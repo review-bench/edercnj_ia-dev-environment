@@ -303,6 +303,49 @@ Exit: 3.
 - Lock is released automatically on process exit (file descriptor
   closure). No `trap`-based cleanup required.
 
+## Trailer Injection Contract (story-0059-0004)
+
+Every write operation that stages and commits `execution-state.json`
+**MUST** inject the canonical trailer into the commit message so that
+the `.githooks/commit-msg` hook (story-0059-0004 surface F guard) allows
+the commit to proceed.
+
+### Canonical Trailer Format
+
+```
+Co-Authored-By: x-internal-status-update@<40-char-git-sha>
+```
+
+- The `<sha>` is the HEAD commit of the repository at the moment the
+  skill executes (`$(git rev-parse HEAD)`).
+- Uses the standard Git trailer key `Co-Authored-By:` (parseable via
+  `git interpret-trailers`).
+
+### Commit Invocation Pattern
+
+When this skill issues a `git commit` that includes `execution-state.json`
+in the staged files, it MUST pass the trailer:
+
+```bash
+SKILL_SHA=$(git rev-parse HEAD)
+git commit -m "<subject>" \
+  --trailer "Co-Authored-By: x-internal-status-update@${SKILL_SHA}"
+```
+
+This trailer is validated by `.githooks/commit-msg` which checks:
+
+```bash
+git interpret-trailers --parse < "$COMMIT_MSG_FILE" \
+  | grep -qE '^Co-Authored-By:\s+x-internal-status-update@[0-9a-f]{40}$'
+```
+
+### Recovery escape
+
+In documented recovery operations where the operator manually edits
+`execution-state.json` (e.g., state corruption), the trailer MUST
+still be present. The operator adds the trailer with an approved SHA.
+The hook validates format only, not SHA authenticity (RULE-059).
+
 ## Testing
 
 The PILOT story (story-0049-0005) ships the following acceptance test

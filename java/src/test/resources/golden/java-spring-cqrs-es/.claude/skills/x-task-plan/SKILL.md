@@ -356,7 +356,20 @@ mkdir -p <EPIC_DIR>/plans/
 
 #### 5.2 Assemble Plan Document
 
-Write the plan to `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` with the following structure:
+Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` with the following structure.
+
+**MANDATORY — Origin Marker (EPIC-0059):** Prepend the YAML frontmatter block before any Markdown content:
+
+```yaml
+---
+generated-by: x-task-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+story-id: story-XXXX-YYYY
+---
+```
+
+This frontmatter is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
+Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
 
 ```markdown
 # Task Plan: TASK-XXXX-YYYY-NNN

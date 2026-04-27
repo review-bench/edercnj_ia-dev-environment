@@ -126,4 +126,73 @@ class FileCategorizerTest {
                     .isEqualTo("Rules");
         }
     }
+
+    @Nested
+    @DisplayName("EPIC-0060 v4 layout categories")
+    class V4Layout {
+
+        @Test
+        @DisplayName("ai/epics/epic-0060-foo/epic.md -> Epics (v4)")
+        void aiEpics_v4() {
+            assertThat(FileCategorizer.categorize(
+                    "ai/epics/epic-0060-foo/epic.md"))
+                    .isEqualTo("Epics (v4)");
+        }
+
+        @Test
+        @DisplayName("ai/runs/transcript.json -> Runs")
+        void aiRuns() {
+            assertThat(FileCategorizer.categorize(
+                    "ai/runs/transcript.json"))
+                    .isEqualTo("Runs");
+        }
+
+        @Test
+        @DisplayName("ai/releases/v4.0.0.json -> Releases")
+        void aiReleases() {
+            assertThat(FileCategorizer.categorize(
+                    "ai/releases/v4.0.0.json"))
+                    .isEqualTo("Releases");
+        }
+
+        @Test
+        @DisplayName("docs/adr/ADR-0001.md -> ADR (v4)")
+        void docsAdr_v4() {
+            assertThat(FileCategorizer.categorize(
+                    "docs/adr/ADR-0001-foo.md"))
+                    .isEqualTo("ADR (v4)");
+        }
+
+        @Test
+        @DisplayName("docs/specs/SPEC-foo.md -> Specs (v4)")
+        void docsSpecs_v4() {
+            assertThat(FileCategorizer.categorize(
+                    "docs/specs/SPEC-foo.md"))
+                    .isEqualTo("Specs (v4)");
+        }
+
+        @Test
+        @DisplayName("docs/glossary.md -> Documentation")
+        void docsRoot_documentation() {
+            assertThat(FileCategorizer.categorize(
+                    "docs/glossary.md"))
+                    .isEqualTo("Documentation");
+        }
+
+        @Test
+        @DisplayName("governance/baselines/foo.txt -> Baselines")
+        void governanceBaselines() {
+            assertThat(FileCategorizer.categorize(
+                    "governance/baselines/foo.txt"))
+                    .isEqualTo("Baselines");
+        }
+
+        @Test
+        @DisplayName("governance/policy.md -> Governance")
+        void governanceRoot() {
+            assertThat(FileCategorizer.categorize(
+                    "governance/policy.md"))
+                    .isEqualTo("Governance");
+        }
+    }
 }
