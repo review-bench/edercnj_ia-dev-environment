@@ -99,10 +99,18 @@ public final class ScriptsAssembler implements Assembler {
             URL resource = getClass().getClassLoader()
                     .getResource(resourcePath);
             if (resource == null) {
-                LOG.warning(() ->
-                        "Script resource not found: "
-                                + resourcePath);
-                continue;
+                // Fail-fast on missing governance script. A partial
+                // .claude/scripts/ defeats the purpose of generation
+                // parity (RULE-003 of EPIC-0058) and silently disables
+                // the corresponding CI gate.
+                throw new IllegalStateException(
+                        "ScriptsAssembler: governance script not"
+                                + " found on classpath: "
+                                + resourcePath
+                                + " (declared in"
+                                + " ScriptsAssembler.AUDIT_SCRIPTS"
+                                + " — refusing to produce partial"
+                                + " .claude/scripts/ output)");
             }
 
             Path target = scriptsDir.resolve(scriptName);

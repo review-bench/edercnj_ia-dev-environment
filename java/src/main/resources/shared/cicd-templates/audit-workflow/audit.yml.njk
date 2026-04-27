@@ -11,10 +11,17 @@ on:
       - develop
       - 'epic/**'
 
+# Restrict GITHUB_TOKEN scope (CodeQL: actions/missing-workflow-permissions).
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   audit-self-check:
     name: Self-check audit scripts
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Self-check audit-flow-version.sh
@@ -32,6 +39,9 @@ jobs:
     name: Run ${{ "{{" }} matrix.script {{ "}}" }}
     needs: [audit-self-check]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     strategy:
       fail-fast: true
       matrix:
@@ -41,6 +51,9 @@ jobs:
           - audit-skill-visibility.sh
           - audit-model-selection.sh
           - audit-execution-integrity.sh
+    env:
+      # audit-epic-branches.sh shells out to gh CLI which requires auth in CI.
+      GH_TOKEN: ${{ "{{" }} secrets.GITHUB_TOKEN {{ "}}" }}
     steps:
       - uses: actions/checkout@v4
         with:

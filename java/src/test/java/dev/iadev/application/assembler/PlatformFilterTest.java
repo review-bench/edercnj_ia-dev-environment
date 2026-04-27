@@ -59,7 +59,7 @@ class PlatformFilterTest {
         @Test
         @DisplayName("CLAUDE_CODE returns 24 assemblers "
                 + "(11 claude + 14 shared)")
-        void filter_claudeCode_returns23() {
+        void filter_claudeCode_returns25() {
             List<AssemblerDescriptor> all =
                     AssemblerFactory.buildAssemblers();
 

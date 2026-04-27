@@ -13,10 +13,10 @@ import java.util.Map;
 
 /**
  * Coordinator that assembles CI/CD pipeline artifacts by
- * delegating to six specialized sub-assemblers.
+ * delegating to seven specialized sub-assemblers.
  *
  * <p>This assembler is registered in the pipeline
- * (position 23 of 32 per RULE-005). It delegates to:
+ * (position 24 of 33 per RULE-005). It delegates to:
  * <ol>
  *   <li>{@link CiWorkflowStep} — always generated</li>
  *   <li>{@link CdWorkflowStep} — release always,

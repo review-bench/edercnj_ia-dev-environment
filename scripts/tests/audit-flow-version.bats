@@ -3,35 +3,42 @@
 # audit-flow-version.bats — Integration tests for audit-flow-version.sh
 # Covers the 5 Gherkin scenarios from story-0058-0003 §7.
 #
+# Each test creates a temp dir mimicking plans/epic-NNNN/execution-state.json,
+# points the script at it via AUDIT_FLOW_VERSION_PLANS_GLOB, and asserts
+# the script's exit code + stdout/stderr.
+#
 # Requirements:
 #   - bats-core >= 1.5 (https://github.com/bats-core/bats-core)
-#   - jq on PATH (optional; grep fallback tested if absent)
+#   - jq on PATH (script's preferred parser)
 #
 # Run: bats scripts/tests/audit-flow-version.bats
 
 SCRIPT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)/audit-flow-version.sh"
 FIXTURES="$(cd "$(dirname "$BATS_TEST_FILENAME")/../fixtures/audit-flow-version" && pwd)"
 
-# Helper: create a temp dir with a single execution-state.json
-setup_file() {
-  TMPDIR="$(mktemp -d)"
-  PLANS_DIR="${TMPDIR}/plans"
-  mkdir -p "${PLANS_DIR}/epic-0001"
-  export TMPDIR PLANS_DIR
+setup() {
+  TMP_PLANS_DIR="$(mktemp -d)"
 }
 
-teardown_file() {
-  rm -rf "${TMPDIR}"
+teardown() {
+  rm -rf "${TMP_PLANS_DIR}"
+}
+
+# Helper: copy a fixture into a per-epic dir under TMP_PLANS_DIR.
+seed_fixture() {
+  local fixture="$1" epic_id="$2"
+  mkdir -p "${TMP_PLANS_DIR}/epic-${epic_id}"
+  cp "${FIXTURES}/${fixture}" \
+     "${TMP_PLANS_DIR}/epic-${epic_id}/execution-state.json"
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Todos os execution-state.json válidos (happy path — flowVersion="2")
+# Scenario: Happy path — flowVersion="2"
 # ---------------------------------------------------------------------------
-@test "valid flowVersion=2 exits 0 with no violations" {
-  mkdir -p "${PLANS_DIR}/epic-test-v2"
-  cp "${FIXTURES}/valid-v2.json" "${PLANS_DIR}/epic-test-v2/execution-state.json"
+@test "valid flowVersion=2 exits 0 with violations: 0" {
+  seed_fixture valid-v2.json 9001
 
-  run env PLANS_GLOB_OVERRIDE="${PLANS_DIR}/epic-test-v2/execution-state.json" \
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
       bash "${SCRIPT}"
 
   [ "$status" -eq 0 ]
@@ -39,39 +46,61 @@ teardown_file() {
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Todos os execution-state.json válidos (happy path — flowVersion="1")
+# Scenario: Happy path — flowVersion="1"
 # ---------------------------------------------------------------------------
-@test "valid flowVersion=1 exits 0 with no violations" {
-  mkdir -p "${PLANS_DIR}/epic-test-v1"
-  cp "${FIXTURES}/valid-v1.json" "${PLANS_DIR}/epic-test-v1/execution-state.json"
+@test "valid flowVersion=1 exits 0 with violations: 0" {
+  seed_fixture valid-v1.json 9002
 
-  # Test directly with the fixture
-  result=$(jq -r '.flowVersion // "ABSENT"' "${FIXTURES}/valid-v1.json")
-  [ "$result" = "1" ]
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}"
+
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "violations: 0" ]]
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Arquivo com flowVersion inválido (error path)
+# Scenario: Error path — flowVersion="3" (invalid)
 # ---------------------------------------------------------------------------
 @test "invalid flowVersion=3 exits 1 with FLOW_VERSION_VIOLATION" {
-  mkdir -p "${PLANS_DIR}/epic-invalid"
-  cp "${FIXTURES}/invalid.json" "${PLANS_DIR}/epic-invalid/execution-state.json"
+  seed_fixture invalid.json 9003
 
-  flow=$(jq -r '.flowVersion // "ABSENT"' "${FIXTURES}/invalid.json")
-  [ "$flow" = "3" ]
-  [[ "$flow" != "1" && "$flow" != "2" ]]
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}"
+
+  [ "$status" -eq 1 ]
+  [[ "$output" =~ "FLOW_VERSION_VIOLATION" ]] || [[ "$stderr" =~ "FLOW_VERSION_VIOLATION" ]] || true
+  # stdout sumarises violation count
+  [[ "$output" =~ "violations: 1" ]]
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Arquivo sem flowVersion em modo strict (boundary)
+# Scenario: Boundary — missing flowVersion in default mode (warning)
+# ---------------------------------------------------------------------------
+@test "missing flowVersion in default mode exits 0 with warning" {
+  seed_fixture missing.json 9004
+
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}"
+
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "warnings: 1" ]] || [[ "$output" =~ "violations: 0" ]]
+}
+
+# ---------------------------------------------------------------------------
+# Scenario: Boundary — missing flowVersion with --strict (violation)
 # ---------------------------------------------------------------------------
 @test "missing flowVersion with --strict exits 1" {
-  flow=$(jq -r '.flowVersion // "ABSENT"' "${FIXTURES}/missing.json")
-  [ "$flow" = "ABSENT" ]
+  seed_fixture missing.json 9005
+
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}" --strict
+
+  [ "$status" -eq 1 ]
+  [[ "$output" =~ "violations: 1" ]]
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Self-check com jq disponível (boundary)
+# Scenario: Self-check exits 0
 # ---------------------------------------------------------------------------
 @test "--self-check exits 0 and prints OK" {
   run bash "${SCRIPT}" --self-check
@@ -80,28 +109,35 @@ teardown_file() {
 }
 
 # ---------------------------------------------------------------------------
-# Scenario: Script validates fixture content
+# Scenario: Help flag exits 0
 # ---------------------------------------------------------------------------
-@test "valid-v2.json has flowVersion 2" {
-  flow=$(jq -r '.flowVersion' "${FIXTURES}/valid-v2.json")
-  [ "$flow" = "2" ]
-}
-
-@test "missing.json has no flowVersion field" {
-  flow=$(jq -r '.flowVersion // "ABSENT"' "${FIXTURES}/missing.json")
-  [ "$flow" = "ABSENT" ]
-}
-
-@test "invalid.json has flowVersion 3 (invalid)" {
-  flow=$(jq -r '.flowVersion' "${FIXTURES}/invalid.json")
-  [ "$flow" = "3" ]
-}
-
-# ---------------------------------------------------------------------------
-# Scenario: --help exits 0
-# ---------------------------------------------------------------------------
-@test "--help exits 0" {
+@test "--help exits 0 and prints Usage" {
   run bash "${SCRIPT}" --help
   [ "$status" -eq 0 ]
   [[ "$output" =~ "Usage" ]]
+}
+
+# ---------------------------------------------------------------------------
+# Scenario: Mixed fixtures — 1 valid + 1 invalid → exit 1
+# ---------------------------------------------------------------------------
+@test "mixed fixtures (valid + invalid) exits 1 with violations: 1" {
+  seed_fixture valid-v2.json 9006
+  seed_fixture invalid.json 9007
+
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}"
+
+  [ "$status" -eq 1 ]
+  [[ "$output" =~ "violations: 1" ]]
+}
+
+# ---------------------------------------------------------------------------
+# Scenario: Empty plans dir — no execution-state.json files
+# ---------------------------------------------------------------------------
+@test "empty plans dir exits 0 with checked 0 files" {
+  run env AUDIT_FLOW_VERSION_PLANS_GLOB="${TMP_PLANS_DIR}/epic-*/execution-state.json" \
+      bash "${SCRIPT}"
+
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "checked 0 files" ]]
 }

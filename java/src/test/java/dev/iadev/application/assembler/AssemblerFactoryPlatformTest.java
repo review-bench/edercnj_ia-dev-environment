@@ -55,7 +55,7 @@ class AssemblerFactoryPlatformTest {
 
         @Test
         @DisplayName("total assembler count is 24")
-        void buildAssemblers_totalCount_is23() {
+        void buildAssemblers_totalCount_is25() {
             List<AssemblerDescriptor> descriptors =
                     AssemblerFactory.buildAssemblers();
 
@@ -65,7 +65,7 @@ class AssemblerFactoryPlatformTest {
         @Test
         @DisplayName("11 assemblers have CLAUDE_CODE "
                 + "platform")
-        void buildAssemblers_claudeCodeCount_is9() {
+        void buildAssemblers_claudeCodeCount_is11() {
             List<String> claudeNames =
                     filterByPlatform(Platform.CLAUDE_CODE);
 

@@ -49,14 +49,14 @@ Critical path length: **5 stories**
 
 | Story | Title | Phase | Blocked By | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0058-0001 | Formalizar Rule 25 "Audit Gate Lifecycle" + ADR | 0 | — | Pendente |
-| story-0058-0002 | Publicar catálogo canônico `docs/audit-gates-catalog.md` | 1 | 0058-0001 | Pendente |
-| story-0058-0003 | Implementar `audit-flow-version.sh` (Rule 19) | 1 | 0058-0001 | Pendente |
-| story-0058-0004 | Implementar `audit-epic-branches.sh` (Rule 21) | 1 | 0058-0001 | Pendente |
-| story-0058-0005 | Implementar `audit-skill-visibility.sh` (Rule 22) | 1 | 0058-0001 | Pendente |
-| story-0058-0006 | Criar `ScriptsAssembler` + source-of-truth | 2 | 0058-0003, 0058-0004, 0058-0005 | Pendente |
-| story-0058-0007 | Regenerar golden files e asserts GoldenFileTest | 3 | 0058-0006 | Pendente |
-| story-0058-0008 | Workflow CI `audit.yml` + sub-assembler | 4 | 0058-0007 | Pendente |
+| story-0058-0001 | Formalizar Rule 26 "Audit Gate Lifecycle" + ADR-0015 | 0 | — | Concluída |
+| story-0058-0002 | Publicar catálogo canônico `docs/audit-gates-catalog.md` | 1 | 0058-0001 | Concluída |
+| story-0058-0003 | Implementar `audit-flow-version.sh` (Rule 19) | 1 | 0058-0001 | Concluída |
+| story-0058-0004 | Implementar `audit-epic-branches.sh` (Rule 21) | 1 | 0058-0001 | Concluída |
+| story-0058-0005 | Implementar `audit-skill-visibility.sh` (Rule 22) | 1 | 0058-0001 | Concluída |
+| story-0058-0006 | Criar `ScriptsAssembler` + source-of-truth | 2 | 0058-0003, 0058-0004, 0058-0005 | Concluída |
+| story-0058-0007 | Regenerar golden files e asserts GoldenFileTest | 3 | 0058-0006 | Concluída |
+| story-0058-0008 | Workflow CI `audit.yml` + sub-assembler | 4 | 0058-0007 | Concluída |
 
 ---
 
