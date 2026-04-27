@@ -33,7 +33,9 @@ set -euo pipefail
 SCRIPT_VERSION="1.0.0"
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-PLANS_GLOB="${REPO_ROOT}/plans/epic-*/execution-state.json"
+# AUDIT_FLOW_VERSION_PLANS_GLOB env var overrides the default scan target.
+# Used by bats tests and CI workflows that need to point at fixture dirs.
+PLANS_GLOB="${AUDIT_FLOW_VERSION_PLANS_GLOB:-${REPO_ROOT}/plans/epic-*/execution-state.json}"
 VALID_VALUES=("1" "2")
 
 # ---------------------------------------------------------------------------
@@ -68,9 +70,19 @@ is_valid_flow_version() {
 extract_flow_version() {
   local file="$1"
   if command -v jq &>/dev/null; then
-    jq -r '.flowVersion // "ABSENT"' "$file" 2>/dev/null || echo "ABSENT"
+    local result
+    result=$(jq -r '.flowVersion // "ABSENT"' "$file" 2>&1) || {
+      echo "${SCRIPT_NAME}: DEPENDENCY_MISSING: failed to parse JSON in $file: $result" >&2
+      return 1
+    }
+    echo "$result"
   else
-    # fallback grep: look for "flowVersion": "X"
+    # Fallback grep: look for "flowVersion": "X". Returns ABSENT if the file
+    # cannot be read at all (return 1 = DEPENDENCY_MISSING upstream).
+    if [[ ! -r "$file" ]]; then
+      echo "${SCRIPT_NAME}: DEPENDENCY_MISSING: cannot read $file" >&2
+      return 1
+    fi
     local match
     match=$(grep -o '"flowVersion"[[:space:]]*:[[:space:]]*"[^"]*"' "$file" 2>/dev/null \
             | head -1 \
@@ -128,7 +140,10 @@ for file in "${files[@]}"; do
   [[ -f "$file" ]] || continue
   checked=$((checked + 1))
 
-  flow_version="$(extract_flow_version "$file")"
+  if ! flow_version="$(extract_flow_version "$file")"; then
+    # extract_flow_version already logged DEPENDENCY_MISSING to stderr.
+    exit 2
+  fi
 
   if [[ "$flow_version" == "ABSENT" ]]; then
     if [[ $STRICT -eq 1 ]]; then
