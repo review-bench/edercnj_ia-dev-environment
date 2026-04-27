@@ -1,0 +1,24 @@
+{
+  "flowVersion": "2",
+  "epicId": "EPIC-0058",
+  "epicBranch": "epic/0058",
+  "mode": "sequential",
+  "autoMergeStrategy": "merge",
+  "createdAt": "2026-04-26T00:00:00Z",
+  "updatedAt": "2026-04-26T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "parallelismDowngrades": [],
+  "storyStatuses": {
+    "story-0058-0001": {"status": "COMPLETE", "phase": 0, "prNumber": 658, "prMergeStatus": "MERGED"},
+    "story-0058-0002": {"status": "COMPLETE", "phase": 1, "prNumber": 663, "prMergeStatus": "MERGED"},
+    "story-0058-0003": {"status": "COMPLETE", "phase": 1, "prNumber": 664, "prMergeStatus": "MERGED"},
+    "story-0058-0004": {"status": "COMPLETE", "phase": 1, "prNumber": 665, "prMergeStatus": "MERGED"},
+    "story-0058-0005": {"status": "COMPLETE", "phase": 1, "prNumber": 666, "prMergeStatus": "MERGED"},
+    "story-0058-0006": {"status": "COMPLETE", "phase": 2, "prNumber": 667, "prMergeStatus": "MERGED"},
+    "story-0058-0007": {"status": "COMPLETE", "phase": 3, "prNumber": 668, "prMergeStatus": "MERGED"},
+    "story-0058-0008": {"status": "COMPLETE", "phase": 4, "prNumber": 669, "prMergeStatus": "MERGED"}
+  }
+}
