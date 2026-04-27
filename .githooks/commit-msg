@@ -1,63 +1,67 @@
 #!/usr/bin/env bash
-# .githooks/commit-msg — story-0059-0004 (EPIC-0059).
+# .githooks/commit-msg — story-0059-0004 + story-0059-0005 (EPIC-0059).
 #
-# Surface F guard: rejects any commit that stages execution-state.json
-# without the canonical trailer injected by x-internal-status-update.
+# Two guards in sequence:
+#
+# Guard 1 — Surface F (story-0059-0004):
+#   Rejects any commit that stages execution-state.json without the
+#   canonical trailer injected by x-internal-status-update.
+#   Trailer: Co-Authored-By: x-internal-status-update@<40-hex-sha>
+#
+# Guard 2 — Surface D (story-0059-0005):
+#   On feat/task-XXXX-YYYY-NNN-* branches, rejects any commit that
+#   does NOT carry the orchestrator-signature trailer injected by x-git-commit.
+#   Trailer: Co-Authored-By: x-git-commit@<40-hex-sha>
+#   Purpose: ensures that all commits in task branches were made via the
+#   TDD orchestrator, not bypassed via direct git commit.
 #
 # Hook type: commit-msg (runs after the commit message is composed,
 # receives the path to COMMIT_EDITMSG as $1).
 #
-# Trailer format validated:
-#   Co-Authored-By: x-internal-status-update@<40-hex-char-sha>
-#
 # Exit codes:
-#   0 — no execution-state.json staged, or trailer present and valid
-#   1 — execution-state.json staged but trailer absent or malformed
+#   0 — all guards pass (no violation)
+#   1 — a guard fired (violation detected)
 #
 # Activation: git config core.hooksPath .githooks
 # (one-time setup per clone via scripts/setup-hooks.sh)
 #
-# Skip behavior:
-#   - CLAUDE_EXECUTION_STATE_HOOK_DISABLED=1 bypasses for a single commit.
+# Skip behavior for Guard 1:
+#   - CLAUDE_EXECUTION_STATE_HOOK_DISABLED=1 bypasses Guard 1 for a single commit.
 #   - Recovery: operator may add the trailer manually (format validated only,
 #     not SHA authenticity — see story-0059-0004 §3.5 recovery escape).
 #
-# See: story-0059-0004, Rule 24 (Execution Integrity),
-#      .claude/rules/24-execution-integrity.md (surface F)
+# Skip behavior for Guard 2:
+#   - CLAUDE_TASK_BRANCH_HOOK_DISABLED=1 bypasses Guard 2 for a single commit.
+#   - Recovery mode only: never for normal developer commits.
+#
+# See: story-0059-0004, story-0059-0005, Rule 24 (Execution Integrity),
+#      .claude/rules/24-execution-integrity.md (surfaces D and F)
 
 set -u
 
 COMMIT_MSG_FILE="${1:?commit-msg hook requires COMMIT_EDITMSG path as \$1}"
 
+# ============================================================================
+# Guard 1 — Surface F: execution-state.json mutation authorization
+# (story-0059-0004)
+# ============================================================================
+
 # Global opt-out for automated environments that already enforce
-# this constraint upstream (e.g., CI pipeline running without a
-# local git config). NOT a bypass for developers — use recovery
-# instructions in §3.5 instead.
+# this constraint upstream. NOT a bypass for developers.
 if [[ "${CLAUDE_EXECUTION_STATE_HOOK_DISABLED:-0}" == "1" ]]; then
-    exit 0
-fi
+    : # skip Guard 1
+else
+    # Check if execution-state.json is in the staged files for this commit.
+    if git diff --cached --name-only 2>/dev/null \
+            | grep -q 'execution-state\.json'; then
 
-# Check if execution-state.json is in the staged files for this commit.
-# Use --cached so we only look at what is about to be committed.
-if ! git diff --cached --name-only 2>/dev/null \
-        | grep -q 'execution-state\.json'; then
-    # No execution-state.json staged — no trailer required.
-    exit 0
-fi
+        # execution-state.json is staged. Validate trailer presence.
+        if ! git interpret-trailers --parse < "${COMMIT_MSG_FILE}" 2>/dev/null \
+                | grep -qE '^Co-Authored-By:[[:space:]]+x-internal-status-update@[0-9a-f]{40}$'; then
 
-# execution-state.json is staged. Validate trailer presence.
-# Use git interpret-trailers for spec-compliant trailer parsing
-# (handles folding, multiple trailers, edge cases).
-if git interpret-trailers --parse < "${COMMIT_MSG_FILE}" 2>/dev/null \
-        | grep -qE '^Co-Authored-By:[[:space:]]+x-internal-status-update@[0-9a-f]{40}$'; then
-    # Canonical trailer present and valid — allow commit.
-    exit 0
-fi
+            cat >&2 <<'EOF'
 
-# Trailer absent or malformed — block the commit with a clear message.
-cat >&2 <<'EOF'
-
-⛔ BLOCKED — .githooks/commit-msg (story-0059-0004 / EPIC-0059 surface F guard)
+BLOCKED -- .githooks/commit-msg Guard 1 (story-0059-0004 / EPIC-0059 surface F)
 
 ERROR: execution-state.json pode ser mutado apenas por x-internal-status-update
 
@@ -74,9 +78,73 @@ OPTIONS:
      message:
        git commit --amend --trailer \
          "Co-Authored-By: x-internal-status-update@$(git rev-parse HEAD)"
-     Only for documented recovery operations — see story-0059-0004 §3.5.
+     Only for documented recovery operations -- see story-0059-0004 §3.5.
 
 Refs: story-0059-0004, EPIC-0059, Rule 24 (Execution Integrity)
+
+EOF
+            exit 1
+        fi
+    fi
+fi
+
+# ============================================================================
+# Guard 2 — Surface D: orchestrator-signature on feat/task-* branches
+# (story-0059-0005)
+# ============================================================================
+
+# Global opt-out (recovery only — NOT a developer bypass).
+if [[ "${CLAUDE_TASK_BRANCH_HOOK_DISABLED:-0}" == "1" ]]; then
+    exit 0
+fi
+
+# Detect the current branch name.
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+
+# Guard 2 only activates on branches matching feat/task-XXXX-YYYY-NNN-*
+# Branches that do not match (feat/story-*, fix/*, chore/*, develop, etc.)
+# are unconditionally exempt.
+if ! echo "${CURRENT_BRANCH}" | grep -qE '^feat/task-[0-9]{4}-[0-9]{4}-[0-9]{3}-'; then
+    exit 0
+fi
+
+# Branch is a task branch. Validate the orchestrator-signature trailer.
+# The trailer is injected by x-git-commit via:
+#   git commit --trailer "Co-Authored-By: x-git-commit@${PARENT_SHA}"
+if git interpret-trailers --parse < "${COMMIT_MSG_FILE}" 2>/dev/null \
+        | grep -qE '^Co-Authored-By:[[:space:]]+x-git-commit@[0-9a-f]{40}$'; then
+    # Orchestrator-signature trailer present and valid.
+    exit 0
+fi
+
+# Trailer absent or malformed — block the commit.
+cat >&2 <<EOF
+
+BLOCKED -- .githooks/commit-msg Guard 2 (story-0059-0005 / EPIC-0059 surface D)
+
+ERROR: commits em feat/task-* requerem x-git-commit-version (orchestrator signature)
+
+Branch: ${CURRENT_BRANCH}
+
+This commit is on a feat/task-* branch but is missing the required trailer:
+
+  Co-Authored-By: x-git-commit@<40-hex-sha>
+
+The trailer is injected automatically when x-git-commit runs the TDD cycle.
+It is your proof that the commit was made through the orchestrator flow
+(Red-Green-Refactor) and not bypassed via a direct git commit.
+
+OPTIONS:
+  1. Use the x-git-commit skill to create your commit (recommended).
+     The skill appends the trailer automatically via git commit --trailer.
+  2. Recovery (approval required): add the trailer manually:
+       git commit --amend --trailer \\
+         "Co-Authored-By: x-git-commit@\$(git rev-parse HEAD)"
+     Only for documented recovery sessions.
+     Set CLAUDE_TASK_BRANCH_HOOK_DISABLED=1 to bypass for a single commit
+     in CLAUDE_RECOVERY_MODE=1 contexts.
+
+Refs: story-0059-0005, EPIC-0059, Rule 24 (Execution Integrity), surface D
 
 EOF
 
