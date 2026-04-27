@@ -39,7 +39,8 @@
 
 set -u
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# Allow REPO_ROOT override for smoke-test isolation (AUDIT_TEST_STORY_IDS usage)
+REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "${REPO_ROOT}"
 
 BASELINE_FILE="audits/execution-integrity-baseline.txt"
@@ -64,8 +65,11 @@ REQUIRED_PHASE_1_ARTIFACT_TEMPLATES=(
     "plans/epic-EPIC_ID/plans/compliance-story-STORY_ID.md"
 )
 
-# Audit scope: "full" (default) | "fase1" | "fase3"
+# Audit scope: "full" (default) | "fase1" | "fase3" | "telemetry"
 AUDIT_SCOPE="full"
+
+# Mandatory x-story-implement phases to verify in events.ndjson (EPIC-0059 story-0059-0008)
+REQUIRED_TELEMETRY_PHASES=("Phase-0-Prepare" "Phase-1-Plan" "Phase-2-Implement" "Phase-3-Verify")
 
 self_check() {
     local broken=0
@@ -107,7 +111,12 @@ self_check() {
         echo "EIE_ENFORCEMENT_BROKEN" >&2
         exit 4
     fi
-    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count}). Anti-backfill functions: present."
+    if ! grep -q 'check_telemetry()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_telemetry() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count}). Anti-backfill functions: present. check_telemetry: present."
     exit 0
 }
 
@@ -397,6 +406,76 @@ EOF
     exit 2
 }
 
+# discover_story_ids_from_commits — extract story IDs mentioned in PR commits.
+# Uses AUDIT_TEST_STORY_IDS env var when set (for smoke-test isolation).
+# Falls back to git log for CI usage.
+discover_story_ids_from_commits() {
+    if [[ -n "${AUDIT_TEST_STORY_IDS:-}" ]]; then
+        echo "${AUDIT_TEST_STORY_IDS}" | tr ' ,' '\n' | grep -E '^story-[0-9]{4}-[0-9]{4}$' | sort -u
+        return 0
+    fi
+    # Extract story IDs from commits not yet in origin/develop (PR branch scope)
+    git log "origin/develop..HEAD" --format="%s %b" 2>/dev/null \
+        | grep -oE 'story-[0-9]{4}-[0-9]{4}' | sort -u || true
+}
+
+# check_telemetry — validate that events.ndjson contains mandatory phase.start events
+# for each story ID referenced in the PR commits (EPIC-0059 story-0059-0008).
+#
+# Returns:
+#   0 — all mandatory events present for all stories
+#   1 — one or more mandatory events missing (prints EIE_TELEMETRY_MISSING to stderr)
+check_telemetry() {
+    local story_ids
+    story_ids="$(discover_story_ids_from_commits)"
+    if [[ -z "${story_ids}" ]]; then
+        # No story IDs detected — nothing to validate
+        return 0
+    fi
+
+    local telemetry_violations=0
+    for story_id in ${story_ids}; do
+        # Derive epic ID from story ID (story-XXXX-YYYY → XXXX)
+        local epic_id
+        epic_id="$(echo "${story_id}" | grep -oE '[0-9]{4}' | head -1)"
+        local ndjson="${REPO_ROOT}/plans/epic-${epic_id}/telemetry/events.ndjson"
+
+        if [[ ! -f "${ndjson}" ]]; then
+            echo "EIE_TELEMETRY_MISSING: events.ndjson not found at ${ndjson} for ${story_id}" >&2
+            telemetry_violations=$((telemetry_violations + 1))
+            continue
+        fi
+
+        local story_violations=0
+        for required_phase in "${REQUIRED_TELEMETRY_PHASES[@]}"; do
+            if [[ "${required_phase}" == "Phase-1-Plan" ]]; then
+                # Accept either phase.start Phase-1-Plan OR phase.skip PRE_PLANNED
+                if grep -q "\"x-story-implement\"" "${ndjson}" 2>/dev/null && \
+                   (grep -q "\"${required_phase}\"" "${ndjson}" 2>/dev/null || \
+                    grep -q "\"Phase-1-Plan\"" "${ndjson}" 2>/dev/null || \
+                    grep -q "PRE_PLANNED" "${ndjson}" 2>/dev/null); then
+                    continue
+                fi
+            else
+                if grep -q "\"phase.start\"" "${ndjson}" 2>/dev/null && \
+                   grep -q "\"x-story-implement\"" "${ndjson}" 2>/dev/null && \
+                   grep -q "\"${required_phase}\"" "${ndjson}" 2>/dev/null; then
+                    continue
+                fi
+            fi
+            echo "EIE_TELEMETRY_MISSING: ${required_phase} missing for ${story_id} in ${ndjson}" >&2
+            story_violations=$((story_violations + 1))
+        done
+
+        if [[ ${story_violations} -gt 0 ]]; then
+            echo "EIE_TELEMETRY_MISSING: no x-story-implement telemetry for ${story_id} (${story_violations} phases missing)" >&2
+            telemetry_violations=$((telemetry_violations + 1))
+        fi
+    done
+
+    return $((telemetry_violations > 0 ? 1 : 0))
+}
+
 emit_json_envelope() {
     local status="$1"
     local total="$2"
@@ -446,8 +525,12 @@ main() {
                 AUDIT_SCOPE="full"
                 shift
                 ;;
+            --scope=telemetry)
+                AUDIT_SCOPE="telemetry"
+                shift
+                ;;
             --scope=*)
-                echo "error: --scope must be one of: full, fase1, fase3" >&2
+                echo "error: --scope must be one of: full, fase1, fase3, telemetry" >&2
                 usage_error
                 ;;
             --json)
@@ -463,6 +546,27 @@ main() {
     done
 
     BASELINE_STORIES="$(load_baseline)"
+
+    # Telemetry-only scope: validate events.ndjson proof-of-life (EPIC-0059 story-0059-0008)
+    if [[ "${AUDIT_SCOPE}" == "telemetry" ]]; then
+        if [[ "${json_mode}" != "true" ]]; then
+            echo "EIE audit — Rule 24 Camada 3 (scope: telemetry)"
+            echo "============================"
+        fi
+        if check_telemetry; then
+            if [[ "${json_mode}" == "true" ]]; then
+                emit_json_envelope "OK" 0 0 0 "[]"
+            else
+                echo "OK — telemetry integrity preserved."
+            fi
+            exit 0
+        else
+            if [[ "${json_mode}" == "true" ]]; then
+                emit_json_envelope "EIE_TELEMETRY_MISSING" 0 0 1 "[{\"status\":\"EIE_TELEMETRY_MISSING\"}]"
+            fi
+            exit 1
+        fi
+    fi
 
     local stories
     if [[ -n "${single_story}" ]]; then
