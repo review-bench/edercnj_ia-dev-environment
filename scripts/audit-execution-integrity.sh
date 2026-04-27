@@ -4,6 +4,16 @@
 # Scans git history for merged story PRs (branches matching feat/story-*)
 # and verifies that each merged story has the mandatory evidence artifacts
 # produced by the x-story-implement pipeline:
+#
+# Phase 1 artifacts (x-internal-story-build-plan wave — EPIC-0059):
+#   - plans/epic-XXXX/plans/arch-story-STORY-ID.md        (x-arch-plan)
+#   - plans/epic-XXXX/plans/plan-story-STORY-ID.md        (x-internal-story-build-plan)
+#   - plans/epic-XXXX/plans/tests-story-STORY-ID.md       (x-test-plan)
+#   - plans/epic-XXXX/plans/tasks-story-STORY-ID.md       (x-lib-task-decomposer)
+#   - plans/epic-XXXX/plans/security-story-STORY-ID.md    (x-threat-model)
+#   - plans/epic-XXXX/plans/compliance-story-STORY-ID.md  (compliance assessment)
+#
+# Phase 3 artifacts (x-story-implement verification wave):
 #   - plans/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-story-verify)
 #   - plans/epic-XXXX/plans/review-story-STORY-ID.md         (x-review)
 #   - plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md (x-review-pr)
@@ -21,9 +31,11 @@
 #   4 — EIE_ENFORCEMENT_BROKEN (self-check failure)
 #
 # Usage:
-#   scripts/audit-execution-integrity.sh              # audit all merged stories
-#   scripts/audit-execution-integrity.sh --self-check # verify enforcement is wired
-#   scripts/audit-execution-integrity.sh --since <ref> # audit merges since git ref
+#   scripts/audit-execution-integrity.sh                       # audit all merged stories
+#   scripts/audit-execution-integrity.sh --self-check          # verify enforcement is wired
+#   scripts/audit-execution-integrity.sh --since <ref>         # audit merges since git ref
+#   scripts/audit-execution-integrity.sh --scope=fase1         # audit Phase 1 artifacts only
+#   scripts/audit-execution-integrity.sh --scope=fase3         # audit Phase 3 artifacts only
 
 set -u
 
@@ -37,6 +49,23 @@ HOOK_FILE=".claude/hooks/verify-story-completion.sh"
 # absent (CI checkouts — .claude/ is gitignored as a generated output).
 RULE_SOT="java/src/main/resources/targets/claude/rules/24-execution-integrity.md"
 HOOK_SOT="java/src/main/resources/targets/claude/hooks/verify-story-completion.sh"
+
+# EPIC-0059: Phase 1 mandatory planning artifacts (x-internal-story-build-plan wave).
+# Template tokens:
+#   EPIC_ID  — 4-digit epic number (e.g., 0059)
+#   STORY_ID — numeric story suffix without the "story-" prefix (e.g., 0059-0001)
+# Array must have exactly 6 entries — self-check enforces this.
+REQUIRED_PHASE_1_ARTIFACT_TEMPLATES=(
+    "plans/epic-EPIC_ID/plans/arch-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/plan-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/tests-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/tasks-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/security-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/compliance-story-STORY_ID.md"
+)
+
+# Audit scope: "full" (default) | "fase1" | "fase3"
+AUDIT_SCOPE="full"
 
 self_check() {
     local broken=0
@@ -56,7 +85,17 @@ self_check() {
         echo "EIE_ENFORCEMENT_BROKEN" >&2
         exit 4
     fi
-    echo "EIE self-check OK."
+    # EPIC-0059: validate artifact counts — Phase 1 must have 6, Phase 3 must have 4
+    local phase1_count=${#REQUIRED_PHASE_1_ARTIFACT_TEMPLATES[@]}
+    # Phase 3 artifacts: verify-envelope, review, techlead-review, story-completion-report
+    local phase3_count=4
+    local total_count=$((phase1_count + phase3_count))
+    if [[ "${phase1_count}" -ne 6 || "${total_count}" -ne 10 ]]; then
+        echo "SELF_CHECK_FAIL: expected 6 Phase-1 + 4 Phase-3 = 10 total artifacts; got Phase-1=${phase1_count} total=${total_count}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count})."
     exit 0
 }
 
@@ -120,6 +159,33 @@ discover_merged_stories() {
             | sed -E 's|^feat/||' \
             | grep -oE 'story-[0-9]{4}-[0-9]{4}'
     } | sort -u
+}
+
+check_phase1_evidence() {
+    # EPIC-0059: verify the 6 mandatory Phase-1 planning artifacts.
+    # Returns 0 if all present, 1 if any missing (prints missing list to stderr).
+    # Artifact naming convention: arch-story-XXXX-YYYY.md where XXXX-YYYY is the
+    # story numeric suffix (e.g., story-0059-0001 → artifact uses "0059-0001").
+    local story_id="$1"
+    local epic_id
+    epic_id="$(echo "${story_id}" | grep -oE '[0-9]{4}' | head -1)"
+    # Extract the numeric suffix of story_id: "story-0059-0001" → "0059-0001"
+    local story_suffix
+    story_suffix="$(echo "${story_id}" | sed 's/^story-//')"
+    local missing=()
+    local artifact_path
+    for template in "${REQUIRED_PHASE_1_ARTIFACT_TEMPLATES[@]}"; do
+        artifact_path="${template/EPIC_ID/${epic_id}}"
+        artifact_path="${artifact_path/STORY_ID/${story_suffix}}"
+        if [[ ! -f "${artifact_path}" ]]; then
+            missing+=("${artifact_path}")
+        fi
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        printf "  ❌ %s — missing Phase-1: %s\n" "${story_id}" "$(IFS=,; echo "${missing[*]}")" >&2
+        return 1
+    fi
+    return 0
 }
 
 check_evidence() {
@@ -195,13 +261,17 @@ usage_error() {
     cat >&2 <<EOF
 usage: $(basename "$0") [--self-check] [--since <git-ref>]
                         [--story-id <story-XXXX-YYYY>] [--json]
+                        [--scope=<full|fase1|fase3>]
 
-  --self-check        verify enforcement infrastructure is wired
+  --self-check        verify enforcement infrastructure is wired (counts 10 artifacts)
   --since <ref>       limit scan to merges since the given git ref
   --story-id <id>     audit only the specified story (skips git log)
   --json              emit a single-line JSON envelope on stdout
                       (status, storiesAudited, storiesPassed,
                        storiesFailed, failures[])
+  --scope=fase1       audit Phase-1 planning artifacts only (6 artifacts)
+  --scope=fase3       audit Phase-3 evidence artifacts only (legacy behavior)
+  --scope=full        audit both Phase-1 and Phase-3 artifacts (default)
 EOF
     exit 2
 }
@@ -243,6 +313,22 @@ main() {
                 single_story="$2"
                 shift 2
                 ;;
+            --scope=fase1)
+                AUDIT_SCOPE="fase1"
+                shift
+                ;;
+            --scope=fase3)
+                AUDIT_SCOPE="fase3"
+                shift
+                ;;
+            --scope=full)
+                AUDIT_SCOPE="full"
+                shift
+                ;;
+            --scope=*)
+                echo "error: --scope must be one of: full, fase1, fase3" >&2
+                usage_error
+                ;;
             --json)
                 json_mode="true"
                 shift
@@ -282,7 +368,7 @@ main() {
     local failures_first="true"
 
     if [[ "${json_mode}" != "true" ]]; then
-        echo "EIE audit — Rule 24 Camada 3"
+        echo "EIE audit — Rule 24 Camada 3 (scope: ${AUDIT_SCOPE})"
         echo "============================"
     fi
     for story in ${stories}; do
@@ -317,7 +403,22 @@ main() {
             failures_json+="{\"storyId\":\"${story}\",\"status\":\"EIE_INVALID_EXEMPTION\"}"
             continue
         fi
-        if check_evidence "${story}"; then
+
+        local story_failed=0
+        # EPIC-0059: check Phase 1 planning artifacts when scope is full or fase1
+        if [[ "${AUDIT_SCOPE}" == "full" || "${AUDIT_SCOPE}" == "fase1" ]]; then
+            if ! check_phase1_evidence "${story}"; then
+                story_failed=1
+            fi
+        fi
+        # Check Phase 3 evidence artifacts when scope is full or fase3
+        if [[ "${AUDIT_SCOPE}" == "full" || "${AUDIT_SCOPE}" == "fase3" ]]; then
+            if ! check_evidence "${story}"; then
+                story_failed=1
+            fi
+        fi
+
+        if [[ "${story_failed}" -eq 0 ]]; then
             [[ "${json_mode}" != "true" ]] && printf "  ✅ %s\n" "${story}"
             passed=$((passed + 1))
         else
