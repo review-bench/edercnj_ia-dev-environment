@@ -95,7 +95,19 @@ self_check() {
         echo "EIE_ENFORCEMENT_BROKEN" >&2
         exit 4
     fi
-    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count})."
+    # EPIC-0059 story-0059-0002: verify anti-backfill functions are defined in this script
+    local self_path="${BASH_SOURCE[0]}"
+    if ! grep -q 'check_frontmatter_origin()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_frontmatter_origin() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    if ! grep -q 'check_anti_backfill()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_anti_backfill() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count}). Anti-backfill functions: present."
     exit 0
 }
 
@@ -161,9 +173,95 @@ discover_merged_stories() {
     } | sort -u
 }
 
+check_frontmatter_origin() {
+    # EPIC-0059 (story-0059-0002): validate the YAML frontmatter origin marker.
+    # Returns:
+    #   0 — frontmatter present, format valid, SHA exists in git history
+    #   1 — any validation failure (prints diagnostic to stderr)
+    local artifact_path="$1"
+    # 1. Check frontmatter delimiter present as first line
+    local first_line
+    first_line=$(head -1 "${artifact_path}" 2>/dev/null || true)
+    if [[ "${first_line}" != "---" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — missing generated-by frontmatter (first line is not '---')" >&2
+        return 1
+    fi
+    # 2. Extract generated-by field from frontmatter (between first --- and second ---)
+    local generated_by
+    generated_by=$(awk '/^---/{f++; next} f==1 && /^generated-by:/{print $2; exit}' "${artifact_path}" 2>/dev/null || true)
+    if [[ -z "${generated_by}" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — generated-by field absent in frontmatter" >&2
+        return 1
+    fi
+    # 3. Validate format: <skill-name>@<40-hex-chars>
+    if ! echo "${generated_by}" | grep -qE '^[a-z-]+@[0-9a-f]{40}$'; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — generated-by format invalid: '${generated_by}' (expected '<skill>@<40-hex-sha>')" >&2
+        return 1
+    fi
+    # 4. Validate SHA exists in git history (fail-open on git errors)
+    local sha="${generated_by##*@}"
+    local cat_file_result
+    cat_file_result=$(git cat-file -t "${sha}" 2>/dev/null || true)
+    if [[ "${cat_file_result}" != "commit" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — SHA not found in git history: ${sha}" >&2
+        return 1
+    fi
+    return 0
+}
+
+check_has_backfill_exempt() {
+    # Check if an artifact has a backfill-specific audit-exempt marker.
+    # Returns:
+    #   0 — valid backfill exemption present (non-empty incident link)
+    #   1 — no backfill exemption present
+    #   3 — backfill exemption present but malformed (empty link)
+    local artifact_path="$1"
+    # Look for <!-- audit-exempt: backfill <link> --> pattern
+    if ! grep -qE '<!--\s*audit-exempt:\s*backfill' "${artifact_path}" 2>/dev/null; then
+        return 1
+    fi
+    # Valid form: <!-- audit-exempt: backfill <url> --> (non-empty URL after "backfill")
+    if grep -qE '<!--\s*audit-exempt:\s*backfill\s+https?://[^[:space:]]+[^-]*-->' "${artifact_path}" 2>/dev/null; then
+        return 0
+    fi
+    # Marker present but malformed (empty or missing URL)
+    echo "EIE_INVALID_EXEMPTION: ${artifact_path} has backfill audit-exempt marker without incident URL" >&2
+    return 3
+}
+
+check_anti_backfill() {
+    # EPIC-0059 (story-0059-0002): detect artifacts committed after the story's PR merged.
+    # Returns:
+    #   0 — artifact committed before merge (or cannot determine — fail-open)
+    #   1 — EIE_BACKFILL_DETECTED (artifact committed after merge)
+    local story_id="$1"
+    local artifact_path="$2"
+    # Get timestamp when artifact was first introduced to git (oldest commit for this path)
+    local artifact_first_commit_ts
+    artifact_first_commit_ts=$(git log --diff-filter=A --pretty=format:'%ct' -- "${artifact_path}" 2>/dev/null | tail -1)
+    # If file not yet in git history (untracked or brand-new), skip check (fail-open)
+    [[ -z "${artifact_first_commit_ts}" ]] && return 0
+    # Find the merge commit timestamp for this story's PR (first-parent merge referencing the story)
+    local story_num="${story_id#story-}"
+    local merge_ts
+    merge_ts=$(git log --first-parent --merges \
+        --pretty=format:'%ct %s' 2>/dev/null \
+        | grep -i "story-${story_num}" \
+        | awk '{print $1}' \
+        | sort -n | head -1)
+    # Cannot determine merge time — skip check (fail-open per ADR-003)
+    [[ -z "${merge_ts}" ]] && return 0
+    if [[ "${artifact_first_commit_ts}" -gt "${merge_ts}" ]]; then
+        echo "EIE_BACKFILL_DETECTED: ${artifact_path} — artifact committed after story merge (artifact_ts=${artifact_first_commit_ts} > merge_ts=${merge_ts})" >&2
+        return 1
+    fi
+    return 0
+}
+
 check_phase1_evidence() {
     # EPIC-0059: verify the 6 mandatory Phase-1 planning artifacts.
-    # Returns 0 if all present, 1 if any missing (prints missing list to stderr).
+    # Also validates origin marker (frontmatter) and anti-backfill for non-grandfathered stories.
+    # Returns 0 if all present and valid, 1 if any check fails (prints diagnostics to stderr).
     # Artifact naming convention: arch-story-XXXX-YYYY.md where XXXX-YYYY is the
     # story numeric suffix (e.g., story-0059-0001 → artifact uses "0059-0001").
     local story_id="$1"
@@ -174,18 +272,41 @@ check_phase1_evidence() {
     story_suffix="$(echo "${story_id}" | sed 's/^story-//')"
     local missing=()
     local artifact_path
+    local phase1_failed=0
     for template in "${REQUIRED_PHASE_1_ARTIFACT_TEMPLATES[@]}"; do
         artifact_path="${template/EPIC_ID/${epic_id}}"
         artifact_path="${artifact_path/STORY_ID/${story_suffix}}"
         if [[ ! -f "${artifact_path}" ]]; then
             missing+=("${artifact_path}")
+            phase1_failed=1
+            continue
+        fi
+        # Origin marker validation (EPIC-0059, story-0059-0002)
+        # Check for backfill-specific exemption first
+        check_has_backfill_exempt "${artifact_path}"
+        local exempt_rc=$?
+        if [[ ${exempt_rc} -eq 3 ]]; then
+            phase1_failed=1
+            continue
+        elif [[ ${exempt_rc} -eq 0 ]]; then
+            # Accepted backfill exemption — skip origin + anti-backfill checks
+            printf "  ⚪ %s — %s: backfill-exempt\n" "${story_id}" "${artifact_path}"
+            continue
+        fi
+        # No exemption — validate frontmatter origin marker
+        if ! check_frontmatter_origin "${artifact_path}"; then
+            phase1_failed=1
+            continue
+        fi
+        # Anti-backfill check: artifact must not have been committed after the story's PR merge
+        if ! check_anti_backfill "${story_id}" "${artifact_path}"; then
+            phase1_failed=1
         fi
     done
     if [[ ${#missing[@]} -gt 0 ]]; then
         printf "  ❌ %s — missing Phase-1: %s\n" "${story_id}" "$(IFS=,; echo "${missing[*]}")" >&2
-        return 1
     fi
-    return 0
+    return ${phase1_failed}
 }
 
 check_evidence() {
