@@ -34,7 +34,7 @@ class AssemblerFactoryBuildAllTest {
                     AssemblerFactory.buildAllAssemblers(
                             options);
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
         }
 
         @Test
@@ -47,7 +47,7 @@ class AssemblerFactoryBuildAllTest {
                     AssemblerFactory.buildAllAssemblers(
                             options);
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
         }
 
         @Test

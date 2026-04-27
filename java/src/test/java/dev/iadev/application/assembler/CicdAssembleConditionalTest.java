@@ -241,7 +241,7 @@ class CicdAssembleConditionalTest {
                                     .smokeTests(true)
                                     .build(),
                             new TemplateEngine(), out);
-            assertThat(files).hasSize(11);
+            assertThat(files).hasSize(12);
         }
 
         @Test
@@ -257,7 +257,7 @@ class CicdAssembleConditionalTest {
                                     .smokeTests(false)
                                     .build(),
                             new TemplateEngine(), out);
-            assertThat(files).hasSize(2);
+            assertThat(files).hasSize(3);
             assertThat(files).anyMatch(
                     f -> f.contains("ci.yml"));
             assertThat(files).anyMatch(
