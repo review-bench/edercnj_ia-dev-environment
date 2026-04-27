@@ -368,6 +368,12 @@ All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `ep
 
 `x-internal-args-normalize` (0.1), `x-internal-story-load-context` (0.2), `x-internal-story-resume` (0.4 cond.), `x-internal-story-build-plan` (1), `x-task-implement` (2 per-task), `x-pr-create` (2 per-task+story), `x-pr-watch-ci` (2), `x-parallel-eval` (1), `x-review`/`x-review-pr`/`x-pr-fix` (3.2), `x-internal-story-verify` (3.1), `x-internal-story-report` (3.3), `x-internal-status-update` (all phases), `x-git-worktree` (0.3+3.5), `x-epic-implement` (caller).
 
+### `events.ndjson` as Committed Evidence (EPIC-0059 story-0059-0008)
+
+`plans/epic-XXXX/telemetry/events.ndjson` is a **committed evidence artifact** under Rule 24 Camada 4. The presence of `phase.start x-story-implement` events for all 4 phases (Phase-0-Prepare, Phase-1-Plan, Phase-2-Implement, Phase-3-Verify) in `events.ndjson` is the deterministic proof that the orchestrator ran. `audit-execution-integrity.sh --scope=telemetry` validates this at CI time.
+
+The `stage-telemetry.sh` Stop hook (registered in `settings.json`) automatically stages `events.ndjson` at end-of-turn when the story status is `Em Andamento`, ensuring it is always included in the next commit. Manual bypass via `CLAUDE_TELEMETRY_DISABLED=1` disables staging (Rule 07 — fail-open); `CLAUDE_SKIP_AUDIT=1` does NOT bypass (RULE-059-07).
+
 `{{PLACEHOLDER}}` tokens (`{{TEST_COMMAND}}`, `{{COVERAGE_COMMAND}}`) are runtime-filled by the AI agent from project config.
 
 ## Full Protocol
