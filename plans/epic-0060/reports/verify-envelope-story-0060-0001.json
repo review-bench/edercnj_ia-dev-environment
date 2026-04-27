@@ -1,0 +1,49 @@
+{
+  "storyId": "story-0060-0001",
+  "epicId": "0060",
+  "passed": true,
+  "timestamp": "2026-04-27T22:50:00Z",
+  "coverage": {
+    "filtered": {
+      "scope": "dev.iadev.util.PathResolver + UnitType",
+      "lineCoveragePct": 100.0,
+      "branchCoveragePct": 100.0,
+      "thresholdLine": 95.0,
+      "thresholdBranch": 90.0,
+      "lineGate": "PASS",
+      "branchGate": "PASS"
+    }
+  },
+  "tests": {
+    "PathResolverTest": {
+      "run": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fullSuite": {
+      "run": 3982,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 14
+    }
+  },
+  "acceptanceCriteria": [
+    {"id": "AC-1", "description": "v3 layout: epic without v4 dir returns plans/epic-{id}", "status": "PASS"},
+    {"id": "AC-2", "description": "v4 layout: epic with ai/epics/epic-{id}-* dir returns v4 path", "status": "PASS"},
+    {"id": "AC-3", "description": "unitDir returns nested work/<type>/<prefix>-<epic>-<unit> path", "status": "PASS"},
+    {"id": "AC-4", "description": "Invalid epicId throws IllegalArgumentException", "status": "PASS"},
+    {"id": "AC-5", "description": "Rule 19 documents flowVersion=4 for v4 layout", "status": "PASS"},
+    {"id": "AC-6", "description": "Probe falls back to v3 when ai/epics empty or non-dir match", "status": "PASS"}
+  ],
+  "tasks": [
+    {"id": "TASK-0060-0001-001", "status": "DONE", "prNumber": 726, "prState": "MERGED", "commitSha": "f640662c64bbb25d1f236ae497b6a06ca55d9290"},
+    {"id": "TASK-0060-0001-002", "status": "DONE", "prNumber": 727, "prState": "MERGED", "commitSha": "7a0e14dcc0da2b8343f8c137938fae38a7ed16c6"},
+    {"id": "TASK-0060-0001-003", "status": "DONE", "prNumber": 728, "prState": "MERGED", "commitSha": "f2a7a02b97d6afeee4671249dfad383f11035116"}
+  ],
+  "additionalPRs": [
+    {"prNumber": 729, "purpose": "branch-coverage-gap-fix", "prState": "MERGED"}
+  ],
+  "crossFileConsistency": "OK — single utility class, no role siblings",
+  "smoke": "skipped (story scope is util layer)"
+}

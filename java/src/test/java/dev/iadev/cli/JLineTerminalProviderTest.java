@@ -1,6 +1,14 @@
 package dev.iadev.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import dev.iadev.exception.GenerationCancelledException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
@@ -11,30 +19,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("JLineTerminalProvider")
 class JLineTerminalProviderTest {
 
-    @Mock
-    private LineReader lineReader;
+    @Mock private LineReader lineReader;
 
     private JLineTerminalProvider createProvider() {
         var sw = new StringWriter();
-        return new JLineTerminalProvider(
-                lineReader, new PrintWriter(sw, true));
+        return new JLineTerminalProvider(lineReader, new PrintWriter(sw, true));
     }
 
-    private JLineTerminalProvider createProviderWithWriter(
-            PrintWriter writer) {
+    private JLineTerminalProvider createProviderWithWriter(PrintWriter writer) {
         return new JLineTerminalProvider(lineReader, writer);
     }
 
@@ -45,38 +41,31 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("readLine_normalInput_returnsText")
         void readLine_normalInput_returnsText() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("hello");
+            when(lineReader.readLine(anyString())).thenReturn("hello");
             var provider = createProvider();
 
-            assertThat(provider.readLine("prompt"))
-                    .isEqualTo("hello");
+            assertThat(provider.readLine("prompt")).isEqualTo("hello");
         }
 
         @Test
         @DisplayName("readLine_userInterrupt_throwsCancelled")
         void readLine_userInterrupt_throwsCancelled() {
-            when(lineReader.readLine(anyString()))
-                    .thenThrow(new UserInterruptException(""));
+            when(lineReader.readLine(anyString())).thenThrow(new UserInterruptException(""));
             var provider = createProvider();
 
             assertThatThrownBy(() -> provider.readLine("prompt"))
-                    .isInstanceOf(
-                            GenerationCancelledException.class)
-                    .hasMessage(
-                            InteractivePrompter.CANCELLED_BY_USER);
+                    .isInstanceOf(GenerationCancelledException.class)
+                    .hasMessage(InteractivePrompter.CANCELLED_BY_USER);
         }
 
         @Test
         @DisplayName("readLine_endOfFile_throwsCancelled")
         void readLine_endOfFile_throwsCancelled() {
-            when(lineReader.readLine(anyString()))
-                    .thenThrow(new EndOfFileException());
+            when(lineReader.readLine(anyString())).thenThrow(new EndOfFileException());
             var provider = createProvider();
 
             assertThatThrownBy(() -> provider.readLine("prompt"))
-                    .isInstanceOf(
-                            GenerationCancelledException.class);
+                    .isInstanceOf(GenerationCancelledException.class);
         }
     }
 
@@ -87,33 +76,25 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("readLineWithValidation_validFirst_returnsIt")
         void readLineWithValidation_validFirst_returnsIt() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("valid-name");
+            when(lineReader.readLine(anyString())).thenReturn("valid-name");
             var provider = createProvider();
 
-            String result = provider.readLineWithValidation(
-                    "prompt",
-                    s -> s.length() >= 3,
-                    "Too short");
+            String result =
+                    provider.readLineWithValidation("prompt", s -> s.length() >= 3, "Too short");
 
             assertThat(result).isEqualTo("valid-name");
         }
 
         @Test
-        @DisplayName(
-                "readLineWithValidation_invalidThenValid_retries")
+        @DisplayName("readLineWithValidation_invalidThenValid_retries")
         void readLineWithValidation_invalidThenValid_retries() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("ab")
-                    .thenReturn("valid");
+            when(lineReader.readLine(anyString())).thenReturn("ab").thenReturn("valid");
             var sw = new StringWriter();
             var pw = new PrintWriter(sw, true);
             var provider = createProviderWithWriter(pw);
 
-            String result = provider.readLineWithValidation(
-                    "prompt",
-                    s -> s.length() >= 3,
-                    "Too short");
+            String result =
+                    provider.readLineWithValidation("prompt", s -> s.length() >= 3, "Too short");
 
             assertThat(result).isEqualTo("valid");
             assertThat(sw.toString()).contains("Too short");
@@ -127,12 +108,10 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("selectFromList_validChoice_returnsOption")
         void selectFromList_validChoice_returnsOption() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("2");
+            when(lineReader.readLine(anyString())).thenReturn("2");
             var provider = createProvider();
 
-            String result = provider.selectFromList(
-                    "pick:", List.of("a", "b", "c"), 0);
+            String result = provider.selectFromList("pick:", List.of("a", "b", "c"), 0);
 
             assertThat(result).isEqualTo("b");
         }
@@ -140,42 +119,32 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("selectFromList_emptyInput_returnsDefault")
         void selectFromList_emptyInput_returnsDefault() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("");
+            when(lineReader.readLine(anyString())).thenReturn("");
             var provider = createProvider();
 
-            String result = provider.selectFromList(
-                    "pick:", List.of("a", "b"), 1);
+            String result = provider.selectFromList("pick:", List.of("a", "b"), 1);
 
             assertThat(result).isEqualTo("b");
         }
 
         @Test
-        @DisplayName(
-                "selectFromList_invalidThenValid_retriesAndReturns")
+        @DisplayName("selectFromList_invalidThenValid_retriesAndReturns")
         void selectFromList_invalidThenValid_retriesAndReturns() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("99")
-                    .thenReturn("1");
+            when(lineReader.readLine(anyString())).thenReturn("99").thenReturn("1");
             var provider = createProvider();
 
-            String result = provider.selectFromList(
-                    "pick:", List.of("a", "b"), 0);
+            String result = provider.selectFromList("pick:", List.of("a", "b"), 0);
 
             assertThat(result).isEqualTo("a");
         }
 
         @Test
-        @DisplayName(
-                "selectFromList_nonNumeric_retriesUntilValid")
+        @DisplayName("selectFromList_nonNumeric_retriesUntilValid")
         void selectFromList_nonNumeric_retriesUntilValid() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("abc")
-                    .thenReturn("1");
+            when(lineReader.readLine(anyString())).thenReturn("abc").thenReturn("1");
             var provider = createProvider();
 
-            String result = provider.selectFromList(
-                    "pick:", List.of("x", "y"), 0);
+            String result = provider.selectFromList("pick:", List.of("x", "y"), 0);
 
             assertThat(result).isEqualTo("x");
         }
@@ -188,13 +157,11 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("selectMultiple_validCommaList_returnsSelected")
         void selectMultiple_validCommaList_returnsSelected() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("1,3");
+            when(lineReader.readLine(anyString())).thenReturn("1,3");
             var provider = createProvider();
 
-            List<String> result = provider.selectMultiple(
-                    "pick:", List.of("a", "b", "c"),
-                    List.of("a"));
+            List<String> result =
+                    provider.selectMultiple("pick:", List.of("a", "b", "c"), List.of("a"));
 
             assertThat(result).containsExactly("a", "c");
         }
@@ -202,13 +169,10 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("selectMultiple_emptyInput_returnsDefaults")
         void selectMultiple_emptyInput_returnsDefaults() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("");
+            when(lineReader.readLine(anyString())).thenReturn("");
             var provider = createProvider();
 
-            List<String> result = provider.selectMultiple(
-                    "pick:", List.of("a", "b"),
-                    List.of("a"));
+            List<String> result = provider.selectMultiple("pick:", List.of("a", "b"), List.of("a"));
 
             assertThat(result).containsExactly("a");
         }
@@ -216,29 +180,21 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("selectMultiple_duplicateNumbers_deduplicates")
         void selectMultiple_duplicateNumbers_deduplicates() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("1,1,2");
+            when(lineReader.readLine(anyString())).thenReturn("1,1,2");
             var provider = createProvider();
 
-            List<String> result = provider.selectMultiple(
-                    "pick:", List.of("a", "b"),
-                    List.of());
+            List<String> result = provider.selectMultiple("pick:", List.of("a", "b"), List.of());
 
             assertThat(result).containsExactly("a", "b");
         }
 
         @Test
-        @DisplayName(
-                "selectMultiple_allInvalidNumbers_retriesUntilValid")
+        @DisplayName("selectMultiple_allInvalidNumbers_retriesUntilValid")
         void selectMultiple_allInvalidNumbers_retriesUntilValid() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("abc")
-                    .thenReturn("1");
+            when(lineReader.readLine(anyString())).thenReturn("abc").thenReturn("1");
             var provider = createProvider();
 
-            List<String> result = provider.selectMultiple(
-                    "pick:", List.of("x"),
-                    List.of());
+            List<String> result = provider.selectMultiple("pick:", List.of("x"), List.of());
 
             assertThat(result).containsExactly("x");
         }
@@ -251,56 +207,46 @@ class JLineTerminalProviderTest {
         @Test
         @DisplayName("confirm_yInput_returnsTrue")
         void confirm_yInput_returnsTrue() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("y");
+            when(lineReader.readLine(anyString())).thenReturn("y");
             var provider = createProvider();
 
-            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO))
-                    .isTrue();
+            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO)).isTrue();
         }
 
         @Test
         @DisplayName("confirm_yesInput_returnsTrue")
         void confirm_yesInput_returnsTrue() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("yes");
+            when(lineReader.readLine(anyString())).thenReturn("yes");
             var provider = createProvider();
 
-            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO))
-                    .isTrue();
+            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO)).isTrue();
         }
 
         @Test
         @DisplayName("confirm_nInput_returnsFalse")
         void confirm_nInput_returnsFalse() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("n");
+            when(lineReader.readLine(anyString())).thenReturn("n");
             var provider = createProvider();
 
-            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_YES))
-                    .isFalse();
+            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_YES)).isFalse();
         }
 
         @Test
         @DisplayName("confirm_emptyInput_returnsDefault")
         void confirm_emptyInput_returnsDefault() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("");
+            when(lineReader.readLine(anyString())).thenReturn("");
             var provider = createProvider();
 
-            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_YES))
-                    .isTrue();
+            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_YES)).isTrue();
         }
 
         @Test
         @DisplayName("confirm_emptyInputDefaultFalse_returnsFalse")
         void confirm_emptyInputDefaultFalse_returnsFalse() {
-            when(lineReader.readLine(anyString()))
-                    .thenReturn("");
+            when(lineReader.readLine(anyString())).thenReturn("");
             var provider = createProvider();
 
-            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO))
-                    .isFalse();
+            assertThat(provider.confirm("proceed?", ConfirmDefault.DEFAULT_NO)).isFalse();
         }
     }
 

@@ -1,29 +1,27 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for story-0013-0024: API Design KP extension
- * with deprecation/versioning sections and FinOps KP
- * conditional generation.
+ * Tests for story-0013-0024: API Design KP extension with deprecation/versioning sections and
+ * FinOps KP conditional generation.
  */
-@Disabled("EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
+@Disabled(
+        "EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
 @DisplayName("API Design + FinOps KP")
 class ApiDesignFinOpsKpTest {
 
@@ -32,53 +30,37 @@ class ApiDesignFinOpsKpTest {
     class ApiDeprecation {
 
         @Test
-        @DisplayName("contains API Deprecation Strategy"
-                + " section")
-        void apiDesign_whenGenerated_containsDeprecation(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("contains API Deprecation Strategy" + " section")
+        void apiDesign_whenGenerated_containsDeprecation(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
-            assertThat(content)
-                    .contains("## API Deprecation Strategy");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
+            assertThat(content).contains("## API Deprecation Strategy");
         }
 
         @Test
-        @DisplayName("contains Sunset header RFC 8594"
-                + " reference")
-        void apiDesign_whenGenerated_containsSunsetHeader(
-                @TempDir Path tempDir)
+        @DisplayName("contains Sunset header RFC 8594" + " reference")
+        void apiDesign_whenGenerated_containsSunsetHeader(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
-            assertThat(content)
-                    .contains("RFC 8594")
-                    .contains("Sunset");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
+            assertThat(content).contains("RFC 8594").contains("Sunset");
         }
 
         @Test
-        @DisplayName("contains 4 deprecation timeline"
-                + " phases")
-        void apiDesign_whenGenerated_containsTimelinePhases(
-                @TempDir Path tempDir)
+        @DisplayName("contains 4 deprecation timeline" + " phases")
+        void apiDesign_whenGenerated_containsTimelinePhases(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
             assertThat(content)
                     .contains("Announce")
                     .contains("Warn")
@@ -87,20 +69,15 @@ class ApiDesignFinOpsKpTest {
         }
 
         @Test
-        @DisplayName("contains deprecation checklist"
-                + " reference")
-        void apiDesign_whenGenerated_containsChecklistRef(
-                @TempDir Path tempDir)
+        @DisplayName("contains deprecation checklist" + " reference")
+        void apiDesign_whenGenerated_containsChecklistRef(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
-            assertThat(content).contains(
-                    "api-deprecation-checklist.md");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
+            assertThat(content).contains("api-deprecation-checklist.md");
         }
     }
 
@@ -109,34 +86,25 @@ class ApiDesignFinOpsKpTest {
     class ApiVersioning {
 
         @Test
-        @DisplayName("contains API Versioning Patterns"
-                + " section")
-        void apiDesign_whenGenerated_containsVersioning(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("contains API Versioning Patterns" + " section")
+        void apiDesign_whenGenerated_containsVersioning(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
-            assertThat(content)
-                    .contains("## API Versioning Patterns");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
+            assertThat(content).contains("## API Versioning Patterns");
         }
 
         @Test
         @DisplayName("contains 4 versioning patterns")
-        void apiDesign_whenGenerated_containsFourPatterns(
-                @TempDir Path tempDir)
+        void apiDesign_whenGenerated_containsFourPatterns(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
             assertThat(content)
                     .contains("URI Versioning")
                     .contains("Header Versioning")
@@ -150,18 +118,13 @@ class ApiDesignFinOpsKpTest {
     class BackwardCompat {
 
         @Test
-        @DisplayName("preserves existing content after"
-                + " extension")
-        void apiDesign_whenExtended_preservesExisting(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("preserves existing content after" + " extension")
+        void apiDesign_whenExtended_preservesExisting(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "api-design/SKILL.md");
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "api-design/SKILL.md");
             assertThat(content)
                     .contains("# Knowledge Pack: API Design")
                     .contains("## Purpose")
@@ -177,19 +140,16 @@ class ApiDesignFinOpsKpTest {
     class ApiDesignReferences {
 
         @Test
-        @DisplayName("generates deprecation checklist"
-                + " reference file")
-        void apiDesign_whenGenerated_hasChecklistFile(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("generates deprecation checklist" + " reference file")
+        void apiDesign_whenGenerated_hasChecklistFile(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            new SkillsAssembler().assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/api-design/references/"
-                            + "api-deprecation-checklist.md"))
+            new SkillsAssembler()
+                    .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            assertThat(
+                            outputDir.resolve(
+                                    "skills/api-design/references/"
+                                            + "api-deprecation-checklist.md"))
                     .exists();
         }
     }
@@ -200,51 +160,32 @@ class ApiDesignFinOpsKpTest {
 
         @Test
         @DisplayName("generated when cloud provider is aws")
-        void finOps_awsProvider_generated(
-                @TempDir Path tempDir)
-                throws IOException {
+        void finOps_awsProvider_generated(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("aws")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/finops/SKILL.md")).exists();
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("aws").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            assertThat(outputDir.resolve("skills/finops/SKILL.md")).exists();
         }
 
         @Test
-        @DisplayName("NOT generated when cloud provider"
-                + " is none")
-        void finOps_noneProvider_notGenerated(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("NOT generated when cloud provider" + " is none")
+        void finOps_noneProvider_notGenerated(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("none")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/finops")).doesNotExist();
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("none").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            assertThat(outputDir.resolve("skills/finops")).doesNotExist();
         }
 
         @Test
         @DisplayName("contains required FinOps sections")
-        void finOps_whenGenerated_containsSections(
-                @TempDir Path tempDir)
-                throws IOException {
+        void finOps_whenGenerated_containsSections(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("aws")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            String content = readSkill(outputDir,
-                    "finops/SKILL.md");
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("aws").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            String content = readSkill(outputDir, "finops/SKILL.md");
             assertThat(content)
                     .contains("Resource Rightsizing")
                     .contains("Cost Allocation")
@@ -255,57 +196,39 @@ class ApiDesignFinOpsKpTest {
         }
 
         @Test
-        @DisplayName("generates cost optimization"
-                + " checklist reference")
-        void finOps_whenGenerated_hasCostChecklist(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("generates cost optimization" + " checklist reference")
+        void finOps_whenGenerated_hasCostChecklist(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("aws")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/finops/references/"
-                            + "cost-optimization-checklist.md"))
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("aws").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            assertThat(
+                            outputDir.resolve(
+                                    "skills/finops/references/" + "cost-optimization-checklist.md"))
                     .exists();
         }
 
         @Test
-        @DisplayName("generates tagging strategy"
-                + " template reference")
-        void finOps_whenGenerated_hasTaggingTemplate(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("generates tagging strategy" + " template reference")
+        void finOps_whenGenerated_hasTaggingTemplate(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("aws")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/finops/references/"
-                            + "tagging-strategy-template.md"))
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("aws").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            assertThat(
+                            outputDir.resolve(
+                                    "skills/finops/references/" + "tagging-strategy-template.md"))
                     .exists();
         }
 
         @Test
         @DisplayName("generated for azure provider too")
-        void finOps_azureProvider_generated(
-                @TempDir Path tempDir)
-                throws IOException {
+        void finOps_azureProvider_generated(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("azure")
-                    .build();
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve(
-                    "skills/finops/SKILL.md")).exists();
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("azure").build();
+            new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
+            assertThat(outputDir.resolve("skills/finops/SKILL.md")).exists();
         }
     }
 
@@ -316,44 +239,29 @@ class ApiDesignFinOpsKpTest {
         @Test
         @DisplayName("includes finops when cloud is aws")
         void select_awsCloud_includesFinops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("aws")
-                    .build();
-            List<String> packs =
-                    SkillsSelection.selectKnowledgePacks(
-                            config);
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("aws").build();
+            List<String> packs = SkillsSelection.selectKnowledgePacks(config);
             assertThat(packs).contains("finops");
         }
 
         @Test
         @DisplayName("excludes finops when cloud is none")
         void select_noneCloud_excludesFinops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("none")
-                    .build();
-            List<String> packs =
-                    SkillsSelection.selectKnowledgePacks(
-                            config);
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("none").build();
+            List<String> packs = SkillsSelection.selectKnowledgePacks(config);
             assertThat(packs).doesNotContain("finops");
         }
 
         @Test
         @DisplayName("includes finops when cloud is gcp")
         void select_gcpCloud_includesFinops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .cloudProvider("gcp")
-                    .build();
-            List<String> packs =
-                    SkillsSelection.selectKnowledgePacks(
-                            config);
+            ProjectConfig config = TestConfigBuilder.builder().cloudProvider("gcp").build();
+            List<String> packs = SkillsSelection.selectKnowledgePacks(config);
             assertThat(packs).contains("finops");
         }
     }
 
-    private String readSkill(Path outputDir, String path)
-            throws IOException {
-        return Files.readString(
-                outputDir.resolve("skills/" + path),
-                StandardCharsets.UTF_8);
+    private String readSkill(Path outputDir, String path) throws IOException {
+        return Files.readString(outputDir.resolve("skills/" + path), StandardCharsets.UTF_8);
     }
 }

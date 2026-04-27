@@ -5,39 +5,35 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Checks section 8 (Decision Rationale) of planning artifacts
- * for RA9 compliance (RULE-006 EPIC-0056 — {@code RA9_RATIONALE_EMPTY}).
+ * Checks section 8 (Decision Rationale) of planning artifacts for RA9 compliance (RULE-006
+ * EPIC-0056 — {@code RA9_RATIONALE_EMPTY}).
  *
- * <p>Applies to Epic and Story files. Task files accept
- * {@code N/A — <reason>} and are not flagged.</p>
+ * <p>Applies to Epic and Story files. Task files accept {@code N/A — <reason>} and are not flagged.
  *
- * <p>Assumes {@link Ra9SectionsChecker} already validates section
- * presence; this checker only runs when section 8 exists.</p>
+ * <p>Assumes {@link Ra9SectionsChecker} already validates section presence; this checker only runs
+ * when section 8 exists.
  */
 public final class Ra9RationaleChecker {
 
-    private static final String EXEMPT_MARKER =
-            "<!-- audit-exempt -->";
+    private static final String EXEMPT_MARKER = "<!-- audit-exempt -->";
 
-    private static final String SECTION_8_HEADER =
-            "## 8. Decision Rationale";
+    private static final String SECTION_8_HEADER = "## 8. Decision Rationale";
 
-    private static final Pattern PLACEHOLDER_PATTERN =
-            Pattern.compile("\\{\\{[^}]+}}");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{[^}]+}}");
 
     private static final String TODO_MARKER = "TODO";
 
-    private static final List<String> REQUIRED_FIELDS = List.of(
-            "**Decisão:**",
-            "**Motivo:**",
-            "**Alternativa descartada:**",
-            "**Consequência:**"
-    );
+    private static final List<String> REQUIRED_FIELDS =
+            List.of(
+                    "**Decisão:**",
+                    "**Motivo:**",
+                    "**Alternativa descartada:**",
+                    "**Consequência:**");
 
     /**
      * Checks section 8 content for valid Decision Rationale.
      *
-     * @param content  the full markdown content of the artifact
+     * @param content the full markdown content of the artifact
      * @param filename the filename (for error messages)
      * @return list of violation strings; empty when compliant
      */
@@ -51,8 +47,7 @@ public final class Ra9RationaleChecker {
             return List.of();
         }
 
-        String sectionBody = extractSectionBody(
-                content, sectionStart);
+        String sectionBody = extractSectionBody(content, sectionStart);
 
         if (isTaskArtifact(filename) && isNaAccepted(sectionBody)) {
             return List.of();
@@ -65,8 +60,7 @@ public final class Ra9RationaleChecker {
             return violations;
         }
 
-        boolean hasAllFields = REQUIRED_FIELDS.stream()
-                .allMatch(sectionBody::contains);
+        boolean hasAllFields = REQUIRED_FIELDS.stream().allMatch(sectionBody::contains);
 
         if (!hasAllFields) {
             violations.add(buildViolation(filename));
@@ -75,16 +69,16 @@ public final class Ra9RationaleChecker {
         return violations;
     }
 
-    private String extractSectionBody(
-            String content, int sectionStart) {
+    private String extractSectionBody(String content, int sectionStart) {
         int bodyStart = content.indexOf('\n', sectionStart);
         if (bodyStart < 0) {
             return "";
         }
         int nextSection = content.indexOf("\n## ", bodyStart + 1);
-        String body = nextSection > 0
-                ? content.substring(bodyStart, nextSection)
-                : content.substring(bodyStart);
+        String body =
+                nextSection > 0
+                        ? content.substring(bodyStart, nextSection)
+                        : content.substring(bodyStart);
         return body.strip();
     }
 
@@ -93,17 +87,14 @@ public final class Ra9RationaleChecker {
     }
 
     /**
-     * N/A is accepted only for Task artifacts. Epic and Story
-     * MUST provide the full 4-line micro-template (Rule-002 of
-     * EPIC-0056). Detection by filename: {@code task-*.md} or
-     * any path segment containing {@code /task-}.
+     * N/A is accepted only for Task artifacts. Epic and Story MUST provide the full 4-line
+     * micro-template (Rule-002 of EPIC-0056). Detection by filename: {@code task-*.md} or any path
+     * segment containing {@code /task-}.
      */
     private boolean isTaskArtifact(String filename) {
         String normalized = filename.replace('\\', '/');
         int lastSlash = normalized.lastIndexOf('/');
-        String base = lastSlash >= 0
-                ? normalized.substring(lastSlash + 1)
-                : normalized;
+        String base = lastSlash >= 0 ? normalized.substring(lastSlash + 1) : normalized;
         return base.startsWith("task-");
     }
 
@@ -121,7 +112,8 @@ public final class Ra9RationaleChecker {
     }
 
     private String buildViolation(String filename) {
-        return "[RA9_RATIONALE_EMPTY] " + filename
+        return "[RA9_RATIONALE_EMPTY] "
+                + filename
                 + "\n  Section 8 (Decision Rationale) is empty,"
                 + " contains a placeholder, or TODO."
                 + "\n  Required: **Decisão:** / **Motivo:** /"

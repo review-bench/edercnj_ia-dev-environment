@@ -1,25 +1,22 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for RunbookAssembler — generates
- * results/runbooks/deploy-runbook.md from a Pebble template.
+ * Tests for RunbookAssembler — generates results/runbooks/deploy-runbook.md from a Pebble template.
  */
 @DisplayName("RunbookAssembler")
 class RunbookAssemblerTest {
@@ -31,11 +28,9 @@ class RunbookAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssemblerInterface() {
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
+            RunbookAssembler assembler = new RunbookAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -44,109 +39,81 @@ class RunbookAssemblerTest {
     class AssembleRunbook {
 
         @Test
-        @DisplayName("generates deploy-runbook.md in"
-                + " results/runbooks/ subdirectory")
-        void assemble_whenCalled_generatesDeployRunbookFile(
-                @TempDir Path tempDir) {
+        @DisplayName("generates deploy-runbook.md in" + " results/runbooks/ subdirectory")
+        void assemble_whenCalled_generatesDeployRunbookFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected = outputDir.resolve(
-                    "results/runbooks/deploy-runbook.md");
+            Path expected = outputDir.resolve("results/runbooks/deploy-runbook.md");
             assertThat(expected).exists();
         }
 
         @Test
         @DisplayName("creates results/runbooks/ subdirectory")
-        void assemble_whenCalled_createsRunbookSubdir(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_createsRunbookSubdir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            assertThat(
-                    outputDir.resolve("results/runbooks"))
-                    .exists()
-                    .isDirectory();
+            assertThat(outputDir.resolve("results/runbooks")).exists().isDirectory();
         }
 
         @Test
         @DisplayName("resolves project_name variable")
-        void assemble_whenCalled_resolvesProjectName(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_resolvesProjectName(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
+            RunbookAssembler assembler = new RunbookAssembler();
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .projectName("api-pagamentos")
-                            .build();
+                    TestConfigBuilder.builder().projectName("api-pagamentos").build();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve(
-                    "results/runbooks/deploy-runbook.md");
+            Path file = outputDir.resolve("results/runbooks/deploy-runbook.md");
             String content = readFile(file);
-            assertThat(content)
-                    .contains("api-pagamentos");
+            assertThat(content).contains("api-pagamentos");
         }
 
         @Test
         @DisplayName("contains deploy and rollback sections")
-        void assemble_whenCalled_containsDeployAndRollbackSections(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_containsDeployAndRollbackSections(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve(
-                    "results/runbooks/deploy-runbook.md");
+            Path file = outputDir.resolve("results/runbooks/deploy-runbook.md");
             String content = readFile(file);
-            assertThat(content)
-                    .contains("Deploy");
+            assertThat(content).contains("Deploy");
         }
 
         @Test
         @DisplayName("returns file path in result list")
-        void assemble_whenCalled_returnsFilePath(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_returnsFilePath(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            assertThat(files.get(0))
-                    .endsWith("deploy-runbook.md");
+            assertThat(files.get(0)).endsWith("deploy-runbook.md");
         }
     }
 
@@ -155,39 +122,28 @@ class RunbookAssemblerTest {
     class GracefulNoOp {
 
         @Test
-        @DisplayName("returns empty list when template"
-                + " file absent")
-        void assemble_whenCalled_returnsEmptyWhenTemplateAbsent(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("returns empty list when template" + " file absent")
+        void assemble_whenCalled_returnsEmptyWhenTemplateAbsent(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("does not create output directory"
-                + " when template absent")
-        void assemble_whenCalled_doesNotCreateOutputDir(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("does not create output directory" + " when template absent")
+        void assemble_whenCalled_doesNotCreateOutputDir(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            RunbookAssembler assembler = new RunbookAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
@@ -202,51 +158,37 @@ class RunbookAssemblerTest {
 
         @Test
         @DisplayName("resolves Pebble conditionals")
-        void assemble_whenCalled_resolvesPebbleConditionals(
-                @TempDir Path tempDir)
+        void assemble_whenCalled_resolvesPebbleConditionals(@TempDir Path tempDir)
                 throws IOException {
-            Path templatesDir =
-                    tempDir.resolve("shared/templates");
+            Path templatesDir = tempDir.resolve("shared/templates");
             Files.createDirectories(templatesDir);
-            String template =
-                    "{% if database_name != \"none\" %}"
-                            + "HAS_DB{% endif %}";
+            String template = "{% if database_name != \"none\" %}" + "HAS_DB{% endif %}";
             Files.writeString(
-                    templatesDir.resolve(
-                            "_TEMPLATE-DEPLOY-RUNBOOK"
-                                    + ".md"),
-                    template, StandardCharsets.UTF_8);
+                    templatesDir.resolve("_TEMPLATE-DEPLOY-RUNBOOK" + ".md"),
+                    template,
+                    StandardCharsets.UTF_8);
 
             Path outputDir = tempDir.resolve("output");
 
-            RunbookAssembler assembler =
-                    new RunbookAssembler(tempDir);
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .database("postgresql", "15")
-                            .build();
-            TemplateEngine engine =
-                    new TemplateEngine(tempDir);
+            RunbookAssembler assembler = new RunbookAssembler(tempDir);
+            ProjectConfig config = TestConfigBuilder.builder().database("postgresql", "15").build();
+            TemplateEngine engine = new TemplateEngine(tempDir);
 
             assembler.assemble(config, engine, outputDir);
 
-            Path dest = outputDir.resolve(
-                    "results/runbooks/deploy-runbook.md");
+            Path dest = outputDir.resolve("results/runbooks/deploy-runbook.md");
             assertThat(dest).exists();
             String content = readFile(dest);
             assertThat(content).contains("HAS_DB");
-            assertThat(content)
-                    .doesNotContain("{%");
+            assertThat(content).doesNotContain("{%");
         }
     }
 
     private static String readFile(Path path) {
         try {
-            return Files.readString(
-                    path, StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Failed to read: " + path, e);
+            throw new RuntimeException("Failed to read: " + path, e);
         }
     }
 }

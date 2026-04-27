@@ -1,15 +1,14 @@
 package dev.iadev.domain.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("MapHelper")
 class MapHelperTest {
@@ -31,8 +30,7 @@ class MapHelperTest {
         @Test
         @DisplayName("throws when field is missing")
         void requireField_fieldMissing_throwsException() {
-            assertThatThrownBy(() ->
-                    MapHelper.requireField(Map.of(), "key", "Test"))
+            assertThatThrownBy(() -> MapHelper.requireField(Map.of(), "key", "Test"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("key")
                     .hasMessageContaining("Test");
@@ -44,8 +42,7 @@ class MapHelperTest {
             var map = new HashMap<String, Object>();
             map.put("key", null);
 
-            assertThatThrownBy(() ->
-                    MapHelper.requireField(map, "key", "Test"))
+            assertThatThrownBy(() -> MapHelper.requireField(map, "key", "Test"))
                     .isInstanceOf(ConfigValidationException.class);
         }
     }
@@ -59,8 +56,7 @@ class MapHelperTest {
         void requireString_validString_returnsValue() {
             var map = Map.<String, Object>of("key", "hello");
 
-            assertThat(MapHelper.requireString(map, "key", "Test"))
-                    .isEqualTo("hello");
+            assertThat(MapHelper.requireString(map, "key", "Test")).isEqualTo("hello");
         }
 
         @Test
@@ -68,8 +64,7 @@ class MapHelperTest {
         void requireString_wrongType_throwsException() {
             var map = Map.<String, Object>of("key", 42);
 
-            assertThatThrownBy(() ->
-                    MapHelper.requireString(map, "key", "Test"))
+            assertThatThrownBy(() -> MapHelper.requireString(map, "key", "Test"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("String");
         }
@@ -84,15 +79,13 @@ class MapHelperTest {
         void optionalString_fieldExists_returnsValue() {
             var map = Map.<String, Object>of("key", "val");
 
-            assertThat(MapHelper.optionalString(map, "key", "def"))
-                    .isEqualTo("val");
+            assertThat(MapHelper.optionalString(map, "key", "def")).isEqualTo("val");
         }
 
         @Test
         @DisplayName("returns default when field missing")
         void optionalString_fieldMissing_returnsDefault() {
-            assertThat(MapHelper.optionalString(Map.of(), "key", "def"))
-                    .isEqualTo("def");
+            assertThat(MapHelper.optionalString(Map.of(), "key", "def")).isEqualTo("def");
         }
 
         @Test
@@ -100,8 +93,7 @@ class MapHelperTest {
         void optionalString_wrongType_returnsDefault() {
             var map = Map.<String, Object>of("key", 42);
 
-            assertThat(MapHelper.optionalString(map, "key", "def"))
-                    .isEqualTo("def");
+            assertThat(MapHelper.optionalString(map, "key", "def")).isEqualTo("def");
         }
     }
 
@@ -114,16 +106,13 @@ class MapHelperTest {
         void optionalBoolean_booleanValue_returnsValue() {
             var map = Map.<String, Object>of("flag", true);
 
-            assertThat(MapHelper.optionalBoolean(map, "flag", false))
-                    .isTrue();
+            assertThat(MapHelper.optionalBoolean(map, "flag", false)).isTrue();
         }
 
         @Test
         @DisplayName("returns default when field missing")
         void optionalBoolean_missing_returnsDefault() {
-            assertThat(MapHelper.optionalBoolean(
-                    Map.of(), "flag", true))
-                    .isTrue();
+            assertThat(MapHelper.optionalBoolean(Map.of(), "flag", true)).isTrue();
         }
 
         @Test
@@ -131,8 +120,7 @@ class MapHelperTest {
         void optionalBoolean_wrongType_returnsDefault() {
             var map = Map.<String, Object>of("flag", "yes");
 
-            assertThat(MapHelper.optionalBoolean(map, "flag", false))
-                    .isFalse();
+            assertThat(MapHelper.optionalBoolean(map, "flag", false)).isFalse();
         }
     }
 
@@ -145,15 +133,13 @@ class MapHelperTest {
         void optionalInt_numberValue_returnsValue() {
             var map = Map.<String, Object>of("count", 42);
 
-            assertThat(MapHelper.optionalInt(map, "count", 0))
-                    .isEqualTo(42);
+            assertThat(MapHelper.optionalInt(map, "count", 0)).isEqualTo(42);
         }
 
         @Test
         @DisplayName("returns default when field missing")
         void optionalInt_missing_returnsDefault() {
-            assertThat(MapHelper.optionalInt(Map.of(), "count", 10))
-                    .isEqualTo(10);
+            assertThat(MapHelper.optionalInt(Map.of(), "count", 10)).isEqualTo(10);
         }
 
         @Test
@@ -161,8 +147,7 @@ class MapHelperTest {
         void optionalInt_doubleValue_convertsToInt() {
             var map = Map.<String, Object>of("count", 42.0);
 
-            assertThat(MapHelper.optionalInt(map, "count", 0))
-                    .isEqualTo(42);
+            assertThat(MapHelper.optionalInt(map, "count", 0)).isEqualTo(42);
         }
     }
 
@@ -176,15 +161,13 @@ class MapHelperTest {
             var sub = Map.<String, Object>of("a", "b");
             var map = Map.<String, Object>of("nested", sub);
 
-            assertThat(MapHelper.optionalMap(map, "nested"))
-                    .containsEntry("a", "b");
+            assertThat(MapHelper.optionalMap(map, "nested")).containsEntry("a", "b");
         }
 
         @Test
         @DisplayName("returns empty map when field missing")
         void optionalMap_missing_returnsEmptyMap() {
-            assertThat(MapHelper.optionalMap(Map.of(), "nested"))
-                    .isEmpty();
+            assertThat(MapHelper.optionalMap(Map.of(), "nested")).isEmpty();
         }
 
         @Test
@@ -192,8 +175,7 @@ class MapHelperTest {
         void optionalMap_wrongType_returnsEmptyMap() {
             var map = Map.<String, Object>of("nested", "string");
 
-            assertThat(MapHelper.optionalMap(map, "nested"))
-                    .isEmpty();
+            assertThat(MapHelper.optionalMap(map, "nested")).isEmpty();
         }
     }
 
@@ -207,8 +189,7 @@ class MapHelperTest {
             var sub = Map.<String, Object>of("x", "y");
             var map = Map.<String, Object>of("key", sub);
 
-            assertThat(MapHelper.requireMap(map, "key", "Test"))
-                    .containsEntry("x", "y");
+            assertThat(MapHelper.requireMap(map, "key", "Test")).containsEntry("x", "y");
         }
 
         @Test
@@ -216,8 +197,7 @@ class MapHelperTest {
         void requireMap_wrongType_throwsException() {
             var map = Map.<String, Object>of("key", "not-a-map");
 
-            assertThatThrownBy(() ->
-                    MapHelper.requireMap(map, "key", "Test"))
+            assertThatThrownBy(() -> MapHelper.requireMap(map, "key", "Test"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("Map");
         }
@@ -225,8 +205,7 @@ class MapHelperTest {
         @Test
         @DisplayName("throws when field missing")
         void requireMap_missing_throwsException() {
-            assertThatThrownBy(() ->
-                    MapHelper.requireMap(Map.of(), "key", "Test"))
+            assertThatThrownBy(() -> MapHelper.requireMap(Map.of(), "key", "Test"))
                     .isInstanceOf(ConfigValidationException.class);
         }
     }
@@ -238,26 +217,21 @@ class MapHelperTest {
         @Test
         @DisplayName("returns list when field is a List")
         void optionalStringList_listValue_returnsList() {
-            var map = Map.<String, Object>of(
-                    "items", List.of("a", "b"));
+            var map = Map.<String, Object>of("items", List.of("a", "b"));
 
-            assertThat(MapHelper.optionalStringList(map, "items"))
-                    .containsExactly("a", "b");
+            assertThat(MapHelper.optionalStringList(map, "items")).containsExactly("a", "b");
         }
 
         @Test
         @DisplayName("returns empty list when field missing")
         void optionalStringList_missing_returnsEmptyList() {
-            assertThat(
-                    MapHelper.optionalStringList(Map.of(), "items"))
-                    .isEmpty();
+            assertThat(MapHelper.optionalStringList(Map.of(), "items")).isEmpty();
         }
 
         @Test
         @DisplayName("returned list is immutable")
         void optionalStringList_whenCalled_immutable() {
-            var map = Map.<String, Object>of(
-                    "items", List.of("a"));
+            var map = Map.<String, Object>of("items", List.of("a"));
 
             var result = MapHelper.optionalStringList(map, "items");
 
@@ -273,26 +247,21 @@ class MapHelperTest {
         @Test
         @DisplayName("returns map when field is a Map")
         void optionalStringMap_mapValue_returnsMap() {
-            var map = Map.<String, Object>of(
-                    "env", Map.of("KEY", "val"));
+            var map = Map.<String, Object>of("env", Map.of("KEY", "val"));
 
-            assertThat(MapHelper.optionalStringMap(map, "env"))
-                    .containsEntry("KEY", "val");
+            assertThat(MapHelper.optionalStringMap(map, "env")).containsEntry("KEY", "val");
         }
 
         @Test
         @DisplayName("returns empty map when field missing")
         void optionalStringMap_missing_returnsEmptyMap() {
-            assertThat(
-                    MapHelper.optionalStringMap(Map.of(), "env"))
-                    .isEmpty();
+            assertThat(MapHelper.optionalStringMap(Map.of(), "env")).isEmpty();
         }
 
         @Test
         @DisplayName("returned map is immutable")
         void optionalStringMap_whenCalled_immutable() {
-            var map = Map.<String, Object>of(
-                    "env", Map.of("K", "V"));
+            var map = Map.<String, Object>of("env", Map.of("K", "V"));
 
             var result = MapHelper.optionalStringMap(map, "env");
 

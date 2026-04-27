@@ -10,25 +10,22 @@ import dev.iadev.domain.model.LanguageConfig;
 import dev.iadev.domain.model.McpConfig;
 import dev.iadev.domain.model.McpServerConfig;
 import dev.iadev.domain.model.ObservabilityConfig;
+import dev.iadev.domain.model.Platform;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.model.ProjectIdentity;
 import dev.iadev.domain.model.SecurityConfig;
 import dev.iadev.domain.model.TechComponent;
 import dev.iadev.domain.model.TestingConfig;
-
-import dev.iadev.domain.model.Platform;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Shared test helper to build ProjectConfig instances
- * with sensible defaults.
+ * Shared test helper to build ProjectConfig instances with sensible defaults.
  *
- * <p>Consolidates the former package-private builders from
- * application.assembler and domain.stack packages.</p>
+ * <p>Consolidates the former package-private builders from application.assembler and domain.stack
+ * packages.
  */
 public final class TestConfigBuilder {
 
@@ -43,8 +40,7 @@ public final class TestConfigBuilder {
     private String schemaRegistry = "";
     private boolean outboxPattern = false;
     private String deadLetterStrategy = "";
-    private int eventsPerSnapshot =
-            ArchitectureConfig.DEFAULT_EVENTS_PER_SNAPSHOT;
+    private int eventsPerSnapshot = ArchitectureConfig.DEFAULT_EVENTS_PER_SNAPSHOT;
     private boolean dddEnabled = false;
     private String langName = "java";
     private String langVersion = "21";
@@ -70,8 +66,7 @@ public final class TestConfigBuilder {
     private String observabilityTool = "none";
     private String serviceMesh = "none";
     private String templating = "kustomize";
-    private List<String> securityFrameworksList =
-            Collections.emptyList();
+    private List<String> securityFrameworksList = Collections.emptyList();
     private boolean scanSast = false;
     private boolean scanDast = false;
     private boolean scanSecretScan = false;
@@ -82,19 +77,15 @@ public final class TestConfigBuilder {
     private String qgQualityGate = "default";
     private boolean pentest = false;
     private String pentestDefaultEnv = "local";
-    private final List<InterfaceConfig> interfaces =
-            new ArrayList<>();
-    private final List<McpServerConfig> mcpServers =
-            new ArrayList<>();
+    private final List<InterfaceConfig> interfaces = new ArrayList<>();
+    private final List<McpServerConfig> mcpServers = new ArrayList<>();
     private String compliance = "none";
     private Set<Platform> platforms = Set.of();
-    private BranchingModel branchingModel =
-            BranchingModel.GITFLOW;
+    private BranchingModel branchingModel = BranchingModel.GITFLOW;
     private boolean telemetryEnabled = true;
 
     private TestConfigBuilder() {
-        interfaces.add(
-                new InterfaceConfig("rest", "", ""));
+        interfaces.add(new InterfaceConfig("rest", "", ""));
     }
 
     public static ProjectConfig minimal() {
@@ -135,8 +126,7 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder validateWithArchUnit(
-            boolean enabled) {
+    public TestConfigBuilder validateWithArchUnit(boolean enabled) {
         this.validateWithArchUnit = enabled;
         return this;
     }
@@ -151,8 +141,7 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder schemaRegistry(
-            String value) {
+    public TestConfigBuilder schemaRegistry(String value) {
         this.schemaRegistry = value;
         return this;
     }
@@ -162,8 +151,7 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder deadLetterStrategy(
-            String strategy) {
+    public TestConfigBuilder deadLetterStrategy(String strategy) {
         this.deadLetterStrategy = strategy;
         return this;
     }
@@ -178,15 +166,13 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder language(
-            String name, String version) {
+    public TestConfigBuilder language(String name, String version) {
         this.langName = name;
         this.langVersion = version;
         return this;
     }
 
-    public TestConfigBuilder framework(
-            String name, String version) {
+    public TestConfigBuilder framework(String name, String version) {
         this.fwName = name;
         this.fwVersion = version;
         return this;
@@ -202,15 +188,13 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder database(
-            String name, String version) {
+    public TestConfigBuilder database(String name, String version) {
         this.dbName = name;
         this.dbVersion = version;
         return this;
     }
 
-    public TestConfigBuilder cache(
-            String name, String version) {
+    public TestConfigBuilder cache(String name, String version) {
         this.cacheName = name;
         this.cacheVersion = version;
         return this;
@@ -222,20 +206,16 @@ public final class TestConfigBuilder {
     }
 
     public TestConfigBuilder addInterface(String type) {
-        this.interfaces.add(
-                new InterfaceConfig(type, "", ""));
+        this.interfaces.add(new InterfaceConfig(type, "", ""));
         return this;
     }
 
-    public TestConfigBuilder addInterface(
-            String type, String spec, String broker) {
-        this.interfaces.add(
-                new InterfaceConfig(type, spec, broker));
+    public TestConfigBuilder addInterface(String type, String spec, String broker) {
+        this.interfaces.add(new InterfaceConfig(type, spec, broker));
         return this;
     }
 
-    public TestConfigBuilder migration(
-            String name, String version) {
+    public TestConfigBuilder migration(String name, String version) {
         this.migrationName = name;
         this.migrationVersion = version;
         return this;
@@ -271,8 +251,7 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder performanceTests(
-            boolean enabled) {
+    public TestConfigBuilder performanceTests(boolean enabled) {
         this.performanceTests = enabled;
         return this;
     }
@@ -302,15 +281,16 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder securityFrameworks(
-            String... frameworks) {
+    public TestConfigBuilder securityFrameworks(String... frameworks) {
         this.securityFrameworksList = List.of(frameworks);
         return this;
     }
 
     public TestConfigBuilder scanningFlags(
-            boolean sast, boolean dast,
-            boolean secretScan, boolean containerScan,
+            boolean sast,
+            boolean dast,
+            boolean secretScan,
+            boolean containerScan,
             boolean infraScan) {
         this.scanSast = sast;
         this.scanDast = dast;
@@ -330,8 +310,7 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder scanningSecretScan(
-            boolean enabled) {
+    public TestConfigBuilder scanningSecretScan(boolean enabled) {
         this.scanSecretScan = enabled;
         return this;
     }
@@ -346,20 +325,17 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder qualityGateProvider(
-            String provider) {
+    public TestConfigBuilder qualityGateProvider(String provider) {
         this.qgProvider = provider;
         return this;
     }
 
-    public TestConfigBuilder qualityGateServerUrl(
-            String url) {
+    public TestConfigBuilder qualityGateServerUrl(String url) {
         this.qgServerUrl = url;
         return this;
     }
 
-    public TestConfigBuilder qualityGateName(
-            String name) {
+    public TestConfigBuilder qualityGateName(String name) {
         this.qgQualityGate = name;
         return this;
     }
@@ -370,8 +346,7 @@ public final class TestConfigBuilder {
     }
 
     /** Alias for {@link #pentest(boolean)}. */
-    public TestConfigBuilder pentestReadiness(
-            boolean enabled) {
+    public TestConfigBuilder pentestReadiness(boolean enabled) {
         return pentest(enabled);
     }
 
@@ -379,7 +354,6 @@ public final class TestConfigBuilder {
         this.pentestDefaultEnv = env;
         return this;
     }
-
 
     public TestConfigBuilder compliance(String value) {
         this.compliance = value;
@@ -391,20 +365,17 @@ public final class TestConfigBuilder {
         return this;
     }
 
-    public TestConfigBuilder branchingModel(
-            BranchingModel model) {
+    public TestConfigBuilder branchingModel(BranchingModel model) {
         this.branchingModel = model;
         return this;
     }
 
-    public TestConfigBuilder telemetryEnabled(
-            boolean enabled) {
+    public TestConfigBuilder telemetryEnabled(boolean enabled) {
         this.telemetryEnabled = enabled;
         return this;
     }
 
-    public TestConfigBuilder addMcpServer(
-            McpServerConfig server) {
+    public TestConfigBuilder addMcpServer(McpServerConfig server) {
         this.mcpServers.add(server);
         return this;
     }
@@ -416,11 +387,12 @@ public final class TestConfigBuilder {
 
     public ProjectConfig build() {
         return new ProjectConfig(
-                new ProjectIdentity(
-                        projectName, purpose),
+                new ProjectIdentity(projectName, purpose),
                 new ArchitectureConfig(
-                        archStyle, domainDriven,
-                        eventDriven, validateWithArchUnit,
+                        archStyle,
+                        domainDriven,
+                        eventDriven,
+                        validateWithArchUnit,
                         basePackage,
                         new ArchitectureConfig.CqrsConfig(
                                 eventStore,
@@ -436,33 +408,31 @@ public final class TestConfigBuilder {
                         buildTool, nativeBuild),
                 new DataConfig(
                         new TechComponent(dbName, dbVersion),
-                        new TechComponent(
-                                migrationName,
-                                migrationVersion),
-                        new TechComponent(
-                                cacheName, cacheVersion)),
+                        new TechComponent(migrationName, migrationVersion),
+                        new TechComponent(cacheName, cacheVersion)),
                 new InfraConfig(
-                        container, orchestrator,
-                        templating, iac,
-                        registry, apiGateway, serviceMesh,
+                        container,
+                        orchestrator,
+                        templating,
+                        iac,
+                        registry,
+                        apiGateway,
+                        serviceMesh,
                         cloudProvider,
-                        new ObservabilityConfig(
-                                observabilityTool,
-                                "none", "none")),
+                        new ObservabilityConfig(observabilityTool, "none", "none")),
                 new SecurityConfig(
                         securityFrameworksList,
                         new SecurityConfig.ScanningConfig(
-                                scanSast, scanDast,
+                                scanSast,
+                                scanDast,
                                 scanSecretScan,
                                 scanContainerScan,
                                 scanInfraScan),
                         new SecurityConfig.QualityGateConfig(
-                                qgProvider, qgServerUrl,
-                                qgQualityGate),
-                        pentest, pentestDefaultEnv),
-                new TestingConfig(
-                        smokeTests, contractTests,
-                        performanceTests, 95, 90),
+                                qgProvider, qgServerUrl, qgQualityGate),
+                        pentest,
+                        pentestDefaultEnv),
+                new TestingConfig(smokeTests, contractTests, performanceTests, 95, 90),
                 new McpConfig(mcpServers),
                 compliance,
                 platforms,

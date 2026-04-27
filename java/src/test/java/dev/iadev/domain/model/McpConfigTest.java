@@ -1,14 +1,13 @@
 package dev.iadev.domain.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("McpConfig")
 class McpConfigTest {
@@ -20,14 +19,16 @@ class McpConfigTest {
         @Test
         @DisplayName("creates config with servers list")
         void fromMap_withServers_listPopulated() {
-            var map = Map.<String, Object>of(
-                    "servers", List.of(
-                            Map.<String, Object>of(
-                                    "id", "s1",
-                                    "url", "http://mcp1"),
-                            Map.<String, Object>of(
-                                    "id", "s2",
-                                    "url", "http://mcp2")));
+            var map =
+                    Map.<String, Object>of(
+                            "servers",
+                            List.of(
+                                    Map.<String, Object>of(
+                                            "id", "s1",
+                                            "url", "http://mcp1"),
+                                    Map.<String, Object>of(
+                                            "id", "s2",
+                                            "url", "http://mcp2")));
 
             var result = McpConfig.fromMap(map);
 
@@ -60,9 +61,12 @@ class McpConfigTest {
     void servers_immutable_throwsOnModification() {
         var config = new McpConfig(List.of());
 
-        assertThatThrownBy(() -> config.servers().add(
-                new McpServerConfig("s1", "http://x",
-                        List.of(), Map.of())))
+        assertThatThrownBy(
+                        () ->
+                                config.servers()
+                                        .add(
+                                                new McpServerConfig(
+                                                        "s1", "http://x", List.of(), Map.of())))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }

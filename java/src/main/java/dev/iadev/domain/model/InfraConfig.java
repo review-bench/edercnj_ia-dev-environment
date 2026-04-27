@@ -5,15 +5,15 @@ import java.util.Map;
 /**
  * Represents the infrastructure configuration section.
  *
- * <p>All fields have sensible defaults matching the TypeScript implementation.
- * Contains a nested {@link ObservabilityConfig} for observability settings.</p>
+ * <p>All fields have sensible defaults matching the TypeScript implementation. Contains a nested
+ * {@link ObservabilityConfig} for observability settings.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("container", "docker", "orchestrator", "kubernetes");
  * InfraConfig cfg = InfraConfig.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param container the container runtime (default: "docker")
  * @param orchestrator the orchestration platform (default: "none")
@@ -52,8 +52,6 @@ public record InfraConfig(
                 MapHelper.optionalString(map, "api_gateway", "none"),
                 MapHelper.optionalString(map, "service_mesh", "none"),
                 MapHelper.optionalString(map, "cloud_provider", "none"),
-                ObservabilityConfig.fromMap(
-                        MapHelper.optionalMap(map, "observability"))
-        );
+                ObservabilityConfig.fromMap(MapHelper.optionalMap(map, "observability")));
     }
 }

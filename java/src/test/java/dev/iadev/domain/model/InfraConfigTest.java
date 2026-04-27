@@ -1,12 +1,11 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("InfraConfig")
 class InfraConfigTest {
@@ -18,19 +17,21 @@ class InfraConfigTest {
         @Test
         @DisplayName("creates config with all fields")
         void fromMap_allFields_allSet() {
-            var map = Map.<String, Object>of(
-                    "container", "docker",
-                    "orchestrator", "kubernetes",
-                    "templating", "helm",
-                    "iac", "terraform",
-                    "registry", "ecr",
-                    "api_gateway", "kong",
-                    "service_mesh", "istio",
-                    "cloud_provider", "aws",
-                    "observability", Map.of(
-                            "tool", "datadog",
-                            "metrics", "statsd",
-                            "tracing", "xray"));
+            var map =
+                    Map.<String, Object>of(
+                            "container", "docker",
+                            "orchestrator", "kubernetes",
+                            "templating", "helm",
+                            "iac", "terraform",
+                            "registry", "ecr",
+                            "api_gateway", "kong",
+                            "service_mesh", "istio",
+                            "cloud_provider", "aws",
+                            "observability",
+                                    Map.of(
+                                            "tool", "datadog",
+                                            "metrics", "statsd",
+                                            "tracing", "xray"));
 
             var result = InfraConfig.fromMap(map);
 
@@ -42,8 +43,7 @@ class InfraConfigTest {
             assertThat(result.apiGateway()).isEqualTo("kong");
             assertThat(result.serviceMesh()).isEqualTo("istio");
             assertThat(result.cloudProvider()).isEqualTo("aws");
-            assertThat(result.observability().tool())
-                    .isEqualTo("datadog");
+            assertThat(result.observability().tool()).isEqualTo("datadog");
         }
 
         @Test
@@ -60,10 +60,8 @@ class InfraConfigTest {
             assertThat(result.serviceMesh()).isEqualTo("none");
             assertThat(result.cloudProvider()).isEqualTo("none");
             assertThat(result.observability().tool()).isEqualTo("none");
-            assertThat(result.observability().metrics())
-                    .isEqualTo("none");
-            assertThat(result.observability().tracing())
-                    .isEqualTo("none");
+            assertThat(result.observability().metrics()).isEqualTo("none");
+            assertThat(result.observability().tracing()).isEqualTo("none");
         }
 
         @Test
@@ -80,9 +78,10 @@ class InfraConfigTest {
         @Test
         @DisplayName("partial map defaults missing fields")
         void fromMap_partialMap_missingDefaulted() {
-            var map = Map.<String, Object>of(
-                    "container", "podman",
-                    "orchestrator", "nomad");
+            var map =
+                    Map.<String, Object>of(
+                            "container", "podman",
+                            "orchestrator", "nomad");
 
             var result = InfraConfig.fromMap(map);
 

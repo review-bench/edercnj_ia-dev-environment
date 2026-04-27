@@ -1,19 +1,15 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for SkillsSelection — testing skill selection.
- */
+/** Tests for SkillsSelection — testing skill selection. */
 @DisplayName("SkillsSelection — testing skills")
 class SkillsSelectionTestingTest {
 
@@ -24,19 +20,15 @@ class SkillsSelectionTestingTest {
         @Test
         @DisplayName("always includes x-test-e2e")
         void select_always_includesRunE2e() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder().build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> skills =
-                    SkillsSelection.selectTestingSkills(
-                            config);
+            List<String> skills = SkillsSelection.selectTestingSkills(config);
 
             assertThat(skills).contains("x-test-e2e");
         }
 
         @Test
-        @DisplayName("smoke tests with REST includes"
-                + " x-test-smoke-api")
+        @DisplayName("smoke tests with REST includes" + " x-test-smoke-api")
         void select_smokeRest_includesSmokeApi() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -45,16 +37,13 @@ class SkillsSelectionTestingTest {
                             .addInterface("rest")
                             .build();
 
-            List<String> skills =
-                    SkillsSelection.selectTestingSkills(
-                            config);
+            List<String> skills = SkillsSelection.selectTestingSkills(config);
 
             assertThat(skills).contains("x-test-smoke-api");
         }
 
         @Test
-        @DisplayName("smoke tests with tcp-custom"
-                + " includes x-test-smoke-socket")
+        @DisplayName("smoke tests with tcp-custom" + " includes x-test-smoke-socket")
         void select_smokeTcp_includesSmokeSocket() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -63,45 +52,29 @@ class SkillsSelectionTestingTest {
                             .addInterface("tcp-custom")
                             .build();
 
-            List<String> skills =
-                    SkillsSelection.selectTestingSkills(
-                            config);
+            List<String> skills = SkillsSelection.selectTestingSkills(config);
 
-            assertThat(skills)
-                    .contains("x-test-smoke-socket");
+            assertThat(skills).contains("x-test-smoke-socket");
         }
 
         @Test
-        @DisplayName("performance tests includes"
-                + " x-test-perf")
+        @DisplayName("performance tests includes" + " x-test-perf")
         void select_performance_includesPerfTest() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .performanceTests(true)
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().performanceTests(true).build();
 
-            List<String> skills =
-                    SkillsSelection.selectTestingSkills(
-                            config);
+            List<String> skills = SkillsSelection.selectTestingSkills(config);
 
             assertThat(skills).contains("x-test-perf");
         }
 
         @Test
-        @DisplayName("contract tests includes"
-                + " x-test-contract")
+        @DisplayName("contract tests includes" + " x-test-contract")
         void select_contract_includesContractTests() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .contractTests(true)
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().contractTests(true).build();
 
-            List<String> skills =
-                    SkillsSelection.selectTestingSkills(
-                            config);
+            List<String> skills = SkillsSelection.selectTestingSkills(config);
 
-            assertThat(skills)
-                    .contains("x-test-contract");
+            assertThat(skills).contains("x-test-contract");
         }
     }
 }

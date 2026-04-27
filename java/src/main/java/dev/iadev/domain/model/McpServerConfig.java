@@ -6,19 +6,18 @@ import java.util.Map;
 /**
  * Represents a single MCP (Model Context Protocol) server configuration.
  *
- * <p>The {@code id} and {@code url} are required. The {@code capabilities}
- * list and {@code env} map are optional.</p>
+ * <p>The {@code id} and {@code url} are required. The {@code capabilities} list and {@code env} map
+ * are optional.
  *
- * <p>The env map may contain sensitive values (API keys, tokens).
- * Use caution when serializing.</p>
+ * <p>The env map may contain sensitive values (API keys, tokens). Use caution when serializing.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("id", "server1", "url", "https://mcp.example.com",
  *     "capabilities", List.of("read", "write"));
  * McpServerConfig cfg = McpServerConfig.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param id the server identifier (required)
  * @param url the server URL (required)
@@ -26,14 +25,9 @@ import java.util.Map;
  * @param env the environment variables map (default: empty, immutable)
  */
 public record McpServerConfig(
-        String id,
-        String url,
-        List<String> capabilities,
-        Map<String, String> env) {
+        String id, String url, List<String> capabilities, Map<String, String> env) {
 
-    /**
-     * Compact constructor enforcing immutability of collections.
-     */
+    /** Compact constructor enforcing immutability of collections. */
     public McpServerConfig {
         capabilities = List.copyOf(capabilities);
         env = Map.copyOf(env);
@@ -51,7 +45,6 @@ public record McpServerConfig(
                 MapHelper.requireString(map, "id", "McpServerConfig"),
                 MapHelper.requireString(map, "url", "McpServerConfig"),
                 MapHelper.optionalStringList(map, "capabilities"),
-                MapHelper.optionalStringMap(map, "env")
-        );
+                MapHelper.optionalStringMap(map, "env"));
     }
 }

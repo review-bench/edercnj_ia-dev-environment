@@ -1,31 +1,22 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for AssemblerTarget enum — maps logical targets
- * to physical directories.
- */
+/** Tests for AssemblerTarget enum — maps logical targets to physical directories. */
 @DisplayName("AssemblerTarget")
 class AssemblerTargetTest {
 
     @ParameterizedTest
-    @CsvSource({
-            "ROOT, output",
-            "CLAUDE, output/.claude"
-    })
+    @CsvSource({"ROOT, output", "CLAUDE, output/.claude"})
     @DisplayName("resolves target to correct physical path")
-    void resolve_returnsCorrectPath(
-            String targetName, String expected) {
-        AssemblerTarget target =
-                AssemblerTarget.valueOf(targetName);
+    void resolve_returnsCorrectPath(String targetName, String expected) {
+        AssemblerTarget target = AssemblerTarget.valueOf(targetName);
         Path base = Path.of("output");
 
         Path resolved = target.resolve(base);
@@ -44,7 +35,6 @@ class AssemblerTargetTest {
     void root_whenCalled_resolvesToOutputDir() {
         Path base = Path.of("/tmp/project");
 
-        assertThat(AssemblerTarget.ROOT.resolve(base))
-                .isEqualTo(base);
+        assertThat(AssemblerTarget.ROOT.resolve(base)).isEqualTo(base);
     }
 }

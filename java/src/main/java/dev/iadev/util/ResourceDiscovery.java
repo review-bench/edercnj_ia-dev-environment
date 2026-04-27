@@ -1,7 +1,6 @@
 package dev.iadev.util;
 
 import dev.iadev.exception.ResourceNotFoundException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -16,22 +15,21 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Discovers and reads resources from the classpath or an external
- * filesystem directory.
+ * Discovers and reads resources from the classpath or an external filesystem directory.
  *
  * <p>Search strategy:
+ *
  * <ol>
- *   <li>If {@code --resources-dir} is configured (via constructor),
- *       check the filesystem path first.</li>
- *   <li>Fall back to classpath via
- *       {@link ClassLoader#getResource(String)}.</li>
+ *   <li>If {@code --resources-dir} is configured (via constructor), check the filesystem path
+ *       first.
+ *   <li>Fall back to classpath via {@link ClassLoader#getResource(String)}.
  * </ol>
  *
- * <p>This abstraction enables resources to be accessed identically
- * whether packaged inside a fat JAR or located on the filesystem
- * during development.</p>
+ * <p>This abstraction enables resources to be accessed identically whether packaged inside a fat
+ * JAR or located on the filesystem during development.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * // Classpath-only discovery
  * var discovery = new ResourceDiscovery();
@@ -49,9 +47,7 @@ public class ResourceDiscovery {
 
     private final Path resourcesDir;
 
-    /**
-     * Creates a discovery instance that searches classpath only.
-     */
+    /** Creates a discovery instance that searches classpath only. */
     public ResourceDiscovery() {
         this.resourcesDir = null;
     }
@@ -59,8 +55,8 @@ public class ResourceDiscovery {
     /**
      * Creates a discovery instance with optional filesystem override.
      *
-     * <p>When {@code resourcesDir} is non-null, filesystem is checked
-     * first before falling back to classpath.</p>
+     * <p>When {@code resourcesDir} is non-null, filesystem is checked first before falling back to
+     * classpath.
      *
      * @param resourcesDir external resources directory, or null
      */
@@ -93,9 +89,8 @@ public class ResourceDiscovery {
     /**
      * Locates a resource by relative path.
      *
-     * <p>Search order: filesystem (if configured) then classpath.
-     * Throws {@link ResourceNotFoundException} if not found via
-     * any strategy.</p>
+     * <p>Search order: filesystem (if configured) then classpath. Throws {@link
+     * ResourceNotFoundException} if not found via any strategy.
      *
      * @param relativePath path relative to the resources root
      * @return URL pointing to the resource
@@ -104,10 +99,10 @@ public class ResourceDiscovery {
     public URL findResource(String relativePath) {
         return findInFilesystem(relativePath)
                 .or(() -> findInClasspath(relativePath))
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                relativePath,
-                                buildStrategiesDescription()));
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        relativePath, buildStrategiesDescription()));
     }
 
     /**
@@ -122,18 +117,16 @@ public class ResourceDiscovery {
         try (InputStream is = url.openStream()) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new ResourceNotFoundException(
-                    relativePath, buildStrategiesDescription());
+            throw new ResourceNotFoundException(relativePath, buildStrategiesDescription());
         }
     }
 
     /**
      * Lists resource names in a directory.
      *
-     * <p>When {@code resourcesDir} is configured and the directory
-     * exists on the filesystem, lists filesystem entries. Otherwise
-     * returns an empty list (classpath directory listing is not
-     * reliably supported across all classloaders).</p>
+     * <p>When {@code resourcesDir} is configured and the directory exists on the filesystem, lists
+     * filesystem entries. Otherwise returns an empty list (classpath directory listing is not
+     * reliably supported across all classloaders).
      *
      * @param directory directory path relative to the resources root
      * @return list of resource names (file names only, not full paths)
@@ -156,16 +149,14 @@ public class ResourceDiscovery {
         return getClassLoader().getResource(relativePath) != null;
     }
 
-    private Optional<URL> findInFilesystem(
-            String relativePath) {
+    private Optional<URL> findInFilesystem(String relativePath) {
         if (resourcesDir == null) {
             return Optional.empty();
         }
         Path filePath = resourcesDir.resolve(relativePath);
         if (Files.exists(filePath)) {
             try {
-                return Optional.of(
-                        filePath.toUri().toURL());
+                return Optional.of(filePath.toUri().toURL());
             } catch (MalformedURLException e) {
                 return Optional.empty();
             }
@@ -173,10 +164,8 @@ public class ResourceDiscovery {
         return Optional.empty();
     }
 
-    private Optional<URL> findInClasspath(
-            String relativePath) {
-        return Optional.ofNullable(
-                getClassLoader().getResource(relativePath));
+    private Optional<URL> findInClasspath(String relativePath) {
+        return Optional.ofNullable(getClassLoader().getResource(relativePath));
     }
 
     private List<String> listFromFilesystem(String directory) {
@@ -185,8 +174,7 @@ public class ResourceDiscovery {
             return Collections.emptyList();
         }
         List<String> entries = new ArrayList<>();
-        try (DirectoryStream<Path> stream =
-                     Files.newDirectoryStream(dirPath)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry)) {
                     entries.add(entry.getFileName().toString());
@@ -214,8 +202,7 @@ public class ResourceDiscovery {
     }
 
     private ClassLoader getClassLoader() {
-        ClassLoader cl = Thread.currentThread()
-                .getContextClassLoader();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (cl == null) {
             cl = ResourceDiscovery.class.getClassLoader();
         }

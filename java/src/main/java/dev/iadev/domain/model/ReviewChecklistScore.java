@@ -1,25 +1,23 @@
 package dev.iadev.domain.model;
 
 /**
- * Computes the review checklist score based on active
- * conditional sections.
+ * Computes the review checklist score based on active conditional sections.
  *
- * <p>The base checklist has 45 points (sections A-K).
- * Conditional sections add points when activated:</p>
+ * <p>The base checklist has 45 points (sections A-K). Conditional sections add points when
+ * activated:
+ *
  * <ul>
- *   <li>Section L (Event-Driven): +8 points</li>
- *   <li>Section M (PCI-DSS): +7 points</li>
- *   <li>Section N (LGPD): +4 points</li>
+ *   <li>Section L (Event-Driven): +8 points
+ *   <li>Section M (PCI-DSS): +7 points
+ *   <li>Section N (LGPD): +4 points
  * </ul>
  *
- * <p>GO threshold is >= 84% of the maximum possible
- * score, rounded up (ceil).</p>
+ * <p>GO threshold is >= 84% of the maximum possible score, rounded up (ceil).
  *
- * @param maxScore      the maximum possible score
- * @param goThreshold   the minimum score for GO decision
+ * @param maxScore the maximum possible score
+ * @param goThreshold the minimum score for GO decision
  */
-public record ReviewChecklistScore(
-        int maxScore, int goThreshold) {
+public record ReviewChecklistScore(int maxScore, int goThreshold) {
 
     private static final int BASE_SCORE = 45;
     private static final int EVENT_DRIVEN_SCORE = 8;
@@ -30,15 +28,13 @@ public record ReviewChecklistScore(
     /**
      * Computes the checklist score from active flags.
      *
-     * @param hasEvent  true if event interfaces exist
+     * @param hasEvent true if event interfaces exist
      * @param hasPciDss true if PCI-DSS compliance active
-     * @param hasLgpd   true if LGPD compliance active
+     * @param hasLgpd true if LGPD compliance active
      * @return computed score with max and threshold
      */
     public static ReviewChecklistScore compute(
-            boolean hasEvent,
-            boolean hasPciDss,
-            boolean hasLgpd) {
+            boolean hasEvent, boolean hasPciDss, boolean hasLgpd) {
         int max = BASE_SCORE;
         if (hasEvent) {
             max += EVENT_DRIVEN_SCORE;

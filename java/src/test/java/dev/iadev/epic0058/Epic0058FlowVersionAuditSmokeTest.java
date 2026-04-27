@@ -1,9 +1,6 @@
 package dev.iadev.epic0058;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,21 +8,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * Smoke tests for EPIC-0058, Story 0058-0003: audit-flow-version.sh.
  *
- * <p>Validates script presence, executability, syntax, and --self-check exit 0.</p>
+ * <p>Validates script presence, executability, syntax, and --self-check exit 0.
  */
 @DisplayName("Epic0058FlowVersionAuditSmokeTest — audit-flow-version.sh")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
 class Epic0058FlowVersionAuditSmokeTest {
 
     private static final Path REPO_ROOT = Paths.get("..").toAbsolutePath().normalize();
-    private static final Path SCRIPT_PATH =
-            REPO_ROOT.resolve("scripts/audit-flow-version.sh");
+    private static final Path SCRIPT_PATH = REPO_ROOT.resolve("scripts/audit-flow-version.sh");
     private static final Path FIXTURES_DIR =
             REPO_ROOT.resolve("scripts/fixtures/audit-flow-version");
 
@@ -42,8 +40,7 @@ class Epic0058FlowVersionAuditSmokeTest {
     @DisplayName("audit-flow-version.sh is executable")
     void script_isExecutable() throws IOException {
         assertThat(SCRIPT_PATH).exists();
-        Set<PosixFilePermission> perms =
-                Files.getPosixFilePermissions(SCRIPT_PATH);
+        Set<PosixFilePermission> perms = Files.getPosixFilePermissions(SCRIPT_PATH);
         assertThat(perms)
                 .as("Script must have owner execute permission")
                 .contains(PosixFilePermission.OWNER_EXECUTE);
@@ -52,14 +49,13 @@ class Epic0058FlowVersionAuditSmokeTest {
     @Test
     @DisplayName("audit-flow-version.sh --self-check exits 0")
     void script_selfCheckPasses() throws IOException, InterruptedException {
-        Process proc = new ProcessBuilder("bash", SCRIPT_PATH.toString(), "--self-check")
-                .directory(REPO_ROOT.toFile())
-                .redirectErrorStream(true)
-                .start();
+        Process proc =
+                new ProcessBuilder("bash", SCRIPT_PATH.toString(), "--self-check")
+                        .directory(REPO_ROOT.toFile())
+                        .redirectErrorStream(true)
+                        .start();
         int exitCode = proc.waitFor();
-        assertThat(exitCode)
-                .as("--self-check must exit 0 (script integrity valid)")
-                .isZero();
+        assertThat(exitCode).as("--self-check must exit 0 (script integrity valid)").isZero();
     }
 
     @Test

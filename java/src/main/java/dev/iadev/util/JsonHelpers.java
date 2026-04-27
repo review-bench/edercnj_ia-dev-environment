@@ -1,15 +1,13 @@
 package dev.iadev.util;
 
 /**
- * Centralized JSON utility methods for manual JSON
- * construction. Implements escaping per RFC 8259 Section 7.
+ * Centralized JSON utility methods for manual JSON construction. Implements escaping per RFC 8259
+ * Section 7.
  *
- * <p>Replaces duplicated {@code escapeJson} and
- * {@code indent} methods previously in
- * {@code SettingsAssembler}.</p>
+ * <p>Replaces duplicated {@code escapeJson} and {@code indent} methods previously in {@code
+ * SettingsAssembler}.
  *
- * @see <a href="https://www.rfc-editor.org/rfc/rfc8259#section-7">
- *     RFC 8259 Section 7</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc8259#section-7">RFC 8259 Section 7</a>
  */
 public final class JsonHelpers {
 
@@ -18,8 +16,7 @@ public final class JsonHelpers {
     }
 
     /**
-     * Returns an indentation string of
-     * {@code level * 2} spaces.
+     * Returns an indentation string of {@code level * 2} spaces.
      *
      * @param level indentation level (&gt;= 0)
      * @return indentation string
@@ -28,31 +25,29 @@ public final class JsonHelpers {
     public static String indent(int level) {
         if (level < 0) {
             throw new IllegalArgumentException(
-                    "Indent level must be >= 0, got: %d"
-                            .formatted(level));
+                    "Indent level must be >= 0, got: %d".formatted(level));
         }
         return "  ".repeat(level);
     }
 
     /**
-     * Escapes a string value according to RFC 8259
-     * Section 7 (Strings).
+     * Escapes a string value according to RFC 8259 Section 7 (Strings).
      *
-     * <p>Handles the following characters:</p>
+     * <p>Handles the following characters:
+     *
      * <ul>
-     *   <li>{@code "} (quotation mark)</li>
-     *   <li>{@code \} (reverse solidus)</li>
-     *   <li>{@code \n} (newline)</li>
-     *   <li>{@code \r} (carriage return)</li>
-     *   <li>{@code \t} (tab)</li>
-     *   <li>{@code \b} (backspace)</li>
-     *   <li>{@code \f} (form feed)</li>
-     *   <li>U+0000 to U+001F (control characters)</li>
+     *   <li>{@code "} (quotation mark)
+     *   <li>{@code \} (reverse solidus)
+     *   <li>{@code \n} (newline)
+     *   <li>{@code \r} (carriage return)
+     *   <li>{@code \t} (tab)
+     *   <li>{@code \b} (backspace)
+     *   <li>{@code \f} (form feed)
+     *   <li>U+0000 to U+001F (control characters)
      * </ul>
      *
      * @param value input string (may be null)
-     * @return escaped string safe for JSON embedding;
-     *         empty string if null
+     * @return escaped string safe for JSON embedding; empty string if null
      */
     public static String escapeJson(String value) {
         if (value == null) {
@@ -65,8 +60,7 @@ public final class JsonHelpers {
         return sb.toString();
     }
 
-    private static void appendEscaped(
-            StringBuilder sb, char ch) {
+    private static void appendEscaped(StringBuilder sb, char ch) {
         switch (ch) {
             case '"' -> sb.append("\\\"");
             case '\\' -> sb.append("\\\\");
@@ -79,8 +73,7 @@ public final class JsonHelpers {
         }
     }
 
-    private static void appendDefault(
-            StringBuilder sb, char ch) {
+    private static void appendDefault(StringBuilder sb, char ch) {
         if (ch < 0x20) {
             sb.append("\\u%04x".formatted((int) ch));
         } else {

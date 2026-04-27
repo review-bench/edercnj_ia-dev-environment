@@ -5,42 +5,32 @@ import dev.iadev.domain.port.output.ProgressReporter;
 /**
  * Console-based implementation of {@link ProgressReporter}.
  *
- * <p>Writes progress messages to {@link System#out} and error
- * messages to {@link System#err}. Thread-safe by virtue of
- * delegating to synchronized {@code PrintStream} methods.</p>
+ * <p>Writes progress messages to {@link System#out} and error messages to {@link System#err}.
+ * Thread-safe by virtue of delegating to synchronized {@code PrintStream} methods.
  *
- * <p>Message format:</p>
+ * <p>Message format:
+ *
  * <ul>
- *   <li>Start: {@code [START] taskName (N steps)}</li>
- *   <li>Progress: {@code [N] taskName: message}</li>
- *   <li>Complete: {@code [DONE] taskName}</li>
- *   <li>Error: {@code [ERROR] taskName: errorMessage}</li>
+ *   <li>Start: {@code [START] taskName (N steps)}
+ *   <li>Progress: {@code [N] taskName: message}
+ *   <li>Complete: {@code [DONE] taskName}
+ *   <li>Error: {@code [ERROR] taskName: errorMessage}
  * </ul>
  *
- * <p>This class is intentionally exempted from Rule 03's ban on
- * {@code System.out} / {@code System.err} because stdout/stderr
- * is its transport contract as the canonical CLI-output adapter.
- * See {@code adr/ADR-0007-console-progress-reporter-stdout-contract.md}.</p>
+ * <p>This class is intentionally exempted from Rule 03's ban on {@code System.out} / {@code
+ * System.err} because stdout/stderr is its transport contract as the canonical CLI-output adapter.
+ * See {@code adr/ADR-0007-console-progress-reporter-stdout-contract.md}.
  */
-public final class ConsoleProgressReporter
-        implements ProgressReporter {
+public final class ConsoleProgressReporter implements ProgressReporter {
 
     @Override
-    public void reportStart(
-            String taskName, int totalSteps) {
-        System.out.printf(
-                "[START] %s (%d steps)%n",
-                taskName, totalSteps);
+    public void reportStart(String taskName, int totalSteps) {
+        System.out.printf("[START] %s (%d steps)%n", taskName, totalSteps);
     }
 
     @Override
-    public void reportProgress(
-            String taskName,
-            int currentStep,
-            String message) {
-        System.out.printf(
-                "[%d] %s: %s%n",
-                currentStep, taskName, message);
+    public void reportProgress(String taskName, int currentStep, String message) {
+        System.out.printf("[%d] %s: %s%n", currentStep, taskName, message);
     }
 
     @Override
@@ -49,10 +39,7 @@ public final class ConsoleProgressReporter
     }
 
     @Override
-    public void reportError(
-            String taskName, String errorMessage) {
-        System.err.printf(
-                "[ERROR] %s: %s%n",
-                taskName, errorMessage);
+    public void reportError(String taskName, String errorMessage) {
+        System.err.printf("[ERROR] %s: %s%n", taskName, errorMessage);
     }
 }

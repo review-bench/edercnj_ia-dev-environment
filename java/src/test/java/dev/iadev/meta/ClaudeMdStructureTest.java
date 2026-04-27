@@ -11,13 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verification test for story-0040-0009 TASK-0040-0009-002: asserts the
- * project root {@code CLAUDE.md} exposes the skill authoring template
- * entry point and points new contributors at the {@code Telemetry}
- * section of {@code _TEMPLATE-SKILL.md}.
+ * Verification test for story-0040-0009 TASK-0040-0009-002: asserts the project root {@code
+ * CLAUDE.md} exposes the skill authoring template entry point and points new contributors at the
+ * {@code Telemetry} section of {@code _TEMPLATE-SKILL.md}.
  *
- * <p>The test runs from the {@code java/} Maven module, so the root
- * {@code CLAUDE.md} lives one directory up.
+ * <p>The test runs from the {@code java/} Maven module, so the root {@code CLAUDE.md} lives one
+ * directory up.
  */
 class ClaudeMdStructureTest {
 
@@ -48,8 +47,9 @@ class ClaudeMdStructureTest {
         String body = Files.readString(CLAUDE_MD, StandardCharsets.UTF_8);
 
         assertThat(body)
-                .as("CLAUDE.md must mention the Telemetry section so authors know "
-                        + "the plug-and-play block exists (story-0040-0009 §3.2)")
+                .as(
+                        "CLAUDE.md must mention the Telemetry section so authors know "
+                                + "the plug-and-play block exists (story-0040-0009 §3.2)")
                 .contains("Telemetry");
     }
 
@@ -59,8 +59,9 @@ class ClaudeMdStructureTest {
         String body = Files.readString(CLAUDE_MD, StandardCharsets.UTF_8);
 
         assertThat(body)
-                .as("CLAUDE.md must point at x-story-implement as the canonical "
-                        + "instrumented example (story-0040-0009 §3.3)")
+                .as(
+                        "CLAUDE.md must point at x-story-implement as the canonical "
+                                + "instrumented example (story-0040-0009 §3.3)")
                 .contains("x-story-implement");
     }
 }

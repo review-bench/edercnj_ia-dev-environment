@@ -1,22 +1,17 @@
 package dev.iadev.application.assembler;
 
+import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
 
-import dev.iadev.domain.model.ProjectConfig;
-
-/**
- * Shared test fixtures for SkillsAssembler tests.
- */
+/** Shared test fixtures for SkillsAssembler tests. */
 final class SkillsTestFixtures {
 
-    private SkillsTestFixtures() {
-    }
+    private SkillsTestFixtures() {}
 
     static ProjectConfig buildQuarkusConfig() {
         return TestConfigBuilder.builder()
                 .projectName("my-quarkus-service")
-                .purpose(
-                        "Describe your service purpose here")
+                .purpose("Describe your service purpose here")
                 .archStyle("microservice")
                 .domainDriven(true)
                 .eventDriven(true)

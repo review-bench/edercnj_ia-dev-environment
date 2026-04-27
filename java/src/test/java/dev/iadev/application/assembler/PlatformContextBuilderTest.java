@@ -1,20 +1,16 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.model.Platform;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for PlatformContextBuilder — computes
- * platform-aware template variables.
- */
+/** Tests for PlatformContextBuilder — computes platform-aware template variables. */
 @DisplayName("PlatformContextBuilder")
 class PlatformContextBuilderTest {
 
@@ -25,103 +21,71 @@ class PlatformContextBuilderTest {
         @Test
         @DisplayName("all platforms set when empty (no filter)")
         void buildFlags_emptyPlatforms_allTrue() {
-            Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(Set.of());
+            Map<String, Object> flags = PlatformContextBuilder.buildPlatformFlags(Set.of());
 
-            assertThat(flags.get("hasClaude"))
-                    .isEqualTo(true);
-            assertThat(flags.get("isMultiPlatform"))
-                    .isEqualTo(false);
+            assertThat(flags.get("hasClaude")).isEqualTo(true);
+            assertThat(flags.get("isMultiPlatform")).isEqualTo(false);
         }
 
         @Test
         @DisplayName("only claude when claude-code selected")
         void buildFlags_claudeOnly_onlyClaude() {
             Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(
-                                    Set.of(Platform
-                                            .CLAUDE_CODE));
+                    PlatformContextBuilder.buildPlatformFlags(Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(flags.get("hasClaude"))
-                    .isEqualTo(true);
-            assertThat(flags.get("isMultiPlatform"))
-                    .isEqualTo(false);
+            assertThat(flags.get("hasClaude")).isEqualTo(true);
+            assertThat(flags.get("isMultiPlatform")).isEqualTo(false);
         }
 
         @Test
         @DisplayName("all user-selectable treated as all")
         void buildFlags_allSelectable_allTrue() {
             Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(
-                                    Platform
-                                            .allUserSelectable());
+                    PlatformContextBuilder.buildPlatformFlags(Platform.allUserSelectable());
 
-            assertThat(flags.get("hasClaude"))
-                    .isEqualTo(true);
-            assertThat(flags.get("isMultiPlatform"))
-                    .isEqualTo(false);
+            assertThat(flags.get("hasClaude")).isEqualTo(true);
+            assertThat(flags.get("isMultiPlatform")).isEqualTo(false);
         }
 
         @Test
         @DisplayName("platforms list contains cli names")
         void buildFlags_selected_platformsList() {
             Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(
-                                    Set.of(Platform
-                                            .CLAUDE_CODE));
+                    PlatformContextBuilder.buildPlatformFlags(Set.of(Platform.CLAUDE_CODE));
 
             @SuppressWarnings("unchecked")
-            List<String> platforms =
-                    (List<String>) flags.get("platforms");
-            assertThat(platforms)
-                    .containsExactly("claude-code");
+            List<String> platforms = (List<String>) flags.get("platforms");
+            assertThat(platforms).containsExactly("claude-code");
         }
 
         @Test
         @DisplayName("empty platforms produces all cli names")
         void buildFlags_emptyPlatforms_allCliNames() {
-            Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(Set.of());
+            Map<String, Object> flags = PlatformContextBuilder.buildPlatformFlags(Set.of());
 
             @SuppressWarnings("unchecked")
-            List<String> platforms =
-                    (List<String>) flags.get("platforms");
-            assertThat(platforms)
-                    .containsExactly("claude-code");
+            List<String> platforms = (List<String>) flags.get("platforms");
+            assertThat(platforms).containsExactly("claude-code");
         }
 
         @Test
-        @DisplayName(
-                "buildFlags_onlyShared_hasClaudeFalse")
+        @DisplayName("buildFlags_onlyShared_hasClaudeFalse")
         void buildFlags_onlyShared_hasClaudeFalse() {
             Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(
-                                    Set.of(Platform.SHARED));
+                    PlatformContextBuilder.buildPlatformFlags(Set.of(Platform.SHARED));
 
-            assertThat(flags.get("hasClaude"))
-                    .isEqualTo(false);
-            assertThat(flags.get("isMultiPlatform"))
-                    .isEqualTo(false);
+            assertThat(flags.get("hasClaude")).isEqualTo(false);
+            assertThat(flags.get("isMultiPlatform")).isEqualTo(false);
         }
 
         @Test
-        @DisplayName(
-                "buildFlags_onlyShared_cliNamesExcludeShared")
+        @DisplayName("buildFlags_onlyShared_cliNamesExcludeShared")
         void buildFlags_onlyShared_cliNamesExcludeShared() {
             Map<String, Object> flags =
-                    PlatformContextBuilder
-                            .buildPlatformFlags(
-                                    Set.of(Platform.SHARED));
+                    PlatformContextBuilder.buildPlatformFlags(Set.of(Platform.SHARED));
 
             @SuppressWarnings("unchecked")
-            List<String> platforms =
-                    (List<String>) flags.get("platforms");
+            List<String> platforms = (List<String>) flags.get("platforms");
             assertThat(platforms).isEmpty();
         }
     }

@@ -227,6 +227,28 @@ Interactive menu (`--non-interactive` skips): PROCEED / FIX-PR / ABORT.
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-5-Final-PR ok`
 
+## Recovery
+
+When resuming an epic that partially executed (e.g., some stories completed, CI watch failed mid-run), skip flags may be needed to bypass already-completed steps. Use `CLAUDE_RECOVERY_MODE=1`:
+
+```bash
+export CLAUDE_RECOVERY_MODE=1
+/x-epic-implement EPIC-XXXX --resume --skip-review
+```
+
+### `CLAUDE_RECOVERY_MODE=1`
+
+When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-review` and `--no-ci-watch` flags on this skill without blocking. A WARNING is emitted to stderr for audit trail. The variable is propagated automatically by `x-internal-story-resume` when `staleWarnings != []`.
+
+**RULE-059-07:** `CLAUDE_RECOVERY_MODE=1` is the only accepted bypass variable. No other env var bypasses the enforcement hook.
+
+### Permitted bypass flags (recovery only)
+
+| Flag | Skips |
+| :--- | :--- |
+| `--skip-review` | Specialist + tech-lead reviews per story |
+| `--no-ci-watch` | CI-watch polling per story PR |
+
 ## Error Envelope
 
 | Exit | Code | Condition |

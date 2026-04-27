@@ -1,13 +1,12 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("InterfaceConfig")
 class InterfaceConfigTest {
@@ -19,10 +18,11 @@ class InterfaceConfigTest {
         @Test
         @DisplayName("creates config with all fields")
         void fromMap_allFields_allSet() {
-            var map = Map.<String, Object>of(
-                    "type", "event-consumer",
-                    "spec", "asyncapi-2.6",
-                    "broker", "kafka");
+            var map =
+                    Map.<String, Object>of(
+                            "type", "event-consumer",
+                            "spec", "asyncapi-2.6",
+                            "broker", "kafka");
 
             var result = InterfaceConfig.fromMap(map);
 
@@ -46,8 +46,7 @@ class InterfaceConfigTest {
         @Test
         @DisplayName("throws when type is missing")
         void fromMap_missingType_throwsException() {
-            assertThatThrownBy(
-                    () -> InterfaceConfig.fromMap(Map.of()))
+            assertThatThrownBy(() -> InterfaceConfig.fromMap(Map.of()))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("type");
         }

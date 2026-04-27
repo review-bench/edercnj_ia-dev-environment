@@ -3,10 +3,11 @@ package dev.iadev.exception;
 /**
  * Thrown when an assembler fails during artifact generation in the pipeline.
  *
- * <p>Carries the name of the assembler that failed, enabling targeted
- * debugging across the 25 assemblers in the pipeline.</p>
+ * <p>Carries the name of the assembler that failed, enabling targeted debugging across the 25
+ * assemblers in the pipeline.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try {
  *     assembler.assemble(config, engine, outputDir);
@@ -24,12 +25,11 @@ public class PipelineException extends RuntimeException {
     /**
      * Creates a pipeline exception identifying the failed assembler.
      *
-     * @param message       description of the pipeline failure
+     * @param message description of the pipeline failure
      * @param assemblerName name of the assembler that failed
-     * @param cause         the original exception from the assembler
+     * @param cause the original exception from the assembler
      */
-    public PipelineException(
-            String message, String assemblerName, Throwable cause) {
+    public PipelineException(String message, String assemblerName, Throwable cause) {
         super(message, cause);
         this.assemblerName = assemblerName;
     }

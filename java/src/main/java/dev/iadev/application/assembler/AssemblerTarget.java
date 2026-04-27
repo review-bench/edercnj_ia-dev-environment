@@ -5,12 +5,11 @@ import java.nio.file.Path;
 /**
  * Logical target directories for assembler output.
  *
- * <p>Maps each assembler's logical target to the physical
- * subdirectory within the output directory. Used by
- * {@link AssemblerPipeline} to route each assembler's output
- * to the correct location.</p>
+ * <p>Maps each assembler's logical target to the physical subdirectory within the output directory.
+ * Used by {@link AssemblerPipeline} to route each assembler's output to the correct location.
  *
  * <p>Physical directory mapping:
+ *
  * <table>
  * <tr><th>Target</th><th>Physical Directory</th></tr>
  * <tr><td>ROOT</td><td>{@code outputDir}</td></tr>
@@ -34,8 +33,7 @@ public enum AssemblerTarget {
     }
 
     /**
-     * Resolves this target to a physical path relative to
-     * the given base directory.
+     * Resolves this target to a physical path relative to the given base directory.
      *
      * @param baseDir the base output directory
      * @return the resolved physical path

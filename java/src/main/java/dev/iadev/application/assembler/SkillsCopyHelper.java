@@ -8,15 +8,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Helper methods for skill directory traversal during
- * skills assembly.
+ * Helper methods for skill directory traversal during skills assembly.
  *
- * <p>EPIC-0051 (ADR-0013): the knowledge-pack copy methods
- * ({@code copyKnowledgePack}, {@code copyStackPatterns},
- * {@code copyInfraPatterns}) were removed. Knowledge packs
- * are now assembled by {@link KnowledgeAssembler} into
- * {@code .claude/knowledge/} — {@code SkillsAssembler}
- * emits only invocable skills.</p>
+ * <p>EPIC-0051 (ADR-0013): the knowledge-pack copy methods ({@code copyKnowledgePack}, {@code
+ * copyStackPatterns}, {@code copyInfraPatterns}) were removed. Knowledge packs are now assembled by
+ * {@link KnowledgeAssembler} into {@code .claude/knowledge/} — {@code SkillsAssembler} emits only
+ * invocable skills.
  *
  * @see SkillsAssembler
  * @see KnowledgeAssembler
@@ -32,11 +29,10 @@ final class SkillsCopyHelper {
     /**
      * Copies non-SKILL.md items from source to dest.
      *
-     * @param src  the source directory
+     * @param src the source directory
      * @param dest the destination directory
      */
-    static void copyNonSkillItems(
-            Path src, Path dest) {
+    static void copyNonSkillItems(Path src, Path dest) {
         List<Path> entries = listEntriesSorted(src);
         for (Path entry : entries) {
             String name = entry.getFileName().toString();
@@ -45,12 +41,10 @@ final class SkillsCopyHelper {
             }
             Path target = dest.resolve(name);
             if (Files.isDirectory(entry)) {
-                if (Files.exists(target)
-                        && Files.isDirectory(target)) {
+                if (Files.exists(target) && Files.isDirectory(target)) {
                     mergeDirectory(entry, target);
                 } else if (!Files.exists(target)) {
-                    CopyHelpers.copyDirectory(
-                            entry, target);
+                    CopyHelpers.copyDirectory(entry, target);
                 }
             } else if (!Files.exists(target)) {
                 CopyHelpers.copyStaticFile(entry, target);
@@ -59,17 +53,14 @@ final class SkillsCopyHelper {
     }
 
     /** Merges src into existing dest, skipping existing files. */
-    private static void mergeDirectory(
-            Path src, Path dest) {
+    private static void mergeDirectory(Path src, Path dest) {
         for (Path entry : listEntriesSorted(src)) {
-            Path target = dest.resolve(
-                    entry.getFileName().toString());
+            Path target = dest.resolve(entry.getFileName().toString());
             if (Files.isDirectory(entry)) {
                 if (Files.exists(target)) {
                     mergeDirectory(entry, target);
                 } else {
-                    CopyHelpers.copyDirectory(
-                            entry, target);
+                    CopyHelpers.copyDirectory(entry, target);
                 }
             } else if (!Files.exists(target)) {
                 CopyHelpers.copyStaticFile(entry, target);
@@ -85,13 +76,9 @@ final class SkillsCopyHelper {
      */
     static List<Path> listDirsSorted(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream
-                    .filter(Files::isDirectory)
-                    .sorted()
-                    .toList();
+            return stream.filter(Files::isDirectory).sorted().toList();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list directory: " + dir, e);
+            throw new UncheckedIOException("Failed to list directory: " + dir, e);
         }
     }
 
@@ -103,12 +90,9 @@ final class SkillsCopyHelper {
      */
     static List<Path> listEntriesSorted(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream
-                    .sorted()
-                    .toList();
+            return stream.sorted().toList();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list directory: " + dir, e);
+            throw new UncheckedIOException("Failed to list directory: " + dir, e);
         }
     }
 }

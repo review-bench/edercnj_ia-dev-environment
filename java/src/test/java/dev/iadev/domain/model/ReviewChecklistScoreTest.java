@@ -1,10 +1,10 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ReviewChecklistScore")
 class ReviewChecklistScoreTest {
@@ -22,8 +22,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("base score without conditionals is 45")
         void maxScore_noConditionals_returns45() {
-            var score = ReviewChecklistScore.compute(
-                    false, false, false);
+            var score = ReviewChecklistScore.compute(false, false, false);
 
             assertThat(score.maxScore()).isEqualTo(BASE_SCORE);
         }
@@ -31,53 +30,42 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("event-driven adds 8 points")
         void maxScore_eventDriven_returns53() {
-            var score = ReviewChecklistScore.compute(
-                    true, false, false);
+            var score = ReviewChecklistScore.compute(true, false, false);
 
-            assertThat(score.maxScore())
-                    .isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE);
+            assertThat(score.maxScore()).isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE);
         }
 
         @Test
         @DisplayName("pci-dss adds 7 points")
         void maxScore_pciDss_returns52() {
-            var score = ReviewChecklistScore.compute(
-                    false, true, false);
+            var score = ReviewChecklistScore.compute(false, true, false);
 
-            assertThat(score.maxScore())
-                    .isEqualTo(BASE_SCORE + PCI_DSS_SCORE);
+            assertThat(score.maxScore()).isEqualTo(BASE_SCORE + PCI_DSS_SCORE);
         }
 
         @Test
         @DisplayName("lgpd adds 4 points")
         void maxScore_lgpd_returns49() {
-            var score = ReviewChecklistScore.compute(
-                    false, false, true);
+            var score = ReviewChecklistScore.compute(false, false, true);
 
-            assertThat(score.maxScore())
-                    .isEqualTo(BASE_SCORE + LGPD_SCORE);
+            assertThat(score.maxScore()).isEqualTo(BASE_SCORE + LGPD_SCORE);
         }
 
         @Test
         @DisplayName("all conditionals sum to 64")
         void maxScore_allConditionals_returns64() {
-            var score = ReviewChecklistScore.compute(
-                    true, true, true);
+            var score = ReviewChecklistScore.compute(true, true, true);
 
             assertThat(score.maxScore())
-                    .isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE
-                            + PCI_DSS_SCORE + LGPD_SCORE);
+                    .isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE + PCI_DSS_SCORE + LGPD_SCORE);
         }
 
         @Test
         @DisplayName("event + pci-dss sum to 60")
         void maxScore_eventAndPciDss_returns60() {
-            var score = ReviewChecklistScore.compute(
-                    true, true, false);
+            var score = ReviewChecklistScore.compute(true, true, false);
 
-            assertThat(score.maxScore())
-                    .isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE
-                            + PCI_DSS_SCORE);
+            assertThat(score.maxScore()).isEqualTo(BASE_SCORE + EVENT_DRIVEN_SCORE + PCI_DSS_SCORE);
         }
     }
 
@@ -88,8 +76,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("base threshold is ceil(45 * 0.84) = 38")
         void goThreshold_base_returns38() {
-            var score = ReviewChecklistScore.compute(
-                    false, false, false);
+            var score = ReviewChecklistScore.compute(false, false, false);
 
             assertThat(score.goThreshold()).isEqualTo(38);
         }
@@ -97,8 +84,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("event threshold is ceil(53 * 0.84) = 45")
         void goThreshold_eventDriven_returns45() {
-            var score = ReviewChecklistScore.compute(
-                    true, false, false);
+            var score = ReviewChecklistScore.compute(true, false, false);
 
             assertThat(score.goThreshold()).isEqualTo(45);
         }
@@ -106,8 +92,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("pci-dss threshold is ceil(52 * 0.84) = 44")
         void goThreshold_pciDss_returns44() {
-            var score = ReviewChecklistScore.compute(
-                    false, true, false);
+            var score = ReviewChecklistScore.compute(false, true, false);
 
             assertThat(score.goThreshold()).isEqualTo(44);
         }
@@ -115,8 +100,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("all conditionals threshold is ceil(64 * 0.84) = 54")
         void goThreshold_allConditionals_returns54() {
-            var score = ReviewChecklistScore.compute(
-                    true, true, true);
+            var score = ReviewChecklistScore.compute(true, true, true);
 
             assertThat(score.goThreshold()).isEqualTo(54);
         }
@@ -124,8 +108,7 @@ class ReviewChecklistScoreTest {
         @Test
         @DisplayName("threshold rounds up with ceil")
         void goThreshold_rounding_usesCeil() {
-            var score = ReviewChecklistScore.compute(
-                    true, true, false);
+            var score = ReviewChecklistScore.compute(true, true, false);
             // 60 * 0.84 = 50.4, ceil = 51
             assertThat(score.goThreshold()).isEqualTo(51);
         }

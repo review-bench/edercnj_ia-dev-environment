@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * Internal helper for extracting typed values from YAML-parsed maps.
  *
- * <p>Provides safe extraction with type checking and required field validation.
- * Used by all model classes in their {@code fromMap()} factory methods.</p>
+ * <p>Provides safe extraction with type checking and required field validation. Used by all model
+ * classes in their {@code fromMap()} factory methods.
  */
 final class MapHelper {
 
@@ -24,10 +24,7 @@ final class MapHelper {
      * @return the non-null value
      * @throws ConfigValidationException if the field is missing
      */
-    static Object requireField(
-            Map<String, Object> map,
-            String key,
-            String model) {
+    static Object requireField(Map<String, Object> map, String key, String model) {
         if (!map.containsKey(key) || map.get(key) == null) {
             throw new ConfigValidationException(key, model);
         }
@@ -43,10 +40,7 @@ final class MapHelper {
      * @return the string value
      * @throws ConfigValidationException if field is missing or not a String
      */
-    static String requireString(
-            Map<String, Object> map,
-            String key,
-            String model) {
+    static String requireString(Map<String, Object> map, String key, String model) {
         var value = requireField(map, key, model);
         if (value instanceof String s) {
             return s;
@@ -62,10 +56,7 @@ final class MapHelper {
      * @param defaultValue the default if absent
      * @return the string value or default
      */
-    static String optionalString(
-            Map<String, Object> map,
-            String key,
-            String defaultValue) {
+    static String optionalString(Map<String, Object> map, String key, String defaultValue) {
         var value = map.get(key);
         return value instanceof String s ? s : defaultValue;
     }
@@ -78,10 +69,7 @@ final class MapHelper {
      * @param defaultValue the default if absent
      * @return the boolean value or default
      */
-    static boolean optionalBoolean(
-            Map<String, Object> map,
-            String key,
-            boolean defaultValue) {
+    static boolean optionalBoolean(Map<String, Object> map, String key, boolean defaultValue) {
         var value = map.get(key);
         return value instanceof Boolean b ? b : defaultValue;
     }
@@ -94,10 +82,7 @@ final class MapHelper {
      * @param defaultValue the default if absent
      * @return the integer value or default
      */
-    static int optionalInt(
-            Map<String, Object> map,
-            String key,
-            int defaultValue) {
+    static int optionalInt(Map<String, Object> map, String key, int defaultValue) {
         var value = map.get(key);
         if (value instanceof Number n) {
             return n.intValue();
@@ -113,9 +98,7 @@ final class MapHelper {
      * @return the sub-map or empty map
      */
     @SuppressWarnings("unchecked")
-    static Map<String, Object> optionalMap(
-            Map<String, Object> map,
-            String key) {
+    static Map<String, Object> optionalMap(Map<String, Object> map, String key) {
         var value = map.get(key);
         if (value instanceof Map<?, ?> m) {
             return (Map<String, Object>) m;
@@ -133,10 +116,7 @@ final class MapHelper {
      * @throws ConfigValidationException if field is missing or not a Map
      */
     @SuppressWarnings("unchecked")
-    static Map<String, Object> requireMap(
-            Map<String, Object> map,
-            String key,
-            String model) {
+    static Map<String, Object> requireMap(Map<String, Object> map, String key, String model) {
         var value = requireField(map, key, model);
         if (value instanceof Map<?, ?> m) {
             return (Map<String, Object>) m;
@@ -152,9 +132,7 @@ final class MapHelper {
      * @return the list or empty list (immutable)
      */
     @SuppressWarnings("unchecked")
-    static List<String> optionalStringList(
-            Map<String, Object> map,
-            String key) {
+    static List<String> optionalStringList(Map<String, Object> map, String key) {
         var value = map.get(key);
         if (value instanceof List<?> list) {
             return List.copyOf((List<String>) list);
@@ -170,9 +148,7 @@ final class MapHelper {
      * @return the string map or empty map (immutable)
      */
     @SuppressWarnings("unchecked")
-    static Map<String, String> optionalStringMap(
-            Map<String, Object> map,
-            String key) {
+    static Map<String, String> optionalStringMap(Map<String, Object> map, String key) {
         var value = map.get(key);
         if (value instanceof Map<?, ?> m) {
             return Map.copyOf((Map<String, String>) m);

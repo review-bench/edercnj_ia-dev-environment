@@ -1,12 +1,11 @@
 package dev.iadev.domain.stack;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.iadev.testutil.TestConfigBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("CoreKpRouting")
 class CoreKpRoutingTest {
@@ -25,32 +24,26 @@ class CoreKpRoutingTest {
         @DisplayName("first route maps clean-code to coding-standards")
         void coreMapping_first_cleanCode() {
             var first = CoreKpRouting.CORE_TO_KP_MAPPING.get(0);
-            assertThat(first.sourceFile())
-                    .isEqualTo("01-clean-code.md");
-            assertThat(first.kpName())
-                    .isEqualTo("coding-standards");
-            assertThat(first.destFile())
-                    .isEqualTo("clean-code.md");
+            assertThat(first.sourceFile()).isEqualTo("01-clean-code.md");
+            assertThat(first.kpName()).isEqualTo("coding-standards");
+            assertThat(first.destFile()).isEqualTo("clean-code.md");
         }
 
         @Test
         @DisplayName("last route maps refactoring to coding-standards")
         void coreMapping_last_refactoring() {
-            var last = CoreKpRouting.CORE_TO_KP_MAPPING
-                    .get(CoreKpRouting.CORE_TO_KP_MAPPING.size() - 1);
-            assertThat(last.sourceFile())
-                    .isEqualTo("14-refactoring-guidelines.md");
-            assertThat(last.kpName())
-                    .isEqualTo("coding-standards");
-            assertThat(last.destFile())
-                    .isEqualTo("refactoring-guidelines.md");
+            var last =
+                    CoreKpRouting.CORE_TO_KP_MAPPING.get(
+                            CoreKpRouting.CORE_TO_KP_MAPPING.size() - 1);
+            assertThat(last.sourceFile()).isEqualTo("14-refactoring-guidelines.md");
+            assertThat(last.kpName()).isEqualTo("coding-standards");
+            assertThat(last.destFile()).isEqualTo("refactoring-guidelines.md");
         }
 
         @Test
         @DisplayName("list is immutable")
         void coreMapping_whenCalled_immutable() {
-            assertThat(CoreKpRouting.CORE_TO_KP_MAPPING)
-                    .isUnmodifiable();
+            assertThat(CoreKpRouting.CORE_TO_KP_MAPPING).isUnmodifiable();
         }
     }
 
@@ -68,12 +61,9 @@ class CoreKpRoutingTest {
         @DisplayName("conditional route excludes library style")
         void conditionalKp_whenCalled_excludesLibrary() {
             var route = CoreKpRouting.CONDITIONAL_CORE_KP.get(0);
-            assertThat(route.sourceFile())
-                    .isEqualTo("12-cloud-native-principles.md");
-            assertThat(route.conditionField())
-                    .isEqualTo("architecture_style");
-            assertThat(route.conditionExclude())
-                    .isEqualTo("library");
+            assertThat(route.sourceFile()).isEqualTo("12-cloud-native-principles.md");
+            assertThat(route.conditionField()).isEqualTo("architecture_style");
+            assertThat(route.conditionExclude()).isEqualTo("library");
         }
     }
 
@@ -84,41 +74,41 @@ class CoreKpRoutingTest {
         @Test
         @DisplayName("microservice includes cloud-native route (13 total)")
         void getActiveRoutes_microservice_includesCloudNative() {
-            var config = TestConfigBuilder.builder()
-                    .architectureStyle("microservice")
-                    .build();
+            var config = TestConfigBuilder.builder().architectureStyle("microservice").build();
 
             var routes = CoreKpRouting.getActiveRoutes(config);
 
             assertThat(routes).hasSize(13);
-            assertThat(routes.stream()
-                    .anyMatch(r -> "12-cloud-native-principles.md"
-                            .equals(r.sourceFile())))
+            assertThat(
+                            routes.stream()
+                                    .anyMatch(
+                                            r ->
+                                                    "12-cloud-native-principles.md"
+                                                            .equals(r.sourceFile())))
                     .isTrue();
         }
 
         @Test
         @DisplayName("library excludes cloud-native route (12 total)")
         void getActiveRoutes_library_excludesCloudNative() {
-            var config = TestConfigBuilder.builder()
-                    .architectureStyle("library")
-                    .build();
+            var config = TestConfigBuilder.builder().architectureStyle("library").build();
 
             var routes = CoreKpRouting.getActiveRoutes(config);
 
             assertThat(routes).hasSize(12);
-            assertThat(routes.stream()
-                    .noneMatch(r -> "12-cloud-native-principles.md"
-                            .equals(r.sourceFile())))
+            assertThat(
+                            routes.stream()
+                                    .noneMatch(
+                                            r ->
+                                                    "12-cloud-native-principles.md"
+                                                            .equals(r.sourceFile())))
                     .isTrue();
         }
 
         @Test
         @DisplayName("monolith includes cloud-native route")
         void getActiveRoutes_monolith_includesCloudNative() {
-            var config = TestConfigBuilder.builder()
-                    .architectureStyle("monolith")
-                    .build();
+            var config = TestConfigBuilder.builder().architectureStyle("monolith").build();
 
             var routes = CoreKpRouting.getActiveRoutes(config);
 
@@ -133,12 +123,9 @@ class CoreKpRoutingTest {
         @Test
         @DisplayName("architecture_style returns config style")
         void resolveCondition_architectureStyle_returnsStyle() {
-            var config = TestConfigBuilder.builder()
-                    .architectureStyle("microservice")
-                    .build();
+            var config = TestConfigBuilder.builder().architectureStyle("microservice").build();
 
-            var value = CoreKpRouting.resolveConditionValue(
-                    config, "architecture_style");
+            var value = CoreKpRouting.resolveConditionValue(config, "architecture_style");
 
             assertThat(value).isEqualTo("microservice");
         }
@@ -148,8 +135,7 @@ class CoreKpRoutingTest {
         void resolveCondition_unknownField_empty() {
             var config = TestConfigBuilder.builder().build();
 
-            var value = CoreKpRouting.resolveConditionValue(
-                    config, "unknown_field");
+            var value = CoreKpRouting.resolveConditionValue(config, "unknown_field");
 
             assertThat(value).isEmpty();
         }

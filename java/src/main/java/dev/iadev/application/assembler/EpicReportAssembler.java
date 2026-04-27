@@ -2,7 +2,6 @@ package dev.iadev.application.assembler;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,56 +9,44 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Copies the epic execution report template to two output
- * locations for runtime resolution.
+ * Copies the epic execution report template to two output locations for runtime resolution.
  *
- * <p>The template contains {@code {{PLACEHOLDER}}} tokens
- * intended for runtime resolution by the consolidation
- * subagent, NOT for build-time rendering. Content is copied
- * verbatim.</p>
+ * <p>The template contains {@code {{PLACEHOLDER}}} tokens intended for runtime resolution by the
+ * consolidation subagent, NOT for build-time rendering. Content is copied verbatim.
  *
- * <p>This is the twenty-fourth assembler in the pipeline
- * (position 22 of 23 per RULE-005). Its target is
- * {@link AssemblerTarget#ROOT}.</p>
+ * <p>This is the twenty-fourth assembler in the pipeline (position 22 of 23 per RULE-005). Its
+ * target is {@link AssemblerTarget#ROOT}.
  *
  * @see Assembler
  */
-public final class EpicReportAssembler
-        implements Assembler {
+public final class EpicReportAssembler implements Assembler {
 
-    private static final String TEMPLATE_FILENAME =
-            "_TEMPLATE-EPIC-EXECUTION-REPORT.md";
-    private static final String TEMPLATES_SUBDIR =
-            "shared/templates";
-    private static final String CLAUDE_OUTPUT_SUBDIR =
-            ".claude/templates";
+    private static final String TEMPLATE_FILENAME = "_TEMPLATE-EPIC-EXECUTION-REPORT.md";
+    private static final String TEMPLATES_SUBDIR = "shared/templates";
+    private static final String CLAUDE_OUTPUT_SUBDIR = ".claude/templates";
 
     /** The 9 mandatory sections that must be present. */
-    static final List<String> MANDATORY_SECTIONS = List.of(
-            "Sumário Executivo",
-            "Timeline de Execução",
-            "Status Final por Story",
-            "Findings Consolidados",
-            "Coverage Delta",
-            "TDD Compliance",
-            "Commits e SHAs",
-            "Issues Não Resolvidos",
-            "PR Link"
-    );
+    static final List<String> MANDATORY_SECTIONS =
+            List.of(
+                    "Sumário Executivo",
+                    "Timeline de Execução",
+                    "Status Final por Story",
+                    "Findings Consolidados",
+                    "Coverage Delta",
+                    "TDD Compliance",
+                    "Commits e SHAs",
+                    "Issues Não Resolvidos",
+                    "PR Link");
 
     private final Path resourcesDir;
 
-    /**
-     * Creates an EpicReportAssembler using classpath
-     * resources.
-     */
+    /** Creates an EpicReportAssembler using classpath resources. */
     public EpicReportAssembler() {
         this(resolveClasspathResources());
     }
 
     /**
-     * Creates an EpicReportAssembler with an explicit
-     * resources directory.
+     * Creates an EpicReportAssembler with an explicit resources directory.
      *
      * @param resourcesDir the base resources directory
      */
@@ -70,37 +57,27 @@ public final class EpicReportAssembler
     /**
      * {@inheritDoc}
      *
-     * <p>Copies the epic report template verbatim to
-     * {@code .claude/templates/}. Returns empty list if
-     * the template is missing or does not contain all 9
-     * mandatory sections.</p>
+     * <p>Copies the epic report template verbatim to {@code .claude/templates/}. Returns empty list
+     * if the template is missing or does not contain all 9 mandatory sections.
      */
     @Override
-    public List<String> assemble(
-            ProjectConfig config,
-            TemplateEngine engine,
-            Path outputDir) {
+    public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {
         return loadValidatedTemplate()
                 .map(content -> copyToOutputDirs(content, outputDir))
                 .orElseGet(List::of);
     }
 
     private Optional<String> loadValidatedTemplate() {
-        Path templatePath = resourcesDir
-                .resolve(TEMPLATES_SUBDIR)
-                .resolve(TEMPLATE_FILENAME);
+        Path templatePath = resourcesDir.resolve(TEMPLATES_SUBDIR).resolve(TEMPLATE_FILENAME);
 
         if (!Files.exists(templatePath)) {
             return Optional.empty();
         }
-        String content =
-                CopyHelpers.readFile(templatePath);
-        return hasAllMandatorySections(content)
-                ? Optional.of(content) : Optional.empty();
+        String content = CopyHelpers.readFile(templatePath);
+        return hasAllMandatorySections(content) ? Optional.of(content) : Optional.empty();
     }
 
-    private List<String> copyToOutputDirs(
-            String content, Path outputDir) {
+    private List<String> copyToOutputDirs(String content, Path outputDir) {
         List<String> results = new ArrayList<>();
         Path destDir = outputDir.resolve(CLAUDE_OUTPUT_SUBDIR);
         CopyHelpers.ensureDirectory(destDir);
@@ -111,20 +88,16 @@ public final class EpicReportAssembler
     }
 
     /**
-     * Checks that the content contains all 9 mandatory
-     * sections.
+     * Checks that the content contains all 9 mandatory sections.
      *
      * @param content the template content
      * @return true if all mandatory sections are present
      */
     static boolean hasAllMandatorySections(String content) {
-        return CopyHelpers.hasAllMandatorySections(
-                content, MANDATORY_SECTIONS);
+        return CopyHelpers.hasAllMandatorySections(content, MANDATORY_SECTIONS);
     }
 
     private static Path resolveClasspathResources() {
-        return dev.iadev.util.ResourceResolver
-                .resolveResourceDir("shared")
-                .getParent();
+        return dev.iadev.util.ResourceResolver.resolveResourceDir("shared").getParent();
     }
 }

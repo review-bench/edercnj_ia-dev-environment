@@ -1,24 +1,23 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
 import dev.iadev.testutil.TestConfigBuilder;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for ConstitutionAssembler -- generates
- * CONSTITUTION.md conditionally when compliance != "none".
+ * Tests for ConstitutionAssembler -- generates CONSTITUTION.md conditionally when compliance !=
+ * "none".
  */
 @DisplayName("ConstitutionAssembler")
 class ConstitutionAssemblerTest {
@@ -30,11 +29,9 @@ class ConstitutionAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssembler() {
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -43,57 +40,41 @@ class ConstitutionAssemblerTest {
     class ComplianceNone {
 
         @Test
-        @DisplayName("returns empty list when compliance"
-                + " is empty")
-        void assemble_complianceEmpty_returnsEmptyList(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty list when compliance" + " is empty")
+        void assemble_complianceEmpty_returnsEmptyList(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("does not create CONSTITUTION.md"
-                + " when compliance is empty")
-        void assemble_complianceEmpty_noFileCreated(
-                @TempDir Path tempDir) {
+        @DisplayName("does not create CONSTITUTION.md" + " when compliance is empty")
+        void assemble_complianceEmpty_noFileCreated(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            Path constitutionFile =
-                    outputDir.resolve("CONSTITUTION.md");
+            Path constitutionFile = outputDir.resolve("CONSTITUTION.md");
             assertThat(constitutionFile).doesNotExist();
         }
 
         @Test
-        @DisplayName("does not create output directory"
-                + " when compliance is empty")
-        void assemble_complianceEmpty_noOutputDir(
-                @TempDir Path tempDir) {
+        @DisplayName("does not create output directory" + " when compliance is empty")
+        void assemble_complianceEmpty_noOutputDir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
             assertThat(outputDir).doesNotExist();
         }
@@ -104,138 +85,101 @@ class ConstitutionAssemblerTest {
     class CompliancePciDss {
 
         @Test
-        @DisplayName("generates CONSTITUTION.md when"
-                + " compliance is pci-dss")
-        void assemble_pciDss_generatesFile(
-                @TempDir Path tempDir) {
+        @DisplayName("generates CONSTITUTION.md when" + " compliance is pci-dss")
+        void assemble_pciDss_generatesFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected =
-                    outputDir.resolve("CONSTITUTION.md");
+            Path expected = outputDir.resolve("CONSTITUTION.md");
             assertThat(expected).exists();
         }
 
         @Test
-        @DisplayName("returns file path ending in"
-                + " CONSTITUTION.md")
-        void assemble_pciDss_returnsFilePath(
-                @TempDir Path tempDir) {
+        @DisplayName("returns file path ending in" + " CONSTITUTION.md")
+        void assemble_pciDss_returnsFilePath(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
-            assertThat(files.get(0))
-                    .endsWith("CONSTITUTION.md");
+            assertThat(files.get(0)).endsWith("CONSTITUTION.md");
         }
 
         @Test
         @DisplayName("contains Invariants section")
-        void assemble_pciDss_containsInvariants(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_containsInvariants(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("## Invariants");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("## Invariants");
         }
 
         @Test
         @DisplayName("contains Security Constraints section")
-        void assemble_pciDss_containsSecurityConstraints(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_containsSecurityConstraints(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("## Security Constraints");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("## Security Constraints");
         }
 
         @Test
-        @DisplayName("contains Architecture Boundaries"
-                + " section")
-        void assemble_pciDss_containsArchBoundaries(
-                @TempDir Path tempDir) {
+        @DisplayName("contains Architecture Boundaries" + " section")
+        void assemble_pciDss_containsArchBoundaries(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("## Architecture Boundaries");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("## Architecture Boundaries");
         }
 
         @Test
         @DisplayName("contains Naming Conventions section")
-        void assemble_pciDss_containsNamingConventions(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_containsNamingConventions(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("## Naming Conventions");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("## Naming Conventions");
         }
 
         @Test
-        @DisplayName("contains Compliance Requirements"
-                + " section")
-        void assemble_pciDss_containsComplianceReqs(
-                @TempDir Path tempDir) {
+        @DisplayName("contains Compliance Requirements" + " section")
+        void assemble_pciDss_containsComplianceReqs(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("## Compliance Requirements");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("## Compliance Requirements");
         }
     }
 
@@ -244,77 +188,59 @@ class ConstitutionAssemblerTest {
     class CweMappings {
 
         @Test
-        @DisplayName("contains CWE-89 SQL Injection"
-                + " mapping")
-        void assemble_pciDss_containsCwe89(
-                @TempDir Path tempDir) {
+        @DisplayName("contains CWE-89 SQL Injection" + " mapping")
+        void assemble_pciDss_containsCwe89(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
             assertThat(content).contains("CWE-89");
         }
 
         @Test
-        @DisplayName("contains CWE-312 Cleartext Storage"
-                + " mapping")
-        void assemble_pciDss_containsCwe312(
-                @TempDir Path tempDir) {
+        @DisplayName("contains CWE-312 Cleartext Storage" + " mapping")
+        void assemble_pciDss_containsCwe312(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
             assertThat(content).contains("CWE-312");
         }
 
         @Test
         @DisplayName("contains RULE-SEC invariant IDs")
-        void assemble_pciDss_containsRuleSecIds(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_containsRuleSecIds(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
             assertThat(content).contains("RULE-SEC-001");
             assertThat(content).contains("RULE-SEC-002");
         }
 
         @Test
         @DisplayName("contains RULE-ARCH invariant IDs")
-        void assemble_pciDss_containsRuleArchIds(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_containsRuleArchIds(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
             assertThat(content).contains("RULE-ARCH-001");
         }
     }
@@ -325,11 +251,9 @@ class ConstitutionAssemblerTest {
 
         @Test
         @DisplayName("resolves project name in output")
-        void assemble_pciDss_resolvesProjectName(
-                @TempDir Path tempDir) {
+        void assemble_pciDss_resolvesProjectName(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler();
+            ConstitutionAssembler assembler = new ConstitutionAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .projectName("payments-api")
@@ -337,13 +261,10 @@ class ConstitutionAssemblerTest {
                             .build();
             TemplateEngine engine = new TemplateEngine();
 
-            assembler.assemble(
-                    config, engine, outputDir);
+            assembler.assemble(config, engine, outputDir);
 
-            String content = readFile(
-                    outputDir.resolve("CONSTITUTION.md"));
-            assertThat(content)
-                    .contains("payments-api");
+            String content = readFile(outputDir.resolve("CONSTITUTION.md"));
+            assertThat(content).contains("payments-api");
         }
     }
 
@@ -352,11 +273,9 @@ class ConstitutionAssemblerTest {
     class PipelineRegistration {
 
         @Test
-        @DisplayName("ConstitutionAssembler is registered"
-                + " in AssemblerFactory")
+        @DisplayName("ConstitutionAssembler is registered" + " in AssemblerFactory")
         void buildAssemblers_always_containsConstitution() {
-            List<AssemblerDescriptor> descriptors =
-                    AssemblerFactory.buildAssemblers();
+            List<AssemblerDescriptor> descriptors = AssemblerFactory.buildAssemblers();
 
             assertThat(descriptors)
                     .extracting(AssemblerDescriptor::name)
@@ -364,25 +283,17 @@ class ConstitutionAssemblerTest {
         }
 
         @Test
-        @DisplayName("ConstitutionAssembler executes"
-                + " before RulesAssembler")
+        @DisplayName("ConstitutionAssembler executes" + " before RulesAssembler")
         void buildAssemblers_always_constitutionBeforeRules() {
-            List<AssemblerDescriptor> descriptors =
-                    AssemblerFactory.buildAssemblers();
+            List<AssemblerDescriptor> descriptors = AssemblerFactory.buildAssemblers();
 
-            List<String> names = descriptors.stream()
-                    .map(AssemblerDescriptor::name)
-                    .toList();
+            List<String> names = descriptors.stream().map(AssemblerDescriptor::name).toList();
 
-            int constitutionIdx =
-                    names.indexOf("ConstitutionAssembler");
-            int rulesIdx =
-                    names.indexOf("RulesAssembler");
+            int constitutionIdx = names.indexOf("ConstitutionAssembler");
+            int rulesIdx = names.indexOf("RulesAssembler");
 
-            assertThat(constitutionIdx)
-                    .isGreaterThanOrEqualTo(0);
-            assertThat(constitutionIdx)
-                    .isLessThan(rulesIdx);
+            assertThat(constitutionIdx).isGreaterThanOrEqualTo(0);
+            assertThat(constitutionIdx).isLessThan(rulesIdx);
         }
     }
 
@@ -391,20 +302,15 @@ class ConstitutionAssemblerTest {
     class GracefulNoOp {
 
         @Test
-        @DisplayName("returns empty list when template"
-                + " is absent")
-        void assemble_templateAbsent_returnsEmpty(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("returns empty list when template" + " is absent")
+        void assemble_templateAbsent_returnsEmpty(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
-            ConstitutionAssembler assembler =
-                    new ConstitutionAssembler(resourcesDir);
+            ConstitutionAssembler assembler = new ConstitutionAssembler(resourcesDir);
             ProjectConfig config = buildPciDssConfig();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
@@ -422,11 +328,9 @@ class ConstitutionAssemblerTest {
 
     private static String readFile(Path path) {
         try {
-            return Files.readString(
-                    path, StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Failed to read: " + path, e);
+            throw new RuntimeException("Failed to read: " + path, e);
         }
     }
 }

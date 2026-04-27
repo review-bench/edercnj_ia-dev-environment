@@ -1,5 +1,8 @@
 package dev.iadev.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.model.Platform;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,30 +12,20 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine.TypeConversionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-/**
- * Tests for PlatformConverter — Picocli type converter
- * for the Platform enum.
- */
+/** Tests for PlatformConverter — Picocli type converter for the Platform enum. */
 @DisplayName("PlatformConverter")
 class PlatformConverterTest {
 
-    private final PlatformConverter converter =
-            new PlatformConverter();
+    private final PlatformConverter converter = new PlatformConverter();
 
     @Nested
     @DisplayName("Valid platform names")
     class ValidPlatformNames {
 
         @ParameterizedTest
-        @CsvSource({
-                "claude-code, CLAUDE_CODE"
-        })
+        @CsvSource({"claude-code, CLAUDE_CODE"})
         @DisplayName("converts kebab-case to Platform enum")
-        void convert_validName_returnsPlatform(
-                String input, Platform expected) {
+        void convert_validName_returnsPlatform(String input, Platform expected) {
             Platform result = converter.convert(input);
 
             assertThat(result).isEqualTo(expected);
@@ -44,9 +37,10 @@ class PlatformConverterTest {
     class AllKeyword {
 
         @Test
-        @DisplayName("returns Platform.ALL for 'all' to "
-                + "signal no filter (Rule 03 — never return "
-                + "null)")
+        @DisplayName(
+                "returns Platform.ALL for 'all' to "
+                        + "signal no filter (Rule 03 — never return "
+                        + "null)")
         void convert_all_returnsAllSentinel() {
             Platform result = converter.convert("all");
 
@@ -59,49 +53,40 @@ class PlatformConverterTest {
     class InvalidPlatformNames {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "invalid", "copilot", "codex",
-                "CLAUDE_CODE",
-                "Claude-Code", "shared",
-                "unknown"
-        })
-        @DisplayName("throws TypeConversionException "
-                + "with clear message")
-        void convert_invalidName_throwsWithMessage(
-                String input) {
-            assertThatThrownBy(
-                    () -> converter.convert(input))
-                    .isInstanceOf(
-                            TypeConversionException.class)
-                    .hasMessageContaining(
-                            "Invalid platform:")
+        @ValueSource(
+                strings = {
+                    "invalid",
+                    "copilot",
+                    "codex",
+                    "CLAUDE_CODE",
+                    "Claude-Code",
+                    "shared",
+                    "unknown"
+                })
+        @DisplayName("throws TypeConversionException " + "with clear message")
+        void convert_invalidName_throwsWithMessage(String input) {
+            assertThatThrownBy(() -> converter.convert(input))
+                    .isInstanceOf(TypeConversionException.class)
+                    .hasMessageContaining("Invalid platform:")
                     .hasMessageContaining(input)
                     .hasMessageContaining("claude-code")
                     .hasMessageContaining("all");
         }
 
         @Test
-        @DisplayName("empty string produces error with "
-                + "quoted representation")
+        @DisplayName("empty string produces error with " + "quoted representation")
         void convert_emptyString_throwsWithQuotedEmpty() {
-            assertThatThrownBy(
-                    () -> converter.convert(""))
-                    .isInstanceOf(
-                            TypeConversionException.class)
-                    .hasMessageContaining(
-                            "Invalid platform: ''");
+            assertThatThrownBy(() -> converter.convert(""))
+                    .isInstanceOf(TypeConversionException.class)
+                    .hasMessageContaining("Invalid platform: ''");
         }
 
         @Test
-        @DisplayName("rejects 'shared' as not "
-                + "user-selectable")
+        @DisplayName("rejects 'shared' as not " + "user-selectable")
         void convert_shared_throwsException() {
-            assertThatThrownBy(
-                    () -> converter.convert("shared"))
-                    .isInstanceOf(
-                            TypeConversionException.class)
-                    .hasMessageContaining(
-                            "Invalid platform: 'shared'");
+            assertThatThrownBy(() -> converter.convert("shared"))
+                    .isInstanceOf(TypeConversionException.class)
+                    .hasMessageContaining("Invalid platform: 'shared'");
         }
     }
 
@@ -110,15 +95,11 @@ class PlatformConverterTest {
     class ErrorMessageFormat {
 
         @Test
-        @DisplayName("error message lists all accepted "
-                + "values")
+        @DisplayName("error message lists all accepted " + "values")
         void convert_invalid_messageListsAcceptedValues() {
-            assertThatThrownBy(
-                    () -> converter.convert("bad"))
-                    .isInstanceOf(
-                            TypeConversionException.class)
-                    .hasMessageContaining(
-                            "Valid values:")
+            assertThatThrownBy(() -> converter.convert("bad"))
+                    .isInstanceOf(TypeConversionException.class)
+                    .hasMessageContaining("Valid values:")
                     .hasMessageContaining("claude-code")
                     .hasMessageContaining("all");
         }

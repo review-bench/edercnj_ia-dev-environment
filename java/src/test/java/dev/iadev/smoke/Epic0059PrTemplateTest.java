@@ -1,28 +1,27 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
- * TASK-0059-0007-001: Verification tests for the GitHub PR template
- * that mandates the {@code ## Orchestrator Evidence} section.
+ * TASK-0059-0007-001: Verification tests for the GitHub PR template that mandates the {@code ##
+ * Orchestrator Evidence} section.
  *
- * <p>Validates the structural requirements of
- * {@code .github/pull_request_template.md}:</p>
+ * <p>Validates the structural requirements of {@code .github/pull_request_template.md}:
+ *
  * <ol>
- *   <li>Template file exists and is readable.</li>
- *   <li>Template contains the mandatory {@code ## Orchestrator Evidence} section.</li>
- *   <li>Template contains all required fields (Story IDs, Orchestrator Commit SHA,
- *       Invocation Skill, Phase 1 Artifacts, Phase 3 Artifacts).</li>
- *   <li>Template contains placeholder values that {@code audit-pr-evidence.sh}
- *       will detect as unfilled (proof of rejection surface).</li>
+ *   <li>Template file exists and is readable.
+ *   <li>Template contains the mandatory {@code ## Orchestrator Evidence} section.
+ *   <li>Template contains all required fields (Story IDs, Orchestrator Commit SHA, Invocation
+ *       Skill, Phase 1 Artifacts, Phase 3 Artifacts).
+ *   <li>Template contains placeholder values that {@code audit-pr-evidence.sh} will detect as
+ *       unfilled (proof of rejection surface).
  * </ol>
  *
  * @see <a href="plans/epic-0059/story-0059-0007.md">story-0059-0007</a>
@@ -54,13 +53,12 @@ class Epic0059PrTemplateTest {
     @DisplayName("templateContainsStoryIdsField — Story IDs campo obrigatório")
     void templateContainsStoryIdsField() throws IOException {
         String content = readTemplate();
-        assertThat(content)
-                .as("template must contain 'Story IDs' field")
-                .contains("Story IDs");
+        assertThat(content).as("template must contain 'Story IDs' field").contains("Story IDs");
     }
 
     @Test
-    @DisplayName("templateContainsOrchestratorCommitShaField — Orchestrator Commit SHA campo obrigatório")
+    @DisplayName(
+            "templateContainsOrchestratorCommitShaField — Orchestrator Commit SHA campo obrigatório")
     void templateContainsOrchestratorCommitShaField() throws IOException {
         String content = readTemplate();
         assertThat(content)
@@ -105,7 +103,8 @@ class Epic0059PrTemplateTest {
     }
 
     @Test
-    @DisplayName("templateContainsShaPlaceholder — audit must detect unfilled Orchestrator Commit SHA")
+    @DisplayName(
+            "templateContainsShaPlaceholder — audit must detect unfilled Orchestrator Commit SHA")
     void templateContainsShaPlaceholder() throws IOException {
         String content = readTemplate();
         assertThat(content)
@@ -134,15 +133,11 @@ class Epic0059PrTemplateTest {
     // ------------------------------------------------------------------ helpers
 
     private String readTemplate() throws IOException {
-        return Files.readString(
-                repoRoot().resolve(TEMPLATE_PATH),
-                StandardCharsets.UTF_8);
+        return Files.readString(repoRoot().resolve(TEMPLATE_PATH), StandardCharsets.UTF_8);
     }
 
     private Path repoRoot() {
         Path cwd = Path.of("").toAbsolutePath();
-        return cwd.getFileName().toString().equals("java")
-                ? cwd.getParent()
-                : cwd;
+        return cwd.getFileName().toString().equals("java") ? cwd.getParent() : cwd;
     }
 }

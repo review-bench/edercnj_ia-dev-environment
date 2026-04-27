@@ -8,25 +8,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that validate the Pebble template for CLAUDE.md
- * parses and renders cleanly with a dummy context.
+ * Tests that validate the Pebble template for CLAUDE.md parses and renders cleanly with a dummy
+ * context.
  *
- * <p>Part of EPIC-0048 / story-0048-0010. The template is
- * consumed in story-0048-0011 by the new ClaudeMdAssembler;
- * this test is the RED-first contract gate per ADR-0048-B.
+ * <p>Part of EPIC-0048 / story-0048-0010. The template is consumed in story-0048-0011 by the new
+ * ClaudeMdAssembler; this test is the RED-first contract gate per ADR-0048-B.
  */
 @DisplayName("CLAUDE.md template (Pebble)")
 class ClaudeMdTemplateSyntaxTest {
 
-    private static final Path TEMPLATE_PATH = Path.of(
-            "src/main/resources/shared/templates/CLAUDE.md");
+    private static final Path TEMPLATE_PATH =
+            Path.of("src/main/resources/shared/templates/CLAUDE.md");
 
     private TemplateEngine engine;
 
@@ -62,23 +60,18 @@ class ClaudeMdTemplateSyntaxTest {
 
         @Test
         @DisplayName("parses and renders without exception under full context")
-        void template_rendersFullContext_doesNotThrow()
-                throws IOException {
+        void template_rendersFullContext_doesNotThrow() throws IOException {
             String content = Files.readString(TEMPLATE_PATH);
             Map<String, Object> ctx = fullContext();
 
-            assertThatCode(() ->
-                    engine.renderString(content, ctx))
-                    .doesNotThrowAnyException();
+            assertThatCode(() -> engine.renderString(content, ctx)).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("rendered output contains all mandatory section headers")
-        void template_rendered_containsSections()
-                throws IOException {
+        void template_rendered_containsSections() throws IOException {
             String content = Files.readString(TEMPLATE_PATH);
-            String rendered = engine.renderString(
-                    content, fullContext());
+            String rendered = engine.renderString(content, fullContext());
 
             assertThat(rendered)
                     .contains("# demo")
@@ -92,11 +85,9 @@ class ClaudeMdTemplateSyntaxTest {
 
         @Test
         @DisplayName("placeholders substituted — full context")
-        void template_rendered_substitutesAll()
-                throws IOException {
+        void template_rendered_substitutesAll() throws IOException {
             String content = Files.readString(TEMPLATE_PATH);
-            String rendered = engine.renderString(
-                    content, fullContext());
+            String rendered = engine.renderString(content, fullContext());
 
             assertThat(rendered)
                     .contains("demo")
@@ -113,28 +104,24 @@ class ClaudeMdTemplateSyntaxTest {
 
         @Test
         @DisplayName("absent DATABASES — conditional block omits line")
-        void template_rendered_omitsDatabasesWhenAbsent()
-                throws IOException {
+        void template_rendered_omitsDatabasesWhenAbsent() throws IOException {
             String content = Files.readString(TEMPLATE_PATH);
             Map<String, Object> ctx = fullContext();
             ctx.put("DATABASES", "");
 
-            String rendered = engine.renderString(
-                    content, ctx);
+            String rendered = engine.renderString(content, ctx);
 
             assertThat(rendered).doesNotContain("Databases:");
         }
 
         @Test
         @DisplayName("absent INTERFACE_TYPES — conditional block omits line")
-        void template_rendered_omitsInterfacesWhenAbsent()
-                throws IOException {
+        void template_rendered_omitsInterfacesWhenAbsent() throws IOException {
             String content = Files.readString(TEMPLATE_PATH);
             Map<String, Object> ctx = fullContext();
             ctx.put("INTERFACE_TYPES", "");
 
-            String rendered = engine.renderString(
-                    content, ctx);
+            String rendered = engine.renderString(content, ctx);
 
             assertThat(rendered).doesNotContain("Interfaces:");
         }

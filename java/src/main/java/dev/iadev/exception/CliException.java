@@ -4,12 +4,14 @@ package dev.iadev.exception;
  * Thrown for CLI usage errors such as invalid arguments or conflicting flags.
  *
  * <p>Carries an {@code errorCode} that maps to process exit codes:
+ *
  * <ul>
- *   <li>{@code 1} — usage error (invalid arguments, conflicting flags)</li>
- *   <li>{@code 2} — execution error (failure during generation)</li>
+ *   <li>{@code 1} — usage error (invalid arguments, conflicting flags)
+ *   <li>{@code 2} — execution error (failure during generation)
  * </ul>
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * throw new CliException("Invalid argument: --output", 1);
  * }</pre>
@@ -21,7 +23,7 @@ public class CliException extends RuntimeException {
     /**
      * Creates a CLI exception with the given message and exit code.
      *
-     * @param message   description of the CLI error
+     * @param message description of the CLI error
      * @param errorCode process exit code (1 = usage, 2 = execution)
      */
     public CliException(String message, int errorCode) {
@@ -40,7 +42,6 @@ public class CliException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "CliException{message='%s', errorCode=%d}"
-                .formatted(getMessage(), errorCode);
+        return "CliException{message='%s', errorCode=%d}".formatted(getMessage(), errorCode);
     }
 }

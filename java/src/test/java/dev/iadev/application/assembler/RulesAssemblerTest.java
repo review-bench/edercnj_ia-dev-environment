@@ -1,27 +1,25 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.config.ContextBuilder;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for RulesAssembler — the first assembler in the
- * pipeline, generating .claude/rules/ and skills/.
+ * Tests for RulesAssembler — the first assembler in the pipeline, generating .claude/rules/ and
+ * skills/.
  */
 @DisplayName("RulesAssembler")
 class RulesAssemblerTest {
@@ -31,119 +29,71 @@ class RulesAssemblerTest {
     class CoreRules {
 
         @Test
-        @DisplayName("generates 9 core rule files for"
-                + " minimal config (no database)")
-        void assemble_whenCalled_generatesNineCoreRules(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("generates 9 core rule files for" + " minimal config (no database)")
+        void assemble_whenCalled_generatesNineCoreRules(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path rulesDir = outputDir.resolve("rules");
-            assertThat(rulesDir.resolve(
-                    "01-project-identity.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "02-domain.md")).exists();
-            assertThat(rulesDir.resolve(
-                    "03-coding-standards.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "04-architecture-summary.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "05-quality-gates.md")).exists();
-            assertThat(rulesDir.resolve(
-                    "06-security-baseline.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "07-operations-baseline.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "08-release-process.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "09-branching-model.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "09-data-management.md"))
-                    .doesNotExist();
+            assertThat(rulesDir.resolve("01-project-identity.md")).exists();
+            assertThat(rulesDir.resolve("02-domain.md")).exists();
+            assertThat(rulesDir.resolve("03-coding-standards.md")).exists();
+            assertThat(rulesDir.resolve("04-architecture-summary.md")).exists();
+            assertThat(rulesDir.resolve("05-quality-gates.md")).exists();
+            assertThat(rulesDir.resolve("06-security-baseline.md")).exists();
+            assertThat(rulesDir.resolve("07-operations-baseline.md")).exists();
+            assertThat(rulesDir.resolve("08-release-process.md")).exists();
+            assertThat(rulesDir.resolve("09-branching-model.md")).exists();
+            assertThat(rulesDir.resolve("09-data-management.md")).doesNotExist();
         }
 
         @Test
-        @DisplayName("generates 10 rule files when database"
-                + " is configured")
-        void assemble_withDb_generatesTenRules(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("generates 10 rule files when database" + " is configured")
+        void assemble_withDb_generatesTenRules(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .database("postgresql", "17")
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.builder().database("postgresql", "17").build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path rulesDir = outputDir.resolve("rules");
-            assertThat(rulesDir.resolve(
-                    "07-operations-baseline.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "08-release-process.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "09-branching-model.md"))
-                    .exists();
-            assertThat(rulesDir.resolve(
-                    "09-data-management.md"))
-                    .exists();
+            assertThat(rulesDir.resolve("07-operations-baseline.md")).exists();
+            assertThat(rulesDir.resolve("08-release-process.md")).exists();
+            assertThat(rulesDir.resolve("09-branching-model.md")).exists();
+            assertThat(rulesDir.resolve("09-data-management.md")).exists();
         }
 
         @Test
-        @DisplayName("01-project-identity.md contains"
-                + " project data")
-        void assemble_identity_containsProjectData(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("01-project-identity.md contains" + " project data")
+        void assemble_identity_containsProjectData(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("my-api")
-                    .language("java", "21")
-                    .framework("spring-boot", "3.4")
-                    .archStyle("microservice")
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .projectName("my-api")
+                            .language("java", "21")
+                            .framework("spring-boot", "3.4")
+                            .archStyle("microservice")
+                            .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/01-project-identity.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/01-project-identity.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("my-api")
@@ -154,146 +104,100 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("02-domain.md generated from template")
-        void assemble_whenCalled_domainFromTemplate(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_whenCalled_domainFromTemplate(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/02-domain.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/02-domain.md"), StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("{DOMAIN_NAME}");
+            assertThat(content).contains("{DOMAIN_NAME}");
         }
 
         @Test
-        @DisplayName("02-domain.md uses fallback when"
-                + " template missing")
-        void assemble_whenTemplateMissing_domainFallback(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("02-domain.md uses fallback when" + " template missing")
+        void assemble_whenTemplateMissing_domainFallback(@TempDir Path tempDir) throws IOException {
             Path resourceDir = tempDir.resolve("res");
-            Path coreRules = resourceDir.resolve(
-                    "targets/claude/rules");
+            Path coreRules = resourceDir.resolve("targets/claude/rules");
             Files.createDirectories(coreRules);
 
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("fallback-project")
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config =
+                    TestConfigBuilder.builder().projectName("fallback-project").build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/02-domain.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/02-domain.md"), StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("fallback-project")
-                    .contains("{DOMAIN_NAME}");
+            assertThat(content).contains("fallback-project").contains("{DOMAIN_NAME}");
         }
 
         @Test
         @DisplayName("core rules have placeholders replaced")
-        void assemble_whenCalled_coreRulesPlaceholdersReplaced(
-                @TempDir Path tempDir)
+        void assemble_whenCalled_coreRulesPlaceholdersReplaced(@TempDir Path tempDir)
                 throws IOException {
             Path resourceDir = tempDir.resolve("res");
-            Path coreRules = resourceDir.resolve(
-                    "targets/claude/rules");
+            Path coreRules = resourceDir.resolve("targets/claude/rules");
             Files.createDirectories(coreRules);
             Files.writeString(
                     coreRules.resolve("03-test.md"),
                     "Project: {PROJECT_NAME}\n",
                     StandardCharsets.UTF_8);
 
-            Path templates = resourceDir.resolve(
-                    "shared/templates");
+            Path templates = resourceDir.resolve("shared/templates");
             Files.createDirectories(templates);
-            Files.writeString(
-                    templates.resolve("domain-template.md"),
-                    "Domain\n");
+            Files.writeString(templates.resolve("domain-template.md"), "Domain\n");
 
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("replaced-name")
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.builder().projectName("replaced-name").build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/03-test.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(outputDir.resolve("rules/03-test.md"), StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("replaced-name")
-                    .doesNotContain("{{PROJECT_NAME}}");
+            assertThat(content).contains("replaced-name").doesNotContain("{{PROJECT_NAME}}");
         }
     }
 
     @Nested
-    @DisplayName("assemble — no database generates"
-            + " only core rules")
+    @DisplayName("assemble — no database generates" + " only core rules")
     class NoDatabaseConfig {
 
         @Test
-        @DisplayName("config without database generates"
-                + " exactly core rules without data rule")
-        void assemble_noDatabase_generatesOnlyCoreRules(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("config without database generates" + " exactly core rules without data rule")
+        void assemble_noDatabase_generatesOnlyCoreRules(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path rulesDir = outputDir.resolve("rules");
             try (var stream = Files.list(rulesDir)) {
-                List<String> ruleFiles = stream
-                        .map(p -> p.getFileName()
-                                .toString())
-                        .sorted()
-                        .toList();
+                List<String> ruleFiles =
+                        stream.map(p -> p.getFileName().toString()).sorted().toList();
 
-                assertThat(ruleFiles).doesNotContain(
-                        "06-database-conventions.md");
-                assertThat(ruleFiles).doesNotContain(
-                        "09-data-management.md");
+                assertThat(ruleFiles).doesNotContain("06-database-conventions.md");
+                assertThat(ruleFiles).doesNotContain("09-data-management.md");
             }
         }
     }
@@ -304,26 +208,20 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("rule 07 contains health check sections")
-        void assemble_rule07_containsHealthChecks(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule07_containsHealthChecks(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/07-operations-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/07-operations-baseline.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("Health Checks")
@@ -334,26 +232,20 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("rule 07 contains structured logging")
-        void assemble_rule07_containsStructuredLogging(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule07_containsStructuredLogging(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/07-operations-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/07-operations-baseline.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("Structured Logging")
@@ -368,26 +260,20 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("rule 08 contains semantic versioning")
-        void assemble_rule08_containsSemVer(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule08_containsSemVer(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/08-release-process.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/08-release-process.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("Semantic Versioning")
@@ -402,26 +288,20 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("rule 09 contains branch types table")
-        void assemble_rule09_containsBranchTypes(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule09_containsBranchTypes(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/09-branching-model.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/09-branching-model.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("Branching Model")
@@ -433,28 +313,21 @@ class RulesAssemblerTest {
         }
 
         @Test
-        @DisplayName("rule 09 contains merge direction"
-                + " and forbidden actions")
-        void assemble_rule09_containsMergeRules(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("rule 09 contains merge direction" + " and forbidden actions")
+        void assemble_rule09_containsMergeRules(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/09-branching-model.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/09-branching-model.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("Merge Direction")
@@ -464,29 +337,22 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("rule 09 contains naming conventions")
-        void assemble_rule09_containsNamingConventions(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule09_containsNamingConventions(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/09-branching-model.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/09-branching-model.md"),
+                            StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("Naming Convention");
+            assertThat(content).contains("Naming Convention");
         }
     }
 
@@ -495,58 +361,42 @@ class RulesAssemblerTest {
     class Rule09DataManagement {
 
         @Test
-        @DisplayName("rule 09 generated with database"
-                + " reference when db is configured")
-        void assemble_rule09_containsDbReference(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("rule 09 generated with database" + " reference when db is configured")
+        void assemble_rule09_containsDbReference(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .database("postgresql", "17")
-                    .migration("flyway", "10.0")
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .database("postgresql", "17")
+                            .migration("flyway", "10.0")
+                            .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/09-data-management.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/09-data-management.md"),
+                            StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("Data Management")
-                    .contains("postgresql");
+            assertThat(content).contains("Data Management").contains("postgresql");
         }
 
         @Test
         @DisplayName("rule 09 not generated when db is none")
-        void assemble_rule09_notGeneratedWithoutDb(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_rule09_notGeneratedWithoutDb(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            assertThat(outputDir.resolve(
-                    "rules/09-data-management.md"))
-                    .doesNotExist();
+            assertThat(outputDir.resolve("rules/09-data-management.md")).doesNotExist();
         }
     }
 
@@ -556,107 +406,75 @@ class RulesAssemblerTest {
 
         @Test
         @DisplayName("returned list is not empty")
-        void assemble_whenCalled_returnedListNotEmpty(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_whenCalled_returnedListNotEmpty(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).isNotEmpty();
         }
 
         @Test
         @DisplayName("returned paths include identity rule")
-        void assemble_whenCalled_includesIdentityRule(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        void assemble_whenCalled_includesIdentityRule(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            assertThat(files).anyMatch(f ->
-                    f.contains("01-project-identity.md"));
+            assertThat(files).anyMatch(f -> f.contains("01-project-identity.md"));
         }
     }
 
     @Nested
-    @DisplayName("assemble — rule 06 security baseline"
-            + " with scanning")
+    @DisplayName("assemble — rule 06 security baseline" + " with scanning")
     class Rule06SecurityBaseline {
 
         @Test
-        @DisplayName("no scanning flags — baseline"
-                + " unchanged")
-        void assemble_noScanning_baselineUnchanged(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("no scanning flags — baseline" + " unchanged")
+        void assemble_noScanning_baselineUnchanged(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/06-security-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/06-security-baseline.md"),
+                            StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .doesNotContain(
-                            "Automated Verification");
+            assertThat(content).doesNotContain("Automated Verification");
         }
 
         @Test
-        @DisplayName("sast enabled — appends verification"
-                + " section")
-        void assemble_withSast_appendsVerification(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("sast enabled — appends verification" + " section")
+        void assemble_withSast_appendsVerification(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .scanningSast(true)
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.builder().scanningSast(true).build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/06-security-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/06-security-baseline.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("## Automated Verification")
@@ -665,32 +483,26 @@ class RulesAssemblerTest {
         }
 
         @Test
-        @DisplayName("all scanning flags — contains all"
-                + " mappings")
-        void assemble_allFlags_containsAllMappings(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("all scanning flags — contains all" + " mappings")
+        void assemble_allFlags_containsAllMappings(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .scanningSast(true)
-                    .scanningSecretScan(true)
-                    .scanningDast(true)
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .scanningSast(true)
+                            .scanningSecretScan(true)
+                            .scanningDast(true)
+                            .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/06-security-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/06-security-baseline.md"),
+                            StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("## Automated Verification")
@@ -700,33 +512,23 @@ class RulesAssemblerTest {
         }
 
         @Test
-        @DisplayName("baseline original content preserved"
-                + " when scanning added")
-        void assemble_withScanning_originalPreserved(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path resourceDir = createMinimalResources(
-                    tempDir);
+        @DisplayName("baseline original content preserved" + " when scanning added")
+        void assemble_withScanning_originalPreserved(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            RulesAssembler assembler =
-                    new RulesAssembler(resourceDir);
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .scanningSast(true)
-                    .build();
+            RulesAssembler assembler = new RulesAssembler(resourceDir);
+            ProjectConfig config = TestConfigBuilder.builder().scanningSast(true).build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "rules/06-security-baseline.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve("rules/06-security-baseline.md"),
+                            StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .startsWith("# Security Baseline");
+            assertThat(content).startsWith("# Security Baseline");
         }
     }
 
@@ -739,8 +541,7 @@ class RulesAssemblerTest {
         void assemble_whenCalled_isAssemblerInstance() {
             RulesAssembler assembler = new RulesAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -751,34 +552,25 @@ class RulesAssemblerTest {
         @Test
         @DisplayName("contains all expected keys")
         void context_whenCalled_containsAllKeys() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("ctx-test")
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .archStyle("microservice")
-                    .buildTool("maven")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .projectName("ctx-test")
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .archStyle("microservice")
+                            .buildTool("maven")
+                            .build();
 
-            Map<String, Object> context =
-                    ContextBuilder.buildContext(config);
+            Map<String, Object> context = ContextBuilder.buildContext(config);
 
             assertThat(context)
-                    .containsEntry("project_name",
-                            "ctx-test")
-                    .containsEntry("language_name",
-                            "java")
-                    .containsEntry("language_version",
-                            "21")
-                    .containsEntry("framework_name",
-                            "quarkus")
-                    .containsEntry("framework_version",
-                            "3.17")
-                    .containsEntry("build_tool",
-                            "maven")
-                    .containsEntry(
-                            "architecture_style",
-                            "microservice");
+                    .containsEntry("project_name", "ctx-test")
+                    .containsEntry("language_name", "java")
+                    .containsEntry("language_version", "21")
+                    .containsEntry("framework_name", "quarkus")
+                    .containsEntry("framework_version", "3.17")
+                    .containsEntry("build_tool", "maven")
+                    .containsEntry("architecture_style", "microservice");
         }
     }
 
@@ -787,167 +579,114 @@ class RulesAssemblerTest {
     class GoldenFile {
 
         @Test
-        @DisplayName("01-project-identity matches golden"
-                + " file for java-quarkus profile")
-        void golden_identity_matchesGoldenFile()
-                throws IOException {
+        @DisplayName("01-project-identity matches golden" + " file for java-quarkus profile")
+        void golden_identity_matchesGoldenFile() throws IOException {
             ProjectConfig config = buildQuarkusConfig();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            String expected = loadGoldenFile(
-                    "01-project-identity.md");
+            String expected = loadGoldenFile("01-project-identity.md");
 
             assertThat(content).isEqualTo(expected);
         }
 
         @Test
         @DisplayName("02-domain matches golden file")
-        void golden_domain_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "02-domain.md");
+        void golden_domain_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("02-domain.md");
 
-            assertThat(expected)
-                    .contains("{DOMAIN_NAME}")
-                    .contains("{DOMAIN_OVERVIEW}");
+            assertThat(expected).contains("{DOMAIN_NAME}").contains("{DOMAIN_OVERVIEW}");
         }
 
         @Test
-        @DisplayName("03-coding-standards matches golden"
-                + " file (unreplaced placeholders)")
-        void golden_codingStandards_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "03-coding-standards.md");
+        @DisplayName("03-coding-standards matches golden" + " file (unreplaced placeholders)")
+        void golden_codingStandards_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("03-coding-standards.md");
 
-            assertThat(expected)
-                    .contains("{{LANGUAGE}}")
-                    .contains("{{LANGUAGE_VERSION}}");
+            assertThat(expected).contains("{{LANGUAGE}}").contains("{{LANGUAGE_VERSION}}");
         }
 
         @Test
-        @DisplayName("04-architecture matches golden file"
-                + " (unreplaced placeholders)")
-        void golden_architecture_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "04-architecture-summary.md");
+        @DisplayName("04-architecture matches golden file" + " (unreplaced placeholders)")
+        void golden_architecture_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("04-architecture-summary.md");
 
-            assertThat(expected)
-                    .contains("{{ARCHITECTURE}}")
-                    .contains("{{ARCH_STYLE}}");
+            assertThat(expected).contains("{{ARCHITECTURE}}").contains("{{ARCH_STYLE}}");
         }
 
         @Test
         @DisplayName("05-quality-gates matches golden file")
-        void golden_qualityGates_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "05-quality-gates.md");
+        void golden_qualityGates_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("05-quality-gates.md");
 
             // EPIC-0050 coverage remediation aligned the
             // source-of-truth thresholds with the review-
             // enforced values (95%/90%).
-            assertThat(expected)
-                    .contains("95%")
-                    .contains("90%")
-                    .contains("Absolute-Gate Rule");
+            assertThat(expected).contains("95%").contains("90%").contains("Absolute-Gate Rule");
         }
 
         @Test
-        @DisplayName("06-security-baseline matches golden"
-                + " file")
-        void golden_securityBaseline_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "06-security-baseline.md");
+        @DisplayName("06-security-baseline matches golden" + " file")
+        void golden_securityBaseline_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("06-security-baseline.md");
 
-            assertThat(expected)
-                    .contains("Security Baseline")
-                    .contains("Secure Defaults");
+            assertThat(expected).contains("Security Baseline").contains("Secure Defaults");
         }
 
         @Test
-        @DisplayName("07-operations-baseline matches golden"
-                + " file")
-        void golden_operationsBaseline_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "07-operations-baseline.md");
+        @DisplayName("07-operations-baseline matches golden" + " file")
+        void golden_operationsBaseline_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("07-operations-baseline.md");
 
-            assertThat(expected)
-                    .contains("Operations Baseline")
-                    .contains("Health Checks");
+            assertThat(expected).contains("Operations Baseline").contains("Health Checks");
         }
 
         @Test
-        @DisplayName("08-release-process matches golden"
-                + " file")
-        void golden_releaseProcess_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "08-release-process.md");
+        @DisplayName("08-release-process matches golden" + " file")
+        void golden_releaseProcess_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("08-release-process.md");
 
-            assertThat(expected)
-                    .contains("Release Process")
-                    .contains("Semantic Versioning");
+            assertThat(expected).contains("Release Process").contains("Semantic Versioning");
         }
 
         @Test
-        @DisplayName("09-branching-model matches golden"
-                + " file")
-        void golden_branchingModel_matchesGoldenFile()
-                throws IOException {
-            String expected = loadGoldenFile(
-                    "09-branching-model.md");
+        @DisplayName("09-branching-model matches golden" + " file")
+        void golden_branchingModel_matchesGoldenFile() throws IOException {
+            String expected = loadGoldenFile("09-branching-model.md");
 
-            assertThat(expected)
-                    .contains("Branching Model")
-                    .contains("Git Flow");
+            assertThat(expected).contains("Branching Model").contains("Git Flow");
         }
 
         @Test
-        @DisplayName("09-data-management template exists"
-                + " in conditional resources")
+        @DisplayName("09-data-management template exists" + " in conditional resources")
         void golden_dataManagement_templateExists() {
-            var url = getClass().getClassLoader()
-                    .getResource(
-                            "targets/claude/rules/"
-                                    + "conditional/"
-                                    + "09-data-management.md");
+            var url =
+                    getClass()
+                            .getClassLoader()
+                            .getResource(
+                                    "targets/claude/rules/"
+                                            + "conditional/"
+                                            + "09-data-management.md");
 
-            assertThat(url)
-                    .as("Conditional template must exist"
-                            + " in resources")
-                    .isNotNull();
+            assertThat(url).as("Conditional template must exist" + " in resources").isNotNull();
         }
 
-        private String loadGoldenFile(String filename)
-                throws IOException {
-            var url = getClass().getClassLoader()
-                    .getResource(
-                            "golden/java-quarkus/"
-                                    + ".claude/rules/"
-                                    + filename);
+        private String loadGoldenFile(String filename) throws IOException {
+            var url =
+                    getClass()
+                            .getClassLoader()
+                            .getResource("golden/java-quarkus/" + ".claude/rules/" + filename);
             assertThat(url)
-                    .as("Golden file %s must exist",
-                            filename)
-                    .satisfies(u -> assertThat(
-                            u.toString())
-                            .contains(filename));
-            return Files.readString(
-                    Path.of(url.getPath()),
-                    StandardCharsets.UTF_8);
+                    .as("Golden file %s must exist", filename)
+                    .satisfies(u -> assertThat(u.toString()).contains(filename));
+            return Files.readString(Path.of(url.getPath()), StandardCharsets.UTF_8);
         }
     }
 
     private static ProjectConfig buildQuarkusConfig() {
         return TestConfigBuilder.builder()
                 .projectName("my-quarkus-service")
-                .purpose(
-                        "Describe your service purpose here")
+                .purpose("Describe your service purpose here")
                 .archStyle("microservice")
                 .domainDriven(true)
                 .eventDriven(true)
@@ -965,27 +704,22 @@ class RulesAssemblerTest {
                 .build();
     }
 
-    private static Path createMinimalResources(
-            Path tempDir) throws IOException {
+    private static Path createMinimalResources(Path tempDir) throws IOException {
         Path resourceDir = tempDir.resolve("res");
         createCoreRules(resourceDir);
         createTemplatesDir(resourceDir);
         return resourceDir;
     }
 
-    private static void createCoreRules(
-            Path resourceDir) throws IOException {
-        Path coreRules =
-                resourceDir.resolve("targets/claude/rules");
+    private static void createCoreRules(Path resourceDir) throws IOException {
+        Path coreRules = resourceDir.resolve("targets/claude/rules");
         Files.createDirectories(coreRules);
         Files.writeString(
-                coreRules.resolve(
-                        "03-coding-standards.md"),
+                coreRules.resolve("03-coding-standards.md"),
                 "# Coding Standards\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
-                coreRules.resolve(
-                        "04-architecture-summary.md"),
+                coreRules.resolve("04-architecture-summary.md"),
                 "# Architecture\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
@@ -993,13 +727,11 @@ class RulesAssemblerTest {
                 "# Quality Gates\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
-                coreRules.resolve(
-                        "06-security-baseline.md"),
+                coreRules.resolve("06-security-baseline.md"),
                 "# Security Baseline\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
-                coreRules.resolve(
-                        "07-operations-baseline.md"),
+                coreRules.resolve("07-operations-baseline.md"),
                 "# Rule 07 — Operations Baseline\n"
                         + "## Health Checks\n"
                         + "liveness, readiness, startup\n"
@@ -1008,16 +740,14 @@ class RulesAssemblerTest {
                         + "## Correlation ID\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
-                coreRules.resolve(
-                        "08-release-process.md"),
+                coreRules.resolve("08-release-process.md"),
                 "# Rule 08 — Release Process\n"
                         + "## Semantic Versioning\n"
                         + "## Conventional Commits\n"
                         + "## CHANGELOG\n",
                 StandardCharsets.UTF_8);
         Files.writeString(
-                coreRules.resolve(
-                        "09-branching-model.md"),
+                coreRules.resolve("09-branching-model.md"),
                 "# Rule 09 — Branching Model\n"
                         + "## Branch Types\n"
                         + "main, develop, feature/*,"
@@ -1031,18 +761,13 @@ class RulesAssemblerTest {
         Path condRules = coreRules.resolve("conditional");
         Files.createDirectories(condRules);
         Files.writeString(
-                condRules.resolve(
-                        "09-data-management.md"),
-                "# Rule 09 — Data Management\n"
-                        + "DB: {DATABASE_NAME}\n"
-                        + "## Migration\n",
+                condRules.resolve("09-data-management.md"),
+                "# Rule 09 — Data Management\n" + "DB: {DATABASE_NAME}\n" + "## Migration\n",
                 StandardCharsets.UTF_8);
     }
 
-    private static void createTemplatesDir(
-            Path resourceDir) throws IOException {
-        Path templates =
-                resourceDir.resolve("shared/templates");
+    private static void createTemplatesDir(Path resourceDir) throws IOException {
+        Path templates = resourceDir.resolve("shared/templates");
         Files.createDirectories(templates);
         Files.writeString(
                 templates.resolve("domain-template.md"),

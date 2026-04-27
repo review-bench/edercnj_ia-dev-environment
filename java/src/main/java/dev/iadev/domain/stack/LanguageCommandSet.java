@@ -3,9 +3,9 @@ package dev.iadev.domain.stack;
 /**
  * Command set for a language and build tool combination.
  *
- * <p>Contains all commands needed to compile, build, test, and measure
- * coverage for a specific language/build-tool pair, plus metadata about
- * the file extension, build file name, and package manager.</p>
+ * <p>Contains all commands needed to compile, build, test, and measure coverage for a specific
+ * language/build-tool pair, plus metadata about the file extension, build file name, and package
+ * manager.
  *
  * @param compileCmd the compilation command
  * @param buildCmd the build/package command
@@ -22,5 +22,4 @@ public record LanguageCommandSet(
         String coverageCmd,
         String fileExtension,
         String buildFile,
-        String packageManager) {
-}
+        String packageManager) {}
