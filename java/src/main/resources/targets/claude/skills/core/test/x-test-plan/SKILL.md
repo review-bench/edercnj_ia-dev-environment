@@ -231,6 +231,21 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-p
 
 Save to: `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p plans/epic-XXXX/plans`.
 
+#### Origin Marker (EPIC-0059 — mandatory)
+
+Before writing the test plan file, prepend the YAML frontmatter block at the very top:
+
+```yaml
+---
+generated-by: x-test-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+story-id: ${STORY_ID}
+---
+```
+
+This frontmatter is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
+Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
+
 ```markdown
 # Test Plan — STORY-ID: [Title]
 
