@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "storyId": "story-0059-0001",
+  "epicId": "EPIC-0059",
+  "timestamp": "2026-04-27T00:00:00Z",
+  "scope": "SIMPLE",
+  "coverageDelta": null,
+  "failures": [],
+  "acCheckResults": [
+    {"scenario": "no-story-in-pr", "passed": true},
+    {"scenario": "all-10-artifacts-present", "passed": true},
+    {"scenario": "missing-phase1-artifacts", "passed": true},
+    {"scenario": "grandfathered-story", "passed": true},
+    {"scenario": "self-check-10-artifacts", "passed": true},
+    {"scenario": "scope-fase1-skips-phase3", "passed": true},
+    {"scenario": "corrupt-baseline-exit-2", "passed": true}
+  ],
+  "selfCheckResult": {
+    "exitCode": 0,
+    "output": "OK: 10 required artifacts configured (Phase-1=6, Phase-3=4)."
+  },
+  "tasksCompleted": [
+    "TASK-0059-0001-001",
+    "TASK-0059-0001-002",
+    "TASK-0059-0001-003"
+  ],
+  "prNumbers": [686, 687, 688]
+}
