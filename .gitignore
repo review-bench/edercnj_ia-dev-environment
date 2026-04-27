@@ -14,6 +14,8 @@
 .github/*
 !.github/workflows/
 !.github/pull_request_template.md
+!.github/CODEOWNERS
+!.github/SETUP-PROTECTION.md
 
 # OS files
 .DS_Store

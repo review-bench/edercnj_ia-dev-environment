@@ -1,0 +1,29 @@
+# CODEOWNERS — GitHub Branch Protection enforcement
+#
+# Files listed here require a review from the specified owner(s) before
+# any PR touching them can be merged. This is the last line of defense
+# in the EPIC-0059 enforcement stack.
+#
+# Governance: any modification to this file itself requires @edercnj approval
+# (self-referential protection).
+#
+# Format: <pattern>  <owner>
+# Patterns follow .gitignore syntax. More specific patterns win.
+
+# ── Enforcement infrastructure (Camada 1 — normative) ──────────────────────
+.claude/rules/                    @edercnj
+
+# ── Runtime enforcement hooks (Camada 2 — runtime Stop hook) ───────────────
+.claude/hooks/                    @edercnj
+
+# ── CI audit scripts (Camada 3 — CI audit) ─────────────────────────────────
+scripts/audit-*.sh                @edercnj
+
+# ── Immutable audit baselines (RULE-059-04) ─────────────────────────────────
+audits/*-baseline.txt             @edercnj
+audits/required-checks.txt        @edercnj
+
+# ── Branch protection and PR governance ────────────────────────────────────
+.github/CODEOWNERS                @edercnj
+.github/pull_request_template.md  @edercnj
+.github/workflows/                @edercnj
