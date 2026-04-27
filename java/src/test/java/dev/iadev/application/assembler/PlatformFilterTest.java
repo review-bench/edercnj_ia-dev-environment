@@ -32,7 +32,7 @@ class PlatformFilterTest {
                     PlatformFilter.filter(
                             all, Set.of());
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
             assertThat(result).isEqualTo(all);
         }
 
@@ -47,7 +47,7 @@ class PlatformFilterTest {
                     PlatformFilter.filter(all,
                             Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
             assertThat(result).isEqualTo(all);
         }
     }
@@ -58,7 +58,7 @@ class PlatformFilterTest {
 
         @Test
         @DisplayName("CLAUDE_CODE returns 24 assemblers "
-                + "(10 claude + 14 shared)")
+                + "(11 claude + 14 shared)")
         void filter_claudeCode_returns23() {
             List<AssemblerDescriptor> all =
                     AssemblerFactory.buildAssemblers();
@@ -67,7 +67,7 @@ class PlatformFilterTest {
                     PlatformFilter.filter(all,
                             Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
             assertThat(result).allSatisfy(d ->
                     assertThat(
                             d.platforms().contains(
@@ -196,7 +196,7 @@ class PlatformFilterTest {
                     AssemblerFactory.buildAssemblers(
                             options);
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
         }
 
         @Test
@@ -207,7 +207,7 @@ class PlatformFilterTest {
                     AssemblerFactory.buildAssemblers(
                             PipelineOptions.defaults());
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
         }
 
         @Test
@@ -217,7 +217,7 @@ class PlatformFilterTest {
             List<AssemblerDescriptor> result =
                     AssemblerFactory.buildAssemblers();
 
-            assertThat(result).hasSize(24);
+            assertThat(result).hasSize(25);
         }
     }
 
