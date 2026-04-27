@@ -1,32 +1,31 @@
 package dev.iadev.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.model.ProjectConfig;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @DisplayName("ConfigProfiles")
 class ConfigProfilesTest {
 
-    private static final List<String> ALL_STACKS = List.of(
-            "java-picocli-cli",
-            "java-quarkus",
-            "java-spring",
-            "java-spring-clickhouse",
-            "java-spring-cqrs-es",
-            "java-spring-elasticsearch",
-            "java-spring-event-driven",
-            "java-spring-fintech-pci",
-            "java-spring-hexagonal",
-            "java-spring-neo4j"
-    );
+    private static final List<String> ALL_STACKS =
+            List.of(
+                    "java-picocli-cli",
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-fintech-pci",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j");
 
     @Nested
     @DisplayName("getAvailableStacks()")
@@ -35,8 +34,7 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns all 10 stack keys (Java-only since EPIC-0048)")
         void getAvailableStacks_whenCalled_returns10Keys() {
-            List<String> stacks =
-                    ConfigProfiles.getAvailableStacks();
+            List<String> stacks = ConfigProfiles.getAvailableStacks();
 
             assertThat(stacks).hasSize(10);
             assertThat(stacks).containsAll(ALL_STACKS);
@@ -48,15 +46,19 @@ class ConfigProfilesTest {
     class ValidStack {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-picocli-cli", "java-quarkus",
-                "java-spring", "java-spring-clickhouse",
-                "java-spring-cqrs-es",
-                "java-spring-elasticsearch",
-                "java-spring-event-driven",
-                "java-spring-fintech-pci",
-                "java-spring-hexagonal",
-                "java-spring-neo4j"})
+        @ValueSource(
+                strings = {
+                    "java-picocli-cli",
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-fintech-pci",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j"
+                })
         @DisplayName("returns true for valid stack keys")
         void isValidStack_validKey_returnsTrue(String key) {
             assertThat(ConfigProfiles.isValidStack(key)).isTrue();
@@ -65,8 +67,7 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns false for unknown stack key")
         void isValidStack_unknownKey_returnsFalse() {
-            assertThat(ConfigProfiles.isValidStack("csharp-dotnet"))
-                    .isFalse();
+            assertThat(ConfigProfiles.isValidStack("csharp-dotnet")).isFalse();
         }
 
         @Test
@@ -83,17 +84,12 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns ProjectConfig for java-spring")
         void getStack_javaSpring_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack("java-spring");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("microservice");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("microservice");
         }
     }
 
@@ -104,15 +100,11 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns ProjectConfig for java-quarkus")
         void getStack_javaQuarkus_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack("java-quarkus");
+            ProjectConfig config = ConfigProfiles.getStack("java-quarkus");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("quarkus");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("quarkus");
         }
     }
 
@@ -124,43 +116,30 @@ class ConfigProfilesTest {
     class JavaSpringFintechPciStack {
 
         @Test
-        @DisplayName("returns ProjectConfig for "
-                + "java-spring-fintech-pci")
+        @DisplayName("returns ProjectConfig for " + "java-spring-fintech-pci")
         void getStack_fintechPci_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-fintech-pci");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-fintech-pci");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("microservice");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("microservice");
         }
 
         @Test
         @DisplayName("has pci-dss compliance framework")
         void getStack_fintechPci_hasPciCompliance() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-fintech-pci");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-fintech-pci");
 
-            assertThat(config.security().frameworks())
-                    .contains("pci-dss");
+            assertThat(config.security().frameworks()).contains("pci-dss");
         }
 
         @Test
         @DisplayName("has encryption at rest enabled")
         void getStack_fintechPci_hasEncryption() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-fintech-pci");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-fintech-pci");
 
-            assertThat(config.security().frameworks())
-                    .isNotEmpty();
+            assertThat(config.security().frameworks()).isNotEmpty();
         }
     }
 
@@ -171,18 +150,12 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns hexagonal profile config")
         void getStack_hexagonal_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-hexagonal");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-hexagonal");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("hexagonal");
-            assertThat(config.architecture().domainDriven())
-                    .isTrue();
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("hexagonal");
+            assertThat(config.architecture().domainDriven()).isTrue();
         }
     }
 
@@ -193,21 +166,13 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns CQRS/ES profile config")
         void getStack_cqrsEs_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-cqrs-es");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-cqrs-es");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("cqrs");
-            assertThat(config.architecture().eventStore())
-                    .isEqualTo("eventstoredb");
-            assertThat(config.architecture()
-                    .eventsPerSnapshot())
-                    .isEqualTo(100);
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("cqrs");
+            assertThat(config.architecture().eventStore()).isEqualTo("eventstoredb");
+            assertThat(config.architecture().eventsPerSnapshot()).isEqualTo(100);
         }
     }
 
@@ -218,22 +183,13 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("returns event-driven profile config")
         void getStack_eventDriven_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-event-driven");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-event-driven");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("event-driven");
-            assertThat(config.architecture()
-                    .schemaRegistry())
-                    .isEqualTo("confluent");
-            assertThat(config.architecture()
-                    .deadLetterStrategy())
-                    .isEqualTo("kafka-dlq");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("event-driven");
+            assertThat(config.architecture().schemaRegistry()).isEqualTo("confluent");
+            assertThat(config.architecture().deadLetterStrategy()).isEqualTo("kafka-dlq");
         }
     }
 
@@ -242,21 +198,14 @@ class ConfigProfilesTest {
     class JavaSpringNeo4jStack {
 
         @Test
-        @DisplayName("returns ProjectConfig for "
-                + "java-spring-neo4j")
+        @DisplayName("returns ProjectConfig for " + "java-spring-neo4j")
         void getStack_neo4j_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-neo4j");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-neo4j");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("microservice");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("microservice");
         }
     }
 
@@ -265,21 +214,14 @@ class ConfigProfilesTest {
     class JavaSpringClickhouseStack {
 
         @Test
-        @DisplayName("returns ProjectConfig for "
-                + "java-spring-clickhouse")
+        @DisplayName("returns ProjectConfig for " + "java-spring-clickhouse")
         void getStack_clickhouse_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-clickhouse");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-clickhouse");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("microservice");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("microservice");
         }
     }
 
@@ -290,21 +232,14 @@ class ConfigProfilesTest {
     class JavaSpringElasticsearchStack {
 
         @Test
-        @DisplayName("returns ProjectConfig for "
-                + "java-spring-elasticsearch")
+        @DisplayName("returns ProjectConfig for " + "java-spring-elasticsearch")
         void getStack_elasticsearch_returnsConfig() {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(
-                            "java-spring-elasticsearch");
+            ProjectConfig config = ConfigProfiles.getStack("java-spring-elasticsearch");
 
-            assertThat(config.language().name())
-                    .isEqualTo("java");
-            assertThat(config.language().version())
-                    .isEqualTo("21");
-            assertThat(config.framework().name())
-                    .isEqualTo("spring-boot");
-            assertThat(config.architecture().style())
-                    .isEqualTo("microservice");
+            assertThat(config.language().name()).isEqualTo("java");
+            assertThat(config.language().version()).isEqualTo("21");
+            assertThat(config.framework().name()).isEqualTo("spring-boot");
+            assertThat(config.architecture().style()).isEqualTo("microservice");
         }
     }
 
@@ -315,8 +250,7 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("throws for unknown stack key")
         void getStack_unknownKey_throwsException() {
-            assertThatThrownBy(() ->
-                    ConfigProfiles.getStack("csharp-dotnet"))
+            assertThatThrownBy(() -> ConfigProfiles.getStack("csharp-dotnet"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("csharp-dotnet");
         }
@@ -324,8 +258,7 @@ class ConfigProfilesTest {
         @Test
         @DisplayName("throws for null stack key")
         void getStack_null_throwsException() {
-            assertThatThrownBy(() ->
-                    ConfigProfiles.getStack(null))
+            assertThatThrownBy(() -> ConfigProfiles.getStack(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -335,52 +268,51 @@ class ConfigProfilesTest {
     class AllStacksValid {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-picocli-cli", "java-quarkus",
-                "java-spring", "java-spring-clickhouse",
-                "java-spring-cqrs-es",
-                "java-spring-elasticsearch",
-                "java-spring-event-driven",
-                "java-spring-fintech-pci",
-                "java-spring-hexagonal",
-                "java-spring-neo4j"})
+        @ValueSource(
+                strings = {
+                    "java-picocli-cli",
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-fintech-pci",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j"
+                })
         @DisplayName("each stack has non-null required fields")
         void getStack_eachStack_hasRequiredFields(String key) {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(key);
+            ProjectConfig config = ConfigProfiles.getStack(key);
 
             assertThat(config.project().name()).isNotBlank();
-            assertThat(config.architecture().style())
-                    .isNotBlank();
+            assertThat(config.architecture().style()).isNotBlank();
             assertThat(config.interfaces()).isNotEmpty();
             assertThat(config.language().name()).isNotBlank();
-            assertThat(config.language().version())
-                    .isNotBlank();
-            assertThat(config.framework().name())
-                    .isNotBlank();
-            assertThat(config.data().database().name())
-                    .isNotBlank();
-            assertThat(config.testing().coverageLine())
-                    .isGreaterThan(0);
+            assertThat(config.language().version()).isNotBlank();
+            assertThat(config.framework().name()).isNotBlank();
+            assertThat(config.data().database().name()).isNotBlank();
+            assertThat(config.testing().coverageLine()).isGreaterThan(0);
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-picocli-cli", "java-quarkus",
-                "java-spring", "java-spring-clickhouse",
-                "java-spring-cqrs-es",
-                "java-spring-elasticsearch",
-                "java-spring-event-driven",
-                "java-spring-hexagonal",
-                "java-spring-neo4j"})
+        @ValueSource(
+                strings = {
+                    "java-picocli-cli",
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j"
+                })
         @DisplayName("each stack defaults compliance to 'none'")
-        void getStack_eachStack_complianceDefaultsNone(
-                String key) {
-            ProjectConfig config =
-                    ConfigProfiles.getStack(key);
+        void getStack_eachStack_complianceDefaultsNone(String key) {
+            ProjectConfig config = ConfigProfiles.getStack(key);
 
-            assertThat(config.compliance())
-                    .isEqualTo("none");
+            assertThat(config.compliance()).isEqualTo("none");
         }
     }
 }

@@ -1,7 +1,12 @@
 package dev.iadev.infrastructure.adapter.output.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.model.StackProfile;
 import dev.iadev.domain.port.output.StackProfileRepository;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,18 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 /**
  * Unit and integration tests for {@link YamlStackProfileRepository}.
  *
- * <p>Tests use real YAML files from the classpath
- * ({@code shared/config-templates/setup-config.*.yaml}) to verify
- * correct loading and mapping to {@link StackProfile}.</p>
+ * <p>Tests use real YAML files from the classpath ({@code
+ * shared/config-templates/setup-config.*.yaml}) to verify correct loading and mapping to {@link
+ * StackProfile}.
  */
 class YamlStackProfileRepositoryTest {
 
@@ -40,11 +39,8 @@ class YamlStackProfileRepositoryTest {
         void findAll_bundledProfiles_returnsAllProfiles() {
             List<StackProfile> profiles = repository.findAll();
 
-            assertThat(profiles)
-                    .isNotNull()
-                    .isNotEmpty();
-            assertThat(profiles.size())
-                    .isGreaterThanOrEqualTo(8);
+            assertThat(profiles).isNotNull().isNotEmpty();
+            assertThat(profiles.size()).isGreaterThanOrEqualTo(8);
         }
 
         @Test
@@ -52,11 +48,12 @@ class YamlStackProfileRepositoryTest {
         void findAll_returnedList_isImmutable() {
             List<StackProfile> profiles = repository.findAll();
 
-            assertThatThrownBy(() -> profiles.add(
-                    new StackProfile("test", "java",
-                            "spring", "maven", null)))
-                    .isInstanceOf(
-                            UnsupportedOperationException.class);
+            assertThatThrownBy(
+                            () ->
+                                    profiles.add(
+                                            new StackProfile(
+                                                    "test", "java", "spring", "maven", null)))
+                    .isInstanceOf(UnsupportedOperationException.class);
         }
 
         @Test
@@ -65,14 +62,10 @@ class YamlStackProfileRepositoryTest {
             List<StackProfile> profiles = repository.findAll();
 
             for (StackProfile profile : profiles) {
-                assertThat(profile.name())
-                        .isNotNull().isNotBlank();
-                assertThat(profile.language())
-                        .isNotNull().isNotBlank();
-                assertThat(profile.framework())
-                        .isNotNull().isNotBlank();
-                assertThat(profile.buildTool())
-                        .isNotNull().isNotBlank();
+                assertThat(profile.name()).isNotNull().isNotBlank();
+                assertThat(profile.language()).isNotNull().isNotBlank();
+                assertThat(profile.framework()).isNotNull().isNotBlank();
+                assertThat(profile.buildTool()).isNotNull().isNotBlank();
             }
         }
     }
@@ -82,27 +75,19 @@ class YamlStackProfileRepositoryTest {
     class FindByName {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-quarkus",
-                "java-spring"
-        })
+        @ValueSource(strings = {"java-quarkus", "java-spring"})
         @DisplayName("finds each of the 8 standard profiles")
-        void findByName_knownProfile_returnsProfile(
-                String profileName) {
-            Optional<StackProfile> result =
-                    repository.findByName(profileName);
+        void findByName_knownProfile_returnsProfile(String profileName) {
+            Optional<StackProfile> result = repository.findByName(profileName);
 
             assertThat(result).isPresent();
-            assertThat(result.get().name())
-                    .isEqualTo(profileName);
+            assertThat(result.get().name()).isEqualTo(profileName);
         }
 
         @Test
         @DisplayName("returns empty for nonexistent profile")
         void findByName_nonexistent_returnsEmpty() {
-            Optional<StackProfile> result =
-                    repository.findByName(
-                            "nonexistent-profile");
+            Optional<StackProfile> result = repository.findByName("nonexistent-profile");
 
             assertThat(result).isEmpty();
         }
@@ -110,19 +95,15 @@ class YamlStackProfileRepositoryTest {
         @Test
         @DisplayName("throws on null profile name")
         void findByName_nullName_throwsException() {
-            assertThatThrownBy(
-                    () -> repository.findByName(null))
-                    .isInstanceOf(
-                            IllegalArgumentException.class);
+            assertThatThrownBy(() -> repository.findByName(null))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("throws on blank profile name")
         void findByName_blankName_throwsException() {
-            assertThatThrownBy(
-                    () -> repository.findByName("  "))
-                    .isInstanceOf(
-                            IllegalArgumentException.class);
+            assertThatThrownBy(() -> repository.findByName("  "))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -131,40 +112,30 @@ class YamlStackProfileRepositoryTest {
     class Exists {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-quarkus",
-                "java-spring"
-        })
+        @ValueSource(strings = {"java-quarkus", "java-spring"})
         @DisplayName("returns true for each of the 8 profiles")
-        void exists_knownProfile_returnsTrue(
-                String profileName) {
-            assertThat(repository.exists(profileName))
-                    .isTrue();
+        void exists_knownProfile_returnsTrue(String profileName) {
+            assertThat(repository.exists(profileName)).isTrue();
         }
 
         @Test
         @DisplayName("returns false for nonexistent profile")
         void exists_nonexistent_returnsFalse() {
-            assertThat(repository.exists(
-                    "nonexistent-profile")).isFalse();
+            assertThat(repository.exists("nonexistent-profile")).isFalse();
         }
 
         @Test
         @DisplayName("throws on null profile name")
         void exists_nullName_throwsException() {
-            assertThatThrownBy(
-                    () -> repository.exists(null))
-                    .isInstanceOf(
-                            IllegalArgumentException.class);
+            assertThatThrownBy(() -> repository.exists(null))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("throws on blank profile name")
         void exists_blankName_throwsException() {
-            assertThatThrownBy(
-                    () -> repository.exists("  "))
-                    .isInstanceOf(
-                            IllegalArgumentException.class);
+            assertThatThrownBy(() -> repository.exists("  "))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -175,18 +146,12 @@ class YamlStackProfileRepositoryTest {
         @Test
         @DisplayName("java-spring has correct fields")
         void javaSpring_hasCorrectFields() {
-            StackProfile profile =
-                    repository.findByName("java-spring")
-                            .orElseThrow();
+            StackProfile profile = repository.findByName("java-spring").orElseThrow();
 
-            assertThat(profile.name())
-                    .isEqualTo("java-spring");
-            assertThat(profile.language())
-                    .isEqualTo("java");
-            assertThat(profile.framework())
-                    .isEqualTo("spring-boot");
-            assertThat(profile.buildTool())
-                    .isEqualTo("gradle");
+            assertThat(profile.name()).isEqualTo("java-spring");
+            assertThat(profile.language()).isEqualTo("java");
+            assertThat(profile.framework()).isEqualTo("spring-boot");
+            assertThat(profile.buildTool()).isEqualTo("gradle");
         }
 
         // go-gin and rust-axum per-stack field tests removed in EPIC-0048
@@ -195,13 +160,9 @@ class YamlStackProfileRepositoryTest {
         @Test
         @DisplayName("profiles have non-empty properties")
         void profiles_haveProperties() {
-            StackProfile profile =
-                    repository.findByName("java-spring")
-                            .orElseThrow();
+            StackProfile profile = repository.findByName("java-spring").orElseThrow();
 
-            assertThat(profile.properties())
-                    .isNotNull()
-                    .isNotEmpty();
+            assertThat(profile.properties()).isNotNull().isNotEmpty();
         }
     }
 
@@ -212,9 +173,7 @@ class YamlStackProfileRepositoryTest {
         @Test
         @DisplayName("implements StackProfileRepository")
         void implementsInterface() {
-            assertThat(repository)
-                    .isInstanceOf(
-                            StackProfileRepository.class);
+            assertThat(repository).isInstanceOf(StackProfileRepository.class);
         }
     }
 }

@@ -1,12 +1,11 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("TestingConfig")
 class TestingConfigTest {
@@ -18,12 +17,13 @@ class TestingConfigTest {
         @Test
         @DisplayName("creates config with all fields")
         void fromMap_allFields_allSet() {
-            var map = Map.<String, Object>of(
-                    "smoke_tests", false,
-                    "contract_tests", true,
-                    "performance_tests", false,
-                    "coverage_line", 80,
-                    "coverage_branch", 70);
+            var map =
+                    Map.<String, Object>of(
+                            "smoke_tests", false,
+                            "contract_tests", true,
+                            "performance_tests", false,
+                            "coverage_line", 80,
+                            "coverage_branch", 70);
 
             var result = TestingConfig.fromMap(map);
 
@@ -49,8 +49,7 @@ class TestingConfigTest {
         @Test
         @DisplayName("partial map defaults missing fields")
         void fromMap_partialMap_missingDefaulted() {
-            var map = Map.<String, Object>of(
-                    "coverage_line", 85);
+            var map = Map.<String, Object>of("coverage_line", 85);
 
             var result = TestingConfig.fromMap(map);
 
@@ -62,8 +61,7 @@ class TestingConfigTest {
         @Test
         @DisplayName("non-numeric coverage values default to thresholds")
         void fromMap_nonNumericCoverage_defaults() {
-            var map = Map.<String, Object>of(
-                    "coverage_line", "high");
+            var map = Map.<String, Object>of("coverage_line", "high");
 
             var result = TestingConfig.fromMap(map);
 

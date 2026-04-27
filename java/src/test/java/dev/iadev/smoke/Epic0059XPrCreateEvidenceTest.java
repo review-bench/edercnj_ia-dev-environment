@@ -1,33 +1,31 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
- * TASK-0059-0007-002: Verification tests confirming that
- * {@code x-pr-create} SKILL.md declares the
+ * TASK-0059-0007-002: Verification tests confirming that {@code x-pr-create} SKILL.md declares the
  * {@code ## Orchestrator Evidence} injection (Phase 3.5).
  *
- * <p>These tests verify the structural requirements of the
- * extended {@code x-pr-create} SKILL.md under the source-of-truth
- * directory. They act as regression guards ensuring the Phase 3.5
- * Orchestrator Evidence section is not accidentally removed.</p>
+ * <p>These tests verify the structural requirements of the extended {@code x-pr-create} SKILL.md
+ * under the source-of-truth directory. They act as regression guards ensuring the Phase 3.5
+ * Orchestrator Evidence section is not accidentally removed.
  *
- * <p>Scenarios validated:</p>
+ * <p>Scenarios validated:
+ *
  * <ol>
- *   <li>SKILL.md exists in source-of-truth ({@code java/src/main/resources/}).</li>
- *   <li>Phase 3.5 section header is present.</li>
- *   <li>Orchestrator Evidence bash block is present (Story IDs extraction).</li>
- *   <li>{@code --no-story-evidence} flag is declared in the parameters table.</li>
- *   <li>{@code Invocation Skill | x-story-implement} canonical value is present.</li>
- *   <li>Both Phase 1 and Phase 3 artifact collection loops are present.</li>
+ *   <li>SKILL.md exists in source-of-truth ({@code java/src/main/resources/}).
+ *   <li>Phase 3.5 section header is present.
+ *   <li>Orchestrator Evidence bash block is present (Story IDs extraction).
+ *   <li>{@code --no-story-evidence} flag is declared in the parameters table.
+ *   <li>{@code Invocation Skill | x-story-implement} canonical value is present.
+ *   <li>Both Phase 1 and Phase 3 artifact collection loops are present.
  * </ol>
  *
  * @see <a href="plans/epic-0059/story-0059-0007.md">story-0059-0007</a>
@@ -38,16 +36,13 @@ class Epic0059XPrCreateEvidenceTest {
     private static final String SOURCE_SKILL_PATH =
             "java/src/main/resources/targets/claude/skills/core/pr/x-pr-create/SKILL.md";
 
-    private static final String GENERATED_SKILL_PATH =
-            ".claude/skills/x-pr-create/SKILL.md";
+    private static final String GENERATED_SKILL_PATH = ".claude/skills/x-pr-create/SKILL.md";
 
     @Test
     @DisplayName("sourceSkillExists — source-of-truth x-pr-create/SKILL.md must exist")
     void sourceSkillExists() {
         Path skill = repoRoot().resolve(SOURCE_SKILL_PATH);
-        assertThat(skill)
-                .as("source-of-truth x-pr-create SKILL.md must exist")
-                .isRegularFile();
+        assertThat(skill).as("source-of-truth x-pr-create SKILL.md must exist").isRegularFile();
     }
 
     @Test
@@ -78,11 +73,13 @@ class Epic0059XPrCreateEvidenceTest {
     }
 
     @Test
-    @DisplayName("sourceSkillContainsCanonicalInvocationSkill — x-story-implement as canonical value")
+    @DisplayName(
+            "sourceSkillContainsCanonicalInvocationSkill — x-story-implement as canonical value")
     void sourceSkillContainsCanonicalInvocationSkill() throws IOException {
         String content = readSourceSkill();
         assertThat(content)
-                .as("source SKILL.md must set 'Invocation Skill | x-story-implement' (not a placeholder)")
+                .as(
+                        "source SKILL.md must set 'Invocation Skill | x-story-implement' (not a placeholder)")
                 .contains("Invocation Skill | x-story-implement");
     }
 
@@ -91,7 +88,8 @@ class Epic0059XPrCreateEvidenceTest {
     void sourceSkillContainsPhase1ArtifactLoop() throws IOException {
         String content = readSourceSkill();
         assertThat(content)
-                .as("source SKILL.md must contain Phase 1 artifact collection (arch/plan/tests/tasks/security/compliance)")
+                .as(
+                        "source SKILL.md must contain Phase 1 artifact collection (arch/plan/tests/tasks/security/compliance)")
                 .contains("arch-story-")
                 .contains("plan-story-")
                 .contains("tests-story-")
@@ -103,7 +101,8 @@ class Epic0059XPrCreateEvidenceTest {
     void sourceSkillContainsPhase3ArtifactLoop() throws IOException {
         String content = readSourceSkill();
         assertThat(content)
-                .as("source SKILL.md must contain Phase 3 artifact collection (verify-envelope/story-completion-report)")
+                .as(
+                        "source SKILL.md must contain Phase 3 artifact collection (verify-envelope/story-completion-report)")
                 .contains("verify-envelope-")
                 .contains("story-completion-report-");
     }
@@ -123,7 +122,8 @@ class Epic0059XPrCreateEvidenceTest {
     }
 
     @Test
-    @DisplayName("generatedSkillContainsNoStoryEvidenceFlag — generated SKILL.md has --no-story-evidence")
+    @DisplayName(
+            "generatedSkillContainsNoStoryEvidenceFlag — generated SKILL.md has --no-story-evidence")
     void generatedSkillContainsNoStoryEvidenceFlag() throws IOException {
         Path generated = repoRoot().resolve(GENERATED_SKILL_PATH);
         if (!Files.exists(generated)) {
@@ -138,15 +138,11 @@ class Epic0059XPrCreateEvidenceTest {
     // ------------------------------------------------------------------ helpers
 
     private String readSourceSkill() throws IOException {
-        return Files.readString(
-                repoRoot().resolve(SOURCE_SKILL_PATH),
-                StandardCharsets.UTF_8);
+        return Files.readString(repoRoot().resolve(SOURCE_SKILL_PATH), StandardCharsets.UTF_8);
     }
 
     private Path repoRoot() {
         Path cwd = Path.of("").toAbsolutePath();
-        return cwd.getFileName().toString().equals("java")
-                ? cwd.getParent()
-                : cwd;
+        return cwd.getFileName().toString().equals("java") ? cwd.getParent() : cwd;
     }
 }

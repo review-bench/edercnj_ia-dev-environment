@@ -1,39 +1,36 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * TASK-0059-0007-003: Smoke tests for {@code scripts/audit-pr-evidence.sh}.
  *
- * <p>Validates the key exit paths of the audit script:</p>
+ * <p>Validates the key exit paths of the audit script:
+ *
  * <ol>
- *   <li>Script exists and is executable.</li>
- *   <li>{@code --self-check} exits 0 when environment is configured.</li>
- *   <li>{@code --help} exits 2 (usage error per convention).</li>
+ *   <li>Script exists and is executable.
+ *   <li>{@code --self-check} exits 0 when environment is configured.
+ *   <li>{@code --help} exits 2 (usage error per convention).
  * </ol>
  *
- * <p>The functional smoke tests (PR body validation) require a live GitHub
- * connection and are exercised at CI integration time. Unit-level structural
- * tests validate the script's contract without network access.</p>
+ * <p>The functional smoke tests (PR body validation) require a live GitHub connection and are
+ * exercised at CI integration time. Unit-level structural tests validate the script's contract
+ * without network access.
  *
  * @see <a href="plans/epic-0059/story-0059-0007.md">story-0059-0007</a>
  */
 @DisplayName("Epic0059AuditPrEvidenceTest — TASK-0059-0007-003")
-@DisabledOnOs(
-        value = OS.WINDOWS,
-        disabledReason = "POSIX bash script — not applicable on Windows")
+@DisabledOnOs(value = OS.WINDOWS, disabledReason = "POSIX bash script — not applicable on Windows")
 class Epic0059AuditPrEvidenceTest {
 
     private static final String SCRIPT_PATH = "scripts/audit-pr-evidence.sh";
@@ -76,7 +73,8 @@ class Epic0059AuditPrEvidenceTest {
     }
 
     @Test
-    @DisplayName("baselineFileHasValidFormat — each data line must be PR_NUMBER optionally followed by comment")
+    @DisplayName(
+            "baselineFileHasValidFormat — each data line must be PR_NUMBER optionally followed by comment")
     void baselineFileHasValidFormat() throws IOException {
         Path baseline = repoRoot().resolve(BASELINE_PATH);
         String content = Files.readString(baseline, StandardCharsets.UTF_8);
@@ -95,11 +93,8 @@ class Epic0059AuditPrEvidenceTest {
     @Test
     @DisplayName("scriptContainsAllFiveExitCodes — exit codes 0-4 must be documented in script")
     void scriptContainsAllFiveExitCodes() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
-        assertThat(content)
-                .as("script must document exit 0 (OK)")
-                .contains("exit 0");
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        assertThat(content).as("script must document exit 0 (OK)").contains("exit 0");
         assertThat(content)
                 .as("script must document exit 1 (PRE_EVIDENCE_MISSING)")
                 .contains("PRE_EVIDENCE_MISSING");
@@ -115,10 +110,10 @@ class Epic0059AuditPrEvidenceTest {
     }
 
     @Test
-    @DisplayName("scriptValidatesStoryIdPlaceholder — script must reject story-XXXX-YYYY placeholder")
+    @DisplayName(
+            "scriptValidatesStoryIdPlaceholder — script must reject story-XXXX-YYYY placeholder")
     void scriptValidatesStoryIdPlaceholder() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
         assertThat(content)
                 .as("script must check for story-XXXX-YYYY placeholder")
                 .contains("story-XXXX-YYYY");
@@ -127,8 +122,7 @@ class Epic0059AuditPrEvidenceTest {
     @Test
     @DisplayName("scriptValidatesShaPlaceholder — script must reject abc123def456... placeholder")
     void scriptValidatesShaPlaceholder() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
         assertThat(content)
                 .as("script must check for abc123def456... placeholder")
                 .contains("abc123def456...");
@@ -137,8 +131,7 @@ class Epic0059AuditPrEvidenceTest {
     @Test
     @DisplayName("scriptValidatesSkillPlaceholder — script must reject SKILL-NAME-HERE placeholder")
     void scriptValidatesSkillPlaceholder() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
         assertThat(content)
                 .as("script must check for SKILL-NAME-HERE placeholder")
                 .contains("SKILL-NAME-HERE");
@@ -147,8 +140,7 @@ class Epic0059AuditPrEvidenceTest {
     @Test
     @DisplayName("scriptValidates40HexSha — script must validate 40 hex char SHA pattern")
     void scriptValidates40HexSha() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
         assertThat(content)
                 .as("script must validate 40-char hex SHA with regex [0-9a-f]{40}")
                 .containsAnyOf("[0-9a-f]{40}", "[0-9a-f]{40}$");
@@ -157,18 +149,14 @@ class Epic0059AuditPrEvidenceTest {
     @Test
     @DisplayName("scriptContainsSelfCheckFlag — --self-check implementation must be present")
     void scriptContainsSelfCheckFlag() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
-        assertThat(content)
-                .as("script must implement --self-check flag")
-                .contains("--self-check");
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        assertThat(content).as("script must implement --self-check flag").contains("--self-check");
     }
 
     @Test
     @DisplayName("scriptContainsNoStoryEvidenceBypass — --no-story-evidence must be recognized")
     void scriptContainsNoStoryEvidenceBypass() throws IOException {
-        String content = Files.readString(
-                repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
+        String content = Files.readString(repoRoot().resolve(SCRIPT_PATH), StandardCharsets.UTF_8);
         assertThat(content)
                 .as("script must recognize --no-story-evidence bypass")
                 .contains("no-story-evidence");
@@ -198,8 +186,6 @@ class Epic0059AuditPrEvidenceTest {
 
     private Path repoRoot() {
         Path cwd = Path.of("").toAbsolutePath();
-        return cwd.getFileName().toString().equals("java")
-                ? cwd.getParent()
-                : cwd;
+        return cwd.getFileName().toString().equals("java") ? cwd.getParent() : cwd;
     }
 }

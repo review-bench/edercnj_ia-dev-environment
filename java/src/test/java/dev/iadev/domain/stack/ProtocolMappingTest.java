@@ -1,12 +1,11 @@
 package dev.iadev.domain.stack;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.iadev.testutil.TestConfigBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ProtocolMapping")
 class ProtocolMappingTest {
@@ -24,23 +23,20 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("rest maps to [rest]")
         void interfaceProtocolMap_whenCalled_rest() {
-            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP.get("rest"))
-                    .containsExactly("rest");
+            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP.get("rest")).containsExactly("rest");
         }
 
         @Test
         @DisplayName("event-consumer maps to [event-driven, messaging]")
         void interfaceProtocolMap_whenCalled_eventConsumer() {
-            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP
-                    .get("event-consumer"))
+            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP.get("event-consumer"))
                     .containsExactly("event-driven", "messaging");
         }
 
         @Test
         @DisplayName("cli maps to empty list")
         void interfaceProtocolMap_whenCalled_cli() {
-            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP.get("cli"))
-                    .isEmpty();
+            assertThat(ProtocolMapping.INTERFACE_PROTOCOL_MAP.get("cli")).isEmpty();
         }
 
         @Test
@@ -52,8 +48,7 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("EVENT_DRIVEN_PROTOCOL is event-driven")
         void map_whenCalled_eventDrivenProtocol() {
-            assertThat(ProtocolMapping.EVENT_DRIVEN_PROTOCOL)
-                    .isEqualTo("event-driven");
+            assertThat(ProtocolMapping.EVENT_DRIVEN_PROTOCOL).isEqualTo("event-driven");
         }
     }
 
@@ -64,10 +59,11 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("rest interface produces [rest]")
         void deriveProtocols_rest_restOnly() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("rest", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("rest", "", "")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
@@ -77,10 +73,11 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("grpc interface produces [grpc]")
         void deriveProtocols_grpc_grpcOnly() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("grpc", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("grpc", "", "")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
@@ -90,43 +87,44 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("event-consumer produces [event-driven, messaging]")
         void deriveProtocols_eventConsumer_eventDrivenMessaging() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("event-consumer", "", "kafka")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("event-consumer", "", "kafka")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
-            assertThat(result)
-                    .containsExactly("event-driven", "messaging");
+            assertThat(result).containsExactly("event-driven", "messaging");
         }
 
         @Test
         @DisplayName("multiple interfaces deduplicated and sorted")
         void deriveProtocols_multiple_deduplicatedSorted() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("rest", "", "")
-                    .addInterface("grpc", "", "")
-                    .addInterface("event-consumer", "", "kafka")
-                    .addInterface("event-producer", "", "kafka")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("rest", "", "")
+                            .addInterface("grpc", "", "")
+                            .addInterface("event-consumer", "", "kafka")
+                            .addInterface("event-producer", "", "kafka")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
             assertThat(result).doesNotHaveDuplicates();
             assertThat(result).isSorted();
-            assertThat(result).contains(
-                    "event-driven", "grpc", "messaging", "rest");
+            assertThat(result).contains("event-driven", "grpc", "messaging", "rest");
         }
 
         @Test
         @DisplayName("cli produces empty list")
         void deriveProtocols_cli_empty() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("cli", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("cli", "", "")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
@@ -136,10 +134,11 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("unknown event- prefix falls back to event-driven")
         void deriveProtocols_unknownEventPrefix_eventDriven() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("event-custom", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("event-custom", "", "")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
@@ -149,10 +148,11 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("completely unknown type produces no protocol")
         void deriveProtocols_unknown_empty() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("scheduled", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("scheduled", "", "")
+                            .build();
 
             var result = ProtocolMapping.deriveProtocols(config);
 
@@ -167,22 +167,23 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("returns broker from first interface with broker")
         void extractBroker_kafkaBroker_kafka() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("event-consumer", "", "kafka")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("event-consumer", "", "kafka")
+                            .build();
 
-            assertThat(ProtocolMapping.extractBroker(config))
-                    .isEqualTo("kafka");
+            assertThat(ProtocolMapping.extractBroker(config)).isEqualTo("kafka");
         }
 
         @Test
         @DisplayName("returns empty when no interface has broker")
         void extractBroker_noBroker_empty() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("rest", "", "")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("rest", "", "")
+                            .build();
 
             assertThat(ProtocolMapping.extractBroker(config)).isEmpty();
         }
@@ -190,14 +191,14 @@ class ProtocolMappingTest {
         @Test
         @DisplayName("returns first broker when multiple exist")
         void extractBroker_multipleBrokers_returnsFirst() {
-            var config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("event-consumer", "", "kafka")
-                    .addInterface("event-producer", "", "rabbitmq")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("event-consumer", "", "kafka")
+                            .addInterface("event-producer", "", "rabbitmq")
+                            .build();
 
-            assertThat(ProtocolMapping.extractBroker(config))
-                    .isEqualTo("kafka");
+            assertThat(ProtocolMapping.extractBroker(config)).isEqualTo("kafka");
         }
     }
 }

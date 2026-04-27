@@ -1,5 +1,8 @@
 package dev.iadev.domain.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.model.ArchitectureConfig;
 import dev.iadev.domain.model.DataConfig;
 import dev.iadev.domain.model.FrameworkConfig;
@@ -11,10 +14,11 @@ import dev.iadev.domain.model.ObservabilityConfig;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.model.ProjectIdentity;
 import dev.iadev.domain.model.SecurityConfig;
-import dev.iadev.domain.model.StackProfile;
 import dev.iadev.domain.model.TestingConfig;
 import dev.iadev.domain.model.ValidationResult;
 import dev.iadev.domain.port.output.StackProfileRepository;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,33 +27,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for {@link ValidateConfigService}.
  *
- * <p>Tests use mocked Output Ports to validate business logic
- * in isolation from infrastructure.</p>
+ * <p>Tests use mocked Output Ports to validate business logic in isolation from infrastructure.
  */
 @ExtendWith(MockitoExtension.class)
 class ValidateConfigServiceTest {
 
-    @Mock
-    private StackProfileRepository profileRepository;
+    @Mock private StackProfileRepository profileRepository;
 
     private ValidateConfigService service;
 
     @BeforeEach
     void setUp() {
-        service = new ValidateConfigService(
-                profileRepository);
+        service = new ValidateConfigService(profileRepository);
     }
 
     @Nested
@@ -57,14 +49,11 @@ class ValidateConfigServiceTest {
     class ConstructorValidation {
 
         @Test
-        @DisplayName("constructor_nullRepository"
-                + "_throwsNullPointerException")
+        @DisplayName("constructor_nullRepository" + "_throwsNullPointerException")
         void constructor_nullRepository_throwsNpe() {
-            assertThatThrownBy(
-                    () -> new ValidateConfigService(null))
+            assertThatThrownBy(() -> new ValidateConfigService(null))
                     .isInstanceOf(NullPointerException.class)
-                    .hasMessageContaining(
-                            "profileRepository");
+                    .hasMessageContaining("profileRepository");
         }
     }
 
@@ -73,13 +62,11 @@ class ValidateConfigServiceTest {
     class ValidateHappyPath {
 
         @Test
-        @DisplayName("validate_validConfig"
-                + "_returnsSuccessWithZeroErrors")
+        @DisplayName("validate_validConfig" + "_returnsSuccessWithZeroErrors")
         void validate_validConfig_returnsSuccessWithZeroErrors() {
             ProjectConfig config = buildValidConfig();
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isTrue();
             assertThat(result.errors()).isEmpty();
@@ -91,79 +78,63 @@ class ValidateConfigServiceTest {
     class ValidateErrorPaths {
 
         @Test
-        @DisplayName("validate_nullConfig"
-                + "_throwsNullPointerException")
+        @DisplayName("validate_nullConfig" + "_throwsNullPointerException")
         void validate_nullConfig_throwsNpe() {
-            assertThatThrownBy(
-                    () -> service.validate(null))
+            assertThatThrownBy(() -> service.validate(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("config");
         }
 
         @Test
-        @DisplayName("validate_nullProjectIdentity"
-                + "_returnsErrorResult")
+        @DisplayName("validate_nullProjectIdentity" + "_returnsErrorResult")
         void validate_nullProjectIdentity_returnsErrorResult() {
             ProjectConfig config = buildConfigWithNullIdentity();
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.toLowerCase()
-                            .contains("project"));
+                    .anyMatch(e -> e.toLowerCase().contains("project"));
         }
 
         @Test
-        @DisplayName("validate_nullLanguage"
-                + "_returnsErrorResult")
+        @DisplayName("validate_nullLanguage" + "_returnsErrorResult")
         void validate_nullLanguage_returnsErrorResult() {
             ProjectConfig config = buildConfigWithNullLanguage();
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.toLowerCase()
-                            .contains("language"));
+                    .anyMatch(e -> e.toLowerCase().contains("language"));
         }
 
         @Test
-        @DisplayName("validate_nullFramework"
-                + "_returnsErrorResult")
+        @DisplayName("validate_nullFramework" + "_returnsErrorResult")
         void validate_nullFramework_returnsErrorResult() {
-            ProjectConfig config =
-                    buildConfigWithNullFramework();
+            ProjectConfig config = buildConfigWithNullFramework();
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.toLowerCase()
-                            .contains("framework"));
+                    .anyMatch(e -> e.toLowerCase().contains("framework"));
         }
 
         @Test
-        @DisplayName("validate_emptyInterfaces"
-                + "_returnsErrorResult")
+        @DisplayName("validate_emptyInterfaces" + "_returnsErrorResult")
         void validate_emptyInterfaces_returnsErrorResult() {
-            ProjectConfig config =
-                    buildConfigWithEmptyInterfaces();
+            ProjectConfig config = buildConfigWithEmptyInterfaces();
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.toLowerCase()
-                            .contains("interface"));
+                    .anyMatch(e -> e.toLowerCase().contains("interface"));
         }
     }
 
@@ -172,102 +143,90 @@ class ValidateConfigServiceTest {
     class ArchitectureCrossField {
 
         @Test
-        @DisplayName("validate_archUnitWithoutBasePackage"
-                + "_returnsErrorResult")
+        @DisplayName("validate_archUnitWithoutBasePackage" + "_returnsErrorResult")
         void validate_archUnitNoBase_returnsError() {
-            ProjectConfig config =
-                    buildConfigWithArchUnit(true, "");
+            ProjectConfig config = buildConfigWithArchUnit(true, "");
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.contains(
-                            "architecture.base_package"));
+                    .anyMatch(e -> e.contains("architecture.base_package"));
         }
 
         @Test
-        @DisplayName("validate_archUnitWithBasePackage"
-                + "_returnsValidResult")
+        @DisplayName("validate_archUnitWithBasePackage" + "_returnsValidResult")
         void validate_archUnitWithBase_returnsValid() {
-            ProjectConfig config =
-                    buildConfigWithArchUnit(
-                            true, "com.example.myapp");
+            ProjectConfig config = buildConfigWithArchUnit(true, "com.example.myapp");
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isTrue();
             assertThat(result.errors()).isEmpty();
         }
 
         @Test
-        @DisplayName("validate_archUnitFalseNoBase"
-                + "_returnsValidResult")
+        @DisplayName("validate_archUnitFalseNoBase" + "_returnsValidResult")
         void validate_archUnitFalseNoBase_returnsValid() {
-            ProjectConfig config =
-                    buildConfigWithArchUnit(false, "");
+            ProjectConfig config = buildConfigWithArchUnit(false, "");
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isTrue();
             assertThat(result.errors()).isEmpty();
         }
 
         @Test
-        @DisplayName("validate_archUnitWithNullBasePackage"
-                + "_returnsErrorResult (branch: null path)")
+        @DisplayName(
+                "validate_archUnitWithNullBasePackage" + "_returnsErrorResult (branch: null path)")
         void validate_archUnitNullBase_returnsError() {
             // Covers the basePackage() == null branch of
             // validateArchitectureCrossFields. The sibling
             // test above covers the isBlank() branch with
             // an empty string. EPIC-0050 coverage closure.
-            ProjectConfig config =
-                    buildConfigWithArchUnit(true, null);
+            ProjectConfig config = buildConfigWithArchUnit(true, null);
 
-            ValidationResult result =
-                    service.validate(config);
+            ValidationResult result = service.validate(config);
 
             assertThat(result.valid()).isFalse();
             assertThat(result.errors())
                     .isNotEmpty()
-                    .anyMatch(e -> e.contains(
-                            "architecture.base_package"));
+                    .anyMatch(e -> e.contains("architecture.base_package"));
         }
     }
 
-    private ProjectConfig buildConfigWithArchUnit(
-            boolean archUnit, String basePackage) {
+    private ProjectConfig buildConfigWithArchUnit(boolean archUnit, String basePackage) {
         return new ProjectConfig(
-                new ProjectIdentity("test-project",
-                        "Test purpose"),
-                new ArchitectureConfig("hexagonal",
-                        false, false,
-                        archUnit, basePackage,
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ProjectIdentity("test-project", "Test purpose"),
+                new ArchitectureConfig(
+                        "hexagonal",
+                        false,
+                        false,
+                        archUnit,
+                        basePackage,
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
-                List.of(new InterfaceConfig(
-                        "rest", "", "")),
+                List.of(new InterfaceConfig("rest", "", "")),
                 new LanguageConfig("java", "21"),
-                new FrameworkConfig("quarkus", "3.17",
-                        "maven", false),
+                new FrameworkConfig("quarkus", "3.17", "maven", false),
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),
-            "none",
-            java.util.Set.of(),
-            null);
+                "none",
+                java.util.Set.of(),
+                null);
     }
 
     @Nested
@@ -278,10 +237,7 @@ class ValidateConfigServiceTest {
         @DisplayName("service_implementsValidateConfigUseCase")
         void service_implementsValidateConfigUseCase() {
             assertThat(service)
-                    .isInstanceOf(
-                            dev.iadev.domain.port.input
-                                    .ValidateConfigUseCase
-                                    .class);
+                    .isInstanceOf(dev.iadev.domain.port.input.ValidateConfigUseCase.class);
         }
     }
 
@@ -289,25 +245,29 @@ class ValidateConfigServiceTest {
 
     private ProjectConfig buildValidConfig() {
         return new ProjectConfig(
-                new ProjectIdentity("test-project",
-                        "Test purpose"),
-                new ArchitectureConfig("microservice",
-                        false, false, false, "",
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ProjectIdentity("test-project", "Test purpose"),
+                new ArchitectureConfig(
+                        "microservice",
+                        false,
+                        false,
+                        false,
+                        "",
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
-                List.of(new InterfaceConfig(
-                        "rest", "", "")),
+                List.of(new InterfaceConfig("rest", "", "")),
                 new LanguageConfig("java", "21"),
-                new FrameworkConfig("quarkus", "3.17",
-                        "maven", false),
+                new FrameworkConfig("quarkus", "3.17", "maven", false),
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),
@@ -319,23 +279,28 @@ class ValidateConfigServiceTest {
     private ProjectConfig buildConfigWithNullIdentity() {
         return new ProjectConfig(
                 null,
-                new ArchitectureConfig("microservice",
-                        false, false, false, "",
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ArchitectureConfig(
+                        "microservice",
+                        false,
+                        false,
+                        false,
+                        "",
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
-                List.of(new InterfaceConfig(
-                        "rest", "", "")),
+                List.of(new InterfaceConfig("rest", "", "")),
                 new LanguageConfig("java", "21"),
-                new FrameworkConfig("quarkus", "3.17",
-                        "maven", false),
+                new FrameworkConfig("quarkus", "3.17", "maven", false),
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),
@@ -346,25 +311,29 @@ class ValidateConfigServiceTest {
 
     private ProjectConfig buildConfigWithNullLanguage() {
         return new ProjectConfig(
-                new ProjectIdentity("test-project",
-                        "Test purpose"),
-                new ArchitectureConfig("microservice",
-                        false, false, false, "",
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ProjectIdentity("test-project", "Test purpose"),
+                new ArchitectureConfig(
+                        "microservice",
+                        false,
+                        false,
+                        false,
+                        "",
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
-                List.of(new InterfaceConfig(
-                        "rest", "", "")),
+                List.of(new InterfaceConfig("rest", "", "")),
                 null,
-                new FrameworkConfig("quarkus", "3.17",
-                        "maven", false),
+                new FrameworkConfig("quarkus", "3.17", "maven", false),
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),
@@ -375,24 +344,29 @@ class ValidateConfigServiceTest {
 
     private ProjectConfig buildConfigWithNullFramework() {
         return new ProjectConfig(
-                new ProjectIdentity("test-project",
-                        "Test purpose"),
-                new ArchitectureConfig("microservice",
-                        false, false, false, "",
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ProjectIdentity("test-project", "Test purpose"),
+                new ArchitectureConfig(
+                        "microservice",
+                        false,
+                        false,
+                        false,
+                        "",
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
-                List.of(new InterfaceConfig(
-                        "rest", "", "")),
+                List.of(new InterfaceConfig("rest", "", "")),
                 new LanguageConfig("java", "21"),
                 null,
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),
@@ -403,24 +377,29 @@ class ValidateConfigServiceTest {
 
     private ProjectConfig buildConfigWithEmptyInterfaces() {
         return new ProjectConfig(
-                new ProjectIdentity("test-project",
-                        "Test purpose"),
-                new ArchitectureConfig("microservice",
-                        false, false, false, "",
-                        new ArchitectureConfig.CqrsConfig(
-                                "eventstoredb", 100,
-                                "", false, ""),
+                new ProjectIdentity("test-project", "Test purpose"),
+                new ArchitectureConfig(
+                        "microservice",
+                        false,
+                        false,
+                        false,
+                        "",
+                        new ArchitectureConfig.CqrsConfig("eventstoredb", 100, "", false, ""),
                         false),
                 List.of(),
                 new LanguageConfig("java", "21"),
-                new FrameworkConfig("quarkus", "3.17",
-                        "maven", false),
+                new FrameworkConfig("quarkus", "3.17", "maven", false),
                 DataConfig.fromMap(Map.of()),
-                new InfraConfig("docker", "none",
-                        "kustomize", "none", "none",
-                        "none", "none", "none",
-                        ObservabilityConfig.fromMap(
-                                Map.of())),
+                new InfraConfig(
+                        "docker",
+                        "none",
+                        "kustomize",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        "none",
+                        ObservabilityConfig.fromMap(Map.of())),
                 SecurityConfig.fromMap(Map.of()),
                 TestingConfig.fromMap(Map.of()),
                 McpConfig.fromMap(Map.of()),

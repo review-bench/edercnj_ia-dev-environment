@@ -1,27 +1,23 @@
 package dev.iadev.migration;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 @DisplayName("MigrateLayoutScriptIT — scripts/migrate-layout.sh")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
 class MigrateLayoutScriptIT {
 
-    private static final Path REPO_ROOT =
-            Paths.get("..").toAbsolutePath().normalize();
-    private static final Path SCRIPT =
-            REPO_ROOT.resolve("scripts/migrate-layout.sh");
+    private static final Path REPO_ROOT = Paths.get("..").toAbsolutePath().normalize();
+    private static final Path SCRIPT = REPO_ROOT.resolve("scripts/migrate-layout.sh");
 
     @Test
     @DisplayName("script file exists and is executable")

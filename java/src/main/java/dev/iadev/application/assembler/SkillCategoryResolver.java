@@ -4,24 +4,18 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Resolves skill names and source paths across the EPIC-0036
- * category-aware source-of-truth layout.
+ * Resolves skill names and source paths across the EPIC-0036 category-aware source-of-truth layout.
  *
- * <p>Extracted from {@code SkillsAssembler} (audit M-002) so
- * the "skill lives in a category subfolder, output is flat"
- * mapping is a single-responsibility helper with its own test
- * surface. Under EPIC-0036, skills physically live under one
- * level of category subfolders (e.g.
- * {@code core/plan/x-epic-create/SKILL.md}) but emit to the
- * flat output path {@code .claude/skills/{name}/}. The
- * {@code lib/} subtree is the one exception — it keeps its
- * {@code lib/} prefix in the emitted name.</p>
+ * <p>Extracted from {@code SkillsAssembler} (audit M-002) so the "skill lives in a category
+ * subfolder, output is flat" mapping is a single-responsibility helper with its own test surface.
+ * Under EPIC-0036, skills physically live under one level of category subfolders (e.g. {@code
+ * core/plan/x-epic-create/SKILL.md}) but emit to the flat output path {@code
+ * .claude/skills/{name}/}. The {@code lib/} subtree is the one exception — it keeps its {@code
+ * lib/} prefix in the emitted name.
  *
- * <p>This class is a thin adapter over
- * {@link SkillsHierarchyResolver}: it provides the root-aware
- * operations callers need (list skills under a root, resolve
- * the on-disk path of a named skill) while keeping the
- * low-level traversal logic single-sourced.</p>
+ * <p>This class is a thin adapter over {@link SkillsHierarchyResolver}: it provides the root-aware
+ * operations callers need (list skills under a root, resolve the on-disk path of a named skill)
+ * while keeping the low-level traversal logic single-sourced.
  *
  * @see SkillsHierarchyResolver
  * @see SkillsAssembler
@@ -33,13 +27,11 @@ final class SkillCategoryResolver {
     }
 
     /**
-     * Lists all skill names under a root directory, honouring
-     * one level of category nesting and the {@code lib/}
-     * prefix exception.
+     * Lists all skill names under a root directory, honouring one level of category nesting and the
+     * {@code lib/} prefix exception.
      *
-     * <p>Delegates traversal to
-     * {@link SkillsHierarchyResolver#listSkillNames(Path)};
-     * scan order and sort contract are preserved verbatim.</p>
+     * <p>Delegates traversal to {@link SkillsHierarchyResolver#listSkillNames(Path)}; scan order
+     * and sort contract are preserved verbatim.
      *
      * @param rootDir the core or conditional root directory
      * @return list of skill names in discovery order
@@ -49,22 +41,16 @@ final class SkillCategoryResolver {
     }
 
     /**
-     * Resolves the on-disk source path of a named skill
-     * within a root directory.
+     * Resolves the on-disk source path of a named skill within a root directory.
      *
-     * <p>Delegates to
-     * {@link SkillsHierarchyResolver#resolveSkillPath(Path,
-     * String)}; supports flat layout, one level of category
-     * nesting, and the {@code lib/} prefix.</p>
+     * <p>Delegates to {@link SkillsHierarchyResolver#resolveSkillPath(Path, String)}; supports flat
+     * layout, one level of category nesting, and the {@code lib/} prefix.
      *
-     * @param rootDir   the core or conditional root
+     * @param rootDir the core or conditional root
      * @param skillName the skill name (may carry lib/ prefix)
-     * @return the resolved skill directory; may not exist
-     *         when the skill cannot be located
+     * @return the resolved skill directory; may not exist when the skill cannot be located
      */
-    static Path resolveSourcePath(
-            Path rootDir, String skillName) {
-        return SkillsHierarchyResolver.resolveSkillPath(
-                rootDir, skillName);
+    static Path resolveSourcePath(Path rootDir, String skillName) {
+        return SkillsHierarchyResolver.resolveSkillPath(rootDir, skillName);
     }
 }

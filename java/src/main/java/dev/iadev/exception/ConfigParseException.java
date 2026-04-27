@@ -3,11 +3,11 @@ package dev.iadev.exception;
 /**
  * Thrown when a YAML configuration file is syntactically invalid.
  *
- * <p>Preserves the original cause (e.g., SnakeYAML's scanner exception)
- * for complete stack trace diagnostics, and carries the file path
- * that failed to parse.</p>
+ * <p>Preserves the original cause (e.g., SnakeYAML's scanner exception) for complete stack trace
+ * diagnostics, and carries the file path that failed to parse.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * try {
  *     yaml.load(input);
@@ -24,12 +24,11 @@ public class ConfigParseException extends RuntimeException {
     /**
      * Creates a config parse exception with file path and original cause.
      *
-     * @param message  description of the parse failure
+     * @param message description of the parse failure
      * @param filePath path to the file that failed to parse
-     * @param cause    the original parsing exception
+     * @param cause the original parsing exception
      */
-    public ConfigParseException(
-            String message, String filePath, Throwable cause) {
+    public ConfigParseException(String message, String filePath, Throwable cause) {
         super(message, cause);
         this.filePath = filePath;
     }

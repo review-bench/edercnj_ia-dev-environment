@@ -1,25 +1,20 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for SmokeTestStep — generates smoke test
- * config conditionally.
- */
+/** Tests for SmokeTestStep — generates smoke test config conditionally. */
 @DisplayName("SmokeTestStep")
 class SmokeTestStepTest {
 
@@ -29,46 +24,38 @@ class SmokeTestStepTest {
 
         @Test
         @DisplayName("generates smoke-config.md")
-        void assemble_whenCalled_generatesSmokeConfig(
-                @TempDir Path tempDir) {
-            SmokeTestStep assembler =
-                    new SmokeTestStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .smokeTests(true)
-                    .container("none")
-                    .orchestrator("none")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+        void assemble_whenCalled_generatesSmokeConfig(@TempDir Path tempDir) {
+            SmokeTestStep assembler = new SmokeTestStep();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .smokeTests(true)
+                            .container("none")
+                            .orchestrator("none")
+                            .build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
             assertThat(result.files()).hasSize(1);
-            assertThat(result.files().get(0))
-                    .contains("smoke-config.md");
+            assertThat(result.files().get(0)).contains("smoke-config.md");
             assertThat(result.warnings()).isEmpty();
         }
 
         @Test
         @DisplayName("smoke-config.md exists on disk")
         void assemble_whenCalled_fileExistsOnDisk(@TempDir Path tempDir) {
-            SmokeTestStep assembler =
-                    new SmokeTestStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .smokeTests(true)
-                    .container("none")
-                    .orchestrator("none")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+            SmokeTestStep assembler = new SmokeTestStep();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .smokeTests(true)
+                            .container("none")
+                            .orchestrator("none")
+                            .build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             assembler.assemble(cicdCtx);
 
-            assertThat(tempDir.resolve(
-                    "tests/smoke/smoke-config.md"))
-                    .exists();
+            assertThat(tempDir.resolve("tests/smoke/smoke-config.md")).exists();
         }
     }
 
@@ -77,26 +64,21 @@ class SmokeTestStepTest {
     class SmokeDisabled {
 
         @Test
-        @DisplayName("skips smoke-config.md when"
-                + " smokeTests=false")
+        @DisplayName("skips smoke-config.md when" + " smokeTests=false")
         void assemble_whenCalled_skipsSmokeConfig(@TempDir Path tempDir) {
-            SmokeTestStep assembler =
-                    new SmokeTestStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .smokeTests(false)
-                    .container("none")
-                    .orchestrator("none")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+            SmokeTestStep assembler = new SmokeTestStep();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .smokeTests(false)
+                            .container("none")
+                            .orchestrator("none")
+                            .build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
             assertThat(result.files()).isEmpty();
-            assertThat(result.warnings())
-                    .anyMatch(w -> w.contains(
-                            "smokeTests is false"));
+            assertThat(result.warnings()).anyMatch(w -> w.contains("smokeTests is false"));
         }
     }
 
@@ -105,27 +87,17 @@ class SmokeTestStepTest {
     class SourceMissing {
 
         @Test
-        @DisplayName("returns empty result when"
-                + " source file does not exist")
-        void assemble_emptyWhenSourceMissing_succeeds(
-                @TempDir Path tempDir)
-                throws IOException {
-            SmokeTestStep assembler =
-                    new SmokeTestStep();
+        @DisplayName("returns empty result when" + " source file does not exist")
+        void assemble_emptyWhenSourceMissing_succeeds(@TempDir Path tempDir) throws IOException {
+            SmokeTestStep assembler = new SmokeTestStep();
             Path resDir = tempDir.resolve("res");
-            Files.createDirectories(
-                    resDir.resolve("shared/cicd-templates"));
+            Files.createDirectories(resDir.resolve("shared/cicd-templates"));
             Path outputDir = tempDir.resolve("output");
 
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .smokeTests(true)
-                    .build();
-            Map<String, Object> ctx =
-                    CicdAssembler.buildStackContext(config);
-            CicdContext cicdCtx = new CicdContext(
-                    config, outputDir, resDir,
-                    new TemplateEngine(), ctx);
+            ProjectConfig config = TestConfigBuilder.builder().smokeTests(true).build();
+            Map<String, Object> ctx = CicdAssembler.buildStackContext(config);
+            CicdContext cicdCtx =
+                    new CicdContext(config, outputDir, resDir, new TemplateEngine(), ctx);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
@@ -134,18 +106,12 @@ class SmokeTestStepTest {
         }
     }
 
-    private static CicdContext buildContext(
-            ProjectConfig config, Path outputDir) {
-        Map<String, Object> ctx =
-                CicdAssembler.buildStackContext(config);
-        return new CicdContext(
-                config, outputDir, resolveResources(),
-                new TemplateEngine(), ctx);
+    private static CicdContext buildContext(ProjectConfig config, Path outputDir) {
+        Map<String, Object> ctx = CicdAssembler.buildStackContext(config);
+        return new CicdContext(config, outputDir, resolveResources(), new TemplateEngine(), ctx);
     }
 
     private static Path resolveResources() {
-        return dev.iadev.util.ResourceResolver
-                .resolveResourceDir("shared")
-                .getParent();
+        return dev.iadev.util.ResourceResolver.resolveResourceDir("shared").getParent();
     }
 }

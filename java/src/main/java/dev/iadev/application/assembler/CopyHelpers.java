@@ -1,7 +1,6 @@
 package dev.iadev.application.assembler;
 
 import dev.iadev.template.TemplateEngine;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -16,11 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Utilities for copying template files with placeholder
- * replacement during artifact generation.
+ * Utilities for copying template files with placeholder replacement during artifact generation.
  *
- * <p>File tree walking, deletion, and section validation
- * are in {@link CopyTreeWalker}.</p>
+ * <p>File tree walking, deletion, and section validation are in {@link CopyTreeWalker}.
  *
  * @see Assembler
  * @see CopyTreeWalker
@@ -32,145 +29,111 @@ public final class CopyHelpers {
     }
 
     /**
-     * Copies a single template file with placeholder
-     * replacement.
+     * Copies a single template file with placeholder replacement.
      *
-     * @param src     the source template file
-     * @param dest    the destination file path
-     * @param engine  the template engine for replacement
+     * @param src the source template file
+     * @param dest the destination file path
+     * @param engine the template engine for replacement
      * @param context the context map for placeholder values
      * @return the destination path as a string
      */
     public static String copyTemplateFile(
-            Path src,
-            Path dest,
-            TemplateEngine engine,
-            Map<String, Object> context) {
+            Path src, Path dest, TemplateEngine engine, Map<String, Object> context) {
         ensureParent(dest);
         try {
-            String content = Files.readString(
-                    src, StandardCharsets.UTF_8);
-            String replaced = engine.replacePlaceholders(
-                    content, context);
-            Files.writeString(
-                    dest, replaced, StandardCharsets.UTF_8);
+            String content = Files.readString(src, StandardCharsets.UTF_8);
+            String replaced = engine.replacePlaceholders(content, context);
+            Files.writeString(dest, replaced, StandardCharsets.UTF_8);
             return dest.toString();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to copy template: %s"
-                            .formatted(src), e);
+            throw new UncheckedIOException("Failed to copy template: %s".formatted(src), e);
         }
     }
 
     /**
      * Copies a template file if the source exists.
      *
-     * @param src     the source template file
-     * @param dest    the destination file path
-     * @param engine  the template engine for replacement
+     * @param src the source template file
+     * @param dest the destination file path
+     * @param engine the template engine for replacement
      * @param context the context map for placeholder values
-     * @return Optional containing the destination path,
-     *         or empty if source is missing
+     * @return Optional containing the destination path, or empty if source is missing
      */
     public static Optional<String> copyTemplateFileIfExists(
-            Path src,
-            Path dest,
-            TemplateEngine engine,
-            Map<String, Object> context) {
+            Path src, Path dest, TemplateEngine engine, Map<String, Object> context) {
         if (!Files.exists(src)) {
             return Optional.empty();
         }
-        return Optional.of(
-                copyTemplateFile(src, dest, engine, context));
+        return Optional.of(copyTemplateFile(src, dest, engine, context));
     }
 
     /**
      * Copies a file without any template rendering.
      *
-     * @param src  the source file
+     * @param src the source file
      * @param dest the destination file
      * @return the destination path as a string
      */
-    public static String copyStaticFile(
-            Path src, Path dest) {
+    public static String copyStaticFile(Path src, Path dest) {
         ensureParent(dest);
         try {
-            Files.copy(src, dest,
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
             return dest.toString();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to copy file: %s"
-                            .formatted(src), e);
+            throw new UncheckedIOException("Failed to copy file: %s".formatted(src), e);
         }
     }
 
     /**
      * Copies a directory tree recursively.
      *
-     * @param srcDir  the source directory
+     * @param srcDir the source directory
      * @param destDir the destination directory
      * @return the destination directory path as a string
      */
-    public static String copyDirectory(
-            Path srcDir, Path destDir) {
+    public static String copyDirectory(Path srcDir, Path destDir) {
         try {
-            Files.walkFileTree(srcDir,
-                    newCopyVisitor(srcDir, destDir));
+            Files.walkFileTree(srcDir, newCopyVisitor(srcDir, destDir));
             return destDir.toString();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to copy directory: %s"
-                            .formatted(srcDir), e);
+            throw new UncheckedIOException("Failed to copy directory: %s".formatted(srcDir), e);
         }
     }
 
-    private static SimpleFileVisitor<Path> newCopyVisitor(
-            Path srcDir, Path destDir) {
+    private static SimpleFileVisitor<Path> newCopyVisitor(Path srcDir, Path destDir) {
         return new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(
-                    Path dir,
-                    BasicFileAttributes attrs)
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                     throws IOException {
-                Path target = destDir.resolve(
-                        srcDir.relativize(dir));
+                Path target = destDir.resolve(srcDir.relativize(dir));
                 Files.createDirectories(target);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFile(
-                    Path file,
-                    BasicFileAttributes attrs)
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                     throws IOException {
-                Files.copy(file,
-                        destDir.resolve(
-                                srcDir.relativize(file)),
-                        StandardCopyOption
-                                .REPLACE_EXISTING);
+                Files.copy(
+                        file,
+                        destDir.resolve(srcDir.relativize(file)),
+                        StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
             }
         };
     }
 
     /**
-     * Writes content to a file, creating parent directories
-     * if needed.
+     * Writes content to a file, creating parent directories if needed.
      *
-     * @param path    target file path
+     * @param path target file path
      * @param content file content (UTF-8)
      */
-    public static void writeFile(
-            Path path, String content) {
+    public static void writeFile(Path path, String content) {
         ensureParent(path);
         try {
-            Files.writeString(
-                    path, content, StandardCharsets.UTF_8);
+            Files.writeString(path, content, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to write file: %s"
-                            .formatted(path), e);
+            throw new UncheckedIOException("Failed to write file: %s".formatted(path), e);
         }
     }
 
@@ -182,22 +145,17 @@ public final class CopyHelpers {
      */
     public static String readFile(Path path) {
         try {
-            return Files.readString(
-                    path, StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to read file: %s"
-                            .formatted(path), e);
+            throw new UncheckedIOException("Failed to read file: %s".formatted(path), e);
         }
     }
 
     /**
-     * Creates the parent directory of {@code targetFile}
-     * if absent. No-op when the parent is null (target is
-     * a filesystem root).
+     * Creates the parent directory of {@code targetFile} if absent. No-op when the parent is null
+     * (target is a filesystem root).
      *
-     * @param targetFile the file whose parent should be
-     *                   ensured
+     * @param targetFile the file whose parent should be ensured
      * @throws UncheckedIOException if parent creation fails
      */
     public static void ensureParent(Path targetFile) {
@@ -209,8 +167,7 @@ public final class CopyHelpers {
             Files.createDirectories(parent);
         } catch (IOException e) {
             throw new UncheckedIOException(
-                    "Failed to create parent directory of: "
-                            + "%s".formatted(targetFile), e);
+                    "Failed to create parent directory of: " + "%s".formatted(targetFile), e);
         }
     }
 
@@ -223,19 +180,14 @@ public final class CopyHelpers {
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to create directory: %s"
-                            .formatted(dir), e);
+            throw new UncheckedIOException("Failed to create directory: %s".formatted(dir), e);
         }
     }
 
     /** Delegates to {@link CopyTreeWalker}. */
     public static void replacePlaceholdersInDir(
-            Path directory,
-            TemplateEngine engine,
-            Map<String, Object> context) {
-        CopyTreeWalker.replacePlaceholdersInDir(
-                directory, engine, context);
+            Path directory, TemplateEngine engine, Map<String, Object> context) {
+        CopyTreeWalker.replacePlaceholdersInDir(directory, engine, context);
     }
 
     /** Delegates to {@link CopyTreeWalker}. */
@@ -249,9 +201,7 @@ public final class CopyHelpers {
     }
 
     /** Delegates to {@link CopyTreeWalker}. */
-    public static boolean hasAllMandatorySections(
-            String content, List<String> sections) {
-        return CopyTreeWalker.hasAllMandatorySections(
-                content, sections);
+    public static boolean hasAllMandatorySections(String content, List<String> sections) {
+        return CopyTreeWalker.hasAllMandatorySections(content, sections);
     }
 }

@@ -1,14 +1,11 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
 import dev.iadev.testutil.TestConfigBuilder;
-
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -20,118 +17,85 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Verifies that SkillsAssembler prunes stale skill
- * directories in the output so that renames and removals
- * in the source of truth are reflected in
- * {@code .claude/skills/} after regeneration.
+ * Verifies that SkillsAssembler prunes stale skill directories in the output so that renames and
+ * removals in the source of truth are reflected in {@code .claude/skills/} after regeneration.
  *
- * <p>Motivated by the post-EPIC-0036 cleanup: 14 legacy
- * skill directories (e.g., {@code x-dev-implement},
- * {@code run-e2e}) persisted in the output because the
- * previous generator was additive-only.</p>
+ * <p>Motivated by the post-EPIC-0036 cleanup: 14 legacy skill directories (e.g., {@code
+ * x-dev-implement}, {@code run-e2e}) persisted in the output because the previous generator was
+ * additive-only.
  */
 @DisplayName("SkillsAssembler — stale output prune")
 class SkillsAssemblerPruneTest {
 
     @Test
-    @DisplayName("stale skill dir not in source is removed"
-            + " after assemble")
-    void assemble_whenStaleSkillExists_removesIt(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName("stale skill dir not in source is removed" + " after assemble")
+    void assemble_whenStaleSkillExists_removesIt(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         createSkillInSource(core, "x-task-implement");
 
         Path outputDir = tempDir.resolve("output");
-        Path staleSkill = outputDir.resolve(
-                "skills/x-dev-implement");
+        Path staleSkill = outputDir.resolve("skills/x-dev-implement");
         Files.createDirectories(staleSkill);
-        Files.writeString(
-                staleSkill.resolve("SKILL.md"),
-                "stale",
-                StandardCharsets.UTF_8);
+        Files.writeString(staleSkill.resolve("SKILL.md"), "stale", StandardCharsets.UTF_8);
 
         runAssemble(tempDir, outputDir);
 
-        assertThat(Files.exists(staleSkill))
-                .as("stale skill dir must be pruned")
-                .isFalse();
-        assertThat(Files.exists(outputDir.resolve(
-                "skills/x-task-implement")))
+        assertThat(Files.exists(staleSkill)).as("stale skill dir must be pruned").isFalse();
+        assertThat(Files.exists(outputDir.resolve("skills/x-task-implement")))
                 .as("fresh skill must be written")
                 .isTrue();
     }
 
     @Test
-    @DisplayName("database-patterns is protected"
-            + " (owned by RulesConditionals, not SkillsAssembler)")
-    void assemble_whenDatabasePatternsExists_preserved(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName(
+            "database-patterns is protected" + " (owned by RulesConditionals, not SkillsAssembler)")
+    void assemble_whenDatabasePatternsExists_preserved(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         createSkillInSource(core, "x-task-implement");
 
         Path outputDir = tempDir.resolve("output");
-        Path dbPatterns = outputDir.resolve(
-                "skills/database-patterns");
+        Path dbPatterns = outputDir.resolve("skills/database-patterns");
         Path dbRefs = dbPatterns.resolve("references");
         Files.createDirectories(dbRefs);
-        Path refFile = dbRefs.resolve(
-                "version-matrix.md");
-        Files.writeString(refFile, "preexisting",
-                StandardCharsets.UTF_8);
+        Path refFile = dbRefs.resolve("version-matrix.md");
+        Files.writeString(refFile, "preexisting", StandardCharsets.UTF_8);
 
         runAssemble(tempDir, outputDir);
 
-        assertThat(Files.exists(dbPatterns))
-                .as("database-patterns must survive prune")
-                .isTrue();
-        assertThat(Files.exists(refFile))
-                .as("references content must survive")
-                .isTrue();
+        assertThat(Files.exists(dbPatterns)).as("database-patterns must survive prune").isTrue();
+        assertThat(Files.exists(refFile)).as("references content must survive").isTrue();
     }
 
     @Test
-    @DisplayName("knowledge-packs directory is protected"
-            + " from prune")
-    void assemble_whenKnowledgePacksDirExists_preserved(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName("knowledge-packs directory is protected" + " from prune")
+    void assemble_whenKnowledgePacksDirExists_preserved(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         createSkillInSource(core, "x-task-implement");
 
         Path outputDir = tempDir.resolve("output");
-        Path kpDir = outputDir.resolve(
-                "skills/knowledge-packs");
+        Path kpDir = outputDir.resolve("skills/knowledge-packs");
         Files.createDirectories(kpDir);
         Path preExisting = kpDir.resolve("cloud-aws.md");
-        Files.writeString(preExisting, "preexisting",
-                StandardCharsets.UTF_8);
+        Files.writeString(preExisting, "preexisting", StandardCharsets.UTF_8);
 
         runAssemble(tempDir, outputDir);
 
-        assertThat(Files.exists(kpDir))
-                .as("knowledge-packs dir must be retained")
-                .isTrue();
-        assertThat(Files.exists(preExisting))
-                .as("pre-existing file inside must survive")
-                .isTrue();
+        assertThat(Files.exists(kpDir)).as("knowledge-packs dir must be retained").isTrue();
+        assertThat(Files.exists(preExisting)).as("pre-existing file inside must survive").isTrue();
     }
 
     @Test
-    @DisplayName("lib subdirectory retained when"
-            + " lib/x-lib-* skills generated")
-    void assemble_whenLibSkillGenerated_libDirRetained(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName("lib subdirectory retained when" + " lib/x-lib-* skills generated")
+    void assemble_whenLibSkillGenerated_libDirRetained(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         Files.createDirectories(core);
         Path libSkill = core.resolve("lib/x-lib-tool");
         Files.createDirectories(libSkill);
@@ -144,46 +108,35 @@ class SkillsAssemblerPruneTest {
 
         runAssemble(tempDir, outputDir);
 
-        assertThat(Files.exists(outputDir.resolve(
-                "skills/lib/x-lib-tool")))
+        assertThat(Files.exists(outputDir.resolve("skills/lib/x-lib-tool")))
                 .as("lib skill must be written")
                 .isTrue();
-        assertThat(Files.exists(outputDir.resolve(
-                "skills/lib")))
+        assertThat(Files.exists(outputDir.resolve("skills/lib")))
                 .as("lib dir must be retained")
                 .isTrue();
     }
 
     @Test
-    @DisplayName("stray file at skills root is NOT deleted"
-            + " (only directories are pruned)")
-    void assemble_whenStrayFileAtRoot_fileRetained(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName("stray file at skills root is NOT deleted" + " (only directories are pruned)")
+    void assemble_whenStrayFileAtRoot_fileRetained(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         createSkillInSource(core, "x-task-implement");
 
         Path outputDir = tempDir.resolve("output");
         Path skillsRoot = outputDir.resolve("skills");
         Files.createDirectories(skillsRoot);
         Path strayFile = skillsRoot.resolve("README.md");
-        Files.writeString(strayFile, "stray",
-                StandardCharsets.UTF_8);
+        Files.writeString(strayFile, "stray", StandardCharsets.UTF_8);
 
         runAssemble(tempDir, outputDir);
 
-        assertThat(Files.exists(strayFile))
-                .as("stray file at skills/ root must survive")
-                .isTrue();
+        assertThat(Files.exists(strayFile)).as("stray file at skills/ root must survive").isTrue();
     }
 
     @Test
-    @DisplayName("output skills dir missing is a no-op"
-            + " (no exception thrown)")
-    void assemble_whenSkillsDirMissing_noError(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    @DisplayName("output skills dir missing is a no-op" + " (no exception thrown)")
+    void assemble_whenSkillsDirMissing_noError(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         Files.createDirectories(core);
 
         Path outputDir = tempDir.resolve("output");
@@ -196,33 +149,30 @@ class SkillsAssemblerPruneTest {
 
     @Test
     @DisplayName("multiple stale dirs are all removed")
-    void assemble_whenMultipleStaleDirs_allRemoved(
-            @TempDir Path tempDir) throws IOException {
-        Path core = tempDir.resolve(
-                "targets/claude/skills/core");
+    void assemble_whenMultipleStaleDirs_allRemoved(@TempDir Path tempDir) throws IOException {
+        Path core = tempDir.resolve("targets/claude/skills/core");
         createSkillInSource(core, "x-task-implement");
 
         Path outputDir = tempDir.resolve("output");
         Path skillsRoot = outputDir.resolve("skills");
         Files.createDirectories(skillsRoot);
-        List<String> staleNames = List.of(
-                "x-dev-implement",
-                "x-dev-story-implement",
-                "x-epic-plan",
-                "x-story-epic",
-                "run-e2e");
+        List<String> staleNames =
+                List.of(
+                        "x-dev-implement",
+                        "x-dev-story-implement",
+                        "x-epic-plan",
+                        "x-story-epic",
+                        "run-e2e");
         for (String name : staleNames) {
             Path d = skillsRoot.resolve(name);
             Files.createDirectories(d);
-            Files.writeString(d.resolve("SKILL.md"),
-                    "stale", StandardCharsets.UTF_8);
+            Files.writeString(d.resolve("SKILL.md"), "stale", StandardCharsets.UTF_8);
         }
 
         runAssemble(tempDir, outputDir);
 
         for (String name : staleNames) {
-            assertThat(Files.exists(
-                    skillsRoot.resolve(name)))
+            assertThat(Files.exists(skillsRoot.resolve(name)))
                     .as("stale %s must be pruned", name)
                     .isFalse();
         }
@@ -230,44 +180,33 @@ class SkillsAssemblerPruneTest {
 
     @Test
     @DisabledOnOs(OS.WINDOWS)
-    @DisplayName("delete failure surfaces as"
-            + " UncheckedIOException, not silent skip")
-    void pruneStaleSkills_whenDeleteFails_throwsUnchecked(
-            @TempDir Path tempDir) throws IOException {
+    @DisplayName("delete failure surfaces as" + " UncheckedIOException, not silent skip")
+    void pruneStaleSkills_whenDeleteFails_throwsUnchecked(@TempDir Path tempDir)
+            throws IOException {
         Assumptions.assumeTrue(
-                FileSystems.getDefault().supportedFileAttributeViews()
-                        .contains("posix"),
+                FileSystems.getDefault().supportedFileAttributeViews().contains("posix"),
                 "POSIX file attributes are required for this test");
         Path outputDir = tempDir.resolve("output");
         Path skillsRoot = outputDir.resolve("skills");
         Path stale = skillsRoot.resolve("x-stale");
         Files.createDirectories(stale);
-        Files.writeString(stale.resolve("SKILL.md"),
-                "stale", StandardCharsets.UTF_8);
+        Files.writeString(stale.resolve("SKILL.md"), "stale", StandardCharsets.UTF_8);
 
-        Set<PosixFilePermission> readOnly = EnumSet.of(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_EXECUTE);
+        Set<PosixFilePermission> readOnly =
+                EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_EXECUTE);
         Files.setPosixFilePermissions(skillsRoot, readOnly);
-        SkillsAssembler assembler =
-                new SkillsAssembler(tempDir);
+        SkillsAssembler assembler = new SkillsAssembler(tempDir);
         try {
-            assertThatThrownBy(() ->
-                    assembler.pruneStaleSkills(
-                            outputDir, List.of()))
+            assertThatThrownBy(() -> assembler.pruneStaleSkills(outputDir, List.of()))
                     .isInstanceOf(UncheckedIOException.class)
                     .hasMessageContaining("x-stale")
-                    .hasMessageContaining(
-                            "prune stale skill directory");
+                    .hasMessageContaining("prune stale skill directory");
         } finally {
-            Files.setPosixFilePermissions(skillsRoot,
-                    PosixFilePermissions.fromString(
-                            "rwxr-xr-x"));
+            Files.setPosixFilePermissions(skillsRoot, PosixFilePermissions.fromString("rwxr-xr-x"));
         }
     }
 
-    private static void createSkillInSource(
-            Path coreDir, String skillName) throws IOException {
+    private static void createSkillInSource(Path coreDir, String skillName) throws IOException {
         Path skill = coreDir.resolve(skillName);
         Files.createDirectories(skill);
         Files.writeString(
@@ -276,14 +215,10 @@ class SkillsAssemblerPruneTest {
                 StandardCharsets.UTF_8);
     }
 
-    private static List<String> runAssemble(
-            Path resourcesDir, Path outputDir)
-            throws IOException {
+    private static List<String> runAssemble(Path resourcesDir, Path outputDir) throws IOException {
         Files.createDirectories(outputDir);
         ProjectConfig config = TestConfigBuilder.minimal();
-        SkillsAssembler assembler =
-                new SkillsAssembler(resourcesDir);
-        return assembler.assemble(
-                config, new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler(resourcesDir);
+        return assembler.assemble(config, new TemplateEngine(), outputDir);
     }
 }

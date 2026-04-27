@@ -1,20 +1,17 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for AgentsSelection — pure selection logic that
- * evaluates feature gates and returns agent filenames for
- * conditional agents, developer agents, and checklist rules.
+ * Tests for AgentsSelection — pure selection logic that evaluates feature gates and returns agent
+ * filenames for conditional agents, developer agents, and checklist rules.
  */
 @DisplayName("AgentsSelection")
 class AgentsSelectionTest {
@@ -24,34 +21,23 @@ class AgentsSelectionTest {
     class ConditionalDatabaseEngineer {
 
         @Test
-        @DisplayName("config with database includes"
-                + " database-engineer.md")
+        @DisplayName("config with database includes" + " database-engineer.md")
         void select_database_includesDbEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .database("postgresql", "16")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().database("postgresql", "16").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("database-engineer.md");
+            assertThat(agents).contains("database-engineer.md");
         }
 
         @Test
-        @DisplayName("config without database excludes"
-                + " database-engineer.md")
+        @DisplayName("config without database excludes" + " database-engineer.md")
         void select_noDatabase_excludesDbEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("database-engineer.md");
+            assertThat(agents).doesNotContain("database-engineer.md");
         }
     }
 
@@ -60,35 +46,24 @@ class AgentsSelectionTest {
     class ConditionalObservabilityEngineer {
 
         @Test
-        @DisplayName("config with observability includes"
-                + " observability-engineer.md")
+        @DisplayName("config with observability includes" + " observability-engineer.md")
         void select_observability_includesObsEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .observabilityTool("prometheus")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().observabilityTool("prometheus").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("observability-engineer.md");
+            assertThat(agents).contains("observability-engineer.md");
         }
 
         @Test
-        @DisplayName("config without observability excludes"
-                + " observability-engineer.md")
+        @DisplayName("config without observability excludes" + " observability-engineer.md")
         void select_noObservability_excludesObsEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain(
-                            "observability-engineer.md");
+            assertThat(agents).doesNotContain("observability-engineer.md");
         }
     }
 
@@ -97,74 +72,62 @@ class AgentsSelectionTest {
     class ConditionalDevopsEngineer {
 
         @Test
-        @DisplayName("config with container includes"
-                + " devops-engineer.md")
+        @DisplayName("config with container includes" + " devops-engineer.md")
         void select_container_includesDevops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("docker")
-                    .orchestrator("none")
-                    .iac("none")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("docker")
+                            .orchestrator("none")
+                            .iac("none")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("devops-engineer.md");
+            assertThat(agents).contains("devops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with orchestrator includes"
-                + " devops-engineer.md")
+        @DisplayName("config with orchestrator includes" + " devops-engineer.md")
         void select_orchestrator_includesDevops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("kubernetes")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("kubernetes")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("devops-engineer.md");
+            assertThat(agents).contains("devops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with iac includes"
-                + " devops-engineer.md")
+        @DisplayName("config with iac includes" + " devops-engineer.md")
         void select_iac_includesDevops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("none")
-                    .iac("terraform")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("none")
+                            .iac("terraform")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("devops-engineer.md");
+            assertThat(agents).contains("devops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with no infra excludes"
-                + " devops-engineer.md")
+        @DisplayName("config with no infra excludes" + " devops-engineer.md")
         void select_noInfra_excludesDevops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("none")
-                    .iac("none")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("none")
+                            .iac("none")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("devops-engineer.md");
+            assertThat(agents).doesNotContain("devops-engineer.md");
         }
     }
 
@@ -173,77 +136,65 @@ class AgentsSelectionTest {
     class ConditionalDevsecopsEngineer {
 
         @Test
-        @DisplayName("config with container includes"
-                + " devsecops-engineer.md")
+        @DisplayName("config with container includes" + " devsecops-engineer.md")
         void select_container_includesDevsecops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("docker")
-                    .orchestrator("none")
-                    .iac("none")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("docker")
+                            .orchestrator("none")
+                            .iac("none")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("devsecops-engineer.md");
+            assertThat(agents).contains("devsecops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with orchestrator includes"
-                + " devsecops-engineer.md")
+        @DisplayName("config with orchestrator includes" + " devsecops-engineer.md")
         void select_orchestrator_includesDevsecops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("kubernetes")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("kubernetes")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("devsecops-engineer.md");
+            assertThat(agents).contains("devsecops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with container and orchestrator"
-                + " both none excludes"
-                + " devsecops-engineer.md")
+        @DisplayName(
+                "config with container and orchestrator"
+                        + " both none excludes"
+                        + " devsecops-engineer.md")
         void select_noContainerNoOrch_excludesDevsecops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("none")
-                    .iac("none")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("none")
+                            .iac("none")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain(
-                            "devsecops-engineer.md");
+            assertThat(agents).doesNotContain("devsecops-engineer.md");
         }
 
         @Test
-        @DisplayName("config with only iac excludes"
-                + " devsecops-engineer.md")
+        @DisplayName("config with only iac excludes" + " devsecops-engineer.md")
         void select_onlyIac_excludesDevsecops() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .container("none")
-                    .orchestrator("none")
-                    .iac("terraform")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("none")
+                            .orchestrator("none")
+                            .iac("terraform")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain(
-                            "devsecops-engineer.md");
+            assertThat(agents).doesNotContain("devsecops-engineer.md");
         }
     }
 
@@ -252,71 +203,47 @@ class AgentsSelectionTest {
     class ConditionalApiEngineer {
 
         @Test
-        @DisplayName("config with REST includes"
-                + " api-engineer.md")
+        @DisplayName("config with REST includes" + " api-engineer.md")
         void select_rest_includesApiEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("rest")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("rest").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("api-engineer.md");
+            assertThat(agents).contains("api-engineer.md");
         }
 
         @Test
-        @DisplayName("config with gRPC includes"
-                + " api-engineer.md")
+        @DisplayName("config with gRPC includes" + " api-engineer.md")
         void select_grpc_includesApiEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("grpc")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("grpc").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("api-engineer.md");
+            assertThat(agents).contains("api-engineer.md");
         }
 
         @Test
-        @DisplayName("config with GraphQL includes"
-                + " api-engineer.md")
+        @DisplayName("config with GraphQL includes" + " api-engineer.md")
         void select_graphql_includesApiEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("graphql")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("graphql").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("api-engineer.md");
+            assertThat(agents).contains("api-engineer.md");
         }
 
         @Test
-        @DisplayName("config without REST/gRPC/GraphQL"
-                + " excludes api-engineer.md")
+        @DisplayName("config without REST/gRPC/GraphQL" + " excludes api-engineer.md")
         void select_noApi_excludesApiEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("cli")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("cli").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("api-engineer.md");
+            assertThat(agents).doesNotContain("api-engineer.md");
         }
     }
 
@@ -325,75 +252,63 @@ class AgentsSelectionTest {
     class ConditionalEventEngineer {
 
         @Test
-        @DisplayName("config with eventDriven includes"
-                + " event-engineer.md")
+        @DisplayName("config with eventDriven includes" + " event-engineer.md")
         void select_eventDriven_includesEventEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .eventDriven(true)
-                    .clearInterfaces()
-                    .addInterface("cli")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .eventDriven(true)
+                            .clearInterfaces()
+                            .addInterface("cli")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("event-engineer.md");
+            assertThat(agents).contains("event-engineer.md");
         }
 
         @Test
-        @DisplayName("config with event-consumer includes"
-                + " event-engineer.md")
+        @DisplayName("config with event-consumer includes" + " event-engineer.md")
         void select_eventConsumer_includesEventEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .eventDriven(false)
-                    .clearInterfaces()
-                    .addInterface("event-consumer")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .eventDriven(false)
+                            .clearInterfaces()
+                            .addInterface("event-consumer")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("event-engineer.md");
+            assertThat(agents).contains("event-engineer.md");
         }
 
         @Test
-        @DisplayName("config with event-producer includes"
-                + " event-engineer.md")
+        @DisplayName("config with event-producer includes" + " event-engineer.md")
         void select_eventProducer_includesEventEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .eventDriven(false)
-                    .clearInterfaces()
-                    .addInterface("event-producer")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .eventDriven(false)
+                            .clearInterfaces()
+                            .addInterface("event-producer")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("event-engineer.md");
+            assertThat(agents).contains("event-engineer.md");
         }
 
         @Test
-        @DisplayName("config without events excludes"
-                + " event-engineer.md")
+        @DisplayName("config without events excludes" + " event-engineer.md")
         void select_noEvents_excludesEventEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .eventDriven(false)
-                    .clearInterfaces()
-                    .addInterface("cli")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .eventDriven(false)
+                            .clearInterfaces()
+                            .addInterface("cli")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("event-engineer.md");
+            assertThat(agents).doesNotContain("event-engineer.md");
         }
     }
 
@@ -402,51 +317,34 @@ class AgentsSelectionTest {
     class ConditionalAppsecEngineer {
 
         @Test
-        @DisplayName("config with security frameworks"
-                + " includes appsec-engineer.md")
+        @DisplayName("config with security frameworks" + " includes appsec-engineer.md")
         void select_securityFrameworks_includesAppsec() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks("owasp")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().securityFrameworks("owasp").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("appsec-engineer.md");
+            assertThat(agents).contains("appsec-engineer.md");
         }
 
         @Test
-        @DisplayName("config with multiple security"
-                + " frameworks includes appsec-engineer.md")
+        @DisplayName("config with multiple security" + " frameworks includes appsec-engineer.md")
         void select_multipleFrameworks_includesAppsec() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks(
-                            "pci-dss", "lgpd")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss", "lgpd").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("appsec-engineer.md");
+            assertThat(agents).contains("appsec-engineer.md");
         }
 
         @Test
-        @DisplayName("config without security frameworks"
-                + " excludes appsec-engineer.md")
+        @DisplayName("config without security frameworks" + " excludes appsec-engineer.md")
         void select_noFrameworks_excludesAppsec() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("appsec-engineer.md");
+            assertThat(agents).doesNotContain("appsec-engineer.md");
         }
     }
 
@@ -455,53 +353,35 @@ class AgentsSelectionTest {
     class ConditionalComplianceAuditor {
 
         @Test
-        @DisplayName("config with security frameworks"
-                + " includes compliance-auditor.md")
+        @DisplayName("config with security frameworks" + " includes compliance-auditor.md")
         void select_secFrameworks_includesComplianceAuditor() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks("gdpr")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().securityFrameworks("gdpr").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("compliance-auditor.md");
+            assertThat(agents).contains("compliance-auditor.md");
         }
 
         @Test
-        @DisplayName("config with multiple security"
-                + " frameworks includes"
-                + " compliance-auditor.md")
+        @DisplayName(
+                "config with multiple security" + " frameworks includes" + " compliance-auditor.md")
         void select_multiFrameworks_includesAuditor() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks(
-                            "gdpr", "lgpd", "hipaa")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().securityFrameworks("gdpr", "lgpd", "hipaa").build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("compliance-auditor.md");
+            assertThat(agents).contains("compliance-auditor.md");
         }
 
         @Test
-        @DisplayName("config without security frameworks"
-                + " excludes compliance-auditor.md")
+        @DisplayName("config without security frameworks" + " excludes compliance-auditor.md")
         void select_noFrameworks_excludesAuditor() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain(
-                            "compliance-auditor.md");
+            assertThat(agents).doesNotContain("compliance-auditor.md");
         }
     }
 
@@ -510,50 +390,33 @@ class AgentsSelectionTest {
     class ConditionalPentestEngineer {
 
         @Test
-        @DisplayName("config with pentest=true includes"
-                + " pentest-engineer.md")
+        @DisplayName("config with pentest=true includes" + " pentest-engineer.md")
         void select_pentestTrue_includesPentestEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .pentest(true)
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().pentest(true).build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .contains("pentest-engineer.md");
+            assertThat(agents).contains("pentest-engineer.md");
         }
 
         @Test
-        @DisplayName("config with pentest=false excludes"
-                + " pentest-engineer.md")
+        @DisplayName("config with pentest=false excludes" + " pentest-engineer.md")
         void select_pentestFalse_excludesPentestEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .pentest(false)
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().pentest(false).build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("pentest-engineer.md");
+            assertThat(agents).doesNotContain("pentest-engineer.md");
         }
 
         @Test
-        @DisplayName("default config excludes"
-                + " pentest-engineer.md")
+        @DisplayName("default config excludes" + " pentest-engineer.md")
         void select_defaultConfig_excludesPentestEngineer() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
-            assertThat(agents)
-                    .doesNotContain("pentest-engineer.md");
+            assertThat(agents).doesNotContain("pentest-engineer.md");
         }
     }
 
@@ -562,25 +425,23 @@ class AgentsSelectionTest {
     class ConditionalAggregation {
 
         @Test
-        @DisplayName("aggregates all conditional agents"
-                + " for full-featured config")
+        @DisplayName("aggregates all conditional agents" + " for full-featured config")
         void select_whenCalled_aggregatesAllConditionals() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .database("postgresql", "16")
-                    .observabilityTool("prometheus")
-                    .container("docker")
-                    .orchestrator("kubernetes")
-                    .eventDriven(true)
-                    .securityFrameworks("owasp")
-                    .pentest(true)
-                    .clearInterfaces()
-                    .addInterface("rest")
-                    .addInterface("event-consumer")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .database("postgresql", "16")
+                            .observabilityTool("prometheus")
+                            .container("docker")
+                            .orchestrator("kubernetes")
+                            .eventDriven(true)
+                            .securityFrameworks("owasp")
+                            .pentest(true)
+                            .clearInterfaces()
+                            .addInterface("rest")
+                            .addInterface("event-consumer")
+                            .build();
 
-            List<String> agents =
-                    AgentsSelection
-                            .selectConditionalAgents(config);
+            List<String> agents = AgentsSelection.selectConditionalAgents(config);
 
             assertThat(agents)
                     .contains("database-engineer.md")
@@ -600,115 +461,73 @@ class AgentsSelectionTest {
     class SelectDeveloperAgent {
 
         @Test
-        @DisplayName("language=java returns"
-                + " java-developer.md")
+        @DisplayName("language=java returns" + " java-developer.md")
         void select_java_returnsJavaDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("java", "21").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("java-developer.md");
+            assertThat(agent).isEqualTo("java-developer.md");
         }
 
         @Test
-        @DisplayName("language=typescript returns"
-                + " typescript-developer.md")
+        @DisplayName("language=typescript returns" + " typescript-developer.md")
         void select_ts_returnsTsDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("typescript", "5")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("typescript", "5").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("typescript-developer.md");
+            assertThat(agent).isEqualTo("typescript-developer.md");
         }
 
         @Test
-        @DisplayName("language=go returns"
-                + " go-developer.md")
+        @DisplayName("language=go returns" + " go-developer.md")
         void select_go_returnsGoDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("go", "1.22")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("go", "1.22").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("go-developer.md");
+            assertThat(agent).isEqualTo("go-developer.md");
         }
 
         @Test
-        @DisplayName("language=python returns"
-                + " python-developer.md")
+        @DisplayName("language=python returns" + " python-developer.md")
         void select_python_returnsPythonDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("python", "3.12")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("python", "3.12").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("python-developer.md");
+            assertThat(agent).isEqualTo("python-developer.md");
         }
 
         @Test
-        @DisplayName("language=kotlin returns"
-                + " kotlin-developer.md")
+        @DisplayName("language=kotlin returns" + " kotlin-developer.md")
         void select_kotlin_returnsKotlinDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("kotlin", "2.0")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("kotlin", "2.0").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("kotlin-developer.md");
+            assertThat(agent).isEqualTo("kotlin-developer.md");
         }
 
         @Test
-        @DisplayName("language=rust returns"
-                + " rust-developer.md")
+        @DisplayName("language=rust returns" + " rust-developer.md")
         void select_rust_returnsRustDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("rust", "1.77")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("rust", "1.77").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("rust-developer.md");
+            assertThat(agent).isEqualTo("rust-developer.md");
         }
 
         @Test
-        @DisplayName("language=csharp returns"
-                + " csharp-developer.md")
+        @DisplayName("language=csharp returns" + " csharp-developer.md")
         void select_csharp_returnsCsharpDeveloper() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("csharp", "12")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("csharp", "12").build();
 
-            String agent =
-                    AgentsSelection
-                            .selectDeveloperAgent(config);
+            String agent = AgentsSelection.selectDeveloperAgent(config);
 
-            assertThat(agent)
-                    .isEqualTo("csharp-developer.md");
+            assertThat(agent).isEqualTo("csharp-developer.md");
         }
     }
 
@@ -717,120 +536,72 @@ class AgentsSelectionTest {
     class BuildChecklistRules {
 
         @Test
-        @DisplayName("pci-dss security framework"
-                + " activates pci-dss-security checklist")
+        @DisplayName("pci-dss security framework" + " activates pci-dss-security checklist")
         void select_whenCalled_pciDssActivatesChecklist() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks("pci-dss")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
             assertThat(rules)
-                    .anyMatch(r ->
-                            "pci-dss-security.md"
-                                    .equals(r.checklist())
-                                    && r.active());
+                    .anyMatch(r -> "pci-dss-security.md".equals(r.checklist()) && r.active());
         }
 
         @Test
-        @DisplayName("lgpd security framework"
-                + " activates privacy-security checklist")
+        @DisplayName("lgpd security framework" + " activates privacy-security checklist")
         void select_whenCalled_lgpdActivatesPrivacyChecklist() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks("lgpd")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().securityFrameworks("lgpd").build();
 
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
             assertThat(rules)
-                    .anyMatch(r ->
-                            "privacy-security.md"
-                                    .equals(r.checklist())
-                                    && r.active());
+                    .anyMatch(r -> "privacy-security.md".equals(r.checklist()) && r.active());
         }
 
         @Test
-        @DisplayName("gdpr security framework"
-                + " activates privacy-security checklist")
+        @DisplayName("gdpr security framework" + " activates privacy-security checklist")
         void select_whenCalled_gdprActivatesPrivacyChecklist() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .securityFrameworks("gdpr")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().securityFrameworks("gdpr").build();
 
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
             assertThat(rules)
-                    .anyMatch(r ->
-                            "privacy-security.md"
-                                    .equals(r.checklist())
-                                    && r.active());
+                    .anyMatch(r -> "privacy-security.md".equals(r.checklist()) && r.active());
         }
 
         @Test
-        @DisplayName("grpc interface activates"
-                + " grpc-api checklist")
+        @DisplayName("grpc interface activates" + " grpc-api checklist")
         void select_whenCalled_grpcActivatesGrpcChecklist() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .clearInterfaces()
-                    .addInterface("grpc")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("grpc").build();
 
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
-            assertThat(rules)
-                    .anyMatch(r ->
-                            "grpc-api.md"
-                                    .equals(r.checklist())
-                                    && r.active());
+            assertThat(rules).anyMatch(r -> "grpc-api.md".equals(r.checklist()) && r.active());
         }
 
         @Test
-        @DisplayName("helm templating activates"
-                + " helm-devops checklist")
+        @DisplayName("helm templating activates" + " helm-devops checklist")
         void select_whenCalled_helmActivatesHelmChecklist() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
             // Default templating is kustomize, not helm
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
-            assertThat(rules)
-                    .anyMatch(r ->
-                            "helm-devops.md"
-                                    .equals(r.checklist())
-                                    && !r.active());
+            assertThat(rules).anyMatch(r -> "helm-devops.md".equals(r.checklist()) && !r.active());
         }
 
         @Test
-        @DisplayName("no security frameworks means"
-                + " all security checklists inactive")
+        @DisplayName("no security frameworks means" + " all security checklists inactive")
         void select_whenCalled_noFrameworksMeansInactive() {
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<AgentsSelection.ChecklistRule> rules =
-                    AgentsSelection.buildChecklistRules(
-                            config);
+            List<AgentsSelection.ChecklistRule> rules = AgentsSelection.buildChecklistRules(config);
 
             List<AgentsSelection.ChecklistRule> secRules =
-                    rules.stream()
-                            .filter(r -> r.agent()
-                                    .equals("security-engineer.md"))
-                            .toList();
+                    rules.stream().filter(r -> r.agent().equals("security-engineer.md")).toList();
 
-            assertThat(secRules)
-                    .allMatch(r -> !r.active());
+            assertThat(secRules).allMatch(r -> !r.active());
         }
     }
 
@@ -839,26 +610,19 @@ class AgentsSelectionTest {
     class ChecklistMarkerTests {
 
         @Test
-        @DisplayName("derives marker from checklist"
-                + " filename")
+        @DisplayName("derives marker from checklist" + " filename")
         void select_whenCalled_derivesMarkerFromFilename() {
-            String marker = AgentsSelection.checklistMarker(
-                    "pci-dss-security.md");
+            String marker = AgentsSelection.checklistMarker("pci-dss-security.md");
 
-            assertThat(marker)
-                    .isEqualTo(
-                            "<!-- PCI_DSS_SECURITY -->");
+            assertThat(marker).isEqualTo("<!-- PCI_DSS_SECURITY -->");
         }
 
         @Test
-        @DisplayName("handles single-word checklist"
-                + " filename")
+        @DisplayName("handles single-word checklist" + " filename")
         void select_whenCalled_handlesSingleWord() {
-            String marker = AgentsSelection.checklistMarker(
-                    "simple.md");
+            String marker = AgentsSelection.checklistMarker("simple.md");
 
-            assertThat(marker)
-                    .isEqualTo("<!-- SIMPLE -->");
+            assertThat(marker).isEqualTo("<!-- SIMPLE -->");
         }
     }
 }

@@ -4,23 +4,19 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * Generates CI workflow artifacts ({@code .github/workflows/ci.yml}).
  *
- * <p>CI workflow is always generated regardless of project
- * configuration flags.</p>
+ * <p>CI workflow is always generated regardless of project configuration flags.
  *
  * @see CicdAssembler
  */
 final class CiWorkflowStep {
 
-    private static final String CICD_TEMPLATES =
-            "shared/cicd-templates";
-    private static final String CI_TEMPLATE =
-            "ci-workflow/ci.yml.njk";
+    private static final String CICD_TEMPLATES = "shared/cicd-templates";
+    private static final String CI_TEMPLATE = "ci-workflow/ci.yml.njk";
 
     /**
      * Generates the CI workflow file.
@@ -29,42 +25,25 @@ final class CiWorkflowStep {
      * @return the generation result
      */
     CicdResult assemble(CicdContext cicdCtx) {
-        Path dest = cicdCtx.outputDir()
-                .resolve(".github")
-                .resolve("workflows")
-                .resolve("ci.yml");
-        Optional<String> err = renderAndWrite(
-                cicdCtx, CI_TEMPLATE, dest);
+        Path dest = cicdCtx.outputDir().resolve(".github").resolve("workflows").resolve("ci.yml");
+        Optional<String> err = renderAndWrite(cicdCtx, CI_TEMPLATE, dest);
         if (err.isEmpty()) {
-            return new CicdResult(
-                    List.of(dest.toString()),
-                    List.of());
+            return new CicdResult(List.of(dest.toString()), List.of());
         }
-        return new CicdResult(
-                List.of(),
-                List.of(err.orElseThrow()));
+        return new CicdResult(List.of(), List.of(err.orElseThrow()));
     }
 
     private Optional<String> renderAndWrite(
-            CicdContext cicdCtx,
-            String templateRelPath,
-            Path destPath) {
+            CicdContext cicdCtx, String templateRelPath, Path destPath) {
         try {
-            String content = cicdCtx.engine().render(
-                    CICD_TEMPLATES + "/"
-                            + templateRelPath,
-                    cicdCtx.ctx());
-            CopyHelpers.ensureDirectory(
-                    destPath.getParent());
-            Files.writeString(
-                    destPath, content,
-                    StandardCharsets.UTF_8);
+            String content =
+                    cicdCtx.engine().render(CICD_TEMPLATES + "/" + templateRelPath, cicdCtx.ctx());
+            CopyHelpers.ensureDirectory(destPath.getParent());
+            Files.writeString(destPath, content, StandardCharsets.UTF_8);
             return Optional.empty();
         } catch (Exception e) {
             return Optional.of(
-                    "Failed to render %s: %s"
-                            .formatted(templateRelPath,
-                                    e.getMessage()));
+                    "Failed to render %s: %s".formatted(templateRelPath, e.getMessage()));
         }
     }
 }

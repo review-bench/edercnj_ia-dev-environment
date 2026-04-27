@@ -1,17 +1,14 @@
 package dev.iadev.application.assembler.gates;
 
 import dev.iadev.domain.model.ProjectConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contributes security-scanning skills based on SAST, DAST,
- * secret-scan, container-scan, infra-scan flags, and the
- * quality-gate provider selection.
+ * Contributes security-scanning skills based on SAST, DAST, secret-scan, container-scan, infra-scan
+ * flags, and the quality-gate provider selection.
  */
-public final class SecurityScanningGate
-        implements SkillGateEvaluator {
+public final class SecurityScanningGate implements SkillGateEvaluator {
 
     @Override
     public List<String> evaluate(ProjectConfig config) {
@@ -32,8 +29,7 @@ public final class SecurityScanningGate
         if (scanning.infraScan()) {
             skills.add("x-security-infra");
         }
-        String qgProvider =
-                config.security().qualityGate().provider();
+        String qgProvider = config.security().qualityGate().provider();
         if (!"none".equalsIgnoreCase(qgProvider)) {
             skills.add("x-security-sonar");
         }

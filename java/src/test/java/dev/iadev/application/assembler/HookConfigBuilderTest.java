@@ -1,15 +1,12 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for HookConfigBuilder — builds the hooks
- * configuration section for settings.json.
- */
+/** Tests for HookConfigBuilder — builds the hooks configuration section for settings.json. */
 @DisplayName("HookConfigBuilder")
 class HookConfigBuilderTest {
 
@@ -22,12 +19,10 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsPostToolUse() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("\"PostToolUse\"");
+            assertThat(result).contains("\"PostToolUse\"");
         }
 
         @Test
@@ -35,12 +30,10 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsWriteEditMatcher() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("\"Write|Edit\"");
+            assertThat(result).contains("\"Write|Edit\"");
         }
 
         @Test
@@ -48,12 +41,10 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsPostCompileScript() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("post-compile-check.sh");
+            assertThat(result).contains("post-compile-check.sh");
         }
 
         @Test
@@ -61,12 +52,10 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsTimeout() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("\"timeout\": 60");
+            assertThat(result).contains("\"timeout\": 60");
         }
 
         @Test
@@ -74,12 +63,10 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsStatusMessage() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("Checking compilation...");
+            assertThat(result).contains("Checking compilation...");
         }
 
         @Test
@@ -87,87 +74,71 @@ class HookConfigBuilderTest {
         void load_whenCalled_containsCommandType() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("\"type\": \"command\"");
+            assertThat(result).contains("\"type\": \"command\"");
         }
 
         @Test
-        @DisplayName("hooks section references CLAUDE"
-                + " project dir")
+        @DisplayName("hooks section references CLAUDE" + " project dir")
         void load_whenCalled_referencesProjectDir() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, false);
+            HookConfigBuilder.appendHooksSection(sb, true, false);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("$CLAUDE_PROJECT_DIR");
+            assertThat(result).contains("$CLAUDE_PROJECT_DIR");
         }
     }
 
     @Nested
-    @DisplayName("appendHooksSection — Rule 59 bypass-flag"
-            + " enforcement (story-0059-0003)")
+    @DisplayName("appendHooksSection — Rule 59 bypass-flag" + " enforcement (story-0059-0003)")
     class Rule59Variants {
 
         @Test
-        @DisplayName("always emits enforce-no-bypass-flags.sh"
-                + " under PreToolUse (no telemetry)")
+        @DisplayName("always emits enforce-no-bypass-flags.sh" + " under PreToolUse (no telemetry)")
         void noTelemetry_emitsNoBpyassHookUnderPreToolUse() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, false, false);
+            HookConfigBuilder.appendHooksSection(sb, false, false);
 
             String result = sb.toString();
             assertThat(result).contains("PreToolUse");
-            assertThat(result)
-                    .contains("enforce-no-bypass-flags.sh");
+            assertThat(result).contains("enforce-no-bypass-flags.sh");
         }
 
         @Test
-        @DisplayName("emits enforce-no-bypass-flags.sh"
-                + " alongside enforce-phase-sequence.sh"
-                + " under PreToolUse")
+        @DisplayName(
+                "emits enforce-no-bypass-flags.sh"
+                        + " alongside enforce-phase-sequence.sh"
+                        + " under PreToolUse")
         void telemetryEnabled_bothEnforcementHooksPresent() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, false, true);
+            HookConfigBuilder.appendHooksSection(sb, false, true);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("enforce-phase-sequence.sh");
-            assertThat(result)
-                    .contains("enforce-no-bypass-flags.sh");
+            assertThat(result).contains("enforce-phase-sequence.sh");
+            assertThat(result).contains("enforce-no-bypass-flags.sh");
         }
     }
 
     @Nested
-    @DisplayName("appendHooksSection — telemetry variants"
-            + " (story-0040-0004)")
+    @DisplayName("appendHooksSection — telemetry variants" + " (story-0040-0004)")
     class TelemetryVariants {
 
         @Test
-        @DisplayName("no legacy + no telemetry emits empty"
-                + " hooks block")
+        @DisplayName("no legacy + no telemetry emits empty" + " hooks block")
         void noFlags_emitsEmptyHooksBlock() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, false, false);
+            HookConfigBuilder.appendHooksSection(sb, false, false);
 
             String result = sb.toString();
             assertThat(result).contains("\"hooks\": {");
-            assertThat(result)
-                    .doesNotContain("PostToolUse");
-            assertThat(result)
-                    .doesNotContain("telemetry-");
+            assertThat(result).doesNotContain("PostToolUse");
+            assertThat(result).doesNotContain("telemetry-");
         }
 
         @Test
@@ -175,8 +146,7 @@ class HookConfigBuilderTest {
         void telemetryOnly_emitsFiveEvents() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, false, true);
+            HookConfigBuilder.appendHooksSection(sb, false, true);
 
             String result = sb.toString();
             assertThat(result).contains("SessionStart");
@@ -184,24 +154,19 @@ class HookConfigBuilderTest {
             assertThat(result).contains("PostToolUse");
             assertThat(result).contains("SubagentStop");
             assertThat(result).contains("Stop");
-            assertThat(result)
-                    .contains("telemetry-posttool.sh");
+            assertThat(result).contains("telemetry-posttool.sh");
         }
 
         @Test
-        @DisplayName("both flags coexist in PostToolUse"
-                + " array")
+        @DisplayName("both flags coexist in PostToolUse" + " array")
         void bothFlags_postToolUseHasTwoEntries() {
             StringBuilder sb = new StringBuilder();
 
-            HookConfigBuilder.appendHooksSection(
-                    sb, true, true);
+            HookConfigBuilder.appendHooksSection(sb, true, true);
 
             String result = sb.toString();
-            assertThat(result)
-                    .contains("post-compile-check.sh");
-            assertThat(result)
-                    .contains("telemetry-posttool.sh");
+            assertThat(result).contains("post-compile-check.sh");
+            assertThat(result).contains("telemetry-posttool.sh");
             assertThat(result).contains("\"Write|Edit\"");
         }
     }

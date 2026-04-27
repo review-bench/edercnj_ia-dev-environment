@@ -10,45 +10,40 @@ class UnsupportedLanguageExceptionTest {
 
     @Test
     void getMessage_withPython_returnsRuleMessage() {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException("python");
-
-        assertThat(ex.getMessage()).isEqualTo(
-                "Language 'python' is not supported."
-                        + " Only 'java' is available"
-                        + " (see CHANGELOG v4.0.0"
-                        + " / EPIC-0048).");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "python", "go", "kotlin", "typescript",
-            "rust", "csharp", "foo", "JAVA"})
-    void getMessage_withAnyAttemptedValue_embedsValue(
-            String value) {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException(value);
+        UnsupportedLanguageException ex = new UnsupportedLanguageException("python");
 
         assertThat(ex.getMessage())
-                .startsWith("Language '" + value + "'")
-                .contains(
-                        "Only 'java' is available"
+                .isEqualTo(
+                        "Language 'python' is not supported."
+                                + " Only 'java' is available"
                                 + " (see CHANGELOG v4.0.0"
                                 + " / EPIC-0048).");
     }
 
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "python", "go", "kotlin", "typescript",
+                "rust", "csharp", "foo", "JAVA"
+            })
+    void getMessage_withAnyAttemptedValue_embedsValue(String value) {
+        UnsupportedLanguageException ex = new UnsupportedLanguageException(value);
+
+        assertThat(ex.getMessage())
+                .startsWith("Language '" + value + "'")
+                .contains("Only 'java' is available" + " (see CHANGELOG v4.0.0" + " / EPIC-0048).");
+    }
+
     @Test
     void attemptedLanguage_returnsOriginalValue() {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException("rust");
+        UnsupportedLanguageException ex = new UnsupportedLanguageException("rust");
 
         assertThat(ex.attemptedLanguage()).isEqualTo("rust");
     }
 
     @Test
     void attemptedLanguage_withEmptyString_returnsEmpty() {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException("");
+        UnsupportedLanguageException ex = new UnsupportedLanguageException("");
 
         assertThat(ex.attemptedLanguage()).isEqualTo("");
         assertThat(ex.getMessage()).startsWith("Language ''");
@@ -56,8 +51,7 @@ class UnsupportedLanguageExceptionTest {
 
     @Test
     void attemptedLanguage_withNull_normalizesToEmpty() {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException(null);
+        UnsupportedLanguageException ex = new UnsupportedLanguageException(null);
 
         assertThat(ex.attemptedLanguage()).isEqualTo("");
         assertThat(ex.getMessage()).startsWith("Language ''");
@@ -65,10 +59,8 @@ class UnsupportedLanguageExceptionTest {
 
     @Test
     void isInstanceOfIllegalArgumentException() {
-        UnsupportedLanguageException ex =
-                new UnsupportedLanguageException("python");
+        UnsupportedLanguageException ex = new UnsupportedLanguageException("python");
 
-        assertThat(ex).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
     }
 }

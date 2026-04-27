@@ -1,10 +1,8 @@
 package dev.iadev.smoke;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
+import static org.assertj.core.api.Assertions.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -18,92 +16,78 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.assertj.core.api.Assertions.fail;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * Static validation utilities for smoke tests.
  *
- * <p>Each method performs a specific structural or content
- * integrity check on pipeline output directories. Methods
- * throw {@link AssertionError} on validation failure with
- * descriptive messages including file paths and details.</p>
+ * <p>Each method performs a specific structural or content integrity check on pipeline output
+ * directories. Methods throw {@link AssertionError} on validation failure with descriptive messages
+ * including file paths and details.
  *
  * @see SmokeTestBase
  */
 public final class SmokeTestValidators {
 
-    private static final ObjectMapper JSON_MAPPER =
-            new ObjectMapper();
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private SmokeTestValidators() {
         // utility class
     }
 
     /**
-     * Asserts that no file under {@code outputDir} has zero
-     * bytes. Passes if the directory contains no files.
+     * Asserts that no file under {@code outputDir} has zero bytes. Passes if the directory contains
+     * no files.
      *
      * @param outputDir the directory to scan recursively
      * @throws AssertionError if any file has 0 bytes
-     * @throws IOException    if directory traversal fails
+     * @throws IOException if directory traversal fails
      */
-    public static void assertNoEmptyFiles(Path outputDir)
-            throws IOException {
+    public static void assertNoEmptyFiles(Path outputDir) throws IOException {
         List<String> emptyFiles = new ArrayList<>();
 
-        Files.walkFileTree(outputDir,
+        Files.walkFileTree(
+                outputDir,
                 new SimpleFileVisitor<>() {
                     @Override
-                    public FileVisitResult visitFile(
-                            Path file,
-                            BasicFileAttributes attrs)
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                             throws IOException {
                         if (attrs.size() == 0) {
-                            emptyFiles.add(
-                                    relativizePosix(
-                                            outputDir,
-                                            file));
+                            emptyFiles.add(relativizePosix(outputDir, file));
                         }
                         return FileVisitResult.CONTINUE;
                     }
                 });
 
         if (!emptyFiles.isEmpty()) {
-            fail("Found %d empty file(s):\n  - %s"
-                    .formatted(
-                            emptyFiles.size(),
-                            String.join("\n  - ",
-                                    emptyFiles)));
+            fail(
+                    "Found %d empty file(s):\n  - %s"
+                            .formatted(emptyFiles.size(), String.join("\n  - ", emptyFiles)));
         }
     }
 
     /**
-     * Asserts that no file under {@code outputDir} contains
-     * unresolved placeholders matching any of the given regex
-     * patterns.
+     * Asserts that no file under {@code outputDir} contains unresolved placeholders matching any of
+     * the given regex patterns.
      *
      * @param outputDir the directory to scan recursively
-     * @param patterns  regex patterns to detect (e.g.,
-     *                  {@code \{\{.*?\}\}})
+     * @param patterns regex patterns to detect (e.g., {@code \{\{.*?\}\}})
      * @throws AssertionError if any placeholder is found
-     * @throws IOException    if file reading fails
+     * @throws IOException if file reading fails
      */
-    public static void assertNoUnresolvedPlaceholders(
-            Path outputDir, Set<String> patterns)
+    public static void assertNoUnresolvedPlaceholders(Path outputDir, Set<String> patterns)
             throws IOException {
-        List<Pattern> compiled = patterns.stream()
-                .map(Pattern::compile)
-                .toList();
+        List<Pattern> compiled = patterns.stream().map(Pattern::compile).toList();
 
         List<String> violations = new ArrayList<>();
 
-        Files.walkFileTree(outputDir,
+        Files.walkFileTree(
+                outputDir,
                 new SimpleFileVisitor<>() {
                     @Override
-                    public FileVisitResult visitFile(
-                            Path file,
-                            BasicFileAttributes attrs)
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                             throws IOException {
                         scanFileForPlaceholders(
                                 file, outputDir,
@@ -113,60 +97,47 @@ public final class SmokeTestValidators {
                 });
 
         if (!violations.isEmpty()) {
-            fail("Found %d unresolved placeholder(s):\n%s"
-                    .formatted(
-                            violations.size(),
-                            String.join("\n",
-                                    violations)));
+            fail(
+                    "Found %d unresolved placeholder(s):\n%s"
+                            .formatted(violations.size(), String.join("\n", violations)));
         }
     }
 
     /**
-     * Asserts that all directories in {@code expectedDirs}
-     * exist as immediate or nested children of
+     * Asserts that all directories in {@code expectedDirs} exist as immediate or nested children of
      * {@code outputDir}.
      *
-     * @param outputDir    the root output directory
-     * @param expectedDirs relative directory paths expected
-     *                     to exist
+     * @param outputDir the root output directory
+     * @param expectedDirs relative directory paths expected to exist
      * @throws AssertionError if any directory is missing
      */
-    public static void assertDirectoryStructure(
-            Path outputDir, Set<String> expectedDirs) {
-        List<String> missing = expectedDirs.stream()
-                .filter(dir -> !Files.isDirectory(
-                        outputDir.resolve(dir)))
-                .sorted()
-                .toList();
+    public static void assertDirectoryStructure(Path outputDir, Set<String> expectedDirs) {
+        List<String> missing =
+                expectedDirs.stream()
+                        .filter(dir -> !Files.isDirectory(outputDir.resolve(dir)))
+                        .sorted()
+                        .toList();
 
         if (!missing.isEmpty()) {
-            fail(("Missing %d expected directory(ies):"
-                    + "\n  - %s")
-                    .formatted(
-                            missing.size(),
-                            String.join(
-                                    "\n  - ", missing)));
+            fail(
+                    ("Missing %d expected directory(ies):" + "\n  - %s")
+                            .formatted(missing.size(), String.join("\n  - ", missing)));
         }
     }
 
     /**
-     * Asserts that the total file count under
-     * {@code outputDir} equals {@code expectedCount}.
+     * Asserts that the total file count under {@code outputDir} equals {@code expectedCount}.
      *
-     * @param outputDir     the directory to count files in
+     * @param outputDir the directory to count files in
      * @param expectedCount the expected number of files
      * @throws AssertionError if the count does not match
-     * @throws IOException    if directory traversal fails
+     * @throws IOException if directory traversal fails
      */
-    public static void assertFileCount(
-            Path outputDir, int expectedCount)
-            throws IOException {
+    public static void assertFileCount(Path outputDir, int expectedCount) throws IOException {
         long actualCount = countFiles(outputDir);
 
         if (actualCount != expectedCount) {
-            fail("Expected %d files but found %d"
-                    .formatted(
-                            expectedCount, actualCount));
+            fail("Expected %d files but found %d".formatted(expectedCount, actualCount));
         }
     }
 
@@ -175,20 +146,14 @@ public final class SmokeTestValidators {
      *
      * @param file the YAML file to validate
      * @throws AssertionError if the file is not valid YAML
-     * @throws IOException    if file reading fails
+     * @throws IOException if file reading fails
      */
-    public static void assertValidYaml(Path file)
-            throws IOException {
-        String content = Files.readString(
-                file, StandardCharsets.UTF_8);
+    public static void assertValidYaml(Path file) throws IOException {
+        String content = Files.readString(file, StandardCharsets.UTF_8);
         try {
-            new Yaml(new SafeConstructor(
-                    new LoaderOptions())).load(content);
+            new Yaml(new SafeConstructor(new LoaderOptions())).load(content);
         } catch (Exception e) {
-            fail("Invalid YAML in %s: %s"
-                    .formatted(
-                            file.getFileName(),
-                            e.getMessage()));
+            fail("Invalid YAML in %s: %s".formatted(file.getFileName(), e.getMessage()));
         }
     }
 
@@ -197,64 +162,53 @@ public final class SmokeTestValidators {
      *
      * @param file the JSON file to validate
      * @throws AssertionError if the file is not valid JSON
-     * @throws IOException    if file reading fails
+     * @throws IOException if file reading fails
      */
-    public static void assertValidJson(Path file)
-            throws IOException {
-        String content = Files.readString(
-                file, StandardCharsets.UTF_8);
+    public static void assertValidJson(Path file) throws IOException {
+        String content = Files.readString(file, StandardCharsets.UTF_8);
         try {
             JSON_MAPPER.readTree(content);
         } catch (Exception e) {
-            fail("Invalid JSON in %s: %s"
-                    .formatted(
-                            file.getFileName(),
-                            e.getMessage()));
+            fail("Invalid JSON in %s: %s".formatted(file.getFileName(), e.getMessage()));
         }
     }
 
     /**
-     * Counts all regular files recursively under
-     * {@code dir}.
+     * Counts all regular files recursively under {@code dir}.
      *
      * @param dir the directory to scan
      * @return the total file count
      * @throws IOException if traversal fails
      */
-    public static long countFiles(Path dir)
-            throws IOException {
+    public static long countFiles(Path dir) throws IOException {
         long[] count = {0};
-        Files.walkFileTree(dir, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(
-                    Path file,
-                    BasicFileAttributes attrs) {
-                count[0]++;
-                return FileVisitResult.CONTINUE;
-            }
-        });
+        Files.walkFileTree(
+                dir,
+                new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                        count[0]++;
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
         return count[0];
     }
 
     /**
-     * Returns the POSIX-style relative path string from
-     * {@code base} to {@code file}, replacing backslashes
-     * with forward slashes for cross-platform consistency.
+     * Returns the POSIX-style relative path string from {@code base} to {@code file}, replacing
+     * backslashes with forward slashes for cross-platform consistency.
      *
      * @param base the base directory
      * @param file the file to relativize
      * @return the relative path with forward slashes
      */
-    public static String relativizePosix(
-            Path base, Path file) {
-        return base.relativize(file).toString()
-                .replace('\\', '/');
+    public static String relativizePosix(Path base, Path file) {
+        return base.relativize(file).toString().replace('\\', '/');
     }
 
     /**
-     * Creates a directory and all parent directories,
-     * wrapping any {@link IOException} in an
-     * {@link UncheckedIOException}.
+     * Creates a directory and all parent directories, wrapping any {@link IOException} in an {@link
+     * UncheckedIOException}.
      *
      * @param dir the directory to create
      */
@@ -262,45 +216,31 @@ public final class SmokeTestValidators {
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to create directory: "
-                            + dir, e);
+            throw new UncheckedIOException("Failed to create directory: " + dir, e);
         }
     }
 
     /**
-     * Reads a skill's SKILL.md plus all reference files,
-     * concatenated into a single string.
+     * Reads a skill's SKILL.md plus all reference files, concatenated into a single string.
      *
      * @param outputDir the pipeline output directory
      * @param skillName the skill directory name
      * @return concatenated content of SKILL.md + references
      * @throws IOException if file reading fails
      */
-    public static String readSkillWithRefs(
-            Path outputDir, String skillName)
-            throws IOException {
-        Path skillDir = outputDir.resolve(
-                ".claude/skills/" + skillName);
+    public static String readSkillWithRefs(Path outputDir, String skillName) throws IOException {
+        Path skillDir = outputDir.resolve(".claude/skills/" + skillName);
         StringBuilder sb = new StringBuilder();
-        sb.append(Files.readString(
-                skillDir.resolve("SKILL.md"),
-                StandardCharsets.UTF_8));
+        sb.append(Files.readString(skillDir.resolve("SKILL.md"), StandardCharsets.UTF_8));
         Path refsDir = skillDir.resolve("references");
         if (Files.isDirectory(refsDir)) {
             try (var stream = Files.list(refsDir)) {
-                List<Path> refs = stream
-                        .filter(p -> p.toString()
-                                .endsWith(".md"))
-                        .sorted()
-                        .toList();
+                List<Path> refs =
+                        stream.filter(p -> p.toString().endsWith(".md")).sorted().toList();
                 for (Path ref : refs) {
                     sb.append("\n\n");
-                    sb.append("<!-- ref: ")
-                            .append(ref.getFileName())
-                            .append(" -->\n");
-                    sb.append(Files.readString(
-                            ref, StandardCharsets.UTF_8));
+                    sb.append("<!-- ref: ").append(ref.getFileName()).append(" -->\n");
+                    sb.append(Files.readString(ref, StandardCharsets.UTF_8));
                 }
             }
         }
@@ -308,13 +248,10 @@ public final class SmokeTestValidators {
     }
 
     private static void scanFileForPlaceholders(
-            Path file, Path outputDir,
-            List<Pattern> compiled,
-            List<String> violations) throws IOException {
-        String content = Files.readString(
-                file, StandardCharsets.UTF_8);
-        String relativePath =
-                relativizePosix(outputDir, file);
+            Path file, Path outputDir, List<Pattern> compiled, List<String> violations)
+            throws IOException {
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        String relativePath = relativizePosix(outputDir, file);
 
         List<String> lines = content.lines().toList();
         for (int i = 0; i < lines.size(); i++) {
@@ -322,15 +259,9 @@ public final class SmokeTestValidators {
             for (Pattern pattern : compiled) {
                 Matcher matcher = pattern.matcher(line);
                 while (matcher.find()) {
-                    violations.add(
-                            "  %s:%d — %s"
-                                    .formatted(
-                                            relativePath,
-                                            i + 1,
-                                            matcher.group()));
+                    violations.add("  %s:%d — %s".formatted(relativePath, i + 1, matcher.group()));
                 }
             }
         }
     }
-
 }

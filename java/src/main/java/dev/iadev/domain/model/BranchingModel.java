@@ -6,13 +6,11 @@ import java.util.Optional;
 /**
  * Represents the Git branching strategy for a project.
  *
- * <p>Determines how branch references are resolved in
- * generated skills and CI/CD artifacts:
+ * <p>Determines how branch references are resolved in generated skills and CI/CD artifacts:
+ *
  * <ul>
- *   <li>{@link #GITFLOW} — base branch is {@code develop},
- *       uses release branches</li>
- *   <li>{@link #TRUNK} — base branch is {@code main},
- *       tags directly on main</li>
+ *   <li>{@link #GITFLOW} — base branch is {@code develop}, uses release branches
+ *   <li>{@link #TRUNK} — base branch is {@code main}, tags directly on main
  * </ul>
  *
  * @see ProjectConfig
@@ -54,18 +52,16 @@ public enum BranchingModel {
     /**
      * Resolves a branching model from its config value.
      *
-     * <p>Matching is case-insensitive.</p>
+     * <p>Matching is case-insensitive.
      *
      * @param value the config value, may be null
      * @return the matching model, or empty if not found
      */
-    public static Optional<BranchingModel> fromConfigValue(
-            String value) {
+    public static Optional<BranchingModel> fromConfigValue(String value) {
         if (value == null || value.isEmpty()) {
             return Optional.empty();
         }
-        String normalized = value.strip()
-                .toLowerCase(Locale.ROOT);
+        String normalized = value.strip().toLowerCase(Locale.ROOT);
         for (BranchingModel model : values()) {
             if (model.configValue.equals(normalized)) {
                 return Optional.of(model);

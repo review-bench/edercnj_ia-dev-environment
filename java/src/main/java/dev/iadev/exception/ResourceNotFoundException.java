@@ -1,16 +1,16 @@
 package dev.iadev.exception;
 
 /**
- * Thrown when a required resource (file, template, configuration)
- * cannot be found via any search strategy.
+ * Thrown when a required resource (file, template, configuration) cannot be found via any search
+ * strategy.
  *
- * <p>Carries the resource path that was searched for and a description
- * of the strategies that were attempted (classpath, filesystem, etc.),
- * enabling clear diagnosis of missing resources.</p>
+ * <p>Carries the resource path that was searched for and a description of the strategies that were
+ * attempted (classpath, filesystem, etc.), enabling clear diagnosis of missing resources.
  *
- * <p>Application-level exception — used across multiple layers.</p>
+ * <p>Application-level exception — used across multiple layers.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * throw new ResourceNotFoundException(
  *     "shared/templates/missing.txt",
@@ -25,13 +25,11 @@ public class ResourceNotFoundException extends RuntimeException {
     /**
      * Creates a resource-not-found exception.
      *
-     * @param resourcePath     the relative path of the resource
+     * @param resourcePath the relative path of the resource
      * @param searchStrategies description of strategies attempted
      */
-    public ResourceNotFoundException(
-            String resourcePath, String searchStrategies) {
-        super("Resource not found: %s. Searched via: %s".formatted(
-                resourcePath, searchStrategies));
+    public ResourceNotFoundException(String resourcePath, String searchStrategies) {
+        super("Resource not found: %s. Searched via: %s".formatted(resourcePath, searchStrategies));
         this.resourcePath = resourcePath;
         this.searchStrategies = searchStrategies;
     }

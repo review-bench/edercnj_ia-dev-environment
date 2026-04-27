@@ -1,35 +1,31 @@
 package dev.iadev.smoke;
 
-import dev.iadev.cli.IaDevEnvApplication;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import picocli.CommandLine;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.iadev.cli.IaDevEnvApplication;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
 
 /**
- * Smoke tests for CLI mode flags: dry-run, force,
- * verbose, and help.
+ * Smoke tests for CLI mode flags: dry-run, force, verbose, and help.
  *
- * <p>Validates that each mode produces the expected
- * behavioral contract when invoked via the CLI.</p>
+ * <p>Validates that each mode produces the expected behavioral contract when invoked via the CLI.
  */
 @DisplayName("CLI Modes Smoke Tests")
 class CliModesSmokeTest {
 
     private static final int EXIT_SUCCESS = 0;
     private static final int EXIT_VALIDATION = 1;
-    private static final String TEST_PROFILE =
-            "java-quarkus";
+    private static final String TEST_PROFILE = "java-quarkus";
 
     @Nested
     @DisplayName("Dry-Run Mode")
@@ -37,97 +33,75 @@ class CliModesSmokeTest {
 
         @Test
         @DisplayName("dry-run succeeds with exit code 0")
-        void dryRun_whenExecuted_returnsSuccess(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("dry-run-output");
+        void dryRun_whenExecuted_returnsSuccess(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("dry-run-output");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--dry-run",
-                    "-o", outputDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            TEST_PROFILE,
+                            "--dry-run",
+                            "-o",
+                            outputDir.toString());
 
-            assertThat(exitCode)
-                    .isEqualTo(EXIT_SUCCESS);
+            assertThat(exitCode).isEqualTo(EXIT_SUCCESS);
         }
 
         @Test
         @DisplayName("dry-run writes no files to output dir")
-        void dryRun_whenExecuted_writesNoFiles(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("dry-run-empty");
+        void dryRun_whenExecuted_writesNoFiles(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("dry-run-empty");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--dry-run",
-                    "-o", outputDir.toString());
+            cmd.execute("generate", "-s", TEST_PROFILE, "--dry-run", "-o", outputDir.toString());
 
             assertThat(outputDir).doesNotExist();
         }
 
         @Test
         @DisplayName("dry-run output contains DRY RUN label")
-        void dryRun_whenExecuted_outputContainsDryRunLabel(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("dry-run-label");
+        void dryRun_whenExecuted_outputContainsDryRunLabel(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("dry-run-label");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--dry-run",
-                    "-o", outputDir.toString());
+            cmd.execute("generate", "-s", TEST_PROFILE, "--dry-run", "-o", outputDir.toString());
 
-            assertThat(sw.toString())
-                    .contains("[DRY RUN]");
+            assertThat(sw.toString()).contains("[DRY RUN]");
         }
 
         @Test
         @DisplayName("dry-run output reports simulated files")
-        void dryRun_whenExecuted_reportsSimulatedFiles(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("dry-run-files");
+        void dryRun_whenExecuted_reportsSimulatedFiles(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("dry-run-files");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--dry-run",
-                    "-o", outputDir.toString());
+            cmd.execute("generate", "-s", TEST_PROFILE, "--dry-run", "-o", outputDir.toString());
 
             String output = sw.toString();
-            assertThat(output)
-                    .contains("Files that would be generated");
+            assertThat(output).contains("Files that would be generated");
         }
 
         @Test
         @DisplayName("dry-run output contains Pipeline Success")
-        void dryRun_whenExecuted_reportsPipelineSuccess(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("dry-run-success");
+        void dryRun_whenExecuted_reportsPipelineSuccess(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("dry-run-success");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--dry-run",
-                    "-o", outputDir.toString());
+            cmd.execute("generate", "-s", TEST_PROFILE, "--dry-run", "-o", outputDir.toString());
 
-            assertThat(sw.toString())
-                    .contains("Pipeline: Success");
+            assertThat(sw.toString()).contains("Pipeline: Success");
         }
     }
 
@@ -137,121 +111,81 @@ class CliModesSmokeTest {
 
         @Test
         @DisplayName("force overwrites existing artifacts")
-        void force_whenExistingArtifacts_overwrites(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path outputDir =
-                    tempDir.resolve("force-overwrite");
+        void force_whenExistingArtifacts_overwrites(@TempDir Path tempDir) throws IOException {
+            Path outputDir = tempDir.resolve("force-overwrite");
 
             CommandLine cmd1 = buildCommandLine();
             StringWriter sw1 = new StringWriter();
             cmd1.setOut(new PrintWriter(sw1));
-            cmd1.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "-o", outputDir.toString());
+            cmd1.execute("generate", "-s", TEST_PROFILE, "-o", outputDir.toString());
 
-            Path readmeMd = outputDir.resolve(
-                    ".claude/README.md");
+            Path readmeMd = outputDir.resolve(".claude/README.md");
             assertThat(readmeMd).exists();
-            String originalContent =
-                    Files.readString(readmeMd,
-                            StandardCharsets.UTF_8);
+            String originalContent = Files.readString(readmeMd, StandardCharsets.UTF_8);
 
-            Files.writeString(readmeMd,
-                    "MODIFIED_SENTINEL_CONTENT",
-                    StandardCharsets.UTF_8);
-            assertThat(Files.readString(readmeMd,
-                    StandardCharsets.UTF_8))
+            Files.writeString(readmeMd, "MODIFIED_SENTINEL_CONTENT", StandardCharsets.UTF_8);
+            assertThat(Files.readString(readmeMd, StandardCharsets.UTF_8))
                     .isEqualTo("MODIFIED_SENTINEL_CONTENT");
 
             CommandLine cmd2 = buildCommandLine();
             StringWriter sw2 = new StringWriter();
             cmd2.setOut(new PrintWriter(sw2));
-            int exitCode = cmd2.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--force",
-                    "-o", outputDir.toString());
+            int exitCode =
+                    cmd2.execute(
+                            "generate", "-s", TEST_PROFILE, "--force", "-o", outputDir.toString());
 
-            assertThat(exitCode)
-                    .isEqualTo(EXIT_SUCCESS);
-            String afterForce =
-                    Files.readString(readmeMd,
-                            StandardCharsets.UTF_8);
-            assertThat(afterForce)
-                    .isEqualTo(originalContent);
-            assertThat(afterForce)
-                    .doesNotContain(
-                            "MODIFIED_SENTINEL_CONTENT");
+            assertThat(exitCode).isEqualTo(EXIT_SUCCESS);
+            String afterForce = Files.readString(readmeMd, StandardCharsets.UTF_8);
+            assertThat(afterForce).isEqualTo(originalContent);
+            assertThat(afterForce).doesNotContain("MODIFIED_SENTINEL_CONTENT");
         }
 
         @Test
         @DisplayName("force without existing files succeeds")
-        void force_whenNoExistingFiles_succeeds(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("force-fresh");
+        void force_whenNoExistingFiles_succeeds(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("force-fresh");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--force",
-                    "-o", outputDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate", "-s", TEST_PROFILE, "--force", "-o", outputDir.toString());
 
-            assertThat(exitCode)
-                    .isEqualTo(EXIT_SUCCESS);
-            assertThat(outputDir.resolve(".claude"))
-                    .isDirectory();
+            assertThat(exitCode).isEqualTo(EXIT_SUCCESS);
+            assertThat(outputDir.resolve(".claude")).isDirectory();
         }
 
         @Test
-        @DisplayName("without force, existing artifacts cause"
-                + " validation error")
-        void noForce_whenExistingArtifacts_returnsError(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path outputDir =
-                    tempDir.resolve("no-force-conflict");
-            Files.createDirectories(
-                    outputDir.resolve(".claude"));
+        @DisplayName("without force, existing artifacts cause" + " validation error")
+        void noForce_whenExistingArtifacts_returnsError(@TempDir Path tempDir) throws IOException {
+            Path outputDir = tempDir.resolve("no-force-conflict");
+            Files.createDirectories(outputDir.resolve(".claude"));
 
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "-o", outputDir.toString());
+            int exitCode = cmd.execute("generate", "-s", TEST_PROFILE, "-o", outputDir.toString());
 
-            assertThat(exitCode)
-                    .isEqualTo(
-                            EXIT_VALIDATION);
-            assertThat(sw.toString())
-                    .contains("--force");
+            assertThat(exitCode).isEqualTo(EXIT_VALIDATION);
+            assertThat(sw.toString()).contains("--force");
         }
 
         @Test
         @DisplayName("force output shows overwrite message")
-        void force_whenExistingArtifacts_showsOverwriteMsg(
-                @TempDir Path tempDir)
+        void force_whenExistingArtifacts_showsOverwriteMsg(@TempDir Path tempDir)
                 throws IOException {
-            Path outputDir =
-                    tempDir.resolve("force-msg");
-            Files.createDirectories(
-                    outputDir.resolve(".claude"));
+            Path outputDir = tempDir.resolve("force-msg");
+            Files.createDirectories(outputDir.resolve(".claude"));
 
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--force",
-                    "-o", outputDir.toString());
+            cmd.execute("generate", "-s", TEST_PROFILE, "--force", "-o", outputDir.toString());
 
-            assertThat(sw.toString())
-                    .contains("Overwriting existing artifacts");
+            assertThat(sw.toString()).contains("Overwriting existing artifacts");
         }
     }
 
@@ -261,37 +195,41 @@ class CliModesSmokeTest {
 
         @Test
         @DisplayName("verbose succeeds with exit code 0")
-        void verbose_whenExecuted_returnsSuccess(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("verbose-output");
+        void verbose_whenExecuted_returnsSuccess(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("verbose-output");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--verbose", "--force",
-                    "-o", outputDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            TEST_PROFILE,
+                            "--verbose",
+                            "--force",
+                            "-o",
+                            outputDir.toString());
 
-            assertThat(exitCode)
-                    .isEqualTo(EXIT_SUCCESS);
+            assertThat(exitCode).isEqualTo(EXIT_SUCCESS);
         }
 
         @Test
         @DisplayName("verbose output contains assembler names")
-        void verbose_whenExecuted_containsAssemblerNames(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("verbose-assemblers");
+        void verbose_whenExecuted_containsAssemblerNames(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("verbose-assemblers");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
             cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--verbose", "--force",
-                    "-o", outputDir.toString());
+                    "generate",
+                    "-s",
+                    TEST_PROFILE,
+                    "--verbose",
+                    "--force",
+                    "-o",
+                    outputDir.toString());
 
             String output = sw.toString();
             assertThat(output).contains("INCLUDED:");
@@ -299,18 +237,20 @@ class CliModesSmokeTest {
 
         @Test
         @DisplayName("verbose output contains completion info")
-        void verbose_whenExecuted_containsCompletionInfo(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("verbose-completion");
+        void verbose_whenExecuted_containsCompletionInfo(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("verbose-completion");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
             cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--verbose", "--force",
-                    "-o", outputDir.toString());
+                    "generate",
+                    "-s",
+                    TEST_PROFILE,
+                    "--verbose",
+                    "--force",
+                    "-o",
+                    outputDir.toString());
 
             String output = sw.toString();
             assertThat(output).contains("completed in");
@@ -318,22 +258,23 @@ class CliModesSmokeTest {
 
         @Test
         @DisplayName("verbose output contains loading message")
-        void verbose_whenExecuted_containsLoadingMessage(
-                @TempDir Path tempDir) {
-            Path outputDir =
-                    tempDir.resolve("verbose-loading");
+        void verbose_whenExecuted_containsLoadingMessage(@TempDir Path tempDir) {
+            Path outputDir = tempDir.resolve("verbose-loading");
             CommandLine cmd = buildCommandLine();
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
             cmd.execute(
-                    "generate", "-s", TEST_PROFILE,
-                    "--verbose", "--force",
-                    "-o", outputDir.toString());
+                    "generate",
+                    "-s",
+                    TEST_PROFILE,
+                    "--verbose",
+                    "--force",
+                    "-o",
+                    outputDir.toString());
 
             String output = sw.toString();
-            assertThat(output)
-                    .contains("Loading bundled stack profile");
+            assertThat(output).contains("Loading bundled stack profile");
         }
     }
 
@@ -348,8 +289,7 @@ class CliModesSmokeTest {
             StringWriter sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "--help");
+            int exitCode = cmd.execute("generate", "--help");
 
             assertThat(exitCode).isZero();
         }
@@ -363,8 +303,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--config");
+            assertThat(sw.toString()).contains("--config");
         }
 
         @Test
@@ -376,8 +315,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--stack");
+            assertThat(sw.toString()).contains("--stack");
         }
 
         @Test
@@ -389,8 +327,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--output");
+            assertThat(sw.toString()).contains("--output");
         }
 
         @Test
@@ -402,8 +339,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--dry-run");
+            assertThat(sw.toString()).contains("--dry-run");
         }
 
         @Test
@@ -415,8 +351,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--force");
+            assertThat(sw.toString()).contains("--force");
         }
 
         @Test
@@ -428,8 +363,7 @@ class CliModesSmokeTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--verbose");
+            assertThat(sw.toString()).contains("--verbose");
         }
 
         @Test

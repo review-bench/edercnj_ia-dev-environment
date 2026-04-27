@@ -2,7 +2,6 @@ package dev.iadev.util;
 
 /** Discriminates the type of work unit within an epic directory. */
 public enum UnitType {
-
     STORY("stories", "story"),
     BUG("bugs", "bug"),
     SPIKE("spikes", "spike"),

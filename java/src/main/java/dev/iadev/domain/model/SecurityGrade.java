@@ -3,9 +3,7 @@ package dev.iadev.domain.model;
 /**
  * Security grade derived from the security score.
  *
- * <p>Grades map to score ranges as follows:
- * A (90-100), B (80-89), C (70-79), D (60-69),
- * F (0-59).</p>
+ * <p>Grades map to score ranges as follows: A (90-100), B (80-89), C (70-79), D (60-69), F (0-59).
  *
  * @see SecurityScore
  */

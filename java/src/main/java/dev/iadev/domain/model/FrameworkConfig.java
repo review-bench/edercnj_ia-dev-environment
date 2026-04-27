@@ -5,27 +5,22 @@ import java.util.Map;
 /**
  * Represents the framework configuration.
  *
- * <p>The {@code name} and {@code version} are required. The {@code buildTool}
- * defaults to "pip" and {@code nativeBuild} defaults to {@code false}, matching
- * the TypeScript implementation.</p>
+ * <p>The {@code name} and {@code version} are required. The {@code buildTool} defaults to "pip" and
+ * {@code nativeBuild} defaults to {@code false}, matching the TypeScript implementation.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("name", "spring-boot", "version", "3.4", "build_tool", "maven");
  * FrameworkConfig cfg = FrameworkConfig.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param name the framework name (required)
  * @param version the framework version (required)
  * @param buildTool the build tool name (default: "pip")
  * @param nativeBuild whether native image build is supported (default: false)
  */
-public record FrameworkConfig(
-        String name,
-        String version,
-        String buildTool,
-        boolean nativeBuild) {
+public record FrameworkConfig(String name, String version, String buildTool, boolean nativeBuild) {
 
     /**
      * Creates a FrameworkConfig from a YAML-parsed map.
@@ -39,7 +34,6 @@ public record FrameworkConfig(
                 MapHelper.requireString(map, "name", "FrameworkConfig"),
                 MapHelper.requireString(map, "version", "FrameworkConfig"),
                 MapHelper.optionalString(map, "build_tool", "pip"),
-                MapHelper.optionalBoolean(map, "native_build", false)
-        );
+                MapHelper.optionalBoolean(map, "native_build", false));
     }
 }

@@ -1,22 +1,21 @@
 package dev.iadev.util;
 
-import dev.iadev.exception.ResourceNotFoundException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dev.iadev.exception.ResourceNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("ResourceDiscovery")
 class ResourceDiscoveryTest {
@@ -30,8 +29,9 @@ class ResourceDiscoveryTest {
         void existingResource_whenCalled_returnsTrue() {
             var discovery = new ResourceDiscovery();
 
-            assertThat(discovery.resourceExists(
-                    "shared/config-templates/setup-config.java-spring.yaml"))
+            assertThat(
+                            discovery.resourceExists(
+                                    "shared/config-templates/setup-config.java-spring.yaml"))
                     .isTrue();
         }
 
@@ -40,23 +40,18 @@ class ResourceDiscoveryTest {
         void nonExistingResource_forNonExistingresource_returnsfalse() {
             var discovery = new ResourceDiscovery();
 
-            assertThat(discovery.resourceExists(
-                    "inexistente/foo.txt"))
-                    .isFalse();
+            assertThat(discovery.resourceExists("inexistente/foo.txt")).isFalse();
         }
 
         @Test
-        @DisplayName("returns true for filesystem resource "
-                + "when resources-dir is set")
+        @DisplayName("returns true for filesystem resource " + "when resources-dir is set")
         void filesystemResource_whenResourcesDir_returnstrue(@TempDir Path tempDir)
                 throws IOException {
             Files.createDirectories(tempDir.resolve("templates"));
-            Files.writeString(
-                    tempDir.resolve("templates/test.txt"), "content");
+            Files.writeString(tempDir.resolve("templates/test.txt"), "content");
             var discovery = new ResourceDiscovery(tempDir);
 
-            assertThat(discovery.resourceExists("templates/test.txt"))
-                    .isTrue();
+            assertThat(discovery.resourceExists("templates/test.txt")).isTrue();
         }
     }
 
@@ -69,11 +64,11 @@ class ResourceDiscoveryTest {
         void classpathResource_whenCalled_returnsValidUrl() {
             var discovery = new ResourceDiscovery();
 
-            URL url = discovery.findResource(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            URL url =
+                    discovery.findResource("shared/config-templates/setup-config.java-spring.yaml");
 
-            assertThat(url.toString()).contains(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            assertThat(url.toString())
+                    .contains("shared/config-templates/setup-config.java-spring.yaml");
             assertThat(url.getProtocol()).isIn("file", "jar");
         }
 
@@ -84,8 +79,7 @@ class ResourceDiscoveryTest {
 
             URL url = discovery.findResource("knowledge/core/01-clean-code.md");
 
-            assertThat(url.toString())
-                    .contains("knowledge/core/01-clean-code.md");
+            assertThat(url.toString()).contains("knowledge/core/01-clean-code.md");
             assertThat(url.getProtocol()).isIn("file", "jar");
         }
     }
@@ -98,32 +92,29 @@ class ResourceDiscoveryTest {
         @DisplayName("prioritizes filesystem over classpath")
         void findResource_whenCalled_filesystemPrioritized(@TempDir Path tempDir)
                 throws IOException {
-            Files.createDirectories(
-                    tempDir.resolve("shared/config-templates"));
+            Files.createDirectories(tempDir.resolve("shared/config-templates"));
             Files.writeString(
-                    tempDir.resolve(
-                            "shared/config-templates/setup-config.java-spring.yaml"),
+                    tempDir.resolve("shared/config-templates/setup-config.java-spring.yaml"),
                     "filesystem-version");
             var discovery = new ResourceDiscovery(tempDir);
 
-            URL url = discovery.findResource(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            URL url =
+                    discovery.findResource("shared/config-templates/setup-config.java-spring.yaml");
 
             assertThat(url.getProtocol()).isEqualTo("file");
             assertThat(url.getPath()).contains(tempDir.toString());
         }
 
         @Test
-        @DisplayName("falls back to classpath when not found "
-                + "in filesystem")
+        @DisplayName("falls back to classpath when not found " + "in filesystem")
         void findResource_whenCalled_fallsBackToClasspath(@TempDir Path tempDir) {
             var discovery = new ResourceDiscovery(tempDir);
 
-            URL url = discovery.findResource(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            URL url =
+                    discovery.findResource("shared/config-templates/setup-config.java-spring.yaml");
 
-            assertThat(url.toString()).contains(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            assertThat(url.toString())
+                    .contains("shared/config-templates/setup-config.java-spring.yaml");
         }
     }
 
@@ -136,23 +127,19 @@ class ResourceDiscoveryTest {
         void nonExistingResource_whenCalled_throwsWithMessage() {
             var discovery = new ResourceDiscovery();
 
-            assertThatThrownBy(
-                    () -> discovery.findResource("inexistente/foo.txt"))
+            assertThatThrownBy(() -> discovery.findResource("inexistente/foo.txt"))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessageContaining(
-                            "Resource not found: inexistente/foo.txt")
+                    .hasMessageContaining("Resource not found: inexistente/foo.txt")
                     .hasMessageContaining("classpath");
         }
 
         @Test
-        @DisplayName("exception message includes filesystem strategy "
-                + "when resources-dir is set")
-        void withResourcesDir_whenResourcesDir_messageincludesfilesystem(
-                @TempDir Path tempDir) {
+        @DisplayName(
+                "exception message includes filesystem strategy " + "when resources-dir is set")
+        void withResourcesDir_whenResourcesDir_messageincludesfilesystem(@TempDir Path tempDir) {
             var discovery = new ResourceDiscovery(tempDir);
 
-            assertThatThrownBy(
-                    () -> discovery.findResource("inexistente/foo.txt"))
+            assertThatThrownBy(() -> discovery.findResource("inexistente/foo.txt"))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("filesystem")
                     .hasMessageContaining("classpath");
@@ -168,8 +155,8 @@ class ResourceDiscoveryTest {
         void classpathResource_whenCalled_readsContent() {
             var discovery = new ResourceDiscovery();
 
-            String content = discovery.readResource(
-                    "shared/config-templates/setup-config.java-spring.yaml");
+            String content =
+                    discovery.readResource("shared/config-templates/setup-config.java-spring.yaml");
 
             assertThat(content).isNotEmpty();
             assertThat(content).contains("java-spring");
@@ -177,8 +164,7 @@ class ResourceDiscoveryTest {
 
         @Test
         @DisplayName("reads filesystem resource as UTF-8")
-        void filesystemResource_whenCalled_readsContent(@TempDir Path tempDir)
-                throws IOException {
+        void filesystemResource_whenCalled_readsContent(@TempDir Path tempDir) throws IOException {
             Files.createDirectories(tempDir.resolve("test"));
             Files.writeString(
                     tempDir.resolve("test/hello.txt"),
@@ -188,20 +174,16 @@ class ResourceDiscoveryTest {
 
             String content = discovery.readResource("test/hello.txt");
 
-            assertThat(content).isEqualTo(
-                    "Hello UTF-8: acentos e simbolos");
+            assertThat(content).isEqualTo("Hello UTF-8: acentos e simbolos");
         }
 
         @Test
         @DisplayName("preserves UTF-8 encoding")
-        void discover_whenCalled_preservesUtf8Encoding(@TempDir Path tempDir)
-                throws IOException {
-            String utf8Content =
-                    "Conteudo com acentuacao: e, a, o, u, c";
+        void discover_whenCalled_preservesUtf8Encoding(@TempDir Path tempDir) throws IOException {
+            String utf8Content = "Conteudo com acentuacao: e, a, o, u, c";
             Files.createDirectories(tempDir.resolve("test"));
             Files.writeString(
-                    tempDir.resolve("test/utf8.txt"),
-                    utf8Content, StandardCharsets.UTF_8);
+                    tempDir.resolve("test/utf8.txt"), utf8Content, StandardCharsets.UTF_8);
             var discovery = new ResourceDiscovery(tempDir);
 
             String result = discovery.readResource("test/utf8.txt");
@@ -211,13 +193,10 @@ class ResourceDiscoveryTest {
 
         @Test
         @DisplayName("preserves LF line endings")
-        void discover_whenCalled_preservesLfLineEndings(@TempDir Path tempDir)
-                throws IOException {
+        void discover_whenCalled_preservesLfLineEndings(@TempDir Path tempDir) throws IOException {
             String lfContent = "line1\nline2\nline3\n";
             Files.createDirectories(tempDir.resolve("test"));
-            Files.write(
-                    tempDir.resolve("test/lf.txt"),
-                    lfContent.getBytes(StandardCharsets.UTF_8));
+            Files.write(tempDir.resolve("test/lf.txt"), lfContent.getBytes(StandardCharsets.UTF_8));
             var discovery = new ResourceDiscovery(tempDir);
 
             String result = discovery.readResource("test/lf.txt");
@@ -231,8 +210,7 @@ class ResourceDiscoveryTest {
         void nonExistingResource_forNonExistingresource_throws() {
             var discovery = new ResourceDiscovery();
 
-            assertThatThrownBy(
-                    () -> discovery.readResource("inexistente/bar.txt"))
+            assertThatThrownBy(() -> discovery.readResource("inexistente/bar.txt"))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
     }
@@ -243,19 +221,15 @@ class ResourceDiscoveryTest {
 
         @Test
         @DisplayName("lists files in filesystem directory")
-        void filesystemDirectory_whenCalled_listsFiles(@TempDir Path tempDir)
-                throws IOException {
+        void filesystemDirectory_whenCalled_listsFiles(@TempDir Path tempDir) throws IOException {
             Files.createDirectories(tempDir.resolve("mydir"));
-            Files.writeString(
-                    tempDir.resolve("mydir/a.txt"), "a");
-            Files.writeString(
-                    tempDir.resolve("mydir/b.txt"), "b");
+            Files.writeString(tempDir.resolve("mydir/a.txt"), "a");
+            Files.writeString(tempDir.resolve("mydir/b.txt"), "b");
             var discovery = new ResourceDiscovery(tempDir);
 
             List<String> result = discovery.listResources("mydir");
 
-            assertThat(result)
-                    .containsExactlyInAnyOrder("a.txt", "b.txt");
+            assertThat(result).containsExactlyInAnyOrder("a.txt", "b.txt");
         }
 
         @Test
@@ -275,8 +249,7 @@ class ResourceDiscoveryTest {
         void nonExistingDirectory_forNonExistingdirectory_returnsemptylist() {
             var discovery = new ResourceDiscovery();
 
-            List<String> result = discovery.listResources(
-                    "nonexistent-dir-xyz");
+            List<String> result = discovery.listResources("nonexistent-dir-xyz");
 
             assertThat(result).isEmpty();
         }
@@ -287,10 +260,11 @@ class ResourceDiscoveryTest {
     class ConfigTemplatesAccessible {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "shared/config-templates/setup-config.java-quarkus.yaml",
-                "shared/config-templates/setup-config.java-spring.yaml"
-        })
+        @ValueSource(
+                strings = {
+                    "shared/config-templates/setup-config.java-quarkus.yaml",
+                    "shared/config-templates/setup-config.java-spring.yaml"
+                })
         @DisplayName("config template exists and is readable")
         void configTemplate_existsAndReadable(String path) {
             var discovery = new ResourceDiscovery();
@@ -336,54 +310,41 @@ class ResourceDiscoveryTest {
     class ListFromFilesystem {
 
         @Test
-        @DisplayName("skips subdirectories, keeps only"
-                + " regular files (Files.isRegularFile=false"
-                + " branch)")
-        void list_subdirectoryMixedFiles_filtersDirs(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName(
+                "skips subdirectories, keeps only"
+                        + " regular files (Files.isRegularFile=false"
+                        + " branch)")
+        void list_subdirectoryMixedFiles_filtersDirs(@TempDir Path tempDir) throws IOException {
             Path targetDir = tempDir.resolve("payload");
             Files.createDirectories(targetDir);
-            Files.writeString(targetDir.resolve("a.md"),
-                    "content", StandardCharsets.UTF_8);
-            Files.createDirectories(
-                    targetDir.resolve("nested"));
-            Files.writeString(targetDir.resolve("b.md"),
-                    "content", StandardCharsets.UTF_8);
+            Files.writeString(targetDir.resolve("a.md"), "content", StandardCharsets.UTF_8);
+            Files.createDirectories(targetDir.resolve("nested"));
+            Files.writeString(targetDir.resolve("b.md"), "content", StandardCharsets.UTF_8);
 
             var discovery = new ResourceDiscovery(tempDir);
-            List<String> result =
-                    discovery.listResources("payload");
+            List<String> result = discovery.listResources("payload");
 
-            assertThat(result)
-                    .containsExactlyInAnyOrder("a.md",
-                            "b.md")
-                    .doesNotContain("nested");
+            assertThat(result).containsExactlyInAnyOrder("a.md", "b.md").doesNotContain("nested");
         }
 
         @Test
-        @DisplayName("returns empty list when resources-dir"
-                + " does not contain the directory")
-        void list_missingDir_returnsEmpty(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty list when resources-dir" + " does not contain the directory")
+        void list_missingDir_returnsEmpty(@TempDir Path tempDir) {
             var discovery = new ResourceDiscovery(tempDir);
 
-            List<String> result =
-                    discovery.listResources("not-a-dir");
+            List<String> result = discovery.listResources("not-a-dir");
 
             assertThat(result).isEmpty();
         }
 
         @Test
-        @DisplayName("returns empty list for empty"
-                + " directory (no iterations branch)")
-        void list_emptyDir_returnsEmpty(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("returns empty list for empty" + " directory (no iterations branch)")
+        void list_emptyDir_returnsEmpty(@TempDir Path tempDir) throws IOException {
             Path emptyDir = tempDir.resolve("empty");
             Files.createDirectories(emptyDir);
 
             var discovery = new ResourceDiscovery(tempDir);
-            List<String> result =
-                    discovery.listResources("empty");
+            List<String> result = discovery.listResources("empty");
 
             assertThat(result).isEmpty();
         }

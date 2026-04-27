@@ -1,27 +1,22 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for SettingsAssembler — hooks config,
- * JSON validity, buildSettingsJson,
- * buildSettingsLocalJson, parseJsonStringArray,
- * and deduplicate.
+ * Tests for SettingsAssembler — hooks config, JSON validity, buildSettingsJson,
+ * buildSettingsLocalJson, parseJsonStringArray, and deduplicate.
  */
 @DisplayName("SettingsAssembler — hooks and JSON")
 class SettingsHooksAndJsonTest {
@@ -31,16 +26,13 @@ class SettingsHooksAndJsonTest {
     class HooksConfig {
 
         @Test
-        @DisplayName("settings.json contains PostToolUse"
-                + " hooks for compiled language")
-        void assemble_whenCalled_containsHooksForCompiledLang(
-                @TempDir Path tempDir)
+        @DisplayName("settings.json contains PostToolUse" + " hooks for compiled language")
+        void assemble_whenCalled_containsHooksForCompiledLang(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -48,32 +40,22 @@ class SettingsHooksAndJsonTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve("settings.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("PostToolUse");
-            assertThat(content)
-                    .contains("Write|Edit");
-            assertThat(content)
-                    .contains("post-compile-check.sh");
+            String content =
+                    Files.readString(outputDir.resolve("settings.json"), StandardCharsets.UTF_8);
+            assertThat(content).contains("PostToolUse");
+            assertThat(content).contains("Write|Edit");
+            assertThat(content).contains("post-compile-check.sh");
         }
 
         @Test
-        @DisplayName("settings.json does NOT contain"
-                + " hooks for python when telemetry off")
-        void assemble_noHooksForPython_succeeds(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("settings.json does NOT contain" + " hooks for python when telemetry off")
+        void assemble_noHooksForPython_succeeds(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -82,17 +64,12 @@ class SettingsHooksAndJsonTest {
                             .telemetryEnabled(false)
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve("settings.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .doesNotContain("PostToolUse");
-            assertThat(content)
-                    .doesNotContain("hooks");
+            String content =
+                    Files.readString(outputDir.resolve("settings.json"), StandardCharsets.UTF_8);
+            assertThat(content).doesNotContain("PostToolUse");
+            assertThat(content).doesNotContain("hooks");
         }
     }
 
@@ -101,16 +78,12 @@ class SettingsHooksAndJsonTest {
     class JsonValidity {
 
         @Test
-        @DisplayName("settings.json is valid JSON with"
-                + " required keys")
-        void assemble_settings_isValidJson(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("settings.json is valid JSON with" + " required keys")
+        void assemble_settings_isValidJson(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("kotlin", "2.0")
@@ -118,50 +91,32 @@ class SettingsHooksAndJsonTest {
                             .buildTool("gradle")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve("settings.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("\"permissions\"");
-            assertThat(content)
-                    .contains("\"allow\"");
-            assertThat(content.trim())
-                    .startsWith("{");
-            assertThat(content.trim())
-                    .endsWith("}");
+            String content =
+                    Files.readString(outputDir.resolve("settings.json"), StandardCharsets.UTF_8);
+            assertThat(content).contains("\"permissions\"");
+            assertThat(content).contains("\"allow\"");
+            assertThat(content.trim()).startsWith("{");
+            assertThat(content.trim()).endsWith("}");
         }
 
         @Test
-        @DisplayName("settings.local.json is valid JSON"
-                + " with empty allow list")
-        void assemble_settingsLocal_isValidJson(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("settings.local.json is valid JSON" + " with empty allow list")
+        void assemble_settingsLocal_isValidJson(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SettingsAssembler assembler = new SettingsAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            "settings.local.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("\"permissions\"");
-            assertThat(content)
-                    .contains("\"allow\": []");
+            String content =
+                    Files.readString(
+                            outputDir.resolve("settings.local.json"), StandardCharsets.UTF_8);
+            assertThat(content).contains("\"permissions\"");
+            assertThat(content).contains("\"allow\": []");
         }
     }
-
 }

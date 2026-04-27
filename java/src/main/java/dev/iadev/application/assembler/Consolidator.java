@@ -18,42 +18,43 @@ public final class Consolidator {
 
     /** Filename patterns for core framework extensions. */
     public static final List<String> CORE_PATTERNS =
-            List.of("-cdi", "-di", "-config", "-web",
-                    "-resteasy", "-middleware", "-resilience");
+            List.of("-cdi", "-di", "-config", "-web", "-resteasy", "-middleware", "-resilience");
 
     /** Filename patterns for data-layer extensions. */
     public static final List<String> DATA_PATTERNS =
-            List.of("-panache", "-jpa", "-prisma",
-                    "-sqlalchemy", "-exposed", "-ef",
-                    "-orm", "-database");
+            List.of(
+                    "-panache",
+                    "-jpa",
+                    "-prisma",
+                    "-sqlalchemy",
+                    "-exposed",
+                    "-ef",
+                    "-orm",
+                    "-database");
 
     /** Filename patterns for operations extensions. */
     public static final List<String> OPS_PATTERNS =
-            List.of("-testing", "-observability",
+            List.of(
+                    "-testing", "-observability",
                     "-native-build", "-infrastructure");
 
-    private static final Set<String> RESERVED_NAMES = Set.of(
-            "CON", "NUL", "AUX", "PRN",
-            "COM1", "COM2", "COM3", "COM4",
-            "COM5", "COM6", "COM7", "COM8", "COM9",
-            "LPT1", "LPT2", "LPT3", "LPT4",
-            "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
-    );
+    private static final Set<String> RESERVED_NAMES =
+            Set.of(
+                    "CON", "NUL", "AUX", "PRN", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6",
+                    "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7",
+                    "LPT8", "LPT9");
 
     private Consolidator() {
         // Utility class
     }
 
     /**
-     * Merges multiple source files into a single output
-     * with header and separators.
+     * Merges multiple source files into a single output with header and separators.
      *
-     * @param outputPath  the merged output file path
+     * @param outputPath the merged output file path
      * @param sourcePaths the list of source file paths
      */
-    public static void consolidateFiles(
-            Path outputPath,
-            List<Path> sourcePaths) {
+    public static void consolidateFiles(Path outputPath, List<Path> sourcePaths) {
         List<Path> existing = filterExistingFiles(sourcePaths);
         if (existing.isEmpty()) {
             return;
@@ -62,16 +63,11 @@ public final class Consolidator {
         writeConsolidatedOutput(outputPath, lines);
     }
 
-    private static List<Path> filterExistingFiles(
-            List<Path> sourcePaths) {
-        return sourcePaths.stream()
-                .filter(p -> Files.exists(p)
-                        && Files.isRegularFile(p))
-                .toList();
+    private static List<Path> filterExistingFiles(List<Path> sourcePaths) {
+        return sourcePaths.stream().filter(p -> Files.exists(p) && Files.isRegularFile(p)).toList();
     }
 
-    private static List<String> buildConsolidatedLines(
-            List<Path> existing) {
+    private static List<String> buildConsolidatedLines(List<Path> existing) {
         List<String> lines = new ArrayList<>();
         lines.add(GENERATED_HEADER);
         lines.add("");
@@ -87,70 +83,51 @@ public final class Consolidator {
 
     private static String readFileContent(Path src) {
         try {
-            return Files.readString(
-                    src, StandardCharsets.UTF_8);
+            return Files.readString(src, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to read file: %s"
-                            .formatted(src), e);
+            throw new UncheckedIOException("Failed to read file: %s".formatted(src), e);
         }
     }
 
-    private static void writeConsolidatedOutput(
-            Path outputPath, List<String> lines) {
+    private static void writeConsolidatedOutput(Path outputPath, List<String> lines) {
         CopyHelpers.ensureParent(outputPath);
         try {
-            Files.writeString(outputPath,
-                    String.join("\n", lines),
-                    StandardCharsets.UTF_8);
+            Files.writeString(outputPath, String.join("\n", lines), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(
-                    "Failed to consolidate files to: %s"
-                            .formatted(outputPath), e);
+                    "Failed to consolidate files to: %s".formatted(outputPath), e);
         }
     }
 
     /**
-     * Groups framework files into 3 consolidated outputs
-     * (core, data, ops).
+     * Groups framework files into 3 consolidated outputs (core, data, ops).
      *
      * @param framework the framework name (sanitized)
-     * @param rulesDir  the directory for consolidated output
+     * @param rulesDir the directory for consolidated output
      * @param sourceDir the directory containing source files
      * @return list of generated file paths
      */
     public static List<String> consolidateFrameworkRules(
-            String framework,
-            Path rulesDir,
-            Path sourceDir) {
-        if (!Files.exists(sourceDir)
-                || !Files.isDirectory(sourceDir)) {
+            String framework, Path rulesDir, Path sourceDir) {
+        if (!Files.exists(sourceDir) || !Files.isDirectory(sourceDir)) {
             return List.of();
         }
-        String safeFramework =
-                sanitizeFilenameSegment(framework);
+        String safeFramework = sanitizeFilenameSegment(framework);
         List<Path> allFiles = listMarkdownFiles(sourceDir);
-        return consolidateByCategory(
-                allFiles, rulesDir, safeFramework);
+        return consolidateByCategory(allFiles, rulesDir, safeFramework);
     }
 
-    private static List<Path> listMarkdownFiles(
-            Path sourceDir) {
-        return MarkdownFileScanner
-                .listMarkdownFilesSorted(sourceDir);
+    private static List<Path> listMarkdownFiles(Path sourceDir) {
+        return MarkdownFileScanner.listMarkdownFilesSorted(sourceDir);
     }
 
     private static List<String> consolidateByCategory(
-            List<Path> allFiles, Path rulesDir,
-            String safeFramework) {
-        List<List<Path>> groups =
-                classifyFilesByCategory(allFiles);
-        return writeConsolidatedGroups(
-                groups, rulesDir, safeFramework);
+            List<Path> allFiles, Path rulesDir, String safeFramework) {
+        List<List<Path>> groups = classifyFilesByCategory(allFiles);
+        return writeConsolidatedGroups(groups, rulesDir, safeFramework);
     }
 
-    private static List<List<Path>> classifyFilesByCategory(
-            List<Path> allFiles) {
+    private static List<List<Path>> classifyFilesByCategory(List<Path> allFiles) {
         List<Path> core = new ArrayList<>();
         List<Path> data = new ArrayList<>();
         List<Path> ops = new ArrayList<>();
@@ -168,48 +145,37 @@ public final class Consolidator {
     }
 
     private static List<String> writeConsolidatedGroups(
-            List<List<Path>> groups, Path rulesDir,
-            String safeFramework) {
-        String[][] labels = {
-                {"30", "core"}, {"31", "data"},
-                {"32", "operations"}};
+            List<List<Path>> groups, Path rulesDir, String safeFramework) {
+        String[][] labels = {{"30", "core"}, {"31", "data"}, {"32", "operations"}};
         List<String> generated = new ArrayList<>();
         for (int i = 0; i < groups.size(); i++) {
-            consolidateGroup(rulesDir, safeFramework,
-                    labels[i][0], labels[i][1],
-                    groups.get(i), generated);
+            consolidateGroup(
+                    rulesDir, safeFramework, labels[i][0], labels[i][1], groups.get(i), generated);
         }
         return generated;
     }
 
     /**
-     * Sanitizes a filename segment by stripping path
-     * separators, parent-directory sequences, and null bytes.
+     * Sanitizes a filename segment by stripping path separators, parent-directory sequences, and
+     * null bytes.
      *
      * @param segment the raw filename segment
      * @return the sanitized segment
-     * @throws IllegalArgumentException if segment is null
-     *         or contains null bytes
+     * @throws IllegalArgumentException if segment is null or contains null bytes
      */
-    public static String sanitizeFilenameSegment(
-            String segment) {
+    public static String sanitizeFilenameSegment(String segment) {
         if (segment == null || segment.contains("\0")) {
             throw new IllegalArgumentException(
-                    "Filename segment must not be null "
-                            + "or contain null bytes");
+                    "Filename segment must not be null " + "or contain null bytes");
         }
         String result = segment;
         String previous;
         do {
             previous = result;
-            result = result
-                    .replace("/", "")
-                    .replace("\\", "")
-                    .replace("..", "");
+            result = result.replace("/", "").replace("\\", "").replace("..", "");
         } while (!result.equals(previous));
 
-        String baseName = result.replaceAll(
-                "\\.[^.]*$", "").toUpperCase();
+        String baseName = result.replaceAll("\\.[^.]*$", "").toUpperCase();
         if (RESERVED_NAMES.contains(baseName)) {
             result = "_" + result;
         }
@@ -217,22 +183,21 @@ public final class Consolidator {
     }
 
     private static void consolidateGroup(
-            Path rulesDir, String framework,
-            String prefix, String label,
-            List<Path> files, List<String> generated) {
+            Path rulesDir,
+            String framework,
+            String prefix,
+            String label,
+            List<Path> files,
+            List<String> generated) {
         if (files.isEmpty()) {
             return;
         }
-        Path output = rulesDir.resolve(
-                prefix + "-" + framework
-                        + "-" + label + ".md");
+        Path output = rulesDir.resolve(prefix + "-" + framework + "-" + label + ".md");
         consolidateFiles(output, files);
         generated.add(output.toString());
     }
 
-    private static boolean matchesAny(
-            String filename, List<String> patterns) {
-        return patterns.stream()
-                .anyMatch(filename::contains);
+    private static boolean matchesAny(String filename, List<String> patterns) {
+        return patterns.stream().anyMatch(filename::contains);
     }
 }

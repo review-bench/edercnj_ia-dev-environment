@@ -5,15 +5,15 @@ import java.util.Map;
 /**
  * Represents the testing configuration section.
  *
- * <p>Provides default coverage thresholds of 95% line and 90% branch coverage,
- * matching the project quality gates and TypeScript implementation.</p>
+ * <p>Provides default coverage thresholds of 95% line and 90% branch coverage, matching the project
+ * quality gates and TypeScript implementation.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("coverage_line", 80, "smoke_tests", false);
  * TestingConfig cfg = TestingConfig.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param smokeTests whether smoke tests are enabled (default: true)
  * @param contractTests whether contract tests are enabled (default: false)
@@ -40,7 +40,6 @@ public record TestingConfig(
                 MapHelper.optionalBoolean(map, "contract_tests", false),
                 MapHelper.optionalBoolean(map, "performance_tests", true),
                 MapHelper.optionalInt(map, "coverage_line", 95),
-                MapHelper.optionalInt(map, "coverage_branch", 90)
-        );
+                MapHelper.optionalInt(map, "coverage_branch", 90));
     }
 }

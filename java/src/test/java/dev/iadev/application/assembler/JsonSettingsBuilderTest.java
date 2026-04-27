@@ -1,35 +1,30 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for JsonSettingsBuilder — builds JSON content for
- * settings.json and settings.local.json.
+ * Tests for JsonSettingsBuilder — builds JSON content for settings.json and settings.local.json.
  */
 @DisplayName("JsonSettingsBuilder")
 class JsonSettingsBuilderTest {
 
-    private final JsonSettingsBuilder builder =
-            new JsonSettingsBuilder();
+    private final JsonSettingsBuilder builder = new JsonSettingsBuilder();
 
     @Nested
     @DisplayName("build — settings.json content")
     class Build {
 
         @Test
-        @DisplayName("without hooks produces permissions"
-                + " only")
+        @DisplayName("without hooks produces permissions" + " only")
         void build_withoutHooksPermissionsOnly_succeeds() {
             List<String> perms = List.of("Bash(git *)");
 
-            String json = builder.build(
-                    perms, HookPresence.WITHOUT_HOOKS, false);
+            String json = builder.build(perms, HookPresence.WITHOUT_HOOKS, false);
 
             assertThat(json)
                     .contains("\"permissions\"")
@@ -43,8 +38,7 @@ class JsonSettingsBuilderTest {
         void build_withHooks_includesPostToolUse() {
             List<String> perms = List.of("Bash(git *)");
 
-            String json = builder.build(
-                    perms, HookPresence.WITH_HOOKS, false);
+            String json = builder.build(perms, HookPresence.WITH_HOOKS, false);
 
             assertThat(json)
                     .contains("\"hooks\"")
@@ -56,46 +50,32 @@ class JsonSettingsBuilderTest {
         }
 
         @Test
-        @DisplayName("empty permissions produces empty"
-                + " allow array")
+        @DisplayName("empty permissions produces empty" + " allow array")
         void build_emptyPermissions_succeeds() {
-            String json = builder.build(
-                    List.of(), HookPresence.WITHOUT_HOOKS,
-                    false);
+            String json = builder.build(List.of(), HookPresence.WITHOUT_HOOKS, false);
 
-            assertThat(json)
-                    .contains("\"allow\": [\n")
-                    .contains("]\n");
+            assertThat(json).contains("\"allow\": [\n").contains("]\n");
         }
 
         @Test
-        @DisplayName("multiple permissions separated"
-                + " by commas")
+        @DisplayName("multiple permissions separated" + " by commas")
         void build_multiplePermissions_succeeds() {
-            List<String> perms = List.of(
-                    "Bash(git *)",
-                    "Bash(mvn *)",
-                    "Bash(npm *)");
+            List<String> perms = List.of("Bash(git *)", "Bash(mvn *)", "Bash(npm *)");
 
-            String json = builder.build(
-                    perms, HookPresence.WITHOUT_HOOKS, false);
+            String json = builder.build(perms, HookPresence.WITHOUT_HOOKS, false);
 
             assertThat(json)
                     .contains("\"Bash(git *)\"")
                     .contains("\"Bash(mvn *)\"")
                     .contains("\"Bash(npm *)\"");
-            assertThat(json)
-                    .contains("\"Bash(git *)\",");
-            assertThat(json)
-                    .contains("\"Bash(mvn *)\",");
+            assertThat(json).contains("\"Bash(git *)\",");
+            assertThat(json).contains("\"Bash(mvn *)\",");
         }
 
         @Test
         @DisplayName("JSON starts and ends with braces")
         void build_validJsonStructure_succeeds() {
-            String json = builder.build(
-                    List.of("Bash(git *)"),
-                    HookPresence.WITHOUT_HOOKS, false);
+            String json = builder.build(List.of("Bash(git *)"), HookPresence.WITHOUT_HOOKS, false);
 
             assertThat(json.trim()).startsWith("{");
             assertThat(json.trim()).endsWith("}");
@@ -111,9 +91,7 @@ class JsonSettingsBuilderTest {
         void buildLocal_whenCalled_producesEmptyPermissions() {
             String json = builder.buildLocal();
 
-            assertThat(json)
-                    .contains("\"permissions\"")
-                    .contains("\"allow\": []");
+            assertThat(json).contains("\"permissions\"").contains("\"allow\": []");
         }
 
         @Test

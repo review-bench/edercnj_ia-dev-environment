@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 /**
  * Counting utilities for README generation.
  *
- * <p>Metadata extraction: {@link ReadmeMetadata}.</p>
+ * <p>Metadata extraction: {@link ReadmeMetadata}.
  *
  * @see ReadmeAssembler
  * @see ReadmeMetadata
@@ -54,18 +54,16 @@ public final class ReadmeUtils {
             return 0;
         }
         try (Stream<Path> dirs = Files.list(skillsDir)) {
-            return (int) dirs
-                    .filter(Files::isDirectory)
-                    .filter(d -> {
-                        Path skillMd =
-                                d.resolve("SKILL.md");
-                        return Files.exists(skillMd)
-                                && isKnowledgePack(skillMd);
-                    })
-                    .count();
+            return (int)
+                    dirs.filter(Files::isDirectory)
+                            .filter(
+                                    d -> {
+                                        Path skillMd = d.resolve("SKILL.md");
+                                        return Files.exists(skillMd) && isKnowledgePack(skillMd);
+                                    })
+                            .count();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list skills", e);
+            throw new UncheckedIOException("Failed to list skills", e);
         }
     }
 
@@ -78,79 +76,63 @@ public final class ReadmeUtils {
         try (Stream<Path> entries = Files.list(hooksDir)) {
             return (int) entries.count();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list hooks", e);
+            throw new UncheckedIOException("Failed to list hooks", e);
         }
     }
 
     /** Counts settings files (0, 1, or 2). */
     public static int countSettings(Path outputDir) {
         int count = 0;
-        if (Files.exists(
-                outputDir.resolve("settings.json"))) {
+        if (Files.exists(outputDir.resolve("settings.json"))) {
             count++;
         }
-        if (Files.exists(
-                outputDir.resolve(
-                        "settings.local.json"))) {
+        if (Files.exists(outputDir.resolve("settings.local.json"))) {
             count++;
         }
         return count;
     }
 
     /** Delegates to {@link ReadmeMetadata}. */
-    public static boolean isKnowledgePack(
-            Path skillMdPath) {
+    public static boolean isKnowledgePack(Path skillMdPath) {
         return ReadmeMetadata.isKnowledgePack(skillMdPath);
     }
 
     /** Delegates to {@link ReadmeMetadata}. */
-    public static String extractRuleNumber(
-            String filename) {
+    public static String extractRuleNumber(String filename) {
         return ReadmeMetadata.extractRuleNumber(filename);
     }
 
     /** Delegates to {@link ReadmeMetadata}. */
-    public static String extractRuleScope(
-            String filename) {
+    public static String extractRuleScope(String filename) {
         return ReadmeMetadata.extractRuleScope(filename);
     }
 
     /** Delegates to {@link ReadmeMetadata}. */
-    public static String extractSkillDescription(
-            Path skillMdPath) {
-        return ReadmeMetadata.extractSkillDescription(
-                skillMdPath);
+    public static String extractSkillDescription(Path skillMdPath) {
+        return ReadmeMetadata.extractSkillDescription(skillMdPath);
     }
 
     /** Recursively counts all files in a directory. */
     static int countFilesRecursive(Path dir) {
         try (Stream<Path> walk = Files.walk(dir)) {
-            return (int) walk
-                    .filter(Files::isRegularFile)
-                    .count();
+            return (int) walk.filter(Files::isRegularFile).count();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to walk directory: " + dir, e);
+            throw new UncheckedIOException("Failed to walk directory: " + dir, e);
         }
     }
 
     private static int countMdFiles(Path dir) {
-        return MarkdownFileScanner
-                .listMarkdownFiles(dir).size();
+        return MarkdownFileScanner.listMarkdownFiles(dir).size();
     }
 
-    private static int countSkillMdFiles(
-            Path skillsDir) {
+    private static int countSkillMdFiles(Path skillsDir) {
         try (Stream<Path> dirs = Files.list(skillsDir)) {
-            return (int) dirs
-                    .filter(Files::isDirectory)
-                    .filter(d -> Files.exists(
-                            d.resolve("SKILL.md")))
-                    .count();
+            return (int)
+                    dirs.filter(Files::isDirectory)
+                            .filter(d -> Files.exists(d.resolve("SKILL.md")))
+                            .count();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list skills dir", e);
+            throw new UncheckedIOException("Failed to list skills dir", e);
         }
     }
 }

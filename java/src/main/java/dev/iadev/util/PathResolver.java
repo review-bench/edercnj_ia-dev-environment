@@ -9,18 +9,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Resolves operational artifact paths for both v3 (legacy {@code plans/})
- * and v4 ({@code ai/epics/}) layouts via an automatic filesystem probe.
+ * Resolves operational artifact paths for both v3 (legacy {@code plans/}) and v4 ({@code
+ * ai/epics/}) layouts via an automatic filesystem probe.
  *
- * <p>Usage: inject an instance with the repository root as {@code basePath}.
- * All returned paths are absolute and normalized.
+ * <p>Usage: inject an instance with the repository root as {@code basePath}. All returned paths are
+ * absolute and normalized.
  *
  * <p>Thread-safe: the probe is stateless per call (no caching).
  */
 public final class PathResolver {
 
-    private static final Logger LOG =
-            Logger.getLogger(PathResolver.class.getName());
+    private static final Logger LOG = Logger.getLogger(PathResolver.class.getName());
 
     private static final String EPIC_ID_PATTERN = "\\d{4}";
 
@@ -33,8 +32,8 @@ public final class PathResolver {
     /**
      * Resolves the top-level directory for an epic.
      *
-     * <p>Returns v4 path when {@code ai/epics/epic-{id}-<slug>} exists;
-     * falls back to v3 {@code plans/epic-{id}}.
+     * <p>Returns v4 path when {@code ai/epics/epic-{id}-<slug>} exists; falls back to v3 {@code
+     * plans/epic-{id}}.
      *
      * @param epicId 4-digit numeric string (e.g. {@code "0060"})
      * @return absolute, normalized path to the epic directory
@@ -49,9 +48,9 @@ public final class PathResolver {
     /**
      * Resolves the work-unit directory inside an epic.
      *
-     * @param epicId  4-digit epic identifier
-     * @param type    unit type (STORY, BUG, SPIKE, CHORE)
-     * @param unitId  4-digit unit identifier within the epic
+     * @param epicId 4-digit epic identifier
+     * @param type unit type (STORY, BUG, SPIKE, CHORE)
+     * @param unitId 4-digit unit identifier within the epic
      * @return path to {@code <epicDir>/work/<type.subFolder>/<type.prefix>-<epicId>-<unitId>}
      */
     public Path unitDir(String epicId, UnitType type, String unitId) {
@@ -111,24 +110,24 @@ public final class PathResolver {
     private Optional<Path> probeV4EpicDir(String epicId) {
         Path v4Base = basePath.resolve("ai/epics");
         String glob = "epic-" + epicId + "-*";
-        try (DirectoryStream<Path> stream =
-                     Files.newDirectoryStream(v4Base, glob)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(v4Base, glob)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
                     Path resolved = entry.toAbsolutePath().normalize();
-                    LOG.log(Level.FINE,
+                    LOG.log(
+                            Level.FINE,
                             "PathResolver probe: epic={0} layout=v4 path={1}",
-                            new Object[]{epicId, resolved});
+                            new Object[] {epicId, resolved});
                     return Optional.of(resolved);
                 }
             }
         } catch (IOException e) {
-            LOG.log(Level.FINE,
+            LOG.log(
+                    Level.FINE,
                     "PathResolver probe: epic={0} ai/epics not found, fallback=v3",
                     epicId);
         }
-        LOG.log(Level.FINE,
-                "PathResolver probe: epic={0} layout=v3", epicId);
+        LOG.log(Level.FINE, "PathResolver probe: epic={0} layout=v3", epicId);
         return Optional.empty();
     }
 }

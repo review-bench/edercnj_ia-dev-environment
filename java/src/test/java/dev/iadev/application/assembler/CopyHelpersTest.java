@@ -1,11 +1,9 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dev.iadev.template.TemplateEngine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -14,13 +12,12 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-/**
- * Tests for CopyHelpers — template copy and rendering utilities.
- */
+/** Tests for CopyHelpers — template copy and rendering utilities. */
 @DisplayName("CopyHelpers")
 class CopyHelpersTest {
 
@@ -30,36 +27,28 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("copies and renders template placeholders")
-        void create_whenCalled_rendersPlaceholders(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_rendersPlaceholders(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("source.md");
-            Files.writeString(src,
-                    "Project: {PROJECT_NAME}\n",
-                    StandardCharsets.UTF_8);
+            Files.writeString(src, "Project: {PROJECT_NAME}\n", StandardCharsets.UTF_8);
 
             Path dest = tempDir.resolve("output/result.md");
-            Map<String, Object> context =
-                    Map.of("project_name", "my-app");
+            Map<String, Object> context = Map.of("project_name", "my-app");
 
             TemplateEngine engine = new TemplateEngine();
-            String result = CopyHelpers.copyTemplateFile(
-                    src, dest, engine, context);
+            String result = CopyHelpers.copyTemplateFile(src, dest, engine, context);
 
             assertThat(result).isEqualTo(dest.toString());
-            assertThat(Files.readString(dest))
-                    .contains("my-app");
+            assertThat(Files.readString(dest)).contains("my-app");
         }
 
         @Test
         @DisplayName("creates parent directories")
-        void create_whenCalled_createsParentDirs(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_createsParentDirs(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("in.md");
             Files.writeString(src, "content");
 
             Path dest = tempDir.resolve("a/b/c/out.md");
-            CopyHelpers.copyTemplateFile(
-                    src, dest, new TemplateEngine(), Map.of());
+            CopyHelpers.copyTemplateFile(src, dest, new TemplateEngine(), Map.of());
 
             assertThat(dest).exists();
         }
@@ -70,36 +59,28 @@ class CopyHelpersTest {
     class CopyTemplateFileIfExists {
 
         @Test
-        @DisplayName("returns present Optional when"
-                + " source exists")
-        void sourceExists_whenSourceExists_returnsPresent(
-                @TempDir Path tempDir)
+        @DisplayName("returns present Optional when" + " source exists")
+        void sourceExists_whenSourceExists_returnsPresent(@TempDir Path tempDir)
                 throws IOException {
             Path src = tempDir.resolve("exists.md");
             Files.writeString(src, "hello");
             Path dest = tempDir.resolve("out.md");
 
             var result =
-                    CopyHelpers.copyTemplateFileIfExists(
-                            src, dest,
-                            new TemplateEngine(), Map.of());
+                    CopyHelpers.copyTemplateFileIfExists(src, dest, new TemplateEngine(), Map.of());
 
             assertThat(result).isPresent();
             assertThat(dest).exists();
         }
 
         @Test
-        @DisplayName("returns empty Optional when"
-                + " source missing")
-        void sourceMissing_whenSourceMissing_returnsEmpty(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty Optional when" + " source missing")
+        void sourceMissing_whenSourceMissing_returnsEmpty(@TempDir Path tempDir) {
             Path src = tempDir.resolve("nonexistent.md");
             Path dest = tempDir.resolve("out.md");
 
             var result =
-                    CopyHelpers.copyTemplateFileIfExists(
-                            src, dest,
-                            new TemplateEngine(), Map.of());
+                    CopyHelpers.copyTemplateFileIfExists(src, dest, new TemplateEngine(), Map.of());
 
             assertThat(result).isEmpty();
             assertThat(dest).doesNotExist();
@@ -112,25 +93,21 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("copies file without rendering")
-        void create_withoutRendering_copies(@TempDir Path tempDir)
-                throws IOException {
+        void create_withoutRendering_copies(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("static.txt");
             String content = "{{NOT_REPLACED}}";
             Files.writeString(src, content);
 
             Path dest = tempDir.resolve("copy.txt");
-            String result = CopyHelpers.copyStaticFile(
-                    src, dest);
+            String result = CopyHelpers.copyStaticFile(src, dest);
 
-            assertThat(Files.readString(dest))
-                    .isEqualTo(content);
+            assertThat(Files.readString(dest)).isEqualTo(content);
             assertThat(result).isEqualTo(dest.toString());
         }
 
         @Test
         @DisplayName("creates parent directories")
-        void create_whenCalled_createsParentDirs(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_createsParentDirs(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("in.txt");
             Files.writeString(src, "data");
 
@@ -147,25 +124,19 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("copies directory recursively")
-        void create_whenCalled_copiesRecursively(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_copiesRecursively(@TempDir Path tempDir) throws IOException {
             Path srcDir = tempDir.resolve("srcDir");
             Files.createDirectories(srcDir.resolve("sub"));
-            Files.writeString(
-                    srcDir.resolve("a.txt"), "file-a");
-            Files.writeString(
-                    srcDir.resolve("sub/b.txt"), "file-b");
+            Files.writeString(srcDir.resolve("a.txt"), "file-a");
+            Files.writeString(srcDir.resolve("sub/b.txt"), "file-b");
 
             Path destDir = tempDir.resolve("destDir");
-            String result = CopyHelpers.copyDirectory(
-                    srcDir, destDir);
+            String result = CopyHelpers.copyDirectory(srcDir, destDir);
 
             assertThat(result).isEqualTo(destDir.toString());
             assertThat(destDir.resolve("a.txt")).exists();
             assertThat(destDir.resolve("sub/b.txt")).exists();
-            assertThat(
-                    Files.readString(destDir.resolve("a.txt")))
-                    .isEqualTo("file-a");
+            assertThat(Files.readString(destDir.resolve("a.txt"))).isEqualTo("file-a");
         }
     }
 
@@ -185,8 +156,7 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("is idempotent for existing directory")
-        void existingDir_forExistingDirectory_noError(@TempDir Path tempDir)
-                throws IOException {
+        void existingDir_forExistingDirectory_noError(@TempDir Path tempDir) throws IOException {
             Path dir = tempDir.resolve("existing");
             Files.createDirectories(dir);
 
@@ -202,47 +172,35 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("replaces placeholders in .md files")
-        void create_whenCalled_replacesInMdFiles(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_replacesInMdFiles(@TempDir Path tempDir) throws IOException {
             Path mdFile = tempDir.resolve("test.md");
-            Files.writeString(mdFile,
-                    "Name: {PROJECT_NAME}\n");
+            Files.writeString(mdFile, "Name: {PROJECT_NAME}\n");
 
             Path txtFile = tempDir.resolve("test.txt");
-            Files.writeString(txtFile,
-                    "Name: {PROJECT_NAME}\n");
+            Files.writeString(txtFile, "Name: {PROJECT_NAME}\n");
 
-            Map<String, Object> context =
-                    Map.of("project_name", "replaced");
+            Map<String, Object> context = Map.of("project_name", "replaced");
 
-            CopyHelpers.replacePlaceholdersInDir(
-                    tempDir, new TemplateEngine(), context);
+            CopyHelpers.replacePlaceholdersInDir(tempDir, new TemplateEngine(), context);
 
-            assertThat(Files.readString(mdFile))
-                    .contains("replaced");
+            assertThat(Files.readString(mdFile)).contains("replaced");
             // .txt files should NOT be replaced
-            assertThat(Files.readString(txtFile))
-                    .contains("{PROJECT_NAME}");
+            assertThat(Files.readString(txtFile)).contains("{PROJECT_NAME}");
         }
 
         @Test
         @DisplayName("replaces in nested directories")
-        void create_whenCalled_replacesInNestedDirs(@TempDir Path tempDir)
-                throws IOException {
+        void create_whenCalled_replacesInNestedDirs(@TempDir Path tempDir) throws IOException {
             Path sub = tempDir.resolve("sub");
             Files.createDirectories(sub);
             Path nested = sub.resolve("deep.md");
-            Files.writeString(nested,
-                    "{PROJECT_NAME} value");
+            Files.writeString(nested, "{PROJECT_NAME} value");
 
-            Map<String, Object> context =
-                    Map.of("project_name", "deep-val");
+            Map<String, Object> context = Map.of("project_name", "deep-val");
 
-            CopyHelpers.replacePlaceholdersInDir(
-                    tempDir, new TemplateEngine(), context);
+            CopyHelpers.replacePlaceholdersInDir(tempDir, new TemplateEngine(), context);
 
-            assertThat(Files.readString(nested))
-                    .contains("deep-val");
+            assertThat(Files.readString(nested)).contains("deep-val");
         }
     }
 
@@ -252,36 +210,30 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("creates parent dirs and writes UTF-8")
-        void writeFile_parentDirsMissing_createsAndWrites(
-                @TempDir Path tempDir) throws IOException {
+        void writeFile_parentDirsMissing_createsAndWrites(@TempDir Path tempDir)
+                throws IOException {
             Path dest = tempDir.resolve("a/b/c/out.txt");
 
             CopyHelpers.writeFile(dest, "hello UTF-8");
 
             assertThat(dest).exists();
-            assertThat(Files.readString(
-                    dest, StandardCharsets.UTF_8))
-                    .isEqualTo("hello UTF-8");
+            assertThat(Files.readString(dest, StandardCharsets.UTF_8)).isEqualTo("hello UTF-8");
         }
 
         @Test
         @DisplayName("overwrites existing file content")
-        void writeFile_existingFile_overwritesContent(
-                @TempDir Path tempDir) throws IOException {
+        void writeFile_existingFile_overwritesContent(@TempDir Path tempDir) throws IOException {
             Path dest = tempDir.resolve("file.txt");
             Files.writeString(dest, "old");
 
             CopyHelpers.writeFile(dest, "new");
 
-            assertThat(Files.readString(
-                    dest, StandardCharsets.UTF_8))
-                    .isEqualTo("new");
+            assertThat(Files.readString(dest, StandardCharsets.UTF_8)).isEqualTo("new");
         }
 
         @Test
         @DisplayName("writes empty content")
-        void writeFile_emptyContent_writesEmptyFile(
-                @TempDir Path tempDir) throws IOException {
+        void writeFile_emptyContent_writesEmptyFile(@TempDir Path tempDir) throws IOException {
             Path dest = tempDir.resolve("empty.txt");
 
             CopyHelpers.writeFile(dest, "");
@@ -297,12 +249,9 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("reads entire file content as UTF-8")
-        void readFile_existingFile_returnsContent(
-                @TempDir Path tempDir) throws IOException {
+        void readFile_existingFile_returnsContent(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("input.txt");
-            Files.writeString(
-                    src, "hello world",
-                    StandardCharsets.UTF_8);
+            Files.writeString(src, "hello world", StandardCharsets.UTF_8);
 
             String result = CopyHelpers.readFile(src);
 
@@ -311,21 +260,17 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("throws UncheckedIOException for missing file")
-        void readFile_missingFile_throwsUncheckedIO(
-                @TempDir Path tempDir) {
+        void readFile_missingFile_throwsUncheckedIO(@TempDir Path tempDir) {
             Path missing = tempDir.resolve("no-such-file.txt");
 
-            assertThatThrownBy(
-                    () -> CopyHelpers.readFile(missing))
+            assertThatThrownBy(() -> CopyHelpers.readFile(missing))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasCauseInstanceOf(
-                            NoSuchFileException.class);
+                    .hasCauseInstanceOf(NoSuchFileException.class);
         }
 
         @Test
         @DisplayName("reads empty file as empty string")
-        void readFile_emptyFile_returnsEmptyString(
-                @TempDir Path tempDir) throws IOException {
+        void readFile_emptyFile_returnsEmptyString(@TempDir Path tempDir) throws IOException {
             Path src = tempDir.resolve("empty.txt");
             Files.writeString(src, "");
 
@@ -340,95 +285,64 @@ class CopyHelpersTest {
     class ListMdFilesSorted {
 
         @Test
-        @DisplayName("returns empty list for directory"
-                + " without .md files")
-        void listMdFilesSorted_noMdFiles_returnsEmptyList(
-                @TempDir Path tempDir) throws IOException {
-            Files.writeString(
-                    tempDir.resolve("file.txt"), "text");
-            Files.writeString(
-                    tempDir.resolve("file.yaml"), "yaml");
+        @DisplayName("returns empty list for directory" + " without .md files")
+        void listMdFilesSorted_noMdFiles_returnsEmptyList(@TempDir Path tempDir)
+                throws IOException {
+            Files.writeString(tempDir.resolve("file.txt"), "text");
+            Files.writeString(tempDir.resolve("file.yaml"), "yaml");
 
-            List<Path> result =
-                    CopyHelpers.listMdFilesSorted(tempDir);
+            List<Path> result = CopyHelpers.listMdFilesSorted(tempDir);
 
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("returns files sorted by filename")
-        void listMdFilesSorted_multipleFiles_sortedByName(
-                @TempDir Path tempDir) throws IOException {
-            Files.writeString(
-                    tempDir.resolve("c-rules.md"), "c");
-            Files.writeString(
-                    tempDir.resolve("a-rules.md"), "a");
-            Files.writeString(
-                    tempDir.resolve("b-rules.md"), "b");
+        void listMdFilesSorted_multipleFiles_sortedByName(@TempDir Path tempDir)
+                throws IOException {
+            Files.writeString(tempDir.resolve("c-rules.md"), "c");
+            Files.writeString(tempDir.resolve("a-rules.md"), "a");
+            Files.writeString(tempDir.resolve("b-rules.md"), "b");
 
-            List<Path> result =
-                    CopyHelpers.listMdFilesSorted(tempDir);
+            List<Path> result = CopyHelpers.listMdFilesSorted(tempDir);
 
             assertThat(result).hasSize(3);
-            assertThat(result.get(0).getFileName()
-                    .toString())
-                    .isEqualTo("a-rules.md");
-            assertThat(result.get(1).getFileName()
-                    .toString())
-                    .isEqualTo("b-rules.md");
-            assertThat(result.get(2).getFileName()
-                    .toString())
-                    .isEqualTo("c-rules.md");
+            assertThat(result.get(0).getFileName().toString()).isEqualTo("a-rules.md");
+            assertThat(result.get(1).getFileName().toString()).isEqualTo("b-rules.md");
+            assertThat(result.get(2).getFileName().toString()).isEqualTo("c-rules.md");
         }
 
         @Test
         @DisplayName("filters out non-.md files")
-        void listMdFilesSorted_mixedFiles_onlyMd(
-                @TempDir Path tempDir) throws IOException {
-            Files.writeString(
-                    tempDir.resolve("keep.md"), "md");
-            Files.writeString(
-                    tempDir.resolve("skip.txt"), "txt");
-            Files.writeString(
-                    tempDir.resolve("skip.yaml"), "yaml");
+        void listMdFilesSorted_mixedFiles_onlyMd(@TempDir Path tempDir) throws IOException {
+            Files.writeString(tempDir.resolve("keep.md"), "md");
+            Files.writeString(tempDir.resolve("skip.txt"), "txt");
+            Files.writeString(tempDir.resolve("skip.yaml"), "yaml");
 
-            List<Path> result =
-                    CopyHelpers.listMdFilesSorted(tempDir);
+            List<Path> result = CopyHelpers.listMdFilesSorted(tempDir);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getFileName()
-                    .toString())
-                    .isEqualTo("keep.md");
+            assertThat(result.get(0).getFileName().toString()).isEqualTo("keep.md");
         }
 
         @Test
-        @DisplayName("excludes subdirectories ending"
-                + " in .md")
-        void listMdFilesSorted_dirEndingMd_excluded(
-                @TempDir Path tempDir) throws IOException {
-            Files.createDirectories(
-                    tempDir.resolve("subdir.md"));
-            Files.writeString(
-                    tempDir.resolve("real.md"), "data");
+        @DisplayName("excludes subdirectories ending" + " in .md")
+        void listMdFilesSorted_dirEndingMd_excluded(@TempDir Path tempDir) throws IOException {
+            Files.createDirectories(tempDir.resolve("subdir.md"));
+            Files.writeString(tempDir.resolve("real.md"), "data");
 
-            List<Path> result =
-                    CopyHelpers.listMdFilesSorted(tempDir);
+            List<Path> result = CopyHelpers.listMdFilesSorted(tempDir);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getFileName()
-                    .toString())
-                    .isEqualTo("real.md");
+            assertThat(result.get(0).getFileName().toString()).isEqualTo("real.md");
         }
 
         @Test
-        @DisplayName("returns empty list for nonexistent"
-                + " directory")
-        void listMdFilesSorted_noDir_returnsEmpty(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty list for nonexistent" + " directory")
+        void listMdFilesSorted_noDir_returnsEmpty(@TempDir Path tempDir) {
             Path noSuch = tempDir.resolve("nonexistent");
 
-            List<Path> result =
-                    CopyHelpers.listMdFilesSorted(noSuch);
+            List<Path> result = CopyHelpers.listMdFilesSorted(noSuch);
 
             assertThat(result).isEmpty();
         }
@@ -440,26 +354,21 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("returns false for nonexistent path")
-        void deleteQuietly_nonexistent_returnsFalse(
-                @TempDir Path tempDir) {
+        void deleteQuietly_nonexistent_returnsFalse(@TempDir Path tempDir) {
             Path noSuch = tempDir.resolve("nonexistent");
 
-            boolean result =
-                    CopyHelpers.deleteQuietly(noSuch);
+            boolean result = CopyHelpers.deleteQuietly(noSuch);
 
             assertThat(result).isFalse();
         }
 
         @Test
-        @DisplayName("deletes existing file and"
-                + " returns true")
-        void deleteQuietly_existingFile_deletesAndTrue(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("deletes existing file and" + " returns true")
+        void deleteQuietly_existingFile_deletesAndTrue(@TempDir Path tempDir) throws IOException {
             Path file = tempDir.resolve("to-delete.txt");
             Files.writeString(file, "content");
 
-            boolean result =
-                    CopyHelpers.deleteQuietly(file);
+            boolean result = CopyHelpers.deleteQuietly(file);
 
             assertThat(result).isTrue();
             assertThat(file).doesNotExist();
@@ -467,31 +376,24 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("does not throw for any path")
-        void deleteQuietly_anyPath_noException(
-                @TempDir Path tempDir) {
+        void deleteQuietly_anyPath_noException(@TempDir Path tempDir) {
             Path noSuch = tempDir.resolve("no-such-file");
 
             // Should never throw
-            boolean result =
-                    CopyHelpers.deleteQuietly(noSuch);
+            boolean result = CopyHelpers.deleteQuietly(noSuch);
 
             assertThat(result).isFalse();
         }
 
         @Test
-        @DisplayName("deletes directory with files"
-                + " recursively")
-        void deleteQuietly_dirWithFiles_deletesAll(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("deletes directory with files" + " recursively")
+        void deleteQuietly_dirWithFiles_deletesAll(@TempDir Path tempDir) throws IOException {
             Path subDir = tempDir.resolve("sub");
             Files.createDirectories(subDir);
-            Files.writeString(
-                    subDir.resolve("a.txt"), "content");
-            Files.writeString(
-                    subDir.resolve("b.txt"), "content");
+            Files.writeString(subDir.resolve("a.txt"), "content");
+            Files.writeString(subDir.resolve("b.txt"), "content");
 
-            boolean result =
-                    CopyHelpers.deleteQuietly(subDir);
+            boolean result = CopyHelpers.deleteQuietly(subDir);
 
             assertThat(result).isTrue();
             assertThat(subDir).doesNotExist();
@@ -499,16 +401,13 @@ class CopyHelpersTest {
 
         @Test
         @DisplayName("deletes nested directory tree")
-        void deleteQuietly_nestedTree_deletesAll(
-                @TempDir Path tempDir) throws IOException {
+        void deleteQuietly_nestedTree_deletesAll(@TempDir Path tempDir) throws IOException {
             Path root = tempDir.resolve("root");
             Path nested = root.resolve("a/b/c");
             Files.createDirectories(nested);
-            Files.writeString(
-                    nested.resolve("file.txt"), "data");
+            Files.writeString(nested.resolve("file.txt"), "data");
 
-            boolean result =
-                    CopyHelpers.deleteQuietly(root);
+            boolean result = CopyHelpers.deleteQuietly(root);
 
             assertThat(result).isTrue();
             assertThat(root).doesNotExist();
@@ -520,20 +419,16 @@ class CopyHelpersTest {
     class HasAllMandatorySections {
 
         @Test
-        @DisplayName("returns true when all sections"
-                + " present")
+        @DisplayName("returns true when all sections" + " present")
         void hasAllMandatorySections_allPresent_true() {
-            String content = "# Doc\n\n"
-                    + "## Status\nAccepted\n\n"
-                    + "## Context\nSome context\n\n"
-                    + "## Decision\nWe decided\n";
-            List<String> sections =
-                    List.of("Status", "Context",
-                            "Decision");
+            String content =
+                    "# Doc\n\n"
+                            + "## Status\nAccepted\n\n"
+                            + "## Context\nSome context\n\n"
+                            + "## Decision\nWe decided\n";
+            List<String> sections = List.of("Status", "Context", "Decision");
 
-            boolean result =
-                    CopyHelpers.hasAllMandatorySections(
-                            content, sections);
+            boolean result = CopyHelpers.hasAllMandatorySections(content, sections);
 
             assertThat(result).isTrue();
         }
@@ -541,16 +436,10 @@ class CopyHelpersTest {
         @Test
         @DisplayName("returns false when section missing")
         void hasAllMandatorySections_missing_false() {
-            String content = "# Doc\n\n"
-                    + "## Status\nAccepted\n\n"
-                    + "## Context\nSome context\n";
-            List<String> sections =
-                    List.of("Status", "Context",
-                            "Decision");
+            String content = "# Doc\n\n" + "## Status\nAccepted\n\n" + "## Context\nSome context\n";
+            List<String> sections = List.of("Status", "Context", "Decision");
 
-            boolean result =
-                    CopyHelpers.hasAllMandatorySections(
-                            content, sections);
+            boolean result = CopyHelpers.hasAllMandatorySections(content, sections);
 
             assertThat(result).isFalse();
         }
@@ -558,23 +447,17 @@ class CopyHelpersTest {
         @Test
         @DisplayName("returns false for empty content")
         void hasAllMandatorySections_emptyContent_false() {
-            List<String> sections =
-                    List.of("Status", "Context");
+            List<String> sections = List.of("Status", "Context");
 
-            boolean result =
-                    CopyHelpers.hasAllMandatorySections(
-                            "", sections);
+            boolean result = CopyHelpers.hasAllMandatorySections("", sections);
 
             assertThat(result).isFalse();
         }
 
         @Test
-        @DisplayName("returns true for empty sections"
-                + " list")
+        @DisplayName("returns true for empty sections" + " list")
         void hasAllMandatorySections_emptySections_true() {
-            boolean result =
-                    CopyHelpers.hasAllMandatorySections(
-                            "any content", List.of());
+            boolean result = CopyHelpers.hasAllMandatorySections("any content", List.of());
 
             assertThat(result).isTrue();
         }
@@ -585,99 +468,75 @@ class CopyHelpersTest {
     class ErrorPaths {
 
         @Test
-        @DisplayName("copyTemplateFile wraps IOException"
-                + " from missing source")
-        void copyTemplateFile_missingSource_throwsUnchecked(
-                @TempDir Path tempDir) {
+        @DisplayName("copyTemplateFile wraps IOException" + " from missing source")
+        void copyTemplateFile_missingSource_throwsUnchecked(@TempDir Path tempDir) {
             Path src = tempDir.resolve("missing.md");
             Path dest = tempDir.resolve("dest.md");
             TemplateEngine engine = new TemplateEngine();
 
-            assertThatThrownBy(() -> CopyHelpers.copyTemplateFile(
-                    src, dest, engine, Map.of()))
+            assertThatThrownBy(() -> CopyHelpers.copyTemplateFile(src, dest, engine, Map.of()))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to copy"
-                            + " template");
+                    .hasMessageContaining("Failed to copy" + " template");
         }
 
         @Test
-        @DisplayName("copyStaticFile wraps IOException"
-                + " from missing source")
-        void copyStaticFile_missingSource_throwsUnchecked(
-                @TempDir Path tempDir) {
+        @DisplayName("copyStaticFile wraps IOException" + " from missing source")
+        void copyStaticFile_missingSource_throwsUnchecked(@TempDir Path tempDir) {
             Path src = tempDir.resolve("missing.bin");
             Path dest = tempDir.resolve("dest.bin");
 
-            assertThatThrownBy(() -> CopyHelpers.copyStaticFile(
-                    src, dest))
+            assertThatThrownBy(() -> CopyHelpers.copyStaticFile(src, dest))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to copy"
-                            + " file");
+                    .hasMessageContaining("Failed to copy" + " file");
         }
 
         @Test
-        @DisplayName("copyDirectory wraps IOException"
-                + " from missing source")
-        void copyDirectory_missingSource_throwsUnchecked(
-                @TempDir Path tempDir) {
+        @DisplayName("copyDirectory wraps IOException" + " from missing source")
+        void copyDirectory_missingSource_throwsUnchecked(@TempDir Path tempDir) {
             Path srcDir = tempDir.resolve("missing-dir");
             Path destDir = tempDir.resolve("out");
 
-            assertThatThrownBy(() -> CopyHelpers.copyDirectory(
-                    srcDir, destDir))
+            assertThatThrownBy(() -> CopyHelpers.copyDirectory(srcDir, destDir))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to copy"
-                            + " directory");
+                    .hasMessageContaining("Failed to copy" + " directory");
         }
 
         @Test
-        @DisplayName("writeFile wraps IOException when"
-                + " parent is an existing regular file")
-        void writeFile_parentIsFile_throwsUnchecked(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("writeFile wraps IOException when" + " parent is an existing regular file")
+        void writeFile_parentIsFile_throwsUnchecked(@TempDir Path tempDir) throws IOException {
             Path parentAsFile = tempDir.resolve("blocker");
-            Files.writeString(parentAsFile, "block",
-                    StandardCharsets.UTF_8);
+            Files.writeString(parentAsFile, "block", StandardCharsets.UTF_8);
             Path target = parentAsFile.resolve("child.md");
 
-            assertThatThrownBy(() -> CopyHelpers.writeFile(
-                    target, "data"))
+            assertThatThrownBy(() -> CopyHelpers.writeFile(target, "data"))
                     .isInstanceOf(UncheckedIOException.class);
         }
 
         @Test
-        @DisplayName("readFile wraps IOException from"
-                + " missing source")
-        void readFile_missingSource_throwsUnchecked(
-                @TempDir Path tempDir) {
+        @DisplayName("readFile wraps IOException from" + " missing source")
+        void readFile_missingSource_throwsUnchecked(@TempDir Path tempDir) {
             Path src = tempDir.resolve("no-such-file.txt");
 
             assertThatThrownBy(() -> CopyHelpers.readFile(src))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to read"
-                            + " file");
+                    .hasMessageContaining("Failed to read" + " file");
         }
 
         @Test
-        @DisplayName("ensureParent wraps IOException when"
-                + " parent creation collides with a file")
-        void ensureParent_parentIsFile_throwsUnchecked(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName(
+                "ensureParent wraps IOException when" + " parent creation collides with a file")
+        void ensureParent_parentIsFile_throwsUnchecked(@TempDir Path tempDir) throws IOException {
             Path fileBlocker = tempDir.resolve("blocker");
-            Files.writeString(fileBlocker, "x",
-                    StandardCharsets.UTF_8);
+            Files.writeString(fileBlocker, "x", StandardCharsets.UTF_8);
             Path target = fileBlocker.resolve("child.md");
 
-            assertThatThrownBy(() -> CopyHelpers.ensureParent(
-                    target))
+            assertThatThrownBy(() -> CopyHelpers.ensureParent(target))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to create"
-                            + " parent directory");
+                    .hasMessageContaining("Failed to create" + " parent directory");
         }
 
         @Test
-        @DisplayName("ensureParent is no-op when target"
-                + " has no parent (filesystem root)")
+        @DisplayName("ensureParent is no-op when target" + " has no parent (filesystem root)")
         void ensureParent_nullParent_noop() {
             Path fsRoot = Path.of("/");
 
@@ -687,20 +546,16 @@ class CopyHelpersTest {
         }
 
         @Test
-        @DisplayName("ensureDirectory wraps IOException"
-                + " when the target collides with a file")
-        void ensureDirectory_collidesWithFile_throwsUnchecked(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("ensureDirectory wraps IOException" + " when the target collides with a file")
+        void ensureDirectory_collidesWithFile_throwsUnchecked(@TempDir Path tempDir)
+                throws IOException {
             Path fileBlocker = tempDir.resolve("blocker");
-            Files.writeString(fileBlocker, "x",
-                    StandardCharsets.UTF_8);
+            Files.writeString(fileBlocker, "x", StandardCharsets.UTF_8);
             Path target = fileBlocker.resolve("nested");
 
-            assertThatThrownBy(() -> CopyHelpers.ensureDirectory(
-                    target))
+            assertThatThrownBy(() -> CopyHelpers.ensureDirectory(target))
                     .isInstanceOf(UncheckedIOException.class)
-                    .hasMessageContaining("Failed to create"
-                            + " directory");
+                    .hasMessageContaining("Failed to create" + " directory");
         }
     }
 }

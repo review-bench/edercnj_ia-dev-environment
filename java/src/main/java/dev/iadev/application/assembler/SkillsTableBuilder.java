@@ -1,9 +1,8 @@
 package dev.iadev.application.assembler;
 
+import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.stack.LanguageCommandSet;
 import dev.iadev.domain.stack.StackMapping;
-import dev.iadev.domain.model.ProjectConfig;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -13,12 +12,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Builds markdown tables for skills, agents, knowledge
- * packs, rules, and hooks sections in README.md.
+ * Builds markdown tables for skills, agents, knowledge packs, rules, and hooks sections in
+ * README.md.
  *
- * <p>Each method scans the output directory for the relevant
- * artifacts and formats them into markdown tables with
- * appropriate headers and data rows.</p>
+ * <p>Each method scans the output directory for the relevant artifacts and formats them into
+ * markdown tables with appropriate headers and data rows.
  *
  * @see ReadmeTables
  * @see ReadmeUtils
@@ -30,8 +28,7 @@ public final class SkillsTableBuilder {
     }
 
     /**
-     * Builds markdown table of rules with number, file,
-     * and scope columns.
+     * Builds markdown table of rules with number, file, and scope columns.
      *
      * @param outputDir the .claude/ output directory
      * @return formatted markdown table
@@ -49,19 +46,15 @@ public final class SkillsTableBuilder {
         lines.add("| # | File | Scope |");
         lines.add("|---|------|-------|");
         for (String fname : files) {
-            String num =
-                    ReadmeUtils.extractRuleNumber(fname);
-            String scope =
-                    ReadmeUtils.extractRuleScope(fname);
-            lines.add("| %s | `%s` | %s |"
-                    .formatted(num, fname, scope));
+            String num = ReadmeUtils.extractRuleNumber(fname);
+            String scope = ReadmeUtils.extractRuleScope(fname);
+            lines.add("| %s | `%s` | %s |".formatted(num, fname, scope));
         }
         return String.join("\n", lines);
     }
 
     /**
-     * Builds markdown table of skills, excluding knowledge
-     * packs.
+     * Builds markdown table of skills, excluding knowledge packs.
      *
      * @param outputDir the .claude/ output directory
      * @return formatted markdown table
@@ -74,18 +67,15 @@ public final class SkillsTableBuilder {
         List<String> dirs = listDirsSorted(skillsDir);
         List<String> rows = new ArrayList<>();
         for (String sname : dirs) {
-            Path skillMd = skillsDir.resolve(sname)
-                    .resolve("SKILL.md");
+            Path skillMd = skillsDir.resolve(sname).resolve("SKILL.md");
             if (!Files.exists(skillMd)) {
                 continue;
             }
             if (ReadmeUtils.isKnowledgePack(skillMd)) {
                 continue;
             }
-            String desc = ReadmeUtils
-                    .extractSkillDescription(skillMd);
-            rows.add("| **%s** | `/%s` | %s |"
-                    .formatted(sname, sname, desc));
+            String desc = ReadmeUtils.extractSkillDescription(skillMd);
+            rows.add("| **%s** | `/%s` | %s |".formatted(sname, sname, desc));
         }
         if (rows.isEmpty()) {
             return "No skills configured.";
@@ -117,8 +107,7 @@ public final class SkillsTableBuilder {
         lines.add("|-------|------|");
         for (String fname : files) {
             String aname = fname.replaceFirst("\\.md$", "");
-            lines.add("| **%s** | `%s` |"
-                    .formatted(aname, fname));
+            lines.add("| **%s** | `%s` |".formatted(aname, fname));
         }
         return String.join("\n", lines);
     }
@@ -137,17 +126,14 @@ public final class SkillsTableBuilder {
         List<String> dirs = listDirsSorted(skillsDir);
         List<String> rows = new ArrayList<>();
         for (String sname : dirs) {
-            Path skillMd = skillsDir.resolve(sname)
-                    .resolve("SKILL.md");
+            Path skillMd = skillsDir.resolve(sname).resolve("SKILL.md");
             if (!Files.exists(skillMd)) {
                 continue;
             }
             if (!ReadmeUtils.isKnowledgePack(skillMd)) {
                 continue;
             }
-            rows.add(
-                    "| `%s` | Referenced internally by agents |"
-                            .formatted(sname));
+            rows.add("| `%s` | Referenced internally by agents |".formatted(sname));
         }
         if (rows.isEmpty()) {
             return "No knowledge packs configured.";
@@ -163,52 +149,46 @@ public final class SkillsTableBuilder {
      * @return formatted hooks section
      */
     String buildReadmeHooksSection(ProjectConfig config) {
-        String key = StackMapping.getHookTemplateKey(
-                config.language().name(),
-                config.framework().buildTool());
+        String key =
+                StackMapping.getHookTemplateKey(
+                        config.language().name(), config.framework().buildTool());
         if (key.isEmpty()) {
             return "No hooks configured.";
         }
-        String langKey = config.language().name()
-                + "-" + config.framework().buildTool();
-        LanguageCommandSet commands =
-                StackMapping.LANGUAGE_COMMANDS.get(langKey);
-        String ext = commands != null
-                ? commands.fileExtension() : "";
-        String compileCmd = commands != null
-                ? commands.compileCmd() : "";
+        String langKey = config.language().name() + "-" + config.framework().buildTool();
+        LanguageCommandSet commands = StackMapping.LANGUAGE_COMMANDS.get(langKey);
+        String ext = commands != null ? commands.fileExtension() : "";
+        String compileCmd = commands != null ? commands.compileCmd() : "";
         return "### Post-Compile Check\n"
                 + "\n"
                 + "- **Event:** `PostToolUse`"
                 + " (after `Write` or `Edit`)\n"
                 + "- **Script:** `.claude/hooks/"
                 + "post-compile-check.sh`\n"
-                + "- **Behavior:** When a `" + ext
+                + "- **Behavior:** When a `"
+                + ext
                 + "` file is modified,"
-                + " runs `" + compileCmd
+                + " runs `"
+                + compileCmd
                 + "` automatically\n"
                 + "- **Purpose:** Catch compilation errors"
                 + " immediately after file changes";
     }
 
     private static List<String> listMdFilesSorted(Path dir) {
-        return MarkdownFileScanner
-                .listMarkdownFilesSorted(dir).stream()
+        return MarkdownFileScanner.listMarkdownFilesSorted(dir).stream()
                 .map(p -> p.getFileName().toString())
                 .toList();
     }
 
     private static List<String> listDirsSorted(Path dir) {
         try (Stream<Path> entries = Files.list(dir)) {
-            return entries
-                    .filter(Files::isDirectory)
+            return entries.filter(Files::isDirectory)
                     .map(p -> p.getFileName().toString())
                     .sorted()
                     .toList();
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to list directory: %s"
-                            .formatted(dir), e);
+            throw new UncheckedIOException("Failed to list directory: %s".formatted(dir), e);
         }
     }
 }

@@ -15,28 +15,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Smoke boundary test for story-0040-0009 TASK-0040-0009-003: simulates a
- * contributor onboarding flow that (1) copies {@code _TEMPLATE-SKILL.md},
- * (2) performs the minimal plug-and-play substitution documented in its
- * Telemetry section, and (3) proves the resulting SKILL.md has at least
- * one functional phase.start/phase.end pair. Also caps wall-clock at
- * 30s (story §8 acceptance) to keep the test under CI budget.
+ * Smoke boundary test for story-0040-0009 TASK-0040-0009-003: simulates a contributor onboarding
+ * flow that (1) copies {@code _TEMPLATE-SKILL.md}, (2) performs the minimal plug-and-play
+ * substitution documented in its Telemetry section, and (3) proves the resulting SKILL.md has at
+ * least one functional phase.start/phase.end pair. Also caps wall-clock at 30s (story §8
+ * acceptance) to keep the test under CI budget.
  *
- * <p>The simulation is intentionally deterministic — it does not spawn a
- * Claude Code session; instead it exercises the template machinery that
- * a new skill author would exercise manually, demonstrating the edit
- * surface is trivial.
+ * <p>The simulation is intentionally deterministic — it does not spawn a Claude Code session;
+ * instead it exercises the template machinery that a new skill author would exercise manually,
+ * demonstrating the edit surface is trivial.
  */
 class OnboardingSmokeIT {
 
-    private static final Path TEMPLATE = Paths.get(
-            "src/main/resources/shared/templates/_TEMPLATE-SKILL.md");
+    private static final Path TEMPLATE =
+            Paths.get("src/main/resources/shared/templates/_TEMPLATE-SKILL.md");
 
-    private static final Pattern PHASE_START = Pattern.compile(
-            "telemetry-phase\\.sh\\s+start\\s+\\S+\\s+\\S+");
+    private static final Pattern PHASE_START =
+            Pattern.compile("telemetry-phase\\.sh\\s+start\\s+\\S+\\s+\\S+");
 
-    private static final Pattern PHASE_END = Pattern.compile(
-            "telemetry-phase\\.sh\\s+end\\s+\\S+\\s+\\S+");
+    private static final Pattern PHASE_END =
+            Pattern.compile("telemetry-phase\\.sh\\s+end\\s+\\S+\\s+\\S+");
 
     @Test
     @DisplayName("onboarding_copyTemplateAndSubstitute_producesValidSkillFile")
@@ -52,9 +50,10 @@ class OnboardingSmokeIT {
         Files.writeString(skillMd, templateBody, StandardCharsets.UTF_8);
 
         // 2. Minimal substitution: pick a skill name + one phase (contributor action)
-        String substituted = Files.readString(skillMd, StandardCharsets.UTF_8)
-                .replace("{{SKILL_NAME}}", "x-new-contrib-skill")
-                .replace("<phase-name>", "preparation");
+        String substituted =
+                Files.readString(skillMd, StandardCharsets.UTF_8)
+                        .replace("{{SKILL_NAME}}", "x-new-contrib-skill")
+                        .replace("<phase-name>", "preparation");
         Files.writeString(skillMd, substituted, StandardCharsets.UTF_8);
 
         // 3. Assert the resulting skill has at least one functional start/end pair
@@ -74,8 +73,9 @@ class OnboardingSmokeIT {
 
         long elapsedMs = (System.nanoTime() - start) / 1_000_000L;
         assertThat(elapsedMs)
-                .as("onboarding simulation must finish well within the 30s budget "
-                        + "declared in story-0040-0009 §8")
+                .as(
+                        "onboarding simulation must finish well within the 30s budget "
+                                + "declared in story-0040-0009 §8")
                 .isLessThan(30_000L);
     }
 
@@ -85,13 +85,14 @@ class OnboardingSmokeIT {
         // Guards against regression of §3.1: template must document phase,
         // subagent and mcp shapes so contributors have a one-stop reference.
         String body = Files.readString(TEMPLATE, StandardCharsets.UTF_8);
-        List<String> required = List.of(
-                "telemetry-phase.sh start",
-                "telemetry-phase.sh end",
-                "subagent-start",
-                "subagent-end",
-                "mcp-start",
-                "mcp-end");
+        List<String> required =
+                List.of(
+                        "telemetry-phase.sh start",
+                        "telemetry-phase.sh end",
+                        "subagent-start",
+                        "subagent-end",
+                        "mcp-start",
+                        "mcp-end");
         for (String needle : required) {
             assertThat(body)
                     .as("_TEMPLATE-SKILL.md must document marker shape '%s'", needle)

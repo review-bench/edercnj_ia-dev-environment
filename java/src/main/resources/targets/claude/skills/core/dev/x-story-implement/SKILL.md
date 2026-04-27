@@ -7,19 +7,9 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, Ta
 argument-hint: "[STORY-ID] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>] [--auto-approve-pr] [--task TASK-ID] [--resume] [--skip-verification] [--skip-smoke] [--skip-review] [--full-lifecycle] [--worktree] [--non-interactive] [--no-auto-remediation] [--no-ci-watch]"
 ---
 
-## Global Output Policy
+## Output Policy & Context Management
 
-- **Language**: English ONLY.
-- **Tone**: Technical, Direct, and Concise.
-- **Efficiency**: Remove all conversational fillers and greetings to save tokens.
-
-## CONTEXT MANAGEMENT
-
-- **Task results:** record only compact envelopes from `x-task-implement` (status/taskId/commitSha/coverageLine/coverageBranch). No full TDD logs.
-- **Plan files:** reference by path only. Do NOT re-read after Phase 1.
-- **Execution state:** delegate every mutation to `x-internal-status-update`.
-- **Review outputs:** reference by path + score only; never load content.
-- **Story file:** read once in Phase 0 via `x-internal-story-load-context`.
+English ONLY; technical, direct, concise (no conversational fillers). Record only compact envelopes from `x-task-implement` (status/taskId/commitSha/coverage*) — no full TDD logs. Reference plan/review files by path (+score for reviews); never re-load content. Read story file once in Phase 0 via `x-internal-story-load-context`. Delegate every state mutation to `x-internal-status-update`.
 
 # Skill: Story Implementation (Thin Orchestrator — ADR-0012 + EPIC-0049)
 
@@ -332,22 +322,7 @@ Full retry/backoff schedule + `SubagentResult` error shape live in `references/f
 
 ## Recovery
 
-When resuming a story that previously aborted mid-phase (e.g., after a transient failure or a forced stop), some mandatory verification or CI-watch steps may be safely skipped if they were already completed. The canonical way to signal this is the `CLAUDE_RECOVERY_MODE=1` environment variable:
-
-```bash
-export CLAUDE_RECOVERY_MODE=1
-/x-story-implement story-XXXX-YYYY --resume --skip-verification
-```
-
-### `CLAUDE_RECOVERY_MODE=1`
-
-Set by `x-internal-story-resume` automatically when it detects `staleWarnings != []` (e.g., resume-point is mid-verification with a completed CI artifact). When active:
-
-- The PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-*` and `--no-ci-watch` flags without blocking — it emits a WARNING instead of exit 1.
-- The skip remains visible in telemetry as a `phase.end status=skipped` event.
-- Set this variable only in operator-controlled recovery sessions; **never in automated orchestrator calls**.
-
-### Permitted bypass flags (recovery only)
+Resuming after an aborted lifecycle may legitimately skip already-completed steps. The canonical signal is `CLAUDE_RECOVERY_MODE=1` — set automatically by `x-internal-story-resume` when `staleWarnings != []`. The PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) then permits the flags below with a WARNING; skips remain visible in telemetry as `phase.end status=skipped`. **Operator-controlled sessions only — never in automated calls.** `CLAUDE_RECOVERY_MODE=1` is the ONLY accepted bypass variable; `CLAUDE_SKIP_AUDIT=1` / `CLAUDE_NO_ENFORCE=1` do NOT bypass (RULE-059-07).
 
 | Flag | Skips |
 | :--- | :--- |
@@ -355,10 +330,6 @@ Set by `x-internal-story-resume` automatically when it detects `staleWarnings !=
 | `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
 | `--skip-smoke` | Smoke gate inside verify |
 | `--no-ci-watch` | CI-watch step in Phase 2 |
-
-### RULE-059-07 compliance
-
-`CLAUDE_RECOVERY_MODE=1` is the ONLY accepted bypass variable. `CLAUDE_SKIP_AUDIT=1`, `CLAUDE_NO_ENFORCE=1`, or any other env var does NOT bypass the PreToolUse hook.
 
 ## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
 
@@ -370,11 +341,7 @@ All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `ep
 
 ### `events.ndjson` as Committed Evidence (EPIC-0059 story-0059-0008)
 
-`plans/epic-XXXX/telemetry/events.ndjson` is a **committed evidence artifact** under Rule 24 Camada 4. The presence of `phase.start x-story-implement` events for all 4 phases (Phase-0-Prepare, Phase-1-Plan, Phase-2-Implement, Phase-3-Verify) in `events.ndjson` is the deterministic proof that the orchestrator ran. `audit-execution-integrity.sh --scope=telemetry` validates this at CI time.
-
-The `stage-telemetry.sh` Stop hook (registered in `settings.json`) automatically stages `events.ndjson` at end-of-turn when the story status is `Em Andamento`, ensuring it is always included in the next commit. Manual bypass via `CLAUDE_TELEMETRY_DISABLED=1` disables staging (Rule 07 — fail-open); `CLAUDE_SKIP_AUDIT=1` does NOT bypass (RULE-059-07).
-
-`{{PLACEHOLDER}}` tokens (`{{TEST_COMMAND}}`, `{{COVERAGE_COMMAND}}`) are runtime-filled by the AI agent from project config.
+`plans/epic-XXXX/telemetry/events.ndjson` is committed evidence under Rule 24 Camada 4 — `phase.start x-story-implement` events for all 4 phases prove the orchestrator ran (validated by `audit-execution-integrity.sh --scope=telemetry`). The `stage-telemetry.sh` Stop hook stages it at end-of-turn when status=`Em Andamento`. `CLAUDE_TELEMETRY_DISABLED=1` disables staging (Rule 07 fail-open); `CLAUDE_SKIP_AUDIT=1` does NOT bypass (RULE-059-07). `{{PLACEHOLDER}}` tokens are runtime-filled by the agent.
 
 ## Full Protocol
 

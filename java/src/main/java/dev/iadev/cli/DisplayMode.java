@@ -3,10 +3,8 @@ package dev.iadev.cli;
 /**
  * Display mode for pipeline result formatting.
  *
- * <p>Replaces opaque {@code boolean dryRun} parameters.
- * Call sites become self-documenting:
- * {@code formatResult(DisplayMode.DRY_RUN)} instead of
- * {@code formatResult(true)}.</p>
+ * <p>Replaces opaque {@code boolean dryRun} parameters. Call sites become self-documenting: {@code
+ * formatResult(DisplayMode.DRY_RUN)} instead of {@code formatResult(true)}.
  *
  * @see CliDisplay#formatResult
  */

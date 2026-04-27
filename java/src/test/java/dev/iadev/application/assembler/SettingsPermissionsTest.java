@@ -1,26 +1,21 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for SettingsAssembler — interface contract,
- * file generation, and permission tests.
- */
+/** Tests for SettingsAssembler — interface contract, file generation, and permission tests. */
 @DisplayName("SettingsAssembler — permissions")
 class SettingsPermissionsTest {
 
@@ -31,11 +26,9 @@ class SettingsPermissionsTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssemblerInterface() {
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -44,29 +37,19 @@ class SettingsPermissionsTest {
     class FileGeneration {
 
         @Test
-        @DisplayName("generates settings.json and"
-                + " settings.local.json")
-        void assemble_whenCalled_generatesBothFiles(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("generates settings.json and" + " settings.local.json")
+        void assemble_whenCalled_generatesBothFiles(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SettingsAssembler assembler = new SettingsAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).hasSize(2);
-            assertThat(outputDir.resolve("settings.json"))
-                    .exists();
-            assertThat(outputDir.resolve(
-                    "settings.local.json"))
-                    .exists();
+            assertThat(outputDir.resolve("settings.json")).exists();
+            assertThat(outputDir.resolve("settings.local.json")).exists();
         }
     }
 
@@ -75,16 +58,12 @@ class SettingsPermissionsTest {
     class MavenPermissions {
 
         @Test
-        @DisplayName("settings.json contains maven"
-                + " commands for java-quarkus")
-        void assemble_whenCalled_containsMavenCommands(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("settings.json contains maven" + " commands for java-quarkus")
+        void assemble_whenCalled_containsMavenCommands(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -92,28 +71,20 @@ class SettingsPermissionsTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve("settings.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("Bash(mvn *)");
+            String content =
+                    Files.readString(outputDir.resolve("settings.json"), StandardCharsets.UTF_8);
+            assertThat(content).contains("Bash(mvn *)");
         }
 
         @Test
-        @DisplayName("settings.json contains universal"
-                + " git commands")
-        void assemble_whenCalled_containsGitCommands(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("settings.json contains universal" + " git commands")
+        void assemble_whenCalled_containsGitCommands(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            SettingsAssembler assembler =
-                    new SettingsAssembler();
+            SettingsAssembler assembler = new SettingsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -121,15 +92,11 @@ class SettingsPermissionsTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve("settings.json"),
-                    StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("Bash(git *)");
+            String content =
+                    Files.readString(outputDir.resolve("settings.json"), StandardCharsets.UTF_8);
+            assertThat(content).contains("Bash(git *)");
         }
     }
 

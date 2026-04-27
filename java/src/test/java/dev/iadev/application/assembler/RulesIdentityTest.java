@@ -1,17 +1,14 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.testutil.TestConfigBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for RulesIdentity — project identity content builder.
- */
+/** Tests for RulesIdentity — project identity content builder. */
 @DisplayName("RulesIdentity")
 class RulesIdentityTest {
 
@@ -22,13 +19,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains project name in header")
         void create_whenCalled_containsProjectName() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("my-api")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().projectName("my-api").build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
                     .contains("# Project Identity — my-api")
@@ -38,13 +31,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains language and version")
         void create_whenCalled_containsLanguageAndVersion() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .language("java", "21")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().language("java", "21").build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
                     .contains("- **Language:** java 21")
@@ -54,13 +43,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains framework with version")
         void create_withVersion_containsFramework() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .framework("quarkus", "3.17")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().framework("quarkus", "3.17").build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
                     .contains("- **Framework:** quarkus 3.17")
@@ -70,98 +55,69 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains architecture style")
         void create_whenCalled_containsArchitectureStyle() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .archStyle("microservice")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().archStyle("microservice").build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
-                    .contains(
-                            "- **Architecture Style:**"
-                                    + " microservice")
-                    .contains(
-                            "| Architecture |"
-                                    + " microservice |");
+                    .contains("- **Architecture Style:**" + " microservice")
+                    .contains("| Architecture |" + " microservice |");
         }
 
         @Test
         @DisplayName("contains DDD and event-driven flags")
         void create_whenCalled_containsDddAndEventDriven() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .domainDriven(true)
-                    .eventDriven(true)
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder().domainDriven(true).eventDriven(true).build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
-                    .contains(
-                            "- **Domain-Driven Design:**"
-                                    + " true")
-                    .contains(
-                            "- **Event-Driven:** true");
+                    .contains("- **Domain-Driven Design:**" + " true")
+                    .contains("- **Event-Driven:** true");
         }
 
         @Test
         @DisplayName("contains interfaces list")
         void create_whenCalled_containsInterfacesList() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .clearInterfaces()
-                    .addInterface("rest")
-                    .addInterface("grpc")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("rest")
+                            .addInterface("grpc")
+                            .build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content)
-                    .contains("- **Interfaces:** rest, grpc");
+            assertThat(content).contains("- **Interfaces:** rest, grpc");
         }
 
         @Test
         @DisplayName("contains build tool in tech stack")
         void create_whenCalled_containsBuildTool() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .buildTool("maven")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().buildTool("maven").build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content)
-                    .contains("| Build Tool | maven |");
+            assertThat(content).contains("| Build Tool | maven |");
         }
 
         @Test
         @DisplayName("contains native build flag")
         void create_whenCalled_containsNativeBuild() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .nativeBuild(true)
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().nativeBuild(true).build();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content)
-                    .contains("| Native Build | true |");
+            assertThat(content).contains("| Native Build | true |");
         }
 
         @Test
         @DisplayName("contains testing flags")
         void create_whenCalled_containsTestingFlags() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
                     .contains("| Smoke Tests | true |")
@@ -171,15 +127,12 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains source of truth hierarchy")
         void create_whenCalled_containsSourceOfTruth() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
-                    .contains(
-                            "## Source of Truth (Hierarchy)")
+                    .contains("## Source of Truth (Hierarchy)")
                     .contains("1. Epics / PRDs")
                     .contains("5. Source code");
         }
@@ -187,11 +140,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains constraints section")
         void create_whenCalled_containsConstraints() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content)
                     .contains("## Constraints")
@@ -203,24 +154,19 @@ class RulesIdentityTest {
         @Test
         @DisplayName("starts with global behavior header")
         void create_withGlobalBehavior_starts() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content).startsWith(
-                    "# Global Behavior & Language Policy");
+            assertThat(content).startsWith("# Global Behavior & Language Policy");
         }
 
         @Test
         @DisplayName("ends with trailing newline")
         void create_withNewline_ends() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
             assertThat(content).endsWith("\n");
         }
@@ -228,28 +174,21 @@ class RulesIdentityTest {
         @Test
         @DisplayName("message broker is always none")
         void create_whenCalled_messageBrokerAlwaysNone() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content)
-                    .contains("| Message Broker | none |");
+            assertThat(content).contains("| Message Broker | none |");
         }
 
         @Test
         @DisplayName("resilience is always mandatory")
         void create_whenCalled_resilienceAlwaysMandatory() {
-            ProjectConfig config = TestConfigBuilder
-                    .minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            String content =
-                    RulesIdentity.buildContent(config);
+            String content = RulesIdentity.buildContent(config);
 
-            assertThat(content).contains(
-                    "| Resilience |"
-                            + " Mandatory (always enabled) |");
+            assertThat(content).contains("| Resilience |" + " Mandatory (always enabled) |");
         }
     }
 
@@ -260,32 +199,25 @@ class RulesIdentityTest {
         @Test
         @DisplayName("joins multiple interfaces")
         void create_whenCalled_joinsMultiple() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .clearInterfaces()
-                    .addInterface("rest")
-                    .addInterface("grpc")
-                    .addInterface("event-consumer")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .clearInterfaces()
+                            .addInterface("rest")
+                            .addInterface("grpc")
+                            .addInterface("event-consumer")
+                            .build();
 
-            String result =
-                    RulesIdentity.extractInterfaces(config);
+            String result = RulesIdentity.extractInterfaces(config);
 
-            assertThat(result)
-                    .isEqualTo(
-                            "rest, grpc, event-consumer");
+            assertThat(result).isEqualTo("rest, grpc, event-consumer");
         }
 
         @Test
         @DisplayName("returns none for empty interfaces")
         void create_empty_returnsNone() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .clearInterfaces()
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().clearInterfaces().build();
 
-            String result =
-                    RulesIdentity.extractInterfaces(config);
+            String result = RulesIdentity.extractInterfaces(config);
 
             assertThat(result).isEqualTo("none");
         }
@@ -298,13 +230,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("formats version with leading space")
         void create_whenCalled_formatsVersion() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .framework("quarkus", "3.17")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().framework("quarkus", "3.17").build();
 
-            String result = RulesIdentity
-                    .formatFrameworkVersion(config);
+            String result = RulesIdentity.formatFrameworkVersion(config);
 
             assertThat(result).isEqualTo(" 3.17");
         }
@@ -312,13 +240,9 @@ class RulesIdentityTest {
         @Test
         @DisplayName("returns empty for empty version")
         void create_whenCalled_emptyVersion() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .framework("quarkus", "")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().framework("quarkus", "").build();
 
-            String result = RulesIdentity
-                    .formatFrameworkVersion(config);
+            String result = RulesIdentity.formatFrameworkVersion(config);
 
             assertThat(result).isEmpty();
         }
@@ -331,17 +255,11 @@ class RulesIdentityTest {
         @Test
         @DisplayName("contains project name")
         void create_whenCalled_containsProjectName() {
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .projectName("my-service")
-                    .build();
+            ProjectConfig config = TestConfigBuilder.builder().projectName("my-service").build();
 
-            String content = RulesIdentity
-                    .fallbackDomainContent(config);
+            String content = RulesIdentity.fallbackDomainContent(config);
 
-            assertThat(content)
-                    .contains("my-service")
-                    .contains("{DOMAIN_NAME}");
+            assertThat(content).contains("my-service").contains("{DOMAIN_NAME}");
         }
     }
 }

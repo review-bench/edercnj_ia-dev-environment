@@ -1,22 +1,20 @@
 package dev.iadev.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @DisplayName("PathResolver — v3/v4 probe and path construction")
 class PathResolverTest {
 
-    @TempDir
-    Path base;
+    @TempDir Path base;
 
     PathResolver resolver;
 
@@ -79,7 +77,8 @@ class PathResolverTest {
     void unitType_hasExpectedValues() {
         UnitType[] values = UnitType.values();
 
-        assertThat(values).extracting(Enum::name)
+        assertThat(values)
+                .extracting(Enum::name)
                 .containsExactlyInAnyOrder("STORY", "BUG", "SPIKE", "CHORE");
     }
 
@@ -159,15 +158,13 @@ class PathResolverTest {
     @Test
     @DisplayName("releasesDir returns ai/releases under base")
     void releasesDir_returnsAiReleases() {
-        assertThat(resolver.releasesDir())
-                .isEqualTo(base.resolve("ai/releases").normalize());
+        assertThat(resolver.releasesDir()).isEqualTo(base.resolve("ai/releases").normalize());
     }
 
     @Test
     @DisplayName("runsDir returns ai/runs under base")
     void runsDir_returnsAiRuns() {
-        assertThat(resolver.runsDir())
-                .isEqualTo(base.resolve("ai/runs").normalize());
+        assertThat(resolver.runsDir()).isEqualTo(base.resolve("ai/runs").normalize());
     }
 
     // ── probe edge cases (branch coverage) ────────────────────────────────

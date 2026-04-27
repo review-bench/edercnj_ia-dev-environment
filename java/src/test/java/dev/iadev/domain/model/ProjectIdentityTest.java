@@ -1,14 +1,13 @@
 package dev.iadev.domain.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("ProjectIdentity")
 class ProjectIdentityTest {
@@ -20,15 +19,15 @@ class ProjectIdentityTest {
         @Test
         @DisplayName("creates identity with name and purpose")
         void fromMap_nameAndPurpose_bothSet() {
-            var map = Map.<String, Object>of(
-                    "name", "my-project",
-                    "purpose", "A CLI tool for developers");
+            var map =
+                    Map.<String, Object>of(
+                            "name", "my-project",
+                            "purpose", "A CLI tool for developers");
 
             var result = ProjectIdentity.fromMap(map);
 
             assertThat(result.name()).isEqualTo("my-project");
-            assertThat(result.purpose())
-                    .isEqualTo("A CLI tool for developers");
+            assertThat(result.purpose()).isEqualTo("A CLI tool for developers");
         }
 
         @Test
@@ -68,9 +67,7 @@ class ProjectIdentityTest {
         @Test
         @DisplayName("throws when name is wrong type")
         void fromMap_wrongTypeName_throwsException() {
-            var map = Map.<String, Object>of(
-                    "name", 123,
-                    "purpose", "Some purpose");
+            var map = Map.<String, Object>of("name", 123, "purpose", "Some purpose");
 
             assertThatThrownBy(() -> ProjectIdentity.fromMap(map))
                     .isInstanceOf(ConfigValidationException.class)
