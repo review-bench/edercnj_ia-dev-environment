@@ -1,0 +1,101 @@
+Test Run Report — story-0059-0011
+Generated: 2026-04-27T19:45:00Z
+
+=============================================================
+STORY: story-0059-0011 — Anistia Formal de EPIC-0054–0057 + Immutability Check
+EPIC:  EPIC-0059 (Zero-Bypass Lifecycle Enforcement)
+=============================================================
+
+TASK-0059-0011-001: Inventariar e popular baseline (audits/rule-26-baseline.txt)
+---------------------------------------------------------------------------
+Verification: PASS
+
+  CHECK: audits/rule-26-baseline.txt exists
+  RESULT: PASS ✓
+
+  CHECK: Contains 32 story IDs from EPIC-0054-0057
+  RESULT: PASS ✓
+    - story-0054-{0001..0004}: 4 entries
+    - story-0055-{0001..0012}: 12 entries
+    - story-0056-{0001..0008}: 8 entries
+    - story-0057-{0001..0008}: 8 entries
+    Total: 32 entries
+
+  CHECK: Format correct (story-XXXX-YYYY  # amnesty EPIC-0059: <reason> (date))
+  RESULT: PASS ✓
+    Sample: story-0054-0001  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+
+  CHECK: execution-integrity-baseline.txt has 0054-0057 entries (from story-0059-0001)
+  RESULT: PASS ✓ (32 entries present, added by story-0059-0001)
+
+STATUS: PASS
+
+=============================================================
+
+TASK-0059-0011-002: scripts/audit-baseline-immutability.sh
+---------------------------------------------------------------------------
+Verification: PASS
+
+  TEST: --self-check mode
+  COMMAND: scripts/audit-baseline-immutability.sh --self-check
+  RESULT: PASS ✓ (exit 0)
+  OUTPUT:
+    self-check: cutoff SHA = 185c7e1b623f6e7e2fcf79e95a68937d2759fbd5
+    self-check: OK
+
+  TEST: Full audit (current baseline — all files immutable)
+  COMMAND: scripts/audit-baseline-immutability.sh
+  RESULT: PASS ✓ (exit 0)
+  OUTPUT:
+    INFO  Cutoff SHA: 185c7e1b623f6e7e2fcf79e95a68937d2759fbd5
+    INFO  Auditing baseline immutability...
+    OK    audits/execution-integrity-baseline.txt: immutable (no new entries since cutoff)
+    OK    audits/rule-26-baseline.txt: immutable (no new entries since cutoff)
+    OK    audits/task-hierarchy-baseline.txt: immutable (no new entries since cutoff)
+    INFO  All baseline files are immutable after EPIC-0059 cutoff — OK
+
+  TEST: Violation detection (new story ID triggers exit 1)
+  COMMAND: BASELINE_CUTOFF_SHA=... scripts/audit-baseline-immutability.sh --file <new-file>
+  RESULT: PASS ✓ (exit 1, BASELINE_IMMUTABILITY_VIOLATION printed)
+
+  TEST: --json output
+  COMMAND: scripts/audit-baseline-immutability.sh --json
+  RESULT: PASS ✓ (exit 0, JSON emitted)
+
+  TEST: audits/baseline-cutoff.sha present
+  RESULT: PASS ✓ (SHA: 185c7e1b623f6e7e2fcf79e95a68937d2759fbd5)
+
+STATUS: PASS
+
+=============================================================
+
+TASK-0059-0011-003: ADR-0015 and CI registration
+---------------------------------------------------------------------------
+Verification: PASS
+
+  CHECK: adr/ADR-0015-zero-bypass-amnesty.md exists
+  RESULT: PASS ✓
+
+  CHECK: ADR contains ## Context section
+  RESULT: PASS ✓
+
+  CHECK: ADR contains ## Decision section
+  RESULT: PASS ✓
+
+  CHECK: ADR contains ## Consequences section
+  RESULT: PASS ✓
+
+  CHECK: .github/workflows/ci-release.yml contains 'Audit Baseline Immutability' step
+  RESULT: PASS ✓
+    Line: - name: Audit Baseline Immutability (Rule 27 + ADR-0015)
+          run: scripts/audit-baseline-immutability.sh
+
+STATUS: PASS
+
+=============================================================
+OVERALL: PASS (3/3 tasks verified)
+=============================================================
+
+Coverage Note: This story delivers bash scripts and config files (not Java source).
+Standard Java coverage thresholds (≥95% line, ≥90% branch) do not apply.
+Script correctness verified via behavioral testing above.

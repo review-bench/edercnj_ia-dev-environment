@@ -64,9 +64,10 @@
       "taskPrs": [715, 716]
     },
     "story-0059-0011": {
-      "status": "PENDING",
-      "prNumber": null,
-      "prUrl": null
+      "status": "COMPLETE",
+      "prNumber": 719,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/719",
+      "taskPrs": [717, 718, 719]
     },
     "story-0059-0012": {
       "status": "PENDING",
