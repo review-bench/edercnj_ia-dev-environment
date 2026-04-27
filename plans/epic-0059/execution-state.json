@@ -10,8 +10,8 @@
     "phaseGateResults": []
   },
   "storyStatuses": {
-    "story-0059-0001": { "status": "PENDING", "prNumber": null, "prUrl": null },
-    "story-0059-0002": { "status": "PENDING", "prNumber": null, "prUrl": null },
+    "story-0059-0001": { "status": "COMPLETE", "prNumber": 689, "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/689" },
+    "story-0059-0002": { "status": "IN_PROGRESS", "prNumber": null, "prUrl": null },
     "story-0059-0003": { "status": "PENDING", "prNumber": null, "prUrl": null },
     "story-0059-0004": { "status": "PENDING", "prNumber": null, "prUrl": null },
     "story-0059-0005": { "status": "PENDING", "prNumber": null, "prUrl": null },

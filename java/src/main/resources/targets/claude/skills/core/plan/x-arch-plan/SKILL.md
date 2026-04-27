@@ -244,10 +244,29 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-p
 ### Output Path
 
 ```
-plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
+plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md
 ```
 
 Where `XXXX` is the epic ID and `YYYY` is the story sequence number extracted from the story ID.
+
+### Origin Marker (EPIC-0059 — mandatory)
+
+Every generated architecture plan MUST start with a YAML frontmatter block:
+
+```yaml
+---
+generated-by: x-arch-plan@<40-char-git-sha>
+generated-at: <ISO-8601-UTC>
+story-id: <story-id>
+---
+```
+
+Capture the SHA and timestamp at write time:
+- SHA: `git rev-parse HEAD 2>/dev/null || echo "unknown"`
+- Timestamp: `date -u +%Y-%m-%dT%H:%M:%SZ`
+
+This frontmatter is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
+Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
 
 ## Mini-ADR Format
 
@@ -338,9 +357,22 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 > 11. **Resilience Strategy** — circuit breakers, retry policies, fallback chains, graceful degradation
 > 12. **Impact Analysis** — affected services, migration steps, rollback strategy, risk assessment
 >
-> **Step 7 — Save the document:**
+> **Step 7 — Emit origin marker and save the document (EPIC-0059 — mandatory):**
+>
+> Before writing the artifact, prepend the YAML frontmatter block at the very top:
+>
+> ```yaml
+> ---
+> generated-by: x-arch-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+> generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+> story-id: ${STORY_ID}
+> ---
 > ```
-> plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
+>
+> Then write the full document content after the closing `---`. The frontmatter is required by
+> `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24). Output path:
+> ```
+> plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md
 > ```
 >
 > **Step 8 — Validate sections post-generation:**
