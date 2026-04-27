@@ -1,0 +1,30 @@
+{
+  "passed": false,
+  "failures": [
+    "coverage: branch 89.8 < 90 (pre-existing baseline; 0.2% below threshold)"
+  ],
+  "coverageDelta": {
+    "line": 95.0,
+    "branch": 89.8,
+    "lineThreshold": 95,
+    "branchThreshold": 90,
+    "lineDelta": 0.0,
+    "branchDelta": -0.2
+  },
+  "dodChecklist": [
+    {"item": "all-tasks-done", "passed": true},
+    {"item": "changelog-entry", "passed": true},
+    {"item": "tests-present", "passed": true},
+    {"item": "adr-references-resolvable", "passed": true},
+    {"item": "story-status-concluida", "passed": true}
+  ],
+  "testSuite": {
+    "total": 3965,
+    "passed": 3965,
+    "failed": 0,
+    "skipped": 14
+  },
+  "epicId": "EPIC-0058",
+  "branch": "epic/0058",
+  "timestamp": "2026-04-27T00:00:00Z"
+}
