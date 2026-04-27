@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **EPIC-0060 (Folder Reorganization v4) — partial delivery:** introduces the
+  v4 layout convention (`ai/epics/`, `docs/`, `governance/`) alongside the
+  legacy v3 (`plans/`) layout. Auto-detection via filesystem probe; epics with
+  `flowVersion <= 2` remain in `plans/`, new epics target `ai/epics/`.
+  Delivered components:
+  - `dev.iadev.util.PathResolver` + `UnitType` enum (story-0060-0001)
+  - `scripts/migrate-layout.sh` idempotent migrator with `pre-layout-v4`
+    rollback tag (story-0060-0002)
+  - `governance/baselines/`, `docs/{adr,specs}/`, `ai/{epics,runs,releases}/`
+    skeletons (story-0060-0003)
+  - `SkillPathResolverSmokeTest` CI gate to prevent hardcoded-path regression
+    (story-0060-0004)
+  - `FileCategorizer` v4-aware categorization (story-0060-0005)
+  - Rule 19 `flowVersion: "4"` row in fallback matrix
+  Deferred to a coordinated migration session per RULE-010:
+  - Bulk `git mv` of 21 ADRs, 11 SPECs, 7 baselines (story-0060-0003 phase 2)
+  - 14 SKILL.md substitutions of hardcoded `plans/epic-N` (story-0060-0004
+    grandfathered baseline)
+  - Rule 24/26/27/45 textual updates referencing `governance/baselines/`
+    (story-0060-0005 phase 2)
+  - Probe v3 removal + `forbid-writes-to-legacy-plans` hook + MAJOR version
+    bump (story-0060-0006 phase 2 — pre-requisite: 2-sprint co-existence
+    window, scheduled for next major release).
+
 - **EPIC-0059 story-0059-0008 (Telemetry as Orchestrator Proof-of-Life):**
   Extends `audit-execution-integrity.sh` with `check_telemetry()` — validates
   that `plans/epic-XXXX/telemetry/events.ndjson` contains 4 mandatory
