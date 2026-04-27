@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-04-27
+
 ### Added
 
 - **EPIC-0058 story-0058-0001 — Rule 26 "Audit Gate Lifecycle" + ADR-0015.**
