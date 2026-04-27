@@ -1,0 +1,55 @@
+# Rule 26 Baseline — Audit Gate Lifecycle grandfather list
+#
+# Format: one STORY-ID per line, optional trailing '# reason' comment.
+# Lines starting with '#' or blank lines are ignored.
+#
+# Stories listed here are EXEMPTED from the Rule 26 audit gate enforcement
+# (audit-skill-visibility.sh, audit-epic-branches.sh, audit-flow-version.sh)
+# because they were merged before Rule 26 (EPIC-0058 Audit Gate Lifecycle) was
+# introduced. No new entries may be added after EPIC-0059 merges.
+#
+# IMMUTABILITY ENFORCED by audit-baseline-immutability.sh (EPIC-0059 story-0059-0011).
+# Any line added after the EPIC-0059 cutoff commit fails CI with BASELINE_IMMUTABILITY_VIOLATION.
+#
+# Cutoff reference: EPIC-0058 merge into develop (pre-EPIC-0059 baseline).
+# Added by story-0059-0011 on 2026-04-27.
+
+# EPIC-0054 (EPIC-0054 pre-Rule-26 stories)
+story-0054-0001  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0054-0002  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0054-0003  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0054-0004  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+
+# EPIC-0055 (Task Hierarchy & Phase Gate Enforcement — pre-Rule-26 stories)
+story-0055-0001  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0002  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0003  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0004  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0005  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0006  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0007  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0008  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0009  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0010  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0011  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0055-0012  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+
+# EPIC-0056 (pre-Rule-26 stories)
+story-0056-0001  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0002  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0003  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0004  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0005  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0006  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0007  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0056-0008  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+
+# EPIC-0057 (CI Watch no Fluxo de PR — pre-Rule-26 stories)
+story-0057-0001  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0002  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0003  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0004  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0005  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0006  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0007  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
+story-0057-0008  # amnesty EPIC-0059: merged before Rule-26 audit gate enforcement (2026-04-27)
