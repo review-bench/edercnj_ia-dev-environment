@@ -55,12 +55,13 @@ output/
 # Re-include Java source 'output' directories (hexagonal architecture ports/adapters)
 !java/src/**/output/
 
-# .claude/ is generated output of ia-dev-env (source of truth lives at
-# java/src/main/resources/targets/claude/). Regenerate locally with the
-# generator; do not version the output. Anchored to the repo root so the
-# rule does not catch golden test fixtures under
-# java/src/test/resources/golden/**/.claude/.
-/.claude/
+# .claude/ is versioned in the repo so the team shares the same configuration
+# (rules, skills, hooks, agents). Regeneration via ia-dev-env will produce
+# diffs that must be reviewed and committed. Local-only artifacts under
+# .claude/ remain ignored below.
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock
+/.claude/worktrees/
 
 # x-release transient state files (created in Step 0, deleted in Step 12)
 /plans/release-state-*.json

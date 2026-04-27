@@ -27,6 +27,7 @@ class AssemblerFactoryPlatformTest {
                     "PatternsAssembler",
                     "ProtocolsAssembler",
                     "HooksAssembler",
+                    "ScriptsAssembler",
                     "SettingsAssembler",
                     "ReadmeAssembler",
                     "ClaudeMdAssembler");
@@ -54,23 +55,23 @@ class AssemblerFactoryPlatformTest {
 
         @Test
         @DisplayName("total assembler count is 24")
-        void buildAssemblers_totalCount_is23() {
+        void buildAssemblers_totalCount_is25() {
             List<AssemblerDescriptor> descriptors =
                     AssemblerFactory.buildAssemblers();
 
-            assertThat(descriptors).hasSize(24);
+            assertThat(descriptors).hasSize(25);
         }
 
         @Test
-        @DisplayName("10 assemblers have CLAUDE_CODE "
+        @DisplayName("11 assemblers have CLAUDE_CODE "
                 + "platform")
-        void buildAssemblers_claudeCodeCount_is9() {
+        void buildAssemblers_claudeCodeCount_is11() {
             List<String> claudeNames =
                     filterByPlatform(Platform.CLAUDE_CODE);
 
             assertThat(claudeNames)
                     .as("CLAUDE_CODE assemblers")
-                    .hasSize(10)
+                    .hasSize(11)
                     .containsExactlyInAnyOrderElementsOf(
                             CLAUDE_CODE_NAMES);
         }
@@ -98,8 +99,8 @@ class AssemblerFactoryPlatformTest {
                     filterByPlatform(Platform.SHARED).size();
 
             assertThat(claude + shared)
-                    .as("10 + 14 = 24")
-                    .isEqualTo(24);
+                    .as("11 + 14 = 25")
+                    .isEqualTo(25);
         }
     }
 

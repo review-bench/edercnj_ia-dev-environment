@@ -140,3 +140,8 @@ CI script `scripts/audit-flow-version.sh` checks every `execution-state.json` un
 **Pre-requisite:** Run `scripts/migrate-task-tracking-v2.sh` before activating this check in CI. The migration script adds `taskTracking.enabled=true` to all `flowVersion=2` state files that are missing the field.
 
 Violations fail the CI build with `FLOW_VERSION_VIOLATION`.
+
+---
+
+> **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
+

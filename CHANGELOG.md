@@ -51,6 +51,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     cache configuration, conditional step ordering, and path filtering.
   [story-0059-0006]
 
+## [4.2.0] - 2026-04-27
+
+### Added
+
+- **EPIC-0058 story-0058-0001 — Rule 26 "Audit Gate Lifecycle" + ADR-0015.**
+  Formalizes the taxonomy for governance gates with four canonical layers
+  (Hook runtime / CI script / Java test / CI workflow), naming conventions
+  (`verify-*.sh` / `audit-*.sh` / `*AuditTest.java`), exit codes 0–3, the
+  mandatory `--self-check` flag contract for CI scripts, and the
+  Catalog-before-Add rule (RULE-004). Closes the normative gap where decisions
+  about gate layer were made ad hoc epic-by-epic.
+  - `java/src/main/resources/targets/claude/rules/26-audit-gate-lifecycle.md`
+    (source-of-truth; copied to `.claude/rules/` in all 9 golden profiles).
+  - `adr/ADR-0015-audit-gate-lifecycle.md` (Status: Accepted).
+  - `Epic0058Rule26SmokeTest` — 7 test methods validating file presence and
+    all 8 mandatory sections.
+  - Golden files regenerated for all 9 profiles to include Rule 26.
+
+- **EPIC-0058 story-0058-0002 — Audit Gates Catalog `docs/audit-gates-catalog.md`.**
+  Publishes the canonical catalog of all 12 governance gates across 4 layers
+  (7 CI scripts, 3 Hook runtimes, 2 Java tests). Adds per-gate detail sections
+  (purpose, exit codes, layer, invoker). Adds catalog cross-ref line to Rules 13,
+  19, 21, 22, 23, 24, 25. Adds References section to readme-template. Enforces
+  RULE-004 (Catalog-before-Add) via `Epic0058CatalogConsistencySmokeTest` (5 tests).
+  Golden files regenerated for all 9 profiles.
+
+- **EPIC-0058 story-0058-0008 — `audit.yml` CI workflow + `AuditWorkflowStep`.**
+  Closes EPIC-0058. Adds `.github/workflows/audit.yml` to the main repo and as a
+  generated artifact via `CicdAssembler` + `AuditWorkflowStep` (7th sub-assembler).
+  Workflow triggers on every PR to `develop` / `epic/**`. Runs `audit-self-check`
+  job first (RULE-006 fail-fast), then `audit-matrix` with 5 scripts in parallel.
+  Template at `shared/cicd-templates/audit-workflow/audit.yml.njk`. Goldens
+  regenerated for 9 profiles. `Epic0058AuditWorkflowSmokeTest` (6 tests).
+
+- **EPIC-0058 story-0058-0007 — Golden files regenerated for ScriptsAssembler.**
+  Regenerated all 9 golden profiles to include `.claude/scripts/` with 5 audit
+  scripts. Fixed path regression (`scripts/` not `.claude/scripts/` in
+  `ScriptsAssembler.SCRIPTS_OUTPUT_DIR`). `GoldenFileTest` passes clean.
+
+- **EPIC-0058 story-0058-0006 — `ScriptsAssembler` + source-of-truth.**
+  Introduces `ScriptsAssembler` (23rd assembler in RULE-005 pipeline) that copies
+  5 audit scripts from classpath `targets/claude/scripts/` to `.claude/scripts/`
+  in each generated project. Achieves generation parity (RULE-003): projects from
+  `ia-dev-env` now inherit CI governance gates automatically. All 5 scripts added
+  to `java/src/main/resources/targets/claude/scripts/`. `AssemblerFactory` updated
+  (22 → 23 assemblers). `ScriptsAssemblerTest` (6 unit tests) covers assembly,
+  idempotency, and POSIX execute permission.
+
+- **EPIC-0058 story-0058-0005 — `scripts/audit-skill-visibility.sh` (Rule 22).**
+  Closes Rule 22 ghost-script gap. Validates x-internal-* skill visibility
+  convention (prefix/frontmatter consistency, body marker, orphan script
+  references via RULE-004). Found and fixed one real gap: `audit-bypass-flags.sh`
+  was referenced in Rule 45 but absent from the catalog — added to catalog.
+  Includes `Epic0058SkillVisibilityAuditSmokeTest` (6 tests, including
+  end-to-end scan of current repo passes exit 0).
+
+- **EPIC-0058 story-0058-0004 — `scripts/audit-epic-branches.sh` (Rule 21).**
+  Closes Rule 21 ghost-script gap. CI script audits `epic/*` branch governance:
+  checks flowVersion="2" on open PRs, branch force-push detection, and cleanup
+  exclusion. Supports `--self-check` and `--help`. Includes
+  `Epic0058EpicBranchesAuditSmokeTest` (5 tests).
+
+- **EPIC-0058 story-0058-0003 — `scripts/audit-flow-version.sh` (Rule 19).**
+  Closes the ghost-script gap in Rule 19. CI script validates `flowVersion` field
+  in all `plans/epic-*/execution-state.json` files. Supports `--strict` (absent field
+  = violation), `--self-check` (structural integrity), and `-h/--help`. Includes 4
+  fixture JSONs (`valid-v1`, `valid-v2`, `missing`, `invalid`), bats integration tests
+  (9 scenarios), and `Epic0058FlowVersionAuditSmokeTest` Java smoke test (7 tests).
+
 ### Changed
 
 - **EPIC-0056 (RA9 Standardized Planning Templates):** Introduces the
