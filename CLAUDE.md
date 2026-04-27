@@ -29,6 +29,15 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > - Decision record: [`adr/ADR-0014-task-hierarchy-and-phase-gates.md`](adr/ADR-0014-task-hierarchy-and-phase-gates.md)
 > - Epic index: [`plans/epic-0055/`](plans/epic-0055/)
 
+> **ZERO-BYPASS LIFECYCLE — INEGOCIÁVEL:** Toda story/task DEVE ser implementada
+> via `/x-story-implement`. Nenhum PR pode ser mergeado sem:
+> (1) 6 artefatos de Fase 1 em `plans/epic-XXXX/plans/`;
+> (2) 4 artefatos de Fase 3 em `plans/epic-XXXX/reports/`;
+> (3) Eventos de telemetria de `x-story-implement` em `events.ndjson`;
+> (4) Seção "## Orchestrator Evidence" preenchida no PR body.
+> Bypass é detectado e bloqueado em CI. Não há escape hatch para happy-path.
+> Ver [Rule 27](.claude/rules/27-zero-bypass-lifecycle.md) e [EPIC-0059](plans/epic-0059/).
+
 > **In progress — EPIC-0046 (Lifecycle Integrity Phase 2 — CI enforcement).**
 > Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `plans/epic-*/reports/` with no `x-git-commit` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
 > - Story: [`plans/epic-0046/story-0046-0007.md`](plans/epic-0046/story-0046-0007.md)
@@ -85,8 +94,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 13 | `13-skill-invocation-protocol.md` | skill invocation protocol (delegation syntax) |
 | 23 | `23-model-selection.md` | model selection strategy (Opus/Sonnet/Haiku tiers, enforcement points, CI audit contract) |
 | 25 | `25-task-hierarchy.md` | task hierarchy (4-level) + phase gates contract (EPIC-0055) |
+| 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle (4-layer taxonomy, naming, exit codes, self-check contract — EPIC-0058) |
+| 27 | `27-zero-bypass-lifecycle.md` | zero-bypass lifecycle contract (Rule 24 vs Rule 27 distinction, 12 surfaces, 4 enforcement layers — EPIC-0059) |
 
-**Total: 12 rules** (gaps at 10, 11, 12 reserved for conditional rules: `10-anti-patterns.*`, `11-security-pci`, `12-security-anti-patterns`; gap at 24 reserved for Rule 24 "Execution Integrity" tracked separately)
+**Total: 14 rules** (gaps at 10, 11, 12 reserved for conditional rules: `10-anti-patterns.*`, `11-security-pci`, `12-security-anti-patterns`; gap at 24 reserved for Rule 24 "Execution Integrity" tracked separately)
 
 ### Numbering
 
