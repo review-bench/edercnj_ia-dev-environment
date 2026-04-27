@@ -366,6 +366,21 @@ main() {
         exit 4
     fi
 
+    # Verify the cutoff SHA is actually reachable in the local repository.
+    # Shallow clones (e.g. actions/checkout default fetch-depth: 1) leave the
+    # cutoff SHA unreachable, which would silently make `git show <sha>:file`
+    # return empty content and report ALL current entries as false-positive
+    # violations. Fail loud with ENFORCEMENT_BROKEN instead.
+    if ! git cat-file -e "${cutoff_sha}^{commit}" 2>/dev/null; then
+        error "ENFORCEMENT_BROKEN: cutoff SHA ${cutoff_sha} not reachable in local repo"
+        error "This usually means the workspace is a shallow clone."
+        error "In CI, set 'fetch-depth: 0' on actions/checkout. Locally, run 'git fetch --unshallow'."
+        if [[ "${OUTPUT_MODE}" == "json" ]]; then
+            emit_json "ENFORCEMENT_BROKEN" "[]" "${cutoff_sha}"
+        fi
+        exit 4
+    fi
+
     info "Cutoff SHA: ${cutoff_sha}"
     info "Auditing baseline immutability..."
 
