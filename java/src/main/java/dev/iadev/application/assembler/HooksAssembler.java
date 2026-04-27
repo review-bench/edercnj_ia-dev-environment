@@ -79,6 +79,16 @@ public final class HooksAssembler implements Assembler {
             "verify-phase-gates.sh",
             "enforce-phase-sequence.sh");
 
+    /**
+     * Rule 59 enforcement hook — always copied, independent of
+     * telemetry. {@code enforce-no-bypass-flags.sh} is the
+     * PreToolUse Layer enforcement that blocks {@code --skip-*}
+     * flags on orchestrator skills outside of recovery mode.
+     * Story-0059-0003: EPIC-0059 Zero-Bypass Lifecycle Enforcement.
+     */
+    public static final List<String> RULE_59_SCRIPTS = List.of(
+            "enforce-no-bypass-flags.sh");
+
     private final Path resourcesDir;
 
     /**
@@ -123,6 +133,10 @@ public final class HooksAssembler implements Assembler {
         // disable runtime enforcement.
         written.addAll(copyScriptList(
                 outputDir, RULE_25_SCRIPTS, "rule-25"));
+        // Rule 59 hooks are always copied — bypass-flag
+        // enforcement is runtime enforcement, not observability.
+        written.addAll(copyScriptList(
+                outputDir, RULE_59_SCRIPTS, "rule-59"));
         return List.copyOf(written);
     }
 

@@ -186,21 +186,26 @@ public final class HookConfigBuilder {
     }
 
     /**
-     * Appends the {@code PreToolUse} event with Rule 25 Layer 3
-     * enforcement ({@code enforce-phase-sequence.sh}) — always
-     * emitted — and the optional telemetry pretool hook
-     * ({@code telemetry-pretool.sh}), only emitted when
-     * {@code telemetryEnabled} is {@code true}.
+     * Appends the {@code PreToolUse} event with:
+     * <ul>
+     *   <li>Rule 25 Layer 3 enforcement
+     *       ({@code enforce-phase-sequence.sh}) — always emitted</li>
+     *   <li>Rule 59 enforcement
+     *       ({@code enforce-no-bypass-flags.sh}) — always emitted;
+     *       blocks {@code --skip-*} flags outside recovery mode
+     *       (story-0059-0003)</li>
+     *   <li>Optional telemetry pretool hook
+     *       ({@code telemetry-pretool.sh}) — only when
+     *       {@code telemetryEnabled} is {@code true}</li>
+     * </ul>
      *
-     * <p>Both (when both present) run under the same wildcard
-     * matcher. {@code enforce-phase-sequence.sh} short-circuits on
-     * {@code tool_name != "Skill"}, so overhead on non-Skill tool
-     * calls is one stdin read + one jq lookup.</p>
+     * <p>All entries run under the same wildcard matcher.
+     * Both enforcement scripts short-circuit on
+     * {@code tool_name != "Skill"}.</p>
      *
-     * <p>Decoupling Layer 3 from telemetry: Rule 25 defines the
-     * phase-sequence hook as a runtime enforcement layer (not an
-     * observability toggle), so disabling telemetry does NOT
-     * disable Rule 25 enforcement.</p>
+     * <p>Decoupling from telemetry: both Rule 25 and Rule 59
+     * define enforcement as runtime (not observability), so
+     * disabling telemetry does NOT disable these hooks.</p>
      */
     private static void appendPreToolUseWithPhaseSequence(
             StringBuilder sb, boolean telemetryEnabled) {
@@ -216,7 +221,10 @@ public final class HookConfigBuilder {
                     sb, "telemetry-pretool.sh", true);
         }
         appendStopHookEntry(sb,
-                "enforce-phase-sequence.sh", false);
+                "enforce-phase-sequence.sh", true);
+        // Rule 59: always the last entry (no sibling after).
+        appendStopHookEntry(sb,
+                "enforce-no-bypass-flags.sh", false);
         sb.append(JsonHelpers.indent(4)).append("]\n");
         sb.append(JsonHelpers.indent(3)).append("}\n");
         sb.append(JsonHelpers.indent(2)).append("],\n");
