@@ -31,9 +31,9 @@
       "prUrl": null
     },
     "story-0059-0005": {
-      "status": "PENDING",
-      "prNumber": null,
-      "prUrl": null
+      "status": "COMPLETE",
+      "prNumber": 702,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/702"
     },
     "story-0059-0006": {
       "status": "PENDING",
