@@ -36,6 +36,7 @@ class AssemblerPipelineTest {
             "PatternsAssembler",
             "ProtocolsAssembler",
             "HooksAssembler",
+            "ScriptsAssembler",
             "SettingsAssembler",
             "DocsAssembler",
             "DocsAdrAssembler",
@@ -63,7 +64,7 @@ class AssemblerPipelineTest {
             List<AssemblerDescriptor> descriptors =
                     AssemblerPipeline.buildAssemblers();
 
-            assertThat(descriptors).hasSize(24);
+            assertThat(descriptors).hasSize(25);
         }
 
         @Test
@@ -90,11 +91,11 @@ class AssemblerPipelineTest {
                     .isEqualTo(AssemblerTarget.ROOT);
             assertThat(descriptors.get(1).target())
                     .isEqualTo(AssemblerTarget.CLAUDE);
-            assertThat(descriptors.get(9).target())
+            assertThat(descriptors.get(10).target())
                     .isEqualTo(AssemblerTarget.ROOT);
-            assertThat(descriptors.get(18).target())
+            assertThat(descriptors.get(19).target())
                     .isEqualTo(AssemblerTarget.ROOT);
-            assertThat(descriptors.get(22).target())
+            assertThat(descriptors.get(23).target())
                     .isEqualTo(AssemblerTarget.CLAUDE);
         }
 
