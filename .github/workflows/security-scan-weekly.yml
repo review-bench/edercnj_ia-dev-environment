@@ -39,7 +39,7 @@ jobs:
       - name: Trivy scan (filesystem)
         # 0.35.0 patches GHSA-69fq-xp46-6x23 (supply chain compromise
         # affecting < 0.35.0). Do not downgrade.
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: java/
@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload SARIF to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy.sarif
           category: trivy-fs-weekly
