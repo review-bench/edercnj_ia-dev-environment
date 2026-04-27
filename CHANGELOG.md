@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **EPIC-0059 story-0059-0006 (CI Re-runs Pre-commit Chain on Merge Commit):**
+  Adds `pre-commit-chain` job to `.github/workflows/ci-release.yml` that
+  re-executes the full pre-commit chain (Spotless format check → Checkstyle lint
+  → `mvn compile`) on every PR that modifies `src/main/java/**` or `pom.xml`.
+  Closes bypass surface E (`git commit --no-verify`): a developer using the
+  `--no-verify` flag locally to skip pre-commit hooks cannot get malformatted
+  or lint-violating code merged, because the CI gate independently validates
+  the same chain on the PR branch.
+  - `pre-commit-chain` CI job: three conditional steps guarded by a defensive
+    `javadiff` step (`git diff origin/<base>...<HEAD>`); job only fires on
+    `pull_request` events; Maven cache via `actions/setup-java cache: maven`
+    targets < 90s re-run time on cache hit.
+  - `java/pom.xml`: adds `spotless-maven-plugin` (Google Java Format / AOSP
+    style) and `maven-checkstyle-plugin` (Google Checks) with pinned versions
+    (`spotless.version`, `google-java-format.version`, `checkstyle.version`).
+  - `java/checkstyle-suppressions.xml`: baseline suppressions for all existing
+    `src/main/java` files — new files added after EPIC-0059 must pass Checkstyle
+    clean without suppressions.
+  - `Epic0059PreCommitChainCiTest` (13 tests) and `Epic0059CiCacheValidationTest`
+    (8 tests): verification tests covering job declaration, Maven plugin presence,
+    cache configuration, conditional step ordering, and path filtering.
+  [story-0059-0006]
+
 ### Changed
 
 - **EPIC-0056 (RA9 Standardized Planning Templates):** Introduces the
