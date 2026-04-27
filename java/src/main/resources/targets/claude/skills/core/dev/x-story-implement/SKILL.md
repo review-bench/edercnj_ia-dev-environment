@@ -330,6 +330,36 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 
 Full retry/backoff schedule + `SubagentResult` error shape live in `references/full-protocol.md` §6.
 
+## Recovery
+
+When resuming a story that previously aborted mid-phase (e.g., after a transient failure or a forced stop), some mandatory verification or CI-watch steps may be safely skipped if they were already completed. The canonical way to signal this is the `CLAUDE_RECOVERY_MODE=1` environment variable:
+
+```bash
+export CLAUDE_RECOVERY_MODE=1
+/x-story-implement story-XXXX-YYYY --resume --skip-verification
+```
+
+### `CLAUDE_RECOVERY_MODE=1`
+
+Set by `x-internal-story-resume` automatically when it detects `staleWarnings != []` (e.g., resume-point is mid-verification with a completed CI artifact). When active:
+
+- The PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-*` and `--no-ci-watch` flags without blocking — it emits a WARNING instead of exit 1.
+- The skip remains visible in telemetry as a `phase.end status=skipped` event.
+- Set this variable only in operator-controlled recovery sessions; **never in automated orchestrator calls**.
+
+### Permitted bypass flags (recovery only)
+
+| Flag | Skips |
+| :--- | :--- |
+| `--skip-verification` | Phase 3 (`x-internal-story-verify`) |
+| `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
+| `--skip-smoke` | Smoke gate inside verify |
+| `--no-ci-watch` | CI-watch step in Phase 2 |
+
+### RULE-059-07 compliance
+
+`CLAUDE_RECOVERY_MODE=1` is the ONLY accepted bypass variable. `CLAUDE_SKIP_AUDIT=1`, `CLAUDE_NO_ENFORCE=1`, or any other env var does NOT bypass the PreToolUse hook.
+
 ## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
 
 All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `epicId` auto-derived — identical to EPIC-0048. `--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
