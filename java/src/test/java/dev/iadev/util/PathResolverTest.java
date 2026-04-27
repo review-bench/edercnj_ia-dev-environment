@@ -169,4 +169,28 @@ class PathResolverTest {
         assertThat(resolver.runsDir())
                 .isEqualTo(base.resolve("ai/runs").normalize());
     }
+
+    // ── probe edge cases (branch coverage) ────────────────────────────────
+
+    @Test
+    @DisplayName("epicDir falls back to v3 when ai/epics exists but no matching dir")
+    void epicDir_aiEpicsExistsButNoMatch_fallsBackV3() throws IOException {
+        Files.createDirectories(base.resolve("ai/epics"));
+        Files.createDirectories(base.resolve("ai/epics/epic-9999-other"));
+
+        Path result = resolver.epicDir("0001");
+
+        assertThat(result).isEqualTo(base.resolve("plans/epic-0001").normalize());
+    }
+
+    @Test
+    @DisplayName("epicDir falls back to v3 when match is a file, not directory")
+    void epicDir_matchIsFile_fallsBackV3() throws IOException {
+        Files.createDirectories(base.resolve("ai/epics"));
+        Files.createFile(base.resolve("ai/epics/epic-0001-spurious-file"));
+
+        Path result = resolver.epicDir("0001");
+
+        assertThat(result).isEqualTo(base.resolve("plans/epic-0001").normalize());
+    }
 }
