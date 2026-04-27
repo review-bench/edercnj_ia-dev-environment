@@ -10,9 +10,10 @@
 .env.test.local
 .env.production.local
 
-# GitHub Copilot — generated output of the boilerplate (except CI workflows)
+# GitHub Copilot — generated output of the boilerplate (except CI workflows and PR template)
 .github/*
 !.github/workflows/
+!.github/pull_request_template.md
 
 # OS files
 .DS_Store
