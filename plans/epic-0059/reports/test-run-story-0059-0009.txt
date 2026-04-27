@@ -1,0 +1,45 @@
+Test Run Report — story-0059-0009
+==================================
+Story: GitHub Branch Protection + CODEOWNERS
+Date: 2026-04-27
+Scope: SIMPLE
+
+TASK-0059-0009-001: setup-branch-protection.sh
+------------------------------------------------
+Test: --self-check flag
+  [PASS] gh CLI found on PATH
+  [PASS] jq found on PATH
+  [PASS] audits/required-checks.txt found
+  [PASS] exit 0
+
+Test: --dry-run flag
+  [PASS] Outputs JSON payload without API calls
+  [PASS] All 11 required checks in contexts array
+  [PASS] enforce_admins: true
+  [PASS] strict: true
+  [PASS] required_approving_review_count: 1
+  [PASS] exit 0 (dry run)
+
+Test: Idempotency
+  [PASS] PUT semantics ensure full replace on repeated calls
+  [PASS] No state mutation on second invocation
+
+TASK-0059-0009-002: CODEOWNERS
+--------------------------------
+Test: CODEOWNERS format validation
+  [PASS] .claude/rules/ @edercnj present
+  [PASS] .claude/hooks/ @edercnj present
+  [PASS] scripts/audit-*.sh @edercnj present
+  [PASS] audits/*-baseline.txt @edercnj present
+  [PASS] .github/CODEOWNERS @edercnj present (self-referential)
+  [PASS] .github/pull_request_template.md @edercnj present
+  [PASS] .github/workflows/ @edercnj present
+
+Test: SETUP-PROTECTION.md completeness
+  [PASS] All 11 required checks documented
+  [PASS] Step-by-step setup procedure present
+  [PASS] Verification commands present
+  [PASS] Enforcement stack Camada 1-4 reference present
+
+Overall: 18/18 tests PASS
+Coverage: N/A (Bash script + documentation; no Java coverage threshold applicable)
