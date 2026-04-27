@@ -1,0 +1,67 @@
+Story: story-0059-0012 — taskTracking.enabled=true Mandatório para flowVersion=2
+Epic: EPIC-0059 (Zero-Bypass Lifecycle Enforcement)
+Test Run Date: 2026-04-27
+
+=== ACCEPTANCE TESTS (Gherkin Scenarios) ===
+
+Scenario 1: audit-flow-version.sh passes for flowVersion=2 with taskTracking.enabled=true
+  Input:  {"flowVersion":"2","taskTracking":{"enabled":true}}
+  Output: "audit-flow-version.sh: OK — all execution-state.json files pass flowVersion audit"
+  Exit:   0
+  Result: PASS ✓
+
+Scenario 2: audit-flow-version.sh fails for flowVersion=2 without taskTracking
+  Input:  {"flowVersion":"2","epicId":"E"}
+  Output: "FLOW_VERSION_VIOLATION: ... has flowVersion=2 but taskTracking is absent; taskTracking required for flowVersion=2"
+  Exit:   1
+  Result: PASS ✓
+
+Scenario 3: audit-flow-version.sh allows flowVersion=1 without taskTracking (backward compat)
+  Input:  {"flowVersion":"1","epicId":"E"}
+  Output: "audit-flow-version.sh: OK — all execution-state.json files pass flowVersion audit"
+  Exit:   0
+  Result: PASS ✓
+
+Scenario 4: migrate script adds taskTracking.enabled=true in active epics
+  Input:  plans/epic-0054/execution-state.json (flowVersion=2, taskTracking.enabled=false)
+  Output: "[migrate] plans/epic-0054/execution-state.json — taskTracking.enabled=ABSENT → true"
+  Result: taskTracking.enabled=true in state file after migration
+  Result: PASS ✓
+
+Scenario 5: migrate script is idempotent
+  Input:  Re-run after migration
+  Output: "[skip] ... — taskTracking.enabled=true already set" for all 5 flowVersion=2 files
+  Exit:   0
+  Result: PASS ✓
+
+Scenario 6: flowVersion=2 with taskTracking.enabled=false generates WARN (exit 0)
+  Input:  {"flowVersion":"2","taskTracking":{"enabled":false}}
+  Output: "WARN [taskTracking-flowVersion2]: ... has flowVersion=2 but taskTracking.enabled=false; this is suspicious"
+  Exit:   0
+  Result: PASS ✓
+
+=== SELF-CHECK TESTS ===
+
+audit-flow-version.sh --self-check
+  Exit: 0
+  Result: PASS ✓
+
+migrate-task-tracking-v2.sh --self-check
+  Exit: 0
+  Result: PASS ✓
+
+=== ACTUAL REPO AUDIT ===
+
+scripts/audit-flow-version.sh (against all plans/epic-*/execution-state.json)
+  Files scanned: 5 with flowVersion=2 (epic-0054, epic-0055, epic-0056, epic-0057, epic-0059)
+  Violations:    0
+  Warnings:      0
+  Exit: 0
+  Result: PASS ✓
+
+=== SUMMARY ===
+
+Total scenarios: 8
+Passed:          8
+Failed:          0
+Coverage:        All Gherkin acceptance criteria verified
