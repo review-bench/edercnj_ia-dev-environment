@@ -1,0 +1,44 @@
+{
+  "storyId": "story-0059-0003",
+  "epicId": "EPIC-0059",
+  "passed": true,
+  "coverageDelta": null,
+  "failures": [],
+  "acCheckResults": [
+    {
+      "scenario": "Hook permite invocação sem flags bloqueadas",
+      "passed": true,
+      "evidence": "AT-02: no blocked flags → exit 0"
+    },
+    {
+      "scenario": "Hook bloqueia --skip-verification em happy path",
+      "passed": true,
+      "evidence": "AT-03: --skip-verification on x-story-implement → exit 1 BLOCKED"
+    },
+    {
+      "scenario": "Hook bloqueia --no-ci-watch em happy path",
+      "passed": true,
+      "evidence": "AT-04: --no-ci-watch on x-story-implement → exit 1"
+    },
+    {
+      "scenario": "Hook permite --skip-verification em recovery mode",
+      "passed": true,
+      "evidence": "AT-05: --skip-verification with RECOVERY_MODE=1 → exit 0 + WARNING"
+    },
+    {
+      "scenario": "Hook não é afetado por CLAUDE_SKIP_AUDIT=1",
+      "passed": true,
+      "evidence": "AT-06: CLAUDE_SKIP_AUDIT=1 ignored → still exit 1"
+    },
+    {
+      "scenario": "Hook permite invocação de skill não-orquestradora",
+      "passed": true,
+      "evidence": "AT-08: --skip-verification on non-orchestrator x-git-commit → exit 0"
+    }
+  ],
+  "smokeTests": {
+    "enforce-no-bypass-flags-smoke.sh": { "passed": 12, "failed": 0 },
+    "settings-hook-registration-smoke.sh": { "passed": 10, "failed": 0 }
+  },
+  "generatedAt": "2026-04-27T17:26:00Z"
+}
