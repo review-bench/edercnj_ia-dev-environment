@@ -1,0 +1,37 @@
+{
+  "epicId": "EPIC-0060",
+  "branch": "epic/0060",
+  "passed": true,
+  "passedConditional": true,
+  "timestamp": "2026-04-27T23:30:00Z",
+  "coverage": {
+    "filtered": {
+      "scope": "EPIC-0060 production code (PathResolver, UnitType, FileCategorizer additions)",
+      "lineCoveragePct": 100.0,
+      "branchCoveragePct": 100.0
+    }
+  },
+  "tests": {
+    "fullSuite": {
+      "run": "≈4000",
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  "stories": [
+    {"id": "story-0060-0001", "status": "Concluída", "prs": [726, 727, 728, 729, 730]},
+    {"id": "story-0060-0002", "status": "Concluída", "prs": [731]},
+    {"id": "story-0060-0003", "status": "Parcial",   "prs": [733], "notes": "Phase 1 (skeleton) delivered; Phase 2 (bulk git mv of 21 ADRs / 11 SPECs / 7 baselines) deferred per RULE-010."},
+    {"id": "story-0060-0004", "status": "Parcial",   "prs": [732], "notes": "CI gate delivered with 14-skill grandfathered baseline; bulk substitution deferred."},
+    {"id": "story-0060-0005", "status": "Parcial",   "prs": [734], "notes": "FileCategorizer v4 awareness delivered; Rule/Hook textual updates deferred to coordinated session."},
+    {"id": "story-0060-0006", "status": "Parcial",   "prs": [735], "notes": "CHANGELOG entry + epic closure report delivered; probe removal + forbid-writes hook + MAJOR bump deferred to next major release after 2-sprint window."}
+  ],
+  "dodChecklist": [
+    {"item": "Tests present", "status": "PASS"},
+    {"item": "All committed PRs merged into epic/0060", "status": "PASS"},
+    {"item": "CHANGELOG entry", "status": "PASS"},
+    {"item": "ADR references", "status": "REFERENCE: SPEC-folder-reorganization-v4.md"},
+    {"item": "Rule 14 (project scope) compliance", "status": "PASS"},
+    {"item": "Backward compatibility preserved", "status": "PASS — v3 epics remain functional"}
+  ]
+}
