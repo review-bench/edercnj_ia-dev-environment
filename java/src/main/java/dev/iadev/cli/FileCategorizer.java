@@ -70,6 +70,17 @@ final class FileCategorizer {
         rules.put(prefix("contracts/"), "Contracts");
         rules.put(prefix("adr/"), "ADR");
         rules.put(prefix("plans/"), "Plans");
+        // EPIC-0060 v4 layout — these prefixes coexist with the v3
+        // ones above so plans/ legacy epics keep their categories
+        // while ai/epics/ + docs/ + governance/ surface the new home.
+        rules.put(prefix("ai/epics/"), "Epics (v4)");
+        rules.put(prefix("ai/runs/"), "Runs");
+        rules.put(prefix("ai/releases/"), "Releases");
+        rules.put(prefix("docs/adr/"), "ADR (v4)");
+        rules.put(prefix("docs/specs/"), "Specs (v4)");
+        rules.put(prefix("docs/"), "Documentation");
+        rules.put(prefix("governance/baselines/"), "Baselines");
+        rules.put(prefix("governance/"), "Governance");
         rules.put(prefix("k8s/"), "Kubernetes");
         rules.put(prefix("tests/"), "Tests");
         rules.put(prefix(".claude/templates/"), "Templates");
