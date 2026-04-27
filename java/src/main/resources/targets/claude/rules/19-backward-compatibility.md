@@ -2,6 +2,7 @@
 
 > **Related:** Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 08 (Release Process).
 > **Introduced by:** EPIC-0049 (Refatoração do Fluxo de Épico) — RULE-008 (`flowVersion` + `--legacy-flow`).
+> **Extended by:** EPIC-0060 (Folder Reorganization v4) — `flowVersion: "4"` for v4 layout (`ai/epics/`).
 
 ## Purpose
 
@@ -22,7 +23,8 @@ Every `execution-state.json` produced by the orchestrators carries a top-level d
 | Version | Meaning |
 | :--- | :--- |
 | `"1"` | Legacy flow — story PRs target `develop`, no `epic/XXXX` branch, auto-merge to `develop` per EPIC-0042 default. |
-| `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. |
+| `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. v3 layout (`plans/`). |
+| `"4"` | New layout (EPIC-0060+) — same flow as `"2"` but artifacts live under `ai/epics/<epic>-<slug>/` (v4 layout). PathResolver auto-detects via filesystem probe. |
 
 ## Fallback Matrix
 
@@ -32,8 +34,9 @@ Whenever an orchestrator reads `execution-state.json` (or creates a new one duri
 | :--- | :--- | :--- | :--- |
 | Field absent (legacy state file pre-EPIC-0049) | `"1"` | Legacy flow | **Yes** — visible warning |
 | Field = `"1"` (explicit) | `"1"` | Legacy flow | No |
-| Field = `"2"` (explicit) | `"2"` | New flow | No |
-| Field = any other value (typo, future-version `"3"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
+| Field = `"2"` (explicit) | `"2"` | New flow, v3 layout (`plans/`) | No |
+| Field = `"4"` (explicit) | `"4"` | New flow, v4 layout (`ai/epics/`) — paths resolved via `PathResolver` | No |
+| Field = any other value (typo, `"3"`, future-version `"5"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
 
 **Warning format:**
 
