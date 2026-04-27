@@ -1,0 +1,25 @@
+Test Run — story-0059-0010
+Date: 2026-04-27
+Story: story-0059-0010 (Rule 27 + ZERO-BYPASS block in CLAUDE.md)
+
+Documentation story — verification tests (file existence + content checks):
+
+[PASS] .claude/rules/27-zero-bypass-lifecycle.md exists
+[PASS] java/src/main/resources/targets/claude/rules/27-zero-bypass-lifecycle.md exists
+[PASS] Rule 27 has 6 sections (## Purpose, ## Non-bypass Contract, ## Enforcement Layers, ## Exceptions, ## Forbidden, ## Audit)
+[PASS] Purpose section mentions "Rule 24" (sub-skill invocations)
+[PASS] Purpose section mentions "Rule 27" (root orchestrator invocation)
+[PASS] Non-bypass Contract table has 12 rows
+[PASS] CLAUDE.md contains "ZERO-BYPASS LIFECYCLE — INEGOCIÁVEL" block
+[PASS] CLAUDE.md block references Rule 27 file link
+[PASS] CLAUDE.md rules index contains "27-zero-bypass-lifecycle.md" entry
+[PASS] CLAUDE.md rules index contains "26-audit-gate-lifecycle.md" entry
+
+Gherkin scenarios verified:
+[PASS] Cenario: Arquivo Rule 27 criado e acessível
+[PASS] Cenario: CLAUDE.md contém bloco ZERO-BYPASS
+[PASS] Cenario: Índice de rules lista Rule 27
+[PASS] Cenario: Rule 27 distingue claramente de Rule 24
+
+Result: 14/14 checks PASS
+Coverage: N/A (documentation story)
