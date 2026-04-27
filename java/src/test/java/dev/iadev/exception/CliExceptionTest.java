@@ -1,10 +1,10 @@
 package dev.iadev.exception;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("CliException")
 class CliExceptionTest {
@@ -56,12 +56,12 @@ class CliExceptionTest {
     @Test
     @DisplayName("is catchable as RuntimeException")
     void create_whenCalled_catchableAsRuntimeException() {
-        Throwable thrown = catchThrowable(() -> {
-            throw new CliException("test", 1);
-        });
+        Throwable thrown =
+                catchThrowable(
+                        () -> {
+                            throw new CliException("test", 1);
+                        });
 
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .isInstanceOf(CliException.class);
+        assertThat(thrown).isInstanceOf(RuntimeException.class).isInstanceOf(CliException.class);
     }
 }

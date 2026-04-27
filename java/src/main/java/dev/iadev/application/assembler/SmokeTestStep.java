@@ -5,24 +5,19 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Generates smoke test configuration conditionally based
- * on {@code smokeTests == true}.
+ * Generates smoke test configuration conditionally based on {@code smokeTests == true}.
  *
- * <p>Copies a static smoke-config.md file from resources
- * to the output directory.</p>
+ * <p>Copies a static smoke-config.md file from resources to the output directory.
  *
  * @see CicdAssembler
  */
 final class SmokeTestStep {
 
-    private static final String CICD_TEMPLATES =
-            "shared/cicd-templates";
-    private static final String SMOKE_SOURCE =
-            "smoke-tests/smoke-config.md";
+    private static final String CICD_TEMPLATES = "shared/cicd-templates";
+    private static final String SMOKE_SOURCE = "smoke-tests/smoke-config.md";
 
     /**
-     * Generates smoke test config if smoke tests are
-     * enabled and the source file exists.
+     * Generates smoke test config if smoke tests are enabled and the source file exists.
      *
      * @param cicdCtx the CI/CD context
      * @return the generation result
@@ -30,24 +25,16 @@ final class SmokeTestStep {
     CicdResult assemble(CicdContext cicdCtx) {
         if (!cicdCtx.config().testing().smokeTests()) {
             return new CicdResult(
-                    List.of(),
-                    List.of("Smoke test config skipped:"
-                            + " smokeTests is false"));
+                    List.of(), List.of("Smoke test config skipped:" + " smokeTests is false"));
         }
-        Path src = cicdCtx.resourcesDir()
-                .resolve(CICD_TEMPLATES)
-                .resolve(SMOKE_SOURCE);
+        Path src = cicdCtx.resourcesDir().resolve(CICD_TEMPLATES).resolve(SMOKE_SOURCE);
         if (!Files.exists(src)) {
             return CicdResult.empty();
         }
-        Path dest = cicdCtx.outputDir()
-                .resolve("tests")
-                .resolve("smoke")
-                .resolve("smoke-config.md");
+        Path dest =
+                cicdCtx.outputDir().resolve("tests").resolve("smoke").resolve("smoke-config.md");
         CopyHelpers.ensureDirectory(dest.getParent());
         CopyHelpers.copyStaticFile(src, dest);
-        return new CicdResult(
-                List.of(dest.toString()),
-                List.of());
+        return new CicdResult(List.of(dest.toString()), List.of());
     }
 }

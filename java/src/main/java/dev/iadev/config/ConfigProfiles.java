@@ -1,42 +1,41 @@
 package dev.iadev.config;
 
 import dev.iadev.domain.model.ProjectConfig;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
- * Provides pre-defined configuration profiles for the 18 bundled
- * technology stacks.
+ * Provides pre-defined configuration profiles for the 18 bundled technology stacks.
  *
- * <p>Each profile is loaded from a YAML config template on the
- * classpath (e.g., {@code shared/config-templates/setup-config.java-spring.yaml})
- * and converted to a {@link ProjectConfig} via {@code fromMap()}.
- * Profiles are loaded lazily and cached for subsequent access.
+ * <p>Each profile is loaded from a YAML config template on the classpath (e.g., {@code
+ * shared/config-templates/setup-config.java-spring.yaml}) and converted to a {@link ProjectConfig}
+ * via {@code fromMap()}. Profiles are loaded lazily and cached for subsequent access.
  *
  * <p>Supported stacks:
+ *
  * <ul>
- *   <li>java-picocli-cli</li>
- *   <li>java-quarkus</li>
- *   <li>java-spring</li>
- *   <li>java-spring-clickhouse</li>
- *   <li>java-spring-cqrs-es</li>
- *   <li>java-spring-elasticsearch</li>
- *   <li>java-spring-event-driven</li>
- *   <li>java-spring-fintech-pci</li>
- *   <li>java-spring-hexagonal</li>
- *   <li>java-spring-neo4j</li>
+ *   <li>java-picocli-cli
+ *   <li>java-quarkus
+ *   <li>java-spring
+ *   <li>java-spring-clickhouse
+ *   <li>java-spring-cqrs-es
+ *   <li>java-spring-elasticsearch
+ *   <li>java-spring-event-driven
+ *   <li>java-spring-fintech-pci
+ *   <li>java-spring-hexagonal
+ *   <li>java-spring-neo4j
  * </ul>
  *
- * <p>EPIC-0048 / v4.0.0: non-Java profiles (python, go,
- * kotlin, typescript, rust) were removed per ADR-0048-A.</p>
+ * <p>EPIC-0048 / v4.0.0: non-Java profiles (python, go, kotlin, typescript, rust) were removed per
+ * ADR-0048-A.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * ProjectConfig config = ConfigProfiles.getStack("java-spring");
  * List<String> stacks = ConfigProfiles.getAvailableStacks();
@@ -47,37 +46,34 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ConfigProfiles {
 
-    private static final List<String> STACK_KEYS = List.of(
-            "java-picocli-cli",
-            "java-quarkus",
-            "java-spring",
-            "java-spring-clickhouse",
-            "java-spring-cqrs-es",
-            "java-spring-elasticsearch",
-            "java-spring-event-driven",
-            "java-spring-fintech-pci",
-            "java-spring-hexagonal",
-            "java-spring-neo4j"
-    );
+    private static final List<String> STACK_KEYS =
+            List.of(
+                    "java-picocli-cli",
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-fintech-pci",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j");
 
-    private static final String TEMPLATE_PATH_PREFIX =
-            "shared/config-templates/setup-config.";
+    private static final String TEMPLATE_PATH_PREFIX = "shared/config-templates/setup-config.";
 
     private static final String TEMPLATE_PATH_SUFFIX = ".yaml";
 
-    private static final Map<String, ProjectConfig> CACHE =
-            new ConcurrentHashMap<>();
+    private static final Map<String, ProjectConfig> CACHE = new ConcurrentHashMap<>();
 
     private ConfigProfiles() {
         // utility class
     }
 
     /**
-     * Returns the pre-defined {@link ProjectConfig} for the given
-     * stack key.
+     * Returns the pre-defined {@link ProjectConfig} for the given stack key.
      *
-     * <p>Loads the config from the classpath YAML template on first
-     * access and caches for subsequent calls.</p>
+     * <p>Loads the config from the classpath YAML template on first access and caches for
+     * subsequent calls.
      *
      * @param stackKey the stack identifier (e.g., "java-spring")
      * @return the pre-defined ProjectConfig for that stack
@@ -86,11 +82,9 @@ public final class ConfigProfiles {
     public static ProjectConfig getStack(String stackKey) {
         if (!isValidStack(stackKey)) {
             throw new IllegalArgumentException(
-                    "Unknown stack: '%s'. Valid stacks: %s"
-                            .formatted(stackKey, STACK_KEYS));
+                    "Unknown stack: '%s'. Valid stacks: %s".formatted(stackKey, STACK_KEYS));
         }
-        return CACHE.computeIfAbsent(stackKey,
-                ConfigProfiles::loadFromClasspath);
+        return CACHE.computeIfAbsent(stackKey, ConfigProfiles::loadFromClasspath);
     }
 
     /**
@@ -113,43 +107,31 @@ public final class ConfigProfiles {
     }
 
     @SuppressWarnings("unchecked")
-    private static ProjectConfig loadFromClasspath(
-            String stackKey) {
-        String resourcePath = TEMPLATE_PATH_PREFIX
-                + stackKey + TEMPLATE_PATH_SUFFIX;
+    private static ProjectConfig loadFromClasspath(String stackKey) {
+        String resourcePath = TEMPLATE_PATH_PREFIX + stackKey + TEMPLATE_PATH_SUFFIX;
         try (InputStream is = openResource(resourcePath)) {
-            Map<String, Object> map =
-                    parseYamlMap(is, resourcePath);
+            Map<String, Object> map = parseYamlMap(is, resourcePath);
             return ProjectConfig.fromMap(map);
         } catch (java.io.IOException e) {
-            throw new IllegalStateException(
-                    "Failed to read config template: "
-                            + resourcePath, e);
+            throw new IllegalStateException("Failed to read config template: " + resourcePath, e);
         }
     }
 
-    private static InputStream openResource(
-            String resourcePath) {
-        InputStream is = ConfigProfiles.class
-                .getClassLoader()
-                .getResourceAsStream(resourcePath);
+    private static InputStream openResource(String resourcePath) {
+        InputStream is = ConfigProfiles.class.getClassLoader().getResourceAsStream(resourcePath);
         if (is == null) {
             throw new IllegalStateException(
-                    "Config template not found on "
-                            + "classpath: " + resourcePath);
+                    "Config template not found on " + "classpath: " + resourcePath);
         }
         return is;
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> parseYamlMap(
-            InputStream is, String resourcePath) {
-        Object parsed = new Yaml(new SafeConstructor(
-                new LoaderOptions())).load(is);
+    private static Map<String, Object> parseYamlMap(InputStream is, String resourcePath) {
+        Object parsed = new Yaml(new SafeConstructor(new LoaderOptions())).load(is);
         if (!(parsed instanceof Map<?, ?> map)) {
             throw new IllegalStateException(
-                    "Config template is not a valid "
-                            + "YAML map: " + resourcePath);
+                    "Config template is not a valid " + "YAML map: " + resourcePath);
         }
         return (Map<String, Object>) map;
     }

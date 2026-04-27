@@ -1,29 +1,24 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.SkillContentReader;
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.SkillContentReader;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for story-0035-0007: Dry-Run output reflects
- * ALL 12 new phases (0-11) with halt markers for
+ * Tests for story-0035-0007: Dry-Run output reflects ALL 12 new phases (0-11) with halt markers for
  * APPROVAL-GATE and BACKMERGE-CONFLICT.
  *
- * <p>Validates that the dry-run section in the x-release
- * SKILL.md shows the complete phase sequence, halt
- * markers, state file summary, and hotfix variant.</p>
+ * <p>Validates that the dry-run section in the x-release SKILL.md shows the complete phase
+ * sequence, halt markers, state file summary, and hotfix variant.
  */
 @DisplayName("x-release Dry-Run Output (story-0035-0007)")
 class ReleaseDryRunTest {
@@ -33,13 +28,9 @@ class ReleaseDryRunTest {
     class PhaseListing {
 
         @Test
-        @DisplayName("dry-run shows all 12 phases"
-                + " numbered 0-11")
-        void dryRun_showsAllTwelvePhases(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("dry-run shows all 12 phases" + " numbered 0-11")
+        void dryRun_showsAllTwelvePhases(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("0. RESUME_DETECTION")
                     .contains("1. DETERMINE")
@@ -57,51 +48,31 @@ class ReleaseDryRunTest {
         }
 
         @Test
-        @DisplayName("dry-run shows halt marker at"
-                + " Phase 8 APPROVAL_GATE")
-        void dryRun_showsHaltMarkerAtPhase8(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("SKILL WILL HALT HERE");
+        @DisplayName("dry-run shows halt marker at" + " Phase 8 APPROVAL_GATE")
+        void dryRun_showsHaltMarkerAtPhase8(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("SKILL WILL HALT HERE");
         }
 
         @Test
-        @DisplayName("dry-run shows HUMAN MUST MERGE"
-                + " PR label")
-        void dryRun_showsHumanMustMergeLabel(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content).contains(
-                    "HUMAN MUST MERGE PR IN GITHUB");
+        @DisplayName("dry-run shows HUMAN MUST MERGE" + " PR label")
+        void dryRun_showsHumanMustMergeLabel(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("HUMAN MUST MERGE PR IN GITHUB");
         }
 
         @Test
-        @DisplayName("dry-run shows NO CHANGES MADE"
-                + " footer")
-        void dryRun_showsNoChangesMadeFooter(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("=== NO CHANGES MADE ===");
+        @DisplayName("dry-run shows NO CHANGES MADE" + " footer")
+        void dryRun_showsNoChangesMadeFooter(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("=== NO CHANGES MADE ===");
         }
 
         @Test
-        @DisplayName("dry-run shows RELEASE PLAN"
-                + " DRY-RUN header")
-        void dryRun_showsReleasePlanHeader(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content).contains(
-                    "=== RELEASE PLAN (DRY-RUN) ===");
+        @DisplayName("dry-run shows RELEASE PLAN" + " DRY-RUN header")
+        void dryRun_showsReleasePlanHeader(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("=== RELEASE PLAN (DRY-RUN) ===");
         }
     }
 
@@ -111,48 +82,30 @@ class ReleaseDryRunTest {
 
         @Test
         @DisplayName("dry-run shows State file path")
-        void dryRun_showsStateFilePath(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("State file:");
+        void dryRun_showsStateFilePath(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("State file:");
         }
 
         @Test
         @DisplayName("dry-run shows Mode field")
-        void dryRun_showsModeField(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Mode:");
+        void dryRun_showsModeField(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Mode:");
         }
 
         @Test
-        @DisplayName("dry-run shows estimated duration"
-                + " per segment")
-        void dryRun_showsEstimatedDuration(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Estimated duration:");
+        @DisplayName("dry-run shows estimated duration" + " per segment")
+        void dryRun_showsEstimatedDuration(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Estimated duration:");
         }
 
         @Test
-        @DisplayName("dry-run shows --continue-after-merge"
-                + " instruction in resume phase")
-        void dryRun_showsContinueAfterMerge(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("--continue-after-merge");
+        @DisplayName("dry-run shows --continue-after-merge" + " instruction in resume phase")
+        void dryRun_showsContinueAfterMerge(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("--continue-after-merge");
         }
     }
 
@@ -161,29 +114,17 @@ class ReleaseDryRunTest {
     class HotfixVariant {
 
         @Test
-        @DisplayName("dry-run documents hotfix mode"
-                + " differences")
-        void dryRun_documentsHotfixMode(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("hotfix mode")
-                    .contains("Source branch:")
-                    .contains("main");
+        @DisplayName("dry-run documents hotfix mode" + " differences")
+        void dryRun_documentsHotfixMode(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("hotfix mode").contains("Source branch:").contains("main");
         }
 
         @Test
-        @DisplayName("dry-run hotfix mode shows"
-                + " patch forced")
-        void dryRun_hotfixShowsPatchForced(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("patch (forced)");
+        @DisplayName("dry-run hotfix mode shows" + " patch forced")
+        void dryRun_hotfixShowsPatchForced(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("patch (forced)");
         }
     }
 
@@ -192,46 +133,30 @@ class ReleaseDryRunTest {
     class VisualSeparators {
 
         @Test
-        @DisplayName("dry-run has visual separator"
-                + " lines around Phase 8")
-        void dryRun_hasSeparatorsAroundPhase8(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("----------");
+        @DisplayName("dry-run has visual separator" + " lines around Phase 8")
+        void dryRun_hasSeparatorsAroundPhase8(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("----------");
         }
 
         @Test
         @DisplayName("dry-run shows Flags active field")
-        void dryRun_showsFlagsActiveField(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Flags active:");
+        void dryRun_showsFlagsActiveField(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Flags active:");
         }
     }
 
-    private Path generateOutput(Path tempDir)
-            throws IOException {
+    private Path generateOutput(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return outputDir;
     }
 
-    private String generateClaudeContent(Path tempDir)
-            throws IOException {
+    private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
-        return SkillContentReader.readSkillWithReferences(
-                outputDir, "x-release");
+        return SkillContentReader.readSkillWithReferences(outputDir, "x-release");
     }
-
 }

@@ -5,24 +5,19 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Categorizes file paths into display categories based on
- * path prefixes.
+ * Categorizes file paths into display categories based on path prefixes.
  *
- * <p>Extracted from {@link CliDisplay} to keep both
- * classes under 250 lines per RULE-004.</p>
+ * <p>Extracted from {@link CliDisplay} to keep both classes under 250 lines per RULE-004.
  *
  * @see CliDisplay
  */
 final class FileCategorizer {
 
     /**
-     * Ordered rule table mapping path predicates to their
-     * display category. Iterated in insertion order so the
-     * first matching predicate wins — matching the original
-     * if/else ladder semantics.
+     * Ordered rule table mapping path predicates to their display category. Iterated in insertion
+     * order so the first matching predicate wins — matching the original if/else ladder semantics.
      */
-    private static final Map<Predicate<String>, String>
-            CATEGORY_RULES = buildCategoryRules();
+    private static final Map<Predicate<String>, String> CATEGORY_RULES = buildCategoryRules();
 
     private FileCategorizer() {
         // utility class
@@ -39,15 +34,13 @@ final class FileCategorizer {
     }
 
     /**
-     * Categorizes a normalized file path into a display
-     * category.
+     * Categorizes a normalized file path into a display category.
      *
      * @param path the normalized file path
      * @return the category name
      */
     static String categorize(String path) {
-        for (Map.Entry<Predicate<String>, String> entry
-                : CATEGORY_RULES.entrySet()) {
+        for (Map.Entry<Predicate<String>, String> entry : CATEGORY_RULES.entrySet()) {
             if (entry.getKey().test(path)) {
                 return entry.getValue();
             }
@@ -55,10 +48,8 @@ final class FileCategorizer {
         return "Other";
     }
 
-    private static Map<Predicate<String>, String>
-            buildCategoryRules() {
-        Map<Predicate<String>, String> rules =
-                new LinkedHashMap<>();
+    private static Map<Predicate<String>, String> buildCategoryRules() {
+        Map<Predicate<String>, String> rules = new LinkedHashMap<>();
         rules.put(prefix(".claude/rules/"), "Rules");
         rules.put(prefix(".claude/skills/"), "Skills");
         rules.put(prefix(".claude/agents/"), "Agents");
@@ -85,8 +76,7 @@ final class FileCategorizer {
         rules.put(prefix("tests/"), "Tests");
         rules.put(prefix(".claude/templates/"), "Templates");
         rules.put(FileCategorizer::isRootFile, "Root Files");
-        rules.put(FileCategorizer::isInfraFile,
-                "Infrastructure");
+        rules.put(FileCategorizer::isInfraFile, "Infrastructure");
         return rules;
     }
 

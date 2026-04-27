@@ -9,21 +9,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verification test for story-0039-0001 — asserts the {@code x-release} source
- * {@code SKILL.md} and the new {@code auto-version-detection.md} reference
- * contain the contract items described in the story.
+ * Verification test for story-0039-0001 — asserts the {@code x-release} source {@code SKILL.md} and
+ * the new {@code auto-version-detection.md} reference contain the contract items described in the
+ * story.
  *
- * <p>This test reads the SOURCE-OF-TRUTH under
- * {@code java/src/main/resources/targets/claude/skills/core/ops/x-release/}
- * per the project-wide rule that {@code .claude/} is a generated output.</p>
+ * <p>This test reads the SOURCE-OF-TRUTH under {@code
+ * java/src/main/resources/targets/claude/skills/core/ops/x-release/} per the project-wide rule that
+ * {@code .claude/} is a generated output.
  */
 @DisplayName("x-release SKILL.md contract — auto-version detection (story-0039-0001)")
 class ReleaseAutoVersionTest {
 
-    private static final Path SKILL_SOURCE = Paths.get(
-            "src/main/resources/targets/claude/skills/core/ops/x-release/SKILL.md");
-    private static final Path AUTO_REFERENCE = Paths.get(
-            "src/main/resources/targets/claude/skills/core/ops/x-release/references/auto-version-detection.md");
+    private static final Path SKILL_SOURCE =
+            Paths.get("src/main/resources/targets/claude/skills/core/ops/x-release/SKILL.md");
+    private static final Path AUTO_REFERENCE =
+            Paths.get(
+                    "src/main/resources/targets/claude/skills/core/ops/x-release/references/auto-version-detection.md");
 
     @Test
     @DisplayName("skillMd_documentsVersionFlag_andAutoDetectAlgorithm")

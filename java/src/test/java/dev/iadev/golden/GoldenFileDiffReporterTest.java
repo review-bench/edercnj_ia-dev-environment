@@ -1,17 +1,16 @@
 package dev.iadev.golden;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Unit tests for {@link GoldenFileDiffReporter}.
  *
- * <p>Verifies diff generation for identical content,
- * differing content, whitespace differences, and output
- * line limiting.</p>
+ * <p>Verifies diff generation for identical content, differing content, whitespace differences, and
+ * output line limiting.
  */
 @DisplayName("GoldenFileDiffReporter")
 class GoldenFileDiffReporterTest {
@@ -24,16 +23,14 @@ class GoldenFileDiffReporterTest {
         void identicalStrings_whenCalled_returnsEmpty() {
             String content = "line1\nline2\nline3\n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", content, content);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", content, content);
 
             assertThat(diff).isEmpty();
         }
 
         @Test
         void emptyStrings_whenCalled_returnsEmpty() {
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", "", "");
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", "", "");
 
             assertThat(diff).isEmpty();
         }
@@ -48,13 +45,9 @@ class GoldenFileDiffReporterTest {
             String expected = "line1\nline2\nline3\n";
             String actual = "line1\nmodified\nline3\n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", expected, actual);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", expected, actual);
 
-            assertThat(diff)
-                    .contains("test.md")
-                    .contains("line2")
-                    .contains("modified");
+            assertThat(diff).contains("test.md").contains("line2").contains("modified");
         }
 
         @Test
@@ -62,12 +55,9 @@ class GoldenFileDiffReporterTest {
             String expected = "line1\nline2\n";
             String actual = "line1\nline2\nline3\n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", expected, actual);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", expected, actual);
 
-            assertThat(diff)
-                    .contains("test.md")
-                    .contains("line3");
+            assertThat(diff).contains("test.md").contains("line3");
         }
 
         @Test
@@ -75,12 +65,9 @@ class GoldenFileDiffReporterTest {
             String expected = "line1\nline2\nline3\n";
             String actual = "line1\nline3\n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", expected, actual);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", expected, actual);
 
-            assertThat(diff)
-                    .contains("test.md")
-                    .contains("line2");
+            assertThat(diff).contains("test.md").contains("line2");
         }
     }
 
@@ -93,8 +80,7 @@ class GoldenFileDiffReporterTest {
             String expected = "line1\nline2\n";
             String actual = "line1\nline2 \n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", expected, actual);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", expected, actual);
 
             assertThat(diff).isNotEmpty();
         }
@@ -104,12 +90,9 @@ class GoldenFileDiffReporterTest {
             String expected = "line1\nline2\n";
             String actual = "line1\r\nline2\r\n";
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md", expected, actual);
+            String diff = GoldenFileDiffReporter.generateDiff("test.md", expected, actual);
 
-            assertThat(diff)
-                    .isNotEmpty()
-                    .contains("\\r\\n");
+            assertThat(diff).isNotEmpty().contains("\\r\\n");
         }
     }
 
@@ -122,26 +105,19 @@ class GoldenFileDiffReporterTest {
             StringBuilder expected = new StringBuilder();
             StringBuilder actual = new StringBuilder();
             for (int i = 0; i < 100; i++) {
-                expected.append("expected-line-")
-                        .append(i).append("\n");
-                actual.append("actual-line-")
-                        .append(i).append("\n");
+                expected.append("expected-line-").append(i).append("\n");
+                actual.append("actual-line-").append(i).append("\n");
             }
 
-            String diff = GoldenFileDiffReporter.generateDiff(
-                    "test.md",
-                    expected.toString(),
-                    actual.toString());
+            String diff =
+                    GoldenFileDiffReporter.generateDiff(
+                            "test.md", expected.toString(), actual.toString());
 
-            assertThat(diff)
-                    .contains("truncated");
+            assertThat(diff).contains("truncated");
 
             long lineCount = diff.lines().count();
             // MAX_DIFF_LINES + 1 truncation message
-            assertThat(lineCount)
-                    .isLessThanOrEqualTo(
-                            GoldenFileDiffReporter
-                                    .MAX_DIFF_LINES + 1);
+            assertThat(lineCount).isLessThanOrEqualTo(GoldenFileDiffReporter.MAX_DIFF_LINES + 1);
         }
     }
 }

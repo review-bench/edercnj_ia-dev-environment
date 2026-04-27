@@ -1,15 +1,14 @@
 package dev.iadev.infrastructure.adapter.output.template;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.port.output.TemplateRenderer;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("PebbleTemplateRenderer")
 class PebbleTemplateRendererTest {
@@ -28,8 +27,7 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("implements TemplateRenderer port")
         void class_implements_templateRendererPort() {
-            assertThat(renderer)
-                    .isInstanceOf(TemplateRenderer.class);
+            assertThat(renderer).isInstanceOf(TemplateRenderer.class);
         }
     }
 
@@ -38,42 +36,33 @@ class PebbleTemplateRendererTest {
     class RenderDegenerateCases {
 
         @Test
-        @DisplayName("null templatePath throws "
-                + "IllegalArgumentException")
+        @DisplayName("null templatePath throws " + "IllegalArgumentException")
         void render_nullPath_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.render(null, Map.of()))
+            assertThatThrownBy(() -> renderer.render(null, Map.of()))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("templatePath");
         }
 
         @Test
-        @DisplayName("blank templatePath throws "
-                + "IllegalArgumentException")
+        @DisplayName("blank templatePath throws " + "IllegalArgumentException")
         void render_blankPath_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.render("", Map.of()))
+            assertThatThrownBy(() -> renderer.render("", Map.of()))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("templatePath");
         }
 
         @Test
-        @DisplayName("whitespace-only templatePath throws "
-                + "IllegalArgumentException")
+        @DisplayName("whitespace-only templatePath throws " + "IllegalArgumentException")
         void render_whitespacePath_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.render("   ", Map.of()))
+            assertThatThrownBy(() -> renderer.render("   ", Map.of()))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("templatePath");
         }
 
         @Test
-        @DisplayName("null context throws "
-                + "IllegalArgumentException")
+        @DisplayName("null context throws " + "IllegalArgumentException")
         void render_nullContext_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.render(
-                            "templates/simple.md.j2", null))
+            assertThatThrownBy(() -> renderer.render("templates/simple.md.j2", null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("context");
         }
@@ -86,11 +75,10 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("renders template with variables")
         void render_withVariables_rendersCorrectly() {
-            String result = renderer.render(
-                    "templates/simple.md.j2",
-                    Map.of("project_name", "my-project",
-                            "project_purpose",
-                            "A CLI tool"));
+            String result =
+                    renderer.render(
+                            "templates/simple.md.j2",
+                            Map.of("project_name", "my-project", "project_purpose", "A CLI tool"));
 
             assertThat(result).contains("# my-project");
             assertThat(result).contains("A CLI tool");
@@ -99,8 +87,7 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("renders template with empty context")
         void render_emptyContext_rendersTemplate() {
-            String result = renderer.render(
-                    "templates/simple.md.j2", Map.of());
+            String result = renderer.render("templates/simple.md.j2", Map.of());
 
             assertThat(result).contains("#");
         }
@@ -113,13 +100,9 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("non-existent template throws exception")
         void render_nonExistentTemplate_throwsException() {
-            assertThatThrownBy(() ->
-                    renderer.render(
-                            "nonexistent-template.peb",
-                            Map.of()))
+            assertThatThrownBy(() -> renderer.render("nonexistent-template.peb", Map.of()))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining(
-                            "nonexistent-template.peb");
+                    .hasMessageContaining("nonexistent-template.peb");
         }
     }
 
@@ -134,8 +117,7 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("returns true for existing template")
         void templateExists_existing_returnsTrue() {
-            boolean result = renderer.templateExists(
-                    "templates/simple.md.j2");
+            boolean result = renderer.templateExists("templates/simple.md.j2");
 
             assertThat(result).isTrue();
         }
@@ -143,28 +125,23 @@ class PebbleTemplateRendererTest {
         @Test
         @DisplayName("returns false for non-existing template")
         void templateExists_nonExisting_returnsFalse() {
-            boolean result = renderer.templateExists(
-                    "templates/nonexistent.md.j2");
+            boolean result = renderer.templateExists("templates/nonexistent.md.j2");
 
             assertThat(result).isFalse();
         }
 
         @Test
-        @DisplayName("null templatePath throws "
-                + "IllegalArgumentException")
+        @DisplayName("null templatePath throws " + "IllegalArgumentException")
         void templateExists_nullPath_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.templateExists(null))
+            assertThatThrownBy(() -> renderer.templateExists(null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("templatePath");
         }
 
         @Test
-        @DisplayName("blank templatePath throws "
-                + "IllegalArgumentException")
+        @DisplayName("blank templatePath throws " + "IllegalArgumentException")
         void templateExists_blankPath_throwsIllegalArgument() {
-            assertThatThrownBy(() ->
-                    renderer.templateExists(""))
+            assertThatThrownBy(() -> renderer.templateExists(""))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("templatePath");
         }
@@ -175,40 +152,35 @@ class PebbleTemplateRendererTest {
     class EngineConfigParity {
 
         @Test
-        @DisplayName("autoEscaping is disabled — "
-                + "HTML chars pass through")
+        @DisplayName("autoEscaping is disabled — " + "HTML chars pass through")
         void render_htmlChars_notEscaped() {
-            String result = renderer.render(
-                    "templates/simple.md.j2",
-                    Map.of("project_name",
-                            "<strong>bold</strong>",
-                            "project_purpose", "test"));
+            String result =
+                    renderer.render(
+                            "templates/simple.md.j2",
+                            Map.of(
+                                    "project_name",
+                                    "<strong>bold</strong>",
+                                    "project_purpose",
+                                    "test"));
 
-            assertThat(result)
-                    .contains("<strong>bold</strong>");
+            assertThat(result).contains("<strong>bold</strong>");
         }
 
         @Test
-        @DisplayName("strictVariables is disabled — "
-                + "missing variables render empty")
+        @DisplayName("strictVariables is disabled — " + "missing variables render empty")
         void render_missingVariable_rendersEmpty() {
-            String result = renderer.render(
-                    "templates/simple.md.j2", Map.of());
+            String result = renderer.render("templates/simple.md.j2", Map.of());
 
-            assertThat(result)
-                    .contains("#")
-                    .doesNotContain("{{")
-                    .doesNotContain("}}");
+            assertThat(result).contains("#").doesNotContain("{{").doesNotContain("}}");
         }
 
         @Test
-        @DisplayName("newLineTrimming is disabled — "
-                + "newlines preserved")
+        @DisplayName("newLineTrimming is disabled — " + "newlines preserved")
         void render_newlines_preserved() {
-            String result = renderer.render(
-                    "templates/simple.md.j2",
-                    Map.of("project_name", "test",
-                            "project_purpose", "purpose"));
+            String result =
+                    renderer.render(
+                            "templates/simple.md.j2",
+                            Map.of("project_name", "test", "project_purpose", "purpose"));
 
             assertThat(result).contains("\n");
         }

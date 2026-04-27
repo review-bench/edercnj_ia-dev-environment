@@ -1,7 +1,6 @@
 package dev.iadev.cli;
 
 import dev.iadev.exception.GenerationCancelledException;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -11,23 +10,21 @@ import java.util.function.Predicate;
 /**
  * Test implementation of {@link TerminalProvider} with pre-configured responses.
  *
- * <p>Responses are queued and consumed in order. Supports configuring
- * a cancellation at a specific prompt to test Ctrl+C scenarios.</p>
+ * <p>Responses are queued and consumed in order. Supports configuring a cancellation at a specific
+ * prompt to test Ctrl+C scenarios.
  */
 public class MockTerminalProvider implements TerminalProvider {
 
     private final Deque<String> readLineResponses = new ArrayDeque<>();
     private final Deque<String> selectResponses = new ArrayDeque<>();
-    private final Deque<List<String>> multiSelectResponses =
-            new ArrayDeque<>();
+    private final Deque<List<String>> multiSelectResponses = new ArrayDeque<>();
     private final Deque<Boolean> confirmResponses = new ArrayDeque<>();
     private final List<String> displayedMessages = new ArrayList<>();
     private int cancelAfterPrompts = -1;
     private int promptCount;
 
     /**
-     * Queues a response for the next {@code readLine} or
-     * {@code readLineWithValidation} call.
+     * Queues a response for the next {@code readLine} or {@code readLineWithValidation} call.
      *
      * @param response the text to return
      * @return this instance for chaining
@@ -49,8 +46,7 @@ public class MockTerminalProvider implements TerminalProvider {
     }
 
     /**
-     * Queues a multi-select response for the next
-     * {@code selectMultiple} call.
+     * Queues a multi-select response for the next {@code selectMultiple} call.
      *
      * @param response the list of selected options
      * @return this instance for chaining
@@ -96,23 +92,19 @@ public class MockTerminalProvider implements TerminalProvider {
         checkCancellation();
         if (readLineResponses.isEmpty()) {
             throw new IllegalStateException(
-                    "No readLine response configured for prompt: "
-                            + prompt);
+                    "No readLine response configured for prompt: " + prompt);
         }
         return readLineResponses.poll();
     }
 
     @Override
     public String readLineWithValidation(
-            String prompt,
-            Predicate<String> validator,
-            String errorMsg) {
+            String prompt, Predicate<String> validator, String errorMsg) {
         while (true) {
             checkCancellation();
             if (readLineResponses.isEmpty()) {
                 throw new IllegalStateException(
-                        "No readLine response configured for prompt: "
-                                + prompt);
+                        "No readLine response configured for prompt: " + prompt);
             }
             String response = readLineResponses.poll();
             if (validator.test(response)) {
@@ -123,38 +115,30 @@ public class MockTerminalProvider implements TerminalProvider {
     }
 
     @Override
-    public String selectFromList(
-            String prompt, List<String> options, int defaultIndex) {
+    public String selectFromList(String prompt, List<String> options, int defaultIndex) {
         checkCancellation();
         if (selectResponses.isEmpty()) {
-            throw new IllegalStateException(
-                    "No select response configured for prompt: "
-                            + prompt);
+            throw new IllegalStateException("No select response configured for prompt: " + prompt);
         }
         return selectResponses.poll();
     }
 
     @Override
-    public List<String> selectMultiple(
-            String prompt, List<String> options,
-            List<String> defaults) {
+    public List<String> selectMultiple(String prompt, List<String> options, List<String> defaults) {
         checkCancellation();
         if (multiSelectResponses.isEmpty()) {
             throw new IllegalStateException(
-                    "No multi-select response configured for prompt: "
-                            + prompt);
+                    "No multi-select response configured for prompt: " + prompt);
         }
         return multiSelectResponses.poll();
     }
 
     @Override
-    public boolean confirm(String prompt,
-                           ConfirmDefault confirmDefault) {
+    public boolean confirm(String prompt, ConfirmDefault confirmDefault) {
         checkCancellation();
         if (confirmResponses.isEmpty()) {
             throw new IllegalStateException(
-                    "No confirm response configured"
-                            + " for prompt: " + prompt);
+                    "No confirm response configured" + " for prompt: " + prompt);
         }
         return confirmResponses.poll();
     }
@@ -166,10 +150,8 @@ public class MockTerminalProvider implements TerminalProvider {
 
     private void checkCancellation() {
         promptCount++;
-        if (cancelAfterPrompts >= 0
-                && promptCount > cancelAfterPrompts) {
-            throw new GenerationCancelledException(
-                    InteractivePrompter.CANCELLED_BY_USER);
+        if (cancelAfterPrompts >= 0 && promptCount > cancelAfterPrompts) {
+            throw new GenerationCancelledException(InteractivePrompter.CANCELLED_BY_USER);
         }
     }
 }

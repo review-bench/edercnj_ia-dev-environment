@@ -1,30 +1,25 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.SkillContentReader;
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.SkillContentReader;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for story-0022-0020: x-security-pipeline skill
- * for CI/CD pipeline generation with conditional security
- * stages.
+ * Tests for story-0022-0020: x-security-pipeline skill for CI/CD pipeline generation with
+ * conditional security stages.
  *
- * <p>Validates that the x-security-pipeline skill template
- * is generated correctly with proper frontmatter, stage
- * definitions, platform support, composability, and
- * conditional stage evaluation.</p>
+ * <p>Validates that the x-security-pipeline skill template is generated correctly with proper
+ * frontmatter, stage definitions, platform support, composability, and conditional stage
+ * evaluation.
  */
 @DisplayName("x-security-pipeline Skill")
 class SecurityPipelineSkillTest {
@@ -34,53 +29,34 @@ class SecurityPipelineSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-security-pipeline SKILL.md exists"
-                + " after assembly")
-        void assemble_securityPipeline_skillMdExists(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("x-security-pipeline SKILL.md exists" + " after assembly")
+        void assemble_securityPipeline_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve(
-                    "skills/x-security-pipeline/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-security-pipeline/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:"
-                + " x-security-pipeline")
-        void assemble_securityPipeline_hasName(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("frontmatter contains name:" + " x-security-pipeline")
+        void assemble_securityPipeline_hasName(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("name: x-security-pipeline");
+        }
+
+        @Test
+        @DisplayName("frontmatter contains" + " user-invocable: true")
+        void assemble_securityPipeline_hasUserInvocable(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
-                    .contains(
-                            "name: x-security-pipeline");
+                    .satisfiesAnyOf(
+                            c -> assertThat(c).contains("user-invocable: true"),
+                            c -> assertThat(c).contains("user-invocable: \"true\""));
         }
 
         @Test
-        @DisplayName("frontmatter contains"
-                + " user-invocable: true")
-        void assemble_securityPipeline_hasUserInvocable(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content).satisfiesAnyOf(
-                    c -> assertThat(c).contains(
-                            "user-invocable: true"),
-                    c -> assertThat(c).contains(
-                            "user-invocable: \"true\""));
-        }
-
-        @Test
-        @DisplayName("frontmatter contains argument-hint"
-                + " with pipeline options")
-        void assemble_securityPipeline_hasArgumentHint(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("frontmatter contains argument-hint" + " with pipeline options")
+        void assemble_securityPipeline_hasArgumentHint(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("argument-hint:")
                     .contains("--ci")
@@ -92,26 +68,16 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("frontmatter contains allowed-tools")
-        void assemble_securityPipeline_hasAllowedTools(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("allowed-tools:");
+        void assemble_securityPipeline_hasAllowedTools(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("allowed-tools:");
         }
 
         @Test
-        @DisplayName("frontmatter contains description"
-                + " with security pipeline keywords")
-        void assemble_securityPipeline_hasDescription(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("description:")
-                    .contains("security stages");
+        @DisplayName("frontmatter contains description" + " with security pipeline keywords")
+        void assemble_securityPipeline_hasDescription(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("description:").contains("security stages");
         }
     }
 
@@ -120,13 +86,9 @@ class SecurityPipelineSkillTest {
     class SecurityStages {
 
         @Test
-        @DisplayName("contains all 9 security stages"
-                + " in order")
-        void assemble_securityPipeline_hasAllStages(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("contains all 9 security stages" + " in order")
+        void assemble_securityPipeline_hasAllStages(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("Secret Scan")
                     .contains("SAST")
@@ -141,35 +103,22 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("contains stage condition mappings")
-        void assemble_securityPipeline_hasConditions(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        void assemble_securityPipeline_hasConditions(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
-                    .contains(
-                            "security.scanning.secrets")
-                    .contains(
-                            "security.scanning.sast")
-                    .contains(
-                            "security.scanning.sonar")
-                    .contains(
-                            "security.scanning.dast")
-                    .contains(
-                            "security.scanning.hardening")
-                    .contains(
-                            "infrastructure.container");
+                    .contains("security.scanning.secrets")
+                    .contains("security.scanning.sast")
+                    .contains("security.scanning.sonar")
+                    .contains("security.scanning.dast")
+                    .contains("security.scanning.hardening")
+                    .contains("infrastructure.container");
         }
 
         @Test
-        @DisplayName("contains phase definitions"
-                + " (pre-commit, build, deploy-staging,"
-                + " gate)")
-        void assemble_securityPipeline_hasPhases(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName(
+                "contains phase definitions" + " (pre-commit, build, deploy-staging," + " gate)")
+        void assemble_securityPipeline_hasPhases(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("pre-commit")
                     .contains("build")
@@ -178,28 +127,17 @@ class SecurityPipelineSkillTest {
         }
 
         @Test
-        @DisplayName("dependency audit is always"
-                + " enabled (baseline)")
-        void assemble_securityPipeline_depAuditAlways(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Always enabled");
+        @DisplayName("dependency audit is always" + " enabled (baseline)")
+        void assemble_securityPipeline_depAuditAlways(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Always enabled");
         }
 
         @Test
-        @DisplayName("contains minimal mode definition"
-                + " with 3 stages")
-        void assemble_securityPipeline_hasMinimalMode(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("minimal")
-                    .contains("stages 1-3");
+        @DisplayName("contains minimal mode definition" + " with 3 stages")
+        void assemble_securityPipeline_hasMinimalMode(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("minimal").contains("stages 1-3");
         }
     }
 
@@ -208,55 +146,32 @@ class SecurityPipelineSkillTest {
     class CiPlatforms {
 
         @Test
-        @DisplayName("contains GitHub Actions pipeline"
-                + " template")
-        void assemble_securityPipeline_hasGithubActions(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("contains GitHub Actions pipeline" + " template")
+        void assemble_securityPipeline_hasGithubActions(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("GitHub Actions")
-                    .contains(
-                            ".github/workflows/security.yml");
+                    .contains(".github/workflows/security.yml");
         }
 
         @Test
-        @DisplayName("contains GitLab CI pipeline"
-                + " template")
-        void assemble_securityPipeline_hasGitlabCi(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("GitLab CI")
-                    .contains(
-                            ".gitlab-ci-security.yml");
+        @DisplayName("contains GitLab CI pipeline" + " template")
+        void assemble_securityPipeline_hasGitlabCi(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("GitLab CI").contains(".gitlab-ci-security.yml");
         }
 
         @Test
-        @DisplayName("contains Azure DevOps pipeline"
-                + " template")
-        void assemble_securityPipeline_hasAzureDevOps(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Azure DevOps")
-                    .contains(
-                            "azure-pipelines-security.yml");
+        @DisplayName("contains Azure DevOps pipeline" + " template")
+        void assemble_securityPipeline_hasAzureDevOps(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Azure DevOps").contains("azure-pipelines-security.yml");
         }
 
         @Test
-        @DisplayName("GitHub Actions template uses"
-                + " correct YAML syntax")
-        void assemble_securityPipeline_githubYamlSyntax(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("GitHub Actions template uses" + " correct YAML syntax")
+        void assemble_securityPipeline_githubYamlSyntax(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("runs-on:")
                     .contains("uses: actions/checkout@v4")
@@ -264,13 +179,9 @@ class SecurityPipelineSkillTest {
         }
 
         @Test
-        @DisplayName("GitLab CI template uses"
-                + " correct YAML syntax")
-        void assemble_securityPipeline_gitlabYamlSyntax(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("GitLab CI template uses" + " correct YAML syntax")
+        void assemble_securityPipeline_gitlabYamlSyntax(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("stages:")
                     .contains("stage: pre-commit")
@@ -279,13 +190,9 @@ class SecurityPipelineSkillTest {
         }
 
         @Test
-        @DisplayName("Azure DevOps template uses"
-                + " correct YAML syntax")
-        void assemble_securityPipeline_azureYamlSyntax(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("Azure DevOps template uses" + " correct YAML syntax")
+        void assemble_securityPipeline_azureYamlSyntax(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("vmImage:")
                     .contains("displayName:")
@@ -298,13 +205,9 @@ class SecurityPipelineSkillTest {
     class Composability {
 
         @Test
-        @DisplayName("references atomic scanning skills"
-                + " (RULE-011)")
-        void assemble_securityPipeline_refsAtomicSkills(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("references atomic scanning skills" + " (RULE-011)")
+        void assemble_securityPipeline_refsAtomicSkills(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("x-security-secrets")
                     .contains("x-security-sast")
@@ -317,28 +220,17 @@ class SecurityPipelineSkillTest {
         }
 
         @Test
-        @DisplayName("contains RULE-011 composability"
-                + " reference")
-        void assemble_securityPipeline_hasRule011(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("RULE-011");
+        @DisplayName("contains RULE-011 composability" + " reference")
+        void assemble_securityPipeline_hasRule011(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("RULE-011");
         }
 
         @Test
         @DisplayName("never duplicates scan logic")
-        void assemble_securityPipeline_noDuplication(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains(
-                            "never duplicates their"
-                                    + " scan logic");
+        void assemble_securityPipeline_noDuplication(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("never duplicates their" + " scan logic");
         }
     }
 
@@ -348,11 +240,8 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("contains 7-step workflow")
-        void assemble_securityPipeline_hasWorkflowSteps(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        void assemble_securityPipeline_hasWorkflowSteps(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("Read Configuration")
                     .contains("Evaluate Stage Conditions")
@@ -365,24 +254,16 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("references ci-cd-patterns KP")
-        void assemble_securityPipeline_refsCiCdPatterns(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("ci-cd-patterns");
+        void assemble_securityPipeline_refsCiCdPatterns(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("ci-cd-patterns");
         }
 
         @Test
         @DisplayName("references ci-cd-generate skill")
-        void assemble_securityPipeline_refsDevopsAgent(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("x-ci-generate");
+        void assemble_securityPipeline_refsDevopsAgent(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("x-ci-generate");
         }
     }
 
@@ -392,64 +273,42 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("supports push trigger")
-        void assemble_securityPipeline_hasPushTrigger(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("push");
+        void assemble_securityPipeline_hasPushTrigger(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("push");
         }
 
         @Test
         @DisplayName("supports pr trigger")
-        void assemble_securityPipeline_hasPrTrigger(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("pull_request");
+        void assemble_securityPipeline_hasPrTrigger(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("pull_request");
         }
 
         @Test
         @DisplayName("supports schedule trigger")
-        void assemble_securityPipeline_hasScheduleTrigger(
-                @TempDir Path tempDir)
+        void assemble_securityPipeline_hasScheduleTrigger(@TempDir Path tempDir)
                 throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("schedule")
-                    .contains("cron:");
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("schedule").contains("cron:");
         }
     }
 
     @Nested
-    @DisplayName(
-            "Claude SKILL.md -- Severity and Findings")
+    @DisplayName("Claude SKILL.md -- Severity and Findings")
     class SeverityAndFindings {
 
         @Test
-        @DisplayName("contains fail-on-findings"
-                + " configuration")
-        void assemble_securityPipeline_hasFailOnFindings(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("fail-on-findings");
+        @DisplayName("contains fail-on-findings" + " configuration")
+        void assemble_securityPipeline_hasFailOnFindings(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("fail-on-findings");
         }
 
         @Test
-        @DisplayName("contains severity-threshold"
-                + " configuration")
-        void assemble_securityPipeline_hasSeverity(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
+        @DisplayName("contains severity-threshold" + " configuration")
+        void assemble_securityPipeline_hasSeverity(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
             assertThat(content)
                     .contains("SEVERITY_THRESHOLD")
                     .contains("CRITICAL")
@@ -463,52 +322,31 @@ class SecurityPipelineSkillTest {
     class Placeholders {
 
         @Test
-        @DisplayName("retains runtime placeholder"
-                + " {{LANGUAGE}} for AI interpretation")
-        void assemble_securityPipeline_retainsLanguage(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("{{LANGUAGE}}");
+        @DisplayName("retains runtime placeholder" + " {{LANGUAGE}} for AI interpretation")
+        void assemble_securityPipeline_retainsLanguage(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("{{LANGUAGE}}");
         }
 
         @Test
-        @DisplayName("retains runtime placeholder"
-                + " {{BUILD_TOOL}} for AI interpretation")
-        void assemble_securityPipeline_retainsBuildTool(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("{{BUILD_TOOL}}");
+        @DisplayName("retains runtime placeholder" + " {{BUILD_TOOL}} for AI interpretation")
+        void assemble_securityPipeline_retainsBuildTool(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("{{BUILD_TOOL}}");
         }
 
         @Test
-        @DisplayName("retains runtime placeholder"
-                + " {{PROJECT_NAME}} for AI"
-                + " interpretation")
-        void assemble_securityPipeline_retainsProject(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("{{PROJECT_NAME}}");
+        @DisplayName("retains runtime placeholder" + " {{PROJECT_NAME}} for AI" + " interpretation")
+        void assemble_securityPipeline_retainsProject(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("{{PROJECT_NAME}}");
         }
 
         @Test
-        @DisplayName("retains runtime placeholder"
-                + " {{FRAMEWORK}} for AI interpretation")
-        void assemble_securityPipeline_retainsFramework(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("{{FRAMEWORK}}");
+        @DisplayName("retains runtime placeholder" + " {{FRAMEWORK}} for AI interpretation")
+        void assemble_securityPipeline_retainsFramework(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("{{FRAMEWORK}}");
         }
     }
 
@@ -518,55 +356,36 @@ class SecurityPipelineSkillTest {
 
         @Test
         @DisplayName("contains error handling table")
-        void assemble_securityPipeline_hasErrorHandling(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Error Handling");
+        void assemble_securityPipeline_hasErrorHandling(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Error Handling");
         }
 
         @Test
         @DisplayName("handles unknown CI platform")
-        void assemble_securityPipeline_unknownPlatform(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("Unknown CI platform");
+        void assemble_securityPipeline_unknownPlatform(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("Unknown CI platform");
         }
 
         @Test
         @DisplayName("handles no SecurityConfig flags")
-        void assemble_securityPipeline_noFlags(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateClaudeContent(tempDir);
-            assertThat(content)
-                    .contains("No SecurityConfig flags");
+        void assemble_securityPipeline_noFlags(@TempDir Path tempDir) throws IOException {
+            String content = generateClaudeContent(tempDir);
+            assertThat(content).contains("No SecurityConfig flags");
         }
     }
 
-    private Path generateOutput(Path tempDir)
-            throws IOException {
+    private Path generateOutput(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return outputDir;
     }
 
-    private String generateClaudeContent(Path tempDir)
-            throws IOException {
+    private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
-        return SkillContentReader.readSkillWithReferences(
-                outputDir, "x-security-pipeline");
+        return SkillContentReader.readSkillWithReferences(outputDir, "x-security-pipeline");
     }
-
 }

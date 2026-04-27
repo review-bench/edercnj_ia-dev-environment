@@ -1,15 +1,13 @@
 package dev.iadev.golden;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import dev.iadev.application.assembler.AssemblerPipeline;
 import dev.iadev.application.assembler.PipelineOptions;
 import dev.iadev.config.ConfigProfiles;
 import dev.iadev.domain.model.PipelineResult;
 import dev.iadev.domain.model.ProjectConfig;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -22,28 +20,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Golden file tests validating byte-for-byte parity between
- * Java pipeline output and TypeScript golden files for all 17
- * bundled profiles.
+ * Golden file tests validating byte-for-byte parity between Java pipeline output and TypeScript
+ * golden files for all 17 bundled profiles.
  *
  * <p>For each profile, the test:
+ *
  * <ol>
- *   <li>Loads the config via {@link ConfigProfiles}</li>
- *   <li>Runs the full pipeline into a temp directory</li>
- *   <li>Compares every generated file with its golden
- *       counterpart</li>
- *   <li>Validates file count and directory structure</li>
- *   <li>Reports detailed diffs on mismatch via
- *       {@link GoldenFileDiffReporter}</li>
+ *   <li>Loads the config via {@link ConfigProfiles}
+ *   <li>Runs the full pipeline into a temp directory
+ *   <li>Compares every generated file with its golden counterpart
+ *   <li>Validates file count and directory structure
+ *   <li>Reports detailed diffs on mismatch via {@link GoldenFileDiffReporter}
  * </ol>
  *
- * <p>RULE-001: byte-for-byte parity between Java and
- * TypeScript output is the acceptance criterion.
+ * <p>RULE-001: byte-for-byte parity between Java and TypeScript output is the acceptance criterion.
  *
  * @see GoldenFileDiffReporter
  * @see AssemblerPipeline
@@ -51,11 +47,9 @@ import static org.assertj.core.api.Assertions.fail;
 @DisplayName("Golden File Parity Tests")
 class GoldenFileTest {
 
-    private static final String GOLDEN_ROOT =
-            "/golden/";
+    private static final String GOLDEN_ROOT = "/golden/";
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     /**
      * Provides the 17 profile names for parameterized tests.
@@ -72,100 +66,75 @@ class GoldenFileTest {
                 "java-spring-event-driven",
                 "java-spring-fintech-pci",
                 "java-spring-hexagonal",
-                "java-spring-neo4j"
-        );
+                "java-spring-neo4j");
     }
 
     /**
-     * Validates that the pipeline output for the given profile
-     * matches the golden files byte-for-byte.
+     * Validates that the pipeline output for the given profile matches the golden files
+     * byte-for-byte.
      *
      * @param profile the bundled stack profile name
      * @throws IOException if file reading fails
      */
-    @ParameterizedTest(
-            name = "{0} — byte-for-byte parity")
+    @ParameterizedTest(name = "{0} — byte-for-byte parity")
     @MethodSource("profiles")
-    void profile_whenCalled_matchesGoldenFiles(String profile)
-            throws IOException {
+    void profile_whenCalled_matchesGoldenFiles(String profile) throws IOException {
         Path outputDir = tempDir.resolve(profile);
         Files.createDirectories(outputDir);
 
-        ProjectConfig config =
-                ConfigProfiles.getStack(profile);
+        ProjectConfig config = ConfigProfiles.getStack(profile);
 
-        AssemblerPipeline pipeline = new AssemblerPipeline(
-                AssemblerPipeline.buildAssemblers());
-        PipelineOptions options = new PipelineOptions(
-                false, true, false, null);
+        AssemblerPipeline pipeline = new AssemblerPipeline(AssemblerPipeline.buildAssemblers());
+        PipelineOptions options = new PipelineOptions(false, true, false, null);
 
-        PipelineResult result = pipeline.runPipeline(
-                config, outputDir, options);
-        assertThat(result.success())
-                .as("Pipeline must succeed for profile: "
-                        + profile)
-                .isTrue();
+        PipelineResult result = pipeline.runPipeline(config, outputDir, options);
+        assertThat(result.success()).as("Pipeline must succeed for profile: " + profile).isTrue();
 
         Path goldenDir = resolveGoldenDir(profile);
-        Set<String> goldenFiles =
-                collectRelativePaths(goldenDir);
-        Set<String> generatedFiles =
-                collectRelativePaths(outputDir);
+        Set<String> goldenFiles = collectRelativePaths(goldenDir);
+        Set<String> generatedFiles = collectRelativePaths(outputDir);
 
-        validateCompleteness(
-                profile, goldenFiles, generatedFiles);
+        validateCompleteness(profile, goldenFiles, generatedFiles);
 
         List<String> mismatches = new ArrayList<>();
         for (String relativePath : goldenFiles) {
-            Path goldenFile =
-                    goldenDir.resolve(relativePath);
-            Path generatedFile =
-                    outputDir.resolve(relativePath);
+            Path goldenFile = goldenDir.resolve(relativePath);
+            Path generatedFile = outputDir.resolve(relativePath);
 
             if (!Files.exists(generatedFile)) {
-                mismatches.add(
-                        "MISSING: " + relativePath);
+                mismatches.add("MISSING: " + relativePath);
                 continue;
             }
 
-            String goldenContent = Files.readString(
-                    goldenFile, StandardCharsets.UTF_8);
-            String generatedContent = Files.readString(
-                    generatedFile, StandardCharsets.UTF_8);
+            String goldenContent = Files.readString(goldenFile, StandardCharsets.UTF_8);
+            String generatedContent = Files.readString(generatedFile, StandardCharsets.UTF_8);
 
             if (!goldenContent.equals(generatedContent)) {
                 String diff =
                         GoldenFileDiffReporter.generateDiff(
-                                relativePath,
-                                goldenContent,
-                                generatedContent);
+                                relativePath, goldenContent, generatedContent);
                 mismatches.add(diff);
             }
         }
 
         if (!mismatches.isEmpty()) {
-            fail("[%s] %d file(s) differ:\n\n%s".formatted(
-                    profile,
-                    mismatches.size(),
-                    String.join("\n\n", mismatches)));
+            fail(
+                    "[%s] %d file(s) differ:\n\n%s"
+                            .formatted(
+                                    profile, mismatches.size(), String.join("\n\n", mismatches)));
         }
     }
 
     private Path resolveGoldenDir(String profile) {
-        var url = getClass().getResource(
-                GOLDEN_ROOT + profile);
+        var url = getClass().getResource(GOLDEN_ROOT + profile);
         assertThat(url)
                 .as("Golden dir must exist for: " + profile)
-                .satisfies(u -> assertThat(
-                        u.toString())
-                        .contains(profile));
+                .satisfies(u -> assertThat(u.toString()).contains(profile));
         return Path.of(url.getPath());
     }
 
     private void validateCompleteness(
-            String profile,
-            Set<String> goldenFiles,
-            Set<String> generatedFiles) {
+            String profile, Set<String> goldenFiles, Set<String> generatedFiles) {
         Set<String> missing = new TreeSet<>(goldenFiles);
         missing.removeAll(generatedFiles);
 
@@ -173,84 +142,69 @@ class GoldenFileTest {
         extra.removeAll(goldenFiles);
 
         if (!missing.isEmpty() || !extra.isEmpty()) {
-            fail(buildMismatchMessage(
-                    profile, goldenFiles.size(),
-                    generatedFiles.size(),
-                    missing, extra));
+            fail(
+                    buildMismatchMessage(
+                            profile, goldenFiles.size(), generatedFiles.size(), missing, extra));
         }
     }
 
     private String buildMismatchMessage(
-            String profile, int goldenCount,
+            String profile,
+            int goldenCount,
             int generatedCount,
-            Set<String> missing, Set<String> extra) {
+            Set<String> missing,
+            Set<String> extra) {
         StringBuilder msg = new StringBuilder();
-        msg.append("[").append(profile)
+        msg.append("[")
+                .append(profile)
                 .append("] File count mismatch: golden=")
                 .append(goldenCount)
                 .append(" generated=")
-                .append(generatedCount).append("\n");
-        appendFileList(
-                msg, missing,
-                "Missing files (in golden, "
-                        + "not generated):");
-        appendFileList(
-                msg, extra,
-                "Extra files (generated, "
-                        + "not in golden):");
+                .append(generatedCount)
+                .append("\n");
+        appendFileList(msg, missing, "Missing files (in golden, " + "not generated):");
+        appendFileList(msg, extra, "Extra files (generated, " + "not in golden):");
         return msg.toString();
     }
 
-    private void appendFileList(
-            StringBuilder msg,
-            Set<String> files, String header) {
+    private void appendFileList(StringBuilder msg, Set<String> files, String header) {
         if (!files.isEmpty()) {
             msg.append(header).append("\n");
-            files.forEach(f ->
-                    msg.append("  - ").append(f)
-                            .append("\n"));
+            files.forEach(f -> msg.append("  - ").append(f).append("\n"));
         }
     }
 
     /**
-     * Collects all relative file paths under a directory,
-     * sorted for deterministic comparison.
+     * Collects all relative file paths under a directory, sorted for deterministic comparison.
      *
-     * <p>Skips {@code platform-*} subdirectories since
-     * those are tested separately by
-     * {@link PlatformGoldenFileTest}.</p>
+     * <p>Skips {@code platform-*} subdirectories since those are tested separately by {@link
+     * PlatformGoldenFileTest}.
      *
      * @param dir the root directory to scan
      * @return sorted set of relative paths as strings
      * @throws IOException if directory traversal fails
      */
-    static Set<String> collectRelativePaths(Path dir)
-            throws IOException {
+    static Set<String> collectRelativePaths(Path dir) throws IOException {
         Set<String> paths = new TreeSet<>();
-        Files.walkFileTree(dir, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(
-                    Path subDir,
-                    BasicFileAttributes attrs) {
-                String name = subDir.getFileName()
-                        .toString();
-                if (name.startsWith("platform-")) {
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                return FileVisitResult.CONTINUE;
-            }
+        Files.walkFileTree(
+                dir,
+                new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(
+                            Path subDir, BasicFileAttributes attrs) {
+                        String name = subDir.getFileName().toString();
+                        if (name.startsWith("platform-")) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult visitFile(
-                    Path file,
-                    BasicFileAttributes attrs) {
-                paths.add(
-                        dir.relativize(file)
-                                .toString()
-                                .replace('\\', '/'));
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                        paths.add(dir.relativize(file).toString().replace('\\', '/'));
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
         return paths;
     }
 }

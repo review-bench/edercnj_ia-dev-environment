@@ -6,27 +6,23 @@ import java.util.Optional;
 /**
  * Version directory lookup with fallback.
  *
- * <p>Resolves version-specific directories by trying exact
- * match first, then falling back to major version wildcard.
- * This is a pure domain utility with no external framework
- * or I/O dependencies (RULE-006).</p>
+ * <p>Resolves version-specific directories by trying exact match first, then falling back to major
+ * version wildcard. This is a pure domain utility with no external framework or I/O dependencies
+ * (RULE-006).
  *
- * <p>Filesystem access is delegated to a
- * {@link VersionDirectoryProvider} port injected via
- * constructor.</p>
+ * <p>Filesystem access is delegated to a {@link VersionDirectoryProvider} port injected via
+ * constructor.
  */
 public final class VersionResolver {
 
     private final VersionDirectoryProvider provider;
 
     /**
-     * Creates a VersionResolver with the given directory
-     * provider.
+     * Creates a VersionResolver with the given directory provider.
      *
      * @param provider the directory provider port
      */
-    public VersionResolver(
-            VersionDirectoryProvider provider) {
+    public VersionResolver(VersionDirectoryProvider provider) {
         this.provider = provider;
     }
 
@@ -34,28 +30,24 @@ public final class VersionResolver {
      * Finds a version-specific directory with fallback.
      *
      * <p>Resolution order:
+     *
      * <ol>
-     *   <li>Exact match:
-     *       {@code {baseDir}/{name}-{version}}</li>
-     *   <li>Major version fallback:
-     *       {@code {baseDir}/{name}-{major}.x}</li>
+     *   <li>Exact match: {@code {baseDir}/{name}-{version}}
+     *   <li>Major version fallback: {@code {baseDir}/{name}-{major}.x}
      * </ol>
      *
      * @param baseDir the base directory to search in
      * @param name the component name (e.g. "java")
      * @param version the full version string (e.g. "21")
-     * @return the resolved directory path, or empty if
-     *         neither exists
+     * @return the resolved directory path, or empty if neither exists
      */
-    public Optional<Path> findVersionDir(
-            Path baseDir, String name, String version) {
+    public Optional<Path> findVersionDir(Path baseDir, String name, String version) {
         Path exact = baseDir.resolve(name + "-" + version);
         if (provider.exists(exact)) {
             return Optional.of(exact);
         }
         String major = extractMajorPart(version);
-        Path fallback =
-                baseDir.resolve(name + "-" + major + ".x");
+        Path fallback = baseDir.resolve(name + "-" + major + ".x");
         if (provider.exists(fallback)) {
             return Optional.of(fallback);
         }

@@ -5,22 +5,18 @@ import java.util.List;
 /**
  * Immutable result of an assembler operation.
  *
- * <p>Shared type replacing the duplicate inner records
- * previously defined in
- * {@code AssemblerPipeline.NormalizedResult}.</p>
+ * <p>Shared type replacing the duplicate inner records previously defined in {@code
+ * AssemblerPipeline.NormalizedResult}.
  *
- * @param files    list of generated file paths (never null)
+ * @param files list of generated file paths (never null)
  * @param warnings list of warning messages (never null)
  */
-public record AssemblerResult(
-        List<String> files,
-        List<String> warnings) {
+public record AssemblerResult(List<String> files, List<String> warnings) {
 
     /** Compact constructor: ensures lists are never null. */
     public AssemblerResult {
         files = files != null ? List.copyOf(files) : List.of();
-        warnings = warnings != null
-                ? List.copyOf(warnings) : List.of();
+        warnings = warnings != null ? List.copyOf(warnings) : List.of();
     }
 
     /**
@@ -35,13 +31,11 @@ public record AssemblerResult(
     /**
      * Factory method for convenience.
      *
-     * @param files    list of generated file paths
+     * @param files list of generated file paths
      * @param warnings list of warning messages
      * @return a new AssemblerResult
      */
-    public static AssemblerResult of(
-            List<String> files,
-            List<String> warnings) {
+    public static AssemblerResult of(List<String> files, List<String> warnings) {
         return new AssemblerResult(files, warnings);
     }
 }

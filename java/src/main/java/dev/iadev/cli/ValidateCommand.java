@@ -1,15 +1,10 @@
 package dev.iadev.cli;
 
 import dev.iadev.config.ConfigLoader;
+import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.stack.StackValidator;
 import dev.iadev.exception.ConfigParseException;
 import dev.iadev.exception.ConfigValidationException;
-import dev.iadev.domain.model.ProjectConfig;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Spec;
-
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,20 +12,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
 
 /**
  * Picocli subcommand for validating a YAML configuration file.
  *
- * <p>Checks that the configuration file is well-formed, contains all
- * required sections, and satisfies cross-field validation rules
- * (language-framework compatibility, version requirements,
+ * <p>Checks that the configuration file is well-formed, contains all required sections, and
+ * satisfies cross-field validation rules (language-framework compatibility, version requirements,
  * architecture style, interface types).
  *
- * <p>Returns exit code 0 for valid configuration, 1 for invalid
- * configuration or I/O errors. Never prints stack traces unless
- * verbose mode is enabled.
+ * <p>Returns exit code 0 for valid configuration, 1 for invalid configuration or I/O errors. Never
+ * prints stack traces unless verbose mode is enabled.
  *
  * <p>Usage examples:
+ *
  * <pre>{@code
  * ia-dev-env validate -c config.yaml
  * ia-dev-env validate -c config.yaml --verbose
@@ -39,8 +37,7 @@ import java.util.function.Function;
 @Command(
         name = "validate",
         mixinStandardHelpOptions = true,
-        description = "Validate a YAML configuration file."
-)
+        description = "Validate a YAML configuration file.")
 public class ValidateCommand implements Callable<Integer> {
 
     /** Successful validation exit code. */
@@ -53,25 +50,22 @@ public class ValidateCommand implements Callable<Integer> {
     @Option(
             names = {"-c", "--config"},
             description = "Path to the YAML configuration file.",
-            required = true
-    )
+            required = true)
     String configPath;
 
     /** Enable verbose logging output. */
     @Option(
             names = {"-v", "--verbose"},
-            description = "Enable verbose output."
-    )
+            description = "Enable verbose output.")
     boolean verbose;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     /**
      * Executes the validate command.
      *
-     * <p>Flow: check file exists, load YAML via ConfigLoader,
-     * run StackValidator validations, report results.
+     * <p>Flow: check file exists, load YAML via ConfigLoader, run StackValidator validations,
+     * report results.
      *
      * @return exit code (0 = valid, 1 = invalid or error)
      */
@@ -80,9 +74,7 @@ public class ValidateCommand implements Callable<Integer> {
         PrintWriter out = spec.commandLine().getOut();
 
         if (!fileExists(configPath)) {
-            out.println(
-                    "Error: Configuration file not found: %s"
-                            .formatted(configPath));
+            out.println("Error: Configuration file not found: %s".formatted(configPath));
             return EXIT_FAILURE;
         }
 
@@ -94,21 +86,17 @@ public class ValidateCommand implements Callable<Integer> {
         try {
             config = ConfigLoader.loadConfig(configPath);
         } catch (ConfigParseException e) {
-            out.println("Error: Invalid YAML: %s"
-                    .formatted(e.getMessage()));
+            out.println("Error: Invalid YAML: %s".formatted(e.getMessage()));
             return EXIT_FAILURE;
         } catch (ConfigValidationException e) {
             return handleValidationException(e, out);
         } catch (IllegalArgumentException e) {
-            out.println("Error: %s".formatted(
-                    e.getMessage()));
+            out.println("Error: %s".formatted(e.getMessage()));
             return EXIT_FAILURE;
         } catch (Exception e) {
-            out.println("Error: An unexpected error "
-                    + "occurred during validation");
+            out.println("Error: An unexpected error " + "occurred during validation");
             if (verbose) {
-                out.println("Details: %s"
-                        .formatted(e.getMessage()));
+                out.println("Details: %s".formatted(e.getMessage()));
                 e.printStackTrace(out);
             }
             return EXIT_FAILURE;
@@ -116,22 +104,17 @@ public class ValidateCommand implements Callable<Integer> {
         return runValidations(config, out);
     }
 
-    private int handleValidationException(
-            ConfigValidationException e, PrintWriter out) {
+    private int handleValidationException(ConfigValidationException e, PrintWriter out) {
         List<String> missing = e.getMissingSections();
         if (!missing.isEmpty()) {
             List<String> errors = new ArrayList<>();
             for (String section : missing) {
-                errors.add(
-                        "Missing required section: %s"
-                                .formatted(section));
+                errors.add("Missing required section: %s".formatted(section));
             }
             if (verbose) {
                 out.println(
                         "[FAIL] Mandatory sections present: %s"
-                                .formatted(
-                                        String.join(", ",
-                                                missing)));
+                                .formatted(String.join(", ", missing)));
             }
             printValidationFailed(errors, out);
             return EXIT_FAILURE;
@@ -140,10 +123,8 @@ public class ValidateCommand implements Callable<Integer> {
         return EXIT_FAILURE;
     }
 
-    private int runValidations(
-            ProjectConfig config, PrintWriter out) {
-        List<String> allErrors =
-                collectAllErrors(config, out);
+    private int runValidations(ProjectConfig config, PrintWriter out) {
+        List<String> allErrors = collectAllErrors(config, out);
 
         if (allErrors.isEmpty()) {
             out.println("Configuration is valid");
@@ -154,28 +135,30 @@ public class ValidateCommand implements Callable<Integer> {
         return EXIT_FAILURE;
     }
 
-    private List<String> collectAllErrors(
-            ProjectConfig config, PrintWriter out) {
+    private List<String> collectAllErrors(ProjectConfig config, PrintWriter out) {
         List<String> allErrors = new ArrayList<>();
-        allErrors.addAll(runCategory(
-                "Mandatory sections present",
-                c -> List.of(), config, out));
-        allErrors.addAll(runCategory(
-                "Language-framework compatibility",
-                StackValidator::validateLanguageFramework,
-                config, out));
-        allErrors.addAll(runCategory(
-                "Version requirements",
-                StackValidator::validateVersionRequirements,
-                config, out));
-        allErrors.addAll(runCategory(
-                "Architecture style",
-                StackValidator::validateArchitectureStyle,
-                config, out));
-        allErrors.addAll(runCategory(
-                "Interface types",
-                StackValidator::validateInterfaceTypes,
-                config, out));
+        allErrors.addAll(runCategory("Mandatory sections present", c -> List.of(), config, out));
+        allErrors.addAll(
+                runCategory(
+                        "Language-framework compatibility",
+                        StackValidator::validateLanguageFramework,
+                        config,
+                        out));
+        allErrors.addAll(
+                runCategory(
+                        "Version requirements",
+                        StackValidator::validateVersionRequirements,
+                        config,
+                        out));
+        allErrors.addAll(
+                runCategory(
+                        "Architecture style",
+                        StackValidator::validateArchitectureStyle,
+                        config,
+                        out));
+        allErrors.addAll(
+                runCategory(
+                        "Interface types", StackValidator::validateInterfaceTypes, config, out));
         return allErrors;
     }
 
@@ -189,15 +172,13 @@ public class ValidateCommand implements Callable<Integer> {
             if (errors.isEmpty()) {
                 out.println("[PASS] %s".formatted(name));
             } else {
-                out.println("[FAIL] %s: %s".formatted(
-                        name, String.join("; ", errors)));
+                out.println("[FAIL] %s: %s".formatted(name, String.join("; ", errors)));
             }
         }
         return errors;
     }
 
-    private void printValidationFailed(
-            List<String> errors, PrintWriter out) {
+    private void printValidationFailed(List<String> errors, PrintWriter out) {
         out.println("Validation failed:");
         for (String error : errors) {
             out.println("- %s".formatted(error));

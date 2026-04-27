@@ -3,10 +3,8 @@ package dev.iadev.cli;
 /**
  * Default answer for yes/no confirmation prompts.
  *
- * <p>Replaces opaque {@code boolean defaultValue} parameters.
- * Call sites become self-documenting:
- * {@code confirm(ConfirmDefault.DEFAULT_YES)} instead of
- * {@code confirm(true)}.</p>
+ * <p>Replaces opaque {@code boolean defaultValue} parameters. Call sites become self-documenting:
+ * {@code confirm(ConfirmDefault.DEFAULT_YES)} instead of {@code confirm(true)}.
  *
  * @see TerminalProvider#confirm
  */

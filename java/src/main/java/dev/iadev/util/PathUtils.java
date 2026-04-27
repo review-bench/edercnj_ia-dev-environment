@@ -1,22 +1,22 @@
 package dev.iadev.util;
 
 import dev.iadev.exception.CliException;
-
 import java.nio.file.Path;
 import java.util.Set;
 
 /**
  * Path safety validation and normalization utilities.
  *
- * <p>Enforces RULE-011 (Dangerous Path Rejection) and RULE-009
- * (Cross-Platform Path Handling) by using {@link java.nio.file.Path}
- * exclusively and rejecting writes to dangerous system directories.
+ * <p>Enforces RULE-011 (Dangerous Path Rejection) and RULE-009 (Cross-Platform Path Handling) by
+ * using {@link java.nio.file.Path} exclusively and rejecting writes to dangerous system
+ * directories.
  *
- * <p>Dangerous paths include the user's home directory, filesystem
- * root, and standard system directories ({@code /usr}, {@code /etc},
- * {@code /bin}, {@code /sbin}, and {@code /var} by exact match).
+ * <p>Dangerous paths include the user's home directory, filesystem root, and standard system
+ * directories ({@code /usr}, {@code /etc}, {@code /bin}, {@code /sbin}, and {@code /var} by exact
+ * match).
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * Path dest = PathUtils.normalizeDirectory("./output");
  * PathUtils.rejectDangerousPath(dest);
@@ -29,13 +29,11 @@ public final class PathUtils {
 
     private static final String ROOT_PATH = "/";
 
-    private static final Set<String> DANGEROUS_SYSTEM_PATHS = Set.of(
-            "/usr", "/etc", "/bin", "/sbin"
-    );
+    private static final Set<String> DANGEROUS_SYSTEM_PATHS =
+            Set.of("/usr", "/etc", "/bin", "/sbin");
 
     /** Paths rejected by exact match only (not startsWith). */
-    private static final Set<String> EXACT_MATCH_PATHS =
-            Set.of("/var");
+    private static final Set<String> EXACT_MATCH_PATHS = Set.of("/var");
 
     private PathUtils() {
         // Utility class — no instantiation
@@ -44,9 +42,8 @@ public final class PathUtils {
     /**
      * Resolves a path string to an absolute, normalized {@link Path}.
      *
-     * <p>Relative paths are resolved against the current working
-     * directory. Path components like {@code ..} and {@code .} are
-     * normalized away.
+     * <p>Relative paths are resolved against the current working directory. Path components like
+     * {@code ..} and {@code .} are normalized away.
      *
      * @param path the path string to normalize (may be relative)
      * @return an absolute, normalized {@link Path}
@@ -56,19 +53,15 @@ public final class PathUtils {
     }
 
     /**
-     * Validates that a path is not a dangerous system directory
-     * or a child of one.
+     * Validates that a path is not a dangerous system directory or a child of one.
      *
-     * <p>Rejects the user's home directory, filesystem root, and
-     * standard system directories ({@code /usr}, {@code /etc},
-     * {@code /bin}, {@code /sbin}) and their children, plus
-     * {@code /var} by exact match only (children like
-     * {@code /var/folders} are allowed for macOS temp directory
-     * compatibility).
+     * <p>Rejects the user's home directory, filesystem root, and standard system directories
+     * ({@code /usr}, {@code /etc}, {@code /bin}, {@code /sbin}) and their children, plus {@code
+     * /var} by exact match only (children like {@code /var/folders} are allowed for macOS temp
+     * directory compatibility).
      *
      * @param path the path to validate (should be absolute)
-     * @throws CliException with errorCode 1 if the path is
-     *         dangerous
+     * @throws CliException with errorCode 1 if the path is dangerous
      */
     public static void rejectDangerousPath(Path path) {
         Path normalized = path.toAbsolutePath().normalize();
@@ -80,57 +73,44 @@ public final class PathUtils {
     }
 
     private static void rejectHome(Path normalized) {
-        Path homePath = Path.of(
-                System.getProperty("user.home"))
-                .toAbsolutePath().normalize();
+        Path homePath = Path.of(System.getProperty("user.home")).toAbsolutePath().normalize();
         if (normalized.equals(homePath)) {
             throw new CliException(
                     "Rejected dangerous destination path: "
                             + "%s (home directory — risk of "
                             + "overwriting personal "
-                            + "configuration files)"
-                            .formatted(normalized), 1);
+                            + "configuration files)".formatted(normalized),
+                    1);
         }
     }
 
     private static void rejectRoot(Path normalized) {
-        Path rootPath = Path.of(ROOT_PATH)
-                .toAbsolutePath().normalize();
+        Path rootPath = Path.of(ROOT_PATH).toAbsolutePath().normalize();
         if (normalized.equals(rootPath)) {
             throw new CliException(
-                    "Path rejected: %s is the filesystem root"
-                            .formatted(normalized), 1);
+                    "Path rejected: %s is the filesystem root".formatted(normalized), 1);
         }
     }
 
     private static void rejectSystemPaths(Path normalized) {
         for (String dangerous : DANGEROUS_SYSTEM_PATHS) {
-            Path dangerousPath = Path.of(dangerous)
-                    .toAbsolutePath().normalize();
-            if (normalized.equals(dangerousPath)
-                    || normalized.startsWith(
-                    dangerousPath)) {
+            Path dangerousPath = Path.of(dangerous).toAbsolutePath().normalize();
+            if (normalized.equals(dangerousPath) || normalized.startsWith(dangerousPath)) {
                 throw new CliException(
-                        ("Path rejected: %s is within "
-                                + "protected directory %s")
-                                .formatted(
-                                        normalized, dangerous),
+                        ("Path rejected: %s is within " + "protected directory %s")
+                                .formatted(normalized, dangerous),
                         1);
             }
         }
     }
 
-    private static void rejectExactMatchPaths(
-            Path normalized) {
+    private static void rejectExactMatchPaths(Path normalized) {
         for (String dangerous : EXACT_MATCH_PATHS) {
-            Path dangerousPath = Path.of(dangerous)
-                    .toAbsolutePath().normalize();
+            Path dangerousPath = Path.of(dangerous).toAbsolutePath().normalize();
             if (normalized.equals(dangerousPath)) {
                 throw new CliException(
-                        ("Path rejected: %s matches "
-                                + "protected directory %s")
-                                .formatted(
-                                        normalized, dangerous),
+                        ("Path rejected: %s matches " + "protected directory %s")
+                                .formatted(normalized, dangerous),
                         1);
             }
         }
@@ -139,9 +119,8 @@ public final class PathUtils {
     /**
      * Combines normalization and dangerous path rejection.
      *
-     * <p>Normalizes the path, rejects dangerous destinations, and
-     * returns the validated path. This is the recommended entry point
-     * for validating user-supplied destination paths.
+     * <p>Normalizes the path, rejects dangerous destinations, and returns the validated path. This
+     * is the recommended entry point for validating user-supplied destination paths.
      *
      * @param path the path to validate (may be relative)
      * @throws CliException with errorCode 1 if the path is dangerous

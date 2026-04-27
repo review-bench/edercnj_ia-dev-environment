@@ -1,13 +1,12 @@
 package dev.iadev.application.assembler.gates;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("InfraGate")
 class InfraGateTest {
@@ -15,12 +14,9 @@ class InfraGateTest {
     private final InfraGate gate = new InfraGate();
 
     @Test
-    @DisplayName("orchestrator configured includes"
-            + " setup-environment")
+    @DisplayName("orchestrator configured includes" + " setup-environment")
     void evaluate_orchestrator_includesSetupEnvironment() {
-        ProjectConfig config = TestConfigBuilder.builder()
-                .orchestrator("kubernetes")
-                .build();
+        ProjectConfig config = TestConfigBuilder.builder().orchestrator("kubernetes").build();
 
         List<String> skills = gate.evaluate(config);
 
@@ -28,12 +24,9 @@ class InfraGateTest {
     }
 
     @Test
-    @DisplayName("apiGateway configured includes"
-            + " x-review-gateway")
+    @DisplayName("apiGateway configured includes" + " x-review-gateway")
     void evaluate_apiGateway_includesReviewGateway() {
-        ProjectConfig config = TestConfigBuilder.builder()
-                .apiGateway("kong")
-                .build();
+        ProjectConfig config = TestConfigBuilder.builder().apiGateway("kong").build();
 
         List<String> skills = gate.evaluate(config);
 
@@ -41,12 +34,9 @@ class InfraGateTest {
     }
 
     @Test
-    @DisplayName("observability tool configured includes"
-            + " x-obs-instrument")
+    @DisplayName("observability tool configured includes" + " x-obs-instrument")
     void evaluate_observability_includesObsInstrument() {
-        ProjectConfig config = TestConfigBuilder.builder()
-                .observabilityTool("otel")
-                .build();
+        ProjectConfig config = TestConfigBuilder.builder().observabilityTool("otel").build();
 
         List<String> skills = gate.evaluate(config);
 
@@ -56,11 +46,12 @@ class InfraGateTest {
     @Test
     @DisplayName("all infra features 'none' returns empty")
     void evaluate_allNone_returnsEmpty() {
-        ProjectConfig config = TestConfigBuilder.builder()
-                .orchestrator("none")
-                .apiGateway("none")
-                .observabilityTool("none")
-                .build();
+        ProjectConfig config =
+                TestConfigBuilder.builder()
+                        .orchestrator("none")
+                        .apiGateway("none")
+                        .observabilityTool("none")
+                        .build();
 
         List<String> skills = gate.evaluate(config);
 

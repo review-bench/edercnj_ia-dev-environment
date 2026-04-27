@@ -1,13 +1,12 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("FrameworkConfig")
 class FrameworkConfigTest {
@@ -19,11 +18,12 @@ class FrameworkConfigTest {
         @Test
         @DisplayName("creates config with all fields")
         void fromMap_allFields_allSet() {
-            var map = Map.<String, Object>of(
-                    "name", "spring-boot",
-                    "version", "3.4",
-                    "build_tool", "maven",
-                    "native_build", true);
+            var map =
+                    Map.<String, Object>of(
+                            "name", "spring-boot",
+                            "version", "3.4",
+                            "build_tool", "maven",
+                            "native_build", true);
 
             var result = FrameworkConfig.fromMap(map);
 
@@ -36,8 +36,7 @@ class FrameworkConfigTest {
         @Test
         @DisplayName("defaults buildTool to pip and nativeBuild to false")
         void fromMap_onlyRequired_defaultsApplied() {
-            var map = Map.<String, Object>of(
-                    "name", "fastapi", "version", "0.104");
+            var map = Map.<String, Object>of("name", "fastapi", "version", "0.104");
 
             var result = FrameworkConfig.fromMap(map);
 

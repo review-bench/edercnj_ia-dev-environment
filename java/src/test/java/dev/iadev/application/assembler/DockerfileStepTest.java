@@ -1,25 +1,20 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for DockerfileStep — generates Dockerfile
- * conditionally.
- */
+/** Tests for DockerfileStep — generates Dockerfile conditionally. */
 @DisplayName("DockerfileStep")
 class DockerfileStepTest {
 
@@ -28,47 +23,39 @@ class DockerfileStepTest {
     class ContainerDocker {
 
         @Test
-        @DisplayName("generates Dockerfile for"
-                + " java-maven")
+        @DisplayName("generates Dockerfile for" + " java-maven")
         void assemble_whenCalled_generatesDockerfile(@TempDir Path tempDir) {
-            DockerfileStep assembler =
-                    new DockerfileStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .container("docker")
-                    .language("java", "21")
-                    .buildTool("maven")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+            DockerfileStep assembler = new DockerfileStep();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("docker")
+                            .language("java", "21")
+                            .buildTool("maven")
+                            .build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
             assertThat(result.files()).hasSize(1);
-            assertThat(result.files().get(0))
-                    .endsWith("Dockerfile");
+            assertThat(result.files().get(0)).endsWith("Dockerfile");
             assertThat(result.warnings()).isEmpty();
         }
 
         @Test
         @DisplayName("Dockerfile exists on disk")
-        void assemble_whenCalled_dockerfileExistsOnDisk(
-                @TempDir Path tempDir) {
-            DockerfileStep assembler =
-                    new DockerfileStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .container("docker")
-                    .language("java", "21")
-                    .buildTool("maven")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+        void assemble_whenCalled_dockerfileExistsOnDisk(@TempDir Path tempDir) {
+            DockerfileStep assembler = new DockerfileStep();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("docker")
+                            .language("java", "21")
+                            .buildTool("maven")
+                            .build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             assembler.assemble(cicdCtx);
 
-            assertThat(tempDir.resolve("Dockerfile"))
-                    .exists();
+            assertThat(tempDir.resolve("Dockerfile")).exists();
         }
     }
 
@@ -77,24 +64,16 @@ class DockerfileStepTest {
     class ContainerNone {
 
         @Test
-        @DisplayName("skips Dockerfile when"
-                + " container=none")
+        @DisplayName("skips Dockerfile when" + " container=none")
         void assemble_whenCalled_skipsDockerfile(@TempDir Path tempDir) {
-            DockerfileStep assembler =
-                    new DockerfileStep();
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .container("none")
-                    .build();
-            CicdContext cicdCtx = buildContext(
-                    config, tempDir);
+            DockerfileStep assembler = new DockerfileStep();
+            ProjectConfig config = TestConfigBuilder.builder().container("none").build();
+            CicdContext cicdCtx = buildContext(config, tempDir);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
             assertThat(result.files()).isEmpty();
-            assertThat(result.warnings())
-                    .anyMatch(w -> w.contains(
-                            "Dockerfile skipped"));
+            assertThat(result.warnings()).anyMatch(w -> w.contains("Dockerfile skipped"));
         }
     }
 
@@ -103,50 +82,36 @@ class DockerfileStepTest {
     class TemplateNotFound {
 
         @Test
-        @DisplayName("warns when template not found"
-                + " for unknown stack")
-        void assemble_whenCalled_warnsForUnknownStack(@TempDir Path tempDir)
-                throws IOException {
-            DockerfileStep assembler =
-                    new DockerfileStep();
+        @DisplayName("warns when template not found" + " for unknown stack")
+        void assemble_whenCalled_warnsForUnknownStack(@TempDir Path tempDir) throws IOException {
+            DockerfileStep assembler = new DockerfileStep();
             Path resDir = tempDir.resolve("res");
-            Files.createDirectories(
-                    resDir.resolve("shared/cicd-templates"));
+            Files.createDirectories(resDir.resolve("shared/cicd-templates"));
             Path outputDir = tempDir.resolve("output");
 
-            ProjectConfig config = TestConfigBuilder
-                    .builder()
-                    .container("docker")
-                    .language("cobol", "85")
-                    .buildTool("none")
-                    .build();
-            Map<String, Object> ctx =
-                    CicdAssembler.buildStackContext(config);
-            CicdContext cicdCtx = new CicdContext(
-                    config, outputDir, resDir,
-                    new TemplateEngine(), ctx);
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .container("docker")
+                            .language("cobol", "85")
+                            .buildTool("none")
+                            .build();
+            Map<String, Object> ctx = CicdAssembler.buildStackContext(config);
+            CicdContext cicdCtx =
+                    new CicdContext(config, outputDir, resDir, new TemplateEngine(), ctx);
 
             CicdResult result = assembler.assemble(cicdCtx);
 
             assertThat(result.files()).isEmpty();
-            assertThat(result.warnings())
-                    .anyMatch(w -> w.contains(
-                            "template not found"));
+            assertThat(result.warnings()).anyMatch(w -> w.contains("template not found"));
         }
     }
 
-    private static CicdContext buildContext(
-            ProjectConfig config, Path outputDir) {
-        Map<String, Object> ctx =
-                CicdAssembler.buildStackContext(config);
-        return new CicdContext(
-                config, outputDir, resolveResources(),
-                new TemplateEngine(), ctx);
+    private static CicdContext buildContext(ProjectConfig config, Path outputDir) {
+        Map<String, Object> ctx = CicdAssembler.buildStackContext(config);
+        return new CicdContext(config, outputDir, resolveResources(), new TemplateEngine(), ctx);
     }
 
     private static Path resolveResources() {
-        return dev.iadev.util.ResourceResolver
-                .resolveResourceDir("shared")
-                .getParent();
+        return dev.iadev.util.ResourceResolver.resolveResourceDir("shared").getParent();
     }
 }

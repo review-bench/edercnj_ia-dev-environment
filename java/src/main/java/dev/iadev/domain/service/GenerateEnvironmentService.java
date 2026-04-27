@@ -8,7 +8,6 @@ import dev.iadev.domain.port.output.FileSystemWriter;
 import dev.iadev.domain.port.output.ProgressReporter;
 import dev.iadev.domain.port.output.StackProfileRepository;
 import dev.iadev.domain.port.output.TemplateRenderer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,18 +16,15 @@ import java.util.Optional;
 /**
  * Domain service that orchestrates environment generation.
  *
- * <p>Implements {@link GenerateEnvironmentUseCase} by
- * coordinating the generation flow:</p>
+ * <p>Implements {@link GenerateEnvironmentUseCase} by coordinating the generation flow:
+ *
  * <ol>
- *   <li>Resolve stack profile via
- *       {@link StackProfileRepository}</li>
- *   <li>Report progress via
- *       {@link ProgressReporter}</li>
+ *   <li>Resolve stack profile via {@link StackProfileRepository}
+ *   <li>Report progress via {@link ProgressReporter}
  * </ol>
  *
- * <p>All dependencies are Output Ports injected via
- * constructor. Contains zero framework or infrastructure
- * dependencies.</p>
+ * <p>All dependencies are Output Ports injected via constructor. Contains zero framework or
+ * infrastructure dependencies.
  *
  * @see GenerateEnvironmentUseCase
  * @see StackProfileRepository
@@ -36,8 +32,7 @@ import java.util.Optional;
  * @see FileSystemWriter
  * @see ProgressReporter
  */
-public final class GenerateEnvironmentService
-        implements GenerateEnvironmentUseCase {
+public final class GenerateEnvironmentService implements GenerateEnvironmentUseCase {
 
     private static final String TASK_NAME = "generate";
     private static final int GENERATION_STEPS = 3;
@@ -51,9 +46,9 @@ public final class GenerateEnvironmentService
      * Creates a new GenerateEnvironmentService.
      *
      * @param profileRepository repository for stack profiles
-     * @param templateRenderer  renderer for template files
-     * @param fileSystemWriter  writer for output files
-     * @param progressReporter  reporter for progress updates
+     * @param templateRenderer renderer for template files
+     * @param fileSystemWriter writer for output files
+     * @param progressReporter reporter for progress updates
      * @throws NullPointerException if any parameter is null
      */
     public GenerateEnvironmentService(
@@ -61,44 +56,33 @@ public final class GenerateEnvironmentService
             TemplateRenderer templateRenderer,
             FileSystemWriter fileSystemWriter,
             ProgressReporter progressReporter) {
-        this.profileRepository = Objects.requireNonNull(
-                profileRepository,
-                "profileRepository must not be null");
-        this.templateRenderer = Objects.requireNonNull(
-                templateRenderer,
-                "templateRenderer must not be null");
-        this.fileSystemWriter = Objects.requireNonNull(
-                fileSystemWriter,
-                "fileSystemWriter must not be null");
-        this.progressReporter = Objects.requireNonNull(
-                progressReporter,
-                "progressReporter must not be null");
+        this.profileRepository =
+                Objects.requireNonNull(profileRepository, "profileRepository must not be null");
+        this.templateRenderer =
+                Objects.requireNonNull(templateRenderer, "templateRenderer must not be null");
+        this.fileSystemWriter =
+                Objects.requireNonNull(fileSystemWriter, "fileSystemWriter must not be null");
+        this.progressReporter =
+                Objects.requireNonNull(progressReporter, "progressReporter must not be null");
     }
 
     /**
-     * Generates a development environment from the given
-     * context.
+     * Generates a development environment from the given context.
      *
-     * <p>Resolves the stack profile from the project name,
-     * loads any existing checkpoint, and orchestrates the
-     * generation pipeline. Reports progress and saves
-     * checkpoints throughout the process.</p>
+     * <p>Resolves the stack profile from the project name, loads any existing checkpoint, and
+     * orchestrates the generation pipeline. Reports progress and saves checkpoints throughout the
+     * process.
      *
-     * @param context the generation context containing
-     *                configuration and output directory
+     * @param context the generation context containing configuration and output directory
      * @return the generation result with status and file list
      * @throws NullPointerException if context is null
      */
     @Override
-    public GenerationResult generate(
-            GenerationContext context) {
-        Objects.requireNonNull(context,
-                "context must not be null");
+    public GenerationResult generate(GenerationContext context) {
+        Objects.requireNonNull(context, "context must not be null");
 
-        String profileName =
-                context.config().project().name();
-        Optional<StackProfile> profileOpt =
-                profileRepository.findByName(profileName);
+        String profileName = context.config().project().name();
+        Optional<StackProfile> profileOpt = profileRepository.findByName(profileName);
 
         if (profileOpt.isEmpty()) {
             return handleProfileNotFound(profileName);
@@ -107,35 +91,24 @@ public final class GenerateEnvironmentService
         return executeGeneration(context, profileName);
     }
 
-    private GenerationResult handleProfileNotFound(
-            String profileName) {
-        String errorMsg =
-                "Stack profile not found: %s"
-                        .formatted(profileName);
+    private GenerationResult handleProfileNotFound(String profileName) {
+        String errorMsg = "Stack profile not found: %s".formatted(profileName);
         progressReporter.reportError(TASK_NAME, errorMsg);
-        return new GenerationResult(
-                false, List.of(), List.of(errorMsg));
+        return new GenerationResult(false, List.of(), List.of(errorMsg));
     }
 
-    private GenerationResult executeGeneration(
-            GenerationContext context,
-            String executionId) {
-        progressReporter.reportStart(
-                TASK_NAME, GENERATION_STEPS);
+    private GenerationResult executeGeneration(GenerationContext context, String executionId) {
+        progressReporter.reportStart(TASK_NAME, GENERATION_STEPS);
 
         List<String> filesGenerated = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
 
-        progressReporter.reportProgress(
-                TASK_NAME, 1, "Resolving stack profile");
-        progressReporter.reportProgress(
-                TASK_NAME, 2, "Generating artifacts");
-        progressReporter.reportProgress(
-                TASK_NAME, 3, "Finalizing output");
+        progressReporter.reportProgress(TASK_NAME, 1, "Resolving stack profile");
+        progressReporter.reportProgress(TASK_NAME, 2, "Generating artifacts");
+        progressReporter.reportProgress(TASK_NAME, 3, "Finalizing output");
 
         progressReporter.reportComplete(TASK_NAME);
 
-        return new GenerationResult(
-                true, filesGenerated, warnings);
+        return new GenerationResult(true, filesGenerated, warnings);
     }
 }

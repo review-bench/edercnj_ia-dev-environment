@@ -1,26 +1,25 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Integration tests for story-0022-0002: Security Report
- * Infrastructure (SARIF + Scoring) reference files and
- * SKILL.md registration.
+ * Integration tests for story-0022-0002: Security Report Infrastructure (SARIF + Scoring) reference
+ * files and SKILL.md registration.
  */
-@Disabled("EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
+@Disabled(
+        "EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
 @DisplayName("Security SARIF + Scoring References")
 class SecuritySarifScoringTest {
 
@@ -29,64 +28,39 @@ class SecuritySarifScoringTest {
     class SarifTemplate {
 
         @Test
-        @DisplayName("sarif-template.md exists after"
-                + " assembly")
-        void assemble_sarifTemplate_fileExists(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("sarif-template.md exists after" + " assembly")
+        void assemble_sarifTemplate_fileExists(@TempDir Path tempDir) throws IOException {
             generateSecurityOutput(tempDir);
-            Path sarifTemplate = tempDir.resolve(
-                    "output/skills/security/references/"
-                            + "sarif-template.md");
+            Path sarifTemplate =
+                    tempDir.resolve("output/skills/security/references/" + "sarif-template.md");
             assertThat(sarifTemplate).exists();
         }
 
         @Test
-        @DisplayName("sarif-template contains SARIF"
-                + " 2.1.0 schema reference")
-        void assemble_sarifTemplate_hasSchemaRef(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readSarifTemplate(tempDir);
-            assertThat(content)
-                    .contains("sarif-schema-2.1.0.json");
+        @DisplayName("sarif-template contains SARIF" + " 2.1.0 schema reference")
+        void assemble_sarifTemplate_hasSchemaRef(@TempDir Path tempDir) throws IOException {
+            String content = readSarifTemplate(tempDir);
+            assertThat(content).contains("sarif-schema-2.1.0.json");
         }
 
         @Test
-        @DisplayName("sarif-template contains version"
-                + " 2.1.0")
-        void assemble_sarifTemplate_hasVersion(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readSarifTemplate(tempDir);
-            assertThat(content)
-                    .contains("\"version\": \"2.1.0\"");
+        @DisplayName("sarif-template contains version" + " 2.1.0")
+        void assemble_sarifTemplate_hasVersion(@TempDir Path tempDir) throws IOException {
+            String content = readSarifTemplate(tempDir);
+            assertThat(content).contains("\"version\": \"2.1.0\"");
         }
 
         @Test
-        @DisplayName("sarif-template contains required"
-                + " fields: tool, results")
-        void assemble_sarifTemplate_hasRequiredFields(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readSarifTemplate(tempDir);
-            assertThat(content)
-                    .contains("\"tool\"")
-                    .contains("\"results\"")
-                    .contains("\"runs\"");
+        @DisplayName("sarif-template contains required" + " fields: tool, results")
+        void assemble_sarifTemplate_hasRequiredFields(@TempDir Path tempDir) throws IOException {
+            String content = readSarifTemplate(tempDir);
+            assertThat(content).contains("\"tool\"").contains("\"results\"").contains("\"runs\"");
         }
 
         @Test
-        @DisplayName("sarif-template contains custom"
-                + " properties")
-        void assemble_sarifTemplate_hasCustomProperties(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readSarifTemplate(tempDir);
+        @DisplayName("sarif-template contains custom" + " properties")
+        void assemble_sarifTemplate_hasCustomProperties(@TempDir Path tempDir) throws IOException {
+            String content = readSarifTemplate(tempDir);
             assertThat(content)
                     .contains("owasp-category")
                     .contains("cvss-score")
@@ -95,13 +69,9 @@ class SecuritySarifScoringTest {
         }
 
         @Test
-        @DisplayName("sarif-template has examples for"
-                + " all severity levels")
-        void assemble_sarifTemplate_hasExamplesPerLevel(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readSarifTemplate(tempDir);
+        @DisplayName("sarif-template has examples for" + " all severity levels")
+        void assemble_sarifTemplate_hasExamplesPerLevel(@TempDir Path tempDir) throws IOException {
+            String content = readSarifTemplate(tempDir);
             assertThat(content)
                     .contains("### CRITICAL")
                     .contains("### HIGH")
@@ -116,39 +86,29 @@ class SecuritySarifScoringTest {
     class ScoringReference {
 
         @Test
-        @DisplayName("security-scoring.md exists after"
-                + " assembly")
-        void assemble_scoring_fileExists(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("security-scoring.md exists after" + " assembly")
+        void assemble_scoring_fileExists(@TempDir Path tempDir) throws IOException {
             generateSecurityOutput(tempDir);
-            Path scoring = tempDir.resolve(
-                    "output/skills/security/references/"
-                            + "security-scoring.md");
+            Path scoring =
+                    tempDir.resolve("output/skills/security/references/" + "security-scoring.md");
             assertThat(scoring).exists();
         }
 
         @Test
         @DisplayName("security-scoring contains formula")
-        void assemble_scoring_hasFormula(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readScoringReference(tempDir);
-            assertThat(content).contains(
-                    "score = max(0, 100 - sum("
-                            + "severity_weight * "
-                            + "count_per_severity))");
+        void assemble_scoring_hasFormula(@TempDir Path tempDir) throws IOException {
+            String content = readScoringReference(tempDir);
+            assertThat(content)
+                    .contains(
+                            "score = max(0, 100 - sum("
+                                    + "severity_weight * "
+                                    + "count_per_severity))");
         }
 
         @Test
-        @DisplayName("security-scoring contains grade"
-                + " scale A-F")
-        void assemble_scoring_hasGradeScale(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readScoringReference(tempDir);
+        @DisplayName("security-scoring contains grade" + " scale A-F")
+        void assemble_scoring_hasGradeScale(@TempDir Path tempDir) throws IOException {
+            String content = readScoringReference(tempDir);
             assertThat(content)
                     .contains("| A | 90 - 100")
                     .contains("| B | 80 - 89")
@@ -158,13 +118,9 @@ class SecuritySarifScoringTest {
         }
 
         @Test
-        @DisplayName("security-scoring contains severity"
-                + " weights")
-        void assemble_scoring_hasSeverityWeights(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readScoringReference(tempDir);
+        @DisplayName("security-scoring contains severity" + " weights")
+        void assemble_scoring_hasSeverityWeights(@TempDir Path tempDir) throws IOException {
+            String content = readScoringReference(tempDir);
             assertThat(content)
                     .contains("| CRITICAL | 10")
                     .contains("| HIGH | 5")
@@ -174,15 +130,10 @@ class SecuritySarifScoringTest {
         }
 
         @Test
-        @DisplayName("security-scoring contains output"
-                + " convention")
-        void assemble_scoring_hasOutputConvention(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    readScoringReference(tempDir);
-            assertThat(content)
-                    .contains("results/security/");
+        @DisplayName("security-scoring contains output" + " convention")
+        void assemble_scoring_hasOutputConvention(@TempDir Path tempDir) throws IOException {
+            String content = readScoringReference(tempDir);
+            assertThat(content).contains("results/security/");
         }
     }
 
@@ -191,36 +142,23 @@ class SecuritySarifScoringTest {
     class SkillMdRegistration {
 
         @Test
-        @DisplayName("SKILL.md references"
-                + " sarif-template.md in table")
-        void assemble_skillMd_refsSarifTemplate(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateSecurityKpContent(tempDir);
-            assertThat(content)
-                    .contains("sarif-template.md");
+        @DisplayName("SKILL.md references" + " sarif-template.md in table")
+        void assemble_skillMd_refsSarifTemplate(@TempDir Path tempDir) throws IOException {
+            String content = generateSecurityKpContent(tempDir);
+            assertThat(content).contains("sarif-template.md");
         }
 
         @Test
-        @DisplayName("SKILL.md references"
-                + " security-scoring.md in table")
-        void assemble_skillMd_refsScoringModel(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateSecurityKpContent(tempDir);
-            assertThat(content)
-                    .contains("security-scoring.md");
+        @DisplayName("SKILL.md references" + " security-scoring.md in table")
+        void assemble_skillMd_refsScoringModel(@TempDir Path tempDir) throws IOException {
+            String content = generateSecurityKpContent(tempDir);
+            assertThat(content).contains("security-scoring.md");
         }
 
         @Test
         @DisplayName("existing references preserved")
-        void assemble_skillMd_preservesExisting(
-                @TempDir Path tempDir)
-                throws IOException {
-            String content =
-                    generateSecurityKpContent(tempDir);
+        void assemble_skillMd_preservesExisting(@TempDir Path tempDir) throws IOException {
+            String content = generateSecurityKpContent(tempDir);
             assertThat(content)
                     .contains("security-principles.md")
                     .contains("application-security.md")
@@ -231,51 +169,33 @@ class SecuritySarifScoringTest {
         }
     }
 
-    private String generateSecurityKpContent(
-            Path tempDir) throws IOException {
+    private String generateSecurityKpContent(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve(
-                        "skills/security/SKILL.md"),
+                outputDir.resolve("skills/security/SKILL.md"), StandardCharsets.UTF_8);
+    }
+
+    private void generateSecurityOutput(Path tempDir) throws IOException {
+        Path outputDir = tempDir.resolve("output");
+        Files.createDirectories(outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+    }
+
+    private String readSarifTemplate(Path tempDir) throws IOException {
+        generateSecurityOutput(tempDir);
+        return Files.readString(
+                tempDir.resolve("output/skills/security/" + "references/" + "sarif-template.md"),
                 StandardCharsets.UTF_8);
     }
 
-    private void generateSecurityOutput(Path tempDir)
-            throws IOException {
-        Path outputDir = tempDir.resolve("output");
-        Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
-    }
-
-    private String readSarifTemplate(Path tempDir)
-            throws IOException {
+    private String readScoringReference(Path tempDir) throws IOException {
         generateSecurityOutput(tempDir);
         return Files.readString(
-                tempDir.resolve(
-                        "output/skills/security/"
-                                + "references/"
-                                + "sarif-template.md"),
-                StandardCharsets.UTF_8);
-    }
-
-    private String readScoringReference(Path tempDir)
-            throws IOException {
-        generateSecurityOutput(tempDir);
-        return Files.readString(
-                tempDir.resolve(
-                        "output/skills/security/"
-                                + "references/"
-                                + "security-scoring.md"),
+                tempDir.resolve("output/skills/security/" + "references/" + "security-scoring.md"),
                 StandardCharsets.UTF_8);
     }
 }

@@ -5,15 +5,15 @@ import java.util.Map;
 /**
  * Represents an interface configuration entry (rest, grpc, graphql, cli, etc.).
  *
- * <p>The {@code type} field is required. Optional fields {@code spec} and
- * {@code broker} default to empty strings.</p>
+ * <p>The {@code type} field is required. Optional fields {@code spec} and {@code broker} default to
+ * empty strings.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("type", "rest", "spec", "openapi-3.1");
  * InterfaceConfig cfg = InterfaceConfig.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param type the interface type (required: rest, grpc, graphql, cli, etc.)
  * @param spec the API specification version (default: "")
@@ -32,7 +32,6 @@ public record InterfaceConfig(String type, String spec, String broker) {
         return new InterfaceConfig(
                 MapHelper.requireString(map, "type", "InterfaceConfig"),
                 MapHelper.optionalString(map, "spec", ""),
-                MapHelper.optionalString(map, "broker", "")
-        );
+                MapHelper.optionalString(map, "broker", ""));
     }
 }

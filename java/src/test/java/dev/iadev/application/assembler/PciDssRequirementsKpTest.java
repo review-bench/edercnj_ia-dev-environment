@@ -1,31 +1,29 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for story-0016-0011: PCI-DSS requirements
- * knowledge pack with 12 PCI-DSS v4.0 requirements
+ * Tests for story-0016-0011: PCI-DSS requirements knowledge pack with 12 PCI-DSS v4.0 requirements
  * mapped to Java code practices.
  *
- * <p>Covers Gherkin scenarios @GK-1 through @GK-5.</p>
+ * <p>Covers Gherkin scenarios @GK-1 through @GK-5.
  */
-@Disabled("EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
+@Disabled(
+        "EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
 @DisplayName("PCI-DSS Requirements KP")
 class PciDssRequirementsKpTest {
 
@@ -34,71 +32,45 @@ class PciDssRequirementsKpTest {
     class PciDssSelection {
 
         @Test
-        @DisplayName("includes pci-dss-requirements when"
-                + " compliance contains pci-dss")
+        @DisplayName("includes pci-dss-requirements when" + " compliance contains pci-dss")
         void select_pciDssCompliance_includesPack() {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            List<String> packs =
-                    KnowledgePackSelection
-                            .selectKnowledgePacks(config);
+            List<String> packs = KnowledgePackSelection.selectKnowledgePacks(config);
 
-            assertThat(packs)
-                    .contains("pci-dss-requirements");
+            assertThat(packs).contains("pci-dss-requirements");
         }
 
         @Test
-        @DisplayName("includes pci-dss-requirements when"
-                + " compliance has pci-dss among others")
+        @DisplayName("includes pci-dss-requirements when" + " compliance has pci-dss among others")
         void select_multipleCompliance_includesPack() {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks(
-                                    "pci-dss", "lgpd")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss", "lgpd").build();
 
-            List<String> packs =
-                    KnowledgePackSelection
-                            .selectKnowledgePacks(config);
+            List<String> packs = KnowledgePackSelection.selectKnowledgePacks(config);
 
-            assertThat(packs)
-                    .contains("pci-dss-requirements");
+            assertThat(packs).contains("pci-dss-requirements");
         }
 
         @Test
-        @DisplayName("excludes pci-dss-requirements when"
-                + " compliance is empty")
+        @DisplayName("excludes pci-dss-requirements when" + " compliance is empty")
         void select_noCompliance_excludesPack() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> packs =
-                    KnowledgePackSelection
-                            .selectKnowledgePacks(config);
+            List<String> packs = KnowledgePackSelection.selectKnowledgePacks(config);
 
-            assertThat(packs)
-                    .doesNotContain("pci-dss-requirements");
+            assertThat(packs).doesNotContain("pci-dss-requirements");
         }
 
         @Test
-        @DisplayName("excludes pci-dss-requirements when"
-                + " compliance has lgpd only")
+        @DisplayName("excludes pci-dss-requirements when" + " compliance has lgpd only")
         void select_lgpdOnly_excludesPack() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("lgpd")
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().securityFrameworks("lgpd").build();
 
-            List<String> packs =
-                    KnowledgePackSelection
-                            .selectKnowledgePacks(config);
+            List<String> packs = KnowledgePackSelection.selectKnowledgePacks(config);
 
-            assertThat(packs)
-                    .doesNotContain("pci-dss-requirements");
+            assertThat(packs).doesNotContain("pci-dss-requirements");
         }
     }
 
@@ -107,25 +79,15 @@ class PciDssRequirementsKpTest {
     class NoResidualVariables {
 
         @Test
-        @DisplayName("rendered output contains no Pebble"
-                + " template markers")
-        void render_pciDssKp_noResidualVariables(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("rendered output contains no Pebble" + " template markers")
+        void render_pciDssKp_noResidualVariables(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
-            assertThat(content)
-                    .doesNotContain("{{")
-                    .doesNotContain("}}")
-                    .doesNotContain("{%");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
+            assertThat(content).doesNotContain("{{").doesNotContain("}}").doesNotContain("{%");
         }
     }
 
@@ -135,54 +97,36 @@ class PciDssRequirementsKpTest {
 
         @Test
         @DisplayName("contains 12 requirement sections")
-        void render_pciDssKp_hasTwelveRequirements(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_pciDssKp_hasTwelveRequirements(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
             for (int i = 1; i <= 12; i++) {
                 assertThat(content)
-                        .as("Requirement %d must be present",
-                                i)
-                        .contains(
-                                "Requirement " + i + ":");
+                        .as("Requirement %d must be present", i)
+                        .contains("Requirement " + i + ":");
             }
         }
 
         @Test
         @DisplayName("each requirement N is from 1 to 12")
-        void render_pciDssKp_requirementsOneToTwelve(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_pciDssKp_requirementsOneToTwelve(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            long reqCount = content.lines()
-                    .filter(l -> l.matches(
-                            "## PCI-DSS v4\\.0.*"
-                                    + "Requirement \\d+:.*"))
-                    .count();
-            assertThat(reqCount)
-                    .as("Must have exactly 12 requirement"
-                            + " sections")
-                    .isEqualTo(12);
+            long reqCount =
+                    content.lines()
+                            .filter(l -> l.matches("## PCI-DSS v4\\.0.*" + "Requirement \\d+:.*"))
+                            .count();
+            assertThat(reqCount).as("Must have exactly 12 requirement" + " sections").isEqualTo(12);
         }
     }
 
@@ -192,68 +136,42 @@ class PciDssRequirementsKpTest {
 
         @Test
         @DisplayName("requirement 3 has prohibited example")
-        void render_req3_hasProhibitedExample(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_req3_hasProhibitedExample(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
-            assertThat(content)
-                    .contains("PROIBIDO:");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
+            assertThat(content).contains("PROIBIDO:");
         }
 
         @Test
         @DisplayName("requirement 3 has correct example")
-        void render_req3_hasCorrectExample(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_req3_hasCorrectExample(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
-            assertThat(content)
-                    .contains("CORRETO:");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
+            assertThat(content).contains("CORRETO:");
         }
 
         @Test
-        @DisplayName("every mappable requirement has both"
-                + " prohibited and correct examples")
-        void render_mappableReqs_haveBothExamples(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("every mappable requirement has both" + " prohibited and correct examples")
+        void render_mappableReqs_haveBothExamples(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            long prohibitedCount = content.lines()
-                    .filter(l -> l.contains("PROIBIDO:"))
-                    .count();
-            long correctCount = content.lines()
-                    .filter(l -> l.contains("CORRETO:"))
-                    .count();
+            long prohibitedCount = content.lines().filter(l -> l.contains("PROIBIDO:")).count();
+            long correctCount = content.lines().filter(l -> l.contains("CORRETO:")).count();
             assertThat(prohibitedCount)
-                    .as("Must have >= 10 prohibited"
-                            + " examples (reqs 1-8, 10-11)")
+                    .as("Must have >= 10 prohibited" + " examples (reqs 1-8, 10-11)")
                     .isGreaterThanOrEqualTo(10);
             assertThat(correctCount)
                     .as("Must have >= 10 correct examples")
@@ -266,54 +184,35 @@ class PciDssRequirementsKpTest {
     class ReviewChecklists {
 
         @Test
-        @DisplayName("each mappable requirement has"
-                + " reviewer checklist section")
-        void render_mappableReqs_haveChecklist(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("each mappable requirement has" + " reviewer checklist section")
+        void render_mappableReqs_haveChecklist(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            long checklistSections = content.lines()
-                    .filter(l -> l.contains(
-                            "code reviewer deve checar"))
-                    .count();
+            long checklistSections =
+                    content.lines().filter(l -> l.contains("code reviewer deve checar")).count();
             assertThat(checklistSections)
-                    .as("Must have >= 10 checklist sections"
-                            + " (reqs 1-8, 10-11)")
+                    .as("Must have >= 10 checklist sections" + " (reqs 1-8, 10-11)")
                     .isGreaterThanOrEqualTo(10);
         }
 
         @Test
         @DisplayName("each checklist has at least 2 items")
-        void render_checklists_haveMinTwoItems(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_checklists_haveMinTwoItems(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            long checklistItems = content.lines()
-                    .filter(l -> l.trim().startsWith("- [ ]"))
-                    .count();
+            long checklistItems = content.lines().filter(l -> l.trim().startsWith("- [ ]")).count();
             assertThat(checklistItems)
-                    .as("Must have >= 20 checklist items"
-                            + " (2+ per 10 mappable reqs)")
+                    .as("Must have >= 20 checklist items" + " (2+ per 10 mappable reqs)")
                     .isGreaterThanOrEqualTo(20);
         }
     }
@@ -324,68 +223,43 @@ class PciDssRequirementsKpTest {
 
         @Test
         @DisplayName("requirement 9 has organizational note")
-        void render_req9_hasOrganizationalNote(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_req9_hasOrganizationalNote(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            assertThat(content).contains(
-                    "organizacional");
+            assertThat(content).contains("organizacional");
         }
 
         @Test
         @DisplayName("requirement 12 has organizational note")
-        void render_req12_hasOrganizationalNote(
-                @TempDir Path tempDir)
-                throws IOException {
+        void render_req12_hasOrganizationalNote(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            String req12Section = extractRequirement(
-                    content, 12);
-            assertThat(req12Section)
-                    .contains("organizacional");
+            String req12Section = extractRequirement(content, 12);
+            assertThat(req12Section).contains("organizacional");
         }
 
         @Test
-        @DisplayName("requirement 9 does not contain"
-                + " code examples")
-        void render_req9_noCodeExamples(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("requirement 9 does not contain" + " code examples")
+        void render_req9_noCodeExamples(@TempDir Path tempDir) throws IOException {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .securityFrameworks("pci-dss")
-                            .build();
+                    TestConfigBuilder.builder().securityFrameworks("pci-dss").build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            String content = readSkill(tempDir,
-                    "pci-dss-requirements/SKILL.md");
+            String content = readSkill(tempDir, "pci-dss-requirements/SKILL.md");
 
-            String req9Section = extractRequirement(
-                    content, 9);
-            assertThat(req9Section)
-                    .doesNotContain("PROIBIDO:")
-                    .doesNotContain("CORRETO:");
+            String req9Section = extractRequirement(content, 9);
+            assertThat(req9Section).doesNotContain("PROIBIDO:").doesNotContain("CORRETO:");
         }
     }
 
@@ -394,43 +268,30 @@ class PciDssRequirementsKpTest {
     class FrontmatterAndStructure {
 
         @Test
-        @DisplayName("not generated when compliance"
-                + " does not include pci-dss")
-        void render_noCompliance_notGenerated(
-                @TempDir Path tempDir)
-                throws IOException {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .build();
+        @DisplayName("not generated when compliance" + " does not include pci-dss")
+        void render_noCompliance_notGenerated(@TempDir Path tempDir) throws IOException {
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            new SkillsAssembler().assemble(
-                    config, new TemplateEngine(), tempDir);
+            new SkillsAssembler().assemble(config, new TemplateEngine(), tempDir);
 
-            Path kpDir = tempDir.resolve(
-                    "skills/pci-dss-requirements");
+            Path kpDir = tempDir.resolve("skills/pci-dss-requirements");
             assertThat(kpDir).doesNotExist();
         }
     }
 
-    private String readSkill(Path outputDir, String path)
-            throws IOException {
-        return Files.readString(
-                outputDir.resolve("skills/" + path),
-                StandardCharsets.UTF_8);
+    private String readSkill(Path outputDir, String path) throws IOException {
+        return Files.readString(outputDir.resolve("skills/" + path), StandardCharsets.UTF_8);
     }
 
-    private String extractRequirement(
-            String content, int reqNum) {
+    private String extractRequirement(String content, int reqNum) {
         String marker = "## PCI-DSS v4.0";
         String reqMarker = "Requirement " + reqNum + ":";
-        String nextMarker =
-                "## PCI-DSS v4.0";
+        String nextMarker = "## PCI-DSS v4.0";
         int start = content.indexOf(reqMarker);
         if (start < 0) {
             return "";
         }
-        int nextStart = content.indexOf(
-                nextMarker, start + reqMarker.length());
+        int nextStart = content.indexOf(nextMarker, start + reqMarker.length());
         if (nextStart < 0) {
             return content.substring(start);
         }

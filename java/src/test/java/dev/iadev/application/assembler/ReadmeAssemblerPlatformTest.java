@@ -1,25 +1,21 @@
 package dev.iadev.application.assembler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.model.Platform;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
-import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for platform-aware ReadmeAssembler generation.
- */
+/** Tests for platform-aware ReadmeAssembler generation. */
 @DisplayName("ReadmeAssembler — platform filtering")
 class ReadmeAssemblerPlatformTest {
 
@@ -29,23 +25,19 @@ class ReadmeAssemblerPlatformTest {
 
         @Test
         @DisplayName("claude-only omits github in summary")
-        void generate_claudeOnly_omitsGithubInSummary(
-                @TempDir Path tempDir)
-                throws IOException {
+        void generate_claudeOnly_omitsGithubInSummary(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = setupOutput(tempDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
             String content =
                     ReadmeAssembler.generateReadme(
-                            config, outputDir,
-                            resourcesDir.resolve(
-                                    "readme-template.md"),
+                            config,
+                            outputDir,
+                            resourcesDir.resolve("readme-template.md"),
                             Set.of(Platform.CLAUDE_CODE));
 
-            String summarySection = extractSection(
-                    content, "## Generation Summary");
+            String summarySection = extractSection(content, "## Generation Summary");
             assertThat(summarySection)
                     .contains("Rules (.claude)")
                     .doesNotContain("(.github)")
@@ -54,64 +46,52 @@ class ReadmeAssemblerPlatformTest {
 
         @Test
         @DisplayName("claude-only omits mapping table")
-        void generate_claudeOnly_omitsMappingTable(
-                @TempDir Path tempDir)
-                throws IOException {
+        void generate_claudeOnly_omitsMappingTable(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = setupOutput(tempDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
             String content =
                     ReadmeAssembler.generateReadme(
-                            config, outputDir,
-                            resourcesDir.resolve(
-                                    "readme-template.md"),
+                            config,
+                            outputDir,
+                            resourcesDir.resolve("readme-template.md"),
                             Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(content)
-                    .doesNotContain(
-                            "| .claude/ | .github/");
+            assertThat(content).doesNotContain("| .claude/ | .github/");
         }
 
         @Test
         @DisplayName("all platforms omits mapping table")
-        void generate_allPlatforms_omitsMappingTable(
-                @TempDir Path tempDir)
-                throws IOException {
+        void generate_allPlatforms_omitsMappingTable(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = setupOutput(tempDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
             String content =
                     ReadmeAssembler.generateReadme(
-                            config, outputDir,
-                            resourcesDir.resolve(
-                                    "readme-template.md"),
+                            config,
+                            outputDir,
+                            resourcesDir.resolve("readme-template.md"),
                             Set.of());
 
             // After Codex removal cross-platform mapping
             // is vacuous and no longer emitted.
-            assertThat(content)
-                    .doesNotContain("| .claude/ | .codex/");
+            assertThat(content).doesNotContain("| .claude/ | .codex/");
         }
 
         @Test
         @DisplayName("replaces all placeholders")
-        void generate_claudeOnly_noPlaceholders(
-                @TempDir Path tempDir)
-                throws IOException {
+        void generate_claudeOnly_noPlaceholders(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = setupOutput(tempDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
             String content =
                     ReadmeAssembler.generateReadme(
-                            config, outputDir,
-                            resourcesDir.resolve(
-                                    "readme-template.md"),
+                            config,
+                            outputDir,
+                            resourcesDir.resolve("readme-template.md"),
                             Set.of(Platform.CLAUDE_CODE));
 
             assertThat(content)
@@ -121,39 +101,30 @@ class ReadmeAssemblerPlatformTest {
         }
     }
 
-    private static Path setupResources(Path tempDir)
-            throws IOException {
-        Path resourcesDir = Files.createDirectories(
-                tempDir.resolve("resources"));
-        var url = ReadmeAssemblerPlatformTest.class
-                .getClassLoader()
-                .getResource("readme-template.md");
+    private static Path setupResources(Path tempDir) throws IOException {
+        Path resourcesDir = Files.createDirectories(tempDir.resolve("resources"));
+        var url =
+                ReadmeAssemblerPlatformTest.class
+                        .getClassLoader()
+                        .getResource("readme-template.md");
         if (url != null) {
-            String templateContent = Files.readString(
-                    Path.of(url.getPath()),
-                    StandardCharsets.UTF_8);
+            String templateContent =
+                    Files.readString(Path.of(url.getPath()), StandardCharsets.UTF_8);
             Files.writeString(
-                    resourcesDir.resolve(
-                            "readme-template.md"),
+                    resourcesDir.resolve("readme-template.md"),
                     templateContent,
                     StandardCharsets.UTF_8);
         }
         return resourcesDir;
     }
 
-    private static Path setupOutput(Path tempDir)
-            throws IOException {
-        Path outputDir = Files.createDirectories(
-                tempDir.resolve("output")
-                        .resolve(".claude"));
-        Files.createDirectories(
-                tempDir.resolve("output")
-                        .resolve(".github"));
+    private static Path setupOutput(Path tempDir) throws IOException {
+        Path outputDir = Files.createDirectories(tempDir.resolve("output").resolve(".claude"));
+        Files.createDirectories(tempDir.resolve("output").resolve(".github"));
         return outputDir;
     }
 
-    private static String extractSection(
-            String content, String header) {
+    private static String extractSection(String content, String header) {
         int start = content.indexOf(header);
         if (start < 0) {
             return "";

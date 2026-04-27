@@ -1,27 +1,25 @@
 package dev.iadev.knowledge;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Validates NewSQL knowledge files existence, content,
- * and line budget compliance (RULE-001: max 300 lines).
+ * Validates NewSQL knowledge files existence, content, and line budget compliance (RULE-001: max
+ * 300 lines).
  */
 @DisplayName("NewSQL Knowledge Files")
 class NewsqlKnowledgeFilesTest {
 
     private static final Path KNOWLEDGE_BASE =
-            Path.of("src/main/resources/"
-                    + "knowledge/databases/newsql");
+            Path.of("src/main/resources/" + "knowledge/databases/newsql");
     private static final int MAX_LINES = 300;
 
     @Nested
@@ -31,15 +29,13 @@ class NewsqlKnowledgeFilesTest {
         @Test
         @DisplayName("newsql-principles.md exists")
         void commonDir_principlesFileExists() {
-            Path file = KNOWLEDGE_BASE.resolve(
-                    "common/newsql-principles.md");
+            Path file = KNOWLEDGE_BASE.resolve("common/newsql-principles.md");
             assertThat(file).exists();
         }
 
         @Test
         @DisplayName("common/ has exactly 1 file")
-        void commonDir_hasExactlyOneFile()
-                throws IOException {
+        void commonDir_hasExactlyOneFile() throws IOException {
             Path dir = KNOWLEDGE_BASE.resolve("common");
             long count;
             try (var stream = Files.list(dir)) {
@@ -55,41 +51,33 @@ class NewsqlKnowledgeFilesTest {
 
         @Test
         @DisplayName("contains Raft or Paxos section")
-        void principles_containsRaftOrPaxos()
-                throws IOException {
+        void principles_containsRaftOrPaxos() throws IOException {
             String content = readPrinciples();
-            assertThat(content).satisfiesAnyOf(
-                    c -> assertThat(c)
-                            .containsIgnoringCase("raft"),
-                    c -> assertThat(c)
-                            .containsIgnoringCase("paxos"));
+            assertThat(content)
+                    .satisfiesAnyOf(
+                            c -> assertThat(c).containsIgnoringCase("raft"),
+                            c -> assertThat(c).containsIgnoringCase("paxos"));
         }
 
         @Test
         @DisplayName("contains clock synchronization")
-        void principles_containsClockSync()
-                throws IOException {
+        void principles_containsClockSync() throws IOException {
             String content = readPrinciples();
-            assertThat(content).satisfiesAnyOf(
-                    c -> assertThat(c).containsIgnoringCase(
-                            "clock synchronization"),
-                    c -> assertThat(c).containsIgnoringCase(
-                            "hybrid logical clock"));
+            assertThat(content)
+                    .satisfiesAnyOf(
+                            c -> assertThat(c).containsIgnoringCase("clock synchronization"),
+                            c -> assertThat(c).containsIgnoringCase("hybrid logical clock"));
         }
 
         @Test
         @DisplayName("contains distributed transactions")
-        void principles_containsDistributedTx()
-                throws IOException {
+        void principles_containsDistributedTx() throws IOException {
             String content = readPrinciples();
-            assertThat(content).containsIgnoringCase(
-                    "distributed transaction");
+            assertThat(content).containsIgnoringCase("distributed transaction");
         }
 
         private String readPrinciples() throws IOException {
-            return Files.readString(
-                    KNOWLEDGE_BASE.resolve(
-                            "common/newsql-principles.md"));
+            return Files.readString(KNOWLEDGE_BASE.resolve("common/newsql-principles.md"));
         }
     }
 
@@ -97,8 +85,7 @@ class NewsqlKnowledgeFilesTest {
     @DisplayName("@GK-2: YugaByteDB files")
     class YugaByteDbFiles {
 
-        private static final Path DB_DIR =
-                KNOWLEDGE_BASE.resolve("yugabytedb");
+        private static final Path DB_DIR = KNOWLEDGE_BASE.resolve("yugabytedb");
 
         @Test
         @DisplayName("directory has exactly 3 files")
@@ -107,11 +94,12 @@ class NewsqlKnowledgeFilesTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "types-and-conventions.md",
-                "migration-patterns.md",
-                "query-optimization.md"
-        })
+        @ValueSource(
+                strings = {
+                    "types-and-conventions.md",
+                    "migration-patterns.md",
+                    "query-optimization.md"
+                })
         @DisplayName("contains {0}")
         void yugaDir_containsFile(String filename) {
             assertThat(DB_DIR.resolve(filename)).exists();
@@ -122,22 +110,21 @@ class NewsqlKnowledgeFilesTest {
     @DisplayName("@GK-3: CockroachDB files")
     class CockroachDbFiles {
 
-        private static final Path DB_DIR =
-                KNOWLEDGE_BASE.resolve("cockroachdb");
+        private static final Path DB_DIR = KNOWLEDGE_BASE.resolve("cockroachdb");
 
         @Test
         @DisplayName("directory has exactly 3 files")
-        void cockroachDir_hasThreeFiles()
-                throws IOException {
+        void cockroachDir_hasThreeFiles() throws IOException {
             assertDirectoryFileCount(DB_DIR, 3);
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "types-and-conventions.md",
-                "migration-patterns.md",
-                "query-optimization.md"
-        })
+        @ValueSource(
+                strings = {
+                    "types-and-conventions.md",
+                    "migration-patterns.md",
+                    "query-optimization.md"
+                })
         @DisplayName("contains {0}")
         void cockroachDir_containsFile(String filename) {
             assertThat(DB_DIR.resolve(filename)).exists();
@@ -148,8 +135,7 @@ class NewsqlKnowledgeFilesTest {
     @DisplayName("@GK-3: TiDB files")
     class TiDbFiles {
 
-        private static final Path DB_DIR =
-                KNOWLEDGE_BASE.resolve("tidb");
+        private static final Path DB_DIR = KNOWLEDGE_BASE.resolve("tidb");
 
         @Test
         @DisplayName("directory has exactly 3 files")
@@ -158,11 +144,12 @@ class NewsqlKnowledgeFilesTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "types-and-conventions.md",
-                "migration-patterns.md",
-                "query-optimization.md"
-        })
+        @ValueSource(
+                strings = {
+                    "types-and-conventions.md",
+                    "migration-patterns.md",
+                    "query-optimization.md"
+                })
         @DisplayName("contains {0}")
         void tidbDir_containsFile(String filename) {
             assertThat(DB_DIR.resolve(filename)).exists();
@@ -174,21 +161,21 @@ class NewsqlKnowledgeFilesTest {
     class LineBudget {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "common/newsql-principles.md",
-                "yugabytedb/types-and-conventions.md",
-                "yugabytedb/migration-patterns.md",
-                "yugabytedb/query-optimization.md",
-                "cockroachdb/types-and-conventions.md",
-                "cockroachdb/migration-patterns.md",
-                "cockroachdb/query-optimization.md",
-                "tidb/types-and-conventions.md",
-                "tidb/migration-patterns.md",
-                "tidb/query-optimization.md"
-        })
+        @ValueSource(
+                strings = {
+                    "common/newsql-principles.md",
+                    "yugabytedb/types-and-conventions.md",
+                    "yugabytedb/migration-patterns.md",
+                    "yugabytedb/query-optimization.md",
+                    "cockroachdb/types-and-conventions.md",
+                    "cockroachdb/migration-patterns.md",
+                    "cockroachdb/query-optimization.md",
+                    "tidb/types-and-conventions.md",
+                    "tidb/migration-patterns.md",
+                    "tidb/query-optimization.md"
+                })
         @DisplayName("{0} has <= 300 lines")
-        void file_withinLineBudget(String relativePath)
-                throws IOException {
+        void file_withinLineBudget(String relativePath) throws IOException {
             Path file = KNOWLEDGE_BASE.resolve(relativePath);
             long lineCount = Files.lines(file).count();
             assertThat(lineCount)
@@ -197,8 +184,7 @@ class NewsqlKnowledgeFilesTest {
         }
     }
 
-    private static void assertDirectoryFileCount(
-            Path dir, int expected) throws IOException {
+    private static void assertDirectoryFileCount(Path dir, int expected) throws IOException {
         long count;
         try (var stream = Files.list(dir)) {
             count = stream.count();

@@ -1,24 +1,20 @@
 package dev.iadev.domain.model;
 
 /**
- * Context budget classification for skills based on their
- * line count.
+ * Context budget classification for skills based on their line count.
  *
- * <p>Used by orchestrator skills to decide between inline
- * execution and subagent delegation. The field is purely
- * informational and does not affect how Claude Code loads
- * the skill.</p>
+ * <p>Used by orchestrator skills to decide between inline execution and subagent delegation. The
+ * field is purely informational and does not affect how Claude Code loads the skill.
  *
  * <ul>
- *   <li>{@link #LIGHT} — below 200 lines (~3K tokens)</li>
- *   <li>{@link #MEDIUM} — 200-500 lines (~3-7K tokens)</li>
- *   <li>{@link #HEAVY} — above 500 lines (>7K tokens)</li>
+ *   <li>{@link #LIGHT} — below 200 lines (~3K tokens)
+ *   <li>{@link #MEDIUM} — 200-500 lines (~3-7K tokens)
+ *   <li>{@link #HEAVY} — above 500 lines (>7K tokens)
  * </ul>
  *
  * @see #fromLineCount(int)
  */
 public enum ContextBudget {
-
     LIGHT("light"),
     MEDIUM("medium"),
     HEAVY("heavy");
@@ -33,8 +29,7 @@ public enum ContextBudget {
     }
 
     /**
-     * Returns the lowercase string representation used
-     * in YAML frontmatter.
+     * Returns the lowercase string representation used in YAML frontmatter.
      *
      * @return the budget value string
      */
@@ -45,12 +40,10 @@ public enum ContextBudget {
     /**
      * Classifies a skill based on its line count.
      *
-     * @param lineCount the number of lines in the skill
-     *                  template
+     * @param lineCount the number of lines in the skill template
      * @return the corresponding budget classification
      */
-    public static ContextBudget fromLineCount(
-            int lineCount) {
+    public static ContextBudget fromLineCount(int lineCount) {
         if (lineCount < LIGHT_THRESHOLD) {
             return LIGHT;
         }
