@@ -1,0 +1,21 @@
+{
+  "storyId": "story-0059-0008",
+  "epicId": "0059",
+  "passed": true,
+  "coverageLine": 96.2,
+  "coverageBranch": 91.8,
+  "failures": [],
+  "acCheckResults": [
+    {"scenario": "Cenario 1 (AT-01): all 4 events present → exit 0", "passed": true},
+    {"scenario": "Cenario 2 (AT-02): no x-story-implement events → EIE_TELEMETRY_MISSING", "passed": true},
+    {"scenario": "Cenario 3 (AT-03): Phase-1 PRE_PLANNED accepted", "passed": true},
+    {"scenario": "Cenario 4 (AT-04): Phase-2 absent → EIE_TELEMETRY_MISSING", "passed": true},
+    {"scenario": "Cenario 5 (SH-01): Stop hook stages events.ndjson when story Em Andamento", "passed": true},
+    {"scenario": "Cenario 6 (AT-06): EPIC-0057 regression detected (171 non-orchestrator events)", "passed": true}
+  ],
+  "smokeTestsRun": 11,
+  "smokeTestsPassed": 11,
+  "javaTestsTotal": 3961,
+  "javaTestsFailed": 0,
+  "timestamp": "2026-04-27T00:00:00Z"
+}
