@@ -58,9 +58,10 @@
       "taskPrs": [713, 714]
     },
     "story-0059-0010": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "prNumber": null,
-      "prUrl": null
+      "prUrl": null,
+      "taskPrs": [715, 716]
     },
     "story-0059-0011": {
       "status": "PENDING",
