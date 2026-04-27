@@ -1,0 +1,18 @@
+# Required GitHub status checks for develop and main branches
+# Single source of truth — used by scripts/setup-branch-protection.sh
+# Format: one check name per line; lines starting with # are comments
+#
+# These correspond to GitHub Actions job names (check run contexts)
+# defined in .github/workflows/ YAML files.
+#
+audit-execution-integrity
+audit-bypass-flags
+audit-phase-gates
+audit-task-hierarchy
+audit-model-selection
+audit-pr-evidence
+audit-baseline-immutability
+audit-flow-version
+lifecycle-integrity-audit
+ra9-audit
+pre-commit-chain

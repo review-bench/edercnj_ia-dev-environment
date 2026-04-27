@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "storyId": "story-0059-0005",
+  "epicId": "EPIC-0059",
+  "timestamp": "2026-04-27T00:00:00Z",
+  "coverageDelta": null,
+  "failures": [],
+  "acCheckResults": [
+    {"scenario": "Commit em branch não-task passa sem verificação de trailer", "passed": true, "testRef": "AT-02,AT-03,AT-04,AT-11"},
+    {"scenario": "Commit em branch task com trailer válido passa", "passed": true, "testRef": "AT-06"},
+    {"scenario": "Commit manual em branch task sem trailer é rejeitado", "passed": true, "testRef": "AT-05"},
+    {"scenario": "x-git-commit injeta trailer em commits de task branch", "passed": true, "testRef": "AT-01..AT-08 in git-commit-trailer.sh"},
+    {"scenario": "Branch sem prefixo feat/ é isenta", "passed": true, "testRef": "AT-03,AT-04,AT-11"}
+  ],
+  "tasks": [
+    {"taskId": "TASK-0059-0005-001", "status": "DONE", "prNumber": 701, "commitSha": "f383ce28f"},
+    {"taskId": "TASK-0059-0005-002", "status": "DONE", "prNumber": 702, "commitSha": "979dc4e66"}
+  ]
+}

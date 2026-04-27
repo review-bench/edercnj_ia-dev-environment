@@ -1,0 +1,80 @@
+{
+  "flowVersion": "2",
+  "epicId": "EPIC-0059",
+  "epicBranch": "epic/0059",
+  "mode": "sequential",
+  "startedAt": "2026-04-27T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0059-0001": {
+      "status": "COMPLETE",
+      "prNumber": 689,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/689"
+    },
+    "story-0059-0002": {
+      "status": "COMPLETE",
+      "prNumber": 693,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/693"
+    },
+    "story-0059-0003": {
+      "status": "COMPLETE",
+      "prNumber": 697,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/697"
+    },
+    "story-0059-0004": {
+      "status": "COMPLETE",
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0059-0005": {
+      "status": "COMPLETE",
+      "prNumber": 702,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/702"
+    },
+    "story-0059-0006": {
+      "status": "PENDING",
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0059-0007": {
+      "status": "COMPLETE",
+      "prNumber": 706,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/706",
+      "taskPrs": [706, 707, 708]
+    },
+    "story-0059-0008": {
+      "status": "PENDING",
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0059-0009": {
+      "status": "COMPLETE",
+      "prNumber": 714,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/714",
+      "taskPrs": [713, 714]
+    },
+    "story-0059-0010": {
+      "status": "COMPLETE",
+      "prNumber": null,
+      "prUrl": null,
+      "taskPrs": [715, 716]
+    },
+    "story-0059-0011": {
+      "status": "COMPLETE",
+      "prNumber": 719,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/719",
+      "taskPrs": [717, 718, 719]
+    },
+    "story-0059-0012": {
+      "status": "COMPLETE",
+      "prNumber": 722,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/722",
+      "taskPrs": [720, 721, 722]
+    }
+  },
+  "parallelismDowngrades": []
+}

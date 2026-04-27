@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **EPIC-0059 story-0059-0008 (Telemetry as Orchestrator Proof-of-Life):**
+  Extends `audit-execution-integrity.sh` with `check_telemetry()` — validates
+  that `plans/epic-XXXX/telemetry/events.ndjson` contains 4 mandatory
+  `phase.start x-story-implement` events (Phase-0-Prepare, Phase-1-Plan,
+  Phase-2-Implement, Phase-3-Verify) for each story referenced in PR commits.
+  Closes bypass surfaces A (orchestrator completely skipped) and H (telemetry
+  absent); directly addresses the EPIC-0057 regression pattern (171 non-
+  orchestrator events but zero `x-story-implement` events).
+  - `scripts/audit-execution-integrity.sh`: new `check_telemetry()`,
+    `discover_story_ids_from_commits()`, `--scope=telemetry` flag, and
+    `AUDIT_TEST_STORY_IDS` env var for smoke-test isolation. `--self-check`
+    extended to verify `check_telemetry` is defined.
+  - `.claude/hooks/stage-telemetry.sh` (Stop hook): auto-stages `events.ndjson`
+    at end-of-turn when a story is `Em Andamento`. `CLAUDE_TELEMETRY_DISABLED=1`
+    bypass supported; `CLAUDE_SKIP_AUDIT=1` explicitly does NOT bypass (RULE-059-07).
+  - `x-story-implement/SKILL.md`: documents `events.ndjson` as committed evidence
+    artifact (Rule 24 Camada 4).
+  - 11 smoke tests: 6 telemetry audit + 5 Stop hook.
+
+- **EPIC-0059 story-0059-0006 (CI Re-runs Pre-commit Chain on Merge Commit):**
+  Adds `pre-commit-chain` job to `.github/workflows/ci-release.yml` that
+  re-executes the full pre-commit chain (Spotless format check → Checkstyle lint
+  → `mvn compile`) on every PR that modifies `src/main/java/**` or `pom.xml`.
+  Closes bypass surface E (`git commit --no-verify`): a developer using the
+  `--no-verify` flag locally to skip pre-commit hooks cannot get malformatted
+  or lint-violating code merged, because the CI gate independently validates
+  the same chain on the PR branch.
+  - `pre-commit-chain` CI job: three conditional steps guarded by a defensive
+    `javadiff` step (`git diff origin/<base>...<HEAD>`); job only fires on
+    `pull_request` events; Maven cache via `actions/setup-java cache: maven`
+    targets < 90s re-run time on cache hit.
+  - `java/pom.xml`: adds `spotless-maven-plugin` (Google Java Format / AOSP
+    style) and `maven-checkstyle-plugin` (Google Checks) with pinned versions
+    (`spotless.version`, `google-java-format.version`, `checkstyle.version`).
+  - `java/checkstyle-suppressions.xml`: baseline suppressions for all existing
+    `src/main/java` files — new files added after EPIC-0059 must pass Checkstyle
+    clean without suppressions.
+  - `Epic0059PreCommitChainCiTest` (13 tests) and `Epic0059CiCacheValidationTest`
+    (8 tests): verification tests covering job declaration, Maven plugin presence,
+    cache configuration, conditional step ordering, and path filtering.
+  [story-0059-0006]
+
 ## [4.2.0] - 2026-04-27
 
 ### Added

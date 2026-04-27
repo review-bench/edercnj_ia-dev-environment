@@ -1,0 +1,10 @@
+# audit-pr-evidence.sh baseline — story-0059-0007 (EPIC-0059).
+# Format: PR_NUMBER  # reason
+# PRs listed here are grandfathered (created before story-0059-0007 merged).
+# This file is IMMUTABLE after story-0059-0007 merges — no new entries allowed.
+689  # pre-story-0059-0007, merged before Orchestrator Evidence was mandated
+693  # pre-story-0059-0007, merged before Orchestrator Evidence was mandated
+697  # pre-story-0059-0007, merged before Orchestrator Evidence was mandated
+702  # pre-story-0059-0007, merged before Orchestrator Evidence was mandated
+706  # task-0059-0007-001 — PR template creation task (no story evidence needed)
+707  # task-0059-0007-002 — x-pr-create extension task (no story evidence needed)

@@ -111,6 +111,44 @@ class HookConfigBuilderTest {
     }
 
     @Nested
+    @DisplayName("appendHooksSection — Rule 59 bypass-flag"
+            + " enforcement (story-0059-0003)")
+    class Rule59Variants {
+
+        @Test
+        @DisplayName("always emits enforce-no-bypass-flags.sh"
+                + " under PreToolUse (no telemetry)")
+        void noTelemetry_emitsNoBpyassHookUnderPreToolUse() {
+            StringBuilder sb = new StringBuilder();
+
+            HookConfigBuilder.appendHooksSection(
+                    sb, false, false);
+
+            String result = sb.toString();
+            assertThat(result).contains("PreToolUse");
+            assertThat(result)
+                    .contains("enforce-no-bypass-flags.sh");
+        }
+
+        @Test
+        @DisplayName("emits enforce-no-bypass-flags.sh"
+                + " alongside enforce-phase-sequence.sh"
+                + " under PreToolUse")
+        void telemetryEnabled_bothEnforcementHooksPresent() {
+            StringBuilder sb = new StringBuilder();
+
+            HookConfigBuilder.appendHooksSection(
+                    sb, false, true);
+
+            String result = sb.toString();
+            assertThat(result)
+                    .contains("enforce-phase-sequence.sh");
+            assertThat(result)
+                    .contains("enforce-no-bypass-flags.sh");
+        }
+    }
+
+    @Nested
     @DisplayName("appendHooksSection — telemetry variants"
             + " (story-0040-0004)")
     class TelemetryVariants {

@@ -1,164 +1,126 @@
 #!/usr/bin/env bash
+# scripts/audit-flow-version.sh
 #
-# audit-flow-version.sh — Rule 19 (Backward Compatibility) CI audit.
-#
-# Validates that every execution-state.json under plans/epic-*/ carries
-# a valid `flowVersion` field ("1" or "2"). Prevents silent fallback to
-# legacy flow when flowVersion is absent or malformed.
+# Audits all execution-state.json files under plans/epic-*/ for:
+#   1. flowVersion field is present and in {"1", "2"}
+#   2. If flowVersion=2: taskTracking.enabled MUST be true
+#   3. If epic branch epic/XXXX exists on remote: flowVersion MUST be "2"
 #
 # Exit codes:
-#   0  — all files conform (or only warnings in non-strict mode)
-#   1  — FLOW_VERSION_VIOLATION: at least one file has an invalid value
-#   1  — FLOW_VERSION_MISSING_STRICT: at least one file is missing the field
-#         in --strict mode
-#   2  — DEPENDENCY_MISSING: jq absent and grep fallback failed
-#   2  — INVALID_ARGS: unknown flag
+#   0  OK — no violations
+#   1  FLOW_VERSION_VIOLATION — at least one violation detected
+#   2  OPERATIONAL_ERROR — jq not on PATH or plans/ directory missing
 #
-# Flags:
-#   --strict      Treat absent flowVersion as a hard violation (exit 1).
-#                 Default: absent field is a warning only (exit 0).
-#   --self-check  Validate script integrity (deps, permissions). Exit 0 OK / 2 broken.
-#   -h|--help     Print usage and exit 0.
+# Rule 19 (Backward Compatibility) — EPIC-0059 (Zero-Bypass Lifecycle Enforcement)
+# Rule 26 (Audit Gate Lifecycle) — naming convention: audit-{subject}.sh
 #
-# Introduced by story-0058-0003 (EPIC-0058). See Rule 19 at
-# .claude/rules/19-backward-compatibility.md for the contract.
-#
-# Catalogado em: docs/audit-gates-catalog.md
+# Usage:
+#   scripts/audit-flow-version.sh [--self-check] [--plans-root <path>]
 
 set -euo pipefail
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-SCRIPT_VERSION="1.0.0"
-SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
-REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-# AUDIT_FLOW_VERSION_PLANS_GLOB env var overrides the default scan target.
-# Used by bats tests and CI workflows that need to point at fixture dirs.
-PLANS_GLOB="${AUDIT_FLOW_VERSION_PLANS_GLOB:-${REPO_ROOT}/plans/epic-*/execution-state.json}"
-VALID_VALUES=("1" "2")
+# ── self-check ────────────────────────────────────────────────────────────────
+case "${1:-}" in
+  --self-check)
+    command -v jq >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required on PATH" >&2; exit 2; }
+    [[ -d "plans" ]] || { echo "OPERATIONAL_ERROR: plans/ directory not found (run from repo root)" >&2; exit 2; }
+    exit 0
+    ;;
+esac
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-usage() {
-  cat <<-EOF
-Usage: ${SCRIPT_NAME} [--strict] [--self-check] [-h|--help]
+# ── argument parsing ──────────────────────────────────────────────────────────
+PLANS_ROOT="plans"
 
-  Validate flowVersion in all plans/epic-*/execution-state.json files.
-
-  Options:
-    --strict      Treat absent flowVersion as a hard violation (exit 1).
-    --self-check  Verify script integrity and deps; exit 0 if OK, 2 if broken.
-    -h, --help    Print this usage.
-
-  Exit codes:
-    0  All files conform.
-    1  FLOW_VERSION_VIOLATION or FLOW_VERSION_MISSING_STRICT detected.
-    2  DEPENDENCY_MISSING or INVALID_ARGS.
-EOF
-}
-
-is_valid_flow_version() {
-  local v="$1"
-  for valid in "${VALID_VALUES[@]}"; do
-    [[ "$v" == "$valid" ]] && return 0
-  done
-  return 1
-}
-
-extract_flow_version() {
-  local file="$1"
-  if command -v jq &>/dev/null; then
-    local result
-    result=$(jq -r '.flowVersion // "ABSENT"' "$file" 2>&1) || {
-      echo "${SCRIPT_NAME}: DEPENDENCY_MISSING: failed to parse JSON in $file: $result" >&2
-      return 1
-    }
-    echo "$result"
-  else
-    # Fallback grep: look for "flowVersion": "X". Returns ABSENT if the file
-    # cannot be read at all (return 1 = DEPENDENCY_MISSING upstream).
-    if [[ ! -r "$file" ]]; then
-      echo "${SCRIPT_NAME}: DEPENDENCY_MISSING: cannot read $file" >&2
-      return 1
-    fi
-    local match
-    match=$(grep -o '"flowVersion"[[:space:]]*:[[:space:]]*"[^"]*"' "$file" 2>/dev/null \
-            | head -1 \
-            | sed 's/.*"\([^"]*\)"$/\1/')
-    echo "${match:-ABSENT}"
-  fi
-}
-
-self_check() {
-  local ok=1
-  if ! command -v bash &>/dev/null; then
-    echo "${SCRIPT_NAME}: DEPENDENCY_MISSING: bash not found" >&2
-    ok=0
-  fi
-  # jq is preferred but not strictly required (grep fallback available)
-  if ! command -v jq &>/dev/null; then
-    echo "${SCRIPT_NAME}: WARNING: jq not found; grep fallback will be used" >&2
-  fi
-  if [[ $ok -eq 0 ]]; then
-    exit 2
-  fi
-  echo "${SCRIPT_NAME}: OK (version ${SCRIPT_VERSION}, deps ok)"
-  exit 0
-}
-
-# ---------------------------------------------------------------------------
-# Argument parsing
-# ---------------------------------------------------------------------------
-STRICT=0
-for arg in "$@"; do
-  case "$arg" in
-    --self-check) self_check ;;
-    --strict)     STRICT=1 ;;
-    -h|--help)    usage; exit 0 ;;
-    *) echo "${SCRIPT_NAME}: INVALID_ARGS: unknown flag: $arg" >&2; exit 2 ;;
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --plans-root)
+      PLANS_ROOT="$2"
+      shift 2
+      ;;
+    --plans-root=*)
+      PLANS_ROOT="${1#--plans-root=}"
+      shift
+      ;;
+    *)
+      echo "OPERATIONAL_ERROR: Unknown argument: $1" >&2
+      exit 2
+      ;;
   esac
 done
 
-# ---------------------------------------------------------------------------
-# Main scan loop
-# ---------------------------------------------------------------------------
-violations=0
-warnings=0
-checked=0
+# ── dependency checks ─────────────────────────────────────────────────────────
+command -v jq >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required on PATH" >&2; exit 2; }
 
-# shellcheck disable=SC2206
-files=( ${PLANS_GLOB} )
-
-if [[ ${#files[@]} -eq 0 ]] || [[ ! -f "${files[0]}" ]]; then
-  echo "checked 0 files, violations: 0"
-  exit 0
+if [[ ! -d "$PLANS_ROOT" ]]; then
+  echo "OPERATIONAL_ERROR: Plans root directory not found: $PLANS_ROOT" >&2
+  exit 2
 fi
 
-for file in "${files[@]}"; do
-  [[ -f "$file" ]] || continue
-  checked=$((checked + 1))
+# ── audit ─────────────────────────────────────────────────────────────────────
+VIOLATIONS=0
 
-  if ! flow_version="$(extract_flow_version "$file")"; then
-    # extract_flow_version already logged DEPENDENCY_MISSING to stderr.
-    exit 2
+check_remote_branch() {
+  local branch="$1"
+  git ls-remote --heads origin "$branch" 2>/dev/null | grep -q "$branch" && return 0 || return 1
+}
+
+while IFS= read -r -d '' state_file; do
+  epic_dir=$(dirname "$state_file")
+  epic_id=$(basename "$epic_dir")  # e.g., epic-0059
+
+  # Parse flowVersion
+  flow_version=$(jq -r '.flowVersion // empty' "$state_file" 2>/dev/null)
+
+  # ── Check 1: flowVersion must be in {"1", "2"} ────────────────────────────
+  if [[ -z "$flow_version" ]]; then
+    # Absent = legacy "1" — OK per Rule 19
+    flow_version="1"
+  elif [[ "$flow_version" != "1" && "$flow_version" != "2" ]]; then
+    echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=${flow_version}; expected \"1\" or \"2\"" >&2
+    ((VIOLATIONS++)) || true
+    continue
   fi
 
-  if [[ "$flow_version" == "ABSENT" ]]; then
-    if [[ $STRICT -eq 1 ]]; then
-      echo "${file}: FLOW_VERSION_MISSING_STRICT: flowVersion field absent in --strict mode" >&2
-      violations=$((violations + 1))
-    else
-      echo "${file}: FLOW_VERSION_MISSING: flowVersion absent; defaulting to legacy (warning)" >&2
-      warnings=$((warnings + 1))
+  # ── Check 2: epic branch presence implies flowVersion=2 ───────────────────
+  epic_num="${epic_id#epic-}"  # e.g., "0059"
+  epic_branch="epic/${epic_num}"
+
+  if [[ "$flow_version" == "1" ]] && check_remote_branch "$epic_branch"; then
+    # Check if --legacy-flow was recorded in metadata
+    legacy_flow=$(jq -r '.legacyFlow // false' "$state_file" 2>/dev/null)
+    if [[ "$legacy_flow" != "true" ]]; then
+      echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=1 but epic branch ${epic_branch} exists on remote; set flowVersion=\"2\" or record legacyFlow=true" >&2
+      ((VIOLATIONS++)) || true
     fi
-  elif ! is_valid_flow_version "$flow_version"; then
-    echo "${file}: FLOW_VERSION_VIOLATION: flowVersion=\"${flow_version}\" not in {1,2}" >&2
-    violations=$((violations + 1))
   fi
-done
 
-echo "checked ${checked} files, violations: ${violations}, warnings: ${warnings}"
+  # ── Check 3: flowVersion=2 requires taskTracking.enabled=true (EPIC-0059) ─
+  if [[ "$flow_version" == "2" ]]; then
+    task_tracking_present=$(jq 'has("taskTracking")' "$state_file" 2>/dev/null)
+    # Use explicit string comparison to handle jq boolean "false" correctly
+    task_tracking_enabled=$(jq -r 'if has("taskTracking") then (.taskTracking.enabled | tostring) else "absent" end' "$state_file" 2>/dev/null)
 
-[[ $violations -eq 0 ]] && exit 0 || exit 1
+    if [[ "$task_tracking_present" == "false" || "$task_tracking_enabled" == "absent" || "$task_tracking_enabled" == "null" ]]; then
+      echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=2 but taskTracking is absent; taskTracking required for flowVersion=2 — run scripts/migrate-task-tracking-v2.sh" >&2
+      ((VIOLATIONS++)) || true
+    elif [[ "$task_tracking_enabled" == "false" ]]; then
+      echo "WARN [taskTracking-flowVersion2]: $state_file has flowVersion=2 but taskTracking.enabled=false; this is suspicious — all flowVersion=2 epics should have full tracking active" >&2
+      echo "  Run scripts/migrate-task-tracking-v2.sh to migrate, or set taskTracking.enabled=true explicitly." >&2
+      # WARN only in first release per Rule 19 / story-0059-0012 §5.2
+      # (Uncomment the following lines to promote to FAIL in second release):
+      # echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=2 + taskTracking.enabled=false" >&2
+      # ((VIOLATIONS++)) || true
+    fi
+  fi
+
+done < <(find "$PLANS_ROOT" -name "execution-state.json" -print0 | sort -z)
+
+# ── result ────────────────────────────────────────────────────────────────────
+if [[ "$VIOLATIONS" -gt 0 ]]; then
+  echo ""
+  echo "audit-flow-version.sh: FAILED — ${VIOLATIONS} violation(s) detected" >&2
+  exit 1
+fi
+
+echo "audit-flow-version.sh: OK — all execution-state.json files pass flowVersion audit"
+exit 0

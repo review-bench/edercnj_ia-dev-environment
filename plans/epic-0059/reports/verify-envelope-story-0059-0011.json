@@ -1,0 +1,39 @@
+{
+  "storyId": "story-0059-0011",
+  "epicId": "EPIC-0059",
+  "passed": true,
+  "timestamp": "2026-04-27T19:45:00Z",
+  "coverageDelta": null,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "failures": [],
+  "acCheckResults": [
+    {
+      "scenario": "Audit passes for stories of EPIC-0057 grandfathered",
+      "passed": true,
+      "evidence": "story-0057-0003 present in audits/execution-integrity-baseline.txt and audits/rule-26-baseline.txt"
+    },
+    {
+      "scenario": "Immutability check blocks new entry after cutoff",
+      "passed": true,
+      "evidence": "scripts/audit-baseline-immutability.sh exits 1 (BASELINE_IMMUTABILITY_VIOLATION) for untracked new entries"
+    },
+    {
+      "scenario": "ADR-0015 exists and is well-formed",
+      "passed": true,
+      "evidence": "adr/ADR-0015-zero-bypass-amnesty.md created with Context, Decision, Consequences sections"
+    },
+    {
+      "scenario": "Baseline covers all stories of EPIC-0054 to 0057",
+      "passed": true,
+      "evidence": "32 stories in execution-integrity-baseline.txt matching story-005[4567]-; 32 stories in rule-26-baseline.txt"
+    }
+  ],
+  "dodChecks": {
+    "audits/execution-integrity-baseline.txt populated with EPIC-0054-0057": true,
+    "audits/rule-26-baseline.txt created and populated": true,
+    "scripts/audit-baseline-immutability.sh created": true,
+    "adr/ADR-0015-zero-bypass-amnesty.md created": true,
+    "CI step registered in .github/workflows/ci-release.yml": true
+  }
+}

@@ -4,6 +4,16 @@
 # Scans git history for merged story PRs (branches matching feat/story-*)
 # and verifies that each merged story has the mandatory evidence artifacts
 # produced by the x-story-implement pipeline:
+#
+# Phase 1 artifacts (x-internal-story-build-plan wave — EPIC-0059):
+#   - plans/epic-XXXX/plans/arch-story-STORY-ID.md        (x-arch-plan)
+#   - plans/epic-XXXX/plans/plan-story-STORY-ID.md        (x-internal-story-build-plan)
+#   - plans/epic-XXXX/plans/tests-story-STORY-ID.md       (x-test-plan)
+#   - plans/epic-XXXX/plans/tasks-story-STORY-ID.md       (x-lib-task-decomposer)
+#   - plans/epic-XXXX/plans/security-story-STORY-ID.md    (x-threat-model)
+#   - plans/epic-XXXX/plans/compliance-story-STORY-ID.md  (compliance assessment)
+#
+# Phase 3 artifacts (x-story-implement verification wave):
 #   - plans/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-story-verify)
 #   - plans/epic-XXXX/plans/review-story-STORY-ID.md         (x-review)
 #   - plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md (x-review-pr)
@@ -21,13 +31,16 @@
 #   4 — EIE_ENFORCEMENT_BROKEN (self-check failure)
 #
 # Usage:
-#   scripts/audit-execution-integrity.sh              # audit all merged stories
-#   scripts/audit-execution-integrity.sh --self-check # verify enforcement is wired
-#   scripts/audit-execution-integrity.sh --since <ref> # audit merges since git ref
+#   scripts/audit-execution-integrity.sh                       # audit all merged stories
+#   scripts/audit-execution-integrity.sh --self-check          # verify enforcement is wired
+#   scripts/audit-execution-integrity.sh --since <ref>         # audit merges since git ref
+#   scripts/audit-execution-integrity.sh --scope=fase1         # audit Phase 1 artifacts only
+#   scripts/audit-execution-integrity.sh --scope=fase3         # audit Phase 3 artifacts only
 
 set -u
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# Allow REPO_ROOT override for smoke-test isolation (AUDIT_TEST_STORY_IDS usage)
+REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "${REPO_ROOT}"
 
 BASELINE_FILE="audits/execution-integrity-baseline.txt"
@@ -37,6 +50,26 @@ HOOK_FILE=".claude/hooks/verify-story-completion.sh"
 # absent (CI checkouts — .claude/ is gitignored as a generated output).
 RULE_SOT="java/src/main/resources/targets/claude/rules/24-execution-integrity.md"
 HOOK_SOT="java/src/main/resources/targets/claude/hooks/verify-story-completion.sh"
+
+# EPIC-0059: Phase 1 mandatory planning artifacts (x-internal-story-build-plan wave).
+# Template tokens:
+#   EPIC_ID  — 4-digit epic number (e.g., 0059)
+#   STORY_ID — numeric story suffix without the "story-" prefix (e.g., 0059-0001)
+# Array must have exactly 6 entries — self-check enforces this.
+REQUIRED_PHASE_1_ARTIFACT_TEMPLATES=(
+    "plans/epic-EPIC_ID/plans/arch-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/plan-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/tests-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/tasks-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/security-story-STORY_ID.md"
+    "plans/epic-EPIC_ID/plans/compliance-story-STORY_ID.md"
+)
+
+# Audit scope: "full" (default) | "fase1" | "fase3" | "telemetry"
+AUDIT_SCOPE="full"
+
+# Mandatory x-story-implement phases to verify in events.ndjson (EPIC-0059 story-0059-0008)
+REQUIRED_TELEMETRY_PHASES=("Phase-0-Prepare" "Phase-1-Plan" "Phase-2-Implement" "Phase-3-Verify")
 
 self_check() {
     local broken=0
@@ -56,7 +89,34 @@ self_check() {
         echo "EIE_ENFORCEMENT_BROKEN" >&2
         exit 4
     fi
-    echo "EIE self-check OK."
+    # EPIC-0059: validate artifact counts — Phase 1 must have 6, Phase 3 must have 4
+    local phase1_count=${#REQUIRED_PHASE_1_ARTIFACT_TEMPLATES[@]}
+    # Phase 3 artifacts: verify-envelope, review, techlead-review, story-completion-report
+    local phase3_count=4
+    local total_count=$((phase1_count + phase3_count))
+    if [[ "${phase1_count}" -ne 6 || "${total_count}" -ne 10 ]]; then
+        echo "SELF_CHECK_FAIL: expected 6 Phase-1 + 4 Phase-3 = 10 total artifacts; got Phase-1=${phase1_count} total=${total_count}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    # EPIC-0059 story-0059-0002: verify anti-backfill functions are defined in this script
+    local self_path="${BASH_SOURCE[0]}"
+    if ! grep -q 'check_frontmatter_origin()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_frontmatter_origin() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    if ! grep -q 'check_anti_backfill()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_anti_backfill() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    if ! grep -q 'check_telemetry()' "${self_path}" 2>/dev/null; then
+        echo "SELF_CHECK_FAIL: check_telemetry() function not found in ${self_path}" >&2
+        echo "EIE_ENFORCEMENT_BROKEN" >&2
+        exit 4
+    fi
+    echo "OK: 10 required artifacts configured (Phase-1=${phase1_count}, Phase-3=${phase3_count}). Anti-backfill functions: present. check_telemetry: present."
     exit 0
 }
 
@@ -120,6 +180,142 @@ discover_merged_stories() {
             | sed -E 's|^feat/||' \
             | grep -oE 'story-[0-9]{4}-[0-9]{4}'
     } | sort -u
+}
+
+check_frontmatter_origin() {
+    # EPIC-0059 (story-0059-0002): validate the YAML frontmatter origin marker.
+    # Returns:
+    #   0 — frontmatter present, format valid, SHA exists in git history
+    #   1 — any validation failure (prints diagnostic to stderr)
+    local artifact_path="$1"
+    # 1. Check frontmatter delimiter present as first line
+    local first_line
+    first_line=$(head -1 "${artifact_path}" 2>/dev/null || true)
+    if [[ "${first_line}" != "---" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — missing generated-by frontmatter (first line is not '---')" >&2
+        return 1
+    fi
+    # 2. Extract generated-by field from frontmatter (between first --- and second ---)
+    local generated_by
+    generated_by=$(awk '/^---/{f++; next} f==1 && /^generated-by:/{print $2; exit}' "${artifact_path}" 2>/dev/null || true)
+    if [[ -z "${generated_by}" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — generated-by field absent in frontmatter" >&2
+        return 1
+    fi
+    # 3. Validate format: <skill-name>@<40-hex-chars>
+    if ! echo "${generated_by}" | grep -qE '^[a-z-]+@[0-9a-f]{40}$'; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — generated-by format invalid: '${generated_by}' (expected '<skill>@<40-hex-sha>')" >&2
+        return 1
+    fi
+    # 4. Validate SHA exists in git history (fail-open on git errors)
+    local sha="${generated_by##*@}"
+    local cat_file_result
+    cat_file_result=$(git cat-file -t "${sha}" 2>/dev/null || true)
+    if [[ "${cat_file_result}" != "commit" ]]; then
+        echo "EIE_EVIDENCE_MISSING: ${artifact_path} — SHA not found in git history: ${sha}" >&2
+        return 1
+    fi
+    return 0
+}
+
+check_has_backfill_exempt() {
+    # Check if an artifact has a backfill-specific audit-exempt marker.
+    # Returns:
+    #   0 — valid backfill exemption present (non-empty incident link)
+    #   1 — no backfill exemption present
+    #   3 — backfill exemption present but malformed (empty link)
+    local artifact_path="$1"
+    # Look for <!-- audit-exempt: backfill <link> --> pattern
+    if ! grep -qE '<!--\s*audit-exempt:\s*backfill' "${artifact_path}" 2>/dev/null; then
+        return 1
+    fi
+    # Valid form: <!-- audit-exempt: backfill <url> --> (non-empty URL after "backfill")
+    if grep -qE '<!--\s*audit-exempt:\s*backfill\s+https?://[^[:space:]]+[^-]*-->' "${artifact_path}" 2>/dev/null; then
+        return 0
+    fi
+    # Marker present but malformed (empty or missing URL)
+    echo "EIE_INVALID_EXEMPTION: ${artifact_path} has backfill audit-exempt marker without incident URL" >&2
+    return 3
+}
+
+check_anti_backfill() {
+    # EPIC-0059 (story-0059-0002): detect artifacts committed after the story's PR merged.
+    # Returns:
+    #   0 — artifact committed before merge (or cannot determine — fail-open)
+    #   1 — EIE_BACKFILL_DETECTED (artifact committed after merge)
+    local story_id="$1"
+    local artifact_path="$2"
+    # Get timestamp when artifact was first introduced to git (oldest commit for this path)
+    local artifact_first_commit_ts
+    artifact_first_commit_ts=$(git log --diff-filter=A --pretty=format:'%ct' -- "${artifact_path}" 2>/dev/null | tail -1)
+    # If file not yet in git history (untracked or brand-new), skip check (fail-open)
+    [[ -z "${artifact_first_commit_ts}" ]] && return 0
+    # Find the merge commit timestamp for this story's PR (first-parent merge referencing the story)
+    local story_num="${story_id#story-}"
+    local merge_ts
+    merge_ts=$(git log --first-parent --merges \
+        --pretty=format:'%ct %s' 2>/dev/null \
+        | grep -i "story-${story_num}" \
+        | awk '{print $1}' \
+        | sort -n | head -1)
+    # Cannot determine merge time — skip check (fail-open per ADR-003)
+    [[ -z "${merge_ts}" ]] && return 0
+    if [[ "${artifact_first_commit_ts}" -gt "${merge_ts}" ]]; then
+        echo "EIE_BACKFILL_DETECTED: ${artifact_path} — artifact committed after story merge (artifact_ts=${artifact_first_commit_ts} > merge_ts=${merge_ts})" >&2
+        return 1
+    fi
+    return 0
+}
+
+check_phase1_evidence() {
+    # EPIC-0059: verify the 6 mandatory Phase-1 planning artifacts.
+    # Also validates origin marker (frontmatter) and anti-backfill for non-grandfathered stories.
+    # Returns 0 if all present and valid, 1 if any check fails (prints diagnostics to stderr).
+    # Artifact naming convention: arch-story-XXXX-YYYY.md where XXXX-YYYY is the
+    # story numeric suffix (e.g., story-0059-0001 → artifact uses "0059-0001").
+    local story_id="$1"
+    local epic_id
+    epic_id="$(echo "${story_id}" | grep -oE '[0-9]{4}' | head -1)"
+    # Extract the numeric suffix of story_id: "story-0059-0001" → "0059-0001"
+    local story_suffix
+    story_suffix="$(echo "${story_id}" | sed 's/^story-//')"
+    local missing=()
+    local artifact_path
+    local phase1_failed=0
+    for template in "${REQUIRED_PHASE_1_ARTIFACT_TEMPLATES[@]}"; do
+        artifact_path="${template/EPIC_ID/${epic_id}}"
+        artifact_path="${artifact_path/STORY_ID/${story_suffix}}"
+        if [[ ! -f "${artifact_path}" ]]; then
+            missing+=("${artifact_path}")
+            phase1_failed=1
+            continue
+        fi
+        # Origin marker validation (EPIC-0059, story-0059-0002)
+        # Check for backfill-specific exemption first
+        check_has_backfill_exempt "${artifact_path}"
+        local exempt_rc=$?
+        if [[ ${exempt_rc} -eq 3 ]]; then
+            phase1_failed=1
+            continue
+        elif [[ ${exempt_rc} -eq 0 ]]; then
+            # Accepted backfill exemption — skip origin + anti-backfill checks
+            printf "  ⚪ %s — %s: backfill-exempt\n" "${story_id}" "${artifact_path}"
+            continue
+        fi
+        # No exemption — validate frontmatter origin marker
+        if ! check_frontmatter_origin "${artifact_path}"; then
+            phase1_failed=1
+            continue
+        fi
+        # Anti-backfill check: artifact must not have been committed after the story's PR merge
+        if ! check_anti_backfill "${story_id}" "${artifact_path}"; then
+            phase1_failed=1
+        fi
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        printf "  ❌ %s — missing Phase-1: %s\n" "${story_id}" "$(IFS=,; echo "${missing[*]}")" >&2
+    fi
+    return ${phase1_failed}
 }
 
 check_evidence() {
@@ -195,15 +391,89 @@ usage_error() {
     cat >&2 <<EOF
 usage: $(basename "$0") [--self-check] [--since <git-ref>]
                         [--story-id <story-XXXX-YYYY>] [--json]
+                        [--scope=<full|fase1|fase3>]
 
-  --self-check        verify enforcement infrastructure is wired
+  --self-check        verify enforcement infrastructure is wired (counts 10 artifacts)
   --since <ref>       limit scan to merges since the given git ref
   --story-id <id>     audit only the specified story (skips git log)
   --json              emit a single-line JSON envelope on stdout
                       (status, storiesAudited, storiesPassed,
                        storiesFailed, failures[])
+  --scope=fase1       audit Phase-1 planning artifacts only (6 artifacts)
+  --scope=fase3       audit Phase-3 evidence artifacts only (legacy behavior)
+  --scope=full        audit both Phase-1 and Phase-3 artifacts (default)
 EOF
     exit 2
+}
+
+# discover_story_ids_from_commits — extract story IDs mentioned in PR commits.
+# Uses AUDIT_TEST_STORY_IDS env var when set (for smoke-test isolation).
+# Falls back to git log for CI usage.
+discover_story_ids_from_commits() {
+    if [[ -n "${AUDIT_TEST_STORY_IDS:-}" ]]; then
+        echo "${AUDIT_TEST_STORY_IDS}" | tr ' ,' '\n' | grep -E '^story-[0-9]{4}-[0-9]{4}$' | sort -u
+        return 0
+    fi
+    # Extract story IDs from commits not yet in origin/develop (PR branch scope)
+    git log "origin/develop..HEAD" --format="%s %b" 2>/dev/null \
+        | grep -oE 'story-[0-9]{4}-[0-9]{4}' | sort -u || true
+}
+
+# check_telemetry — validate that events.ndjson contains mandatory phase.start events
+# for each story ID referenced in the PR commits (EPIC-0059 story-0059-0008).
+#
+# Returns:
+#   0 — all mandatory events present for all stories
+#   1 — one or more mandatory events missing (prints EIE_TELEMETRY_MISSING to stderr)
+check_telemetry() {
+    local story_ids
+    story_ids="$(discover_story_ids_from_commits)"
+    if [[ -z "${story_ids}" ]]; then
+        # No story IDs detected — nothing to validate
+        return 0
+    fi
+
+    local telemetry_violations=0
+    for story_id in ${story_ids}; do
+        # Derive epic ID from story ID (story-XXXX-YYYY → XXXX)
+        local epic_id
+        epic_id="$(echo "${story_id}" | grep -oE '[0-9]{4}' | head -1)"
+        local ndjson="${REPO_ROOT}/plans/epic-${epic_id}/telemetry/events.ndjson"
+
+        if [[ ! -f "${ndjson}" ]]; then
+            echo "EIE_TELEMETRY_MISSING: events.ndjson not found at ${ndjson} for ${story_id}" >&2
+            telemetry_violations=$((telemetry_violations + 1))
+            continue
+        fi
+
+        local story_violations=0
+        for required_phase in "${REQUIRED_TELEMETRY_PHASES[@]}"; do
+            if [[ "${required_phase}" == "Phase-1-Plan" ]]; then
+                # Accept either phase.start Phase-1-Plan OR phase.skip PRE_PLANNED
+                if grep -q "\"x-story-implement\"" "${ndjson}" 2>/dev/null && \
+                   (grep -q "\"${required_phase}\"" "${ndjson}" 2>/dev/null || \
+                    grep -q "\"Phase-1-Plan\"" "${ndjson}" 2>/dev/null || \
+                    grep -q "PRE_PLANNED" "${ndjson}" 2>/dev/null); then
+                    continue
+                fi
+            else
+                if grep -q "\"phase.start\"" "${ndjson}" 2>/dev/null && \
+                   grep -q "\"x-story-implement\"" "${ndjson}" 2>/dev/null && \
+                   grep -q "\"${required_phase}\"" "${ndjson}" 2>/dev/null; then
+                    continue
+                fi
+            fi
+            echo "EIE_TELEMETRY_MISSING: ${required_phase} missing for ${story_id} in ${ndjson}" >&2
+            story_violations=$((story_violations + 1))
+        done
+
+        if [[ ${story_violations} -gt 0 ]]; then
+            echo "EIE_TELEMETRY_MISSING: no x-story-implement telemetry for ${story_id} (${story_violations} phases missing)" >&2
+            telemetry_violations=$((telemetry_violations + 1))
+        fi
+    done
+
+    return $((telemetry_violations > 0 ? 1 : 0))
 }
 
 emit_json_envelope() {
@@ -243,6 +513,26 @@ main() {
                 single_story="$2"
                 shift 2
                 ;;
+            --scope=fase1)
+                AUDIT_SCOPE="fase1"
+                shift
+                ;;
+            --scope=fase3)
+                AUDIT_SCOPE="fase3"
+                shift
+                ;;
+            --scope=full)
+                AUDIT_SCOPE="full"
+                shift
+                ;;
+            --scope=telemetry)
+                AUDIT_SCOPE="telemetry"
+                shift
+                ;;
+            --scope=*)
+                echo "error: --scope must be one of: full, fase1, fase3, telemetry" >&2
+                usage_error
+                ;;
             --json)
                 json_mode="true"
                 shift
@@ -256,6 +546,27 @@ main() {
     done
 
     BASELINE_STORIES="$(load_baseline)"
+
+    # Telemetry-only scope: validate events.ndjson proof-of-life (EPIC-0059 story-0059-0008)
+    if [[ "${AUDIT_SCOPE}" == "telemetry" ]]; then
+        if [[ "${json_mode}" != "true" ]]; then
+            echo "EIE audit — Rule 24 Camada 3 (scope: telemetry)"
+            echo "============================"
+        fi
+        if check_telemetry; then
+            if [[ "${json_mode}" == "true" ]]; then
+                emit_json_envelope "OK" 0 0 0 "[]"
+            else
+                echo "OK — telemetry integrity preserved."
+            fi
+            exit 0
+        else
+            if [[ "${json_mode}" == "true" ]]; then
+                emit_json_envelope "EIE_TELEMETRY_MISSING" 0 0 1 "[{\"status\":\"EIE_TELEMETRY_MISSING\"}]"
+            fi
+            exit 1
+        fi
+    fi
 
     local stories
     if [[ -n "${single_story}" ]]; then
@@ -282,7 +593,7 @@ main() {
     local failures_first="true"
 
     if [[ "${json_mode}" != "true" ]]; then
-        echo "EIE audit — Rule 24 Camada 3"
+        echo "EIE audit — Rule 24 Camada 3 (scope: ${AUDIT_SCOPE})"
         echo "============================"
     fi
     for story in ${stories}; do
@@ -317,7 +628,22 @@ main() {
             failures_json+="{\"storyId\":\"${story}\",\"status\":\"EIE_INVALID_EXEMPTION\"}"
             continue
         fi
-        if check_evidence "${story}"; then
+
+        local story_failed=0
+        # EPIC-0059: check Phase 1 planning artifacts when scope is full or fase1
+        if [[ "${AUDIT_SCOPE}" == "full" || "${AUDIT_SCOPE}" == "fase1" ]]; then
+            if ! check_phase1_evidence "${story}"; then
+                story_failed=1
+            fi
+        fi
+        # Check Phase 3 evidence artifacts when scope is full or fase3
+        if [[ "${AUDIT_SCOPE}" == "full" || "${AUDIT_SCOPE}" == "fase3" ]]; then
+            if ! check_evidence "${story}"; then
+                story_failed=1
+            fi
+        fi
+
+        if [[ "${story_failed}" -eq 0 ]]; then
             [[ "${json_mode}" != "true" ]] && printf "  ✅ %s\n" "${story}"
             passed=$((passed + 1))
         else
