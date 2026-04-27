@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# .githooks/commit-msg — story-0059-0004 (EPIC-0059).
+#
+# Surface F guard: rejects any commit that stages execution-state.json
+# without the canonical trailer injected by x-internal-status-update.
+#
+# Hook type: commit-msg (runs after the commit message is composed,
+# receives the path to COMMIT_EDITMSG as $1).
+#
+# Trailer format validated:
+#   Co-Authored-By: x-internal-status-update@<40-hex-char-sha>
+#
+# Exit codes:
+#   0 — no execution-state.json staged, or trailer present and valid
+#   1 — execution-state.json staged but trailer absent or malformed
+#
+# Activation: git config core.hooksPath .githooks
+# (one-time setup per clone via scripts/setup-hooks.sh)
+#
+# Skip behavior:
+#   - CLAUDE_EXECUTION_STATE_HOOK_DISABLED=1 bypasses for a single commit.
+#   - Recovery: operator may add the trailer manually (format validated only,
+#     not SHA authenticity — see story-0059-0004 §3.5 recovery escape).
+#
+# See: story-0059-0004, Rule 24 (Execution Integrity),
+#      .claude/rules/24-execution-integrity.md (surface F)
+
+set -u
+
+COMMIT_MSG_FILE="${1:?commit-msg hook requires COMMIT_EDITMSG path as \$1}"
+
+# Global opt-out for automated environments that already enforce
+# this constraint upstream (e.g., CI pipeline running without a
+# local git config). NOT a bypass for developers — use recovery
+# instructions in §3.5 instead.
+if [[ "${CLAUDE_EXECUTION_STATE_HOOK_DISABLED:-0}" == "1" ]]; then
+    exit 0
+fi
+
+# Check if execution-state.json is in the staged files for this commit.
+# Use --cached so we only look at what is about to be committed.
+if ! git diff --cached --name-only 2>/dev/null \
+        | grep -q 'execution-state\.json'; then
+    # No execution-state.json staged — no trailer required.
+    exit 0
+fi
+
+# execution-state.json is staged. Validate trailer presence.
+# Use git interpret-trailers for spec-compliant trailer parsing
+# (handles folding, multiple trailers, edge cases).
+if git interpret-trailers --parse < "${COMMIT_MSG_FILE}" 2>/dev/null \
+        | grep -qE '^Co-Authored-By:[[:space:]]+x-internal-status-update@[0-9a-f]{40}$'; then
+    # Canonical trailer present and valid — allow commit.
+    exit 0
+fi
+
+# Trailer absent or malformed — block the commit with a clear message.
+cat >&2 <<'EOF'
+
+⛔ BLOCKED — .githooks/commit-msg (story-0059-0004 / EPIC-0059 surface F guard)
+
+ERROR: execution-state.json pode ser mutado apenas por x-internal-status-update
+
+This commit stages execution-state.json but is missing the required trailer:
+
+  Co-Authored-By: x-internal-status-update@<40-hex-sha>
+
+The trailer is injected automatically when x-internal-status-update
+performs the mutation. It is your proof that the canonical skill ran.
+
+OPTIONS:
+  1. Let x-internal-status-update handle this commit (recommended).
+  2. Recovery (manual edit with approval): add the trailer to your commit
+     message:
+       git commit --amend --trailer \
+         "Co-Authored-By: x-internal-status-update@$(git rev-parse HEAD)"
+     Only for documented recovery operations — see story-0059-0004 §3.5.
+
+Refs: story-0059-0004, EPIC-0059, Rule 24 (Execution Integrity)
+
+EOF
+
+exit 1
