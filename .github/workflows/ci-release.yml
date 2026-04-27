@@ -32,6 +32,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # fetch-depth: 0 is required so that audit-baseline-immutability.sh
+          # can resolve the cutoff SHA recorded in audits/baseline-cutoff.sha.
+          # A shallow clone (default fetch-depth: 1) makes the cutoff SHA
+          # unreachable, causing the script to treat the empty cutoff content
+          # as "all entries new" and produce false-positive violations.
+          fetch-depth: 0
 
       - name: Setup JDK 21 (Temurin) + Maven cache
         uses: actions/setup-java@v5
