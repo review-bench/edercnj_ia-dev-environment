@@ -79,6 +79,17 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: scripts/audit-bypass-flags.sh || [[ $? -eq 3 ]]
 
+      # EPIC-0059 story-0059-0011 (Rule 27): audit baseline immutability.
+      # Fails the PR when any story ID is added to the audit baseline files
+      # (execution-integrity-baseline.txt, rule-26-baseline.txt) after the
+      # EPIC-0059 cutoff commit recorded in audits/baseline-cutoff.sha.
+      # This ensures the amnesty window is formally closed and no new entries
+      # can be added without CODEOWNERS review (<!-- baseline-correction -->).
+      # See ADR-0015-zero-bypass-amnesty.md for the amnesty decision record.
+      - name: Audit Baseline Immutability (Rule 27 + ADR-0015)
+        working-directory: ${{ github.workspace }}
+        run: scripts/audit-baseline-immutability.sh
+
       - name: mvn -B verify
         run: mvn -B verify
 
