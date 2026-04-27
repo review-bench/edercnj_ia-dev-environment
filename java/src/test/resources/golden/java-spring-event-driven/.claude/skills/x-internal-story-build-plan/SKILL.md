@@ -222,6 +222,33 @@ Per-step role and artifact mapping:
 | 1E | Security Engineer | `x-threat-model` via `Skill(…)` inside subagent | `security-story-${story_id}.md` |
 | 1F | Compliance Engineer | — (inline prompt) | `compliance-story-${story_id}.md` |
 
+#### Origin Marker Emission (EPIC-0059 — mandatory for all 1B-1F artifacts)
+
+Every subagent producing a planning artifact MUST prepend the YAML frontmatter block
+before writing the file content:
+
+```yaml
+---
+generated-by: x-internal-story-build-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+story-id: ${story_id}
+---
+```
+
+Include the following instruction in each subagent prompt:
+
+> **MANDATORY — FIRST STEP of writing the artifact:** Prepend the following YAML frontmatter
+> block at the very top of the output file before any Markdown content:
+> ```yaml
+> ---
+> generated-by: x-internal-story-build-plan@<run: git rev-parse HEAD>
+> generated-at: <run: date -u +%Y-%m-%dT%H:%M:%SZ>
+> story-id: ${story_id}
+> ---
+> ```
+> This is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
+> Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
+
 The `--skip-review` flag propagates into the subagent prompt when
 set: a single sentence instructing the subagent to omit the inline
 peer-review pass customarily appended to its artifact.

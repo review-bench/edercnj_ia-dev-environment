@@ -201,12 +201,21 @@ If `--body` is provided, append it after a blank line:
 
 ### Step 5 — Execute Commit
 
-```bash
-# Normal commit
-git commit -m "{message}"
+Every commit MUST carry the orchestrator-signature trailer (`Co-Authored-By: x-git-commit@<sha>`).
+The SHA is the current HEAD captured before the commit executes — it references the parent commit
+and satisfies the `.githooks/commit-msg` surface-D guard (story-0059-0005).
 
-# Amend commit
-git commit --amend -m "{message}"
+```bash
+# Capture parent HEAD for the orchestrator-signature trailer
+PARENT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "0000000000000000000000000000000000000000")
+
+# Normal commit with trailer
+git commit -m "{message}" \
+  --trailer "Co-Authored-By: x-git-commit@${PARENT_SHA}"
+
+# Amend commit with trailer
+git commit --amend -m "{message}" \
+  --trailer "Co-Authored-By: x-git-commit@${PARENT_SHA}"
 ```
 
 When `--amend` is used, warn:

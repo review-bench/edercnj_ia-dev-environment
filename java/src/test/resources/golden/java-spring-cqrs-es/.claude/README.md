@@ -87,9 +87,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 24 | `24-execution-integrity.md` | execution integrity |
 | 25 | `25-task-hierarchy.md` | task hierarchy |
 | 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle |
+| 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 21 rules**
+**Total: 22 rules**
 
 ### Numbering
 
@@ -326,11 +327,11 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 21 |
+| Rules (.claude) | 22 |
 | Skills (.claude) | 68 |
 | Knowledge Packs (.claude) | 13 |
 | Agents (.claude) | 12 |
-| Hooks (.claude) | 12 |
+| Hooks (.claude) | 13 |
 | Settings (.claude) | 2 |
 | Plan Templates (.claude) | 22 |
 
