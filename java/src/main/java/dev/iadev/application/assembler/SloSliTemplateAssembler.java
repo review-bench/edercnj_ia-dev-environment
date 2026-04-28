@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Assembles {@code specs/_templates/_TEMPLATE-SLO-SLI-DEFINITION.md} from the {@code
+ * Assembles {@code governance/slo-sli/_TEMPLATE-SLO-SLI-DEFINITION.md} from the {@code
  * _TEMPLATE-SLO-SLI-DEFINITION.md} Pebble template.
  *
  * <p>This assembler renders the SLO/SLI definition template using full Pebble rendering via {@link
@@ -27,7 +27,7 @@ import java.util.Map;
 public final class SloSliTemplateAssembler implements Assembler {
 
     private static final String TEMPLATE_PATH = "shared/templates/_TEMPLATE-SLO-SLI-DEFINITION.md";
-    private static final String OUTPUT_SUBDIR = "specs/_templates";
+    private static final String OUTPUT_SUBDIR = "governance/slo-sli";
     private static final String OUTPUT_FILENAME = "_TEMPLATE-SLO-SLI-DEFINITION.md";
 
     /** The 7 mandatory SLO/SLI template sections. */
@@ -61,7 +61,7 @@ public final class SloSliTemplateAssembler implements Assembler {
      * {@inheritDoc}
      *
      * <p>Renders the SLO/SLI definition template with Pebble and writes it to {@code
-     * specs/_templates/_TEMPLATE-SLO-SLI-DEFINITION.md}.
+     * governance/slo-sli/_TEMPLATE-SLO-SLI-DEFINITION.md}.
      */
     @Override
     public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {
