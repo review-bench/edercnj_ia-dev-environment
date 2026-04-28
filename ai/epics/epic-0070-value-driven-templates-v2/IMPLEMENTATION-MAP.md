@@ -160,7 +160,7 @@ graph TD
 ### Fase 3 — Verification + Supersedência
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0070-0008 | Smoke E2E (6 cenários: gerar epic v2, gerar story v2, system.md inicializado, x-arch-system-update incremental, migrar epic v1, EPIC-0056 marker) + audit `audit-template-version.sh` Rule 26-compliant (D-R5) + EPIC-0056 marker SUPERSEDED (D-R9) + CHANGELOG MAJOR sem versão fixa (D-R10) + regen 9 goldens | `java/src/test/java/dev/iadev/templates/Epic0070ValueTemplatesSmokeIT.java`, `java/src/main/resources/targets/claude/scripts/audit-template-version.sh`, `audits/template-version-baseline.txt`, `epic-0056.md` (marker D-R9), `CHANGELOG.md`, `CLAUDE.md`, `docs/audit-gates-catalog.md` |
+| 0070-0008 | Smoke E2E (6 cenários: gerar epic v2, gerar story v2, system.md inicializado, x-arch-system-update incremental, migrar epic v1, EPIC-0056 marker) + audit `audit-template-version.sh` Rule 26-compliant (D-R5) + EPIC-0056 marker SUPERSEDED (D-R9) + CHANGELOG MAJOR sem versão fixa (D-R10) + regen 9 goldens | `java/src/test/java/dev/iadev/templates/Epic0070ValueTemplatesSmokeIT.java`, `java/src/main/resources/targets/claude/scripts/audit-template-version.sh`, `governance/baselines/template-version-baseline.txt`, `epic-0056.md` (marker D-R9), `CHANGELOG.md`, `CLAUDE.md`, `docs/audit-gates-catalog.md` |
 
 ---
 
