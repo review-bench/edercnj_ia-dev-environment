@@ -30,7 +30,7 @@ A CLI tool that generates complete `.claude/` boilerplate for AI-assisted develo
 `ia-dev-env` reads a YAML configuration file describing your project's tech stack (language, framework, database, infrastructure, etc.) and generates a complete Claude Code configuration:
 
 - **Claude Code** (`.claude/`) -- rules, skills, agents, hooks, settings
-- **Documentation** (`steering/`, `docs/specs/`, `plans/`, `results/`, `contracts/`, `docs/adr/`) -- architecture, specs, stories, runbooks, contracts, ADRs
+- **Documentation** (`governance/steering/`, `docs/specs/`, `plans/` + `ai/epics/`, `ai/runs/`, `docs/runbooks/`, `docs/contracts/`, `docs/adr/`) -- architecture, specs, epics (legacy + v4), runs, runbooks, contracts, ADRs
 - **CI/CD** -- Dockerfile, docker-compose, GitHub Actions workflows, Kubernetes manifests
 
 All generated artifacts enforce consistent engineering standards: coding conventions, architecture boundaries, TDD workflow, coverage thresholds, and security practices.
@@ -175,22 +175,34 @@ Each profile generates the complete set of skills, agents, and rules tailored to
 ├── templates/                    # 12 plan & review templates (EPIC-0024)
 └── hooks/                        # Automation scripts (post-compile, etc.)
 
-steering/                         # Persistent project context
+governance/steering/              # Persistent project context
 ├── service-architecture.md       # Service architecture doc
 └── product.md, tech-stack.md...  # Project identity files
 
 docs/specs/                       # Human-authored specifications
 └── _templates/                   # Spec templates (contributing, etc.)
 
-results/                          # Execution outputs
-└── runbooks/                     # Deploy runbook, operational guides
+docs/runbooks/                    # Operational runbooks and templates
+└── deploy-runbook.md             # Deploy runbook, operational guides
 
-contracts/                        # API contracts and schemas
+ai/runs/                          # Local execution outputs
+├── audits/                       # Codebase audit reports
+├── reviews/                      # Review session outputs
+├── test-runs/                    # Test execution snapshots
+└── telemetry/                    # Cross-session telemetry NDJSON
+
+docs/contracts/                   # API contracts and schemas
 └── api/                          # gRPC reference (when applicable)
 
 docs/adr/                         # Architecture Decision Records
 ├── README.md                     # ADR index
 └── _TEMPLATE-ADR.md              # ADR template
+
+ai/epics/                         # Epic workspaces (v4 layout, flowVersion 4)
+└── epic-XXXX-<slug>/             # epic.md, IMPLEMENTATION-MAP, stories, plans/, reports/
+
+plans/                            # Legacy epic workspaces (read-only, flowVersion ≤ 2)
+└── epic-XXXX/                    # 60 legacy epics 0001..0060 — kept per SPEC RULE-001
 ```
 
 Plus CI/CD artifacts: `Dockerfile`, `docker-compose.yml`, `.github/workflows/ci.yml`, and Kubernetes manifests (when applicable).
@@ -403,7 +415,7 @@ Automatically evaluates scope (Full / Simplified / Skip) based on change impact.
 |---|---|
 | **When to use** | After implementing a feature, to keep architecture docs current |
 | **Input** | Story ID or architecture plan path |
-| **Output** | Updated `steering/service-architecture.md` |
+| **Output** | Updated `governance/steering/service-architecture.md` |
 
 Reads the architecture plan and incrementally updates the service architecture document. **Appends only** -- never rewrites existing content. Updates the Change History section with date, story ID, and summary.
 
@@ -528,7 +540,7 @@ Applies a **45-point checklist** across 11 dimensions:
 |---|---|
 | **When to use** | Periodic quality assessment of the entire codebase |
 | **Input** | Optional: `--scope all\|rules\|patterns\|architecture\|security\|cross-file` |
-| **Output** | `results/audits/codebase-audit-YYYY-MM-DD.md` |
+| **Output** | `ai/runs/audits/codebase-audit-YYYY-MM-DD.md` |
 
 Like `/x-review-pr` but for the **entire codebase**, not just a single PR. Launches parallel subagents for 6 audit dimensions:
 
@@ -549,7 +561,7 @@ Like `/x-review-pr` but for the **entire codebase**, not just a single PR. Launc
 |---|---|
 | **When to use** | Checking dependencies for security, freshness, and licensing |
 | **Input** | Optional: `--scope all\|vulnerabilities\|outdated\|licenses` |
-| **Output** | `results/audits/dependency-audit-YYYY-MM-DD.md` |
+| **Output** | `ai/runs/audits/dependency-audit-YYYY-MM-DD.md` |
 
 Audits three dimensions with language-specific commands:
 
