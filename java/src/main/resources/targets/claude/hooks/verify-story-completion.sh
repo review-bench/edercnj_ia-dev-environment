@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# verify-story-completion.sh — Claude Code `Stop` hook, EIE Camada 2.
+# Layer:      0 (preventive — fires during LLM turn)
+# Trigger:    Stop
+# Event:      stop
+# Exit codes: 0=OK (no story evidence issues), 2=WARNING (missing evidence artifact)
+# Latency:    < 500ms
+# Telemetry:  reads NDJSON events for session activity detection
+#
+# verify-story-completion.sh — Claude Code `Stop` hook, EIE Camada 0.
 #
 # Detects when a turn just completed story-level work (PR created, merge done,
 # or git commit on a feat/story-* branch) and verifies that the required
