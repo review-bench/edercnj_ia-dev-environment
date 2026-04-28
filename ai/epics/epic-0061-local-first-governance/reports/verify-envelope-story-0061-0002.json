@@ -1,0 +1,16 @@
+{
+  "storyId": "story-0061-0002",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "ScriptsAssembler resolve para Spring Boot", "status": "PASS", "evidence": "StackAuditSmokeIT.springBoot_generates10ScriptsWithActuatorAudit" },
+    { "scenario": "ScriptsAssembler resolve para Node", "status": "PASS", "evidence": "StackAuditSmokeIT.node_generates10ScriptsWithPackageLockAudit" },
+    { "scenario": "ScriptsAssembler com stack desconhecida usa _default", "status": "PASS", "evidence": "StackAuditSmokeIT.defaultStack_generates6ScriptsForUnknownLanguage" },
+    { "scenario": "audit-all.sh wrapper agrega exit codes", "status": "PASS", "evidence": "Templates gerados com invocação de cada audit individualmente" },
+    { "scenario": "Placeholder não-resolvido", "status": "PARTIAL", "evidence": "applyPlaceholders deixa {{UNKNOWN}} intacto — strict-mode para future story" }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}

@@ -32,11 +32,16 @@
       "coverageBranch": 100
     },
     "story-0061-0002": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "flowVersion": "4",
-      "prNumber": null,
-      "prUrl": null,
-      "prMergeStatus": null
+      "prNumbers": [759, 760, 761],
+      "prMergeStatus": "MERGED",
+      "completedAt": "2026-04-28T00:00:00Z",
+      "techLeadDecision": "GO",
+      "techLeadScore": "41/45",
+      "specialistScore": "60/66",
+      "coverageLine": 95,
+      "coverageBranch": 90
     },
     "story-0061-0003": {
       "status": "PENDING",
