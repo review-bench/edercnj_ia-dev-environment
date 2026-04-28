@@ -44,22 +44,40 @@ cd "${PROJECT_DIR}" 2>/dev/null || exit 0
 TELEMETRY="$(ls -t plans/epic-*/telemetry/events.ndjson 2>/dev/null | head -1)"
 [[ -z "${TELEMETRY}" ]] && exit 0
 
-# Heuristic: look for recent "story completion" signals in this session.
-# Signal A — `gh pr create` invocation in recent 500 telemetry events.
-# Signal B — git commit message mentioning "feat(story-" in HEAD.
+# Heuristic: story-completion signals SCOPED TO THIS SESSION ONLY.
+# (EPIC-0061 story-0061-0006 false-positive storm fix — TASK-0061-0006-005)
+SESSION_START_FILE="${PROJECT_DIR}/.claude/state/session-start.txt"
+if [[ -f "${SESSION_START_FILE}" ]]; then
+    SESSION_EPOCH="$(cat "${SESSION_START_FILE}" 2>/dev/null || echo "")"
+else
+    SESSION_EPOCH=""
+fi
+if [[ -z "${SESSION_EPOCH}" || ! "${SESSION_EPOCH}" =~ ^[0-9]+$ ]]; then
+    SESSION_EPOCH="$(date -d '1 hour ago' +%s 2>/dev/null \
+        || date -v -1H +%s 2>/dev/null \
+        || echo "$(( $(date +%s) - 3600 ))")"
+fi
+SESSION_ISO="$(date -d "@${SESSION_EPOCH}" --iso-8601=seconds 2>/dev/null \
+    || date -r "${SESSION_EPOCH}" -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || echo "")"
+
+# Signal A — commits with story references made IN THIS SESSION (not historical telemetry)
 HAS_PR_CREATE=0
-if command -v jq >/dev/null 2>&1; then
-    RECENT_PR="$(tail -500 "${TELEMETRY}" 2>/dev/null \
-        | jq -r 'select(.tool_name=="Bash") | .tool_input.command // empty' 2>/dev/null \
-        | grep -E "gh\s+pr\s+create" 2>/dev/null \
-        | tail -1)"
-    if [[ -n "${RECENT_PR}" ]]; then
+if [[ -n "${SESSION_ISO}" ]]; then
+    SESSION_STORY_COMMITS="$(git log --since="${SESSION_ISO}" --format=%B 2>/dev/null \
+        | grep -cE "feat\(story-|chore\(story-|fix\(story-" 2>/dev/null || echo 0)"
+    if [[ "${SESSION_STORY_COMMITS}" -gt 0 ]]; then
         HAS_PR_CREATE=1
     fi
 fi
 
+# Signal B — most recent commit from THIS SESSION (not pre-session HEAD)
 HAS_STORY_COMMIT=0
-LATEST_COMMIT_MSG="$(git log -1 --format=%B 2>/dev/null || true)"
+LATEST_COMMIT_MSG=""
+if [[ -n "${SESSION_ISO}" ]]; then
+    LATEST_COMMIT_MSG="$(git log --since="${SESSION_ISO}" -1 --format=%B 2>/dev/null || true)"
+fi
+[[ -z "${LATEST_COMMIT_MSG}" ]] && LATEST_COMMIT_MSG="$(git log -1 --format=%B 2>/dev/null || true)"
 if [[ "${LATEST_COMMIT_MSG}" =~ feat\(story-[0-9]{4}-[0-9]{4} ]]; then
     HAS_STORY_COMMIT=1
 fi
@@ -69,7 +87,7 @@ if [[ "${HAS_PR_CREATE}" -eq 0 && "${HAS_STORY_COMMIT}" -eq 0 ]]; then
     exit 0
 fi
 
-# Extract story ID from the commit message or PR
+# Extract story ID from session-scoped commit
 STORY_ID=""
 if [[ "${LATEST_COMMIT_MSG}" =~ (story-[0-9]{4}-[0-9]{4}) ]]; then
     STORY_ID="${BASH_REMATCH[1]}"
