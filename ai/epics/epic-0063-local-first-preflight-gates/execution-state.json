@@ -13,29 +13,29 @@
   },
   "storyStatuses": {
     "story-0063-0001": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Pre-Flight Runner Script",
       "blockedBy": [
         "story-0063-0002",
         "story-0063-0003",
         "story-0063-0007"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 793,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/793"
     },
     "story-0063-0002": {
-      "status": "IN_PROGRESS",
+      "status": "COMPLETE",
       "title": "Content-Quality Audits (Review + Verify Envelope)",
       "blockedBy": [],
       "prNumber": 781,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/781"
     },
     "story-0063-0003": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Telemetry-as-Evidence Audit + Stage Hook",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 783,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/783"
     },
     "story-0063-0004": {
       "status": "PENDING",
@@ -66,32 +66,32 @@
       "prUrl": null
     },
     "story-0063-0007": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Local Coverage Gate (audit-coverage-local.sh)",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 784,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/784"
     },
     "story-0063-0008": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Branch Protection Automation (--apply-strict)",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 787,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/787"
     },
     "story-0063-0009": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Bypass-Skill Catalog (docs/audit-bypass-catalog.md)",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 785,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/785"
     },
     "story-0063-0010": {
-      "status": "PENDING",
-      "title": "Rule 24 §Camada 0 + CLAUDE.md Update",
+      "status": "COMPLETE",
+      "title": "Rule 24 \u00a7Camada 0 + CLAUDE.md Update",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 786,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/786"
     },
     "story-0063-0011": {
       "status": "PENDING",
@@ -157,7 +157,7 @@
     },
     "story-0063-0016": {
       "status": "PENDING",
-      "title": "Rollout WARN→FAIL Execution + ADR-0016",
+      "title": "Rollout WARN\u2192FAIL Execution + ADR-0016",
       "blockedBy": [
         "story-0063-0004",
         "story-0063-0013",
@@ -206,11 +206,11 @@
       "prUrl": null
     },
     "story-0063-0021": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "x-pr-fix Real-Diff Gate",
       "blockedBy": [],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 788,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/788"
     }
   }
 }
