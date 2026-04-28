@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "2.0.0",
+  "flowVersion": "4",
+  "epicId": "EPIC-0066",
+  "epicSlug": "pr-body-templates",
+  "epicTitle": "PR Body Templates & Telemetry-Aware Review Visibility",
+  "epicBranch": "epic/0066",
+  "epicMarkdownPath": "ai/epics/epic-0066-pr-body-templates/epic-0066.md",
+  "implementationMapPath": "ai/epics/epic-0066-pr-body-templates/IMPLEMENTATION-MAP.md",
+  "createdAt": "2026-04-28T00:00:00Z",
+  "status": "Backlog",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0066-0001": {
+      "status": "Pendente",
+      "phase": 0,
+      "blockedBy": [],
+      "blocks": ["story-0066-0003", "story-0066-0004", "story-0066-0007", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0002": {
+      "status": "Pendente",
+      "phase": 0,
+      "blockedBy": [],
+      "blocks": ["story-0066-0003", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0003": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0066-0001", "story-0066-0002"],
+      "blocks": ["story-0066-0004", "story-0066-0005", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0004": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0066-0003"],
+      "blocks": ["story-0066-0006", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0005": {
+      "status": "Pendente",
+      "phase": 2,
+      "blockedBy": ["story-0066-0003"],
+      "blocks": ["story-0066-0007", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0006": {
+      "status": "Pendente",
+      "phase": 2,
+      "blockedBy": ["story-0066-0004"],
+      "blocks": ["story-0066-0007", "story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0007": {
+      "status": "Pendente",
+      "phase": 3,
+      "blockedBy": ["story-0066-0001", "story-0066-0005", "story-0066-0006"],
+      "blocks": ["story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0008": {
+      "status": "Pendente",
+      "phase": 3,
+      "blockedBy": ["story-0066-0001", "story-0066-0002", "story-0066-0003", "story-0066-0004", "story-0066-0005", "story-0066-0006", "story-0066-0007", "story-0066-0009"],
+      "blocks": [],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0066-0009": {
+      "status": "Pendente",
+      "phase": 0,
+      "blockedBy": [],
+      "blocks": ["story-0066-0008"],
+      "commitSha": null,
+      "prNumber": null
+    }
+  },
+  "externalDependencies": {
+    "epics": [
+      {"id": "EPIC-0063", "reason": "story-0063-0005 moves reviews to Phase 2.5", "blocking": true},
+      {"id": "EPIC-0065", "reason": "story-0065-0003 renames x-epic-decompose to x-feature-create", "blocking": true},
+      {"id": "EPIC-0067", "reason": "reviews emit YAML frontmatter", "blocking": true}
+    ]
+  },
+  "parallelismDowngrades": []
+}
