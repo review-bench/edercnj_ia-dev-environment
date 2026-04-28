@@ -16,6 +16,15 @@
 set +e
 set -u
 
+# --self-check mode (Rule 26 §Camada 0 Hook Contract)
+case "${1:-}" in
+  --self-check)
+    command -v jq >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required" >&2; exit 2; }
+    echo "verify-story-completion.sh: self-check passed"
+    exit 0
+    ;;
+esac
+
 if [[ "${CLAUDE_EIE_DISABLED:-0}" == "1" ]]; then
     cat >/dev/null 2>&1
     exit 0

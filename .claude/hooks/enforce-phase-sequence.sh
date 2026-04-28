@@ -23,6 +23,15 @@
 
 set -u
 
+# --self-check mode (Rule 26 §Camada 0 Hook Contract)
+case "${1:-}" in
+  --self-check)
+    command -v jq >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required" >&2; exit 2; }
+    echo "enforce-phase-sequence.sh: self-check passed"
+    exit 0
+    ;;
+esac
+
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 
 # Honor global opt-out

@@ -1,0 +1,20 @@
+{
+  "storyId": "story-0063-0018",
+  "epicId": "EPIC-0063",
+  "passed": true,
+  "timestamp": "2026-04-28T00:00:00Z",
+  "coverageDelta": 0,
+  "failures": [],
+  "acCheckResults": {
+    "scenariosTotal": 5,
+    "scenariosCovered": 5,
+    "uncoveredScenarios": []
+  },
+  "artifactsVerified": [
+    "java/src/main/resources/targets/claude/scripts/audit-hooks-self-check.sh",
+    ".claude/scripts/audit-hooks-self-check.sh",
+    "src/test/shell/audit_hooks_self_check_test.sh",
+    "ai/epics/epic-0063-local-first-preflight-gates/plans/review-story-story-0063-0018.md",
+    "ai/epics/epic-0063-local-first-preflight-gates/plans/techlead-review-story-story-0063-0018.md"
+  ]
+}
