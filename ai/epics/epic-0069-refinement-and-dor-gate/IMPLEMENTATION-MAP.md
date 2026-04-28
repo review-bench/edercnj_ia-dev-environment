@@ -171,7 +171,7 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0007 | Smoke test E2E cobrindo 6 cenários (aprovação, bloqueio, refinement parcial, retomada, opt-out legacy, hotfix bypass); CHANGELOG entry MINOR | `src/test/java/dev/iadev/skills/Epic0069RefinementGateSmokeIT.java`, `CHANGELOG.md` (entry com Highlights) |
+| 0069-0007 | Smoke test E2E cobrindo 6 cenários (aprovação, bloqueio, refinement parcial, retomada, opt-out legacy, hotfix bypass); CHANGELOG entry MINOR | `java/src/test/java/dev/iadev/skills/Epic0069RefinementGateSmokeIT.java`, `CHANGELOG.md` (entry com Highlights) |
 
 **Entregas da Fase 3:**
 - Smoke verde em CI.
@@ -226,6 +226,6 @@ A ser populada quando `/x-story-refine` rodar sobre cada story do EPIC-0069 — 
 - `settings.json` (regen) — story-0005 toca para registrar hook.
 - `capabilities/_index.yaml` (regen) — story-0001 toca.
 - `CHANGELOG.md` (regen) — story-0007 toca.
-- `docs/audit-gates-catalog.md` (regen) — story-0001 e story-0006.
+- `docs/audit-gates-catalog.md` (regen) — story-0006 (entry para o novo CI script `audit-refinement-gate.sh`). Story-0001 publica Rule 29 + ADR-0018, mas a Rule por si não tem entry no catálogo de audit gates (catálogo lista gates executáveis: hooks, CI scripts, Java tests, workflows — não rules).
 
-Recomendação preliminar: **stories 0001 e 0006 não rodam simultaneamente** se ambas tocarem `audit-gates-catalog.md`.
+Recomendação preliminar: zero colisão hard prevista; story-0001 e story-0006 podem rodar em paralelo dentro de suas respectivas fases sem conflito sobre o catálogo.

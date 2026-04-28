@@ -1,7 +1,7 @@
 # Proposta — EPICs 0069 a 0075 (Planning Branch)
 
 **Branch:** `chore/epics-0069-0075-planning`
-**Worktree:** `.claude/worktrees/epics-planning/`
+**Worktree:** `.claude/worktrees/epics-planning-v2/` (recriado após o original ser removido por cleanup paralelo — veja PR description)
 **Criado em:** 2026-04-28
 **Autor:** sessão de planejamento entre operador (Eder) e Claude Opus 4.7
 **Status global:** `Backlog` — todos os 7 épicos são propostas pendentes de refinamento e priorização.
