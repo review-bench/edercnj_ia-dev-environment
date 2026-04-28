@@ -1,6 +1,6 @@
 # Prompt: Geração de Épico e História — Mid-Execution Continuous-Flow Heartbeat Hook
 
-> **Instrução de uso**: Tratar este SPEC como gap-filler do EPIC-0063 (mergeado, PR #752). Decidir entre (a) extender 0063 com 22ª story via amendment, ou (b) abrir EPIC-0068 follow-up dedicado. Recomendado: (b), porque 0063 está fechado.
+> **Instrução de uso**: Tratar este SPEC como gap-filler do EPIC-0063 (mergeado, PR #752). Decidir entre (a) estender 0063 com 22ª story via amendment, ou (b) abrir EPIC-0068 follow-up dedicado. Recomendado: (b), porque 0063 está fechado.
 
 ---
 
