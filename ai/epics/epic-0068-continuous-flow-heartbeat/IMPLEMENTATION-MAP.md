@@ -151,7 +151,7 @@ parallelism-constraints:
 | Epic | Status | Interação com EPIC-0068 |
 | :--- | :--- | :--- |
 | EPIC-0061 (Non-Interactive Default) | Concluída (`story-0061-0001` mergeada em 2026-04-28 — PRs #755/#756/#757) | **Pré-requisito conceitual satisfeito.** Default-flip ativo em `develop`, hook agora faz sentido para 100% das invocações sem `--interactive`. |
-| EPIC-0063 (Local-First Pre-Flight Gates) | Scaffold mergeado (PR #752); 21 stories implementação `PENDING` | **Complementar.** EPIC-0063 fechará boundaries; EPIC-0068 fecha gap intra-fase. `story-0068-0003` espera `story-0063-0012` (Tool-Call Grammar; rule number TBD) mergeada para grammar parsing — fallback genérico documentado em `story-0068-0002` §3.4 se não. |
+| EPIC-0063 (Local-First Pre-Flight Gates) | Scaffold mergeado (PR #752 — 21 markdown files); `execution-state.json` rastreia 11 stories da v1 (`0001..0011` `PENDING`); v2 (`0012..0021`) só em markdown, ainda não no state | **Complementar.** EPIC-0063 fechará boundaries; EPIC-0068 fecha gap intra-fase. `story-0068-0003` espera `story-0063-0012` (Tool-Call Grammar; rule number TBD) mergeada para grammar parsing — fallback genérico documentado em `story-0068-0002` §3.4 se não. |
 | EPIC-0064 (Capability-Driven Composition) | Em Refinamento | Sem interação direta. EPIC-0068 não toca capabilities. |
 | EPIC-0065 (Feature Creation Chain) | Concluída (PR #754) | Sem interação direta. |
 | EPIC-0066 (PR Body Templates) | Backlog | Sem interação direta. EPIC-0068 não modifica PR creation flow. |
