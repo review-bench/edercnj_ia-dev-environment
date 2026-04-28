@@ -21,10 +21,10 @@
 
 ## 0.5 Cross-Epic Dependencies
 
-> **Rule 29 — Cross-Epic Dependency Awareness**
-> Epic-level dependencies are declared here and mirrored in `execution-state.json.blockedBy[]`.
-> `x-epic-implement` Phase 0.5 performs a synchronous gate: if any dependency's `expectedStatus` is not met, the epic aborts with exit 1.
-> See `.claude/rules/29-cross-epic-dependencies.md` and ADR-0017.
+> **Cross-Epic Dependency Awareness (EPIC-0076)**
+> Epic-level dependencies are declared in this section and used by the implementation workflow as a Phase 0.5 gate.
+> If any dependency's `expectedStatus` is not met, `x-epic-implement` aborts synchronously with exit 1.
+> TODO: link to the dedicated cross-epic dependency rule and ADR once those artifacts land in subsequent stories of EPIC-0076.
 
 ### Blocked By Epics
 
