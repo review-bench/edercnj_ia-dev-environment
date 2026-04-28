@@ -1,0 +1,20 @@
+# tool-call-grammar-baseline.txt — Grandfather list for audit-tool-call-grammar.sh
+#
+# Skills listed here are EXEMPT from the Rule 28 grammar marker requirement.
+# This file is IMMUTABLE after EPIC-0063 merges to develop.
+# CI script audit-immutability.sh enforces append-only behavior.
+#
+# Format: <skill-name>  # <reason>
+#   skill-name: the 'name:' field from the skill's SKILL.md frontmatter
+#   reason: why this skill is grandfathered (must reference epic/story)
+#
+# Initial state: EMPTY.
+# All 8 Anexo B orchestrators have grammar markers applied by story-0063-0012.
+# Non-Anexo-B skills (leaf skills, x-internal-*) are out of scope and do NOT
+# appear in this baseline — they are simply not checked.
+#
+# To grandfather a legacy skill, add an entry here BEFORE the EPIC-0063 merge
+# to develop. After that date, this file is frozen.
+#
+# Example (do not uncomment — for documentation only):
+# x-legacy-orchestrator  # pre-EPIC-0063, markers not yet applied (ETA: EPIC-0070)
