@@ -141,26 +141,26 @@ graph TD
 ### Fase 0 — Governance Foundation
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0070-0001 | Capability `governance.value-driven-templates`, Rule 30, ADR-0019, decisão sobre rule compartilhada com EPIC-0071 | `capabilities/governance/value-driven-templates.yaml`, `rules/core/30-value-driven-templates.md`, `docs/adr/ADR-0019-...md` |
+| 0070-0001 | Capability `governance.value-driven-templates`, Rule (NN TBD — D-R3), ADR (NNNN TBD — D-R4), decisão D-R7 sobre rule única vs compartilhada com EPIC-0071, marker SUPERSEDED em EPIC-0056 (D-R9) | `capabilities/governance/value-driven-templates.yaml`, `java/src/main/resources/targets/claude/rules/<NN>-value-driven-templates.md` (D-R2), `docs/adr/ADR-<NNNN>-value-driven-templates.md` |
 
 ### Fase 1 — Templates v2
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0070-0002 | TEMPLATE-EPIC v2: 9 seções pivotadas (Visão, Persona, Hipótese, Alternativas, Escopo, Riscos, Stories, Quality Gates, Origem) | `shared/templates/_TEMPLATE-EPIC.md` (rewrite) |
-| 0070-0003 | TEMPLATE-STORY v2: 9 seções (Visão, Persona, Entrega, AC Gherkin, Contratos, Tasks, Dependências, Decision Rationale, Refinement Verdict) | `shared/templates/_TEMPLATE-STORY.md` (rewrite) |
-| 0070-0004 | TEMPLATE-ARCHITECTURE-SYSTEM: 11 seções, auto-fill via YAML (stack, persistência, comunicação, observabilidade, resilience, perf budget, security baseline, dep policy, doc targets, integrações, decision log) | `shared/templates/_TEMPLATE-ARCHITECTURE-SYSTEM.md` (NEW) |
+| 0070-0002 | TEMPLATE-EPIC v2: 9 seções pivotadas (Visão, Persona, Hipótese, Alternativas, Escopo, Riscos, Stories, Quality Gates, Origem) + frontmatter v3.0 (D-R6) | `java/src/main/resources/shared/templates/_TEMPLATE-EPIC.md` (rewrite) |
+| 0070-0003 | TEMPLATE-STORY v2: 9 seções (Visão, Persona, Entrega, AC Gherkin 4 categorias, Contratos, Tasks, Dependências, Decision Rationale, Refinement Verdict) + frontmatter v3.0 (D-R6) | `java/src/main/resources/shared/templates/_TEMPLATE-STORY.md` (rewrite) |
+| 0070-0004 | TEMPLATE-ARCHITECTURE-SYSTEM: 11 seções, auto-fill via YAML (stack, persistência, comunicação, observabilidade, resilience, perf budget, security baseline, dep policy, doc targets, integrações, decision log) + frontmatter v3.0 + 1 golden de referência | `java/src/main/resources/shared/templates/_TEMPLATE-ARCHITECTURE-SYSTEM.md` (NEW), `DocsAssembler.renderSystemArchitecture` (extend), `java/src/test/resources/golden/<perfil>/system.md.golden` |
 
-### Fase 2 — Skills
+### Fase 2 — Skills (path D-R1: `targets/claude/skills/core/plan/`)
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0070-0005 | `x-epic-create` e `x-story-create` emitem v2 por padrão; flag `--legacy-template-v1` para opt-out (deprecation 2 releases) | SKILL.md modificadas |
-| 0070-0006 | `/x-arch-system-update` atualiza `docs/architecture/system.md` incrementalmente (lê épico recém-implementado + ADRs novos + diff YAML) | NEW `targets/claude/skills/plan/x-arch-system-update/SKILL.md` |
-| 0070-0007 | `/x-template-migrate` assistida v1→v2 com diff + perguntas por bloco técnico | NEW `targets/claude/skills/plan/x-template-migrate/SKILL.md` |
+| 0070-0005 | `x-epic-create` e `x-story-create` emitem v2 por padrão; flag `--legacy-template-v1` para opt-out (Rule 19 deprecation 2 releases) + telemetry de uso da flag | SKILL.md de `x-epic-create` e `x-story-create` modificadas (path em `targets/claude/skills/core/<categoria>/`) |
+| 0070-0006 | `/x-arch-system-update` atualiza `docs/architecture/system.md` incrementalmente (lê épico recém-implementado + ADRs novos + diff YAML); merge via `x-internal-report-write --append` para Decision Log + Edit cirúrgico para auto-fill; idempotente | NEW `java/src/main/resources/targets/claude/skills/core/plan/x-arch-system-update/SKILL.md` (D-R1) |
+| 0070-0007 | `/x-template-migrate` assistida v1→v2 com diff + perguntas por bloco técnico (interativo + `--non-interactive` com defaults seguros) + recovery via state-file | NEW `java/src/main/resources/targets/claude/skills/core/plan/x-template-migrate/SKILL.md` (D-R1) |
 
 ### Fase 3 — Verification + Supersedência
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0070-0008 | Smoke E2E (gerar epic v2, gerar story v2, atualizar system.md, migrar epic v1) + audit `audit-template-version.sh` + EPIC-0056 marked Superseded + CHANGELOG MAJOR | `Epic0070ValueTemplatesSmokeIT.java`, `audit-template-version.sh`, `epic-0056.md` (marker), `CHANGELOG.md` |
+| 0070-0008 | Smoke E2E (6 cenários: gerar epic v2, gerar story v2, system.md inicializado, x-arch-system-update incremental, migrar epic v1, EPIC-0056 marker) + audit `audit-template-version.sh` Rule 26-compliant (D-R5) + EPIC-0056 marker SUPERSEDED (D-R9) + CHANGELOG MAJOR sem versão fixa (D-R10) + regen 9 goldens | `java/src/test/java/dev/iadev/templates/Epic0070ValueTemplatesSmokeIT.java`, `java/src/main/resources/targets/claude/scripts/audit-template-version.sh`, `audits/template-version-baseline.txt`, `epic-0056.md` (marker D-R9), `CHANGELOG.md`, `CLAUDE.md`, `docs/audit-gates-catalog.md` |
 
 ---
 
@@ -188,7 +188,13 @@ graph TD
 
 ## 8. Dependências entre Tasks (Cross-Story)
 
-A ser populada pós-refinement (EPIC-0069).
+Cross-story task dependencies a serem detalhadas durante Phase 0 do `x-epic-implement` quando cada story for decomposta em tasks (`x-task-plan`). Pontos conhecidos pós-refinement:
+
+- task-0070-0001-005 (criar Rule NN) → task-0070-0002-002, 0070-0003-002, 0070-0004-002 (declarar `requires-capabilities` precisa do capability ID estável da Rule).
+- task-0070-0008-002 (`audit-template-version.sh`) consome o conjunto de épicos pós-rollout — depende de stories 0005-0007 já merged em `epic/0070`.
+- task-0070-0007-006 (side-effect "mover para system.md") invoca `x-arch-system-update` da story 0070-0006 — sequência de Phase 2 deve respeitar essa dependência cruzada (0006 antes de 0007 OU stub do skill em 0006 disponível).
+
+Refinement-driven deps acima foram derivadas das D-R1..D-R10 do `epic-0070.md §10`.
 
 ---
 
