@@ -87,11 +87,16 @@
       "specialistScore": "62/66"
     },
     "story-0061-0007": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "flowVersion": "4",
-      "prNumber": null,
-      "prUrl": null,
-      "prMergeStatus": null
+      "prNumbers": [774, 775],
+      "prMergeStatus": "MERGED",
+      "completedAt": "2026-04-28T00:00:00Z",
+      "techLeadDecision": "GO",
+      "techLeadScore": "43/45",
+      "specialistScore": "62/66",
+      "terminalStory": true,
+      "epicComplete": true
     }
   },
   "executionOrder": [
