@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **EPIC-0062 (Migração Física v3→v4 — Finalização do EPIC-0060) — Concluída:**
+  Completes the deferred physical migration from EPIC-0060. All artifacts now
+  live at v4 canonical paths with no transitional symlinks remaining.
+  - **story-0062-0001 (PR #743):** `BASELINE_DIR` env var added to 6 governance
+    audit scripts; default remains `audits/` for backward compat.
+  - **story-0062-0002 (PR #745):** `git mv audits/*.txt → governance/baselines/`;
+    default flipped to `governance/baselines`; transitional symlink created.
+  - **story-0062-0003 (PR #744):** `git mv adr/*.md → docs/adr/`; cross-refs
+    updated in `CLAUDE.md`, `Conventions.md`, `README.md`, rules.
+  - **story-0062-0004 (PR #746):** `git mv specs/*.md → docs/specs/`; `README.md`
+    refs updated.
+  - **story-0062-0005 (PR #747):** 5 Java assemblers + `FileCategorizer` updated
+    to emit v4 paths natively; symlinks `adr/` and `specs/` removed; 11 golden
+    fixtures regenerated; 3992 tests GREEN.
+  - **story-0062-0006 (PR #748):** 14 SKILL.md files updated to remove numeric
+    `plans/epic-NNN/` literals; `skill-pathresolver-baseline.txt` cleared.
+  - **story-0062-0007 (PR #749):** Rules 05/13/24/25/26/27 updated to reference
+    `governance/baselines/`, `docs/adr/`, `docs/specs/`; 11 golden fixtures
+    regenerated; full test suite GREEN.
+  - **story-0062-0008 (this PR):** Transitional symlink `audits/ → governance/baselines/`
+    removed; `CHANGELOG.md` updated; epic report generated; `epic-0062.md` marked
+    `Concluída`.
+  Follow-up: EPIC-0063 (freeze hook) and EPIC-0064 (probe removal + MAJOR bump).
+
 - **EPIC-0060 (Folder Reorganization v4) — partial delivery:** introduces the
   v4 layout convention (`ai/epics/`, `docs/`, `governance/`) alongside the
   legacy v3 (`plans/`) layout. Auto-detection via filesystem probe; epics with
