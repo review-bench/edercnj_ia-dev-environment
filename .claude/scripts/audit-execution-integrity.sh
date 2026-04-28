@@ -216,10 +216,88 @@ emit_json_envelope() {
         "${status}" "${total}" "${passed}" "${failed}" "${failures_json}"
 }
 
+# EPIC-0063 story-0063-0003 — Telemetry scope audit (RULE-003 dual-evidence)
+# Validates that each merged story has 3 mandatory tool.call events in NDJSON:
+#   - skill=x-review with matching storyId
+#   - skill=x-review-pr with matching storyId
+#   - skill=x-internal-story-verify with matching storyId
+# Plus NDJSON integrity: required fields + monotonic timestamps per session_id.
+audit_telemetry_scope() {
+    local story_id="$1"
+    local epic_id="$2"
+    local ndjson_file="$3"
+
+    if ! command -v jq >/dev/null 2>&1; then
+        echo "OPERATIONAL_ERROR: jq required for --scope=telemetry" >&2
+        return 2
+    fi
+
+    # Resolve NDJSON file: if explicit, use it; else discover from epic_id
+    if [[ -z "${ndjson_file}" ]]; then
+        if [[ -z "${epic_id}" ]]; then
+            echo "OPERATIONAL_ERROR: --epic-id or --ndjson-file required for telemetry scope" >&2
+            return 2
+        fi
+        # Try v3 layout first, then v4
+        for candidate in \
+            "plans/epic-${epic_id}/telemetry/events.ndjson" \
+            "ai/epics/epic-${epic_id}-"*"/telemetry/events.ndjson"; do
+            if [[ -f "${candidate}" ]]; then
+                ndjson_file="${candidate}"
+                break
+            fi
+        done
+    fi
+
+    if [[ ! -f "${ndjson_file}" ]]; then
+        echo "EIE_TELEMETRY_EVIDENCE_MISSING: no telemetry file found (epic=${epic_id})" >&2
+        return 1
+    fi
+
+    # NDJSON integrity check: required fields per line
+    local line_num=0
+    while IFS= read -r line; do
+        line_num=$((line_num + 1))
+        [[ -z "${line}" ]] && continue
+        if ! echo "${line}" | jq -e 'has("timestamp") and has("event") and has("session_id") and has("pid")' >/dev/null 2>&1; then
+            echo "EIE_NDJSON_INTEGRITY_VIOLATED: line ${line_num} missing required fields" >&2
+            return 1
+        fi
+    done < "${ndjson_file}"
+
+    # Required event check: 3 skills must have at least one tool.call event matching story_id
+    if [[ -n "${story_id}" ]]; then
+        local missing=()
+        for required_skill in "x-review" "x-review-pr" "x-internal-story-verify"; do
+            local count
+            count=$(jq -r --arg skill "${required_skill}" --arg sid "${story_id}" \
+                'select(.event=="tool.call" and .skill==$skill and .storyId==$sid) | .timestamp' \
+                "${ndjson_file}" 2>/dev/null | wc -l | tr -d ' ')
+            if [[ "${count}" -eq 0 ]]; then
+                missing+=("${required_skill}")
+            fi
+        done
+        if [[ "${#missing[@]}" -gt 0 ]]; then
+            for s in "${missing[@]}"; do
+                echo "EIE_TELEMETRY_EVIDENCE_MISSING: missing skill=${s} event for storyId=${story_id}" >&2
+            done
+            return 1
+        fi
+        echo "AUDIT_OK: telemetry evidence present for ${story_id}" >&2
+        return 0
+    fi
+
+    echo "AUDIT_OK: telemetry NDJSON integrity validated" >&2
+    return 0
+}
+
 main() {
     local since_ref=""
     local single_story=""
     local json_mode="false"
+    local scope="full"
+    local epic_id=""
+    local ndjson_file=""
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --self-check) self_check ;;
@@ -231,17 +309,49 @@ main() {
                 since_ref="$2"
                 shift 2
                 ;;
-            --story-id)
-                if [[ $# -lt 2 || -z "${2:-}" || "${2:0:2}" == "--" ]]; then
-                    echo "error: --story-id requires a story id argument" >&2
-                    usage_error
+            --story-id|--story-id=*)
+                if [[ "$1" == "--story-id" ]]; then
+                    if [[ $# -lt 2 || -z "${2:-}" || "${2:0:2}" == "--" ]]; then
+                        echo "error: --story-id requires a story id argument" >&2
+                        usage_error
+                    fi
+                    single_story="$2"
+                    shift 2
+                else
+                    single_story="${1#--story-id=}"
+                    shift
                 fi
-                if ! [[ "$2" =~ ^story-[0-9]{4}-[0-9]{4}$ ]]; then
+                if ! [[ "${single_story}" =~ ^story-[0-9]{4}-[0-9]{4}$ ]]; then
                     echo "error: --story-id must match story-XXXX-YYYY pattern" >&2
                     usage_error
                 fi
-                single_story="$2"
-                shift 2
+                ;;
+            --scope|--scope=*)
+                if [[ "$1" == "--scope" ]]; then
+                    scope="$2"
+                    shift 2
+                else
+                    scope="${1#--scope=}"
+                    shift
+                fi
+                if [[ "${scope}" != "full" && "${scope}" != "telemetry" ]]; then
+                    echo "error: --scope must be 'full' or 'telemetry'" >&2
+                    usage_error
+                fi
+                ;;
+            --epic-id|--epic-id=*)
+                if [[ "$1" == "--epic-id" ]]; then
+                    epic_id="$2"; shift 2
+                else
+                    epic_id="${1#--epic-id=}"; shift
+                fi
+                ;;
+            --ndjson-file|--ndjson-file=*)
+                if [[ "$1" == "--ndjson-file" ]]; then
+                    ndjson_file="$2"; shift 2
+                else
+                    ndjson_file="${1#--ndjson-file=}"; shift
+                fi
                 ;;
             --json)
                 json_mode="true"
@@ -254,6 +364,12 @@ main() {
                 ;;
         esac
     done
+
+    # EPIC-0063 story-0063-0003 — telemetry scope: validate NDJSON events per merged story
+    if [[ "${scope}" == "telemetry" ]]; then
+        audit_telemetry_scope "${single_story}" "${epic_id}" "${ndjson_file}"
+        exit $?
+    fi
 
     BASELINE_STORIES="$(load_baseline)"
 
