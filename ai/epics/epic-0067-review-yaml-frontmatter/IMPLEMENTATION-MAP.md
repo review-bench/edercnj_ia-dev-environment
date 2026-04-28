@@ -136,11 +136,11 @@ hard_collisions: []
 regen_overlaps:
   - story_a: story-0067-0001
     story_b: story-0067-0002
-    files: [src/test/resources/golden/**]
+    files: [java/src/test/resources/golden/**]
     severity: low
   - story_a: story-0067-0001
     story_b: story-0067-0003
-    files: [src/test/resources/golden/**]
+    files: [java/src/test/resources/golden/**]
     severity: low
 soft_warnings:
   - story_id: story-0067-0004
