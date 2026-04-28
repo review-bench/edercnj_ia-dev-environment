@@ -19,6 +19,31 @@
 
 ---
 
+## 0.5 Cross-Epic Dependencies
+
+> **Cross-Epic Dependency Awareness (EPIC-0076)**
+> Epic-level dependencies are declared in this section and used by the implementation workflow as a Phase 0.5 gate.
+> If any dependency's `expectedStatus` is not met, `x-epic-implement` aborts synchronously with exit 1.
+> TODO: link to the dedicated cross-epic dependency rule and ADR once those artifacts land in subsequent stories of EPIC-0076.
+
+### Blocked By Epics
+
+| Epic ID   | Title                      | Expected Status @ Start | Reason / Surface Touched                               |
+| --------- | -------------------------- | ----------------------- | ------------------------------------------------------ |
+| (none)    | —                          | —                       | —                                                      |
+
+### Blocks (informational, derived)
+
+| Epic ID   |
+| --------- |
+| (none)    |
+
+### In-Flight Reference Allowance
+
+(Nenhuma dependência em voo declarada.)
+
+---
+
 ## 1. Contexto & Escopo
 
 **Chave Jira:** <CHAVE-JIRA>
