@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking
 
-- **EPIC-0064 — Capability-Driven Composition Refactor.** Schema YAML do projeto-alvo salta para v3.0 (sem retrocompat com v2). Composição de `.claude/` passa a ser dirigida por **capabilities** declaradas em frontmatter universal (Rule 28), substituindo o copy-cego atual. Todo `.claude/` gerado precisa ser regenerado. Detalhes: [ADR-0016](adr/ADR-0016-capability-driven-composition.md), [SPEC-capability-composition-v1](docs/specs/SPEC-capability-composition-v1.md), [Rule 28](.claude/rules/28-capability-frontmatter-contract.md), [EPIC-0064](ai/epics/epic-0064-capability-driven-composition/epic-0064.md). Scope: 79 stories em 8 fases (Phase 0 entregue nesta birth; Phases 1-7 TBD). Bump major reservado para Phase 7.
+- **EPIC-0064 — Capability-Driven Composition Refactor.** Schema YAML do projeto-alvo salta para v3.0 (sem retrocompat com v2). Composição de `.claude/` passa a ser dirigida por **capabilities** declaradas em frontmatter universal (Rule 28), substituindo o copy-cego atual. Todo `.claude/` gerado precisa ser regenerado. Detalhes: [ADR-0016](docs/adr/ADR-0016-capability-driven-composition.md), [SPEC-capability-composition-v1](docs/specs/SPEC-capability-composition-v1.md), [Rule 28](.claude/rules/28-capability-frontmatter-contract.md), [EPIC-0064](ai/epics/epic-0064-capability-driven-composition/epic-0064.md). Scope: 79 stories em 8 fases (Phase 0 entregue nesta birth; Phases 1-7 TBD). Bump major reservado para Phase 7.
 
 ### Added
 
