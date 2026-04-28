@@ -47,7 +47,7 @@ cd "${REPO_ROOT}"
 # BASELINE_DIR: directory containing baseline *.txt files (story-0062-0001).
 # Default kept at "audits" for backward compat; override via env var to
 # point at "governance/baselines" after the v4 physical migration.
-BASELINE_DIR="${BASELINE_DIR:-audits}"
+BASELINE_DIR="${BASELINE_DIR:-governance/baselines}"
 
 # Baseline files to audit (story-ID format; frozen after EPIC-0059 cutoff).
 # Note: ${BASELINE_DIR}/pr-evidence-baseline.txt uses PR numbers (not story IDs) and

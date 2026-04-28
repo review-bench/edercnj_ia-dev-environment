@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0062-0002",
+  "epicId": "EPIC-0062",
+  "passed": true,
+  "scope": "SIMPLE",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "failures": [],
+  "acCheckResults": [
+    {"ac": "AC1", "passed": true, "evidence": "ls governance/baselines/*.txt -> 7 files"},
+    {"ac": "AC2", "passed": true, "evidence": "ls -la audits -> symlink to governance/baselines"},
+    {"ac": "AC3", "passed": true, "evidence": "git log --follow preserves history"},
+    {"ac": "AC4", "passed": true, "evidence": "6 audit scripts --self-check exit 0"},
+    {"ac": "AC5", "passed": true, "evidence": "mvn test passes via symlink"},
+    {"ac": "AC6", "passed": true, "evidence": "migrate-layout.sh --self-check exit 0"}
+  ],
+  "timestamp": "2026-04-28T12:25:00Z"
+}
