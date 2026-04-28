@@ -339,7 +339,7 @@ class Epic0055FoundationSmokeTest extends SmokeTestBase {
         // and shrinks as each retrofit story merges (0055-0003..0010).
         // Every entry MUST still be a canonical orchestrator name —
         // unknown entries would be baseline corruption.
-        Path baseline = repoRoot().resolve("audits/task-hierarchy-baseline.txt");
+        Path baseline = repoRoot().resolve("governance/baselines/task-hierarchy-baseline.txt");
         assertThat(baseline).exists();
 
         List<String> baselineEntries =
