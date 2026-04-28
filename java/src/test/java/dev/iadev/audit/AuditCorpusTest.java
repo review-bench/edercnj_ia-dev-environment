@@ -14,8 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("AuditCorpus")
 class AuditCorpusTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Nested
     @DisplayName("walkSkills")
@@ -32,7 +31,9 @@ class AuditCorpusTest {
 
         @Test
         void skillsMdFiles_returnedOnlySkillMd() throws IOException {
-            Path skillsDir = tempDir.resolve("java/src/main/resources/targets/claude/skills/core/dev/x-epic-implement");
+            Path skillsDir =
+                    tempDir.resolve(
+                            "java/src/main/resources/targets/claude/skills/core/dev/x-epic-implement");
             Files.createDirectories(skillsDir);
             Files.writeString(skillsDir.resolve("SKILL.md"), "---\nname: x-epic-implement\n---\n");
             Files.writeString(skillsDir.resolve("README.md"), "# readme");
@@ -60,9 +61,11 @@ class AuditCorpusTest {
 
         @Test
         void javaMavenStack_returnsShTplFiles() throws IOException {
-            Path scriptsDir = tempDir.resolve("java/src/main/resources/targets/claude/scripts/java-maven");
+            Path scriptsDir =
+                    tempDir.resolve("java/src/main/resources/targets/claude/scripts/java-maven");
             Files.createDirectories(scriptsDir);
-            Files.writeString(scriptsDir.resolve("audit-model-selection.sh.tpl"), "#!/usr/bin/env bash");
+            Files.writeString(
+                    scriptsDir.resolve("audit-model-selection.sh.tpl"), "#!/usr/bin/env bash");
             Files.writeString(scriptsDir.resolve("audit-all.sh.tpl"), "#!/usr/bin/env bash");
             Files.writeString(scriptsDir.resolve("readme.txt"), "ignored");
             AuditCorpus corpus = new AuditCorpus(tempDir);

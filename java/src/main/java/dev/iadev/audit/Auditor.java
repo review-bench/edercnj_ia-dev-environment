@@ -31,8 +31,8 @@ public interface Auditor {
     String name();
 
     /**
-     * Returns the path to the bash template that is the canonical equivalent of this auditor.
-     * Used by {@code AuditEquivalenceSmokeIT} to locate the bash counterpart.
+     * Returns the path to the bash template that is the canonical equivalent of this auditor. Used
+     * by {@code AuditEquivalenceSmokeIT} to locate the bash counterpart.
      */
     Path bashEquivalentTemplate();
 }

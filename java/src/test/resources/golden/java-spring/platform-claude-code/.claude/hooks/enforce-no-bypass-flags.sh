@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Layer:      0 (preventive — fires during LLM turn)
+# Trigger:    PreToolUse
+# Event:      pre_tool_use (matcher: "Skill")
+# Exit codes: 0=OK (no bypass flag), non-zero=block (bypass flag detected outside Recovery)
+# Latency:    < 100ms
+# Telemetry:  no direct emission
+#
 # enforce-no-bypass-flags.sh — PreToolUse hook for Rule 22 / Rule 24 enforcement.
 #
 # Registered in settings.json as PreToolUse matcher "Skill".

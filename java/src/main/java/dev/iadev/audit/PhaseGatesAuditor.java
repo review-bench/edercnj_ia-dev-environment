@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 /**
  * Java equivalent of {@code audit-phase-gates.sh} (Rule 25).
  *
- * <p>Checks that orchestrator SKILL.md files invoke {@code x-internal-phase-gate} in each
- * {@code ## Phase N} section that has a {@code TaskCreate}. Phases with tasks but no gate
- * (and no {@code phase-no-gate} exemption) are violations.
+ * <p>Checks that orchestrator SKILL.md files invoke {@code x-internal-phase-gate} in each {@code ##
+ * Phase N} section that has a {@code TaskCreate}. Phases with tasks but no gate (and no {@code
+ * phase-no-gate} exemption) are violations.
  */
 public final class PhaseGatesAuditor implements Auditor {
 
@@ -38,7 +38,8 @@ public final class PhaseGatesAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-phase-gates.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-phase-gates.sh.tpl");
     }
 
     private static boolean isOrchestrator(Path skillPath) {
@@ -63,8 +64,13 @@ public final class PhaseGatesAuditor implements Auditor {
             String line = lines[i];
             if (PHASE_HEADER.matcher(line.trim()).find()) {
                 if (phaseLineNum >= 0 && hasTask && !hasGate && !hasNoGateExemption) {
-                    violations.add(new AuditViolation(skillPath, phaseLineNum, "MISSING_PHASE_GATE",
-                            "Phase has TaskCreate but no x-internal-phase-gate: " + phaseLine.strip()));
+                    violations.add(
+                            new AuditViolation(
+                                    skillPath,
+                                    phaseLineNum,
+                                    "MISSING_PHASE_GATE",
+                                    "Phase has TaskCreate but no x-internal-phase-gate: "
+                                            + phaseLine.strip()));
                 }
                 phaseLineNum = i + 1;
                 phaseLine = line;
@@ -76,8 +82,12 @@ public final class PhaseGatesAuditor implements Auditor {
             if (line.contains("x-internal-phase-gate")) hasGate = true;
         }
         if (phaseLineNum >= 0 && hasTask && !hasGate && !hasNoGateExemption) {
-            violations.add(new AuditViolation(skillPath, phaseLineNum, "MISSING_PHASE_GATE",
-                    "Last phase has TaskCreate but no x-internal-phase-gate"));
+            violations.add(
+                    new AuditViolation(
+                            skillPath,
+                            phaseLineNum,
+                            "MISSING_PHASE_GATE",
+                            "Last phase has TaskCreate but no x-internal-phase-gate"));
         }
     }
 

@@ -33,12 +33,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          # fetch-depth: 0 is required so that audit-baseline-immutability.sh
-          # can resolve the cutoff SHA recorded in $BASELINE_DIR/baseline-cutoff.sha
-          # (default: audits/; override via BASELINE_DIR env — story-0062-0001).
-          # A shallow clone (default fetch-depth: 1) makes the cutoff SHA
-          # unreachable, causing the script to treat the empty cutoff content
-          # as "all entries new" and produce false-positive violations.
+          # fetch-depth: 0 is required so that Java auditors can resolve git
+          # history (e.g., merged story branches in ExecutionIntegrityAuditor).
+          # A shallow clone (default fetch-depth: 1) makes commits unreachable
+          # and produces false-positive violations.
           fetch-depth: 0
 
       - name: Setup JDK 21 (Temurin) + Maven cache
@@ -63,42 +61,12 @@ jobs:
           fi
           shellcheck -S warning -e SC2034 "${SCRIPTS[@]}"
 
-      # EPIC-0050 (Rule 23): audit model selection (Opus/Sonnet/Haiku)
-      # enforcement. Fails the PR when a SKILL.md, Agent() dispatch,
-      # Skill() dispatch, or agent metadata violates Rule 23.
-      - name: Audit Model Selection (Rule 23)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-model-selection.sh
-
-      # EPIC-0057 (Rule 24 Camada 3): audit execution-integrity evidence.
-      # Fails the PR when a merged story-* branch lacks the mandatory
-      # evidence artifacts (verify-envelope, review, techlead-review,
-      # story-completion-report) defined in Rule 24 §32-42.
-      - name: Audit Execution Integrity (Camada 3)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-execution-integrity.sh
-
-      # EPIC-0057 story-0057-0005: audit bypass flags (--no-*/--skip-*)
-      # outside ## Recovery / ## Error Handling sections. Per Rule 24
-      # §30 + Rule 45 §--no-ci-watch Constraints. Hard violations fail
-      # the build (exit 1); soft warnings (--no-jira) are surfaced but
-      # do not block (exit 3).
-      - name: Audit Bypass Flags (Rule 24 §30 + Rule 45)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-bypass-flags.sh || [[ $? -eq 3 ]]
-
-      # EPIC-0059 story-0059-0011 (Rule 27): audit baseline immutability.
-      # Fails the PR when any story ID is added to the audit baseline files
-      # (execution-integrity-baseline.txt, rule-26-baseline.txt) after the
-      # EPIC-0059 cutoff commit recorded in $BASELINE_DIR/baseline-cutoff.sha
-      # (default: audits/; override via BASELINE_DIR env — story-0062-0001).
-      # This ensures the amnesty window is formally closed and no new entries
-      # can be added without CODEOWNERS review (<!-- baseline-correction -->).
-      # See ADR-0015-zero-bypass-amnesty.md for the amnesty decision record.
-      - name: Audit Baseline Immutability (Rule 27 + ADR-0015)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-baseline-immutability.sh
-
+      # EPIC-0061 (RULE-007): all governance audit gates moved to Java auditors
+      # under dev.iadev.audit.* and run as part of `mvn verify`. The legacy
+      # bash scripts (audit-model-selection.sh, audit-execution-integrity.sh,
+      # audit-bypass-flags.sh, audit-baseline-immutability.sh) were removed
+      # in favor of the local-first architecture (Camada 0-4). See ADR-0017
+      # and Rule 26 §Camada-0.
       - name: mvn -B verify
         run: mvn -B verify
 

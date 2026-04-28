@@ -9,7 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Smoke test verifying the lean CI pipeline contract (RULE-007, RULE-008 — EPIC-0061 story-0061-0005).
+ * Smoke test verifying the lean CI pipeline contract (RULE-007, RULE-008 — EPIC-0061
+ * story-0061-0005).
  *
  * <p>After story-0061-0005 merges:
  *
@@ -32,15 +33,18 @@ class CiPipelineLeanSmokeIT {
             return;
         }
 
-        List<Path> auditShFiles = Files.list(scriptsDir)
-                .filter(p -> {
-                    String name = p.getFileName().toString();
-                    return name.startsWith("audit-") && name.endsWith(".sh");
-                })
-                .toList();
+        List<Path> auditShFiles =
+                Files.list(scriptsDir)
+                        .filter(
+                                p -> {
+                                    String name = p.getFileName().toString();
+                                    return name.startsWith("audit-") && name.endsWith(".sh");
+                                })
+                        .toList();
 
         assertThat(auditShFiles)
-                .as("scripts/ root must not contain audit-*.sh files (RULE-007: bash audits live only in targets/claude/scripts/{stack}/)")
+                .as(
+                        "scripts/ root must not contain audit-*.sh files (RULE-007: bash audits live only in targets/claude/scripts/{stack}/)")
                 .isEmpty();
     }
 
@@ -50,22 +54,26 @@ class CiPipelineLeanSmokeIT {
         Path auditYml = REPO_ROOT.resolve(".github/workflows/audit.yml");
 
         assertThat(auditYml.toFile())
-                .as("audit.yml workflow must be deleted (RULE-008: CI runs only via ci.yml + mvn verify)")
+                .as(
+                        "audit.yml workflow must be deleted (RULE-008: CI runs only via ci.yml + mvn verify)")
                 .doesNotExist();
     }
 
     @Test
     @DisplayName("targets/claude/scripts/ has java-maven stack templates (replacement exists)")
     void scriptTemplates_existForJavaMavenStack() throws Exception {
-        Path stackDir = REPO_ROOT.resolve("java/src/main/resources/targets/claude/scripts/java-maven");
+        Path stackDir =
+                REPO_ROOT.resolve("java/src/main/resources/targets/claude/scripts/java-maven");
 
         assertThat(stackDir.toFile())
-                .as("java-maven stack template directory must exist as replacement for root audit scripts")
+                .as(
+                        "java-maven stack template directory must exist as replacement for root audit scripts")
                 .isDirectory();
 
-        List<Path> templates = Files.list(stackDir)
-                .filter(p -> p.getFileName().toString().endsWith(".sh.tpl"))
-                .toList();
+        List<Path> templates =
+                Files.list(stackDir)
+                        .filter(p -> p.getFileName().toString().endsWith(".sh.tpl"))
+                        .toList();
 
         assertThat(templates)
                 .as("java-maven stack must have at least 8 .sh.tpl templates")

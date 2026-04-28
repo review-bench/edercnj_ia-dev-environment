@@ -61,8 +61,11 @@ public final class StackResolver {
         String stack = resolveStack(normalizedLanguage, normalizedFramework, normalizedBuildTool);
 
         if (!isStackSafe(stack) && !stack.equals(DEFAULT_STACK)) {
-            LOG.warning(() ->
-                    "Stack name '" + stack + "' failed safety check — falling back to _default");
+            LOG.warning(
+                    () ->
+                            "Stack name '"
+                                    + stack
+                                    + "' failed safety check — falling back to _default");
             return DEFAULT_STACK;
         }
         return stack;
@@ -76,8 +79,8 @@ public final class StackResolver {
     /**
      * Validates that a stack name is safe to use as a path component.
      *
-     * <p>Accepts only lowercase letters, digits, and hyphens starting with a letter.
-     * Rejects {@code _default} (uses underscore) and path-traversal patterns.
+     * <p>Accepts only lowercase letters, digits, and hyphens starting with a letter. Rejects {@code
+     * _default} (uses underscore) and path-traversal patterns.
      *
      * @param stack the stack name to validate
      * @return {@code true} if the name is safe
@@ -96,8 +99,13 @@ public final class StackResolver {
         if (LANGUAGE_STACKS.containsKey(language)) {
             return LANGUAGE_STACKS.get(language);
         }
-        LOG.warning(() -> "Stack '" + language + "/" + framework
-                + "' not supported — falling back to _default");
+        LOG.warning(
+                () ->
+                        "Stack '"
+                                + language
+                                + "/"
+                                + framework
+                                + "' not supported — falling back to _default");
         return DEFAULT_STACK;
     }
 }

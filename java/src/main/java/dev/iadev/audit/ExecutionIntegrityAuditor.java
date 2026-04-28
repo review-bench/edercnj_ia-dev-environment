@@ -12,20 +12,22 @@ import java.util.regex.Pattern;
 /**
  * Java equivalent of {@code audit-execution-integrity.sh} (Rules 24, 27).
  *
- * <p>For each story with {@code status=COMPLETE} and {@code prMergeStatus=MERGED} in
- * {@code execution-state.json}, checks that the story completion report exists on disk.
- * Absent evidence is an {@code EIE_EVIDENCE_MISSING} violation.
+ * <p>For each story with {@code status=COMPLETE} and {@code prMergeStatus=MERGED} in {@code
+ * execution-state.json}, checks that the story completion report exists on disk. Absent evidence is
+ * an {@code EIE_EVIDENCE_MISSING} violation.
  */
 public final class ExecutionIntegrityAuditor implements Auditor {
 
     private static final String VIOLATION_NAME = "EIE_EVIDENCE_MISSING";
     private static final Pattern STORY_STATUS_PATTERN =
-            Pattern.compile("\"(story-[0-9]+-[0-9]+)\"\\s*:\\s*\\{[^}]*\"status\"\\s*:\\s*\"COMPLETE\"[^}]*\"prMergeStatus\"\\s*:\\s*\"MERGED\"");
+            Pattern.compile(
+                    "\"(story-[0-9]+-[0-9]+)\"\\s*:\\s*\\{[^}]*\"status\"\\s*:\\s*\"COMPLETE\"[^}]*\"prMergeStatus\"\\s*:\\s*\"MERGED\"");
 
     @Override
     public AuditResult audit(AuditCorpus corpus) {
         List<AuditViolation> violations = new ArrayList<>();
-        corpus.walkExecutionStates().forEach(stateFile -> checkStateFile(stateFile, corpus.rootDir(), violations));
+        corpus.walkExecutionStates()
+                .forEach(stateFile -> checkStateFile(stateFile, corpus.rootDir(), violations));
         return violations.isEmpty()
                 ? AuditResult.ok()
                 : AuditResult.violation(VIOLATION_NAME, violations);
@@ -38,7 +40,8 @@ public final class ExecutionIntegrityAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-execution-integrity.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-execution-integrity.sh.tpl");
     }
 
     private void checkStateFile(Path stateFile, Path rootDir, List<AuditViolation> violations) {
@@ -48,11 +51,22 @@ public final class ExecutionIntegrityAuditor implements Auditor {
             String storyId = m.group(1);
             String epicId = extractEpicId(content);
             if (epicId == null) continue;
-            String reportPath = "ai/epics/" + epicId.toLowerCase().replace("epic-", "epic-") + "-*/reports/story-completion-report-" + storyId + ".md";
+            String reportPath =
+                    "ai/epics/"
+                            + epicId.toLowerCase().replace("epic-", "epic-")
+                            + "-*/reports/story-completion-report-"
+                            + storyId
+                            + ".md";
             boolean evidenceFound = findEvidence(rootDir, storyId);
             if (!evidenceFound) {
-                violations.add(new AuditViolation(stateFile, 0, "EIE_EVIDENCE_MISSING",
-                        "Merged story " + storyId + " has no story-completion-report on disk"));
+                violations.add(
+                        new AuditViolation(
+                                stateFile,
+                                0,
+                                "EIE_EVIDENCE_MISSING",
+                                "Merged story "
+                                        + storyId
+                                        + " has no story-completion-report on disk"));
             }
         }
     }
@@ -60,8 +74,7 @@ public final class ExecutionIntegrityAuditor implements Auditor {
     private boolean findEvidence(Path rootDir, String storyId) {
         String reportName = "story-completion-report-" + storyId + ".md";
         try {
-            return Files.walk(rootDir)
-                    .anyMatch(p -> p.getFileName().toString().equals(reportName));
+            return Files.walk(rootDir).anyMatch(p -> p.getFileName().toString().equals(reportName));
         } catch (IOException e) {
             return false;
         }

@@ -9,12 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Contract test validating the fix for the false-positive storm in
- * {@code verify-story-completion.sh} (EPIC-0061 story-0061-0006 TASK-0061-0006-005).
+ * Contract test validating the fix for the false-positive storm in {@code
+ * verify-story-completion.sh} (EPIC-0061 story-0061-0006 TASK-0061-0006-005).
  *
- * <p>The original bug: Signal A read from 500 telemetry entries (historical) + Signal B
- * read from HEAD commit (pre-session merge commit) → both false-positive on every Stop event,
- * creating ~80 consecutive warnings even without any new commits in the session.
+ * <p>The original bug: Signal A read from 500 telemetry entries (historical) + Signal B read from
+ * HEAD commit (pre-session merge commit) → both false-positive on every Stop event, creating ~80
+ * consecutive warnings even without any new commits in the session.
  *
  * <p>This class verifies the behavioral contract of the fix:
  *
@@ -29,10 +29,11 @@ class VerifyStoryCompletionFalsePositiveTest {
 
     private static final Path REPO_ROOT = Path.of(System.getProperty("user.dir")).getParent();
 
-    private static final Path SESSION_START_HOOK = REPO_ROOT.resolve(
-            "java/src/main/resources/targets/claude/hooks/session-start.sh");
-    private static final Path VERIFY_HOOK = REPO_ROOT.resolve(
-            "java/src/main/resources/targets/claude/hooks/verify-story-completion.sh");
+    private static final Path SESSION_START_HOOK =
+            REPO_ROOT.resolve("java/src/main/resources/targets/claude/hooks/session-start.sh");
+    private static final Path VERIFY_HOOK =
+            REPO_ROOT.resolve(
+                    "java/src/main/resources/targets/claude/hooks/verify-story-completion.sh");
 
     @Test
     @DisplayName("session-start.sh exists and writes epoch to session-start.txt path")
@@ -70,13 +71,15 @@ class VerifyStoryCompletionFalsePositiveTest {
         String content = Files.readString(VERIFY_HOOK);
 
         assertThat(content)
-                .as("verify-story-completion.sh must NOT use 'tail -500' on telemetry "
-                        + "(false-positive storm fix — TASK-0061-0006-005)")
+                .as(
+                        "verify-story-completion.sh must NOT use 'tail -500' on telemetry "
+                                + "(false-positive storm fix — TASK-0061-0006-005)")
                 .doesNotContain("tail -500");
     }
 
     @Test
-    @DisplayName("verify-story-completion.sh Signal A is session-scoped (commits since SESSION_ISO)")
+    @DisplayName(
+            "verify-story-completion.sh Signal A is session-scoped (commits since SESSION_ISO)")
     void verifyHook_signalAScopedToSession() throws IOException {
         String content = Files.readString(VERIFY_HOOK);
 

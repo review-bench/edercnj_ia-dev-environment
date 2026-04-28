@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
  * presence of a non-null {@code epicBranch} field. Missing or empty epicBranch on a v2 state file
  * is a violation.
  *
- * <p>Note: Branch existence on the remote (git/gh checks) is skipped in this Java implementation
- * — that check requires network access and is the responsibility of the bash CI script.
+ * <p>Note: Branch existence on the remote (git/gh checks) is skipped in this Java implementation —
+ * that check requires network access and is the responsibility of the bash CI script.
  */
 public final class EpicBranchesAuditor implements Auditor {
 
@@ -43,7 +43,8 @@ public final class EpicBranchesAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-epic-branches.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-epic-branches.sh.tpl");
     }
 
     private void checkStateFile(Path stateFile, List<AuditViolation> violations) {
@@ -54,8 +55,12 @@ public final class EpicBranchesAuditor implements Auditor {
         }
         Matcher branchMatcher = EPIC_BRANCH_PATTERN.matcher(content);
         if (!branchMatcher.find() || branchMatcher.group(1).isBlank()) {
-            violations.add(new AuditViolation(stateFile, 0, "MISSING_EPIC_BRANCH",
-                    "flowVersion=2 state file has no epicBranch declared"));
+            violations.add(
+                    new AuditViolation(
+                            stateFile,
+                            0,
+                            "MISSING_EPIC_BRANCH",
+                            "flowVersion=2 state file has no epicBranch declared"));
         }
     }
 

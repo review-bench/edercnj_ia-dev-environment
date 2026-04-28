@@ -18,8 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("ScriptsAssembler stack-aware")
 class ScriptsAssemblerStackAwareTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private TemplateEngine engine;
 
@@ -45,11 +44,12 @@ class ScriptsAssemblerStackAwareTest {
         @Test
         void resolverConstructor_assemblesForJavaMaven() {
             ScriptsAssembler assembler = new ScriptsAssembler(new StackResolver());
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("picocli", "4.7")
-                    .buildTool("maven")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("picocli", "4.7")
+                            .buildTool("maven")
+                            .build();
 
             List<String> generated = assembler.assemble(config, engine, outputDir);
 
@@ -59,11 +59,12 @@ class ScriptsAssemblerStackAwareTest {
         @Test
         void resolverConstructor_assemblesForUnknownStack_fallsBackToDefault() {
             ScriptsAssembler assembler = new ScriptsAssembler(new StackResolver());
-            ProjectConfig config = TestConfigBuilder.builder()
-                    .language("rust", "1.75")
-                    .framework("actix", "4.0")
-                    .buildTool("cargo")
-                    .build();
+            ProjectConfig config =
+                    TestConfigBuilder.builder()
+                            .language("rust", "1.75")
+                            .framework("actix", "4.0")
+                            .buildTool("cargo")
+                            .build();
 
             List<String> generated = assembler.assemble(config, engine, outputDir);
 

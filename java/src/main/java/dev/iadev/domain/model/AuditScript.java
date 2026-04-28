@@ -5,8 +5,8 @@ import java.util.List;
 /**
  * Metadata describing a single audit script in the generated {@code .claude/scripts/} directory.
  *
- * <p>Used by {@code DocsAssembler.renderCatalog()} to populate the
- * {@code _TEMPLATE-AUDIT-GATES-CATALOG.md} template with per-stack accurate data.
+ * <p>Used by {@code DocsAssembler.renderCatalog()} to populate the {@code
+ * _TEMPLATE-AUDIT-GATES-CATALOG.md} template with per-stack accurate data.
  *
  * @param name the script filename (e.g., {@code audit-model-selection.sh})
  * @param category one of {@code Template}, {@code Runtime}, or {@code Stack-Specific}

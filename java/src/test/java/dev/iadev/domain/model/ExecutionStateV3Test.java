@@ -57,7 +57,8 @@ class ExecutionStateV3Test {
 
         @Test
         void invalidFlowVersionWithLocalFirstTrue_throwsIllegalArgument() {
-            String json = "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-X\", \"localFirstLifecycle\": true}";
+            String json =
+                    "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-X\", \"localFirstLifecycle\": true}";
 
             assertThatThrownBy(() -> ExecutionState.parse(json))
                     .isInstanceOf(IllegalArgumentException.class)

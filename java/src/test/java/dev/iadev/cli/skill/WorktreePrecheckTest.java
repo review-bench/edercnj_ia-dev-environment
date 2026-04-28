@@ -32,8 +32,7 @@ class WorktreePrecheckTest {
         @Test
         void dirtyTreeOnly_whenCalled_returnsDirty() {
             ProcessRunner runner = mock(ProcessRunner.class);
-            when(runner.run(any()))
-                    .thenReturn(" M plans/unknown/telemetry/events.ndjson", "");
+            when(runner.run(any())).thenReturn(" M plans/unknown/telemetry/events.ndjson", "");
             WorktreePrecheck precheck = new WorktreePrecheck(runner);
 
             PrecheckResult result = precheck.precheck(false);
@@ -66,8 +65,9 @@ class WorktreePrecheckTest {
         @Test
         void gitNotFound_whenCalled_throwsOperationalError() {
             ProcessRunner runner = mock(ProcessRunner.class);
-            when(runner.run(any())).thenThrow(
-                    new IllegalStateException("OPERATIONAL_ERROR: git not found on PATH"));
+            when(runner.run(any()))
+                    .thenThrow(
+                            new IllegalStateException("OPERATIONAL_ERROR: git not found on PATH"));
             WorktreePrecheck precheck = new WorktreePrecheck(runner);
 
             assertThatThrownBy(() -> precheck.precheck(false))

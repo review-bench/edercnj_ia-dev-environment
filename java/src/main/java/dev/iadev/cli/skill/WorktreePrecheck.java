@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
  */
 public final class WorktreePrecheck {
 
-    private static final List<String> STATUS_CMD =
-            List.of("git", "status", "--porcelain");
+    private static final List<String> STATUS_CMD = List.of("git", "status", "--porcelain");
     private static final List<String> UPSTREAM_CMD =
             List.of("git", "rev-list", "--count", "--left-right", "@{upstream}...HEAD");
     private static final List<String> BRANCH_CMD =
@@ -50,10 +49,11 @@ public final class WorktreePrecheck {
 
         PrecheckResult result = classify(isDirty, isDivergent);
 
-        if (!allowDirty && (result == PrecheckResult.DIVERGENT || result == PrecheckResult.AMBIGUOUS)) {
+        if (!allowDirty
+                && (result == PrecheckResult.DIVERGENT || result == PrecheckResult.AMBIGUOUS)) {
             throw new WorktreeAmbiguousException(
                     "WORKTREE_AMBIGUOUS: working tree has uncommitted changes and branch divergence."
-                    + " Use --allow-dirty to bypass or git stash to resolve.");
+                            + " Use --allow-dirty to bypass or git stash to resolve.");
         }
         return result;
     }

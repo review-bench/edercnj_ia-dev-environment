@@ -3,7 +3,7 @@ name: x-review-pr
 description: "Tech Lead holistic review with 57-point checklist covering Clean Code, SOLID, architecture, framework conventions, tests, TDD process, security, and cross-file consistency. Produces GO/NO-GO decision. Use for final review before merge."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
-argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--non-interactive] [--resume-review <pr>]"
+argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"
 context-budget: heavy
 ---
 
@@ -336,15 +336,15 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
 
 Reached when auto-remediation cycles are exhausted (2 retries without convergence) or when `--no-auto-remediation` is set and the review returns NO-GO.
 
-**Non-interactive path (`--non-interactive` present):**
-Skip `AskUserQuestion`. Print legacy HALT text and return NO-GO:
+**Non-interactive path (default — `--interactive` absent or `--non-interactive` deprecated flag):**
+Skip `AskUserQuestion`. Print HALT text and return NO-GO:
 ```
 REVIEW NO-GO: Auto-remediation exhausted without convergence. Remaining issues recorded in report.
-Run with --resume-review <pr> to re-enter the gate interactively.
+Run with --resume-review <pr> --interactive to re-enter the gate interactively.
 ```
-Exit with NO-GO. No state file written.
+Exit with NO-GO. No state file written. (`--non-interactive` DEPRECATED — same as default; WARN emitted per Rule 20 EPIC-0061.)
 
-**Interactive path (default — `--non-interactive` absent):**
+**Interactive path (`--interactive` present):**
 
 Initialize `gateAttempts = 0`.
 

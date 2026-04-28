@@ -11,8 +11,8 @@ import java.util.stream.Stream;
  * Provides file-system walks over the generator's resource corpus for use by {@link Auditor}
  * implementations.
  *
- * <p>All walkers are bounded and do not follow symbolic links. Paths are relative to
- * {@code rootDir}.
+ * <p>All walkers are bounded and do not follow symbolic links. Paths are relative to {@code
+ * rootDir}.
  */
 public final class AuditCorpus {
 
@@ -39,7 +39,8 @@ public final class AuditCorpus {
     /**
      * Streams every {@code SKILL.md} found under {@code targets/claude/skills/}.
      *
-     * @return stream of SKILL.md paths (closed by caller via try-with-resources or {@code .toList()})
+     * @return stream of SKILL.md paths (closed by caller via try-with-resources or {@code
+     *     .toList()})
      */
     public Stream<Path> walkSkills() {
         Path skillsRoot = rootDir.resolve("java/src/main/resources/targets/claude/skills");
@@ -71,22 +72,21 @@ public final class AuditCorpus {
     }
 
     /**
-     * Lists all {@code *.sh.tpl} template files under
-     * {@code java/src/main/resources/targets/claude/scripts/{stack}/} for the given stack.
+     * Lists all {@code *.sh.tpl} template files under {@code
+     * java/src/main/resources/targets/claude/scripts/{stack}/} for the given stack.
      *
      * @param stack e.g. {@code "java-maven"}
      * @return list of template paths
      */
     public List<Path> listAuditTemplates(String stack) {
-        Path scriptsDir = rootDir.resolve(
-                "java/src/main/resources/targets/claude/scripts/" + stack);
+        Path scriptsDir =
+                rootDir.resolve("java/src/main/resources/targets/claude/scripts/" + stack);
         try {
             if (!Files.isDirectory(scriptsDir)) {
                 return List.of();
             }
             try (Stream<Path> stream = Files.list(scriptsDir)) {
-                return stream
-                        .filter(p -> p.getFileName().toString().endsWith(".sh.tpl"))
+                return stream.filter(p -> p.getFileName().toString().endsWith(".sh.tpl"))
                         .sorted()
                         .toList();
             }

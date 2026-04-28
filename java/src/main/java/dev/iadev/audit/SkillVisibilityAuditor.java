@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * Java equivalent of {@code audit-skill-visibility.sh} (Rule 22).
  *
- * <p>Checks that every internal skill ({@code x-internal-*}) has {@code visibility: internal}
- * in frontmatter. Also checks that public skills do NOT set {@code visibility: internal}.
+ * <p>Checks that every internal skill ({@code x-internal-*}) has {@code visibility: internal} in
+ * frontmatter. Also checks that public skills do NOT set {@code visibility: internal}.
  */
 public final class SkillVisibilityAuditor implements Auditor {
 
@@ -33,7 +33,8 @@ public final class SkillVisibilityAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-skill-visibility.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-skill-visibility.sh.tpl");
     }
 
     private void checkSkill(Path skillPath, List<AuditViolation> violations) {
@@ -42,12 +43,20 @@ public final class SkillVisibilityAuditor implements Auditor {
         boolean hasInternalVisibility = content.contains("visibility: internal");
 
         if (isInternal && !hasInternalVisibility) {
-            violations.add(new AuditViolation(skillPath, 0, "INTERNAL_MISSING_FRONTMATTER",
-                    "Internal skill missing 'visibility: internal' in frontmatter"));
+            violations.add(
+                    new AuditViolation(
+                            skillPath,
+                            0,
+                            "INTERNAL_MISSING_FRONTMATTER",
+                            "Internal skill missing 'visibility: internal' in frontmatter"));
         }
         if (!isInternal && hasInternalVisibility) {
-            violations.add(new AuditViolation(skillPath, 0, "PUBLIC_HAS_INTERNAL_VISIBILITY",
-                    "Public skill incorrectly has 'visibility: internal'"));
+            violations.add(
+                    new AuditViolation(
+                            skillPath,
+                            0,
+                            "PUBLIC_HAS_INTERNAL_VISIBILITY",
+                            "Public skill incorrectly has 'visibility: internal'"));
         }
     }
 

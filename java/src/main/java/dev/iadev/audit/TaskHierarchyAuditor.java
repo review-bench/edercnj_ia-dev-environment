@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 /**
  * Java equivalent of {@code audit-task-hierarchy.sh} (Rule 25).
  *
- * <p>Checks that orchestrator SKILL.md files declare {@code TaskCreate} inside each
- * {@code ## Phase N} section. Phases without TaskCreate are a hierarchy violation.
+ * <p>Checks that orchestrator SKILL.md files declare {@code TaskCreate} inside each {@code ## Phase
+ * N} section. Phases without TaskCreate are a hierarchy violation.
  */
 public final class TaskHierarchyAuditor implements Auditor {
 
@@ -37,7 +37,8 @@ public final class TaskHierarchyAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-task-hierarchy.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-task-hierarchy.sh.tpl");
     }
 
     private static boolean isOrchestrator(Path skillPath) {
@@ -62,8 +63,13 @@ public final class TaskHierarchyAuditor implements Auditor {
             String line = lines[i];
             if (PHASE_HEADER.matcher(line.trim()).find()) {
                 if (currentPhaseStart >= 0 && !phaseHasTaskCreate && !phaseHasNoGate) {
-                    violations.add(new AuditViolation(skillPath, currentPhaseStart, "MISSING_TASK_CREATE",
-                            "Phase section lacks TaskCreate: " + lines[currentPhaseStart].strip()));
+                    violations.add(
+                            new AuditViolation(
+                                    skillPath,
+                                    currentPhaseStart,
+                                    "MISSING_TASK_CREATE",
+                                    "Phase section lacks TaskCreate: "
+                                            + lines[currentPhaseStart].strip()));
                 }
                 currentPhaseStart = i + 1;
                 phaseHasTaskCreate = false;
@@ -74,8 +80,12 @@ public final class TaskHierarchyAuditor implements Auditor {
             }
         }
         if (currentPhaseStart >= 0 && !phaseHasTaskCreate && !phaseHasNoGate) {
-            violations.add(new AuditViolation(skillPath, currentPhaseStart, "MISSING_TASK_CREATE",
-                    "Last phase section lacks TaskCreate"));
+            violations.add(
+                    new AuditViolation(
+                            skillPath,
+                            currentPhaseStart,
+                            "MISSING_TASK_CREATE",
+                            "Last phase section lacks TaskCreate"));
         }
     }
 

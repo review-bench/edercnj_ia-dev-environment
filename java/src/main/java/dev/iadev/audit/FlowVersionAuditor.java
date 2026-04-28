@@ -40,21 +40,30 @@ public final class FlowVersionAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-flow-version.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-flow-version.sh.tpl");
     }
 
     private void checkStateFile(Path stateFile, List<AuditViolation> violations) {
         String content = readFile(stateFile);
         Matcher m = FLOW_VERSION_PATTERN.matcher(content);
         if (!m.find()) {
-            violations.add(new AuditViolation(stateFile, 0, "MISSING_FLOW_VERSION",
-                    "execution-state.json has no flowVersion field"));
+            violations.add(
+                    new AuditViolation(
+                            stateFile,
+                            0,
+                            "MISSING_FLOW_VERSION",
+                            "execution-state.json has no flowVersion field"));
             return;
         }
         String version = m.group(1);
         if (!VALID_VERSIONS.contains(version)) {
-            violations.add(new AuditViolation(stateFile, 0, "INVALID_FLOW_VERSION",
-                    "flowVersion='" + version + "' is not in valid set " + VALID_VERSIONS));
+            violations.add(
+                    new AuditViolation(
+                            stateFile,
+                            0,
+                            "INVALID_FLOW_VERSION",
+                            "flowVersion='" + version + "' is not in valid set " + VALID_VERSIONS));
         }
     }
 

@@ -25,8 +25,9 @@ class MigrateToLocalFirstSmokeIT {
 
     private static final Path REPO_ROOT = Path.of(System.getProperty("user.dir")).getParent();
 
-    private static final Path MIGRATE_TEMPLATE = REPO_ROOT.resolve(
-            "java/src/main/resources/targets/claude/scripts/_default/migrate-to-local-first.sh.tpl");
+    private static final Path MIGRATE_TEMPLATE =
+            REPO_ROOT.resolve(
+                    "java/src/main/resources/targets/claude/scripts/_default/migrate-to-local-first.sh.tpl");
 
     @Test
     @DisplayName("migrate-to-local-first.sh.tpl exists in _default stack")
@@ -41,9 +42,7 @@ class MigrateToLocalFirstSmokeIT {
     void migrateTemplate_supportsDryRun() throws IOException {
         String content = Files.readString(MIGRATE_TEMPLATE);
 
-        assertThat(content)
-                .as("Template must have --dry-run mode")
-                .contains("--dry-run");
+        assertThat(content).as("Template must have --dry-run mode").contains("--dry-run");
         assertThat(content)
                 .as("dry-run must not write files")
                 .contains("dry-run") // the mode
@@ -84,8 +83,9 @@ class MigrateToLocalFirstSmokeIT {
     @Test
     @DisplayName("Rule 19 fallback matrix contains flowVersion 3 entry")
     void rule19_containsFlowVersion3() throws IOException {
-        Path rule19 = REPO_ROOT.resolve(
-                "java/src/main/resources/targets/claude/rules/19-backward-compatibility.md");
+        Path rule19 =
+                REPO_ROOT.resolve(
+                        "java/src/main/resources/targets/claude/rules/19-backward-compatibility.md");
 
         String content = Files.readString(rule19);
 

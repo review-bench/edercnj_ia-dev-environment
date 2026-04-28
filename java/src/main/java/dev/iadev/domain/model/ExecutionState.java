@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
  *   <li>{@code "4"} — EPIC-0060 v4 layout: same as "2" but {@code ai/epics/} path layout
  * </ul>
  *
- * <p>{@code localFirstLifecycle} is derived from {@code flowVersion} — true when version is "3"
- * or "4". It is serialized explicitly for grep/jq discoverability (EPIC-0061 story-0061-0007
- * decision rationale).
+ * <p>{@code localFirstLifecycle} is derived from {@code flowVersion} — true when version is "3" or
+ * "4". It is serialized explicitly for grep/jq discoverability (EPIC-0061 story-0061-0007 decision
+ * rationale).
  *
  * @param flowVersion the flow version discriminator
  * @param epicId the epic identifier
@@ -45,8 +45,8 @@ public record ExecutionState(
      *
      * @param json the raw JSON content
      * @return the parsed ExecutionState
-     * @throws IllegalArgumentException if {@code localFirstLifecycle=true} is declared
-     *         but {@code flowVersion} is not "3" or "4" (impossible combination)
+     * @throws IllegalArgumentException if {@code localFirstLifecycle=true} is declared but {@code
+     *     flowVersion} is not "3" or "4" (impossible combination)
      */
     public static ExecutionState parse(String json) {
         String version = extractString(json, FLOW_VERSION_PATTERN, "1");
@@ -56,8 +56,9 @@ public record ExecutionState(
 
         if (explicitLocalFirst && !derivedLocalFirst) {
             throw new IllegalArgumentException(
-                    "localFirstLifecycle=true is inconsistent with flowVersion='" + version
-                    + "' — localFirstLifecycle requires flowVersion 3 or 4");
+                    "localFirstLifecycle=true is inconsistent with flowVersion='"
+                            + version
+                            + "' — localFirstLifecycle requires flowVersion 3 or 4");
         }
 
         return new ExecutionState(version, epicId, null, null, derivedLocalFirst);

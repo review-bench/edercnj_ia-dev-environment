@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# enforce-phase-sequence.sh — Camada 3 (PreToolUse hook) of Rule 25 enforcement.
+# Layer:      0 (preventive — fires during LLM turn)
+# Trigger:    PreToolUse
+# Event:      pre_tool_use (matcher: "*")
+# Exit codes: 0=OK, non-zero=block tool call (predecessor phase not completed)
+# Latency:    < 200ms
+# Telemetry:  reads execution-state.json.taskTracking.phaseGateResults
+#
+# enforce-phase-sequence.sh — Camada 0 (PreToolUse hook) of Rule 25 enforcement.
 #
 # Registered in settings.json as a broad PreToolUse hook (matcher "*"),
 # then self-filtered in this script to `Skill` invocations via the

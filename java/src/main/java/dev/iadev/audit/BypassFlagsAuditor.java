@@ -38,7 +38,8 @@ public final class BypassFlagsAuditor implements Auditor {
 
     @Override
     public Path bashEquivalentTemplate() {
-        return Path.of("java/src/main/resources/targets/claude/scripts/java-maven/audit-bypass-flags.sh.tpl");
+        return Path.of(
+                "java/src/main/resources/targets/claude/scripts/java-maven/audit-bypass-flags.sh.tpl");
     }
 
     private void checkSkill(Path skillPath, List<AuditViolation> violations) {
@@ -57,8 +58,12 @@ public final class BypassFlagsAuditor implements Auditor {
             if (BYPASS_PATTERN.matcher(line).find() && !inRecovery) {
                 boolean exempt = i > 0 && lines[i - 1].contains(AUDIT_EXEMPT);
                 if (!exempt) {
-                    violations.add(new AuditViolation(skillPath, i + 1, "BYPASS_FLAG_OUTSIDE_RECOVERY",
-                            "Bypass flag used outside ## Recovery block: " + line.strip()));
+                    violations.add(
+                            new AuditViolation(
+                                    skillPath,
+                                    i + 1,
+                                    "BYPASS_FLAG_OUTSIDE_RECOVERY",
+                                    "Bypass flag used outside ## Recovery block: " + line.strip()));
                 }
             }
         }

@@ -38,7 +38,8 @@ context-budget: medium
 | `--dry-run` | Boolean | `false` | Generate execution plan; exit after Phase 1. |
 | `--skip-review` | Boolean | `false` | Propagated to `x-story-implement` — skips specialist/TL reviews. |
 | `--auto-merge-strategy` | Enum | `merge` | Story-PR auto-merge strategy: `merge\|squash\|rebase`. |
-| `--non-interactive` | Boolean | `false` | Skip all `AskUserQuestion` gates (CI / orchestrated calls). |
+| `--interactive` | Boolean | `false` | Opt-in to 3-option menus (PROCEED/FIX-PR/ABORT) at each gate. Default: non-interactive (Rule 20 EPIC-0061). |
+| `--non-interactive` | Boolean | **DEPRECATED** | Was opt-in; now equals default. Emits deprecation WARN. Removed in 2 releases. |
 | `--skip-pr-comments` | Boolean | `false` | Skip Phase 4b post-gate PR-comment remediation pass. |
 | `--revert-on-failure` | Boolean | `false` | On integrity-gate failure, revert last story merge instead of remediation agent. |
 | `--skip-smoke` | Boolean | `false` | Bypass epic smoke gate (advisory; emergency only). |
@@ -220,7 +221,7 @@ On conflict → `FINAL_PR_CONFLICTS`. Then create final PR:
 
     Skill(skill: "x-pr-create", model: "haiku", args: "--epic-id <ID> --head epic/<ID> --target-branch develop --auto-merge none --label epic-integration")
 
-Interactive menu (`--non-interactive` skips): PROCEED / FIX-PR / ABORT.
+Interactive menu (only when `--interactive`): PROCEED / FIX-PR / ABORT. Default is non-interactive (Rule 20, EPIC-0061).
 
     TaskUpdate(id: phase5TaskId, status: "completed")
 

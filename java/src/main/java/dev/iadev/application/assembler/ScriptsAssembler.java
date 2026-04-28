@@ -58,42 +58,49 @@ public final class ScriptsAssembler implements Assembler {
 
     private static final Map<String, Map<String, String>> PLACEHOLDER_TABLE =
             Map.of(
-                    "java-maven", Map.of(
-                            "BUILD_TOOL", "mvn",
-                            "COVERAGE_REPORT_PATH", "target/site/jacoco/jacoco.xml",
-                            "LOCK_FILE", "pom.xml",
-                            "TEST_COMMAND", "mvn verify"),
-                    "java-gradle", Map.of(
-                            "BUILD_TOOL", "gradle",
-                            "COVERAGE_REPORT_PATH",
-                                    "build/reports/jacoco/test/jacocoTestReport.xml",
-                            "LOCK_FILE", "gradle.lockfile",
-                            "TEST_COMMAND", "./gradlew check"),
-                    "spring-boot", Map.of(
-                            "BUILD_TOOL", "mvn",
-                            "COVERAGE_REPORT_PATH", "target/site/jacoco/jacoco.xml",
-                            "LOCK_FILE", "pom.xml",
-                            "TEST_COMMAND", "mvn verify"),
-                    "node", Map.of(
-                            "BUILD_TOOL", "npm",
-                            "COVERAGE_REPORT_PATH", "coverage/lcov.info",
-                            "LOCK_FILE", "package-lock.json",
-                            "TEST_COMMAND", "npm test"),
-                    "python", Map.of(
-                            "BUILD_TOOL", "pip",
-                            "COVERAGE_REPORT_PATH", "coverage.xml",
-                            "LOCK_FILE", "requirements.txt",
-                            "TEST_COMMAND", "pytest"),
-                    "go", Map.of(
-                            "BUILD_TOOL", "go",
-                            "COVERAGE_REPORT_PATH", "coverage.out",
-                            "LOCK_FILE", "go.sum",
-                            "TEST_COMMAND", "go test ./..."),
-                    "_default", Map.of(
-                            "BUILD_TOOL", "",
-                            "COVERAGE_REPORT_PATH", "",
-                            "LOCK_FILE", "",
-                            "TEST_COMMAND", ""));
+                    "java-maven",
+                            Map.of(
+                                    "BUILD_TOOL", "mvn",
+                                    "COVERAGE_REPORT_PATH", "target/site/jacoco/jacoco.xml",
+                                    "LOCK_FILE", "pom.xml",
+                                    "TEST_COMMAND", "mvn verify"),
+                    "java-gradle",
+                            Map.of(
+                                    "BUILD_TOOL", "gradle",
+                                    "COVERAGE_REPORT_PATH",
+                                            "build/reports/jacoco/test/jacocoTestReport.xml",
+                                    "LOCK_FILE", "gradle.lockfile",
+                                    "TEST_COMMAND", "./gradlew check"),
+                    "spring-boot",
+                            Map.of(
+                                    "BUILD_TOOL", "mvn",
+                                    "COVERAGE_REPORT_PATH", "target/site/jacoco/jacoco.xml",
+                                    "LOCK_FILE", "pom.xml",
+                                    "TEST_COMMAND", "mvn verify"),
+                    "node",
+                            Map.of(
+                                    "BUILD_TOOL", "npm",
+                                    "COVERAGE_REPORT_PATH", "coverage/lcov.info",
+                                    "LOCK_FILE", "package-lock.json",
+                                    "TEST_COMMAND", "npm test"),
+                    "python",
+                            Map.of(
+                                    "BUILD_TOOL", "pip",
+                                    "COVERAGE_REPORT_PATH", "coverage.xml",
+                                    "LOCK_FILE", "requirements.txt",
+                                    "TEST_COMMAND", "pytest"),
+                    "go",
+                            Map.of(
+                                    "BUILD_TOOL", "go",
+                                    "COVERAGE_REPORT_PATH", "coverage.out",
+                                    "LOCK_FILE", "go.sum",
+                                    "TEST_COMMAND", "go test ./..."),
+                    "_default",
+                            Map.of(
+                                    "BUILD_TOOL", "",
+                                    "COVERAGE_REPORT_PATH", "",
+                                    "LOCK_FILE", "",
+                                    "TEST_COMMAND", ""));
 
     private final StackResolver resolver;
 
@@ -162,15 +169,20 @@ public final class ScriptsAssembler implements Assembler {
         String buildTool = config.framework().buildTool();
 
         String stack = resolver.resolveTemplateDir(language, framework, buildTool);
-        Map<String, String> vars = PLACEHOLDER_TABLE.getOrDefault(
-                stack, PLACEHOLDER_TABLE.get("_default"));
+        Map<String, String> vars =
+                PLACEHOLDER_TABLE.getOrDefault(stack, PLACEHOLDER_TABLE.get("_default"));
 
         String stackPrefix = SCRIPTS_CLASSPATH_PREFIX + stack + "/";
         List<URL> templates = findClasspathResources(stackPrefix);
 
         if (templates.isEmpty()) {
-            LOG.warning(() -> "No templates found for stack '" + stack
-                    + "' at " + stackPrefix + " — falling back to legacy flat scripts");
+            LOG.warning(
+                    () ->
+                            "No templates found for stack '"
+                                    + stack
+                                    + "' at "
+                                    + stackPrefix
+                                    + " — falling back to legacy flat scripts");
             return assembleLegacy(outputDir);
         }
 
@@ -185,9 +197,10 @@ public final class ScriptsAssembler implements Assembler {
         List<String> generated = new ArrayList<>();
         for (URL template : templates) {
             String fileName = extractFileName(template);
-            String outputName = fileName.endsWith(".tpl")
-                    ? fileName.substring(0, fileName.length() - 4)
-                    : fileName;
+            String outputName =
+                    fileName.endsWith(".tpl")
+                            ? fileName.substring(0, fileName.length() - 4)
+                            : fileName;
             Path target = scriptsDir.resolve(outputName);
 
             try (InputStream is = template.openStream()) {

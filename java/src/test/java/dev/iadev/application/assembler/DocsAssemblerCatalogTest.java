@@ -1,7 +1,6 @@
 package dev.iadev.application.assembler;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.iadev.domain.model.AuditScript;
 import dev.iadev.domain.model.AuditScript.ExitCodeEntry;
@@ -24,7 +23,8 @@ class DocsAssemblerCatalogTest {
                 "Rule 23",
                 List.of(
                         new ExitCodeEntry(0, "OK", "all checks pass"),
-                        new ExitCodeEntry(1, "MODEL_SELECTION_VIOLATION", "missing model: declaration"),
+                        new ExitCodeEntry(
+                                1, "MODEL_SELECTION_VIOLATION", "missing model: declaration"),
                         new ExitCodeEntry(2, "OPERATIONAL_ERROR", "skills root not found")));
     }
 
@@ -37,7 +37,8 @@ class DocsAssemblerCatalogTest {
                 "CIS Spring Boot",
                 List.of(
                         new ExitCodeEntry(0, "OK", "no exposure"),
-                        new ExitCodeEntry(1, "ACTUATOR_EXPOSURE_VIOLATION", "sensitive endpoint exposed"),
+                        new ExitCodeEntry(
+                                1, "ACTUATOR_EXPOSURE_VIOLATION", "sensitive endpoint exposed"),
                         new ExitCodeEntry(2, "OPERATIONAL_ERROR", "config file unreadable")));
     }
 
@@ -86,19 +87,27 @@ class DocsAssemblerCatalogTest {
 
         @Test
         void threeAuditInventory_containsThreeSubsections() {
-            AuditScript second = new AuditScript("audit-skill-visibility.sh", "Template",
-                    "internal skills have visibility: internal", "rule 22 enforced", "Rule 22",
-                    List.of(new ExitCodeEntry(0, "OK", "pass")));
-            AuditScript third = new AuditScript("audit-bypass-flags.sh", "Template",
-                    "--no-ci-watch outside recovery blocks", "no bypass violations", "Rule 45",
-                    List.of(new ExitCodeEntry(0, "OK", "pass")));
+            AuditScript second =
+                    new AuditScript(
+                            "audit-skill-visibility.sh",
+                            "Template",
+                            "internal skills have visibility: internal",
+                            "rule 22 enforced",
+                            "Rule 22",
+                            List.of(new ExitCodeEntry(0, "OK", "pass")));
+            AuditScript third =
+                    new AuditScript(
+                            "audit-bypass-flags.sh",
+                            "Template",
+                            "--no-ci-watch outside recovery blocks",
+                            "no bypass violations",
+                            "Rule 45",
+                            List.of(new ExitCodeEntry(0, "OK", "pass")));
             List<AuditScript> inventory = List.of(modelSelectionAudit(), second, third);
 
             String output = assembler.renderCatalog("java-maven", inventory);
 
-            long subsections = output.lines()
-                    .filter(line -> line.startsWith("### "))
-                    .count();
+            long subsections = output.lines().filter(line -> line.startsWith("### ")).count();
             assertThat(subsections).isEqualTo(3);
         }
 

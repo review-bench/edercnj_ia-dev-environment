@@ -32,8 +32,7 @@ public final class DocsAssembler implements Assembler {
 
     private static final String TEMPLATE_PATH =
             "shared/templates/_TEMPLATE-SERVICE-ARCHITECTURE.md";
-    static final String CATALOG_TEMPLATE_PATH =
-            "shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md";
+    static final String CATALOG_TEMPLATE_PATH = "shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md";
     private static final String OUTPUT_SUBDIR = "steering";
     private static final String OUTPUT_FILENAME = "service-architecture.md";
     private static final String DEFAULT_STACK = "_default";
@@ -83,13 +82,14 @@ public final class DocsAssembler implements Assembler {
      */
     public String renderCatalog(String stack, List<AuditScript> inventory) {
         Path catalogTemplate = resourcesDir.resolve(CATALOG_TEMPLATE_PATH);
-        String template = Files.exists(catalogTemplate)
-                ? readFile(catalogTemplate)
-                : buildFallbackCatalogTemplate();
+        String template =
+                Files.exists(catalogTemplate)
+                        ? readFile(catalogTemplate)
+                        : buildFallbackCatalogTemplate();
 
-        String result = template
-                .replace("{{STACK}}", stack)
-                .replace("{{TOTAL_AUDITS}}", String.valueOf(inventory.size()));
+        String result =
+                template.replace("{{STACK}}", stack)
+                        .replace("{{TOTAL_AUDITS}}", String.valueOf(inventory.size()));
 
         result = renderAuditLoop(result, inventory);
         result = renderConditionals(result, stack);
@@ -115,12 +115,12 @@ public final class DocsAssembler implements Assembler {
     }
 
     private String renderAuditBlock(String block, AuditScript audit) {
-        String rendered = block
-                .replace("{{audit.name}}", audit.name())
-                .replace("{{audit.category}}", audit.category())
-                .replace("{{audit.validates}}", audit.validates())
-                .replace("{{audit.guarantees}}", audit.guarantees())
-                .replace("{{audit.ruleAnchor}}", audit.ruleAnchor());
+        String rendered =
+                block.replace("{{audit.name}}", audit.name())
+                        .replace("{{audit.category}}", audit.category())
+                        .replace("{{audit.validates}}", audit.validates())
+                        .replace("{{audit.guarantees}}", audit.guarantees())
+                        .replace("{{audit.ruleAnchor}}", audit.ruleAnchor());
         return renderExitCodeLoop(rendered, audit);
     }
 
@@ -136,10 +136,10 @@ public final class DocsAssembler implements Assembler {
 
         StringBuilder sb = new StringBuilder(before);
         for (AuditScript.ExitCodeEntry entry : audit.exitCodes()) {
-            sb.append(rowBlock
-                    .replace("{{exitCode.code}}", String.valueOf(entry.code()))
-                    .replace("{{exitCode.constant}}", entry.constant())
-                    .replace("{{exitCode.meaning}}", entry.meaning()));
+            sb.append(
+                    rowBlock.replace("{{exitCode.code}}", String.valueOf(entry.code()))
+                            .replace("{{exitCode.constant}}", entry.constant())
+                            .replace("{{exitCode.meaning}}", entry.meaning()));
         }
         sb.append(after);
         return sb.toString();
@@ -148,9 +148,7 @@ public final class DocsAssembler implements Assembler {
     private String renderConditionals(String template, String stack) {
         boolean isDefault = DEFAULT_STACK.equals(stack);
         if (isDefault) {
-            return template
-                    .replace("{{#if isDefaultStack}}", "")
-                    .replace("{{/if}}", "");
+            return template.replace("{{#if isDefaultStack}}", "").replace("{{/if}}", "");
         }
         int ifStart = template.indexOf("{{#if isDefaultStack}}");
         int ifEnd = template.indexOf("{{/if}}");

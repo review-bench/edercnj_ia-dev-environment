@@ -13,8 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("Wave B Runtime Auditors")
 class WaveBRuntimeAuditorsTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private Path writeExecutionState(Path dir, String content) throws IOException {
         Files.createDirectories(dir);
@@ -91,7 +90,8 @@ class WaveBRuntimeAuditorsTest {
         @Test
         void flowVersion2WithEpicBranch_returnsOk() throws IOException {
             Path dir = tempDir.resolve("ai/epics/epic-0061/");
-            writeExecutionState(dir,
+            writeExecutionState(
+                    dir,
                     "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-0061\", \"epicBranch\": \"epic/0061\"}");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -101,8 +101,7 @@ class WaveBRuntimeAuditorsTest {
         @Test
         void flowVersion2MissingEpicBranch_returnsViolation() throws IOException {
             Path dir = tempDir.resolve("ai/epics/epic-9999/");
-            writeExecutionState(dir,
-                    "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-9999\"}");
+            writeExecutionState(dir, "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-9999\"}");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             AuditResult result = auditor.audit(corpus);
@@ -135,13 +134,15 @@ class WaveBRuntimeAuditorsTest {
         @Test
         void completedStoryWithReport_returnsOk() throws IOException {
             Path epicDir = tempDir.resolve("ai/epics/epic-0061-slug/");
-            writeExecutionState(epicDir,
+            writeExecutionState(
+                    epicDir,
                     "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-0061\","
-                    + "\"storyStatuses\":{\"story-0061-0001\":{\"status\":\"COMPLETE\","
-                    + "\"prMergeStatus\":\"MERGED\"}}}");
+                            + "\"storyStatuses\":{\"story-0061-0001\":{\"status\":\"COMPLETE\","
+                            + "\"prMergeStatus\":\"MERGED\"}}}");
             Path reportsDir = epicDir.resolve("reports");
             Files.createDirectories(reportsDir);
-            Files.writeString(reportsDir.resolve("story-completion-report-story-0061-0001.md"), "# Report");
+            Files.writeString(
+                    reportsDir.resolve("story-completion-report-story-0061-0001.md"), "# Report");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
@@ -150,10 +151,11 @@ class WaveBRuntimeAuditorsTest {
         @Test
         void completedStoryMissingReport_returnsViolation() throws IOException {
             Path epicDir = tempDir.resolve("ai/epics/epic-0099-slug/");
-            writeExecutionState(epicDir,
+            writeExecutionState(
+                    epicDir,
                     "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-0099\","
-                    + "\"storyStatuses\":{\"story-0099-0001\":{\"status\":\"COMPLETE\","
-                    + "\"prMergeStatus\":\"MERGED\"}}}");
+                            + "\"storyStatuses\":{\"story-0099-0001\":{\"status\":\"COMPLETE\","
+                            + "\"prMergeStatus\":\"MERGED\"}}}");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             AuditResult result = auditor.audit(corpus);
@@ -165,9 +167,10 @@ class WaveBRuntimeAuditorsTest {
         @Test
         void pendingStory_notChecked() throws IOException {
             Path epicDir = tempDir.resolve("ai/epics/epic-0061-slug/");
-            writeExecutionState(epicDir,
+            writeExecutionState(
+                    epicDir,
                     "{\"flowVersion\": \"2\", \"epicId\": \"EPIC-0061\","
-                    + "\"storyStatuses\":{\"story-0061-0001\":{\"status\":\"PENDING\"}}}");
+                            + "\"storyStatuses\":{\"story-0061-0001\":{\"status\":\"PENDING\"}}}");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);

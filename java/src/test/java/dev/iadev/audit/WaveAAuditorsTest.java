@@ -11,14 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Unit tests for Wave A auditors (5 markdown audits).
- * Creates fixture files in @TempDir to avoid classpath resource resolution issues.
+ * Unit tests for Wave A auditors (5 markdown audits). Creates fixture files in @TempDir to avoid
+ * classpath resource resolution issues.
  */
 @DisplayName("Wave A Auditors")
 class WaveAAuditorsTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private Path writeSkill(Path dir, String filename, String content) throws IOException {
         Files.createDirectories(dir);
@@ -36,7 +35,9 @@ class WaveAAuditorsTest {
         @Test
         void validSkillWithModel_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\nmodel: sonnet\nuser-invocable: true\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -48,8 +49,7 @@ class WaveAAuditorsTest {
         @Test
         void invalidSkillMissingModel_returnsViolation() throws IOException {
             Path skillDir = tempDir.resolve("x-bad-skill");
-            writeSkill(skillDir, "SKILL.md",
-                    "---\nname: x-bad-skill\nuser-invocable: true\n---\n");
+            writeSkill(skillDir, "SKILL.md", "---\nname: x-bad-skill\nuser-invocable: true\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             AuditResult result = auditor.audit(corpus);
@@ -63,7 +63,9 @@ class WaveAAuditorsTest {
         @Test
         void notUserInvocable_notCheckedForModel() throws IOException {
             Path skillDir = tempDir.resolve("x-internal-foo");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-internal-foo\nvisibility: internal\nuser-invocable: false\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -93,7 +95,9 @@ class WaveAAuditorsTest {
         @Test
         void validInternalSkill_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-internal-foo");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-internal-foo\nvisibility: internal\nuser-invocable: false\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -105,7 +109,9 @@ class WaveAAuditorsTest {
         @Test
         void internalSkillMissingVisibility_returnsViolation() throws IOException {
             Path skillDir = tempDir.resolve("x-internal-missing");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-internal-missing\nuser-invocable: false\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -118,7 +124,9 @@ class WaveAAuditorsTest {
         @Test
         void publicSkillWithoutVisibility_isOk() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\nmodel: sonnet\nuser-invocable: true\n---\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -142,7 +150,9 @@ class WaveAAuditorsTest {
         @Test
         void bypassFlagInRecovery_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-story-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-story-implement\n---\n## Phase 2\n\nNormal flow.\n\n## Recovery\n\nUse --no-ci-watch here.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -154,7 +164,9 @@ class WaveAAuditorsTest {
         @Test
         void bypassFlagOutsideRecovery_returnsViolation() throws IOException {
             Path skillDir = tempDir.resolve("x-bad-story");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-bad-story\n---\n## Phase 2\n\nUse --no-ci-watch in normal flow (VIOLATION)\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -167,7 +179,9 @@ class WaveAAuditorsTest {
         @Test
         void noBypassFlag_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-clean");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-clean\n---\n## Phase 2\n\nNormal execution only.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -189,7 +203,9 @@ class WaveAAuditorsTest {
         @Test
         void orchestratorWithTaskCreate_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\n---\n## Phase 1 - Plan\n\nTaskCreate(subject: \"Phase 1\")\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -201,7 +217,9 @@ class WaveAAuditorsTest {
         @Test
         void orchestratorWithoutTaskCreate_returnsViolation() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\n---\n## Phase 1 - Plan\n\nNo task create here.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -214,7 +232,9 @@ class WaveAAuditorsTest {
         @Test
         void nonOrchestratorWithoutTaskCreate_isIgnored() throws IOException {
             Path skillDir = tempDir.resolve("x-review-qa");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-review-qa\n---\n## Phase 1\n\nNo TaskCreate — not an orchestrator.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -236,7 +256,9 @@ class WaveAAuditorsTest {
         @Test
         void phaseWithGate_returnsOk() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\n---\n## Phase 1 - Plan\n\nTaskCreate(subject: \"Phase 1\")\nx-internal-phase-gate --mode pre\nx-internal-phase-gate --mode post\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -248,7 +270,9 @@ class WaveAAuditorsTest {
         @Test
         void phaseWithTaskButNoGate_returnsViolation() throws IOException {
             Path skillDir = tempDir.resolve("x-epic-implement");
-            writeSkill(skillDir, "SKILL.md",
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
                     "---\nname: x-epic-implement\n---\n## Phase 1 - Plan\n\nTaskCreate(subject: \"Phase 1\")\n# No gate here\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
