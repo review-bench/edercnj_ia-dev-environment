@@ -4,8 +4,9 @@
 #
 # Verifies that:
 #   (a) Every open PR targeting develop whose head is epic/* has flowVersion="2"
-#       in its execution-state.json. ABSENT flowVersion is treated as a
-#       violation when the state file exists (Rule 21 requires explicit "2").
+#       or "4" (v4 layout, EPIC-0062) in its execution-state.json. ABSENT
+#       flowVersion is treated as a violation when the state file exists
+#       (Rule 21 requires explicit "2" or "4").
 #   (b) No epic/* remote branch contains a "force-push marker" (HEAD diverged
 #       from upstream by a non-fast-forward — best-effort check via reflog
 #       comparison; full check requires reflog access to origin).
@@ -44,7 +45,7 @@ Usage: ${SCRIPT_NAME} [--self-check] [--skip-pr-check] [-h|--help]
   Audit epic/* branch governance compliance (Rule 21).
 
   Checks:
-    A  Every open epic/* → develop PR has flowVersion="2".
+    A  Every open epic/* → develop PR has flowVersion="2" or "4" (v4 layout, EPIC-0062).
        (When state file is missing flowVersion: violation.)
     B  No epic/* remote branch has divergent reflog vs upstream
        (best-effort force-push detection).
@@ -111,8 +112,9 @@ if command -v gh &>/dev/null; then
         echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: failed to parse ${state_file}: ${flow}" >&2
         exit 2
       }
-      if [[ "$flow" != "2" ]]; then
-        echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: PR #${pr_number} (epic/${epic_id}) has flowVersion=\"${flow}\" (Rule 21 requires \"2\")" >&2
+      # Accept "2" (v3 layout) and "4" (v4 layout, EPIC-0062). Rule 21 + Rule 19.
+      if [[ "$flow" != "2" && "$flow" != "4" ]]; then
+        echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: PR #${pr_number} (epic/${epic_id}) has flowVersion=\"${flow}\" (Rule 21 requires \"2\" or \"4\")" >&2
         violations=$((violations + 1))
       fi
     fi

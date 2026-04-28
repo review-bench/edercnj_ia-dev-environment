@@ -116,15 +116,44 @@ find_cutoff_sha() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Resolve historical path of a file at a given commit, following renames.
+# Required after EPIC-0062 git mv: cutoff commit predates audits/→governance/
+# baselines/ rename, so `git show <cutoff>:<current_path>` returns empty for
+# files that moved.
+# ─────────────────────────────────────────────────────────────────────────────
+resolve_historical_path() {
+    local current_path="$1"
+    local commit_sha="$2"
+
+    if git cat-file -e "${commit_sha}:${current_path}" 2>/dev/null; then
+        echo "${current_path}"
+        return 0
+    fi
+
+    git log --follow --name-status --diff-filter=R \
+        --pretty=format:'' "${commit_sha}..HEAD" -- "${current_path}" 2>/dev/null \
+        | awk -v target="${current_path}" '
+            /^R/ {
+                old = $2
+                new = $3
+                if (new == target) { target = old }
+            }
+            END { print target }
+          '
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Get story IDs added to a file AFTER the cutoff commit
 # ─────────────────────────────────────────────────────────────────────────────
 get_new_stories_since_cutoff() {
     local file="$1"
     local cutoff_sha="$2"
 
-    # Content at cutoff
+    # Content at cutoff — resolve historical path first (handles renames, EPIC-0062)
+    local cutoff_path
+    cutoff_path=$(resolve_historical_path "${file}" "${cutoff_sha}")
     local cutoff_content=""
-    cutoff_content=$(git show "${cutoff_sha}:${file}" 2>/dev/null || true)
+    cutoff_content=$(git show "${cutoff_sha}:${cutoff_path}" 2>/dev/null || true)
 
     # Current content
     local current_content=""
