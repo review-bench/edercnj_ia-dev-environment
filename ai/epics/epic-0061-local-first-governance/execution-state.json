@@ -1,0 +1,84 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0061",
+  "epicSlug": "local-first-governance",
+  "epicBranch": "epic/0061",
+  "epicDir": "ai/epics/epic-0061-local-first-governance",
+  "mode": "sequential",
+  "worktreeIsolation": true,
+  "worktreePath": ".claude/worktrees/epic-0061",
+  "startedAt": "2026-04-28T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": 1,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0061-0001": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0002": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0003": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0004": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0005": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0006": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    },
+    "story-0061-0007": {
+      "status": "PENDING",
+      "flowVersion": "4",
+      "prNumber": null,
+      "prUrl": null,
+      "prMergeStatus": null
+    }
+  },
+  "executionOrder": [
+    "story-0061-0001",
+    "story-0061-0002",
+    "story-0061-0003",
+    "story-0061-0004",
+    "story-0061-0005",
+    "story-0061-0006",
+    "story-0061-0007"
+  ],
+  "phases": [
+    { "name": "Phase 0 - Args",    "status": "COMPLETED" },
+    { "name": "Phase 1 - Plan",    "status": "IN_PROGRESS" },
+    { "name": "Phase 2 - Branch",  "status": "PENDING" },
+    { "name": "Phase 3 - Stories", "status": "PENDING" },
+    { "name": "Phase 4 - Gate",    "status": "PENDING" },
+    { "name": "Phase 5 - Final PR","status": "PENDING" }
+  ]
+}
