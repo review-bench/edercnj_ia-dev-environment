@@ -66,7 +66,7 @@ follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -182,7 +182,7 @@ and exits 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -197,7 +197,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -212,7 +212,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type epic --id 0049 \
              --field flowVersion --value 2 \
              --initialize")
@@ -228,7 +228,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type task --id TASK-0049-0005-003 \
              --field prNumber --value 612")
 ```
@@ -243,7 +243,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value UNUSED \
              --read-only")
@@ -260,7 +260,7 @@ ignored under `--read-only`.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file plans/epic-XXXX/execution-state.json \
              --type story --id unknown-story \
              --field status --value DONE")
 ```

@@ -8,17 +8,4 @@
 # Adding NEW lines to this baseline post-EPIC-0060 is FORBIDDEN.
 # CI gate `SkillPathResolverSmokeTest` enforces it.
 #
-core/git/x-planning-commit
-core/internal/ops/x-internal-report-write
-core/internal/ops/x-internal-status-update
-core/internal/plan/x-internal-epic-build-plan
-core/internal/plan/x-internal-phase-gate
-core/internal/plan/x-internal-story-build-plan
-core/internal/plan/x-internal-story-load-context
-core/internal/plan/x-internal-story-report
-core/internal/plan/x-internal-story-resume
-core/jira/x-jira-create-epic
-core/jira/x-jira-create-stories
-core/ops/x-telemetry-trend
-core/plan/x-parallel-eval
-core/plan/x-task-plan
+# All SKILLs migrated by EPIC-0062
