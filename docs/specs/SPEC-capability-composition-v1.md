@@ -8,7 +8,7 @@
 **ADR:** ADR-0016
 
 > Spec funcional canônica do modelo de capability-driven composition. Acompanha ADR-0016 e Rule 28.
-> Derivada do plano executivo `.claude/plans/quero-melhorar-isso-ainda-nifty-seal.md`.
+> Derivada do plano executivo da sessão Plan Mode (`~/.claude/plans/quero-melhorar-isso-ainda-nifty-seal.md`, artefato local do usuário, não commitado). Esta SPEC é a versão canônica e auto-suficiente das decisões funcionais.
 
 ---
 

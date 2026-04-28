@@ -118,8 +118,8 @@
   "$defs": {
     "capabilityRef": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9*]+)+$",
-      "description": "Referência a capability ID, possivelmente com glob (* = qualquer atomic; ** = recursivo)."
+      "pattern": "^[a-z][a-z0-9]*(\\.(?:[a-z0-9][a-z0-9-]*|\\*|\\*\\*))+$",
+      "description": "Referência a capability ID, possivelmente com glob. Formato: `[a-z][a-z0-9]*(.<segment>)+` onde segment é `[a-z0-9][a-z0-9-]*` (hyphens permitidos), ou `*` (qualquer atomic), ou `**` (recursivo). Exemplos válidos: `data.database.postgres`, `framework.spring-boot`, `data.database.*`, `messaging.**`."
     }
   }
 }

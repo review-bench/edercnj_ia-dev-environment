@@ -9,8 +9,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9-]+)+$",
-      "description": "Identificador único da capability. Formato 'category.subcategory.atomic' (e.g., 'data.database.postgres')."
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$",
+      "description": "Identificador único da capability. Formato 'category.subcategory.atomic'. Hyphens permitidos em segmentos (e.g., 'data.database.postgres', 'framework.spring-boot')."
     },
     "category": {
       "type": "string",
@@ -71,17 +71,17 @@
       "type": "array",
       "items": {
         "oneOf": [
-          { "type": "string", "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9*]+)+$" },
+          { "type": "string", "pattern": "^[a-z][a-z0-9]*(\\.(?:[a-z0-9][a-z0-9-]*|\\*|\\*\\*))+$" },
           { "type": "string", "pattern": "^.+ (AND|OR|NOT) .+$" }
         ]
       },
-      "description": "Capabilities que devem estar ativas para esta poder ser ativada. Glob permitido. Mini-DSL AND/OR/NOT opcional."
+      "description": "Capabilities que devem estar ativas para esta poder ser ativada. Glob permitido (`*` = qualquer atomic; `**` = recursivo). Hyphens permitidos em segmentos. Mini-DSL AND/OR/NOT opcional."
     },
     "provides": {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9-]+)+$"
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
       },
       "description": "Capabilities virtuais que esta capability satisfaz. Outros artefatos podem requerer 'data.transactional-store' sem saber qual database concreta."
     },
@@ -89,7 +89,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9-]+)+$"
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
       },
       "description": "Capabilities mutex com esta. Excludes é simétrico — A.excludes B implica B.excludes A (validado por audit-capability-graph.sh)."
     },
@@ -104,21 +104,28 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9-]+)+$"
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
       },
       "description": "Apenas para kind=profile. Lista de atomics/composites para expandir."
     }
   },
   "allOf": [
     {
-      "if": { "properties": { "kind": { "const": "profile" } } },
+      "if": { "properties": { "kind": { "const": "profile" } }, "required": ["kind"] },
       "then": {
         "required": ["expands-to"],
-        "not": { "required": ["requires", "provides", "excludes", "parameters"] }
+        "not": {
+          "anyOf": [
+            { "required": ["requires"] },
+            { "required": ["provides"] },
+            { "required": ["excludes"] },
+            { "required": ["parameters"] }
+          ]
+        }
       }
     },
     {
-      "if": { "properties": { "kind": { "enum": ["atomic", "composite"] } } },
+      "if": { "properties": { "kind": { "enum": ["atomic", "composite"] } }, "required": ["kind"] },
       "then": {
         "not": { "required": ["expands-to"] }
       }

@@ -138,16 +138,18 @@ You are a Database Engineer specializing in {{ capabilities.data.database.name }
 
 ## Audit (Layer 4 — CI)
 
-Quatro audit scripts validam o contrato:
+Seis audit scripts compõem o gate de Rule 28 + EPIC-0064. Quatro (1-4 abaixo) são **diretamente derivados do contrato de frontmatter**; dois (5-6) são audits do **runtime de composição** que dependem do contrato e ficam catalogados aqui para visão única:
 
-| Script | Valida | Exit |
-| :--- | :--- | :--- |
-| `audit-capability-coverage.sh` | Toda artefato em diretório condicional declara `requires-capabilities` | 0 / 1 / 2 |
-| `audit-frontmatter-schema.sh` | 100% dos `.md` válidos contra schema 3.0 | 0 / 1 |
-| `audit-capability-graph.sh` | Refs apontam para capabilities reais; mutex simétrico; sem ciclos | 0 / 1 / 2 / 3 |
-| `audit-fragment-coherence.sh` | Slots declarados ↔ refs existem ↔ fragments em disco | 0 / 1 |
+| # | Script | Valida | Origem | Exit |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `audit-capability-coverage.sh` | Todo artefato em diretório condicional declara `requires-capabilities` | Frontmatter contract | 0 / 1 / 2 |
+| 2 | `audit-frontmatter-schema.sh` | 100% dos `.md` válidos contra schema 3.0 | Frontmatter contract | 0 / 1 |
+| 3 | `audit-capability-graph.sh` | Refs apontam para capabilities reais; mutex simétrico; sem ciclos; sem órfãos | Frontmatter contract | 0 / 1 / 2 / 3 |
+| 4 | `audit-fragment-coherence.sh` | Slots declarados ↔ refs no body ↔ fragments em disco | Frontmatter contract | 0 / 1 |
+| 5 | `audit-output-pruning.sh` | Para cada perfil canônico, output `.claude/` não contém artefato com capability requerida ausente | Composer runtime | 0 / 1 |
+| 6 | `audit-capability-determinism.sh` | Compor 2× consecutivas = mesmo SHA bytewise por arquivo | Composer runtime | 0 / 1 |
 
-Catálogo em `docs/audit-gates-catalog.md`.
+Catálogo único em `docs/audit-gates-catalog.md` (Rule 26). ADR-0016 enumera os 6 como conjunto canônico do epic.
 
 ## Migration
 
