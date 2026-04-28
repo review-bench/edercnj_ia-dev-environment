@@ -40,6 +40,13 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > Bypass é detectado e bloqueado em CI. Não há escape hatch para happy-path.
 > Ver [Rule 27](.claude/rules/27-zero-bypass-lifecycle.md) e [EPIC-0059](plans/epic-0059/).
 
+> **EXECUTION INTEGRITY — Camada 0 (NEW — EPIC-0063):** Gates locais pré-flight via
+> PreToolUse hook `enforce-preflight-gates.sh`. `git push`, `gh pr create`, `Skill x-pr-create`
+> são interceptados e bloqueados se `scripts/preflight.sh` falha. Único bypass:
+> `CLAUDE_RECOVERY_MODE=1` (com WARNING visível). Camada 0 é **preventiva** — bloqueia
+> antes do remote op; Camadas 1-4 (Rule 24) são **detectivas** — pegam após o fato.
+> Ver [Rule 24 §Camada 0](.claude/rules/24-execution-integrity.md).
+
 > **In progress — EPIC-0046 (Lifecycle Integrity Phase 2 — CI enforcement).**
 > Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `plans/epic-*/reports/` with no `x-git-commit` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
 > - Story: [`plans/epic-0046/story-0046-0007.md`](plans/epic-0046/story-0046-0007.md)
