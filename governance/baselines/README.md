@@ -18,9 +18,10 @@ of the v3 → v4 layout migration.
 | `task-hierarchy-baseline.txt` | Grandfathered orchestrators for audit-task-hierarchy.sh | EPIC-0055 |
 | `baseline-cutoff.sha` | EPIC-0059 amnesty cutoff commit SHA | EPIC-0059 |
 
-> **Migration note (EPIC-0062, story-0062-0002):** These files were physically moved
-> from `audits/` → `governance/baselines/` via `git mv`. The symlink `audits/`
-> → `governance/baselines/` is transitional and will be removed in story-0062-0008.
+> **Migration complete (EPIC-0062):** Files were physically moved
+> from `audits/` → `governance/baselines/` via `git mv` (story-0062-0002).
+> The transitional symlink `audits/ → governance/baselines/` was removed in
+> story-0062-0008. The `audits/` directory no longer exists in the repo root.
 
 ## Conventions
 
