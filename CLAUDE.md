@@ -29,6 +29,8 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > - Decision record: [`docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md`](docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md)
 > - Epic index: [`plans/epic-0055/`](plans/epic-0055/)
 
+> **Concluded — EPIC-0061 (Local-First Lifecycle & Stack-Aware Governance).** `flowVersion: "3"` marks epics born in local-first lifecycle. Key changes: (1) Rule 20 flipped — non-interactive is DEFAULT; (2) ScriptsAssembler stack-aware (7 stacks × bash templates); (3) Java audit harness (8 `*Auditor` + `AuditEquivalenceSmokeIT`); (4) `audit.yml` deleted; (5) Rule 26 extended with Camada 0 (preventivo, during LLM turn); (6) ADR-0017 published; (7) `migrate-to-local-first.sh` for legacy projects. Tag `local-first-lifecycle-frozen` marks epic closure.
+
 > **ZERO-BYPASS LIFECYCLE — INEGOCIÁVEL:** Toda story/task DEVE ser implementada
 > via `/x-story-implement`. Nenhum PR pode ser mergeado sem:
 > (1) 6 artefatos de Fase 1 em `plans/epic-XXXX/plans/`;
