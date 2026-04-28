@@ -172,7 +172,7 @@ serialization_recommendation: none
 
 3. **Schema 1.0 versionado para evolução futura.** Se findings ganharem campos (ex: `cwe`, `cve`, `affected-component`), schema bumpa para 1.1 (backward-compat) ou 2.0 (breaking). Audit script aceita schema-version superior se semver-compat.
 
-4. **Audit script é a 12ª audit gate da CI matrix.** Após este epic, total será: audit-flow-version, audit-epic-branches, audit-skill-visibility, audit-execution-integrity, audit-task-hierarchy, audit-phase-gates, audit-model-selection, audit-bypass-flags, audit-pr-evidence, audit-skill-visibility-script-refs, audit-pr-template (vindo do EPIC-0066), audit-review-frontmatter (este epic).
+4. **Audit script segue o padrão Rule 26 §CI script** (prefixo `audit-`, exit 0/1/2/3, `--self-check` mandatório, entrada catalogada em `docs/audit-gates-catalog.md`). A contagem total de gates da CI matrix é volátil — vários epics em flight (0063, 0064, 0066) também adicionam gates; consulte `docs/audit-gates-catalog.md` na hora do merge para a contagem corrente.
 
 5. **Baseline empty by design.** Reviews legacy ficam não-grandfathered — qualquer review novo precisa ter frontmatter. Justificado em §8.3 do epic-0067.md.
 
