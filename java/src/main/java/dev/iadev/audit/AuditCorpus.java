@@ -43,6 +43,9 @@ public final class AuditCorpus {
      */
     public Stream<Path> walkSkills() {
         Path skillsRoot = rootDir.resolve("java/src/main/resources/targets/claude/skills");
+        if (!Files.isDirectory(skillsRoot)) {
+            skillsRoot = rootDir;
+        }
         return walkFiles(skillsRoot, "SKILL.md");
     }
 
