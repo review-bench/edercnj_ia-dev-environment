@@ -25,7 +25,7 @@ set -u
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 # BASELINE_DIR: directory containing baseline *.txt files (story-0062-0001).
-BASELINE_DIR="${BASELINE_DIR:-audits}"
+BASELINE_DIR="${BASELINE_DIR:-governance/baselines}"
 DEFAULT_SKILLS_ROOT="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core"
 DEFAULT_BASELINE="${REPO_ROOT}/${BASELINE_DIR}/task-hierarchy-baseline.txt"
 
