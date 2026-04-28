@@ -38,32 +38,32 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/783"
     },
     "story-0063-0004": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "PreToolUse Blocking Hook (enforce-preflight-gates.sh)",
       "blockedBy": [
         "story-0063-0001"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 798,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/798"
     },
     "story-0063-0005": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "x-story-implement Phase Shift (Reviews ANTES do PR)",
       "blockedBy": [
         "story-0063-0001",
         "story-0063-0004"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 804,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/804"
     },
     "story-0063-0006": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "x-epic-implement Phase 4.5 (Epic-Level Review)",
       "blockedBy": [
         "story-0063-0004"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 805,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/805"
     },
     "story-0063-0007": {
       "status": "COMPLETE",
@@ -94,7 +94,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/786"
     },
     "story-0063-0011": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "E2E Smoke Test (Epic0063LocalFirstSmokeTest)",
       "blockedBy": [
         "story-0063-0001",
@@ -113,97 +113,97 @@
         "story-0063-0020",
         "story-0063-0021"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 812,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/812"
     },
     "story-0063-0012": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "SKILL.md Tool-Call Grammar (Rule 28)",
       "blockedBy": [
         "story-0063-0003",
         "story-0063-0010"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 794,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/794"
     },
     "story-0063-0013": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "PreToolUse Hook v2 (15 vetores adicionais)",
       "blockedBy": [
         "story-0063-0004"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 803,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/803"
     },
     "story-0063-0014": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Sub-Skill Wave Dispatch Audit",
       "blockedBy": [
         "story-0063-0003",
         "story-0063-0012"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 799,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/799"
     },
     "story-0063-0015": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Planning-Content Audits (6 artefatos Phase 1)",
       "blockedBy": [
         "story-0063-0002",
         "story-0063-0003"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 795,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/795"
     },
     "story-0063-0016": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Rollout WARN\u2192FAIL Execution + ADR-0016",
       "blockedBy": [
         "story-0063-0004",
         "story-0063-0013",
         "story-0063-0017"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 811,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/811"
     },
     "story-0063-0017": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Recovery-Mode Periodic Audit + Dashboard",
       "blockedBy": [
         "story-0063-0003",
         "story-0063-0013"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 809,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/809"
     },
     "story-0063-0018": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Hooks --self-check Contract",
       "blockedBy": [
         "story-0063-0003",
         "story-0063-0004"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 808,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/808"
     },
     "story-0063-0019": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "NDJSON Integrity Hash Chain",
       "blockedBy": [
         "story-0063-0003"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 796,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/796"
     },
     "story-0063-0020": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "title": "Epic-Review Reconciliation",
       "blockedBy": [
         "story-0063-0002",
         "story-0063-0006"
       ],
-      "prNumber": null,
-      "prUrl": null
+      "prNumber": 810,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/810"
     },
     "story-0063-0021": {
       "status": "COMPLETE",
