@@ -21,6 +21,15 @@
 
 set -uo pipefail
 
+# --self-check mode (Rule 26 §Camada 0 Hook Contract)
+case "${1:-}" in
+  --self-check)
+    command -v git >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: git required" >&2; exit 2; }
+    echo "stage-telemetry.sh: self-check passed"
+    exit 0
+    ;;
+esac
+
 # Fail-open: telemetry disabled
 if [[ "${CLAUDE_TELEMETRY_DISABLED:-0}" == "1" ]]; then
   exit 0

@@ -5,6 +5,14 @@ set -euo pipefail
 # Triggers after Write/Edit on .java files and runs mvn compile
 # Prefers ./mvnw wrapper when available, falls back to system mvn
 
+# --self-check mode (Rule 26 §Camada 0 Hook Contract)
+case "${1:-}" in
+  --self-check)
+    echo "post-compile-check.sh: self-check passed"
+    exit 0
+    ;;
+esac
+
 if ! command -v jq &>/dev/null; then
     cat >/dev/null
     exit 0
