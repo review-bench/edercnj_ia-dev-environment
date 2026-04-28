@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ia-dev-env.example/schemas/frontmatter-3.0.json",
+  "title": "Frontmatter Schema v3.0 (EPIC-0064)",
+  "description": "Schema universal para frontmatter YAML de skills, rules, KPs, agents, hooks e templates. Introduzido por EPIC-0064 / ADR-0016 / Rule 28.",
+  "type": "object",
+  "required": ["name", "requires-capabilities"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Identificador kebab-case do artefato."
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição one-line do artefato."
+    },
+    "visibility": {
+      "type": "string",
+      "enum": ["public", "internal", "shared"],
+      "default": "public",
+      "description": "Classe de visibilidade (Rule 22). Skills internas devem ser 'internal' + user-invocable: false."
+    },
+    "user-invocable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se false, CLI bloqueia invocação direta. Obrigatório false para visibility=internal."
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["claude-code", "shared"],
+      "default": "claude-code",
+      "description": "Plataforma alvo. SHARED = não Claude-Code-specific (CI, docs, etc)."
+    },
+    "model": {
+      "type": "string",
+      "enum": ["opus", "sonnet", "haiku"],
+      "description": "Tier do modelo (Rule 23). Obrigatório em orchestrators, deep planners, reviewers, executors, utilities, KPs."
+    },
+    "allowed-tools": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Lista de tools que a skill pode invocar."
+    },
+    "argument-hint": {
+      "type": "string",
+      "description": "Hint de argumentos para a skill (legacy, mantido)."
+    },
+    "context-budget": {
+      "type": "string",
+      "description": "Budget de contexto injetado por FrontmatterInjector (legacy, mantido)."
+    },
+
+    "requires-capabilities": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/capabilityRef" },
+          { "type": "object", "additionalProperties": true }
+        ]
+      },
+      "description": "Lista AND lógico de capabilities requeridas. Vazio = universal. Glob 'category.subcategory.*' permitido."
+    },
+    "requires-any": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/capabilityRef" },
+      "description": "Lista OR lógico — pelo menos uma deve estar ativa."
+    },
+    "excludes-capabilities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/capabilityRef" },
+      "description": "Lista de capabilities mutex com este artefato. Nenhuma pode estar ativa."
+    },
+    "parameters-from": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
+      "description": "Variáveis injetadas no contexto Pebble (caminhos dot-path em capabilities ativas)."
+    },
+
+    "fragment-slot": {
+      "type": "object",
+      "description": "Declara que ESTE arquivo é um fragmento de outro artefato.",
+      "required": ["slot", "fragment-id", "fragment-order"],
+      "properties": {
+        "slot": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "fragment-id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "fragment-order": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "fragment-slots": {
+      "type": "array",
+      "description": "Declara que ESTE arquivo recebe fragmentos.",
+      "items": {
+        "type": "object",
+        "required": ["slot"],
+        "properties": {
+          "slot": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "ordering": {
+            "type": "string",
+            "enum": ["fragment-order", "alphabetical", "discovery"],
+            "default": "fragment-order"
+          }
+        }
+      }
+    },
+
+    "composition-priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 50,
+      "description": "Prioridade de composição quando múltiplos artefatos colidem. Maior vence."
+    }
+  },
+  "$defs": {
+    "capabilityRef": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9*]+)+$",
+      "description": "Referência a capability ID, possivelmente com glob (* = qualquer atomic; ** = recursivo)."
+    }
+  }
+}
