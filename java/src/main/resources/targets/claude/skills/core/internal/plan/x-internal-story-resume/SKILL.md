@@ -413,7 +413,7 @@ skill reads at most 2 files (1 state file via `jq` + `flock -s`,
 1 story file via `stat`) and spawns a single `jq` pass for envelope
 assembly. No network I/O.
 
-Measured on `plans/epic-0049/` with 22 stories × ~5 tasks each:
+Measured on `plans/epic-XXXX/` with 22 stories × ~5 tasks each:
 
 | Step | Median time |
 | :--- | :--- |

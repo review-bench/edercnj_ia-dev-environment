@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "storyId": "story-0062-0006",
+  "epicId": "EPIC-0062",
+  "coverageDelta": null,
+  "failures": [],
+  "acCheckResults": [
+    {
+      "ac": "AC1: grep -rE 'plans/epic-[0-9]+' java/src/main/resources/targets/claude/skills/ → zero hits",
+      "passed": true
+    },
+    {
+      "ac": "AC2: skill-pathresolver-baseline.txt cleared",
+      "passed": true
+    }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}
