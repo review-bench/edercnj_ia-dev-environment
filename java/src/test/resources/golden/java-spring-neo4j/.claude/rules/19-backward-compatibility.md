@@ -24,6 +24,7 @@ Every `execution-state.json` produced by the orchestrators carries a top-level d
 | :--- | :--- |
 | `"1"` | Legacy flow — story PRs target `develop`, no `epic/XXXX` branch, auto-merge to `develop` per EPIC-0042 default. |
 | `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. v3 layout (`plans/`). |
+| `"3"` | **Local-First (EPIC-0061+)** — same flow as `"2"` with: non-interactive as default (menus opt-in via `--interactive`), Java audits in generator CI (`mvn verify`), bash audit templates per stack for generated projects. `localFirstLifecycle: true` in state file. |
 | `"4"` | New layout (EPIC-0060+) — same flow as `"2"` but artifacts live under `ai/epics/<epic>-<slug>/` (v4 layout). PathResolver auto-detects via filesystem probe. |
 
 ## Fallback Matrix
@@ -35,8 +36,9 @@ Whenever an orchestrator reads `execution-state.json` (or creates a new one duri
 | Field absent (legacy state file pre-EPIC-0049) | `"1"` | Legacy flow | **Yes** — visible warning |
 | Field = `"1"` (explicit) | `"1"` | Legacy flow | No |
 | Field = `"2"` (explicit) | `"2"` | New flow, v3 layout (`plans/`) | No |
+| Field = `"3"` (explicit) | `"3"` | **EPIC-0061 Local-First** — non-interactive default, Java audits in CI, bash audits per stack in generated projects | No |
 | Field = `"4"` (explicit) | `"4"` | New flow, v4 layout (`ai/epics/`) — paths resolved via `PathResolver` | No |
-| Field = any other value (typo, `"3"`, future-version `"5"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
+| Field = any other value (typo, future-version `"5"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
 
 **Warning format:**
 

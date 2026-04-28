@@ -57,6 +57,7 @@ public final class HooksAssembler implements Assembler {
                     "telemetry-posttool.sh",
                     "telemetry-subagent.sh",
                     "telemetry-stop.sh",
+                    "session-start.sh",
                     "verify-story-completion.sh");
 
     /**

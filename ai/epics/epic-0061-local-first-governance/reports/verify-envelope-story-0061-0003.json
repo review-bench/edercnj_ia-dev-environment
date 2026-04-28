@@ -1,0 +1,15 @@
+{
+  "storyId": "story-0061-0003",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "renderCatalog para Spring inclui actuator audit", "status": "PASS", "evidence": "DocsAssemblerCatalogTest.springBootInventory_containsActuatorSection" },
+    { "scenario": "renderCatalog para _default lista apenas markdown audits", "status": "PASS", "evidence": "DocsAssemblerCatalogTest.defaultStack_containsNoteAboutRuntimeAudits" },
+    { "scenario": "docs/audit-gates-catalog.md raiz é removido", "status": "PASS", "evidence": "File deleted via git rm in TASK-0061-0003-003" },
+    { "scenario": "Loop {{#each audit}} renderiza tabela completa", "status": "PASS", "evidence": "DocsAssemblerCatalogTest.threeAuditInventory_containsThreeSubsections" }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}

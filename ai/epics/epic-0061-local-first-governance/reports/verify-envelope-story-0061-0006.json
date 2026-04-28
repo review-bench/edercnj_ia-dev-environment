@@ -1,0 +1,15 @@
+{
+  "storyId": "story-0061-0006",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "Rule 26 documenta Camada 0", "status": "PASS", "evidence": "Rule26CamadaZeroSmokeIT.rule26_containsCamadaZeroSection" },
+    { "scenario": "ADR-0017 publicado", "status": "PASS", "evidence": "Rule26CamadaZeroSmokeIT.adr0017_existsWithAcceptedStatus" },
+    { "scenario": "Hook contract docstrings", "status": "PASS", "evidence": "Rule26CamadaZeroSmokeIT.allHooks_haveCamadaZeroHeader" },
+    { "scenario": "verify-story-completion.sh false-positive fix", "status": "PASS", "evidence": "VerifyStoryCompletionFalsePositiveTest (4 contract tests)" }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}

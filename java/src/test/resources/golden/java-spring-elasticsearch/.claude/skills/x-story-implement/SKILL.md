@@ -26,7 +26,7 @@ Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load
 - `/x-story-implement story-XXXX-YYYY --resume` — continue from `execution-state.json` via `x-internal-story-resume`
 - `/x-story-implement story-XXXX-YYYY --auto-approve-pr` — parent-branch mode (RULE-004)
 - `/x-story-implement story-XXXX-YYYY --worktree` — standalone opt-in worktree (ADR-0004 Mode 2)
-- `/x-story-implement story-XXXX-YYYY --non-interactive` — skip interactive gate menus (CI / orchestrated calls)
+- `/x-story-implement story-XXXX-YYYY --interactive` — opt-in to gate menus (PROCEED/FIX-PR/ABORT)
 
 ## Review Policy — `MANDATORY — NON-NEGOTIABLE`: Specialist (`x-review`) + Tech-Lead (`x-review-pr`) reviews in Step 3.2 MUST execute unless `--skip-verification` / `--skip-review`; silent omission is a `PROTOCOL_VIOLATION` and subagents MUST abort with `"REVIEW_SKIPPED_WITHOUT_FLAG"`.
 
@@ -43,7 +43,9 @@ Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load
 | `--resume` | Boolean | `false` | Delegates resume-point detection to `x-internal-story-resume`. |
 | `--skip-verification` | Boolean | `false` | **Recovery-only.** Skips Phase 3; flagged outside `## Recovery` blocks. |
 | `--skip-smoke`, `--skip-review` | Boolean | `false` | Bypass smoke gate / specialist + TL reviews (the only supported per-review bypass path). |
-| `--full-lifecycle`, `--worktree`, `--non-interactive` | Boolean | `false` | Full execution / standalone worktree / CI mode. |
+| `--full-lifecycle`, `--worktree` | Boolean | `false` | Full execution / standalone worktree mode. |
+| `--interactive` | Boolean | `false` | Opt-in to 3-option gate menus (PROCEED/FIX-PR/ABORT). Default: non-interactive (Rule 20, EPIC-0061). |
+| `--non-interactive` | Boolean | **DEPRECATED** | Was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--no-auto-remediation`, `--no-ci-watch` | Boolean | `false` | Skip Step 3.5 remediation / Rule 21 CI-watch. |
 
 **Deprecated (no-op, warn-once):** `--manual-contract-approval`, `--manual-task-approval` (both since EPIC-0043).

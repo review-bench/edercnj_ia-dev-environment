@@ -37,8 +37,8 @@ context-budget: medium
 | `--dry-run` | Preview plan without executing any changes |
 | `--hotfix` | Create hotfix release from `main` instead of `develop` |
 | `--continue-after-merge` | Resume from `APPROVAL_PENDING` state after PR merged. Requires existing state file. |
-| `--interactive` | With `--dry-run`: interactive walkthrough pausing before each phase. Without: deprecated no-op (warns). |
-| `--non-interactive` | Skip Phase 8 approval gate menu; print legacy HALT text and exit 0 (CI mode). |
+| `--interactive` | Opt-in to gate menus (PROCEED/FIX-PR/ABORT) at Phase 8. With `--dry-run`: pauses before each phase. Default: non-interactive (Rule 20, EPIC-0061). |
+| `--non-interactive` | **DEPRECATED** — was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--skip-review` | Skip `x-review-pr` fire-and-forget in OPEN-RELEASE-PR |
 | `--ci-watch` | Opt-in: poll CI on release PR via `x-pr-watch-ci`; abort on CI failure |
 | `--signed-tag` | Create GPG-signed tag (`git tag -s`) instead of annotated |
