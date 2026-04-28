@@ -44,11 +44,14 @@
       "coverageBranch": 90
     },
     "story-0061-0003": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "flowVersion": "4",
-      "prNumber": null,
-      "prUrl": null,
-      "prMergeStatus": null
+      "prNumbers": [763, 764, 765],
+      "prMergeStatus": "MERGED",
+      "completedAt": "2026-04-28T00:00:00Z",
+      "techLeadDecision": "GO",
+      "techLeadScore": "42/45",
+      "specialistScore": "58/66"
     },
     "story-0061-0004": {
       "status": "PENDING",
