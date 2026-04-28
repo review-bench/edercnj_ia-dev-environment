@@ -98,9 +98,9 @@ class AssemblerRegressionSmokeTest extends SmokeTestBase {
                     Map.entry(".claude/skills", "SkillsAssembler"),
                     Map.entry(".claude/agents", "AgentsAssembler"),
                     Map.entry("steering", "DocsAssembler"),
-                    Map.entry("adr", "DocsAdrAssembler"),
+                    Map.entry("docs/adr", "DocsAdrAssembler"),
                     Map.entry("results/runbooks", "RunbookAssembler"),
-                    Map.entry("specs/_templates", "DocsContributingAssembler"));
+                    Map.entry("docs/specs/_templates", "DocsContributingAssembler"));
 
     static Stream<String> profiles() {
         return SmokeProfiles.profiles();

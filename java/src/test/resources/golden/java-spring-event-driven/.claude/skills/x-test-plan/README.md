@@ -17,7 +17,7 @@ Produces a test plan that serves as the implementation roadmap for TDD. It maps 
 ## Usage
 
 ```
-/x-test-plan plans/epic-0012/story-0012-0003.md
+/x-test-plan plans/epic-XXXX/story-XXXX-YYYY.md
 /x-test-plan story-0012-0003
 ```
 

@@ -2,6 +2,7 @@
 
 > **Related:** Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 08 (Release Process).
 > **Introduced by:** EPIC-0049 (Refatoração do Fluxo de Épico) — RULE-008 (`flowVersion` + `--legacy-flow`).
+> **Extended by:** EPIC-0060 (Folder Reorganization v4) — `flowVersion: "4"` for v4 layout (`ai/epics/`).
 
 ## Purpose
 
@@ -22,7 +23,8 @@ Every `execution-state.json` produced by the orchestrators carries a top-level d
 | Version | Meaning |
 | :--- | :--- |
 | `"1"` | Legacy flow — story PRs target `develop`, no `epic/XXXX` branch, auto-merge to `develop` per EPIC-0042 default. |
-| `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. |
+| `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. v3 layout (`plans/`). |
+| `"4"` | New layout (EPIC-0060+) — same flow as `"2"` but artifacts live under `ai/epics/<epic>-<slug>/` (v4 layout). PathResolver auto-detects via filesystem probe. |
 
 ## Fallback Matrix
 
@@ -32,8 +34,9 @@ Whenever an orchestrator reads `execution-state.json` (or creates a new one duri
 | :--- | :--- | :--- | :--- |
 | Field absent (legacy state file pre-EPIC-0049) | `"1"` | Legacy flow | **Yes** — visible warning |
 | Field = `"1"` (explicit) | `"1"` | Legacy flow | No |
-| Field = `"2"` (explicit) | `"2"` | New flow | No |
-| Field = any other value (typo, future-version `"3"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
+| Field = `"2"` (explicit) | `"2"` | New flow, v3 layout (`plans/`) | No |
+| Field = `"4"` (explicit) | `"4"` | New flow, v4 layout (`ai/epics/`) — paths resolved via `PathResolver` | No |
+| Field = any other value (typo, `"3"`, future-version `"5"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
 
 **Warning format:**
 
@@ -91,25 +94,35 @@ New fields added to `execution-state.json` (e.g., `parallelismDowngrades` in EPI
 2. Be documented in the companion ADR and in this rule's fallback matrix.
 3. Have a fallback entry defined here before any orchestrator reads them in production.
 
-### `taskTracking` Field (EPIC-0055)
+### `taskTracking` Field (EPIC-0055 / EPIC-0059)
 
 Added by EPIC-0055 (Rule 25 — Task Hierarchy & Phase Gate Enforcement). Controls whether orchestrators emit `TaskCreate`/`TaskUpdate` calls and invoke `x-internal-phase-gate`.
 
-| Condition on `taskTracking` | Resolved behavior | Warning? |
-| :--- | :--- | :--- |
-| Field absent (legacy state file pre-EPIC-0055) | `enabled=false` — tracking skipped, gates are no-ops | **Yes** — emitted once per orchestrator run |
-| `taskTracking.enabled = false` (explicit) | Tracking skipped, gates are no-ops | No |
-| `taskTracking.enabled = true` (explicit) | Full tracking active — `TaskCreate`/`TaskUpdate` emitted, gates enforced | No |
+**EPIC-0059 enforcement:** `flowVersion=2` now requires `taskTracking.enabled=true`. Absence of `taskTracking` on a `flowVersion=2` state file is a `TASK_TRACKING_REQUIRED` error — no silent no-op. Run `scripts/migrate-task-tracking-v2.sh` before enabling `audit-flow-version.sh` to migrate all active epics.
 
-**Warning format (when field is absent):**
+#### Fallback Matrix (updated by EPIC-0059 — no deprecation window)
+
+| Condition on `taskTracking` | `flowVersion` | Resolved behavior | Warning? |
+| :--- | :--- | :--- | :--- |
+| Field absent | `"1"` or absent | `enabled=false` — tracking disabled (legacy default) | **Yes** — visible warning |
+| Field absent | `"2"` | **FAIL: `TASK_TRACKING_REQUIRED`** — enforcement immediate (EPIC-0059) | N/A — hard fail |
+| `taskTracking.enabled = false` (explicit) | `"1"` or absent | Tracking skipped, gates are no-ops (legacy opt-out) | No |
+| `taskTracking.enabled = false` (explicit) | `"2"` | Tracking skipped — **WARN: suspicious for flowVersion=2** (first release: WARN; second release: FAIL) | **Yes** — visible warning |
+| `taskTracking.enabled = true` (explicit) | any | Full tracking active — `TaskCreate`/`TaskUpdate` emitted, gates enforced | No |
+
+**Error code:** `TASK_TRACKING_REQUIRED` — emitted by `scripts/audit-flow-version.sh` (exit 1) when `flowVersion=2` and `taskTracking` is absent or `enabled=false`.
+
+**WARN format (enabled=false + flowVersion=2):**
 
 ```
-WARN [taskTracking-fallback] execution-state.json has no taskTracking field;
-     defaulting to disabled (legacy behavior). To enable Rule 25 task hierarchy,
-     add {"taskTracking": {"enabled": true}} to the state file.
+WARN [taskTracking-flowVersion2] execution-state.json has flowVersion=2 but taskTracking.enabled=false;
+     this is suspicious — all flowVersion=2 epics should have full tracking active.
+     Run scripts/migrate-task-tracking-v2.sh to migrate, or set taskTracking.enabled=true explicitly.
 ```
 
-**Migration:** Run `scripts/migrate-task-tracking.sh` to add `{"taskTracking": {"enabled": false}}` to all existing `execution-state.json` files that lack the field. This is a safe, additive, idempotent migration (performed by story-0055-0012 for all pre-EPIC-0055 epics).
+**Opt-out:** To preserve pre-EPIC-0055 behavior on a specific epic, use `flowVersion=1` with `--legacy-flow`. Setting `taskTracking.enabled=false` on a `flowVersion=2` epic is permitted in the first release (WARN only) but will become a hard fail in the second release after EPIC-0059.
+
+**Migration:** Run `scripts/migrate-task-tracking-v2.sh` to migrate all active `flowVersion=2` epics to `taskTracking.enabled=true` before activating the CI audit. The script is idempotent — re-execution is safe.
 
 ## Forbidden
 
@@ -120,9 +133,18 @@ WARN [taskTracking-fallback] execution-state.json has no taskTracking field;
 
 ## Audit
 
-CI script `scripts/audit-flow-version.sh` (or equivalent) checks every `execution-state.json` under `plans/epic-*/`:
+CI script `scripts/audit-flow-version.sh` checks every `execution-state.json` under `plans/epic-*/`:
 
 - Field `flowVersion` present and in `{"1", "2"}`.
 - If the enclosing epic uses Rule 21 (`epic/XXXX` branch exists on the remote), `flowVersion` MUST be `"2"` unless `--legacy-flow` was recorded in the epic's metadata.
+- **EPIC-0059 addition:** If `flowVersion=2`, `taskTracking.enabled` MUST be `true`. Absence or `false` → exit 1 `FLOW_VERSION_VIOLATION` with message `taskTracking required for flowVersion=2`.
+- `--self-check`: validates `jq` on PATH and existence of `plans/` directory.
+
+**Pre-requisite:** Run `scripts/migrate-task-tracking-v2.sh` before activating this check in CI. The migration script adds `taskTracking.enabled=true` to all `flowVersion=2` state files that are missing the field.
 
 Violations fail the CI build with `FLOW_VERSION_VIOLATION`.
+
+---
+
+> **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
+

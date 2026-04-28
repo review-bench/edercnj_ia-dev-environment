@@ -18,7 +18,7 @@ Implements a feature or story end-to-end using strict TDD discipline. It reuses 
 
 ```
 /x-task-implement
-/x-task-implement plans/epic-0012/story-0012-0003.md
+/x-task-implement plans/epic-XXXX/story-XXXX-YYYY.md
 /x-task-implement "Add payment retry logic"
 ```
 

@@ -17,7 +17,7 @@ Creates Jira Stories from all local `story-XXXX-YYYY.md` files in an epic direct
 ## Usage
 
 ```
-/x-jira-create-stories plans/epic-0012
+/x-jira-create-stories plans/epic-XXXX
 /x-jira-create-stories 0012
 ```
 

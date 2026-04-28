@@ -17,8 +17,8 @@ Computes the optimal implementation order from the story dependency graph. It gr
 ## Usage
 
 ```
-/x-epic-map plans/epic-0012/
-/x-epic-map plans/epic-0012/epic-0012.md
+/x-epic-map plans/epic-XXXX/
+/x-epic-map plans/epic-XXXX/epic-0012.md
 ```
 
 ## Workflow

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Acceptance test: runs {@link SkillSizeLinter} against the real source-of-truth tree at {@code
  * java/src/main/resources/targets/claude/skills/} and fails the build if a NEW offender (not in
- * {@code audits/skill-size-baseline.txt}) appears.
+ * {@code governance/baselines/skill-size-baseline.txt}) appears.
  *
  * <p>Brownfield policy (story-0047-0003 §4 DoR Local): at the time this story landed, 25 SKILL.md
  * files exceeded 500 lines without a non-empty {@code references/} sibling. These are enumerated in
@@ -31,7 +31,8 @@ class SkillSizeLinterAcceptanceTest {
     private static final Path SKILLS_ROOT =
             Path.of("src", "main", "resources", "targets", "claude", "skills");
 
-    private static final Path BASELINE_FILE = Path.of("..", "audits", "skill-size-baseline.txt");
+    private static final Path BASELINE_FILE =
+            Path.of("..", "governance", "baselines", "skill-size-baseline.txt");
 
     @Test
     void lint_realCorpus_noNewViolations() throws IOException {
@@ -54,7 +55,7 @@ class SkillSizeLinterAcceptanceTest {
                                 + " exceed %d lines without a non-empty"
                                 + " references/ sibling. Either carve out the"
                                 + " content (see ADR-0011 / ADR-0007) or add"
-                                + " the path to audits/skill-size-baseline.txt"
+                                + " the path to governance/baselines/skill-size-baseline.txt"
                                 + " (discouraged -- prefer carve-out).",
                         SkillSizeLinter.ERROR_THRESHOLD_LINES)
                 .isEmpty();
@@ -102,7 +103,7 @@ class SkillSizeLinterAcceptanceTest {
                 .as(
                         "Baseline contains entries that no longer"
                                 + " violate the threshold. Remove them from"
-                                + " audits/skill-size-baseline.txt to keep"
+                                + " governance/baselines/skill-size-baseline.txt to keep"
                                 + " the guard-rail tight.")
                 .isEmpty();
     }

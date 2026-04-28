@@ -140,9 +140,9 @@ If validation fails, abort with descriptive error message.
 
 | Path | Pattern | Example |
 |------|---------|---------|
-| Story file | `<EPIC_DIR>/story-XXXX-YYYY.md` | `plans/epic-0029/story-0029-0001.md` |
-| Plan output | `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` | `plans/epic-0029/plans/task-plan-0029-0001-001.md` |
-| Output dir | `<EPIC_DIR>/plans/` | `plans/epic-0029/plans/` |
+| Story file | `<EPIC_DIR>/story-XXXX-YYYY.md` | `plans/epic-XXXX/story-XXXX-YYYY.md` |
+| Plan output | `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` | `plans/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` |
+| Output dir | `<EPIC_DIR>/plans/` | `plans/epic-XXXX/plans/` |
 
 #### 0.4 Idempotency Check (Staleness)
 
@@ -167,7 +167,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task
 #### 1A. Task-file-first branch (EPIC-0038 — `--task-file` present)
 
 1. Read the file at `<task-file>`. Abort with exit code 1 if missing.
-2. Validate structure per story-0038-0001 schema (`plans/epic-0038/schemas/task-schema.md`):
+2. Validate structure per story-0038-0001 schema (`plans/epic-XXXX/schemas/task-schema.md`):
    - `**ID:** TASK-XXXX-YYYY-NNN` present and matches filename.
    - `**Story:** story-XXXX-YYYY` present and well-formed.
    - `**Status:**` in the allowed enum (`Pendente | Em Andamento | Concluída | Bloqueada | Falha`).

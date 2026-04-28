@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Assembles {@code specs/_templates/_TEMPLATE-DATA-MIGRATION-PLAN.md} from the Pebble template of
- * the same name.
+ * Assembles {@code governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md} from the Pebble template
+ * of the same name.
  *
  * <p>This assembler is <strong>conditional</strong>: the template is only generated when {@code
  * database_name != "none"}. Projects without a database (e.g., CLI tools) skip generation entirely.
@@ -28,7 +28,7 @@ import java.util.Map;
 public final class DataMigrationPlanAssembler implements Assembler {
 
     private static final String TEMPLATE_PATH = "shared/templates/_TEMPLATE-DATA-MIGRATION-PLAN.md";
-    private static final String OUTPUT_SUBDIR = "specs/_templates";
+    private static final String OUTPUT_SUBDIR = "governance/migrations";
     private static final String OUTPUT_FILENAME = "_TEMPLATE-DATA-MIGRATION-PLAN.md";
     private static final String NO_DATABASE = "none";
 
@@ -65,8 +65,8 @@ public final class DataMigrationPlanAssembler implements Assembler {
      * {@inheritDoc}
      *
      * <p>Renders the data migration plan template with Pebble and writes it to {@code
-     * specs/_templates/_TEMPLATE-DATA-MIGRATION-PLAN.md}. Returns empty list if database type is
-     * "none" or the source template is missing.
+     * governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md}. Returns empty list if database type
+     * is "none" or the source template is missing.
      */
     @Override
     public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {

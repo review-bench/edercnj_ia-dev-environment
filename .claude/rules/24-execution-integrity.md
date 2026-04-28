@@ -40,6 +40,12 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 | `x-review-pr` | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
 | `x-internal-story-report` | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
 | `x-arch-plan` | `plans/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
+| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `plans/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
+| `x-test-tdd` / `x-test-run` | `plans/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
+| `x-git-commit` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
+| `x-dependency-audit` | `plans/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
+| `x-threat-model` | `plans/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
@@ -103,3 +109,8 @@ story-0051-0001  # pre-Rule-24, merged 2026-04-23 (PR #602), inline execution wa
 ## Audit
 
 The audit is self-auditing: `scripts/audit-execution-integrity.sh --self-check` verifies that this rule file exists, the Stop hook is registered in `settings.json`, and the baseline file is present. Any missing piece fails the CI build with `EIE_ENFORCEMENT_BROKEN`.
+
+---
+
+> **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
+

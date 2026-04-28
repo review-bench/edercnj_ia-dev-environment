@@ -767,12 +767,12 @@ Emitidos em `.claude/templates/` pelo `PlanTemplatesAssembler` (RULE-003). **12 
 - **Rules canônicas:** `.claude/rules/01-project-identity.md` … `24-execution-integrity.md`
 - **CLAUDE.md raiz:** blocos `> **Concluded**` / `> **In progress**` para status de épicos
 - **ADRs relevantes:**
-  - `adr/ADR-0003-skill-taxonomy-and-naming.md` — refatoração de taxonomia (EPIC-0036)
-  - `adr/ADR-0004-worktree-lifecycle.md` — lifecycle de worktrees
-  - `adr/ADR-0005-telemetry-architecture.md` — arquitetura de telemetria
-  - `adr/ADR-0006-file-conflict-aware-parallelism.md` — collisão em paralelo (EPIC-0041)
-  - `adr/ADR-0010-interactive-gates-convention.md` — gates interativos (EPIC-0043)
-  - `adr/ADR-0012-*` — rollout slim (EPIC-0054)
+  - `docs/adr/ADR-0003-skill-taxonomy-and-naming.md` — refatoração de taxonomia (EPIC-0036)
+  - `docs/adr/ADR-0004-worktree-lifecycle.md` — lifecycle de worktrees
+  - `docs/adr/ADR-0005-telemetry-architecture.md` — arquitetura de telemetria
+  - `docs/adr/ADR-0006-file-conflict-aware-parallelism.md` — collisão em paralelo (EPIC-0041)
+  - `docs/adr/ADR-0010-interactive-gates-convention.md` — gates interativos (EPIC-0043)
+  - `docs/adr/ADR-0012-*` — rollout slim (EPIC-0054)
 - **Planos de épicos em evolução:** `plans/epic-0055/epic-0055.md`, `plans/epic-0056/epic-0056.md`, `plans/epic-0057/epic-0057.md`
 - **Especificações:** `plans/epic-0055/spec-task-granularity-phase-gates.md`, `plans/epic-0056/spec-ra9-standardized-planning-templates.md`
 

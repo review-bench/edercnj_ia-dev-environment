@@ -141,7 +141,7 @@ Four layers — a violation caught by any layer fails the lifecycle.
 
 Escape hatches:
 
-- **Baseline** (`audits/task-hierarchy-baseline.txt`) grandfathers orchestrators merged before Rule 25 was introduced. Immutable after EPIC-0055 merges.
+- **Baseline** (`governance/baselines/task-hierarchy-baseline.txt`) grandfathers orchestrators merged before Rule 25 was introduced. Immutable after EPIC-0055 merges.
 - **Per-phase exemption** (`<!-- phase-no-gate: <reason> -->`) marks intentional skips — e.g., purely prose phases that produce no artifact.
 - **Per-task exemption** (`<!-- audit-exempt -->`) allows a `TaskCreate` without a completion partner — rare, reviewed case.
 
@@ -167,11 +167,11 @@ This promotes Rule 24 enforcement from "Stop-hook notices afterwards" to **synch
 - Using ASCII `>` or `-` instead of `›` as hierarchy separator (breaks Invariant 5 + subject regex).
 - Using `TodoWrite`/`TodoRead` (legacy) in a skill that already emits `TaskCreate` — redundant and drifts the task list.
 - Skipping a phase gate to "speed up" execution — the gate's 47ms average latency is below the telemetry-measurable floor.
-- Adding entries to `audits/task-hierarchy-baseline.txt` after Rule 25 merges — file is immutable by CI check.
+- Adding entries to `governance/baselines/task-hierarchy-baseline.txt` after Rule 25 merges — file is immutable by CI check.
 
 ## Audit
 
-The audit itself is self-verified: `scripts/audit-task-hierarchy.sh --self-check` asserts that this rule file, the baseline file (`audits/task-hierarchy-baseline.txt`), and the skills root directory are present. If any of those expected paths are missing, the build fails with `RULE_25_ENFORCEMENT_BROKEN`. Deeper wiring assertions (CLAUDE.md references, `x-internal-phase-gate` presence) are intentionally out of scope for the self-check — they live inside the full audit pass.
+The audit itself is self-verified: `scripts/audit-task-hierarchy.sh --self-check` asserts that this rule file, the baseline file (`governance/baselines/task-hierarchy-baseline.txt`), and the skills root directory are present. If any of those expected paths are missing, the build fails with `RULE_25_ENFORCEMENT_BROKEN`. Deeper wiring assertions (CLAUDE.md references, `x-internal-phase-gate` presence) are intentionally out of scope for the self-check — they live inside the full audit pass.
 
 ---
 

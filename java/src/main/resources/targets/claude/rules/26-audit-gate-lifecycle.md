@@ -73,7 +73,7 @@ New gate proposed
 | 0 | Success — no violations detected | — | — |
 | 1 | Violation detected | `<RULE>_VIOLATION` (e.g., `FLOW_VERSION_VIOLATION`) | `FLOW_VERSION_VIOLATION: execution-state.json has flowVersion=3` |
 | 2 | Operational error | `OPERATIONAL_ERROR` | `OPERATIONAL_ERROR: jq not found on PATH` |
-| 3 | Baseline / exemption file corrupt | `BASELINE_CORRUPT` or `INVALID_EXEMPTION` | `BASELINE_CORRUPT: audits/baseline.txt malformed at line 12` |
+| 3 | Baseline / exemption file corrupt | `BASELINE_CORRUPT` or `INVALID_EXEMPTION` | `BASELINE_CORRUPT: governance/baselines/baseline.txt malformed at line 12` |
 
 Java tests and CI workflows do not follow this matrix — they use JUnit assertion failures and GitHub Actions job exit codes respectively.
 
@@ -94,7 +94,7 @@ A structurally broken script aborts the job without polluting other audit result
 case "${1:-}" in
   --self-check)
     command -v jq >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required" >&2; exit 2; }
-    [[ -f "audits/my-baseline.txt" ]] || { echo "OPERATIONAL_ERROR: baseline missing" >&2; exit 2; }
+    [[ -f "governance/baselines/my-baseline.txt" ]] || { echo "OPERATIONAL_ERROR: baseline missing" >&2; exit 2; }
     exit 0
     ;;
 esac

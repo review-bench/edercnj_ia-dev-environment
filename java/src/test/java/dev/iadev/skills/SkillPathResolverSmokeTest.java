@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
  * <p>The test scans every SKILL.md under {@code java/src/main/resources/targets/claude/skills/} and
  * reports any skill containing a hardcoded {@code plans/epic-NNNN} reference outside the
  * user-facing {@code ## Triggers} or {@code ## Examples} sections. The baseline file {@code
- * audits/skill-pathresolver-baseline.txt} grandfathers skills that already had the violation when
- * EPIC-0060 was introduced.
+ * governance/baselines/skill-pathresolver-baseline.txt} grandfathers skills that already had the
+ * violation when EPIC-0060 was introduced.
  *
  * <p>A NEW skill (or a previously-clean skill that introduces a hardcoded path) MUST cause this
  * test to fail.
@@ -34,16 +34,20 @@ class SkillPathResolverSmokeTest {
     private static final Path SKILLS_ROOT =
             REPO_ROOT.resolve("java/src/main/resources/targets/claude/skills");
     private static final Path BASELINE =
-            REPO_ROOT.resolve("audits/skill-pathresolver-baseline.txt");
+            REPO_ROOT.resolve("governance/baselines/skill-pathresolver-baseline.txt");
 
     private static final Pattern HARDCODED = Pattern.compile("plans/epic-[0-9]");
 
     @Test
     @DisplayName("baseline file exists and is parseable")
     void baseline_existsAndParseable() throws IOException {
+        // Post-EPIC-0062 (story-0062-0006): all 14 grandfathered skills migrated to
+        // PathResolver, so baseline is intentionally empty (only the explanatory
+        // comment remains). The file MUST still exist as the contract surface of
+        // the audit, but emptiness is a valid (and now expected) state.
         assertThat(BASELINE).exists().isRegularFile();
         Set<String> entries = loadBaseline();
-        assertThat(entries).isNotEmpty();
+        assertThat(entries).isNotNull();
     }
 
     @Test

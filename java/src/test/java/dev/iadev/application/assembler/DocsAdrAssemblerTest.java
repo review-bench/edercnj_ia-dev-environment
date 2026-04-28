@@ -70,7 +70,7 @@ class DocsAdrAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path readme = outputDir.resolve("adr/README.md");
+            Path readme = outputDir.resolve("docs/adr/README.md");
             String content = readFile(readme);
             assertThat(content).contains("# Architecture Decision Records");
         }
@@ -87,7 +87,7 @@ class DocsAdrAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path readme = outputDir.resolve("adr/README.md");
+            Path readme = outputDir.resolve("docs/adr/README.md");
             String content = readFile(readme);
             assertThat(content).contains("my-api");
         }
@@ -104,7 +104,7 @@ class DocsAdrAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path readme = outputDir.resolve("adr/README.md");
+            Path readme = outputDir.resolve("docs/adr/README.md");
             String content = readFile(readme);
             assertThat(content).contains("| ID | Title |" + " Status | Date |");
         }
@@ -121,7 +121,7 @@ class DocsAdrAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path templateDest = outputDir.resolve("adr/_TEMPLATE-ADR.md");
+            Path templateDest = outputDir.resolve("docs/adr/_TEMPLATE-ADR.md");
             String content = readFile(templateDest);
             assertThat(content).isEqualTo(VALID_TEMPLATE);
         }
@@ -138,7 +138,7 @@ class DocsAdrAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            assertThat(outputDir.resolve("adr")).exists().isDirectory();
+            assertThat(outputDir.resolve("docs/adr")).exists().isDirectory();
         }
     }
 

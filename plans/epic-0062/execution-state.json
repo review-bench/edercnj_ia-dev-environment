@@ -1,0 +1,44 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0062",
+  "epicBranch": "epic/0062",
+  "epicDir": "ai/epics/epic-0062-folder-migration-v4",
+  "mode": "sequential",
+  "startedAt": "2026-04-28T12:00:00Z",
+  "completedAt": "2026-04-28T13:45:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": 1,
+    "phaseGateResults": [
+      {"phase": "Phase 0", "mode": "post", "passed": true},
+      {"phase": "Phase 1", "mode": "post", "passed": true},
+      {"phase": "Phase 2", "mode": "post", "passed": true},
+      {"phase": "Phase 3", "mode": "post", "passed": true},
+      {"phase": "Phase 4", "mode": "post", "passed": true},
+      {"phase": "Phase 5", "mode": "post", "passed": true}
+    ]
+  },
+  "finalPrNumber": 751,
+  "finalPrUrl": "https://github.com/edercnj/ia-dev-environment/pull/751",
+  "integrityGatePassed": true,
+  "storyStatuses": {
+    "story-0062-0001": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 743},
+    "story-0062-0002": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 745},
+    "story-0062-0003": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 744},
+    "story-0062-0004": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 746},
+    "story-0062-0005": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 747},
+    "story-0062-0006": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 748},
+    "story-0062-0007": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 749},
+    "story-0062-0008": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 750}
+  },
+  "executionOrder": [
+    "story-0062-0001",
+    "story-0062-0003",
+    "story-0062-0002",
+    "story-0062-0004",
+    "story-0062-0005",
+    "story-0062-0006",
+    "story-0062-0007",
+    "story-0062-0008"
+  ]
+}

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.condition.OS;
 class Epic0059AuditPrEvidenceTest {
 
     private static final String SCRIPT_PATH = "scripts/audit-pr-evidence.sh";
-    private static final String BASELINE_PATH = "audits/pr-evidence-baseline.txt";
+    private static final String BASELINE_PATH = "governance/baselines/pr-evidence-baseline.txt";
 
     @Test
     @DisplayName("scriptExists — scripts/audit-pr-evidence.sh must exist")
@@ -64,11 +64,11 @@ class Epic0059AuditPrEvidenceTest {
     }
 
     @Test
-    @DisplayName("baselineFileExists — audits/pr-evidence-baseline.txt must exist")
+    @DisplayName("baselineFileExists — governance/baselines/pr-evidence-baseline.txt must exist")
     void baselineFileExists() {
         Path baseline = repoRoot().resolve(BASELINE_PATH);
         assertThat(baseline)
-                .as("audits/pr-evidence-baseline.txt must exist (story-0059-0007)")
+                .as("governance/baselines/pr-evidence-baseline.txt must exist (story-0059-0007)")
                 .isRegularFile();
     }
 

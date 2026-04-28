@@ -56,10 +56,8 @@ final class FileCategorizer {
         rules.put(prefix(".claude/hooks/"), "Hooks");
         rules.put(prefix(".claude/settings"), "Settings");
         rules.put(prefix("steering/"), "Steering");
-        rules.put(prefix("specs/"), "Specs");
         rules.put(prefix("results/"), "Results");
         rules.put(prefix("contracts/"), "Contracts");
-        rules.put(prefix("adr/"), "ADR");
         rules.put(prefix("plans/"), "Plans");
         // EPIC-0060 v4 layout — these prefixes coexist with the v3
         // ones above so plans/ legacy epics keep their categories
