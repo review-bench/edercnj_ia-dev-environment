@@ -2,6 +2,8 @@
 
 **Gerado a partir das dependências BlockedBy/Blocks de cada história do epic-0069.**
 
+> ℹ️ **Refinamento cross-cutting aplicado em 2026-04-28** — paths e referências atualizados conforme epic-0069.md §10 (D-R1..D-R11). Principais correções: D-R3 (Rule 29 publica máquina de estados, não Rule 22); D-R4 (skills em `plan/`, não `refine/`); D-R6 (Rule/ADR numbers são working-titles).
+
 ---
 
 ## 1. Matriz de Dependências
@@ -138,7 +140,7 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0001 | Capability declarativa, Rule 29 normativa, ADR-0018 decision record, KP playbook de refinement | `capabilities/governance/refinement-gate.yaml`, `.claude/rules/29-refinement-gate.md`, `docs/adr/ADR-0018-refinement-gate.md`, `knowledge/refinement/dimensions.md` |
+| 0069-0001 | Capability declarativa, Rule 29 normativa (working-title — D-R6) com **§State Machine Extension** publicando o status `Refinada` (D-R3 (b)), ADR-0018 decision record, KP playbook de refinement | `capabilities/governance/refinement-gate.yaml`, `java/src/main/resources/targets/claude/rules/29-refinement-gate.md` (D-R3 (a) — layout plano vigente), `docs/adr/ADR-0018-refinement-gate.md`, `java/src/main/resources/targets/claude/knowledge/refinement/dimensions.md` |
 
 **Entregas da Fase 0:**
 - Fundação normativa pronta para skills, hooks e auditoria consumirem.
@@ -148,9 +150,9 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0002 | Skill interativa de refinamento de história (6 dimensões: persona/valor, AC Gherkin, contratos, métricas, alternativas, riscos) | `targets/claude/skills/refine/x-story-refine/SKILL.md`, KP shared `knowledge/refinement/dimensions.md` |
-| 0069-0003 | Skill interativa de refinamento de épico (7 dimensões: problema, persona ampla, hipótese, OKRs, alternativas estratégicas, riscos de produto, escopo) | `targets/claude/skills/refine/x-epic-refine/SKILL.md` |
-| 0069-0004 | Field `refinementVerdict` em ExecutionState; status `Refinada` na máquina de estados (Rule 22 estendida); `_TEMPLATE-REFINEMENT-VERDICT.md` | `domain/model/ExecutionState.java`, `targets/claude/rules/core/22-lifecycle-integrity.md` (modified), `shared/templates/_TEMPLATE-REFINEMENT-VERDICT.md` |
+| 0069-0002 | Skill interativa de refinamento de história (6 dimensões: persona/valor, AC Gherkin, contratos, métricas, alternativas, riscos) com `model: sonnet` (D-R8) e 6 TaskCreate (D-R10) | `java/src/main/resources/targets/claude/skills/plan/x-story-refine/SKILL.md` (D-R4), KP shared `targets/claude/knowledge/refinement/dimensions.md` |
+| 0069-0003 | Skill interativa de refinamento de épico (7 dimensões: problema, persona ampla, hipótese, OKRs, alternativas estratégicas, riscos de produto, escopo) com `model: sonnet` e 7 TaskCreate | `java/src/main/resources/targets/claude/skills/plan/x-epic-refine/SKILL.md` (D-R4) |
+| 0069-0004 | Field `refinementVerdict` (com `verdictHash` sha256) em ExecutionState; status `Refinada` na **§State Machine Extension da Rule 29** (NÃO Rule 22 — D-R3 (b)); `_TEMPLATE-REFINEMENT-VERDICT.md` | `domain/model/ExecutionState.java`, `domain/model/RefinementVerdict.java` (record imutável domain-pure), `java/src/main/resources/targets/claude/rules/29-refinement-gate.md` (extended pela story-0001), `java/src/main/resources/shared/templates/_TEMPLATE-REFINEMENT-VERDICT.md` |
 
 **Entregas da Fase 1:**
 - Skills user-invocáveis prontas para uso (independentes do gate runtime — gate vem na Fase 2).
@@ -160,8 +162,8 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0005 | PreToolUse hook que bloqueia `x-story-implement` / `x-epic-implement` / `x-task-implement` / `x-epic-orchestrate` quando `refinementVerdict.status != "approved"` | `targets/claude/hooks/PreToolUse/enforce-refinement-gate.sh`, registro em `settings.json` via `HooksAssembler` |
-| 0069-0006 | CI script consolida verificação de PRs merged sem refinement aprovado | `targets/claude/scripts/_default/audit-refinement-gate.sh`, entry em `docs/audit-gates-catalog.md` |
+| 0069-0005 | PreToolUse hook que bloqueia `x-story-implement` / `x-epic-implement` / `x-task-implement` / `x-epic-orchestrate` quando `refinementVerdict.status != "approved"` (Camada 0 — Rule 26); exit code dedicado (working-default 33 — verificação de não-colisão é primeira task — D-R7) | `java/src/main/resources/targets/claude/hooks/PreToolUse/enforce-refinement-gate.sh`, registro em `settings.json` via `HooksAssembler`, mensagens em PT-BR (Rule 02), bypass único `CLAUDE_RECOVERY_MODE=1` |
+| 0069-0006 | CI script consolida verificação de PRs merged sem refinement aprovado (Camada 2 — Rule 26); exit codes 0/1/2/3 padrão; detecção de divergência state↔markdown via `verdictHash` | `java/src/main/resources/targets/claude/scripts/_default/audit-refinement-gate.sh` (D-R2), `governance/baselines/refinement-gate-baseline.txt` (immutable post-merge), entry em `docs/audit-gates-catalog.md` (RULE-004 catalog-before-add) |
 
 **Entregas da Fase 2:**
 - Gate runtime (Camada 0) ativo.
@@ -171,7 +173,7 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0007 | Smoke test E2E cobrindo 6 cenários (aprovação, bloqueio, refinement parcial, retomada, opt-out legacy, hotfix bypass); CHANGELOG entry MINOR | `java/src/test/java/dev/iadev/skills/Epic0069RefinementGateSmokeIT.java`, `CHANGELOG.md` (entry com Highlights) |
+| 0069-0007 | Smoke test E2E cobrindo 6 cenários (aprovação, bloqueio, refinement parcial, opt-out legacy, hotfix bypass, refinement de épico vs story); CHANGELOG entry MINOR (versão TBD — não pinada); CLAUDE.md ganha bloco "REFINEMENT GATE — INEGOCIÁVEL" | `java/src/test/java/dev/iadev/skills/Epic0069RefinementGateSmokeIT.java` (D-R11 — suffix `IT` integration), `java/src/test/resources/fixtures/epic-0069/`, `CHANGELOG.md`, `CLAUDE.md`, dogfood pós-merge (PR follow-up) |
 
 **Entregas da Fase 3:**
 - Smoke verde em CI.
@@ -204,7 +206,9 @@ graph TD
 
 ### Marco de Validação Arquitetural
 
-**story-0069-0004** (state field + Rule 22) é o checkpoint arquitetural. Se Rule 22 estendida estiver mal-modelada (transição `Refinada` ambígua), todo o resto sofre. Gate de revisão extra recomendado nesta story antes de Fase 2 começar.
+**story-0069-0004** (state field + §State Machine Extension da Rule 29 — D-R3 (b)) é o checkpoint arquitetural. Se a §State Machine Extension da Rule 29 estiver mal-modelada (transição `Refinada` ambígua), todo o resto sofre. Gate de revisão extra recomendado nesta story antes de Fase 2 começar.
+
+> **Correção do scaffold:** o scaffold original referenciava "Rule 22 — lifecycle-integrity" para a máquina de estados. Isso é incorreto — Rule 22 é "Skill Visibility". Cohesion: a máquina de estados foi movida para dentro da Rule 29 (que é nascente e define o estado `Refinada`).
 
 ---
 
