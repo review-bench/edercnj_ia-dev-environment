@@ -179,7 +179,7 @@ steering/                         # Persistent project context
 ├── service-architecture.md       # Service architecture doc
 └── product.md, tech-stack.md...  # Project identity files
 
-specs/                            # Human-authored specifications
+docs/specs/                       # Human-authored specifications
 └── _templates/                   # Spec templates (contributing, etc.)
 
 results/                          # Execution outputs
@@ -787,7 +787,7 @@ ia-dev-environment/
 │       ├── java/                 # 1961 tests (unit + integration + golden)
 │       └── resources/golden/     # Golden files for 8 profiles
 ├── steering/                     # Persistent project context
-├── specs/                        # Human-authored specifications
+├── docs/specs/                   # Human-authored specifications
 ├── plans/                        # SDD artifacts (epics, stories, maps)
 ├── results/                      # Execution outputs (audits, reviews, runbooks)
 ├── contracts/                    # API contracts and schemas
