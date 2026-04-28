@@ -103,7 +103,7 @@ esac
 ## Catalog-before-Add (RULE-004)
 
 No gate of any layer may be introduced — in any Rule, ADR, SKILL.md, or code comment —
-without a simultaneous entry in `docs/audit-gates-catalog.md`.
+without a simultaneous entry in `docs/audit-gates-catalog.md` (generated dynamically per stack from `shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md` — EPIC-0061 story-0061-0003).
 
 A PR that adds a Rule reference to an `audit-*.sh` script without a matching catalog
 entry fails `scripts/audit-skill-visibility.sh` (extended in story-0058-0005 to
@@ -124,7 +124,7 @@ check orphan script references).
 This rule is self-verified by the catalog check in `scripts/audit-skill-visibility.sh`
 (EPIC-0058, story-0058-0005): every `audit-*.sh` reference found in any `.md` file
 under `java/src/main/resources/targets/claude/` MUST have a corresponding entry in
-`docs/audit-gates-catalog.md`. Missing entry → exit 1 `ORPHAN_SCRIPT_REFERENCE`.
+`docs/audit-gates-catalog.md` (generated dynamically per stack from `shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md` — EPIC-0061 story-0061-0003). Missing entry → exit 1 `ORPHAN_SCRIPT_REFERENCE`.
 
 The smoke test `Epic0058Rule26SmokeTest` validates:
 1. This rule file exists in source-of-truth.
@@ -144,4 +144,4 @@ The smoke test `Epic0058Rule26SmokeTest` validates:
 - **Rule 25** (Task Hierarchy) — references `scripts/audit-task-hierarchy.sh` and `scripts/audit-phase-gates.sh` (EPIC-0055).
 - **Rule 45** (CI-Watch Integrity) — Hook runtime gate pattern; illustrates the Hook layer.
 - **ADR-0015** — decision record for this rule.
-- **`docs/audit-gates-catalog.md`** — canonical catalog of all gates across all 4 layers.
+- **`docs/audit-gates-catalog.md` (generated dynamically per stack from `shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md` — EPIC-0061 story-0061-0003)** — canonical catalog of all gates across all 4 layers.
