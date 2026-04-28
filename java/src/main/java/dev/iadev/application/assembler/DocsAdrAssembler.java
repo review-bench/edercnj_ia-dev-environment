@@ -12,16 +12,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * Assembles {@code adr/} with an ADR index README.md and the ADR template file.
+ * Assembles {@code docs/adr/} with an ADR index README.md and the ADR template file.
  *
  * <p>This is the twenty-second assembler in the pipeline (position 22 of 25 per RULE-005). It
  * generates two files:
  *
  * <ol>
- *   <li>{@code adr/README.md} — programmatically built index with project name, empty ADR table,
- *       and creation instructions
- *   <li>{@code adr/_TEMPLATE-ADR.md} — copied verbatim from resources after validating mandatory
- *       sections
+ *   <li>{@code docs/adr/README.md} — programmatically built index with project name, empty ADR
+ *       table, and creation instructions
+ *   <li>{@code docs/adr/_TEMPLATE-ADR.md} — copied verbatim from resources after validating
+ *       mandatory sections
  * </ol>
  *
  * <p>Double graceful no-op:
@@ -57,7 +57,7 @@ public final class DocsAdrAssembler implements Assembler {
 
     private static final String TEMPLATE_FILENAME = "_TEMPLATE-ADR.md";
     private static final String TEMPLATES_SUBDIR = "shared/templates";
-    private static final String ADR_OUTPUT_SUBDIR = "adr";
+    private static final String ADR_OUTPUT_SUBDIR = "docs/adr";
     private static final String README_FILENAME = "README.md";
     private static final String ADR_TITLE_HEADING = "# Architecture Decision Records";
 

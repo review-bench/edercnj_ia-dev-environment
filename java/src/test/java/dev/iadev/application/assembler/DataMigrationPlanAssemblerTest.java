@@ -17,7 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Tests for DataMigrationPlanAssembler -- conditional generation of
- * specs/_templates/_TEMPLATE-DATA-MIGRATION-PLAN.md.
+ * governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md.
  *
  * <p>TPP order: degenerate (no DB) -> simple (PostgreSQL/Flyway) -> conditional (MongoDB/Mongock)
  * -> all sections -> cross-profile comparison.
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("DataMigrationPlanAssembler")
 class DataMigrationPlanAssemblerTest {
 
-    private static final String OUTPUT_PATH = "specs/_templates/_TEMPLATE-DATA-MIGRATION-PLAN.md";
+    private static final String OUTPUT_PATH = "governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md";
 
     @Nested
     @DisplayName("implements Assembler interface")

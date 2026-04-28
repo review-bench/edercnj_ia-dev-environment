@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Assembles {@code specs/_templates/_TEMPLATE-CONTRIBUTING.md} from the {@code
+ * Assembles {@code docs/specs/_templates/_TEMPLATE-CONTRIBUTING.md} from the {@code
  * _TEMPLATE-CONTRIBUTING.md} Pebble template.
  *
  * <p>This assembler renders the contributing guide template using full Pebble rendering via {@link
@@ -35,7 +35,7 @@ import java.util.Map;
 public final class DocsContributingAssembler implements Assembler {
 
     private static final String TEMPLATE_PATH = "shared/templates/_TEMPLATE-CONTRIBUTING.md";
-    private static final String OUTPUT_SUBDIR = "specs/_templates";
+    private static final String OUTPUT_SUBDIR = "docs/specs/_templates";
     private static final String OUTPUT_FILENAME = "_TEMPLATE-CONTRIBUTING.md";
 
     private final Path resourcesDir;
@@ -58,7 +58,7 @@ public final class DocsContributingAssembler implements Assembler {
      * {@inheritDoc}
      *
      * <p>Renders the contributing guide template with Pebble and writes it to {@code
-     * specs/_templates/_TEMPLATE-CONTRIBUTING.md}.
+     * docs/specs/_templates/_TEMPLATE-CONTRIBUTING.md}.
      */
     @Override
     public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {

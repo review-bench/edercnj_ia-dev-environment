@@ -76,9 +76,10 @@ class CliDisplayTest {
 
         @Test
         void adrPath_whenCalled_classifiedCorrectly() {
-            Map<String, List<String>> result = CliDisplay.classifyFiles(List.of("adr/001.md"));
+            Map<String, List<String>> result =
+                    CliDisplay.classifyFiles(List.of("docs/adr/ADR-0001-foo.md"));
 
-            assertThat(result).containsKey("ADR");
+            assertThat(result).containsKey("ADR (v4)");
         }
 
         @Test
@@ -100,9 +101,9 @@ class CliDisplayTest {
         @Test
         void specsPath_whenCalled_classifiedCorrectly() {
             Map<String, List<String>> result =
-                    CliDisplay.classifyFiles(List.of("specs/SPEC-001.md"));
+                    CliDisplay.classifyFiles(List.of("docs/specs/SPEC-001.md"));
 
-            assertThat(result).containsKey("Specs");
+            assertThat(result).containsKey("Specs (v4)");
         }
 
         @Test

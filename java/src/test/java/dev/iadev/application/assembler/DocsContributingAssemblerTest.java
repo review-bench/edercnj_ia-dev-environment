@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for DocsContributingAssembler — generates specs/_templates/_TEMPLATE-CONTRIBUTING.md from a
+ * Tests for DocsContributingAssembler — generates docs/specs/_templates/_TEMPLATE-CONTRIBUTING.md from a
  * Pebble template.
  */
 @DisplayName("DocsContributingAssembler")
@@ -40,7 +40,7 @@ class DocsContributingAssemblerTest {
     class AssembleContributing {
 
         @Test
-        @DisplayName("generates _TEMPLATE-CONTRIBUTING.md" + " in specs/_templates/ subdirectory")
+        @DisplayName("generates _TEMPLATE-CONTRIBUTING.md" + " in docs/specs/_templates/ subdirectory")
         void assemble_whenCalled_generatesContributingFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
@@ -51,12 +51,12 @@ class DocsContributingAssemblerTest {
             List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path expected = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             assertThat(expected).exists();
         }
 
         @Test
-        @DisplayName("creates specs/_templates/ subdirectory")
+        @DisplayName("creates docs/specs/_templates/ subdirectory")
         void assemble_whenCalled_createsDocsTemplatesSubdir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
@@ -66,7 +66,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            assertThat(outputDir.resolve("specs/_templates")).exists().isDirectory();
+            assertThat(outputDir.resolve("docs/specs/_templates")).exists().isDirectory();
         }
 
         @Test
@@ -81,7 +81,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("payment-service");
             assertThat(content).contains("# Contributing to payment-service");
@@ -102,7 +102,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("Java JDK");
             assertThat(content).contains("mvn test");
@@ -120,7 +120,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("mvn clean install");
             assertThat(content).contains("Apache Maven");
@@ -137,7 +137,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("## Prerequisites");
             assertThat(content).contains("## Getting Started");
@@ -175,7 +175,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains(">= 95%");
             assertThat(content).contains(">= 90%");
@@ -202,7 +202,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("Node.js");
             assertThat(content).contains("npm install");
@@ -225,7 +225,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path file = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             String content = readFile(file);
             assertThat(content).contains("Go");
             assertThat(content).contains("go mod download");
@@ -291,7 +291,7 @@ class DocsContributingAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path dest = outputDir.resolve("specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path dest = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             assertThat(dest).exists();
             String content = readFile(dest);
             assertThat(content).contains("USE_MAVEN");
