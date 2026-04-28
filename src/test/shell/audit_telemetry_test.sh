@@ -59,6 +59,37 @@ else
     FAIL=$((FAIL + 1))
 fi
 
+# T3: NDJSON com timestamps não-monotônicos é detectado (TASK-003)
+mkdir -p "$TMP_DIR/badtelemetry"
+cat > "$TMP_DIR/badtelemetry/events.ndjson" <<'NDJSON_EOF'
+{"timestamp":"2026-04-28T12:00:00Z","event":"tool.call","skill":"x-review","storyId":"story-0063-0001","session_id":"abc","pid":111}
+{"timestamp":"2026-04-28T12:05:00Z","event":"tool.call","skill":"x-review-pr","storyId":"story-0063-0001","session_id":"abc","pid":111}
+{"timestamp":"2026-04-28T12:03:00Z","event":"tool.call","skill":"x-internal-story-verify","storyId":"story-0063-0001","session_id":"abc","pid":111}
+NDJSON_EOF
+assert_exit "T3 timestamps nao-monotonicos rejeitados" 1 \
+    "$AUDIT_SCRIPT" --scope=telemetry --story-id=story-0063-0001 \
+        --ndjson-file "$TMP_DIR/badtelemetry/events.ndjson"
+
+# T4: Stub case — eventos para story diferente (mismatched storyId)
+mkdir -p "$TMP_DIR/stub"
+cat > "$TMP_DIR/stub/events.ndjson" <<'NDJSON_EOF'
+{"timestamp":"2026-04-28T12:00:00Z","event":"tool.call","skill":"x-review","storyId":"story-0063-9999","session_id":"abc","pid":111}
+{"timestamp":"2026-04-28T12:05:00Z","event":"tool.call","skill":"x-review-pr","storyId":"story-0063-9999","session_id":"abc","pid":111}
+{"timestamp":"2026-04-28T12:10:00Z","event":"tool.call","skill":"x-internal-story-verify","storyId":"story-0063-9999","session_id":"abc","pid":111}
+NDJSON_EOF
+assert_exit "T4 stub story sem eventos matching rejeitada" 1 \
+    "$AUDIT_SCRIPT" --scope=telemetry --story-id=story-0063-0001 \
+        --ndjson-file "$TMP_DIR/stub/events.ndjson"
+
+# T5: Campos faltantes (sem session_id) rejeitado
+mkdir -p "$TMP_DIR/missing"
+cat > "$TMP_DIR/missing/events.ndjson" <<'NDJSON_EOF'
+{"timestamp":"2026-04-28T12:00:00Z","event":"tool.call","skill":"x-review","storyId":"story-0063-0001"}
+NDJSON_EOF
+assert_exit "T5 evento sem campos obrigatorios rejeitado" 1 \
+    "$AUDIT_SCRIPT" --scope=telemetry --story-id=story-0063-0001 \
+        --ndjson-file "$TMP_DIR/missing/events.ndjson"
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] || exit 1

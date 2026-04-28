@@ -265,6 +265,28 @@ audit_telemetry_scope() {
         fi
     done < "${ndjson_file}"
 
+    # NDJSON monotonicity check (TASK-0063-0003-003): per session_id, timestamps must be non-decreasing
+    # Detects manual editing / clock skew within a single session. Uses jq for portability (BSD/GNU).
+    local mono_violation
+    mono_violation=$(jq -rs '
+        # Group by session_id, then within each group check timestamps are non-decreasing
+        group_by(.session_id) |
+        map(
+            . as $events |
+            reduce range(1; $events | length) as $i (null;
+                if . != null then .
+                elif $events[$i].timestamp < $events[$i-1].timestamp then
+                    "REGRESSION session=\($events[$i].session_id) ts=\($events[$i].timestamp) prev=\($events[$i-1].timestamp)"
+                else null end
+            )
+        ) | map(select(. != null)) | .[0] // ""
+    ' "${ndjson_file}" 2>/dev/null || true)
+
+    if [[ -n "${mono_violation}" ]]; then
+        echo "EIE_NDJSON_INTEGRITY_VIOLATED: ${mono_violation}" >&2
+        return 1
+    fi
+
     # Required event check: 3 skills must have at least one tool.call event matching story_id
     if [[ -n "${story_id}" ]]; then
         local missing=()
