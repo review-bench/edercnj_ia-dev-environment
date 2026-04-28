@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **EPIC-0061 (Local-First Lifecycle) — story-0061-0005:** Removed `scripts/audit-*.sh` and `.github/workflows/audit.yml` workflow. Audits now run inline via `mvn verify` through Java `*AuditorTest` classes (RULE-007, RULE-008). Canonical bash templates live under `java/src/main/resources/targets/claude/scripts/{stack}/`. Tag `pre-local-first-lifecycle` marks the last commit before removal. CI compute reduced ~38% (no `audit.yml` parallel job).
+
 ### Breaking
 
 - **EPIC-0064 — Capability-Driven Composition Refactor.** Schema YAML do projeto-alvo salta para v3.0 (sem retrocompat com v2). Composição de `.claude/` passa a ser dirigida por **capabilities** declaradas em frontmatter universal (Rule 28), substituindo o copy-cego atual. Todo `.claude/` gerado precisa ser regenerado. Detalhes: [ADR-0016](adr/ADR-0016-capability-driven-composition.md), [SPEC-capability-composition-v1](docs/specs/SPEC-capability-composition-v1.md), [Rule 28](.claude/rules/28-capability-frontmatter-contract.md), [EPIC-0064](ai/epics/epic-0064-capability-driven-composition/epic-0064.md). Scope: 79 stories em 8 fases (Phase 0 entregue nesta birth; Phases 1-7 TBD). Bump major reservado para Phase 7.
