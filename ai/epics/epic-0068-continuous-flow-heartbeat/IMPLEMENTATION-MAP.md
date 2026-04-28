@@ -13,7 +13,7 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | story-0068-0001 | Field `interactiveMode` em `execution-state.json` | 0 | 0 | — | 0002, 0003 | Pendente |
 | story-0068-0002 | Hook `enforce-continuous-flow.sh` (esqueleto + smoke) | 1 | 1 | 0001 | 0004 | Pendente |
-| story-0068-0003 | Integração Rule 28 grammar (`derive_next_mandatory_call`) | 1 | 1 | 0001 | 0004 | Pendente |
+| story-0068-0003 | Integração Tool-Call Grammar — `derive_next_mandatory_call` (EPIC-0063 `story-0063-0012`; rule number TBD) | 1 | 1 | 0001 | 0004 | Pendente |
 | story-0068-0004 | E2E smoke test + catalog entry + CHANGELOG | 2 | 2 | 0001, 0002, 0003 | — | Pendente |
 
 ---
@@ -24,7 +24,7 @@
 graph LR
     S1[story-0068-0001<br/>interactiveMode field]
     S2[story-0068-0002<br/>Hook esqueleto]
-    S3[story-0068-0003<br/>Rule 28 integration]
+    S3[story-0068-0003<br/>Tool-Call Grammar integration]
     S4[story-0068-0004<br/>E2E smoke + catalog]
 
     S1 --> S2
@@ -75,8 +75,8 @@ Sprint 1                              Sprint 2
 ╔══════════╩═════════════════════╗
 ║  PHASE 1                       ║
 ║  ┌──────────┐  ┌──────────┐    ║
-║  │   0002   │  │   0003   │    ║   Hook + Rule 28
-║  │ Hook     │‖│ Grammar  │    ║   integration
+║  │   0002   │  │   0003   │    ║   Hook + Tool-Call
+║  │ Hook     │‖│ Grammar  │    ║   Grammar integration
 ║  │ skeleton │  │ deriv.   │    ║   (paralelo se EPIC-0041 ok)
 ║  └──────────┘  └──────────┘    ║
 ╚════════════════╦═══════════════╝
@@ -150,8 +150,8 @@ parallelism-constraints:
 
 | Epic | Status | Interação com EPIC-0068 |
 | :--- | :--- | :--- |
-| EPIC-0061 (Non-Interactive Default) | Em Andamento | **Pré-requisito conceitual.** Sem default flip, hook seria no-op em maioria dos casos. story-0068-0001 espera 0061-0001 mergeado. |
-| EPIC-0063 (Local-First Pre-Flight Gates) | Concluída (PR #752) | **Complementar.** EPIC-0063 fecha boundaries; EPIC-0068 fecha gap intra-fase. story-0068-0003 espera 0063-0012 (Rule 28) mergeada para grammar parsing — fallback documentado se não. |
+| EPIC-0061 (Non-Interactive Default) | Concluída (`story-0061-0001` mergeada em 2026-04-28 — PRs #755/#756/#757) | **Pré-requisito conceitual satisfeito.** Default-flip ativo em `develop`, hook agora faz sentido para 100% das invocações sem `--interactive`. |
+| EPIC-0063 (Local-First Pre-Flight Gates) | Scaffold mergeado (PR #752 — 21 markdown files); `execution-state.json` rastreia 11 stories da v1 (`0001..0011` `PENDING`); v2 (`0012..0021`) só em markdown, ainda não no state | **Complementar.** EPIC-0063 fechará boundaries; EPIC-0068 fecha gap intra-fase. `story-0068-0003` espera `story-0063-0012` (Tool-Call Grammar; rule number TBD) mergeada para grammar parsing — fallback genérico documentado em `story-0068-0002` §3.4 se não. |
 | EPIC-0064 (Capability-Driven Composition) | Em Refinamento | Sem interação direta. EPIC-0068 não toca capabilities. |
 | EPIC-0065 (Feature Creation Chain) | Concluída (PR #754) | Sem interação direta. |
 | EPIC-0066 (PR Body Templates) | Backlog | Sem interação direta. EPIC-0068 não modifica PR creation flow. |
