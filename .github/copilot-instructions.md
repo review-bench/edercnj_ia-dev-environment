@@ -25,12 +25,20 @@ por equivalentes ASCII (`não`, não `nao`; `é`, não `e`).
 
 ## Identidade do Projeto
 
-- **Nome:** `my-java-cli` (CLI gerador de ambiente de desenvolvimento Claude Code).
+- **Repositório:** `ia-dev-environment` — CLI gerador (binário publicado como
+  `ia-dev-env`) que produz o diretório `.claude/` e demais artefatos de
+  governança a partir de um YAML de configuração.
+- **Pacote Java:** `dev.iadev` — todo código-fonte vive sob
+  `java/src/main/java/dev/iadev/**`.
 - **Stack:** Java 21, Picocli 4.7, Maven.
 - **Arquitetura:** Hexagonal (Ports & Adapters). Domínio puro, sem dependências
   externas além da biblioteca padrão.
 - **Propósito:** Ler YAML de configuração e gerar o diretório `.claude/`
   (skills, rules, hooks, agents) para o projeto-alvo.
+- **Nota sobre identidade:** o template do gerador ainda referencia o
+  placeholder `my-java-cli` em `.claude/rules/01-project-identity.md` — esse
+  nome é apenas marcador do template e NÃO se aplica a este repositório.
+  Use sempre `ia-dev-environment` ao se referir ao projeto.
 
 ## Foco da Revisão (em ordem de prioridade)
 
@@ -97,26 +105,49 @@ por equivalentes ASCII (`não`, não `nao`; `é`, não `e`).
 - **Não sugira refatorações fora do diff** do PR. Mantenha o escopo do que
   mudou.
 - **Não peça mudanças em arquivos `.claude/`, `src/test/resources/golden/`
-  ou `audits/baselines/*.txt`** — são gerados/imutáveis por contrato.
+  ou `governance/baselines/*.txt`** — são gerados/imutáveis por contrato.
 - **Não bloqueie PRs por nits.** Reserve "request changes" para violações
   de Rules 03–06, 12 ou bugs lógicos reais.
 
 ## Caminhos com Tratamento Especial
 
-- **`domain/**`:** pureza absoluta — zero imports de framework/serialização.
-  Se o domínio precisa de I/O ou serialização, exigir port interface.
-- **`adapter/inbound/**`:** validação de entrada + tratamento de erro
-  uniforme; nunca retornar mensagem de exceção crua ao cliente. Deve chamar
-  `application/`, nunca orquestrar domínio diretamente.
-- **`adapter/outbound/**`:** queries parametrizadas, timeouts explícitos,
-  cleanup de recursos via `try-with-resources` ou `finally`.
-- **`src/test/**`:** nomes no padrão `[método]_[cenário]_[comportamento]`,
-  asserções específicas (`assertThat(x).isEqualTo(y)`, não `isNotNull()`),
-  arquivos > 250 linhas exigem inner classes / agrupamento.
-- **`scripts/audit-*.sh`:** prefixo obrigatório `audit-`, exit codes
-  padronizados (0/1/2/3) conforme Rule 26, suporte obrigatório a `--self-check`.
+Todo código-fonte Java vive sob `java/src/main/java/dev/iadev/**`. Os
+caminhos abaixo usam o pacote real do repositório — não há diretório
+`adapter/` separado: os concretos ficam sob `infrastructure/` (port impls)
+e `cli/` (entrada CLI).
+
+- **`java/src/main/java/dev/iadev/domain/**`** (`model/`, `port/`,
+  `service/`, `stack/`): pureza absoluta — zero imports de framework ou
+  biblioteca de serialização. Se o domínio precisa de I/O, exigir port
+  interface declarada em `domain/port/`.
+- **`java/src/main/java/dev/iadev/cli/**`** (CLI inbound — Picocli):
+  validação de entrada e tratamento de erro uniforme; nunca expor mensagem
+  de exceção crua ao usuário. Deve chamar `application/`, nunca orquestrar
+  `domain/` diretamente.
+- **`java/src/main/java/dev/iadev/infrastructure/**`** (adapters outbound
+  — implementações de port): I/O com timeouts explícitos, cleanup de
+  recursos via `try-with-resources` ou `finally`, sem lógica de negócio.
+- **`java/src/main/java/dev/iadev/application/**`**: orquestração de casos
+  de uso. Pode depender de `domain/` (incluindo ports), nunca de
+  `infrastructure/` ou `cli/` diretamente.
+- **`java/src/test/**`**: nomes no padrão
+  `[método]_[cenário]_[comportamento]`, asserções específicas
+  (`assertThat(x).isEqualTo(y)`, não `isNotNull()`), arquivos > 250 linhas
+  exigem `@Nested` / agrupamento por `@DisplayName`.
+- **Audit scripts:**
+  - **Templates fonte:** `java/src/main/resources/targets/claude/scripts/<stack>/*.sh.tpl`
+    (ex.: `java-maven/`, `node/`, `go/`, `python/`, `_default/`). Mudanças
+    em audits começam aqui.
+  - **Saída gerada:** `.claude/scripts/audit-*.sh` — produzida pelo
+    `ScriptsAssembler` durante `ia-dev-env generate`. Não editar diretamente.
+  - **Contrato (Rule 26):** prefixo obrigatório `audit-`, exit codes
+    padronizados (0/1/2/3), suporte obrigatório a `--self-check`.
+  - **Violação de Rule 007:** qualquer arquivo `audit-*.sh` em `scripts/`
+    na raiz do repositório é proibido — `CiPipelineLeanSmokeIT` falha o
+    build. Sinalize esse caso explicitamente.
 - **`.claude/`, `src/test/resources/golden/`:** **gerados** — não comentar
-  conteúdo, apenas o gerador (`*Assembler.java`).
+  conteúdo, apenas o gerador (`*Assembler.java` em
+  `java/src/main/java/dev/iadev/application/assembler/`).
 
 ## Quando uma Sugestão Sua Conflitar com uma Regra do Projeto
 
