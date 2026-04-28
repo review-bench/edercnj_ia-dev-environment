@@ -2,7 +2,7 @@
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility), Rule 26 (Audit Gate Lifecycle).
 > **Introduced by:** EPIC-0064 (Capability-Driven Composition Refactor).
-> **ADR:** ADR-0016.
+> **ADR:** [ADR-0016 — Capability-Driven Composition](../../docs/adr/ADR-0016-capability-driven-composition.md) (`docs/adr/ADR-0016-capability-driven-composition.md`).
 
 ## Purpose
 
@@ -12,12 +12,12 @@ Rule 28 codifica que **toda decisão de incluir/excluir/parametrizar um artefato
 
 ## Scope
 
-Aplica-se a todos os 6 tipos de artefato gerados pelo `ia-dev-env`:
+Aplica-se a todos os 6 tipos de artefato gerados pelo `ia-dev-env`. A coluna **Source-of-truth path** descreve a estrutura **planejada para EPIC-0064 (alvo)** com subdirs `core/` (universal) e `fragments/<NN>/` (condicionais por capability). Hoje, o repositório opera num layout pré-EPIC-0064: `targets/claude/rules/` é um diretório plano + um subdir `conditional/` (sem `core/` nem `fragments/`). Migração ocorre na Phase 2 do EPIC-0064 (story-0064-0210 — Rules):
 
-| Artefato | Source-of-truth path | Output path |
+| Artefato | Source-of-truth path (alvo EPIC-0064) | Output path |
 | :--- | :--- | :--- |
 | Skill | `targets/claude/skills/<category>/<name>/SKILL.md` | `.claude/skills/<name>/SKILL.md` |
-| Rule | `targets/claude/rules/core/<NN>-<name>.md` + `rules/fragments/<NN>/*.md` | `.claude/rules/<NN>-<name>.md` |
+| Rule | `targets/claude/rules/core/<NN>-<name>.md` + `rules/fragments/<NN>/*.md` *(planejado; hoje plano `targets/claude/rules/<NN>-<name>.md` + `rules/conditional/*.md`)* | `.claude/rules/<NN>-<name>.md` |
 | Knowledge Pack | `targets/claude/knowledge/<name>/index.md` + `knowledge/<name>/fragments/*.md` | `.claude/knowledge/<name>/index.md` |
 | Agent | `targets/claude/agents/<name>.md` | `.claude/agents/<name>.md` |
 | Hook | `targets/claude/hooks/<event>/<name>.sh` | `.claude/hooks/<event>/<name>.sh` |
