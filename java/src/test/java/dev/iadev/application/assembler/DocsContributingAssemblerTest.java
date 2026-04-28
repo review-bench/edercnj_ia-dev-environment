@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for DocsContributingAssembler — generates docs/specs/_templates/_TEMPLATE-CONTRIBUTING.md from a
- * Pebble template.
+ * Tests for DocsContributingAssembler — generates docs/specs/_templates/_TEMPLATE-CONTRIBUTING.md
+ * from a Pebble template.
  */
 @DisplayName("DocsContributingAssembler")
 class DocsContributingAssemblerTest {
@@ -40,7 +40,8 @@ class DocsContributingAssemblerTest {
     class AssembleContributing {
 
         @Test
-        @DisplayName("generates _TEMPLATE-CONTRIBUTING.md" + " in docs/specs/_templates/ subdirectory")
+        @DisplayName(
+                "generates _TEMPLATE-CONTRIBUTING.md" + " in docs/specs/_templates/ subdirectory")
         void assemble_whenCalled_generatesContributingFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
@@ -51,7 +52,8 @@ class DocsContributingAssemblerTest {
             List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected = outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
+            Path expected =
+                    outputDir.resolve("docs/specs/_templates/" + "_TEMPLATE-CONTRIBUTING.md");
             assertThat(expected).exists();
         }
 

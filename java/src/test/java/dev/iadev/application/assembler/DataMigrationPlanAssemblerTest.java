@@ -25,7 +25,8 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("DataMigrationPlanAssembler")
 class DataMigrationPlanAssemblerTest {
 
-    private static final String OUTPUT_PATH = "governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md";
+    private static final String OUTPUT_PATH =
+            "governance/migrations/_TEMPLATE-DATA-MIGRATION-PLAN.md";
 
     @Nested
     @DisplayName("implements Assembler interface")

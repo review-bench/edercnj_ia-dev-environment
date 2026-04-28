@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/** Tests for SloSliTemplateAssembler -- copies SLO/SLI definition template to governance/slo-sli/. */
+/**
+ * Tests for SloSliTemplateAssembler -- copies SLO/SLI definition template to governance/slo-sli/.
+ */
 @DisplayName("SloSliTemplateAssembler")
 class SloSliTemplateAssemblerTest {
 
@@ -49,7 +51,8 @@ class SloSliTemplateAssemblerTest {
 
             assertThat(files).hasSize(1);
             Path sloPath =
-                    outputDir.resolve("governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
+                    outputDir.resolve(
+                            "governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
             assertThat(sloPath).exists();
         }
 
@@ -299,7 +302,8 @@ class SloSliTemplateAssemblerTest {
             assembler.assemble(config, engine, outputDir);
 
             Path sloPath =
-                    outputDir.resolve("governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
+                    outputDir.resolve(
+                            "governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
             String content = readFile(sloPath);
             assertThat(content).contains("my-awesome-service");
         }

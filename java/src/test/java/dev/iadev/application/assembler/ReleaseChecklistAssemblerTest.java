@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for ReleaseChecklistAssembler -- generates ai/releases/_TEMPLATE-RELEASE-CHECKLIST.md
- * from a Pebble template with conditional sections for container, native build, and contract tests.
+ * Tests for ReleaseChecklistAssembler -- generates ai/releases/_TEMPLATE-RELEASE-CHECKLIST.md from
+ * a Pebble template with conditional sections for container, native build, and contract tests.
  */
 @DisplayName("ReleaseChecklistAssembler")
 class ReleaseChecklistAssemblerTest {
@@ -51,8 +51,7 @@ class ReleaseChecklistAssemblerTest {
             List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected =
-                    outputDir.resolve("ai/releases/" + "_TEMPLATE-RELEASE-CHECKLIST.md");
+            Path expected = outputDir.resolve("ai/releases/" + "_TEMPLATE-RELEASE-CHECKLIST.md");
             assertThat(expected).exists();
         }
 
