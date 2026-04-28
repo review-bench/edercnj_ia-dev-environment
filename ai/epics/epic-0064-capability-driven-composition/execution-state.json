@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0",
-  "flowVersion": "2",
+  "flowVersion": "4",
   "epicId": "EPIC-0064",
   "epicTitle": "Capability-Driven Composition Refactor",
   "epicBranch": "epic/0064",
   "createdAt": "2026-04-28T00:00:00Z",
+  "lastRefinementAt": "2026-04-28T17:50:00Z",
   "status": "Em Refinamento",
   "taskTracking": {
     "enabled": true,
@@ -12,17 +13,17 @@
     "phaseGateResults": []
   },
   "storyStatuses": {
-    "story-0064-0001": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": [], "commitSha": null },
-    "story-0064-0002": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "M", "predecessors": ["story-0064-0001"], "commitSha": null },
-    "story-0064-0003": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0002"], "commitSha": null },
-    "story-0064-0004": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0002"], "commitSha": null },
-    "story-0064-0005": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0003"], "commitSha": null },
-    "story-0064-0006": { "status": "Pendente", "phase": "Phase 0", "wave": "A", "size": "M", "predecessors": ["EPIC-0062 merged"], "blockedReason": "Waiting for EPIC-0062 to merge into develop" },
+    "story-0064-0001": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": [], "commitSha": null, "artifactPath": "docs/adr/ADR-0016-capability-driven-composition.md" },
+    "story-0064-0002": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "M", "predecessors": ["story-0064-0001"], "commitSha": null, "artifactPath": "docs/specs/SPEC-capability-composition-v1.md" },
+    "story-0064-0003": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0002"], "commitSha": null, "artifactPath": "governance/schemas/frontmatter-3.0.json" },
+    "story-0064-0004": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0002"], "commitSha": null, "artifactPath": "governance/schemas/capabilities-1.0.json" },
+    "story-0064-0005": { "status": "Em Andamento", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0003"], "commitSha": null, "artifactPath": ".claude/rules/28-capability-frontmatter-contract.md", "blockedReason": "Source-of-truth seed entregue no refinement chore/refine-epic-0064 (D2): java/src/main/resources/targets/claude/rules/28-capability-frontmatter-contract.md. Vira Concluída quando esse commit mergear em develop." },
+    "story-0064-0006": { "status": "Concluída", "phase": "Phase 0", "wave": "A", "size": "M", "predecessors": ["EPIC-0062 merged"], "commitSha": null, "completionNote": "EPIC-0062 mergeado em PR #751 (commit 91129cc24); paths v4 (docs/adr/, docs/specs/, ai/epics/) em vigor; cross-refs atualizados no refinement chore/refine-epic-0064 (2026-04-28)." },
     "story-0064-0007": { "status": "Pendente", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0005"] },
     "story-0064-0008": { "status": "Pendente", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": ["story-0064-0001"] }
   },
   "phaseSummary": {
-    "Phase 0": { "totalStories": 8, "concluida": 5, "pendente": 3, "materialized": 8 },
+    "Phase 0": { "totalStories": 8, "concluida": 5, "emAndamento": 1, "pendente": 2, "materialized": 8 },
     "Phase 1": { "totalStories": 12, "materialized": 0, "note": "TBD via x-story-create" },
     "Phase 2": { "totalStories": 15, "materialized": 0, "note": "TBD via x-story-create" },
     "Phase 3": { "totalStories": 10, "materialized": 0, "note": "TBD via x-story-create" },
@@ -35,15 +36,16 @@
   "totalWaves": 15,
   "criticalPath": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"],
   "externalDependencies": {
-    "EPIC-0062": { "status": "Em Refinamento", "blocking": "Phase 0 close (story-0064-0006)" },
+    "EPIC-0062": { "status": "Concluído (mergeado)", "mergedPr": 751, "mergedCommit": "91129cc24", "blocking": null, "note": "Folder migration v4 efetivada; paths docs/adr/, docs/specs/, ai/epics/ em vigor" },
     "EPIC-0036": { "status": "Em Refinamento", "blocking": "Phase 4 (Wave K)" },
     "EPIC-0046": { "status": "Em Refinamento", "blocking": null, "note": "orthogonal — coordenação só no merge order" },
     "EPIC-0063": { "status": "Em Refinamento", "blocking": null, "note": "orthogonal — 0064 herda preflight gates" }
   },
   "documents": {
-    "adr": "adr/ADR-0016-capability-driven-composition.md",
+    "adr": "docs/adr/ADR-0016-capability-driven-composition.md",
     "spec": "docs/specs/SPEC-capability-composition-v1.md",
     "rule": ".claude/rules/28-capability-frontmatter-contract.md",
+    "ruleSourceOfTruth": "java/src/main/resources/targets/claude/rules/28-capability-frontmatter-contract.md",
     "schemas": [
       "governance/schemas/frontmatter-3.0.json",
       "governance/schemas/capabilities-1.0.json"
