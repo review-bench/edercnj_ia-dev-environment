@@ -19,6 +19,31 @@
 
 ---
 
+## 0.5 Cross-Epic Dependencies
+
+> **Rule 29 — Cross-Epic Dependency Awareness**
+> Epic-level dependencies are declared here and mirrored in `execution-state.json.blockedBy[]`.
+> `x-epic-implement` Phase 0.5 performs a synchronous gate: if any dependency's `expectedStatus` is not met, the epic aborts with exit 1.
+> See `.claude/rules/29-cross-epic-dependencies.md` and ADR-0017.
+
+### Blocked By Epics
+
+| Epic ID   | Title                      | Expected Status @ Start | Reason / Surface Touched                               |
+| --------- | -------------------------- | ----------------------- | ------------------------------------------------------ |
+| (none)    | —                          | —                       | —                                                      |
+
+### Blocks (informational, derived)
+
+| Epic ID   |
+| --------- |
+| (none)    |
+
+### In-Flight Reference Allowance
+
+(Nenhuma dependência em voo declarada.)
+
+---
+
 ## 1. Contexto & Escopo
 
 **Chave Jira:** <CHAVE-JIRA>
