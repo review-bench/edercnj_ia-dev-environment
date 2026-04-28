@@ -17,7 +17,7 @@ Generates self-contained story files that developers can implement without refer
 ## Usage
 
 ```
-/x-story-create plans/epic-0012/epic-0012.md specs/payment-gateway.md
+/x-story-create plans/epic-XXXX/epic-XXXX.md specs/payment-gateway.md
 ```
 
 ## Workflow

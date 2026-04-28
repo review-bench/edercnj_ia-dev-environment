@@ -100,7 +100,7 @@ stays bounded in the per-skill duration arrays.
 
 # Strict: threshold 10 %, mean baseline, write JSON to disk
 /x-telemetry-trend --threshold-pct 10 --baseline mean --format json \
-    --out plans/epic-0040/reports/trends.json
+    --out plans/epic-XXXX/reports/trends.json
 
 # Historical deep dive: last 10 epics, report to a custom path
 /x-telemetry-trend --last 10 --out reports/quarterly-trends.md

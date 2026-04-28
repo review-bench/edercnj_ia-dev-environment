@@ -16,10 +16,10 @@ Batch-commits the planning artifacts a planning skill just wrote (under `plans/e
 ## Usage
 
 ```
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "add epic scaffold"
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md,plans/epic-0049/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "preview" --dry-run
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "chore bump" --scope chore
+/x-planning-commit --epic-id 0049 --paths plans/epic-XXXX/epic-0049.md --subject "add epic scaffold"
+/x-planning-commit --epic-id 0049 --paths plans/epic-XXXX/epic-0049.md,plans/epic-XXXX/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"
+/x-planning-commit --epic-id 0049 --paths plans/epic-XXXX/epic-0049.md --subject "preview" --dry-run
+/x-planning-commit --epic-id 0049 --paths plans/epic-XXXX/epic-0049.md --subject "chore bump" --scope chore
 ```
 
 ## Workflow

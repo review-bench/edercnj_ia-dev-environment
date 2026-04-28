@@ -303,7 +303,7 @@ Skill(skill: "x-internal-story-build-plan",
 
 Output:
 ```json
-{"archPlan":"plans/epic-0049/plans/arch-story-0049-0012.md","implPlan":"plans/epic-0049/plans/plan-story-0049-0012.md","testPlan":"plans/epic-0049/plans/tests-story-0049-0012.md","taskBreakdown":"plans/epic-0049/plans/tasks-story-0049-0012.md","taskMap":"plans/epic-0049/plans/task-implementation-map-story-0049-0012.md","securityAssessment":"plans/epic-0049/plans/security-story-0049-0012.md","complianceAssessment":"plans/epic-0049/plans/compliance-story-0049-0012.md","scope":"STANDARD","skipped":[]}
+{"archPlan":"plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md","implPlan":"plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md","testPlan":"plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md","taskBreakdown":"plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md","taskMap":"plans/epic-XXXX/plans/task-implementation-map-story-XXXX-YYYY.md","securityAssessment":"plans/epic-XXXX/plans/security-story-XXXX-YYYY.md","complianceAssessment":"plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md","scope":"STANDARD","skipped":[]}
 ```
 Exit: 0.
 

@@ -132,7 +132,7 @@ toolchain, which the skill tolerates.
 
 ## 6. Performance Profile
 
-Measured on the `plans/epic-0049/` fixture (22 stories × ~5 tasks
+Measured on the `plans/epic-XXXX/` fixture (22 stories × ~5 tasks
 per story in `execution-state.json`):
 
 | Step | Median time | Dominated by |
