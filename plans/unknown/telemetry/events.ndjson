@@ -119,3 +119,4 @@
 {"schemaVersion":"1.0.0","eventId":"ee137f5e-056d-4fd6-8578-0df59778edc3","timestamp":"2026-04-28T23:35:25Z","sessionId":"c8585733-9efd-4687-99a6-c1bc774ee4a2","type":"session.end","epicId":"unknown"}
 {"schemaVersion":"1.0.0","eventId":"61fc54e3-88bf-43f0-8b84-7e03db825689","timestamp":"2026-04-28T23:35:34Z","sessionId":"c8585733-9efd-4687-99a6-c1bc774ee4a2","type":"session.end","epicId":"unknown"}
 {"schemaVersion":"1.0.0","eventId":"b2b7bd03-0fa8-487f-9e8c-8040352d5c78","timestamp":"2026-04-28T23:35:35Z","sessionId":"420dfae8-e02e-4290-b0a5-6460cf9d8cc6","type":"session.start","epicId":"unknown"}
+{"schemaVersion":"1.0.0","eventId":"3b442cee-aac8-494e-8730-c5bb3df71370","timestamp":"2026-04-28T23:44:21Z","sessionId":"41bc9e1f-bb1a-44b8-b97c-d42431416fc0","type":"tool.call","epicId":"unknown","tool":"Bash","status":"ok","durationMs":2004}
