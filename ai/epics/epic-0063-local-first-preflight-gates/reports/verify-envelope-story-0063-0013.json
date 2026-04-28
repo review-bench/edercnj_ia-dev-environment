@@ -1,0 +1,51 @@
+{
+  "storyId": "story-0063-0013",
+  "epicId": "epic-0063",
+  "passed": true,
+  "timestamp": "2026-04-28T00:00:00Z",
+  "coverageDelta": {
+    "line": 0,
+    "branch": 0,
+    "note": "shell hook — coverage measured via 15 explicit test cases in enforce_preflight_gates_v2_test.sh"
+  },
+  "failures": [],
+  "acCheckResults": [
+    {"id": "AC-mvn-skipTests", "passed": true, "test": "T6"},
+    {"id": "AC-git-amend", "passed": true, "test": "T7"},
+    {"id": "AC-git-rebase-skip", "passed": true, "test": "T8"},
+    {"id": "AC-mvn-release-perform", "passed": true, "test": "T9"},
+    {"id": "AC-gh-release-delete", "passed": true, "test": "T10"},
+    {"id": "AC-git-push-force-main", "passed": true, "test": "T5"},
+    {"id": "AC-git-push-force-feat-allowed", "passed": true, "test": "T11"},
+    {"id": "AC-git-tag-delete", "passed": true, "test": "T12"},
+    {"id": "AC-mvn-spotless-skip", "passed": true, "test": "T13"},
+    {"id": "AC-recovery-mode-bypass", "passed": true, "test": "T3"},
+    {"id": "AC-recovery-mode-warn", "passed": true, "test": "T15"},
+    {"id": "AC-no-match-passthrough", "passed": true, "test": "T14"}
+  ],
+  "vectorsImplemented": [
+    "mvn-skipTests",
+    "mvn-skipITs",
+    "mvn-spotlessSkip",
+    "mvn-testSkip",
+    "mvn-noTestsProfile",
+    "git-amend-pushed",
+    "git-rebase-skip",
+    "git-tag-delete",
+    "git-push-delete-tag",
+    "gh-release-delete",
+    "mvn-release-perform",
+    "git-push-force-protected",
+    "gh-pr-merge-rebase-admin",
+    "skill-x-pr-merge",
+    "skill-x-pr-merge-train"
+  ],
+  "vectorCount": 15,
+  "testResults": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0
+  },
+  "specialistReview": "GO",
+  "techLeadReview": "GO"
+}
