@@ -26,7 +26,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-REQUIRED_CHECKS_FILE="${REPO_ROOT}/audits/required-checks.txt"
+# BASELINE_DIR: directory containing governance baseline files (story-0062-0001).
+BASELINE_DIR="${BASELINE_DIR:-audits}"
+REQUIRED_CHECKS_FILE="${REPO_ROOT}/${BASELINE_DIR}/required-checks.txt"
 
 # --- argument parsing ---
 DRY_RUN=false

@@ -26,7 +26,10 @@ set -u
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "${REPO_ROOT}"
 
-BASELINE_FILE="audits/pr-evidence-baseline.txt"
+# BASELINE_DIR: directory containing baseline *.txt files (story-0062-0001).
+BASELINE_DIR="${BASELINE_DIR:-audits}"
+
+BASELINE_FILE="${BASELINE_DIR}/pr-evidence-baseline.txt"
 
 # Placeholder patterns that indicate an unfilled section
 PLACEHOLDER_STORY_ID="story-XXXX-YYYY"
