@@ -1,8 +1,8 @@
 # Audit Gates Catalog — {{STACK}} Stack
 
-**Stack:** {{STACK}}
-**Total Audits:** {{TOTAL_AUDITS}}
-**Generated:** automatically by `ia-dev-env generate`
+Stack: {{STACK}}
+Total Audits: {{TOTAL_AUDITS}}
+Generated: automatically by `ia-dev-env generate`
 
 This catalog lists exactly the audit scripts delivered to `.claude/scripts/` for this project.
 Each audit runs as part of the CI governance pipeline via `bash .claude/scripts/audit-all.sh`.
@@ -45,4 +45,4 @@ Each audit runs as part of the CI governance pipeline via `bash .claude/scripts/
 bash .claude/scripts/audit-all.sh
 ```
 
-**Exit codes:** `0` = all pass | `1` = at least one failure | `2` = operational error (missing dependency)
+**Exit codes:** `0` = all pass | `1` = at least one failure | `2` = operational error
