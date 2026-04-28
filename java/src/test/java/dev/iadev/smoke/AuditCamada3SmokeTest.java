@@ -54,7 +54,7 @@ class AuditCamada3SmokeTest {
     @Test
     @DisplayName("baseline file exists and uses canonical comment header")
     void baseline_existsWithHeader() throws IOException {
-        Path baseline = repoRoot().resolve("audits/execution-integrity-baseline.txt");
+        Path baseline = repoRoot().resolve("governance/baselines/execution-integrity-baseline.txt");
         assertThat(baseline).as("baseline file must exist").exists();
 
         String head = Files.readString(baseline, StandardCharsets.UTF_8);

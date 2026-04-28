@@ -46,7 +46,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira
 
 1. Accept the epic directory path or epic ID as argument. If not provided, ask:
    ```
-   question: "Informe o caminho do diretorio do epico ou o ID (ex: plans/epic-0012 ou 0012)"
+   question: "Informe o caminho do diretorio do epico ou o ID (ex: plans/epic-XXXX ou XXXX)"
    header: "Epic Directory"
    ```
 2. If only an ID was given (e.g., `0012`), construct the path: `plans/epic-{ID}/`

@@ -43,7 +43,10 @@ set -u
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "${REPO_ROOT}"
 
-BASELINE_FILE="audits/execution-integrity-baseline.txt"
+# BASELINE_DIR: directory containing baseline *.txt files (story-0062-0001).
+BASELINE_DIR="${BASELINE_DIR:-governance/baselines}"
+
+BASELINE_FILE="${BASELINE_DIR}/execution-integrity-baseline.txt"
 RULE_FILE=".claude/rules/24-execution-integrity.md"
 HOOK_FILE=".claude/hooks/verify-story-completion.sh"
 # Source-of-truth fallback paths used when the runtime .claude/ tree is

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Assembles {@code specs/_templates/_TEMPLATE-RELEASE-CHECKLIST.md} from the {@code
+ * Assembles {@code ai/releases/_TEMPLATE-RELEASE-CHECKLIST.md} from the {@code
  * _TEMPLATE-RELEASE-CHECKLIST.md} Pebble template.
  *
  * <p>Renders a release checklist with conditional sections for container, native build, and
@@ -25,7 +25,7 @@ import java.util.Map;
 public final class ReleaseChecklistAssembler implements Assembler {
 
     private static final String TEMPLATE_PATH = "shared/templates/_TEMPLATE-RELEASE-CHECKLIST.md";
-    private static final String OUTPUT_SUBDIR = "specs/_templates";
+    private static final String OUTPUT_SUBDIR = "ai/releases";
     private static final String OUTPUT_FILENAME = "_TEMPLATE-RELEASE-CHECKLIST.md";
 
     /** The 6 mandatory release checklist sections. */
@@ -58,7 +58,7 @@ public final class ReleaseChecklistAssembler implements Assembler {
      * {@inheritDoc}
      *
      * <p>Renders the release checklist template with Pebble conditionals and writes it to {@code
-     * specs/_templates/_TEMPLATE-RELEASE-CHECKLIST.md}.
+     * ai/releases/_TEMPLATE-RELEASE-CHECKLIST.md}.
      */
     @Override
     public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {

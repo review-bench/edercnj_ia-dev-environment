@@ -33,7 +33,7 @@ Rationale:
    thresholds on `develop` first, then rebase the feature PR.
 3. **Document an explicit exception** via an ADR that temporarily lowers
    the gate for a specific package with a sunset date. The ADR MUST be
-   approved by the tech lead and recorded under `adr/ADR-NNN-*.md`.
+   approved by the tech lead and recorded under `docs/adr/ADR-NNN-*.md`.
 
 **Silently overriding the gate is forbidden.** No reviewer may merge a PR
 that fails the gate without either (a) closing the gap in-PR, (b) closing

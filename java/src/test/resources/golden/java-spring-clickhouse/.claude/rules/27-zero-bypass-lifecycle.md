@@ -111,7 +111,7 @@ bypass the full story-implement orchestrator when:
 2. The `hotfix/*` PR body contains the section `## Hotfix Bypass Justification` with
    a written rationale.
 3. The tech lead approves via `x-review-pr` with an explicit hotfix exception marker.
-4. The bypass is recorded in `audits/execution-integrity-baseline.txt` with a
+4. The bypass is recorded in `governance/baselines/execution-integrity-baseline.txt` with a
    `# hotfix-exception` comment before the PR is merged.
 
 No other bypass path exists. `CLAUDE_SKIP_AUDIT=1`, `CLAUDE_NO_ENFORCE=1`, or
@@ -127,7 +127,7 @@ EPIC-0059, story-0059-0005).
 - Creating a PR with a body that lacks `## Orchestrator Evidence` (catches manual PRs).
 - Merging a PR that fails `scripts/audit-execution-integrity.sh` (bypassing the CI gate).
 - Using `--force-merge` or `--admin` merge overrides on `epic/*` or `develop` branches.
-- Adding stories to `audits/execution-integrity-baseline.txt` after EPIC-0059 merges
+- Adding stories to `governance/baselines/execution-integrity-baseline.txt` after EPIC-0059 merges
   (baseline is immutable post-EPIC-0059 — use the hotfix exception path instead).
 - Introducing a new bypass environment variable without a Rule 27 amendment and a
   SemVer MINOR bump.
@@ -142,13 +142,13 @@ Non-bypass Contract. Exit codes follow the Rule 26 §Standardized Exit Codes mat
 | :--- | :--- | :--- |
 | 0 | `OK` | All merged stories have complete evidence; no bypass flags detected. |
 | 1 | `EIE_EVIDENCE_MISSING` | At least one surface artifact is absent for a merged story. |
-| 2 | `EIE_BASELINE_CORRUPT` | `audits/execution-integrity-baseline.txt` is malformed. |
+| 2 | `EIE_BASELINE_CORRUPT` | `governance/baselines/execution-integrity-baseline.txt` is malformed. |
 | 3 | `EIE_INVALID_EXEMPTION` | `audit-exempt` marker is missing a reason. |
 
 Self-check: `scripts/audit-execution-integrity.sh --self-check` MUST verify:
 1. This rule file (`27-zero-bypass-lifecycle.md`) exists.
 2. The Stop hook `verify-story-completion.sh` is registered in `settings.json`.
-3. The baseline file `audits/execution-integrity-baseline.txt` is present.
+3. The baseline file `governance/baselines/execution-integrity-baseline.txt` is present.
 
 Missing any of the three fails CI with `RULE_27_ENFORCEMENT_BROKEN`.
 

@@ -44,17 +44,22 @@ set -uo pipefail
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "${REPO_ROOT}"
 
+# BASELINE_DIR: directory containing baseline *.txt files (story-0062-0001).
+# Default kept at "audits" for backward compat; override via env var to
+# point at "governance/baselines" after the v4 physical migration.
+BASELINE_DIR="${BASELINE_DIR:-governance/baselines}"
+
 # Baseline files to audit (story-ID format; frozen after EPIC-0059 cutoff).
-# Note: audits/pr-evidence-baseline.txt uses PR numbers (not story IDs) and
+# Note: ${BASELINE_DIR}/pr-evidence-baseline.txt uses PR numbers (not story IDs) and
 # is excluded here — it is governed by audit-pr-evidence.sh independently.
 BASELINE_FILES=(
-    "audits/execution-integrity-baseline.txt"
-    "audits/rule-26-baseline.txt"
-    "audits/task-hierarchy-baseline.txt"
+    "${BASELINE_DIR}/execution-integrity-baseline.txt"
+    "${BASELINE_DIR}/rule-26-baseline.txt"
+    "${BASELINE_DIR}/task-hierarchy-baseline.txt"
 )
 
 # The canonical cutoff marker file: created by story-0059-0011 to record the SHA
-CUTOFF_SHA_FILE="audits/baseline-cutoff.sha"
+CUTOFF_SHA_FILE="${BASELINE_DIR}/baseline-cutoff.sha"
 
 # Story ID pattern
 STORY_ID_PATTERN="^story-[0-9]{4}-[0-9]{4}"
@@ -92,10 +97,10 @@ find_cutoff_sha() {
         fi
     fi
 
-    # 3. Fallback: SHA of commit that first created audits/rule-26-baseline.txt
+    # 3. Fallback: SHA of commit that first created ${BASELINE_DIR}/rule-26-baseline.txt
     local sha
     sha=$(git log --all --diff-filter=A --format="%H" \
-        -- "audits/rule-26-baseline.txt" 2>/dev/null \
+        -- "${BASELINE_DIR}/rule-26-baseline.txt" 2>/dev/null \
         | tail -1 || true)
     if [[ -n "${sha}" ]]; then
         echo "${sha}"
@@ -301,7 +306,7 @@ self_check() {
         broken=1
     fi
 
-    for f in "audits/execution-integrity-baseline.txt" "audits/rule-26-baseline.txt"; do
+    for f in "${BASELINE_DIR}/execution-integrity-baseline.txt" "${BASELINE_DIR}/rule-26-baseline.txt"; do
         if [[ ! -f "${f}" ]]; then
             echo "OPERATIONAL_ERROR: baseline file missing: ${f}" >&2
             broken=1
@@ -312,7 +317,7 @@ self_check() {
     sha=$(find_cutoff_sha)
     if [[ -z "${sha}" ]]; then
         echo "ENFORCEMENT_BROKEN: cannot determine EPIC-0059 cutoff commit" >&2
-        echo "  Hint: create audits/baseline-cutoff.sha with the story-0059-0011 commit SHA" >&2
+        echo "  Hint: create ${BASELINE_DIR}/baseline-cutoff.sha with the story-0059-0011 commit SHA" >&2
         broken=1
     else
         echo "self-check: cutoff SHA = ${sha}"

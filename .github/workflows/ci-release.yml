@@ -34,7 +34,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           # fetch-depth: 0 is required so that audit-baseline-immutability.sh
-          # can resolve the cutoff SHA recorded in audits/baseline-cutoff.sha.
+          # can resolve the cutoff SHA recorded in $BASELINE_DIR/baseline-cutoff.sha
+          # (default: audits/; override via BASELINE_DIR env — story-0062-0001).
           # A shallow clone (default fetch-depth: 1) makes the cutoff SHA
           # unreachable, causing the script to treat the empty cutoff content
           # as "all entries new" and produce false-positive violations.
@@ -89,7 +90,8 @@ jobs:
       # EPIC-0059 story-0059-0011 (Rule 27): audit baseline immutability.
       # Fails the PR when any story ID is added to the audit baseline files
       # (execution-integrity-baseline.txt, rule-26-baseline.txt) after the
-      # EPIC-0059 cutoff commit recorded in audits/baseline-cutoff.sha.
+      # EPIC-0059 cutoff commit recorded in $BASELINE_DIR/baseline-cutoff.sha
+      # (default: audits/; override via BASELINE_DIR env — story-0062-0001).
       # This ensures the amnesty window is formally closed and no new entries
       # can be added without CODEOWNERS review (<!-- baseline-correction -->).
       # See ADR-0015-zero-bypass-amnesty.md for the amnesty decision record.

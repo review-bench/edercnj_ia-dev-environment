@@ -4,7 +4,7 @@
 # Audits all execution-state.json files under plans/epic-*/ for:
 #   1. flowVersion field is present and in {"1", "2", "4"} (EPIC-0062 adds "4")
 #   2. If flowVersion=2: taskTracking.enabled MUST be true
-#   3. If epic branch epic/XXXX exists on remote: flowVersion MUST be "2"
+#   3. If epic branch epic/XXXX exists on remote: flowVersion MUST be "2" or "4"
 #
 # Exit codes:
 #   0  OK — no violations
@@ -72,7 +72,7 @@ while IFS= read -r -d '' state_file; do
   flow_version=$(jq -r '.flowVersion // empty' "$state_file" 2>/dev/null)
 
   # ── Check 1: flowVersion must be in {"1", "2", "4"} ──────────────────────
-  # "4" added by EPIC-0062 — v4 layout (ai/epics/) per Rule 19.
+  # "4" added by EPIC-0062 (story-0062-0001) — v4 layout (ai/epics/) per Rule 19.
   if [[ -z "$flow_version" ]]; then
     # Absent = legacy "1" — OK per Rule 19
     flow_version="1"
@@ -90,7 +90,7 @@ while IFS= read -r -d '' state_file; do
     # Check if --legacy-flow was recorded in metadata
     legacy_flow=$(jq -r '.legacyFlow // false' "$state_file" 2>/dev/null)
     if [[ "$legacy_flow" != "true" ]]; then
-      echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=1 but epic branch ${epic_branch} exists on remote; set flowVersion=\"2\" or record legacyFlow=true" >&2
+      echo "FLOW_VERSION_VIOLATION: $state_file has flowVersion=1 but epic branch ${epic_branch} exists on remote; set flowVersion=\"2\" or \"4\" or record legacyFlow=true" >&2
       ((VIOLATIONS++)) || true
     fi
   fi

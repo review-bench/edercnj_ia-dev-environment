@@ -30,7 +30,7 @@ A CLI tool that generates complete `.claude/` boilerplate for AI-assisted develo
 `ia-dev-env` reads a YAML configuration file describing your project's tech stack (language, framework, database, infrastructure, etc.) and generates a complete Claude Code configuration:
 
 - **Claude Code** (`.claude/`) -- rules, skills, agents, hooks, settings
-- **Documentation** (`steering/`, `specs/`, `plans/`, `results/`, `contracts/`, `adr/`) -- architecture, specs, stories, runbooks, contracts, ADRs
+- **Documentation** (`steering/`, `docs/specs/`, `plans/`, `results/`, `contracts/`, `docs/adr/`) -- architecture, specs, stories, runbooks, contracts, ADRs
 - **CI/CD** -- Dockerfile, docker-compose, GitHub Actions workflows, Kubernetes manifests
 
 All generated artifacts enforce consistent engineering standards: coding conventions, architecture boundaries, TDD workflow, coverage thresholds, and security practices.
@@ -179,7 +179,7 @@ steering/                         # Persistent project context
 ├── service-architecture.md       # Service architecture doc
 └── product.md, tech-stack.md...  # Project identity files
 
-specs/                            # Human-authored specifications
+docs/specs/                       # Human-authored specifications
 └── _templates/                   # Spec templates (contributing, etc.)
 
 results/                          # Execution outputs
@@ -188,7 +188,7 @@ results/                          # Execution outputs
 contracts/                        # API contracts and schemas
 └── api/                          # gRPC reference (when applicable)
 
-adr/                              # Architecture Decision Records
+docs/adr/                         # Architecture Decision Records
 ├── README.md                     # ADR index
 └── _TEMPLATE-ADR.md              # ADR template
 ```
@@ -206,7 +206,7 @@ The generator produces **20 core skills** (always included) and up to **13 condi
 > **EPIC-0036 (Skill Taxonomy Refactor) — renames applied.**
 > The source of truth for skills under `java/src/main/resources/targets/claude/skills/` has been reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`) and 19 skills have been renamed to a consistent `x-{subject}-{action}` scheme. The generated output (`.claude/skills/`) remains **flat** — user-facing invocation paths stay `/{skill-name}` without a category prefix.
 >
-> - Decision record: [`adr/ADR-0003-skill-taxonomy-and-naming.md`](adr/ADR-0003-skill-taxonomy-and-naming.md)
+> - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
 > - Rename history: [`plans/epic-0036/skill-renames.md`](plans/epic-0036/skill-renames.md)
 > - Release notes (post-merge migration table): [`docs/release-notes/EPIC-0036-skill-renames.md`](docs/release-notes/EPIC-0036-skill-renames.md)
 
@@ -787,11 +787,11 @@ ia-dev-environment/
 │       ├── java/                 # 1961 tests (unit + integration + golden)
 │       └── resources/golden/     # Golden files for 8 profiles
 ├── steering/                     # Persistent project context
-├── specs/                        # Human-authored specifications
+├── docs/specs/                   # Human-authored specifications
 ├── plans/                        # SDD artifacts (epics, stories, maps)
 ├── results/                      # Execution outputs (audits, reviews, runbooks)
 ├── contracts/                    # API contracts and schemas
-├── adr/                          # Architecture Decision Records
+├── docs/adr/                     # Architecture Decision Records
 ├── CLAUDE.md                     # Executive summary (auto-loaded by Claude Code)
 └── README.md                     # This file
 ```

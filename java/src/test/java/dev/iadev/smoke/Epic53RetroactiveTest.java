@@ -72,7 +72,7 @@ class Epic53RetroactiveTest {
     @Test
     @DisplayName("baseline file has NO entries for EPIC-0053 (backfill chosen)")
     void baseline_noEpic53Entries() throws IOException {
-        Path baseline = repoRoot().resolve("audits/execution-integrity-baseline.txt");
+        Path baseline = repoRoot().resolve("governance/baselines/execution-integrity-baseline.txt");
         assertThat(baseline).exists();
 
         String body = Files.readString(baseline, StandardCharsets.UTF_8);
