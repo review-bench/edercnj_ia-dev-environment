@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ia-dev-env.example/schemas/capabilities-1.0.json",
+  "title": "Capability Definition Schema v1.0 (EPIC-0064)",
+  "description": "Schema para arquivos YAML em capabilities/<category>/<id>.yaml. Cada arquivo declara uma capability atomic, composite ou profile.",
+  "type": "object",
+  "required": ["id", "category", "kind"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$",
+      "description": "Identificador único da capability. Formato 'category.subcategory.atomic'. Hyphens permitidos em segmentos (e.g., 'data.database.postgres', 'framework.spring-boot')."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "language", "framework", "interface", "data", "messaging",
+        "architecture", "observability", "deployment", "security",
+        "compliance", "testing", "cloud", "governance"
+      ],
+      "description": "Top-level namespace canônico. Lista fechada; novas categorias requerem revisão de ADR-0016."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["atomic", "composite", "profile"],
+      "description": "atomic: indivisível. composite: agrupa atomics via requires. profile: macro/atalho expandido cedo, não pode ser referenciado em frontmatter."
+    },
+    "version": {
+      "type": "string",
+      "description": "Versão do recurso técnico (e.g., '16' para Postgres 16). Opcional — algumas capabilities são version-agnostic."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "stable", "deprecated"],
+      "default": "stable",
+      "description": "Status de maturidade da capability."
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição one-line da capability."
+    },
+
+    "parameters": {
+      "type": "object",
+      "description": "Parâmetros declarativos que cada uso da capability pode customizar.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["string", "int", "boolean", "enum"]
+          },
+          "values": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Lista de valores aceitos (apenas para type=enum)."
+          },
+          "default": {
+            "description": "Valor default se omitido pelo usuário."
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "requires": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string", "pattern": "^[a-z][a-z0-9]*(\\.(?:[a-z0-9][a-z0-9-]*|\\*|\\*\\*))+$" },
+          { "type": "string", "pattern": "^.+ (AND|OR|NOT) .+$" }
+        ]
+      },
+      "description": "Capabilities que devem estar ativas para esta poder ser ativada. Glob permitido (`*` = qualquer atomic; `**` = recursivo). Hyphens permitidos em segmentos. Mini-DSL AND/OR/NOT opcional."
+    },
+    "provides": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
+      },
+      "description": "Capabilities virtuais que esta capability satisfaz. Outros artefatos podem requerer 'data.transactional-store' sem saber qual database concreta."
+    },
+    "excludes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
+      },
+      "description": "Capabilities mutex com esta. Excludes é simétrico — A.excludes B implica B.excludes A (validado por audit-capability-graph.sh)."
+    },
+
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags livres para categorização e busca."
+    },
+
+    "expands-to": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9-]*)+$"
+      },
+      "description": "Apenas para kind=profile. Lista de atomics/composites para expandir."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "profile" } }, "required": ["kind"] },
+      "then": {
+        "required": ["expands-to"],
+        "not": {
+          "anyOf": [
+            { "required": ["requires"] },
+            { "required": ["provides"] },
+            { "required": ["excludes"] },
+            { "required": ["parameters"] }
+          ]
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "enum": ["atomic", "composite"] } }, "required": ["kind"] },
+      "then": {
+        "not": { "required": ["expands-to"] }
+      }
+    }
+  ]
+}
