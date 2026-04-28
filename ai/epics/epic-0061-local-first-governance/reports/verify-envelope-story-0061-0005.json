@@ -1,0 +1,16 @@
+{
+  "storyId": "story-0061-0005",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "scripts/audit-*.sh ausentes pós-merge", "status": "PASS", "evidence": "CiPipelineLeanSmokeIT.scriptsRoot_hasNoAuditShFiles" },
+    { "scenario": ".github/workflows/audit.yml ausente pós-merge", "status": "PASS", "evidence": "CiPipelineLeanSmokeIT.auditYml_isAbsent" },
+    { "scenario": "mvn verify ainda executa Java auditors", "status": "PASS", "evidence": "AuditEquivalenceSmokeIT 32/32 + *AuditorTest 75/75 green in mvn verify" },
+    { "scenario": "Tag git pre-local-first-lifecycle existe", "status": "PASS", "evidence": "git tag -l shows pre-local-first-lifecycle pushed to origin" },
+    { "scenario": "CHANGELOG.md menciona migration", "status": "PASS", "evidence": "Changed entry added to CHANGELOG.md [Unreleased] section" }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}
