@@ -1,0 +1,17 @@
+{
+  "storyId": "story-0062-0001",
+  "epicId": "EPIC-0062",
+  "passed": true,
+  "scope": "SIMPLE",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "failures": [],
+  "acCheckResults": [
+    {"ac": "AC1", "passed": true, "evidence": "grep -nE returns 0 hits"},
+    {"ac": "AC2", "passed": true, "evidence": "audit-baseline-immutability.sh --self-check exit 0"},
+    {"ac": "AC3", "passed": true, "evidence": "BASELINE_DIR override --self-check exit 0"},
+    {"ac": "AC4", "passed": true, "evidence": "test-audit-baseline-parametrization.sh 4/4 pass"},
+    {"ac": "AC5", "passed": true, "evidence": "CI workflow green"}
+  ],
+  "timestamp": "2026-04-28T12:00:00Z"
+}

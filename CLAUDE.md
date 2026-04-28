@@ -14,7 +14,7 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 
 > **Concluded — EPIC-0041 (File-Conflict-Aware Parallelism Analysis).**
 > Planning now emits a structured `## File Footprint` / `## Story File Footprint` block on every task/story plan (`write:` / `read:` / `regen:`). The new skill `/x-parallel-eval --scope=epic|story|task` consumes those footprints, produces a collision matrix (hard / regen / soft), and recommends demotions to serial when two plans touch the same hotspot. `x-epic-map` Step 8.5 annotates the Implementation Map with "Restrições de Paralelismo"; `x-epic-implement` Phase 0.5.0 and `x-story-implement` Phase 1.5 run the gate and **degrade waves to serial with a visible warning** when a collision is detected (`ExecutionState.parallelismDowngrades`). Hotspots catalogued in RULE-004 (`SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`, `pom.xml`, `.gitignore`, `src/test/resources/golden/**`). Plans predating this epic are treated as "footprint unknown" — warn, do not block (RULE-006).
-> - Decision record: [`adr/ADR-0006-file-conflict-aware-parallelism.md`](adr/ADR-0006-file-conflict-aware-parallelism.md)
+> - Decision record: [`docs/adr/ADR-0006-file-conflict-aware-parallelism.md`](docs/adr/ADR-0006-file-conflict-aware-parallelism.md)
 > - Retroactive diff patches for epics 0036–0040: [`plans/epic-0041/migrations/`](plans/epic-0041/migrations/) (EPIC-0040 flagged HIGH — hard conflict on `telemetry-phase.sh`).
 > - Skill inventory gained `/x-parallel-eval` (category `plan/`).
 
@@ -26,7 +26,7 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > Introduces Rule 25 (hierarchical task tracking, 4-level depth via `›` separator: Epic › Story › Phase › Wave/Cycle), skill `x-internal-phase-gate` (internal, `haiku`, 4 modes: pre/post/wave/final), and ADR-0014. Phase gates block `## Phase N` transitions until child tasks are `completed` AND expected artifacts exist on disk. Operators can see `"EPIC-0065 › Phase 3 › story-0065-0001 (in_progress)"` during execution. 4-layer enforcement: normative (Rule 25 + CLAUDE.md), Stop hook (`verify-phase-gates.sh`), PreToolUse hook (`enforce-phase-sequence.sh`), CI audit (`audit-task-hierarchy.sh` + `audit-phase-gates.sh`). All 8 canonical orchestrators retrofitted: `x-task-implement`, `x-story-implement`, `x-epic-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`. Backward compatible via Rule 19: `taskTracking.enabled` defaults `false` for legacy epics (gates become no-ops); 28 legacy execution-state.json files migrated. `Epic0055FoundationSmokeTest` validates end-to-end.
 > - Rule: [`.claude/rules/25-task-hierarchy.md`](.claude/rules/25-task-hierarchy.md)
 > - Skill (internal): `x-internal-phase-gate` (not user-invocable)
-> - Decision record: [`adr/ADR-0014-task-hierarchy-and-phase-gates.md`](adr/ADR-0014-task-hierarchy-and-phase-gates.md)
+> - Decision record: [`docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md`](docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md)
 > - Epic index: [`plans/epic-0055/`](plans/epic-0055/)
 
 > **ZERO-BYPASS LIFECYCLE — INEGOCIÁVEL:** Toda story/task DEVE ser implementada
@@ -44,18 +44,18 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 
 > **In progress — EPIC-0043 (Interactive Gates Convention).**
 > Standardizes interactive decision gates across orchestrating skills (`x-release`, `x-story-implement`, `x-epic-implement`, `x-review-pr`) with a fixed 3-option menu (PROCEED / FIX-PR / ABORT) as the default behavior. Menu is now default; `--non-interactive` replaces the patchwork of opt-in flags for CI/automation. FIX-PR slot invokes `x-pr-fix`/`x-pr-fix-epic` via Rule 13 INLINE-SKILL and loops back to the same menu. Guard-rail caps 3 consecutive fix attempts with `GATE_FIX_LOOP_EXCEEDED`. Rule 20 + ADR-0010 published in story-0043-0001; retrofits follow in stories 0043-0002 through 0043-0006.
-> - Decision record: [`adr/ADR-0010-interactive-gates-convention.md`](adr/ADR-0010-interactive-gates-convention.md)
+> - Decision record: [`docs/adr/ADR-0010-interactive-gates-convention.md`](docs/adr/ADR-0010-interactive-gates-convention.md)
 > - Story index: [`plans/epic-0043/`](plans/epic-0043/)
 
 > **Concluded — EPIC-0058 (Audit Scripts Lifecycle & Generation).**
 > Formalizes the lifecycle of governance audit gates: creates Rule 26 "Audit Gate Lifecycle" + ADR-0015 (4-layer taxonomy: Hook/CI script/Java test/Workflow); creates 3 missing CI scripts referenced in Rules 19/21/22 (`audit-flow-version.sh`, `audit-epic-branches.sh`, `audit-skill-visibility.sh`); introduces `ScriptsAssembler` so generated projects inherit governance gates; regenerates golden files for 9 profiles; adds `audit.yml` CI workflow.
 > - Rule: [`.claude/rules/26-audit-gate-lifecycle.md`](.claude/rules/26-audit-gate-lifecycle.md)
-> - Decision record: [`adr/ADR-0015-audit-gate-lifecycle.md`](adr/ADR-0015-audit-gate-lifecycle.md)
+> - Decision record: [`docs/adr/ADR-0015-audit-gate-lifecycle.md`](docs/adr/ADR-0015-audit-gate-lifecycle.md)
 > - Epic index: [`plans/epic-0058/`](plans/epic-0058/)
 
 > **In progress — EPIC-0036 (Skill Taxonomy Refactor).**
 > The source of truth for skills under `java/src/main/resources/targets/claude/skills/` is being reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`), and ~19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. The generated output `.claude/skills/` remains **flat** — user-facing invocation paths are preserved.
-> - Decision record: [`adr/ADR-0003-skill-taxonomy-and-naming.md`](adr/ADR-0003-skill-taxonomy-and-naming.md)
+> - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
 > - Rename staging checklist: [`plans/epic-0036/skill-renames.md`](plans/epic-0036/skill-renames.md)
 > - Current skill names are the renamed forms (e.g., `/x-epic-create`, `/x-task-implement`, `/x-test-e2e`). Do not use the old pre-rename names.
 
@@ -146,7 +146,7 @@ A complete list of skills with descriptions is generated in `.claude/README.md` 
 
 ## Telemetry
 
-Every `ia-dev-env`-generated project ships with telemetry capture enabled by default. Skill executions, phase boundaries, subagent lifecycles, and tool calls are recorded as NDJSON under `plans/epic-*/telemetry/events.ndjson`, producing an auditable timeline of how long each part of an epic / story / task actually took. The design is documented in [`adr/ADR-0005-telemetry-architecture.md`](adr/ADR-0005-telemetry-architecture.md); the privacy contract is enforced by [Rule 20 — Telemetry Privacy](.claude/rules/20-telemetry-privacy.md) and the scrubber at `dev.iadev.telemetry.TelemetryScrubber`.
+Every `ia-dev-env`-generated project ships with telemetry capture enabled by default. Skill executions, phase boundaries, subagent lifecycles, and tool calls are recorded as NDJSON under `plans/epic-*/telemetry/events.ndjson`, producing an auditable timeline of how long each part of an epic / story / task actually took. The design is documented in [`docs/adr/ADR-0005-telemetry-architecture.md`](docs/adr/ADR-0005-telemetry-architecture.md); the privacy contract is enforced by [Rule 20 — Telemetry Privacy](.claude/rules/20-telemetry-privacy.md) and the scrubber at `dev.iadev.telemetry.TelemetryScrubber`.
 
 Capture happens through two cooperating layers:
 
