@@ -1,0 +1,99 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0063",
+  "epicBranch": "epic/0063",
+  "mode": "sequential",
+  "startedAt": "2026-04-28T00:00:00Z",
+  "layout": "v4",
+  "epicRoot": "ai/epics/epic-0063-local-first-preflight-gates",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0063-0001": {
+      "status": "PENDING",
+      "title": "Pre-Flight Runner Script",
+      "blockedBy": ["story-0063-0002", "story-0063-0003", "story-0063-0007"],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0002": {
+      "status": "PENDING",
+      "title": "Content-Quality Audits (Review + Verify Envelope)",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0003": {
+      "status": "PENDING",
+      "title": "Telemetry-as-Evidence Audit + stage-telemetry Hook",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0004": {
+      "status": "PENDING",
+      "title": "PreToolUse Blocking Hook (enforce-preflight-gates.sh)",
+      "blockedBy": ["story-0063-0001"],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0005": {
+      "status": "PENDING",
+      "title": "x-story-implement Phase Shift (Reviews ANTES do PR)",
+      "blockedBy": ["story-0063-0001", "story-0063-0004"],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0006": {
+      "status": "PENDING",
+      "title": "x-epic-implement Phase 4.5 (Epic-Level Review)",
+      "blockedBy": ["story-0063-0004"],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0007": {
+      "status": "PENDING",
+      "title": "Local Coverage Gate (audit-coverage-local.sh)",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0008": {
+      "status": "PENDING",
+      "title": "Branch Protection Automation (--apply-strict)",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0009": {
+      "status": "PENDING",
+      "title": "Bypass-Skill Catalog (docs/audit-bypass-catalog.md)",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0010": {
+      "status": "PENDING",
+      "title": "Rule 24 §Camada 0 + CLAUDE.md Update",
+      "blockedBy": [],
+      "prNumber": null,
+      "prUrl": null
+    },
+    "story-0063-0011": {
+      "status": "PENDING",
+      "title": "E2E Smoke Test (Epic0063LocalFirstSmokeTest)",
+      "blockedBy": [
+        "story-0063-0001",
+        "story-0063-0004",
+        "story-0063-0005",
+        "story-0063-0006",
+        "story-0063-0010"
+      ],
+      "prNumber": null,
+      "prUrl": null
+    }
+  }
+}

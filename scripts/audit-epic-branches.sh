@@ -45,7 +45,7 @@ Usage: ${SCRIPT_NAME} [--self-check] [--skip-pr-check] [-h|--help]
   Audit epic/* branch governance compliance (Rule 21).
 
   Checks:
-    A  Every open epic/* → develop PR has flowVersion="2" or "4" (EPIC-0062).
+    A  Every open epic/* → develop PR has flowVersion="2" or "4" (v4 layout, EPIC-0062).
        (When state file is missing flowVersion: violation.)
     B  No epic/* remote branch has divergent reflog vs upstream
        (best-effort force-push detection).
