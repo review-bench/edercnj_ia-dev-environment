@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "2.0.0",
+  "flowVersion": "4",
+  "epicId": "EPIC-0067",
+  "epicSlug": "review-yaml-frontmatter",
+  "epicTitle": "Review YAML Frontmatter",
+  "epicBranch": "epic/0067",
+  "epicMarkdownPath": "ai/epics/epic-0067-review-yaml-frontmatter/epic-0067.md",
+  "implementationMapPath": "ai/epics/epic-0067-review-yaml-frontmatter/IMPLEMENTATION-MAP.md",
+  "createdAt": "2026-04-28T00:00:00Z",
+  "status": "Backlog",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0067-0001": {
+      "status": "Pendente",
+      "phase": 0,
+      "blockedBy": [],
+      "blocks": ["story-0067-0002", "story-0067-0003", "story-0067-0004"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0067-0002": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0067-0001"],
+      "blocks": ["story-0067-0004"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0067-0003": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0067-0001"],
+      "blocks": ["story-0067-0004"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0067-0004": {
+      "status": "Pendente",
+      "phase": 2,
+      "blockedBy": ["story-0067-0001", "story-0067-0002", "story-0067-0003"],
+      "blocks": [],
+      "commitSha": null,
+      "prNumber": null
+    }
+  },
+  "externalDependencies": {
+    "epics": []
+  },
+  "downstreamEpics": [
+    {"id": "EPIC-0066", "reason": "consumes review YAML frontmatter for PR body templates"}
+  ],
+  "parallelismDowngrades": []
+}
