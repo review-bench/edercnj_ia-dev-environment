@@ -33,6 +33,7 @@ REQUIRED_CHECKS_FILE="${REPO_ROOT}/${BASELINE_DIR}/required-checks.txt"
 # --- argument parsing ---
 DRY_RUN=false
 BRANCHES="develop,main"
+APPLY_STRICT=false  # EPIC-0063 story-0063-0008: Camada 4 strict mode
 
 while [[ $# -gt 0 ]]; do
   case "${1:-}" in
@@ -43,6 +44,10 @@ while [[ $# -gt 0 ]]; do
     --branches)
       BRANCHES="${2:-}"
       shift 2
+      ;;
+    --apply-strict)
+      APPLY_STRICT=true
+      shift
       ;;
     --self-check)
       # Verify prerequisites
@@ -92,20 +97,41 @@ fi
 CONTEXTS_JSON=$(printf '%s\n' "${CHECKS[@]}" | jq -R . | jq -cs .)
 
 # Build the full protection payload
-PROTECTION_PAYLOAD=$(jq -n \
-  --argjson contexts "${CONTEXTS_JSON}" \
-  '{
-    required_status_checks: {
-      strict: true,
-      contexts: $contexts
-    },
-    enforce_admins: true,
-    required_pull_request_reviews: {
-      required_approving_review_count: 1,
-      dismiss_stale_reviews: true
-    },
-    restrictions: null
-  }')
+# EPIC-0063 story-0063-0008: --apply-strict adds linear history, no force-push, no deletions
+if [[ "${APPLY_STRICT}" == "true" ]]; then
+  PROTECTION_PAYLOAD=$(jq -n \
+    --argjson contexts "${CONTEXTS_JSON}" \
+    '{
+      required_status_checks: {
+        strict: true,
+        contexts: $contexts
+      },
+      enforce_admins: true,
+      required_pull_request_reviews: {
+        required_approving_review_count: 1,
+        dismiss_stale_reviews: true
+      },
+      required_linear_history: true,
+      allow_force_pushes: false,
+      allow_deletions: false,
+      restrictions: null
+    }')
+else
+  PROTECTION_PAYLOAD=$(jq -n \
+    --argjson contexts "${CONTEXTS_JSON}" \
+    '{
+      required_status_checks: {
+        strict: true,
+        contexts: $contexts
+      },
+      enforce_admins: true,
+      required_pull_request_reviews: {
+        required_approving_review_count: 1,
+        dismiss_stale_reviews: true
+      },
+      restrictions: null
+    }')
+fi
 
 echo "=== Branch Protection Setup ==="
 echo "Repository : ${REPO}"
