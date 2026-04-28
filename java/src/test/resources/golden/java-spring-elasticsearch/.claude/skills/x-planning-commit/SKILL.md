@@ -21,10 +21,10 @@ RULE-007 of EPIC-0049 requires every planning skill to delegate to this skill at
 
 ## Triggers
 
-- `/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "add epic scaffold"` -- single-file commit
-- `/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md,plans/epic-0049/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"` -- batch commit
-- `/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "preview" --dry-run` -- dry-run preview
-- `/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "chore bump" --scope chore` -- chore scope
+- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "add epic scaffold"` -- single-file commit
+- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md,plans/epic-XXXX/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"` -- batch commit
+- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "preview" --dry-run` -- dry-run preview
+- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "chore bump" --scope chore` -- chore scope
 
 ## Parameters
 

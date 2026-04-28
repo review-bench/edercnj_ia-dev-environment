@@ -71,7 +71,7 @@ Four defense-in-depth layers. A violation caught by any layer fails the lifecycl
 - `scripts/audit-execution-integrity.sh` runs on every PR to `develop` (via the CI workflow) and on every PR to `epic/*` branches.
 - For each story-branch merge detected via `git log`, verifies the mandatory artifact set exists.
 - Fails the CI build with `EIE_EVIDENCE_MISSING` if evidence is absent.
-- Escape hatch: baseline file `audits/execution-integrity-baseline.txt` grandfathers stories merged before this rule was introduced. Newly-merged stories cannot be added to the baseline.
+- Escape hatch: baseline file `governance/baselines/execution-integrity-baseline.txt` grandfathers stories merged before this rule was introduced. Newly-merged stories cannot be added to the baseline.
 - Per-story escape: `<!-- audit-exempt: <reason> -->` line in the story markdown (rare, reviewed exceptions).
 
 ### Camada 4 — Observability (mandatory artifacts)
@@ -86,12 +86,12 @@ Sub-skills that "count" for Rule 24 are required by contract to emit their evide
 | :--- | :--- | :--- |
 | 0 | `OK` | All merged stories have required evidence (or are grandfathered). |
 | 1 | `EIE_EVIDENCE_MISSING` | At least one merged story lacks mandatory artifacts. |
-| 2 | `EIE_BASELINE_CORRUPT` | `audits/execution-integrity-baseline.txt` malformed. |
+| 2 | `EIE_BASELINE_CORRUPT` | `governance/baselines/execution-integrity-baseline.txt` malformed. |
 | 3 | `EIE_INVALID_EXEMPTION` | `audit-exempt` marker missing a reason. |
 
 ## Baseline (Grandfather List)
 
-`audits/execution-integrity-baseline.txt` lists stories merged before Rule 24 was introduced. Format: one `STORY-ID` per line, with trailing `# reason` comment. No new entries may be added after Rule 24 merges — CI refuses additions via a separate immutability check.
+`governance/baselines/execution-integrity-baseline.txt` lists stories merged before Rule 24 was introduced. Format: one `STORY-ID` per line, with trailing `# reason` comment. No new entries may be added after Rule 24 merges — CI refuses additions via a separate immutability check.
 
 Example (initial baseline):
 

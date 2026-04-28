@@ -115,7 +115,7 @@ orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-story-report",
-      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-0049/reports/story-0049-0001-report.md")
+      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
 ## Parameters
@@ -156,13 +156,13 @@ On success the skill writes a single-line JSON object to stdout:
 ### Example envelope (happy path)
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
+{"reportPath":"/repo/plans/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
 ```
 
 ### Example envelope (story without PR — boundary)
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":4,"tasksDone":2,"commitsCount":2,"prNumber":null,"prState":null,"coverageLine":null,"coverageBranch":null}}
+{"reportPath":"/repo/plans/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":4,"tasksDone":2,"commitsCount":2,"prNumber":null,"prState":null,"coverageLine":null,"coverageBranch":null}}
 ```
 
 ## Exit Codes
@@ -345,13 +345,13 @@ Invocation:
 
 ```markdown
 Skill(skill: "x-internal-story-report",
-      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-0049/reports/story-0049-0001-report.md")
+      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
 Envelope:
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
+{"reportPath":"/repo/plans/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
 ```
 
 Exit: 0.
@@ -372,7 +372,7 @@ Skill(skill: "x-internal-story-report",
 Stderr:
 
 ```
-State missing: plans/epic-0099/execution-state.json
+State missing: plans/epic-XXXX/execution-state.json
 ```
 
 Exit: 1. No envelope emitted.

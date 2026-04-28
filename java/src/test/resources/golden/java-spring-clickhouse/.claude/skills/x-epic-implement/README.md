@@ -138,5 +138,5 @@ flowchart TD
 - Main skill body: [`SKILL.md`](SKILL.md)
 - Full protocol + retry/circuit-breaker/legacy semantics: [`references/full-protocol.md`](references/full-protocol.md)
 - Args schema consumed by `x-internal-args-normalize`: [`references/args-schema.json`](references/args-schema.json)
-- Parent story: `plans/epic-0049/story-0049-0018.md`
+- Parent story: `plans/epic-XXXX/story-XXXX-YYYY.md`
 - ADR-0006 (file-conflict-aware parallelism), ADR-0010 (interactive gates), ADR-0012 (thin-skill pattern)

@@ -102,7 +102,7 @@ calling orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id 0049 --mode sequential --output plans/epic-0049/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode sequential --output plans/epic-XXXX/epic-execution-plan.md")
 ```
 
 ## Parameters
@@ -309,12 +309,12 @@ Emit on stdout as a single line terminated by `\n`. Exit `0`.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id 0049 --mode sequential --output plans/epic-0049/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode sequential --output plans/epic-XXXX/epic-execution-plan.md")
 ```
 
 Output:
 ```json
-{"epicId":"0049","mode":"sequential","phases":[{"index":0,"stories":["story-0049-0001","story-0049-0002","story-0049-0003","story-0049-0004"]},{"index":1,"stories":["story-0049-0005","story-0049-0006","story-0049-0007","story-0049-0008"]},{"index":2,"stories":["story-0049-0009","story-0049-0010","story-0049-0011","story-0049-0012","story-0049-0013","story-0049-0014","story-0049-0015","story-0049-0016","story-0049-0017"]},{"index":3,"stories":["story-0049-0018","story-0049-0019"]},{"index":4,"stories":["story-0049-0020","story-0049-0021","story-0049-0022"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-0049-0001","story-0049-0005","story-0049-0018","story-0049-0020"],"planPath":"plans/epic-0049/epic-execution-plan.md","storyCount":22,"strictOverlap":false}
+{"epicId":"XXXX","mode":"sequential","phases":[{"index":0,"stories":["story-XXXX-0001","story-XXXX-0002","story-XXXX-0003","story-XXXX-0004"]},{"index":1,"stories":["story-XXXX-0005","story-XXXX-0006","story-XXXX-0007","story-XXXX-0008"]},{"index":2,"stories":["story-XXXX-0009","story-XXXX-0010","story-XXXX-0011","story-XXXX-0012","story-XXXX-0013","story-XXXX-0014","story-XXXX-0015","story-XXXX-0016","story-XXXX-0017"]},{"index":3,"stories":["story-XXXX-0018","story-XXXX-0019"]},{"index":4,"stories":["story-XXXX-0020","story-XXXX-0021","story-XXXX-0022"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-XXXX-0001","story-XXXX-0005","story-XXXX-0018","story-XXXX-0020"],"planPath":"plans/epic-XXXX/epic-execution-plan.md","storyCount":22,"strictOverlap":false}
 ```
 Exit: 0.
 
@@ -322,7 +322,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id 0049 --mode parallel --output plans/epic-0049/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode parallel --output plans/epic-XXXX/epic-execution-plan.md")
 ```
 
 Output (truncated):
@@ -351,7 +351,7 @@ Skill(skill: "x-internal-epic-build-plan",
 
 Stderr:
 ```
-Epic dir not found: plans/epic-9999
+Epic dir not found: plans/epic-XXXX
 ```
 Exit: 1.
 
@@ -370,12 +370,12 @@ Exit: 4.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id 0050 --mode sequential --output plans/epic-0050/epic-execution-plan.md")
+      args: "--epic-id YYYY --mode sequential --output plans/epic-YYYY/epic-execution-plan.md")
 ```
 
 Output:
 ```json
-{"epicId":"0050","mode":"sequential","phases":[{"index":0,"stories":["story-0050-0001"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-0050-0001"],"planPath":"plans/epic-0050/epic-execution-plan.md","storyCount":1,"strictOverlap":false}
+{"epicId":"YYYY","mode":"sequential","phases":[{"index":0,"stories":["story-YYYY-0001"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-YYYY-0001"],"planPath":"plans/epic-YYYY/epic-execution-plan.md","storyCount":1,"strictOverlap":false}
 ```
 Exit: 0.
 
