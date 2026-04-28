@@ -15,11 +15,21 @@
   },
   "storyStatuses": {
     "story-0061-0001": {
-      "status": "PENDING",
+      "status": "COMPLETE",
       "flowVersion": "4",
-      "prNumber": null,
-      "prUrl": null,
-      "prMergeStatus": null
+      "prNumbers": [755, 756, 757],
+      "prUrls": [
+        "https://github.com/edercnj/ia-dev-environment/pull/755",
+        "https://github.com/edercnj/ia-dev-environment/pull/756",
+        "https://github.com/edercnj/ia-dev-environment/pull/757"
+      ],
+      "prMergeStatus": "MERGED",
+      "completedAt": "2026-04-28T00:00:00Z",
+      "techLeadDecision": "GO",
+      "techLeadScore": "39/45",
+      "specialistScore": "56/68",
+      "coverageLine": 100,
+      "coverageBranch": 100
     },
     "story-0061-0002": {
       "status": "PENDING",

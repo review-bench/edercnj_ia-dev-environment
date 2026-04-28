@@ -1,0 +1,19 @@
+{
+  "storyId": "story-0061-0001",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 100,
+  "coverageBranch": 100,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "x-epic-implement sem flag executa non-interactive", "status": "PASS", "evidence": "Rule 20 documenta --interactive como opt-in; default é non-interactive" },
+    { "scenario": "x-epic-implement --interactive emite menus", "status": "PASS", "evidence": "SKILL.md atualizado com --interactive flag" },
+    { "scenario": "--non-interactive emite warning de deprecation", "status": "PASS", "evidence": "Rule 20 §Deprecation Timeline + SKILL.md deprecated entry" },
+    { "scenario": "CLAUDE_LEGACY_INTERACTIVE=1 restaura menu como default", "status": "PASS", "evidence": "Rule 20 §Env escape hatch documentado" },
+    { "scenario": "WorktreePrecheck retorna CLEAN em working tree limpo", "status": "PASS", "evidence": "WorktreePrecheckTest.cleanTree_whenCalled_returnsClean" },
+    { "scenario": "WorktreePrecheck retorna AMBIGUOUS com dirty + divergent", "status": "PASS", "evidence": "WorktreePrecheckTest.dirtyAndDivergent_whenCalled_throwsAmbiguous" },
+    { "scenario": "WorktreePrecheck com allowDirty=true em AMBIGUOUS", "status": "PASS", "evidence": "WorktreePrecheckTest.ambiguousState_whenAllowDirty_returnsAmbiguousWithoutThrowing" },
+    { "scenario": "git binário ausente lança OPERATIONAL_ERROR", "status": "PASS", "evidence": "WorktreePrecheckTest.gitNotFound_whenCalled_throwsOperationalError" }
+  ],
+  "timestamp": "2026-04-28T00:00:00Z"
+}
