@@ -138,7 +138,12 @@ public final class HookConfigBuilder {
             appendStopHookEntry(sb, "verify-story-completion.sh", true);
         }
         // Rule 25 Layer 2 — always emitted, independent of telemetry.
-        appendStopHookEntry(sb, "verify-phase-gates.sh", false);
+        appendStopHookEntry(sb, "verify-phase-gates.sh", true);
+        // EPIC-0063 story-0063-0003 — stage-telemetry.sh: auto git add NDJSON turn-by-turn.
+        // Requires telemetry enabled (NDJSON only exists when telemetry runs).
+        if (telemetryEnabled) {
+            appendStopHookEntry(sb, "stage-telemetry.sh", false);
+        }
         sb.append(JsonHelpers.indent(4)).append("]\n");
         sb.append(JsonHelpers.indent(3)).append("}\n");
         sb.append(JsonHelpers.indent(2)).append("]\n");
