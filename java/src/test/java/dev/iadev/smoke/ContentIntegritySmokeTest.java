@@ -377,6 +377,15 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
                         "OVERLAP_MATRIX",
                         "OVERLAP_SEVERITY",
                         "RENDERED_AT",
+                        // EPIC-0064 Composer didactic tokens — appear literal
+                        // in rule examples (`{{ fragment-id }}`,
+                        // `{{ description }}`) showing future Composer syntax;
+                        // pipeline never substitutes them (single-curly
+                        // regex only). Same pattern as `{{LANGUAGE}}` in
+                        // Rule 03 (resolved at runtime by the LLM): literal
+                        // by design, catalogued here for the smoke test.
+                        "fragment-id",
+                        "description",
                         ".",
                         "...");
 
@@ -412,7 +421,14 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
                         // lookups (e.g. {{a.b.c}},
                         // {{stories.0.id}},
                         // {{stories.story-0049-0001.status}})
-                        Pattern.compile("[A-Za-z_][A-Za-z0-9_-]*" + "(\\.[A-Za-z0-9_-]+)+"));
+                        Pattern.compile("[A-Za-z_][A-Za-z0-9_-]*" + "(\\.[A-Za-z0-9_-]+)+"),
+                        // EPIC-0064 Composer slot syntax (e.g.
+                        // {{ slot: X }}, {{ slot: data-migration }})
+                        // documented in Rule 28 §Examples (b)/(c). Pipeline
+                        // never substitutes (single-curly only); future
+                        // CompositionEngine resolves only outside markdown
+                        // code blocks — examples remain literal by design.
+                        Pattern.compile("slot:\\s*[A-Za-z][A-Za-z0-9_-]*"));
 
         private static final Pattern DATA =
                 Pattern.compile(
