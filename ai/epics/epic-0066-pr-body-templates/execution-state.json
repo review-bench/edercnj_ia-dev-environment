@@ -8,7 +8,7 @@
   "epicMarkdownPath": "ai/epics/epic-0066-pr-body-templates/epic-0066.md",
   "implementationMapPath": "ai/epics/epic-0066-pr-body-templates/IMPLEMENTATION-MAP.md",
   "createdAt": "2026-04-28T00:00:00Z",
-  "status": "Em Andamento",
+  "status": "Concluída",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
