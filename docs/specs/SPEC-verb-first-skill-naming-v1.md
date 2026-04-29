@@ -1,10 +1,15 @@
 # SPEC — Verb-First Skill Naming Refactor
 
-**Status:** Draft  
-**Versão:** 1.0  
-**Data:** 2026-04-28  
+**Status:** Refined  
+**Versão:** 1.1  
+**Data:** 2026-04-29  
 **Autor:** GitHub Copilot CLI + Eder Junior  
 **Epic:** EPIC-0076
+
+> **v1.1 — Refinamento (2026-04-29):**
+> - 11 skills do catálogo atual ausentes na v1.0 foram adicionadas à matriz canônica nas seções 6.1 e 6.4.
+> - Reordenadas seções para refletir presença real de `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create`, `x-parallel-eval`, `x-spec-drift`, `x-mcp-recommend`, `x-frontmatter-migrate`, `x-ci-generate`, `x-setup-env`, `x-setup-stack`.
+> - Esclarecido que `x-setup-env` e `x-setup-stack` já estão em forma verb-first aceitável (não renomear).
 
 > SPEC funcional para a segunda onda de renomeação de skills.
 > A baseline considerada é o **catálogo efetivo após a execução dos épicos anteriores**.
@@ -109,6 +114,10 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | :--- | :--- |
 | x-feature-ideate | x-ideate-feature |
 | x-feature-create | x-create-feature |
+| x-epic-create | x-create-epic |
+| x-story-create | x-create-story |
+| x-epic-decompose | x-decompose-epic |
+| x-epic-map | x-map-epic |
 | x-epic-orchestrate | x-orchestrate-epic |
 | x-arch-plan | x-plan-architecture |
 | x-arch-update | x-update-architecture |
@@ -121,6 +130,8 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-story-refine | x-refine-story |
 | x-epic-refine | x-refine-epic |
 | x-threat-model | x-model-threats |
+| x-spec-drift | x-detect-spec-drift |
+| x-parallel-eval | x-evaluate-parallelism |
 
 ### 6.2 Testes
 
@@ -164,7 +175,7 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-review-data-modeling | x-review-data-modeling |
 | x-code-audit | x-audit-code |
 
-### 6.4 Code, docs e templates
+### 6.4 Code, docs, templates e setup de ambiente
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
@@ -174,6 +185,11 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-doc-generate-v2 | x-generate-docs-v2 |
 | x-doc-validate | x-validate-docs |
 | x-template-migrate | x-migrate-templates |
+| x-frontmatter-migrate | x-migrate-frontmatter |
+| x-ci-generate | x-generate-ci |
+| x-mcp-recommend | x-recommend-mcp |
+| x-setup-env | x-setup-env *(já em verb-first; sem renome)* |
+| x-setup-stack | x-setup-stack *(já em verb-first; sem renome)* |
 
 ### 6.5 Git, PR e worktree
 
