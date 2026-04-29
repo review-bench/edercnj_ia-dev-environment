@@ -34,7 +34,9 @@ class FrontmatterValidatorTest {
         @DisplayName("valid v3.0 frontmatter passes (happy)")
         void validV30Passes(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("valid.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     name: x-test-skill
                     description: A test skill
@@ -51,7 +53,9 @@ class FrontmatterValidatorTest {
         @DisplayName("frontmatter v2 without requires-capabilities fails (RULE-006)")
         void v2FrontmatterFails(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("legacy.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     name: x-legacy-skill
                     description: Old style frontmatter
@@ -67,7 +71,9 @@ class FrontmatterValidatorTest {
         @DisplayName("unknown capability ID emits warning (not fatal)")
         void unknownCapabilityIdWarns(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("warn.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     name: x-test-skill
                     requires-capabilities:
@@ -83,7 +89,9 @@ class FrontmatterValidatorTest {
         @DisplayName("missing name field also fails")
         void missingNameFails(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("no-name.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     description: Missing name
                     requires-capabilities: []
@@ -113,7 +121,8 @@ class FrontmatterValidatorTest {
         void missingFileReturnsCannotRead(@TempDir Path tmp) {
             var result = validator.validate(tmp.resolve("nonexistent.md"));
             assertThat(result.ok()).isFalse();
-            assertThat(result.errors()).anyMatch(e -> e.contains("cannot read") || e.contains("missing"));
+            assertThat(result.errors())
+                    .anyMatch(e -> e.contains("cannot read") || e.contains("missing"));
         }
 
         @Test
@@ -129,7 +138,8 @@ class FrontmatterValidatorTest {
         @DisplayName("requires-capabilities with known ID emits no warning")
         void knownCapabilityNoWarning(@TempDir Path tmp) throws java.io.IOException {
             Path file = tmp.resolve("known.md");
-            java.nio.file.Files.writeString(file, "---\nname: x\nrequires-capabilities: [data.database.postgres]\n---\n");
+            java.nio.file.Files.writeString(
+                    file, "---\nname: x\nrequires-capabilities: [data.database.postgres]\n---\n");
             var result = validator.validate(file, java.util.Set.of("data.database.postgres"));
             assertThat(result.ok()).isTrue();
             assertThat(result.warnings()).isEmpty();
@@ -139,7 +149,8 @@ class FrontmatterValidatorTest {
         @DisplayName("withWarnings result has ok=true and non-empty warnings")
         void withWarningsIsOk(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("warn.md");
-            Files.writeString(file, "---\nname: x\nrequires-capabilities:\n  - unknown.cap.ability\n---\n");
+            Files.writeString(
+                    file, "---\nname: x\nrequires-capabilities:\n  - unknown.cap.ability\n---\n");
             var result = validator.validate(file, java.util.Set.of("data.database.postgres"));
             assertThat(result.ok()).isTrue();
             assertThat(result.warnings()).isNotEmpty();
@@ -153,13 +164,17 @@ class FrontmatterValidatorTest {
         @Test
         @DisplayName("validateAll reports each file independently")
         void validateAllReportsPerFile(@TempDir Path tmp) throws IOException {
-            Files.writeString(tmp.resolve("valid.md"), """
+            Files.writeString(
+                    tmp.resolve("valid.md"),
+                    """
                     ---
                     name: valid-skill
                     requires-capabilities: []
                     ---
                     """);
-            Files.writeString(tmp.resolve("invalid.md"), """
+            Files.writeString(
+                    tmp.resolve("invalid.md"),
+                    """
                     ---
                     name: invalid-skill
                     ---

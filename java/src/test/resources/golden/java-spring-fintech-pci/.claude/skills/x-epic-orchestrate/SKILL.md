@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Grep, Glob, Agent, AskUserQuestion, Skill, TaskCreate, TaskUpdate"
 argument-hint: "[EPIC-ID] [--resume] [--story story-XXXX-YYYY] [--dry-run]"
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Skill
 argument-hint: "TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description \"short desc\"] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

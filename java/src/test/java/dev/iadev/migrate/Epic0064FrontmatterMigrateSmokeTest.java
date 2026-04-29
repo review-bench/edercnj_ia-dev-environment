@@ -30,7 +30,9 @@ class Epic0064FrontmatterMigrateSmokeTest {
         @DisplayName("v2 frontmatter (no requires-capabilities) is detected as needing migration")
         void v2DetectedAsNeedingMigration(@TempDir Path tmp) throws IOException {
             Path v2File = tmp.resolve("legacy-skill.md");
-            Files.writeString(v2File, """
+            Files.writeString(
+                    v2File,
+                    """
                     ---
                     name: x-legacy-skill
                     description: A skill without requires-capabilities
@@ -48,7 +50,9 @@ class Epic0064FrontmatterMigrateSmokeTest {
         @DisplayName("v3.0 frontmatter (with requires-capabilities) passes validation gate")
         void v30PassesGate(@TempDir Path tmp) throws IOException {
             Path v3File = tmp.resolve("migrated-skill.md");
-            Files.writeString(v3File, """
+            Files.writeString(
+                    v3File,
+                    """
                     ---
                     name: x-migrated-skill
                     description: A skill migrated to v3.0
@@ -66,7 +70,9 @@ class Epic0064FrontmatterMigrateSmokeTest {
         @DisplayName("internal skill preserves visibility and user-invocable after migration")
         void internalSkillPreservesFields(@TempDir Path tmp) throws IOException {
             Path internalFile = tmp.resolve("x-internal-skill.md");
-            Files.writeString(internalFile, """
+            Files.writeString(
+                    internalFile,
+                    """
                     ---
                     name: x-internal-example
                     description: Internal skill
@@ -86,13 +92,18 @@ class Epic0064FrontmatterMigrateSmokeTest {
         @Test
         @DisplayName("x-frontmatter-migrate SKILL.md itself is v3.0 compliant")
         void skillFileIsV30Compliant() throws Exception {
-            var resource = getClass().getClassLoader().getResource(
-                    "targets/claude/skills/core/internal/plan/x-frontmatter-migrate/SKILL.md");
+            var resource =
+                    getClass()
+                            .getClassLoader()
+                            .getResource(
+                                    "targets/claude/skills/core/internal/plan/x-frontmatter-migrate/SKILL.md");
             assertThat(resource).as("SKILL.md should be on classpath").isNotNull();
             Path skillPath = Path.of(resource.toURI());
             var result = validator.validate(skillPath);
             assertThat(result.ok())
-                    .as("x-frontmatter-migrate SKILL.md should be valid v3.0 frontmatter, errors: " + result.errors())
+                    .as(
+                            "x-frontmatter-migrate SKILL.md should be valid v3.0 frontmatter, errors: "
+                                    + result.errors())
                     .isTrue();
         }
     }

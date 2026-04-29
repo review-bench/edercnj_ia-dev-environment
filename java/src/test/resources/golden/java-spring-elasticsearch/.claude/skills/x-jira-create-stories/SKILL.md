@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
 argument-hint: "[EPIC_DIR_PATH or EPIC_ID]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

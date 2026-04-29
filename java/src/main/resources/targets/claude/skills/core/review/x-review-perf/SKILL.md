@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: perf, fragment-order: 110 }
 ---
 
 ## Global Output Policy

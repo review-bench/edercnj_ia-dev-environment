@@ -21,7 +21,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * E2E integration smoke test for the EPIC-0064 capability composer pipeline (story-0064-0310).
  *
- * <p>Validates: resolver → composer → pruner → reporter chain, determinism, and pruning correctness.
+ * <p>Validates: resolver → composer → pruner → reporter chain, determinism, and pruning
+ * correctness.
  */
 @DisplayName("Epic0064ComposerIntegrationSmokeTest")
 class Epic0064ComposerIntegrationSmokeTest {
@@ -31,20 +32,35 @@ class Epic0064ComposerIntegrationSmokeTest {
     private final CompositionPlanReporter reporter = new CompositionPlanReporter();
 
     private static ResolvedCapabilitySet springActiveSet() {
-        return new ResolvedCapabilitySet("spring-rest-postgres", List.of(
-                CapabilityId.of("framework.spring-boot.mvc"),
-                CapabilityId.of("data.database.postgres"),
-                CapabilityId.of("runtime.jvm.openjdk")
-        ), Map.of(), List.of());
+        return new ResolvedCapabilitySet(
+                "spring-rest-postgres",
+                List.of(
+                        CapabilityId.of("framework.spring-boot.mvc"),
+                        CapabilityId.of("data.database.postgres"),
+                        CapabilityId.of("runtime.jvm.openjdk")),
+                Map.of(),
+                List.of());
     }
 
     private static void writeArtifact(Path dir, String rel, String... caps) throws IOException {
         Path file = dir.resolve(rel);
         Files.createDirectories(file.getParent());
-        String capList = caps.length == 0 ? "[]" : "\n" + String.join("\n",
-                java.util.Arrays.stream(caps).map(c -> "  - " + c).toList());
-        Files.writeString(file, "---\nname: " + rel.replace("/SKILL.md", "").replace("/", "-")
-                + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
+        String capList =
+                caps.length == 0
+                        ? "[]"
+                        : "\n"
+                                + String.join(
+                                        "\n",
+                                        java.util.Arrays.stream(caps)
+                                                .map(c -> "  - " + c)
+                                                .toList());
+        Files.writeString(
+                file,
+                "---\nname: "
+                        + rel.replace("/SKILL.md", "").replace("/", "-")
+                        + "\nrequires-capabilities:"
+                        + capList
+                        + "\n---\n# Content\n");
     }
 
     @Nested
@@ -53,7 +69,8 @@ class Epic0064ComposerIntegrationSmokeTest {
 
         @Test
         @DisplayName("composer includes spring + postgres artifacts, excludes quarkus-only (happy)")
-        void composerFiltersCorrectly(@TempDir Path targets, @TempDir Path output) throws IOException {
+        void composerFiltersCorrectly(@TempDir Path targets, @TempDir Path output)
+                throws IOException {
             writeArtifact(targets, "skills/x-universal/SKILL.md");
             writeArtifact(targets, "skills/x-spring-ctrl/SKILL.md", "framework.spring-boot.mvc");
             writeArtifact(targets, "skills/x-quarkus-res/SKILL.md", "framework.quarkus.rest");
@@ -81,7 +98,8 @@ class Epic0064ComposerIntegrationSmokeTest {
         }
 
         @Test
-        @DisplayName("3 consecutive plans are deterministic — same included/excluded order (RULE-004)")
+        @DisplayName(
+                "3 consecutive plans are deterministic — same included/excluded order (RULE-004)")
         void planIsDeterministic(@TempDir Path targets) throws IOException {
             writeArtifact(targets, "skills/x-a/SKILL.md", "framework.spring-boot.mvc");
             writeArtifact(targets, "skills/x-b/SKILL.md");
@@ -91,9 +109,18 @@ class Epic0064ComposerIntegrationSmokeTest {
             CompositionPlan p2 = composer.plan(springActiveSet(), targets);
             CompositionPlan p3 = composer.plan(springActiveSet(), targets);
 
-            List<String> paths1 = p1.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
-            List<String> paths2 = p2.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
-            List<String> paths3 = p3.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
+            List<String> paths1 =
+                    p1.included().stream()
+                            .map(CompositionPlan.ArtifactEntry::relativePath)
+                            .toList();
+            List<String> paths2 =
+                    p2.included().stream()
+                            .map(CompositionPlan.ArtifactEntry::relativePath)
+                            .toList();
+            List<String> paths3 =
+                    p3.included().stream()
+                            .map(CompositionPlan.ArtifactEntry::relativePath)
+                            .toList();
             assertThat(paths1).isEqualTo(paths2).isEqualTo(paths3);
         }
     }

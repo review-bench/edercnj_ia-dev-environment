@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
 argument-hint: "[STORY-ID] [--mode standalone|inline]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

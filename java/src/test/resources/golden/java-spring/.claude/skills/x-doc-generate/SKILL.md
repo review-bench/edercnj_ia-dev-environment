@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[--type api|readme|adr|changelog|all] [--scope path] [--force]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

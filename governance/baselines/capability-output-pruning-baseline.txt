@@ -1,0 +1,10 @@
+# capability-output-pruning-baseline.txt
+# Generated on: 2026-04-29 (PR: epic/0064 → develop, story-0064-0706)
+# Schema: capability-baseline-v1.0
+# Status: SEALED — immutable post-merge
+#
+# This file intentionally empty — EPIC-0064 ships without backward compatibility.
+# Output pruning correctness is verified against canonical profiles with zero exemptions.
+# No artifacts with unsatisfied capability requirements may appear in generated output.
+# See: .claude/rules/28-capability-frontmatter-contract.md §Forbidden post-merge
+# See: java/src/main/resources/targets/claude/scripts/audit-output-pruning.sh

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 argument-hint: "[ci|cd|release|security|all] [--monorepo] [--force]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

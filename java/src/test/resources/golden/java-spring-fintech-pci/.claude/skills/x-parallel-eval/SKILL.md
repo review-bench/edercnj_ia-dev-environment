@@ -8,6 +8,7 @@ allowed-tools:
   - Bash
   - Read
   - Skill
+requires-capabilities: []
 ---
 
 # Skill: x-parallel-eval

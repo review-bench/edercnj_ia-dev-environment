@@ -45,7 +45,8 @@ class CapabilityGlobTest {
         @Test
         @DisplayName("single-star matches same-segment candidate")
         void singleStarMatchesSameSegment() {
-            assertThat(CapabilityGlob.matches("data.database.*", "data.database.postgres")).isTrue();
+            assertThat(CapabilityGlob.matches("data.database.*", "data.database.postgres"))
+                    .isTrue();
         }
 
         @Test
@@ -63,14 +64,17 @@ class CapabilityGlobTest {
         @Test
         @DisplayName("literal dot in pattern is escaped")
         void literalDotEscaped() {
-            assertThat(CapabilityGlob.matches("data.database.*", "dataxdatabasexpostgres")).isFalse();
+            assertThat(CapabilityGlob.matches("data.database.*", "dataxdatabasexpostgres"))
+                    .isFalse();
         }
 
         @Test
         @DisplayName("regular characters match literally")
         void regularCharsLiteral() {
-            assertThat(CapabilityGlob.matches("data.database.postgres", "data.database.postgres")).isTrue();
-            assertThat(CapabilityGlob.matches("data.database.postgres", "data.database.mysql")).isFalse();
+            assertThat(CapabilityGlob.matches("data.database.postgres", "data.database.postgres"))
+                    .isTrue();
+            assertThat(CapabilityGlob.matches("data.database.postgres", "data.database.mysql"))
+                    .isFalse();
         }
     }
 }

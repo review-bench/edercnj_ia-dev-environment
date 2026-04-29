@@ -17,7 +17,9 @@ class CapabilityErrorTest {
         @Test
         @DisplayName("referredId() and referrerId() accessible")
         void contextAccessible() {
-            var err = new CapabilityError.MissingPrerequisite("msg", "web.unknown", "web.spring.boot");
+            var err =
+                    new CapabilityError.MissingPrerequisite(
+                            "msg", "web.unknown", "web.spring.boot");
             assertThat(err.referredId()).isEqualTo("web.unknown");
             assertThat(err.referrerId()).isEqualTo("web.spring.boot");
             assertThat(err.getMessage()).isEqualTo("msg");
@@ -45,7 +47,9 @@ class CapabilityErrorTest {
         @Test
         @DisplayName("cyclePath() returns the cycle")
         void cyclePathAccessible() {
-            var err = new CapabilityError.CyclicDependency("cycle", List.of("a.b.c", "a.b.d", "a.b.c"));
+            var err =
+                    new CapabilityError.CyclicDependency(
+                            "cycle", List.of("a.b.c", "a.b.d", "a.b.c"));
             assertThat(err.cyclePath()).containsExactly("a.b.c", "a.b.d", "a.b.c");
         }
 

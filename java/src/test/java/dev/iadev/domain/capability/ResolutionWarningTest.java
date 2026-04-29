@@ -33,14 +33,19 @@ class ResolutionWarningTest {
         @Test
         @DisplayName("null message throws")
         void nullMessageThrows() {
-            assertThatThrownBy(() -> new ResolutionWarning(ResolutionWarning.Kind.UNKNOWN_CAPABILITY, null, "ctx"))
+            assertThatThrownBy(
+                            () ->
+                                    new ResolutionWarning(
+                                            ResolutionWarning.Kind.UNKNOWN_CAPABILITY, null, "ctx"))
                     .isInstanceOf(NullPointerException.class);
         }
 
         @Test
         @DisplayName("null context defaults to empty string")
         void nullContextDefaultsToEmpty() {
-            var w = new ResolutionWarning(ResolutionWarning.Kind.CYCLIC_DEPENDENCY_SUSPECT, "msg", null);
+            var w =
+                    new ResolutionWarning(
+                            ResolutionWarning.Kind.CYCLIC_DEPENDENCY_SUSPECT, "msg", null);
             assertThat(w.context()).isEmpty();
         }
     }
@@ -52,14 +57,20 @@ class ResolutionWarningTest {
         @Test
         @DisplayName("includes kind and message")
         void includesKindAndMessage() {
-            var w = ResolutionWarning.of(ResolutionWarning.Kind.DEPRECATED_CAPABILITY, "deprecated!");
+            var w =
+                    ResolutionWarning.of(
+                            ResolutionWarning.Kind.DEPRECATED_CAPABILITY, "deprecated!");
             assertThat(w.toString()).contains("DEPRECATED_CAPABILITY").contains("deprecated!");
         }
 
         @Test
         @DisplayName("includes context when present")
         void includesContextWhenPresent() {
-            var w = new ResolutionWarning(ResolutionWarning.Kind.GLOB_MATCHED_ZERO, "no match", "data.database.*");
+            var w =
+                    new ResolutionWarning(
+                            ResolutionWarning.Kind.GLOB_MATCHED_ZERO,
+                            "no match",
+                            "data.database.*");
             assertThat(w.toString()).contains("data.database.*");
         }
     }

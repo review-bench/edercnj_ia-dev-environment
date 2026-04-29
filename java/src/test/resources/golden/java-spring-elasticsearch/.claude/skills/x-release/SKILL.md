@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Skill, AskUserQuestion, TaskCreate, TaskUpdate
 argument-hint: "[major|minor|patch|version] [--version X.Y.Z] [--last-tag <tag>] [--dry-run] [--skip-tests] [--no-publish] [--no-github-release] [--hotfix] [--continue-after-merge] [--interactive] [--non-interactive] [--no-prompt] [--signed-tag] [--skip-review] [--ci-watch] [--state-file <path>] [--skip-integrity] [--integrity-report <path>] [--max-parallel <N>] [--status] [--abort] [--yes] [--force]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

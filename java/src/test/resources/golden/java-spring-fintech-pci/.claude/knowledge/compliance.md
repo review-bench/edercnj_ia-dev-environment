@@ -1,6 +1,7 @@
 ---
 name: compliance
 description: "Compliance frameworks (conditionally included): GDPR, HIPAA, LGPD, PCI-DSS, SOX. Data classification, rights enforcement, processing records, international transfers, security measures, audit logging, and framework-specific requirements."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Compliance

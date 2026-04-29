@@ -28,10 +28,18 @@ class PrerequisiteResolverTest {
 
     private static CapabilityDefinition def(String id, List<String> requires) {
         return new CapabilityDefinition(
-                CapabilityId.of(id), CapabilityKind.ATOMIC, id.split("\\.")[0],
-                Optional.empty(), "stable", "",
-                Map.of(), requires.stream().map(CapabilityId::of).toList(),
-                List.of(), List.of(), List.of(), List.of());
+                CapabilityId.of(id),
+                CapabilityKind.ATOMIC,
+                id.split("\\.")[0],
+                Optional.empty(),
+                "stable",
+                "",
+                Map.of(),
+                requires.stream().map(CapabilityId::of).toList(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     @Nested
@@ -62,11 +70,11 @@ class PrerequisiteResolverTest {
         @Test
         @DisplayName("linear chain A→B→C returns C,B,A in topological order (happy)")
         void linearChain() {
-            Map<String, CapabilityDefinition> cat = catalog(
-                    def("aaa.bbb.c", List.of()),
-                    def("aaa.bbb.b", List.of("aaa.bbb.c")),
-                    def("aaa.bbb.a", List.of("aaa.bbb.b"))
-            );
+            Map<String, CapabilityDefinition> cat =
+                    catalog(
+                            def("aaa.bbb.c", List.of()),
+                            def("aaa.bbb.b", List.of("aaa.bbb.c")),
+                            def("aaa.bbb.a", List.of("aaa.bbb.b")));
             List<CapabilityId> result = resolver.expand("aaa.bbb.a", cat);
             assertThat(result).hasSize(3);
             assertThat(result.get(0).value()).isEqualTo("aaa.bbb.c");
@@ -77,9 +85,8 @@ class PrerequisiteResolverTest {
         @Test
         @DisplayName("missing required capability throws MissingPrerequisite with context")
         void missingPrerequisite() {
-            Map<String, CapabilityDefinition> cat = catalog(
-                    def("aaa.bbb.x", List.of("aaa.bbb.missing"))
-            );
+            Map<String, CapabilityDefinition> cat =
+                    catalog(def("aaa.bbb.x", List.of("aaa.bbb.missing")));
             assertThatThrownBy(() -> resolver.expand("aaa.bbb.x", cat))
                     .isInstanceOf(CapabilityError.MissingPrerequisite.class)
                     .hasMessageContaining("aaa.bbb.missing")
@@ -109,16 +116,18 @@ class PrerequisiteResolverTest {
         @Test
         @DisplayName("glob requires expands to all matching atomics")
         void globRequiresExpands() {
-            Map<String, CapabilityDefinition> cat = catalog(
-                    def("data.database.postgres", List.of()),
-                    def("data.database.mysql", List.of()),
-                    def("data.database.mongo", List.of()),
-                    def("aaa.bbb.x", List.of("data.database.*"))
-            );
+            Map<String, CapabilityDefinition> cat =
+                    catalog(
+                            def("data.database.postgres", List.of()),
+                            def("data.database.mysql", List.of()),
+                            def("data.database.mongo", List.of()),
+                            def("aaa.bbb.x", List.of("data.database.*")));
             List<CapabilityId> result = resolver.expand("aaa.bbb.x", cat);
             assertThat(result).hasSize(4);
             List<String> ids = result.stream().map(CapabilityId::value).toList();
-            assertThat(ids).containsSequence("data.database.mongo", "data.database.mysql", "data.database.postgres");
+            assertThat(ids)
+                    .containsSequence(
+                            "data.database.mongo", "data.database.mysql", "data.database.postgres");
         }
     }
 }

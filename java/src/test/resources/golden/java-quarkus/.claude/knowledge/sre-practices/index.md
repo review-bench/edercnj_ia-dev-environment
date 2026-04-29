@@ -1,6 +1,7 @@
 ---
 name: sre-practices
 description: "SRE practices: error budgets, toil reduction, on-call practices, capacity planning, incident management process, and change management. Covers SLO-based release gates, burn rate calculation, automation prioritization, rotation patterns, load testing methodology, blameless postmortems, and canary analysis."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: SRE Practices

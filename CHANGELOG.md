@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-04-29
+
 ### Added
 
 - **EPIC-0061 (Local-First Lifecycle & Stack-Aware Governance) — stories 0001-0007:**

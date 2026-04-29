@@ -1,6 +1,7 @@
 ---
 name: data-modeling
 description: "Cross-cutting data modeling patterns: schema design (soft delete, temporal tables, audit trails, multi-tenant, SCD), concurrency, and test data management."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Data Modeling

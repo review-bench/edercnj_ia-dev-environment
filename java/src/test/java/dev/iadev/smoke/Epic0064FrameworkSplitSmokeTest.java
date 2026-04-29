@@ -14,19 +14,17 @@ import org.junit.jupiter.api.Test;
 /**
  * Smoke test for Phase 4 of EPIC-0064: Framework-specific content split.
  *
- * Validates that:
- * 1. Old spring-patterns/ and quarkus-patterns/ directories no longer exist
- * 2. New stack-patterns/spring/, quarkus/, picocli/, helidon/, micronaut/ subdirs exist
- * 3. All new stack-pattern index files have requires-capabilities: [...] set (non-empty)
- * 4. The capabilities catalog has symmetric excludes for production databases
- * 5. JPA fragments exist for all four database engines
- * 6. R2DBC index exists with requires-capabilities
+ * <p>Validates that: 1. Old spring-patterns/ and quarkus-patterns/ directories no longer exist 2.
+ * New stack-patterns/spring/, quarkus/, picocli/, helidon/, micronaut/ subdirs exist 3. All new
+ * stack-pattern index files have requires-capabilities: [...] set (non-empty) 4. The capabilities
+ * catalog has symmetric excludes for production databases 5. JPA fragments exist for all four
+ * database engines 6. R2DBC index exists with requires-capabilities
  */
 @DisplayName("Epic0064FrameworkSplitSmokeTest")
 class Epic0064FrameworkSplitSmokeTest {
 
-    private static final Path KNOWLEDGE_ROOT = Path.of(
-            "src/main/resources/targets/claude/knowledge");
+    private static final Path KNOWLEDGE_ROOT =
+            Path.of("src/main/resources/targets/claude/knowledge");
     private static final Path STACK_PATTERNS = KNOWLEDGE_ROOT.resolve("stack-patterns");
     private static final Path DB_PATTERNS = KNOWLEDGE_ROOT.resolve("database-patterns");
     private static final Path CAPABILITIES_ROOT = Path.of("../capabilities");
@@ -65,7 +63,10 @@ class Epic0064FrameworkSplitSmokeTest {
             var indexFile = STACK_PATTERNS.resolve(dir).resolve("index.md");
             String content = Files.readString(indexFile);
             assertThat(content)
-                    .withFailMessage("stack-patterns/" + dir + "/index.md missing non-empty requires-capabilities")
+                    .withFailMessage(
+                            "stack-patterns/"
+                                    + dir
+                                    + "/index.md missing non-empty requires-capabilities")
                     .containsPattern("requires-capabilities: \\[\\S+");
         }
     }
@@ -94,7 +95,8 @@ class Epic0064FrameworkSplitSmokeTest {
     // --- Story 0401: Capabilities catalog correctness ---
 
     @Test
-    @DisplayName("Capabilities catalog: postgres/mysql/mariadb must not exclude h2 (h2 is test-only)")
+    @DisplayName(
+            "Capabilities catalog: postgres/mysql/mariadb must not exclude h2 (h2 is test-only)")
     void productionDbs_mustNotExcludeH2() throws IOException {
         List<String> productionDbs = List.of("postgres", "mysql", "mariadb");
         for (String db : productionDbs) {
@@ -102,7 +104,10 @@ class Epic0064FrameworkSplitSmokeTest {
             if (!Files.exists(yamlPath)) continue;
             var content = Files.readString(yamlPath);
             assertThat(content)
-                    .withFailMessage("capabilities/data/database/" + db + ".yaml must not exclude data.database.h2")
+                    .withFailMessage(
+                            "capabilities/data/database/"
+                                    + db
+                                    + ".yaml must not exclude data.database.h2")
                     .doesNotContain("data.database.h2");
         }
     }
@@ -151,18 +156,22 @@ class Epic0064FrameworkSplitSmokeTest {
     void jpaFragments_haveFrontmatterFields() throws IOException {
         try (Stream<Path> files = Files.list(DB_PATTERNS.resolve("jpa"))) {
             files.filter(p -> p.toString().endsWith(".md"))
-                 .forEach(file -> {
-                     String content;
-                     try { content = Files.readString(file); }
-                     catch (IOException e) { throw new UncheckedIOException(e); }
+                    .forEach(
+                            file -> {
+                                String content;
+                                try {
+                                    content = Files.readString(file);
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
 
-                     assertThat(content)
-                             .withFailMessage(file + " missing requires-capabilities")
-                             .containsPattern("requires-capabilities: \\[\\S+");
-                     assertThat(content)
-                             .withFailMessage(file + " missing fragment-slot")
-                             .contains("fragment-slot:");
-                 });
+                                assertThat(content)
+                                        .withFailMessage(file + " missing requires-capabilities")
+                                        .containsPattern("requires-capabilities: \\[\\S+");
+                                assertThat(content)
+                                        .withFailMessage(file + " missing fragment-slot")
+                                        .contains("fragment-slot:");
+                            });
         }
     }
 
@@ -186,27 +195,37 @@ class Epic0064FrameworkSplitSmokeTest {
     @Test
     @DisplayName("Framework-specific skills must exist with SKILL.md")
     void frameworkSkills_exist() {
-        List<String> skills = List.of(
-                "spring-controller", "quarkus-resource", "picocli-command",
-                "helidon-scaffold", "micronaut-scaffold");
+        List<String> skills =
+                List.of(
+                        "spring-controller",
+                        "quarkus-resource",
+                        "picocli-command",
+                        "helidon-scaffold",
+                        "micronaut-scaffold");
         for (String skill : skills) {
-            var skillFile = Path.of("src/main/resources/targets/claude/skills/core/dev")
-                    .resolve(skill).resolve("SKILL.md");
-            assertThat(skillFile)
-                    .withFailMessage("Missing SKILL.md for: " + skill)
-                    .exists();
+            var skillFile =
+                    Path.of("src/main/resources/targets/claude/skills/core/dev")
+                            .resolve(skill)
+                            .resolve("SKILL.md");
+            assertThat(skillFile).withFailMessage("Missing SKILL.md for: " + skill).exists();
         }
     }
 
     @Test
     @DisplayName("Framework skills must declare requires-capabilities in frontmatter")
     void frameworkSkills_haveRequiresCapabilities() throws IOException {
-        List<String> skills = List.of(
-                "spring-controller", "quarkus-resource", "picocli-command",
-                "helidon-scaffold", "micronaut-scaffold");
+        List<String> skills =
+                List.of(
+                        "spring-controller",
+                        "quarkus-resource",
+                        "picocli-command",
+                        "helidon-scaffold",
+                        "micronaut-scaffold");
         for (String skill : skills) {
-            var skillFile = Path.of("src/main/resources/targets/claude/skills/core/dev")
-                    .resolve(skill).resolve("SKILL.md");
+            var skillFile =
+                    Path.of("src/main/resources/targets/claude/skills/core/dev")
+                            .resolve(skill)
+                            .resolve("SKILL.md");
             if (!Files.exists(skillFile)) continue;
             var content = Files.readString(skillFile);
             assertThat(content)

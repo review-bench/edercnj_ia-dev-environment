@@ -185,6 +185,33 @@ EPIC-0040 shipped this stack — see the [CHANGELOG](CHANGELOG.md#380---2026-04-
 
 ---
 
+## Capability Composition — Como funciona
+
+**EPIC-0064 (v5.0.0 — Breaking).** O gerador `ia-dev-env` passou de copy-cego para composição capability-driven. Todo artefato gerado (skills, rules, KPs, agents, hooks, templates) declara `requires-capabilities` em frontmatter v3.0. O pipeline:
+
+```
+profile.yaml → CapabilityResolver → ResolvedCapabilitySet
+                                        ↓
+                               CapabilityAwareComposer
+                                        ↓
+                              OutputPruner (.claude/ filtrado)
+                                        ↓
+                        CompositionEngine → Pebble → LLM
+```
+
+**Para adicionar uma nova capability:**
+
+1. Crie `capabilities/<categoria>/<id>.yaml` com campos `id`, `name`, `description`, `requires`, `excludes`.
+2. Declare `requires-capabilities: [<id>]` nos artefatos que dependem dela.
+3. Execute `audit-capability-graph.sh --self-check` para verificar integridade.
+4. Ver: [Rule 28 §Invariants](.claude/rules/28-capability-frontmatter-contract.md) · [ADR-0016](docs/adr/ADR-0016-capability-driven-composition.md)
+
+**Para adicionar um novo framework (stack):** edite `java/src/main/resources/targets/claude/skills/conditional/` e declare as capabilities do framework. Ver story-0064-0408/0409.
+
+> Schema v3.0 é obrigatório — não há fallback v2. Baselines vazios em `governance/baselines/capability-*.txt` declaram explicitamente zero exceções (Rule 28 §Forbidden post-merge).
+
+---
+
 ## Settings & Artifact Conventions
 
 - `settings.json` (committed): team permissions and hooks.

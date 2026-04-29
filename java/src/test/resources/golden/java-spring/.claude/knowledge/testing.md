@@ -2,6 +2,7 @@
 name: testing
 model: haiku
 description: "Complete testing reference: testing philosophy, 8 test categories, coverage thresholds, fixture patterns, data uniqueness, async handling, database strategy, and {{LANGUAGE}}-specific test frameworks. Read before writing tests."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Testing

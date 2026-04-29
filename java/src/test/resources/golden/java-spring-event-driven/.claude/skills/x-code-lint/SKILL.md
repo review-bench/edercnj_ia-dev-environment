@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[--fix | --changed-only | --strict]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

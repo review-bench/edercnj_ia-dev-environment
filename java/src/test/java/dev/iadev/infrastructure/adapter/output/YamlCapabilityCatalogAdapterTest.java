@@ -37,7 +37,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("parses valid capability YAML (happy)")
         void parsesValidYaml(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("postgres.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: atomic
@@ -53,7 +55,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("throws with file:line for malformed YAML (error)")
         void malformedYamlFails(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("broken.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: [unclosed
@@ -67,7 +71,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("rejects YAML missing required fields (schema v3.0 check)")
         void rejectsMissingRequiredFields(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("legacy.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     description: missing kind and category
                     """);
@@ -80,7 +86,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("parses requires list correctly")
         void parsesRequiresList(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("composite.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: framework.spring-boot.data-jpa
                     category: framework
                     kind: composite
@@ -101,7 +109,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("parses COMPOSITE kind correctly")
         void parsesCompositeKind(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("composite.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: framework.spring-boot.full
                     category: framework
                     kind: composite
@@ -116,7 +126,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("parses PROFILE kind correctly")
         void parsesProfileKind(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("profile.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: framework.spring-boot.full
                     category: framework
                     kind: profile
@@ -131,13 +143,16 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("unknown kind throws UnknownCapability")
         void unknownKindThrows(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("bad.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: unknown-kind
                     """);
             assertThatThrownBy(() -> adapter.load(file))
-                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
+                    .isInstanceOf(
+                            dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
                     .hasMessageContaining("unknown kind");
         }
 
@@ -145,7 +160,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("version field parsed when present")
         void versionFieldParsed(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("versioned.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: atomic
@@ -161,7 +178,8 @@ class YamlCapabilityCatalogAdapterTest {
             Path file = tmp.resolve("list.yaml");
             Files.writeString(file, "- item1\n- item2\n");
             assertThatThrownBy(() -> adapter.load(file))
-                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class);
+                    .isInstanceOf(
+                            dev.iadev.domain.capability.CapabilityError.UnknownCapability.class);
         }
 
         @Test
@@ -170,7 +188,8 @@ class YamlCapabilityCatalogAdapterTest {
             Path file = tmp.resolve("bad-field.yaml");
             Files.writeString(file, "id: 123\ncategory: data\nkind: atomic\n");
             assertThatThrownBy(() -> adapter.load(file))
-                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
+                    .isInstanceOf(
+                            dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
                     .hasMessageContaining("must be a string");
         }
 
@@ -178,7 +197,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("tags and provides as list are parsed")
         void tagsAndProvidesAsList(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("tagged.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: atomic
@@ -197,7 +218,9 @@ class YamlCapabilityCatalogAdapterTest {
         @DisplayName("excludes list parsed correctly")
         void excludesListParsed(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("excludes.yaml");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     id: data.database.postgres
                     category: data
                     kind: atomic
@@ -240,11 +263,14 @@ class YamlCapabilityCatalogAdapterTest {
             Files.createDirectories(dataDb);
             Files.createDirectories(dataCache);
 
-            Files.writeString(dataDb.resolve("postgres.yaml"),
+            Files.writeString(
+                    dataDb.resolve("postgres.yaml"),
                     "id: data.database.postgres\ncategory: data\nkind: atomic\n");
-            Files.writeString(dataDb.resolve("mysql.yaml"),
+            Files.writeString(
+                    dataDb.resolve("mysql.yaml"),
                     "id: data.database.mysql\ncategory: data\nkind: atomic\n");
-            Files.writeString(dataCache.resolve("redis.yaml"),
+            Files.writeString(
+                    dataCache.resolve("redis.yaml"),
                     "id: data.cache.redis\ncategory: data\nkind: atomic\n");
 
             List<CapabilityDefinition> first = adapter.loadAll(catalog);
@@ -252,7 +278,8 @@ class YamlCapabilityCatalogAdapterTest {
 
             assertThat(first).hasSize(3);
             assertThat(first.stream().map(d -> d.id().value()).toList())
-                    .containsExactly("data.cache.redis", "data.database.mysql", "data.database.postgres");
+                    .containsExactly(
+                            "data.cache.redis", "data.database.mysql", "data.database.postgres");
             assertThat(first.stream().map(d -> d.id().value()).toList())
                     .isEqualTo(second.stream().map(d -> d.id().value()).toList());
         }

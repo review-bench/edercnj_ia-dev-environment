@@ -6,6 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[EPIC-ID] [--dry-run] [--prs N,M,...] [--skip-replies] [--include-suggestions]"
 context-budget: light
 user-invocable: true
+requires-capabilities: []
 ---
 
 ## Global Output Policy

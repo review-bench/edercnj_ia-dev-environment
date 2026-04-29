@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[branch-name or commit-message]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

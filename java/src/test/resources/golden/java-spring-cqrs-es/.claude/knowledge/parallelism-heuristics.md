@@ -1,6 +1,7 @@
 ---
 name: parallelism-heuristics
 description: "Canonical catalog of file-collision heuristics for parallel task, story, and epic execution. Defines the File Footprint block format, the three Conflict Categories (hard / regen / soft), a hotspot list of high-contention paths, and the degrade-with-warning policy. Consumed by x-task-plan, x-story-plan, x-epic-map, x-parallel-eval, and x-dev-*-implement."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Parallelism Heuristics

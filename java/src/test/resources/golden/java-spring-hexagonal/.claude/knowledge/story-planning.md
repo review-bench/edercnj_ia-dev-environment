@@ -1,6 +1,7 @@
 ---
 name: story-planning
 description: "Story decomposition and planning: layer-by-layer decomposition (foundation, core domain, extensions, compositions, cross-cutting), story self-containment (data contracts, acceptance criteria), dependency DAG, sizing rules, and phase computation."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Story Planning

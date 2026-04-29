@@ -1,6 +1,7 @@
 ---
 name: performance-engineering
 description: "Performance engineering patterns: profiling, benchmarking, optimization, regression detection, and memory management for {{LANGUAGE}} {{FRAMEWORK}} projects using {{BUILD_TOOL}}."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Performance Engineering

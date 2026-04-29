@@ -31,8 +31,8 @@ class CompositionEngineTest {
         @DisplayName("slot resolved by matching fragment (happy)")
         void slotResolvedByFragment() {
             var frag = frag("review-specialist", "db", 10, "## DB Review\nContent here.");
-            String result = engine.render("Header\n{{ slot: review-specialist }}\nFooter",
-                    List.of(frag));
+            String result =
+                    engine.render("Header\n{{ slot: review-specialist }}\nFooter", List.of(frag));
             assertThat(result).contains("## DB Review");
             assertThat(result).startsWith("Header");
             assertThat(result).endsWith("Footer");
@@ -82,7 +82,8 @@ class CompositionEngineTest {
         @Test
         @DisplayName("each block with no matching fragments renders empty string")
         void eachWithNoFragmentsEmpty() {
-            String result = engine.render("{{ #each fragments.absent-slot }}item{{ /each }}", List.of());
+            String result =
+                    engine.render("{{ #each fragments.absent-slot }}item{{ /each }}", List.of());
             assertThat(result).isEmpty();
         }
 
@@ -91,8 +92,9 @@ class CompositionEngineTest {
         void eachExpandsBody() {
             var f1 = frag("spec", "qa", 10, "QA Body");
             var f2 = frag("spec", "perf", 20, "Perf Body");
-            String result = engine.render(
-                    "{{ #each fragments.spec }}\n{{ body }}\n{{ /each }}", List.of(f1, f2));
+            String result =
+                    engine.render(
+                            "{{ #each fragments.spec }}\n{{ body }}\n{{ /each }}", List.of(f1, f2));
             assertThat(result).contains("QA Body").contains("Perf Body");
         }
     }

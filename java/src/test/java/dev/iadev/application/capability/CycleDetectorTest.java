@@ -20,9 +20,18 @@ class CycleDetectorTest {
     private static CapabilityDefinition def(String id, List<String> requires) {
         List<CapabilityId> reqs = requires.stream().map(CapabilityId::of).toList();
         return new CapabilityDefinition(
-                CapabilityId.of(id), CapabilityKind.ATOMIC, id.split("\\.")[0],
-                java.util.Optional.empty(), "stable", "",
-                java.util.Map.of(), reqs, List.of(), List.of(), List.of(), List.of());
+                CapabilityId.of(id),
+                CapabilityKind.ATOMIC,
+                id.split("\\.")[0],
+                java.util.Optional.empty(),
+                "stable",
+                "",
+                java.util.Map.of(),
+                reqs,
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     @Nested
@@ -32,7 +41,8 @@ class CycleDetectorTest {
         @Test
         @DisplayName("single node graph returns empty (degenerate)")
         void singleNode() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(def("data.database.postgres", List.of())));
+            CapabilityGraph g =
+                    CapabilityGraph.of(List.of(def("data.database.postgres", List.of())));
             assertThat(detector.detect(g)).isEmpty();
         }
 
@@ -45,11 +55,12 @@ class CycleDetectorTest {
         @Test
         @DisplayName("linear chain A→B→C is acyclic (happy)")
         void linearChain() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    def("aaa.bbb.a", List.of()),
-                    def("aaa.bbb.b", List.of("aaa.bbb.a")),
-                    def("aaa.bbb.c", List.of("aaa.bbb.b"))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    def("aaa.bbb.a", List.of()),
+                                    def("aaa.bbb.b", List.of("aaa.bbb.a")),
+                                    def("aaa.bbb.c", List.of("aaa.bbb.b"))));
             assertThat(detector.detect(g)).isEmpty();
         }
     }
@@ -61,10 +72,11 @@ class CycleDetectorTest {
         @Test
         @DisplayName("direct cycle A→B, B→A detected (error path)")
         void directCycle() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    def("aaa.bbb.alpha", List.of("aaa.bbb.beta")),
-                    def("aaa.bbb.beta", List.of("aaa.bbb.alpha"))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    def("aaa.bbb.alpha", List.of("aaa.bbb.beta")),
+                                    def("aaa.bbb.beta", List.of("aaa.bbb.alpha"))));
             Optional<CycleDetector.CycleDetected> result = detector.detect(g);
             assertThat(result).isPresent();
             List<String> path = result.get().cyclePath();
@@ -75,11 +87,12 @@ class CycleDetectorTest {
         @Test
         @DisplayName("indirect cycle A→B→C→A detected (error path)")
         void indirectCycle() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    def("aaa.bbb.alpha", List.of("aaa.bbb.beta")),
-                    def("aaa.bbb.beta", List.of("aaa.bbb.gamma")),
-                    def("aaa.bbb.gamma", List.of("aaa.bbb.alpha"))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    def("aaa.bbb.alpha", List.of("aaa.bbb.beta")),
+                                    def("aaa.bbb.beta", List.of("aaa.bbb.gamma")),
+                                    def("aaa.bbb.gamma", List.of("aaa.bbb.alpha"))));
             Optional<CycleDetector.CycleDetected> result = detector.detect(g);
             assertThat(result).isPresent();
             List<String> path = result.get().cyclePath();
@@ -90,12 +103,13 @@ class CycleDetectorTest {
         @Test
         @DisplayName("multiple disjoint cycles — primary SCC is alphabetically first (boundary)")
         void multipleCyclesDeterministic() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    def("xxx.yyy.alpha", List.of("xxx.yyy.beta")),
-                    def("xxx.yyy.beta", List.of("xxx.yyy.alpha")),
-                    def("zzz.yyy.x", List.of("zzz.yyy.y")),
-                    def("zzz.yyy.y", List.of("zzz.yyy.x"))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    def("xxx.yyy.alpha", List.of("xxx.yyy.beta")),
+                                    def("xxx.yyy.beta", List.of("xxx.yyy.alpha")),
+                                    def("zzz.yyy.x", List.of("zzz.yyy.y")),
+                                    def("zzz.yyy.y", List.of("zzz.yyy.x"))));
             Optional<CycleDetector.CycleDetected> first = detector.detect(g);
             Optional<CycleDetector.CycleDetected> second = detector.detect(g);
             Optional<CycleDetector.CycleDetected> third = detector.detect(g);

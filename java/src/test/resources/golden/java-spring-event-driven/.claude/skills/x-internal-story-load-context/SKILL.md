@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--story-id <story-XXXX-YYYY> --epic-id <XXXX>"
 category: internal-plan
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

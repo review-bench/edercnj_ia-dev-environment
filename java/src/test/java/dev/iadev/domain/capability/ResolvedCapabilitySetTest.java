@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,8 @@ class ResolvedCapabilitySetTest {
         @Test
         @DisplayName("null profileName throws")
         void nullProfileNameThrows() {
-            assertThatThrownBy(() -> new ResolvedCapabilitySet(null, List.of(), Map.of(), List.of()))
+            assertThatThrownBy(
+                            () -> new ResolvedCapabilitySet(null, List.of(), Map.of(), List.of()))
                     .isInstanceOf(NullPointerException.class);
         }
     }
@@ -49,8 +49,12 @@ class ResolvedCapabilitySetTest {
         @Test
         @DisplayName("contains returns false for inactive capability")
         void containsReturnsFalseForInactive() {
-            var set = new ResolvedCapabilitySet("test",
-                    List.of(CapabilityId.of("data.database.postgres")), Map.of(), List.of());
+            var set =
+                    new ResolvedCapabilitySet(
+                            "test",
+                            List.of(CapabilityId.of("data.database.postgres")),
+                            Map.of(),
+                            List.of());
             assertThat(set.contains(CapabilityId.of("data.cache.redis"))).isFalse();
         }
     }
@@ -62,8 +66,12 @@ class ResolvedCapabilitySetTest {
         @Test
         @DisplayName("returns present parameter value")
         void returnsParameter() {
-            var set = new ResolvedCapabilitySet("test", List.of(),
-                    Map.of("data.database.postgres.version", "16"), List.of());
+            var set =
+                    new ResolvedCapabilitySet(
+                            "test",
+                            List.of(),
+                            Map.of("data.database.postgres.version", "16"),
+                            List.of());
             assertThat(set.parameter("data.database.postgres.version")).contains("16");
         }
 
@@ -89,8 +97,14 @@ class ResolvedCapabilitySetTest {
         @Test
         @DisplayName("true when warnings present")
         void trueWhenWarnings() {
-            var set = new ResolvedCapabilitySet("test", List.of(), Map.of(),
-                    List.of(ResolutionWarning.of(ResolutionWarning.Kind.UNKNOWN_CAPABILITY, "test")));
+            var set =
+                    new ResolvedCapabilitySet(
+                            "test",
+                            List.of(),
+                            Map.of(),
+                            List.of(
+                                    ResolutionWarning.of(
+                                            ResolutionWarning.Kind.UNKNOWN_CAPABILITY, "test")));
             assertThat(set.hasWarnings()).isTrue();
         }
     }

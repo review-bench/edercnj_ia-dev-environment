@@ -41,18 +41,34 @@ class TelemetryCapabilityResolverTest {
         @Test
         @DisplayName("propagates exceptions from delegate")
         void propagatesExceptions() {
-            List<CapabilityDefinition> catalog = List.of(
-                    new CapabilityDefinition(
-                            CapabilityId.of("aaa.bbb.alpha"), CapabilityKind.ATOMIC, "aaa",
-                            Optional.empty(), "stable", "", Map.of(),
-                            List.of(CapabilityId.of("aaa.bbb.beta")),
-                            List.of(), List.of(), List.of(), List.of()),
-                    new CapabilityDefinition(
-                            CapabilityId.of("aaa.bbb.beta"), CapabilityKind.ATOMIC, "aaa",
-                            Optional.empty(), "stable", "", Map.of(),
-                            List.of(CapabilityId.of("aaa.bbb.alpha")),
-                            List.of(), List.of(), List.of(), List.of())
-            );
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            new CapabilityDefinition(
+                                    CapabilityId.of("aaa.bbb.alpha"),
+                                    CapabilityKind.ATOMIC,
+                                    "aaa",
+                                    Optional.empty(),
+                                    "stable",
+                                    "",
+                                    Map.of(),
+                                    List.of(CapabilityId.of("aaa.bbb.beta")),
+                                    List.of(),
+                                    List.of(),
+                                    List.of(),
+                                    List.of()),
+                            new CapabilityDefinition(
+                                    CapabilityId.of("aaa.bbb.beta"),
+                                    CapabilityKind.ATOMIC,
+                                    "aaa",
+                                    Optional.empty(),
+                                    "stable",
+                                    "",
+                                    Map.of(),
+                                    List.of(CapabilityId.of("aaa.bbb.alpha")),
+                                    List.of(),
+                                    List.of(),
+                                    List.of(),
+                                    List.of()));
             Profile profile = Profile.of("cyclic", List.of(CapabilityId.of("aaa.bbb.alpha")));
             assertThatThrownBy(() -> resolver.resolve(profile, catalog))
                     .isInstanceOf(CapabilityError.CyclicDependency.class);
@@ -61,16 +77,34 @@ class TelemetryCapabilityResolverTest {
         @Test
         @DisplayName("propagates exceptions from delegate with telemetry phase.end failed")
         void propagatesWithTelemetry() {
-            List<CapabilityDefinition> catalog = List.of(
-                    new CapabilityDefinition(
-                            CapabilityId.of("aaa.bbb.alpha"), CapabilityKind.ATOMIC, "aaa",
-                            Optional.empty(), "stable", "", Map.of(),
-                            List.of(CapabilityId.of("aaa.bbb.beta")), List.of(), List.of(), List.of(), List.of()),
-                    new CapabilityDefinition(
-                            CapabilityId.of("aaa.bbb.beta"), CapabilityKind.ATOMIC, "aaa",
-                            Optional.empty(), "stable", "", Map.of(),
-                            List.of(CapabilityId.of("aaa.bbb.alpha")), List.of(), List.of(), List.of(), List.of())
-            );
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            new CapabilityDefinition(
+                                    CapabilityId.of("aaa.bbb.alpha"),
+                                    CapabilityKind.ATOMIC,
+                                    "aaa",
+                                    Optional.empty(),
+                                    "stable",
+                                    "",
+                                    Map.of(),
+                                    List.of(CapabilityId.of("aaa.bbb.beta")),
+                                    List.of(),
+                                    List.of(),
+                                    List.of(),
+                                    List.of()),
+                            new CapabilityDefinition(
+                                    CapabilityId.of("aaa.bbb.beta"),
+                                    CapabilityKind.ATOMIC,
+                                    "aaa",
+                                    Optional.empty(),
+                                    "stable",
+                                    "",
+                                    Map.of(),
+                                    List.of(CapabilityId.of("aaa.bbb.alpha")),
+                                    List.of(),
+                                    List.of(),
+                                    List.of(),
+                                    List.of()));
             Profile profile = Profile.of("cyclic", List.of(CapabilityId.of("aaa.bbb.alpha")));
             assertThatThrownBy(() -> resolver.resolve(profile, catalog))
                     .isInstanceOf(CapabilityError.CyclicDependency.class);

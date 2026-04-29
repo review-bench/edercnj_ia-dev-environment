@@ -75,3 +75,27 @@ The file is append-only; multiple runs add new sections.
 | Epic | flowVersion | Source | Destination | Action |
 | :--- | :--- | :--- | :--- | :--- |
 | 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042-épico | skipped (legacy v0) |
+
+## Run at 2026-04-29T12:25:37Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042-épico | skipped (legacy v0) |
+
+## Run at 2026-04-29T12:25:37Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042-épico | skipped (legacy v0) |
+
+## Run at 2026-04-29T12:43:11Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042-épico | skipped (legacy v0) |
+
+## Run at 2026-04-29T12:43:12Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042-épico | skipped (legacy v0) |

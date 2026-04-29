@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 argument-hint: "[--scope all|rules|patterns|architecture|cross-file]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -4,7 +4,9 @@ description: "Validates event schemas, producer/consumer patterns, error handlin
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[event-name or consumer/producer class]"
-context-budget: light
+context-budget: medium
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: events, fragment-order: 60 }
 ---
 
 ## Global Output Policy

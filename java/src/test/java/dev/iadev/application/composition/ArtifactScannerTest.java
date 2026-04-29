@@ -36,7 +36,8 @@ class ArtifactScannerTest {
         @Test
         @DisplayName("file starting with _ is skipped")
         void underscoreFilesSkipped(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("_TEMPLATE-test.md"),
+            Files.writeString(
+                    dir.resolve("_TEMPLATE-test.md"),
                     "---\nname: template\nrequires-capabilities: []\n---\n");
             assertThat(scanner.scan(dir)).isEmpty();
         }
@@ -44,17 +45,20 @@ class ArtifactScannerTest {
         @Test
         @DisplayName("valid frontmatter with requires-capabilities scanned")
         void validFrontmatterScanned(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("skill.md"),
+            Files.writeString(
+                    dir.resolve("skill.md"),
                     "---\nname: test-skill\nrequires-capabilities:\n  - data.database.postgres\n---\n# Content\n");
             List<ArtifactScanner.ScannedArtifact> result = scanner.scan(dir);
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).requiredCapabilities()).containsExactly("data.database.postgres");
+            assertThat(result.get(0).requiredCapabilities())
+                    .containsExactly("data.database.postgres");
         }
 
         @Test
         @DisplayName("inline list requires-capabilities parsed correctly")
         void inlineListParsed(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("skill.md"),
+            Files.writeString(
+                    dir.resolve("skill.md"),
                     "---\nname: test\nrequires-capabilities: [data.database.postgres, data.cache.redis]\n---\n");
             List<ArtifactScanner.ScannedArtifact> result = scanner.scan(dir);
             assertThat(result).hasSize(1);
@@ -65,7 +69,8 @@ class ArtifactScannerTest {
         @Test
         @DisplayName("empty requires-capabilities returns empty list")
         void emptyRequiresCapabilities(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("universal.md"),
+            Files.writeString(
+                    dir.resolve("universal.md"),
                     "---\nname: universal\nrequires-capabilities: []\n---\n");
             List<ArtifactScanner.ScannedArtifact> result = scanner.scan(dir);
             assertThat(result).hasSize(1);
@@ -75,25 +80,28 @@ class ArtifactScannerTest {
         @Test
         @DisplayName("file with frontmatter missing closing --- returns empty")
         void unclosedFrontmatterSkipped(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("unclosed.md"),
-                    "---\nname: test\nrequires-capabilities: []");
+            Files.writeString(
+                    dir.resolve("unclosed.md"), "---\nname: test\nrequires-capabilities: []");
             assertThat(scanner.scan(dir)).isEmpty();
         }
 
         @Test
         @DisplayName("requires-capabilities with other field following stops list correctly")
         void requiresCapabilitiesFollowedByOtherField(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("multi2.md"),
+            Files.writeString(
+                    dir.resolve("multi2.md"),
                     "---\nname: x\nrequires-capabilities:\n  - data.database.postgres\nmodel: sonnet\n---\n");
             var result = scanner.scan(dir);
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).requiredCapabilities()).containsExactly("data.database.postgres");
+            assertThat(result.get(0).requiredCapabilities())
+                    .containsExactly("data.database.postgres");
         }
 
         @Test
         @DisplayName("multiline requires-capabilities list parsed")
         void multilineRequiresCapabilities(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("multi.md"),
+            Files.writeString(
+                    dir.resolve("multi.md"),
                     "---\nname: x\nrequires-capabilities:\n  - data.database.postgres\n  - data.cache.redis\n---\n");
             var result = scanner.scan(dir);
             assertThat(result).hasSize(1);
@@ -106,10 +114,10 @@ class ArtifactScannerTest {
         void sortedByPath(@TempDir Path dir) throws IOException {
             Path sub = dir.resolve("z-skills");
             Files.createDirectories(sub);
-            Files.writeString(sub.resolve("b-skill.md"),
-                    "---\nname: b\nrequires-capabilities: []\n---\n");
-            Files.writeString(dir.resolve("a-skill.md"),
-                    "---\nname: a\nrequires-capabilities: []\n---\n");
+            Files.writeString(
+                    sub.resolve("b-skill.md"), "---\nname: b\nrequires-capabilities: []\n---\n");
+            Files.writeString(
+                    dir.resolve("a-skill.md"), "---\nname: a\nrequires-capabilities: []\n---\n");
             List<ArtifactScanner.ScannedArtifact> result = scanner.scan(dir);
             assertThat(result).hasSize(2);
             assertThat(result.get(0).relativePath()).startsWith("a-skill");

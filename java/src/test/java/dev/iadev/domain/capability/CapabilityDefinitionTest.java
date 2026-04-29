@@ -19,8 +19,9 @@ class CapabilityDefinitionTest {
         @Test
         @DisplayName("creates atomic with defaults")
         void createsAtomicDefaults() {
-            CapabilityDefinition def = CapabilityDefinition.atomic(
-                    CapabilityId.of("data.database.postgres"), "data", "PostgreSQL");
+            CapabilityDefinition def =
+                    CapabilityDefinition.atomic(
+                            CapabilityId.of("data.database.postgres"), "data", "PostgreSQL");
             assertThat(def.kind()).isEqualTo(CapabilityKind.ATOMIC);
             assertThat(def.status()).isEqualTo("stable");
             assertThat(def.requires()).isEmpty();
@@ -36,10 +37,11 @@ class CapabilityDefinitionTest {
         @Test
         @DisplayName("creates profile with expands-to")
         void createsProfile() {
-            CapabilityDefinition def = CapabilityDefinition.profile(
-                    CapabilityId.of("framework.spring-boot.full"),
-                    "framework",
-                    List.of(CapabilityId.of("framework.spring-boot.mvc")));
+            CapabilityDefinition def =
+                    CapabilityDefinition.profile(
+                            CapabilityId.of("framework.spring-boot.full"),
+                            "framework",
+                            List.of(CapabilityId.of("framework.spring-boot.mvc")));
             assertThat(def.kind()).isEqualTo(CapabilityKind.PROFILE);
             assertThat(def.expandsTo()).hasSize(1);
         }
@@ -47,9 +49,21 @@ class CapabilityDefinitionTest {
         @Test
         @DisplayName("profile without expands-to throws")
         void profileWithoutExpandsToThrows() {
-            assertThatThrownBy(() -> new CapabilityDefinition(
-                    CapabilityId.of("framework.spring-boot.full"), CapabilityKind.PROFILE, "framework",
-                    Optional.empty(), "stable", "", java.util.Map.of(), List.of(), List.of(), List.of(), List.of(), List.of()))
+            assertThatThrownBy(
+                            () ->
+                                    new CapabilityDefinition(
+                                            CapabilityId.of("framework.spring-boot.full"),
+                                            CapabilityKind.PROFILE,
+                                            "framework",
+                                            Optional.empty(),
+                                            "stable",
+                                            "",
+                                            java.util.Map.of(),
+                                            List.of(),
+                                            List.of(),
+                                            List.of(),
+                                            List.of(),
+                                            List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -61,17 +75,30 @@ class CapabilityDefinitionTest {
         @Test
         @DisplayName("stable is not deprecated")
         void stableNotDeprecated() {
-            assertThat(CapabilityDefinition.atomic(
-                    CapabilityId.of("data.database.postgres"), "data", "").isDeprecated()).isFalse();
+            assertThat(
+                            CapabilityDefinition.atomic(
+                                            CapabilityId.of("data.database.postgres"), "data", "")
+                                    .isDeprecated())
+                    .isFalse();
         }
 
         @Test
         @DisplayName("deprecated status returns true")
         void deprecatedStatusTrue() {
-            CapabilityDefinition def = new CapabilityDefinition(
-                    CapabilityId.of("data.database.postgres"), CapabilityKind.ATOMIC, "data",
-                    Optional.empty(), "deprecated", "", java.util.Map.of(),
-                    List.of(), List.of(), List.of(), List.of(), List.of());
+            CapabilityDefinition def =
+                    new CapabilityDefinition(
+                            CapabilityId.of("data.database.postgres"),
+                            CapabilityKind.ATOMIC,
+                            "data",
+                            Optional.empty(),
+                            "deprecated",
+                            "",
+                            java.util.Map.of(),
+                            List.of(),
+                            List.of(),
+                            List.of(),
+                            List.of(),
+                            List.of());
             assertThat(def.isDeprecated()).isTrue();
         }
     }
@@ -83,9 +110,20 @@ class CapabilityDefinitionTest {
         @Test
         @DisplayName("null lists default to empty")
         void nullListsDefaultToEmpty() {
-            CapabilityDefinition def = new CapabilityDefinition(
-                    CapabilityId.of("data.database.postgres"), CapabilityKind.ATOMIC, "data",
-                    null, null, null, null, null, null, null, null, null);
+            CapabilityDefinition def =
+                    new CapabilityDefinition(
+                            CapabilityId.of("data.database.postgres"),
+                            CapabilityKind.ATOMIC,
+                            "data",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
             assertThat(def.requires()).isEmpty();
             assertThat(def.tags()).isEmpty();
             assertThat(def.status()).isEqualTo("stable");

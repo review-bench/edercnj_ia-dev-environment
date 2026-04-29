@@ -34,12 +34,13 @@ class OutputPrunerTest {
 
         @Test
         @DisplayName("writes included artifacts to output root")
-        void writesIncludedArtifacts(@TempDir Path source, @TempDir Path output) throws IOException {
+        void writesIncludedArtifacts(@TempDir Path source, @TempDir Path output)
+                throws IOException {
             Path src = source.resolve("skill.md");
             Files.writeString(src, "# Content");
-            var plan = new CompositionPlan(
-                    List.of(included(src, "skills/skill.md")),
-                    List.of(), List.of());
+            var plan =
+                    new CompositionPlan(
+                            List.of(included(src, "skills/skill.md")), List.of(), List.of());
             var result = pruner.execute(plan, output);
             assertThat(result.written()).isEqualTo(1);
             assertThat(Files.exists(output.resolve("skills/skill.md"))).isTrue();
@@ -51,9 +52,9 @@ class OutputPrunerTest {
         void createsParentDirs(@TempDir Path source, @TempDir Path output) throws IOException {
             Path src = source.resolve("file.md");
             Files.writeString(src, "content");
-            var plan = new CompositionPlan(
-                    List.of(included(src, "a/b/c/file.md")),
-                    List.of(), List.of());
+            var plan =
+                    new CompositionPlan(
+                            List.of(included(src, "a/b/c/file.md")), List.of(), List.of());
             pruner.execute(plan, output);
             assertThat(Files.exists(output.resolve("a/b/c/file.md"))).isTrue();
         }
@@ -61,10 +62,13 @@ class OutputPrunerTest {
         @Test
         @DisplayName("returns excluded count as skipped")
         void excludedCountInSkipped(@TempDir Path source, @TempDir Path output) throws IOException {
-            var plan = new CompositionPlan(
-                    List.of(),
-                    List.of(new CompositionPlan.ArtifactEntry(source.resolve("x.md"), "x.md", "no match")),
-                    List.of());
+            var plan =
+                    new CompositionPlan(
+                            List.of(),
+                            List.of(
+                                    new CompositionPlan.ArtifactEntry(
+                                            source.resolve("x.md"), "x.md", "no match")),
+                            List.of());
             var result = pruner.execute(plan, output);
             assertThat(result.skipped()).isEqualTo(1);
             assertThat(result.written()).isZero();
@@ -75,7 +79,8 @@ class OutputPrunerTest {
         void idempotent(@TempDir Path source, @TempDir Path output) throws IOException {
             Path src = source.resolve("skill.md");
             Files.writeString(src, "# Content");
-            var plan = new CompositionPlan(List.of(included(src, "skill.md")), List.of(), List.of());
+            var plan =
+                    new CompositionPlan(List.of(included(src, "skill.md")), List.of(), List.of());
             pruner.execute(plan, output);
             pruner.execute(plan, output);
             assertThat(Files.readString(output.resolve("skill.md"))).isEqualTo("# Content");

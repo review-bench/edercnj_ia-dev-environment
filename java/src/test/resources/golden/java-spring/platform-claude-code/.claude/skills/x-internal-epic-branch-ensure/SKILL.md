@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--epic-id <XXXX> [--base <branch>] [--push <true|false>]"
 category: internal-git
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[STORY-ID or feature-name]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

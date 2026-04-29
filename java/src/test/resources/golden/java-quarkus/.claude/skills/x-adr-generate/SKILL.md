@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[architecture-plan-path] [story-id]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

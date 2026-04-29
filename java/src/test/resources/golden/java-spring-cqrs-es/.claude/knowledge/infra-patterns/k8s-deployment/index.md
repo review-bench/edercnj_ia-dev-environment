@@ -1,6 +1,7 @@
 ---
 name: k8s-deployment
 description: "Kubernetes deployment patterns: workload types, pod specifications, resource sizing, probes, autoscaling, network policies, and security contexts."
+requires-capabilities: []
 ---
 
 # Pattern: Kubernetes Deployment Patterns

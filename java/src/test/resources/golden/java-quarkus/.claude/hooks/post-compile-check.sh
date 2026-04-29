@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# requires-capabilities: [lang.java.21]
 set -euo pipefail
 
 # Post-compile check hook for Java (Maven)

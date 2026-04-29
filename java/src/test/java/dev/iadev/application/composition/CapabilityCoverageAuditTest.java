@@ -19,8 +19,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("CapabilityCoverageAuditTest — Rule 28 hard-fail gate")
 class CapabilityCoverageAuditTest {
 
-    private static final Path SKILLS_ROOT =
-            Path.of("src/main/resources/targets/claude/skills");
+    private static final Path SKILLS_ROOT = Path.of("src/main/resources/targets/claude/skills");
     private static final FrontmatterValidator VALIDATOR = new FrontmatterValidator();
 
     @Nested
@@ -34,21 +33,31 @@ class CapabilityCoverageAuditTest {
 
             List<String> violations;
             try (Stream<Path> paths = Files.walk(SKILLS_ROOT)) {
-                violations = paths
-                        .filter(p -> p.getFileName().toString().equals("SKILL.md"))
-                        .filter(p -> !p.getFileName().toString().startsWith("_"))
-                        .filter(p -> {
-                            var result = VALIDATOR.validate(p);
-                            return !result.ok() && result.errors().stream()
-                                    .anyMatch(e -> e.contains("requires-capabilities"));
-                        })
-                        .map(p -> "RULE_28_VIOLATION: " + p + " missing requires-capabilities")
-                        .sorted()
-                        .collect(Collectors.toList());
+                violations =
+                        paths.filter(p -> p.getFileName().toString().equals("SKILL.md"))
+                                .filter(p -> !p.getFileName().toString().startsWith("_"))
+                                .filter(
+                                        p -> {
+                                            var result = VALIDATOR.validate(p);
+                                            return !result.ok()
+                                                    && result.errors().stream()
+                                                            .anyMatch(
+                                                                    e ->
+                                                                            e.contains(
+                                                                                    "requires-capabilities"));
+                                        })
+                                .map(
+                                        p ->
+                                                "RULE_28_VIOLATION: "
+                                                        + p
+                                                        + " missing requires-capabilities")
+                                .sorted()
+                                .collect(Collectors.toList());
             }
             assertThat(violations)
-                    .as("All SKILL.md files must have requires-capabilities (v3.0). Violations:\n"
-                            + String.join("\n", violations))
+                    .as(
+                            "All SKILL.md files must have requires-capabilities (v3.0). Violations:\n"
+                                    + String.join("\n", violations))
                     .isEmpty();
         }
 
@@ -57,7 +66,9 @@ class CapabilityCoverageAuditTest {
         void validV30PassesGate() throws IOException {
             Path tmp = Files.createTempDirectory("audit-test");
             Path file = tmp.resolve("test-skill.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     name: x-test-skill
                     requires-capabilities: []
@@ -75,7 +86,9 @@ class CapabilityCoverageAuditTest {
         void v2FailsGate() throws IOException {
             Path tmp = Files.createTempDirectory("audit-test-v2");
             Path file = tmp.resolve("legacy.md");
-            Files.writeString(file, """
+            Files.writeString(
+                    file,
+                    """
                     ---
                     name: x-legacy
                     model: sonnet

@@ -33,7 +33,9 @@ class FrontmatterMigrationServiceTest {
         @DisplayName("skips file already having requires-capabilities")
         void skipsAlreadyMigrated(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("skill.md");
-            Files.writeString(file, "---\nname: test\nrequires-capabilities: [data.database.postgres]\n---\n");
+            Files.writeString(
+                    file,
+                    "---\nname: test\nrequires-capabilities: [data.database.postgres]\n---\n");
             boolean migrated = service.migrateFile(file);
             assertThat(migrated).isFalse();
             String content = Files.readString(file);
@@ -132,7 +134,8 @@ class FrontmatterMigrationServiceTest {
         @DisplayName("migrates all matching files in directory")
         void migratesMatchingFiles(@TempDir Path tmp) throws IOException {
             Files.writeString(tmp.resolve("a.md"), "---\nname: a\n---\n# Content\n");
-            Files.writeString(tmp.resolve("b.md"), "---\nname: b\nrequires-capabilities: []\n---\n");
+            Files.writeString(
+                    tmp.resolve("b.md"), "---\nname: b\nrequires-capabilities: []\n---\n");
             var result = service.migrateDirectory(tmp, "*.md");
             assertThat(result.migrated()).isEqualTo(1);
             assertThat(result.skipped()).isEqualTo(1);

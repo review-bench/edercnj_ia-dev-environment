@@ -16,8 +16,8 @@ class CapabilityMatcherTest {
     private final CapabilityMatcher matcher = new CapabilityMatcher();
 
     private static ResolvedCapabilitySet activeSet(List<String> ids) {
-        return new ResolvedCapabilitySet("test",
-                ids.stream().map(CapabilityId::of).toList(), Map.of(), List.of());
+        return new ResolvedCapabilitySet(
+                "test", ids.stream().map(CapabilityId::of).toList(), Map.of(), List.of());
     }
 
     @Nested
@@ -40,18 +40,20 @@ class CapabilityMatcherTest {
         @Test
         @DisplayName("matching canonical capability includes artifact")
         void matchingCapabilityIncludes() {
-            var result = matcher.matches(
-                    List.of("data.database.postgres"),
-                    activeSet(List.of("data.database.postgres")));
+            var result =
+                    matcher.matches(
+                            List.of("data.database.postgres"),
+                            activeSet(List.of("data.database.postgres")));
             assertThat(result.included()).isTrue();
         }
 
         @Test
         @DisplayName("non-matching capability excludes artifact with reason")
         void nonMatchingExcludesWithReason() {
-            var result = matcher.matches(
-                    List.of("data.database.postgres"),
-                    activeSet(List.of("framework.spring-boot.mvc")));
+            var result =
+                    matcher.matches(
+                            List.of("data.database.postgres"),
+                            activeSet(List.of("framework.spring-boot.mvc")));
             assertThat(result.included()).isFalse();
             assertThat(result.excludeReason()).isNotNull().contains("no matching capability");
         }
@@ -59,36 +61,39 @@ class CapabilityMatcherTest {
         @Test
         @DisplayName("glob requires matches active atomics")
         void globRequiresMatchesAtomics() {
-            var result = matcher.matches(
-                    List.of("data.database.*"),
-                    activeSet(List.of("data.database.postgres")));
+            var result =
+                    matcher.matches(
+                            List.of("data.database.*"),
+                            activeSet(List.of("data.database.postgres")));
             assertThat(result.included()).isTrue();
         }
 
         @Test
         @DisplayName("glob requires does not match different subcategory")
         void globRequiresDoesNotMatchOtherSubcategory() {
-            var result = matcher.matches(
-                    List.of("data.database.*"),
-                    activeSet(List.of("data.cache.redis")));
+            var result =
+                    matcher.matches(
+                            List.of("data.database.*"), activeSet(List.of("data.cache.redis")));
             assertThat(result.included()).isFalse();
         }
 
         @Test
         @DisplayName("invalid capability ID in requires is silently skipped (graceful fallback)")
         void invalidCapabilityIdSkipped() {
-            var result = matcher.matches(
-                    List.of("invalid-id-no-dots"),
-                    activeSet(List.of("data.database.postgres")));
+            var result =
+                    matcher.matches(
+                            List.of("invalid-id-no-dots"),
+                            activeSet(List.of("data.database.postgres")));
             assertThat(result.included()).isFalse();
         }
 
         @Test
         @DisplayName("any one of multiple requires matching is sufficient")
         void anyOneRequiresMatchSuffices() {
-            var result = matcher.matches(
-                    List.of("data.database.mysql", "data.database.postgres"),
-                    activeSet(List.of("data.database.postgres")));
+            var result =
+                    matcher.matches(
+                            List.of("data.database.mysql", "data.database.postgres"),
+                            activeSet(List.of("data.database.postgres")));
             assertThat(result.included()).isTrue();
         }
     }

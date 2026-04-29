@@ -1,6 +1,7 @@
 ---
 name: architecture-cqrs
 description: "CQRS/Event Sourcing patterns: write/read model separation, command bus, event store, aggregate with event sourcing, projections, snapshot policy, and dead letter handling."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: CQRS / Event Sourcing

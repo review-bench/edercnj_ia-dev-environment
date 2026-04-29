@@ -38,10 +38,12 @@ class ProfileTest {
         @Test
         @DisplayName("capabilities() includes globs")
         void capabilitiesIncludesGlobs() {
-            Profile profile = Profile.of("test", List.of(
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("data.cache.*")
-            ));
+            Profile profile =
+                    Profile.of(
+                            "test",
+                            List.of(
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("data.cache.*")));
             assertThat(profile.capabilities()).hasSize(2);
         }
     }
@@ -53,13 +55,15 @@ class ProfileTest {
         @Test
         @DisplayName("expand returns set of non-glob atomics")
         void expandReturnsAtomics() {
-            Profile profile = Profile.of("spring-rest-api-postgres", List.of(
-                    CapabilityId.of("framework.spring-boot.mvc"),
-                    CapabilityId.of("framework.spring-boot.data-jpa"),
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("interface.rest.openapi"),
-                    CapabilityId.of("testing.framework.junit5")
-            ));
+            Profile profile =
+                    Profile.of(
+                            "spring-rest-api-postgres",
+                            List.of(
+                                    CapabilityId.of("framework.spring-boot.mvc"),
+                                    CapabilityId.of("framework.spring-boot.data-jpa"),
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("interface.rest.openapi"),
+                                    CapabilityId.of("testing.framework.junit5")));
 
             Set<CapabilityId> expanded = profile.expand();
             assertThat(expanded).hasSize(5);
@@ -69,10 +73,12 @@ class ProfileTest {
         @Test
         @DisplayName("expand excludes glob capabilities")
         void expandExcludesGlobs() {
-            Profile profile = Profile.of("mixed", List.of(
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("data.cache.*")
-            ));
+            Profile profile =
+                    Profile.of(
+                            "mixed",
+                            List.of(
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("data.cache.*")));
 
             Set<CapabilityId> expanded = profile.expand();
             assertThat(expanded).hasSize(1);
@@ -82,11 +88,13 @@ class ProfileTest {
         @Test
         @DisplayName("expand is deterministic across invocations")
         void expandIsDeterministic() {
-            Profile profile = Profile.of("spring-rest-api-postgres", List.of(
-                    CapabilityId.of("framework.spring-boot.mvc"),
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("testing.framework.junit5")
-            ));
+            Profile profile =
+                    Profile.of(
+                            "spring-rest-api-postgres",
+                            List.of(
+                                    CapabilityId.of("framework.spring-boot.mvc"),
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("testing.framework.junit5")));
 
             Set<CapabilityId> first = profile.expand();
             Set<CapabilityId> second = profile.expand();

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[service-name or proto-file]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

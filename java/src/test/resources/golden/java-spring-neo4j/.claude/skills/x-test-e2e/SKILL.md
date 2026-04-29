@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[scenario: happy-path|error|timeout|persistent|all]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

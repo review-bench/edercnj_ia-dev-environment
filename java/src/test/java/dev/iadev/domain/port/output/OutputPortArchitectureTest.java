@@ -111,7 +111,8 @@ class OutputPortArchitectureTest {
     class ExistenceVerification {
 
         @Test
-        @DisplayName("Output port interfaces should exist (including EPIC-0064 CapabilityCatalogRepository)")
+        @DisplayName(
+                "Output port interfaces should exist (including EPIC-0064 CapabilityCatalogRepository)")
         void fourOutputPortsShouldExist() {
             var outputPortClasses =
                     importedClasses.stream()

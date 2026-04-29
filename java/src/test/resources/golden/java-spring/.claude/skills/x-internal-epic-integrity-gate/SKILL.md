@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--epic-id <XXXX> [--branch <name>] [--coverage-threshold-line <N>] [--coverage-threshold-branch <N>]"
 category: internal-plan
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

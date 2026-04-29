@@ -1,6 +1,7 @@
 ---
 name: iac-terraform
 description: "Terraform patterns: module structure, remote state, naming conventions, CI/CD workflows, drift detection, and common infrastructure modules."
+requires-capabilities: []
 ---
 
 # Pattern: Terraform Patterns

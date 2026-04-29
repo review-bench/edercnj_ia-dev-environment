@@ -6,6 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, AskUserQuestion
 argument-hint: "--epic XXXX | --story story-XXXX-YYYY [--apply] [--non-interactive] [--dry-run]"
 category: ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

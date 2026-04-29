@@ -22,11 +22,18 @@ class MutexValidatorTest {
 
     private static CapabilityDefinition def(String id, List<String> excludes) {
         return new CapabilityDefinition(
-                CapabilityId.of(id), CapabilityKind.ATOMIC, id.split("\\.")[0],
-                Optional.empty(), "stable", "",
-                Map.of(), List.of(), List.of(),
+                CapabilityId.of(id),
+                CapabilityKind.ATOMIC,
+                id.split("\\.")[0],
+                Optional.empty(),
+                "stable",
+                "",
+                Map.of(),
+                List.of(),
+                List.of(),
                 excludes.stream().map(CapabilityId::of).toList(),
-                List.of(), List.of());
+                List.of(),
+                List.of());
     }
 
     @Nested
@@ -36,30 +43,30 @@ class MutexValidatorTest {
         @Test
         @DisplayName("no excludes — passes (degenerate)")
         void noExcludesPasses() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of()),
-                    def("data.database.mysql", List.of())
-            );
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of()),
+                            def("data.database.mysql", List.of()));
             assertThatCode(() -> validator.validateCatalog(catalog)).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("symmetric excludes — passes (happy)")
         void symmetricPasses() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of("data.database.mongo")),
-                    def("data.database.mongo", List.of("data.database.postgres"))
-            );
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of("data.database.mongo")),
+                            def("data.database.mongo", List.of("data.database.postgres")));
             assertThatCode(() -> validator.validateCatalog(catalog)).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("asymmetric excludes — throws MutexConflict (error path — catalog defect)")
         void asymmetricThrows() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of("data.database.mongo")),
-                    def("data.database.mongo", List.of())
-            );
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of("data.database.mongo")),
+                            def("data.database.mongo", List.of()));
             assertThatThrownBy(() -> validator.validateCatalog(catalog))
                     .isInstanceOf(CapabilityError.MutexConflict.class)
                     .hasMessageContaining("asymmetric mutex")
@@ -73,16 +80,19 @@ class MutexValidatorTest {
     class ValidateProfile {
 
         @Test
-        @DisplayName("profile with excluded pair active — throws MutexConflict (error path — usage)")
+        @DisplayName(
+                "profile with excluded pair active — throws MutexConflict (error path — usage)")
         void conflictingProfileThrows() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of("data.database.mongo")),
-                    def("data.database.mongo", List.of("data.database.postgres"))
-            );
-            Profile profile = Profile.of("my-profile", List.of(
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("data.database.mongo")
-            ));
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of("data.database.mongo")),
+                            def("data.database.mongo", List.of("data.database.postgres")));
+            Profile profile =
+                    Profile.of(
+                            "my-profile",
+                            List.of(
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("data.database.mongo")));
             assertThatThrownBy(() -> validator.validateProfile(profile, catalog))
                     .isInstanceOf(CapabilityError.MutexConflict.class)
                     .hasMessageContaining("mutually exclusive")
@@ -92,16 +102,19 @@ class MutexValidatorTest {
         @Test
         @DisplayName("profile without conflicting pair — passes")
         void noConflictPasses() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of("data.database.mongo")),
-                    def("data.database.mongo", List.of("data.database.postgres")),
-                    def("data.cache.redis", List.of())
-            );
-            Profile profile = Profile.of("safe-profile", List.of(
-                    CapabilityId.of("data.database.postgres"),
-                    CapabilityId.of("data.cache.redis")
-            ));
-            assertThatCode(() -> validator.validateProfile(profile, catalog)).doesNotThrowAnyException();
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of("data.database.mongo")),
+                            def("data.database.mongo", List.of("data.database.postgres")),
+                            def("data.cache.redis", List.of()));
+            Profile profile =
+                    Profile.of(
+                            "safe-profile",
+                            List.of(
+                                    CapabilityId.of("data.database.postgres"),
+                                    CapabilityId.of("data.cache.redis")));
+            assertThatCode(() -> validator.validateProfile(profile, catalog))
+                    .doesNotThrowAnyException();
         }
     }
 }

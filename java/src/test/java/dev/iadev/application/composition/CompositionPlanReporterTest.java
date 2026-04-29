@@ -2,7 +2,6 @@ package dev.iadev.application.composition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.iadev.domain.capability.CapabilityId;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +28,13 @@ class CompositionPlanReporterTest {
         @Test
         @DisplayName("plan listed in text with included/excluded counts (happy)")
         void textFormat() {
-            CompositionPlan plan = new CompositionPlan(
-                    List.of(included("skills/x-test/SKILL.md"), included("rules/01-project.md")),
-                    List.of(excluded("skills/x-db/SKILL.md", "no matching capability")),
-                    List.of());
+            CompositionPlan plan =
+                    new CompositionPlan(
+                            List.of(
+                                    included("skills/x-test/SKILL.md"),
+                                    included("rules/01-project.md")),
+                            List.of(excluded("skills/x-db/SKILL.md", "no matching capability")),
+                            List.of());
             String report = reporter.report(plan, CompositionPlanReporter.Format.TEXT);
             assertThat(report).contains("Included artifacts: 2");
             assertThat(report).contains("Excluded artifacts: 1");
@@ -43,7 +45,8 @@ class CompositionPlanReporterTest {
         @Test
         @DisplayName("empty plan produces zero counts (degenerate)")
         void emptyPlan() {
-            String report = reporter.report(CompositionPlan.empty(), CompositionPlanReporter.Format.TEXT);
+            String report =
+                    reporter.report(CompositionPlan.empty(), CompositionPlanReporter.Format.TEXT);
             assertThat(report).contains("Included artifacts: 0");
             assertThat(report).contains("Excluded artifacts: 0");
         }
@@ -56,10 +59,7 @@ class CompositionPlanReporterTest {
         @Test
         @DisplayName("text report includes warning count")
         void textReportWithWarnings() {
-            CompositionPlan plan = new CompositionPlan(
-                    List.of(),
-                    List.of(),
-                    List.of("warning 1"));
+            CompositionPlan plan = new CompositionPlan(List.of(), List.of(), List.of("warning 1"));
             String report = reporter.report(plan, CompositionPlanReporter.Format.TEXT);
             assertThat(report).contains("Warnings: 1");
         }
@@ -72,10 +72,9 @@ class CompositionPlanReporterTest {
         @Test
         @DisplayName("JSON output is parseable and contains counts")
         void jsonFormat() {
-            CompositionPlan plan = new CompositionPlan(
-                    List.of(included("skills/x-test/SKILL.md")),
-                    List.of(),
-                    List.of());
+            CompositionPlan plan =
+                    new CompositionPlan(
+                            List.of(included("skills/x-test/SKILL.md")), List.of(), List.of());
             String json = reporter.report(plan, CompositionPlanReporter.Format.JSON);
             assertThat(json).contains("\"included\": 1");
             assertThat(json).contains("\"excluded\": 0");

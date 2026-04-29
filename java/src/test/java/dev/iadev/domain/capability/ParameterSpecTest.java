@@ -43,8 +43,13 @@ class ParameterSpecTest {
         @Test
         @DisplayName("ENUM with values accepted")
         void enumWithValuesAccepted() {
-            var spec = new ParameterSpec("env", ParameterSpec.ParameterType.ENUM,
-                    List.of("dev", "prod"), Optional.empty(), "environment");
+            var spec =
+                    new ParameterSpec(
+                            "env",
+                            ParameterSpec.ParameterType.ENUM,
+                            List.of("dev", "prod"),
+                            Optional.empty(),
+                            "environment");
             assertThat(spec.values()).containsExactly("dev", "prod");
         }
     }

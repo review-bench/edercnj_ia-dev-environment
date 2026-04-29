@@ -1,6 +1,7 @@
 ---
 name: owasp-asvs
 description: "OWASP ASVS 4.0.3 verification standard with L1/L2/L3 levels, cross-reference tables, and verification items for all 14 chapters (V1-V14)."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: OWASP ASVS 4.0.3

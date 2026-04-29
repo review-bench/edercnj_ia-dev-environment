@@ -1,6 +1,7 @@
 ---
 name: observability
 description: "Observability principles: distributed tracing (span trees, mandatory attributes), metrics naming conventions, structured logging with mandatory fields, health checks (liveness/readiness/startup), correlation IDs, and OpenTelemetry integration."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Observability

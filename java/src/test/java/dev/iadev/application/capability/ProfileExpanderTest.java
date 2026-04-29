@@ -6,8 +6,8 @@ import dev.iadev.domain.capability.CapabilityDefinition;
 import dev.iadev.domain.capability.CapabilityId;
 import dev.iadev.domain.capability.CapabilityKind;
 import dev.iadev.domain.capability.Profile;
-import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import dev.iadev.domain.capability.ResolutionWarning;
+import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,10 +22,18 @@ class ProfileExpanderTest {
 
     private static CapabilityDefinition def(String id, List<String> requires) {
         return new CapabilityDefinition(
-                CapabilityId.of(id), CapabilityKind.ATOMIC, id.split("\\.")[0],
-                Optional.empty(), "stable", "",
-                Map.of(), requires.stream().map(CapabilityId::of).toList(),
-                List.of(), List.of(), List.of(), List.of());
+                CapabilityId.of(id),
+                CapabilityKind.ATOMIC,
+                id.split("\\.")[0],
+                Optional.empty(),
+                "stable",
+                "",
+                Map.of(),
+                requires.stream().map(CapabilityId::of).toList(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     @Nested
@@ -45,14 +53,16 @@ class ProfileExpanderTest {
         @Test
         @DisplayName("profile with glob capability skips it during expansion")
         void globCapabilitySkippedDuringExpansion() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of()),
-                    def("data.database.mysql", List.of())
-            );
-            Profile profile = Profile.of("glob-test", List.of(
-                    CapabilityId.of("data.database.*"),
-                    CapabilityId.of("data.database.postgres")
-            ));
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of()),
+                            def("data.database.mysql", List.of()));
+            Profile profile =
+                    Profile.of(
+                            "glob-test",
+                            List.of(
+                                    CapabilityId.of("data.database.*"),
+                                    CapabilityId.of("data.database.postgres")));
             // Glob capabilities are excluded by Profile.expand(), only atomic is expanded
             ResolvedCapabilitySet result = expander.expand(profile, catalog, Map.of());
             assertThat(result.contains(CapabilityId.of("data.database.postgres"))).isTrue();
@@ -67,7 +77,8 @@ class ProfileExpanderTest {
         @DisplayName("minimal profile with single capability (degenerate)")
         void minimalProfile() {
             List<CapabilityDefinition> catalog = List.of(def("runtime.jvm.openjdk", List.of()));
-            Profile profile = Profile.of("minimal", List.of(CapabilityId.of("runtime.jvm.openjdk")));
+            Profile profile =
+                    Profile.of("minimal", List.of(CapabilityId.of("runtime.jvm.openjdk")));
 
             ResolvedCapabilitySet result = expander.expand(profile, catalog, Map.of());
             assertThat(result.capabilities()).hasSize(1);
@@ -78,14 +89,13 @@ class ProfileExpanderTest {
         @Test
         @DisplayName("profile with transitive prerequisites expands all (happy)")
         void transitivePrerequsites() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("runtime.jvm.openjdk", List.of()),
-                    def("web.servlet.api", List.of("runtime.jvm.openjdk")),
-                    def("framework.spring-boot.mvc", List.of("web.servlet.api"))
-            );
-            Profile profile = Profile.of("spring", List.of(
-                    CapabilityId.of("framework.spring-boot.mvc")
-            ));
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("runtime.jvm.openjdk", List.of()),
+                            def("web.servlet.api", List.of("runtime.jvm.openjdk")),
+                            def("framework.spring-boot.mvc", List.of("web.servlet.api")));
+            Profile profile =
+                    Profile.of("spring", List.of(CapabilityId.of("framework.spring-boot.mvc")));
             ResolvedCapabilitySet result = expander.expand(profile, catalog, Map.of());
             assertThat(result.capabilities()).hasSize(3);
             assertThat(result.contains(CapabilityId.of("runtime.jvm.openjdk"))).isTrue();
@@ -95,7 +105,8 @@ class ProfileExpanderTest {
         @DisplayName("parameter override applied for active capability (composition)")
         void parameterOverrideApplied() {
             List<CapabilityDefinition> catalog = List.of(def("data.database.postgres", List.of()));
-            Profile profile = Profile.of("pg-profile", List.of(CapabilityId.of("data.database.postgres")));
+            Profile profile =
+                    Profile.of("pg-profile", List.of(CapabilityId.of("data.database.postgres")));
             Map<String, String> overrides = Map.of("data.database.postgres.version", "15");
 
             ResolvedCapabilitySet result = expander.expand(profile, catalog, overrides);
@@ -105,17 +116,20 @@ class ProfileExpanderTest {
         @Test
         @DisplayName("override for inactive capability emits warning and is skipped")
         void inactiveCapabilityOverrideWarns() {
-            List<CapabilityDefinition> catalog = List.of(
-                    def("data.database.postgres", List.of()),
-                    def("data.database.mysql", List.of())
-            );
-            Profile profile = Profile.of("pg-only", List.of(CapabilityId.of("data.database.postgres")));
+            List<CapabilityDefinition> catalog =
+                    List.of(
+                            def("data.database.postgres", List.of()),
+                            def("data.database.mysql", List.of()));
+            Profile profile =
+                    Profile.of("pg-only", List.of(CapabilityId.of("data.database.postgres")));
             Map<String, String> overrides = Map.of("data.database.mysql.version", "8");
 
             ResolvedCapabilitySet result = expander.expand(profile, catalog, overrides);
             assertThat(result.warnings()).hasSize(1);
-            assertThat(result.warnings().get(0).kind()).isEqualTo(ResolutionWarning.Kind.UNKNOWN_CAPABILITY);
-            assertThat(result.effectiveParameters()).doesNotContainKey("data.database.mysql.version");
+            assertThat(result.warnings().get(0).kind())
+                    .isEqualTo(ResolutionWarning.Kind.UNKNOWN_CAPABILITY);
+            assertThat(result.effectiveParameters())
+                    .doesNotContainKey("data.database.mysql.version");
         }
     }
 }

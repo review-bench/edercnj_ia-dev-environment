@@ -3,7 +3,6 @@ package dev.iadev.application.composition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.capability.CapabilityId;
-import dev.iadev.domain.capability.Profile;
 import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,9 +27,22 @@ class CapabilityAwareComposerTest {
     private static Path writeArtifact(Path dir, String name, String... capIds) throws IOException {
         Path file = dir.resolve(name);
         Files.createDirectories(file.getParent());
-        String capList = capIds.length == 0 ? "[]" : "\n" + String.join("\n",
-                java.util.Arrays.stream(capIds).map(c -> "  - " + c).toList());
-        Files.writeString(file, "---\nname: " + name.replace(".md", "").replace("/", "-") + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
+        String capList =
+                capIds.length == 0
+                        ? "[]"
+                        : "\n"
+                                + String.join(
+                                        "\n",
+                                        java.util.Arrays.stream(capIds)
+                                                .map(c -> "  - " + c)
+                                                .toList());
+        Files.writeString(
+                file,
+                "---\nname: "
+                        + name.replace(".md", "").replace("/", "-")
+                        + "\nrequires-capabilities:"
+                        + capList
+                        + "\n---\n# Content\n");
         return file;
     }
 
@@ -40,7 +52,8 @@ class CapabilityAwareComposerTest {
 
         @Test
         @DisplayName("execute writes included artifacts to outputRoot")
-        void executesWritesArtifacts(@TempDir Path targets, @TempDir Path output) throws IOException {
+        void executesWritesArtifacts(@TempDir Path targets, @TempDir Path output)
+                throws IOException {
             writeArtifact(targets, "skills/skill.md");
             ResolvedCapabilitySet active = activeSet(List.of());
             CompositionPlan plan = composer.plan(active, targets);
@@ -52,9 +65,12 @@ class CapabilityAwareComposerTest {
         @DisplayName("execute with empty plan creates no files")
         void executesEmptyPlanNoFiles(@TempDir Path output) throws IOException {
             composer.execute(CompositionPlan.empty(), output);
-            assertThat(java.util.stream.StreamSupport.stream(
-                    java.nio.file.Files.walk(output).spliterator(), false)
-                    .filter(Files::isRegularFile).count()).isZero();
+            assertThat(
+                            java.util.stream.StreamSupport.stream(
+                                            java.nio.file.Files.walk(output).spliterator(), false)
+                                    .filter(Files::isRegularFile)
+                                    .count())
+                    .isZero();
         }
     }
 
@@ -140,9 +156,18 @@ class CapabilityAwareComposerTest {
             CompositionPlan p2 = composer.plan(active, root);
             CompositionPlan p3 = composer.plan(active, root);
 
-            assertThat(p1.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList())
-                    .isEqualTo(p2.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList())
-                    .isEqualTo(p3.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList());
+            assertThat(
+                            p1.included().stream()
+                                    .map(CompositionPlan.ArtifactEntry::relativePath)
+                                    .toList())
+                    .isEqualTo(
+                            p2.included().stream()
+                                    .map(CompositionPlan.ArtifactEntry::relativePath)
+                                    .toList())
+                    .isEqualTo(
+                            p3.included().stream()
+                                    .map(CompositionPlan.ArtifactEntry::relativePath)
+                                    .toList());
         }
     }
 }

@@ -152,13 +152,15 @@ class CapabilityIdTest {
         @Test
         @DisplayName("toString() returns value")
         void toStringReturnsValue() {
-            assertThat(CapabilityId.of("data.database.postgres").toString()).isEqualTo("data.database.postgres");
+            assertThat(CapabilityId.of("data.database.postgres").toString())
+                    .isEqualTo("data.database.postgres");
         }
 
         @Test
         @DisplayName("equals with non-CapabilityId returns false")
         void notEqualToNonId() {
-            assertThat(CapabilityId.of("data.database.postgres").equals("data.database.postgres")).isFalse();
+            assertThat(CapabilityId.of("data.database.postgres").equals("data.database.postgres"))
+                    .isFalse();
         }
 
         @Test

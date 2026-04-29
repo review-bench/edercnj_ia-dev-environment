@@ -4,6 +4,7 @@ description: "Detect cross-epic P95 regressions (>= threshold %) and rank top-10
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--last N] [--threshold-pct P] [--baseline mean|median] [--format md|json] [--out path]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

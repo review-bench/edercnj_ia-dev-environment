@@ -17,9 +17,18 @@ class CapabilityGraphTest {
 
     private static CapabilityDefinition atomicWithReqs(String id, List<CapabilityId> reqs) {
         return new CapabilityDefinition(
-                CapabilityId.of(id), CapabilityKind.ATOMIC, id.split("\\.")[0],
-                java.util.Optional.empty(), "stable", "",
-                java.util.Map.of(), reqs, List.of(), List.of(), List.of(), List.of());
+                CapabilityId.of(id),
+                CapabilityKind.ATOMIC,
+                id.split("\\.")[0],
+                java.util.Optional.empty(),
+                "stable",
+                "",
+                java.util.Map.of(),
+                reqs,
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
     @Nested
@@ -29,10 +38,11 @@ class CapabilityGraphTest {
         @Test
         @DisplayName("nodes() returns all defined nodes")
         void returnsAllNodes() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomic("data.database.mysql")
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomic("data.database.mysql")));
             assertThat(g.nodes()).hasSize(2);
             assertThat(g.nodes()).containsKey("data.database.postgres");
         }
@@ -48,11 +58,12 @@ class CapabilityGraphTest {
         @DisplayName("topological sort of graph with indegree > 0 after processing respects order")
         void sortWithMultipleDependents() {
             CapabilityId base = CapabilityId.of("aaa.bbb.base");
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("aaa.bbb.base"),
-                    atomicWithReqs("aaa.bbb.dep1", List.of(base)),
-                    atomicWithReqs("aaa.bbb.dep2", List.of(base))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("aaa.bbb.base"),
+                                    atomicWithReqs("aaa.bbb.dep1", List.of(base)),
+                                    atomicWithReqs("aaa.bbb.dep2", List.of(base))));
             List<CapabilityId> sorted = g.topologicalSort();
             assertThat(sorted).hasSize(3);
             assertThat(sorted.get(0)).isEqualTo(base);
@@ -75,11 +86,12 @@ class CapabilityGraphTest {
         @Test
         @DisplayName("nodes without requirements sort alphabetically")
         void alphabeticalTieBreak() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomic("data.cache.redis"),
-                    atomic("data.database.mysql")
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomic("data.cache.redis"),
+                                    atomic("data.database.mysql")));
             List<CapabilityId> sorted = g.topologicalSort();
             assertThat(sorted).hasSize(3);
             assertThat(sorted.get(0).value()).isEqualTo("data.cache.redis");
@@ -92,10 +104,12 @@ class CapabilityGraphTest {
         void respectsDependencies() {
             CapabilityId base = CapabilityId.of("data.database.postgres");
             CapabilityId dep = CapabilityId.of("framework.spring-boot.data-jpa");
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomicWithReqs("framework.spring-boot.data-jpa", List.of(base))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomicWithReqs(
+                                            "framework.spring-boot.data-jpa", List.of(base))));
             List<CapabilityId> sorted = g.topologicalSort();
             int baseIdx = sorted.indexOf(base);
             int depIdx = sorted.indexOf(dep);
@@ -105,11 +119,12 @@ class CapabilityGraphTest {
         @Test
         @DisplayName("sort is deterministic across 3 invocations")
         void deterministic() {
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomic("data.cache.redis"),
-                    atomic("framework.spring-boot.mvc")
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomic("data.cache.redis"),
+                                    atomic("framework.spring-boot.mvc")));
             List<CapabilityId> first = g.topologicalSort();
             List<CapabilityId> second = g.topologicalSort();
             List<CapabilityId> third = g.topologicalSort();
@@ -125,10 +140,12 @@ class CapabilityGraphTest {
         @DisplayName("returns dependents of a required node")
         void returnsDependents() {
             CapabilityId base = CapabilityId.of("data.database.postgres");
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomicWithReqs("framework.spring-boot.data-jpa", List.of(base))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomicWithReqs(
+                                            "framework.spring-boot.data-jpa", List.of(base))));
             Set<String> deps = g.dependentsOf(base);
             assertThat(deps).containsExactly("framework.spring-boot.data-jpa");
         }
@@ -156,10 +173,12 @@ class CapabilityGraphTest {
         @DisplayName("returns requirements list for node with deps")
         void returnsRequirements() {
             CapabilityId base = CapabilityId.of("data.database.postgres");
-            CapabilityGraph g = CapabilityGraph.of(List.of(
-                    atomic("data.database.postgres"),
-                    atomicWithReqs("framework.spring-boot.data-jpa", List.of(base))
-            ));
+            CapabilityGraph g =
+                    CapabilityGraph.of(
+                            List.of(
+                                    atomic("data.database.postgres"),
+                                    atomicWithReqs(
+                                            "framework.spring-boot.data-jpa", List.of(base))));
             assertThat(g.prerequisitesOf(CapabilityId.of("framework.spring-boot.data-jpa")))
                     .containsExactly(base);
         }

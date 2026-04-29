@@ -1,0 +1,10 @@
+# capability-frontmatter-schema-baseline.txt
+# Generated on: 2026-04-29 (PR: epic/0064 → develop, story-0064-0706)
+# Schema: capability-baseline-v1.0
+# Status: SEALED — immutable post-merge
+#
+# This file intentionally empty — EPIC-0064 ships without backward compatibility.
+# All .md artifacts MUST conform to frontmatter schema v3.0 (requires-capabilities field).
+# No pre-existing v2 schema exemptions are permitted.
+# See: .claude/rules/28-capability-frontmatter-contract.md §Forbidden post-merge
+# See: governance/schemas/frontmatter-3.0.json

@@ -1,6 +1,7 @@
 <!-- placeholders: PROJECT_NAME, LANGUAGE, FRAMEWORK, ARCHITECTURE, DATABASES, INTERFACE_TYPES, BUILD_COMMAND, TEST_COMMAND -->
 <!-- Schema authoritative: adr/ADR-0048-B-claude-md-contract.md §3.2 -->
 <!-- Generator-owned: do not hand-edit — regenerated on every `ia-dev-env generate`. -->
+<!-- composition: requires-capabilities: [] fragment-slots: [{slot: domain-specific, ordering: fragment-order}] -->
 
 # my-quarkus-service
 
