@@ -61,6 +61,12 @@ output/
 # regenerate locally instead of committing diffs.
 /.claude/
 
+# .claire/ is a local Claude Code worktree/state directory (generated at runtime).
+/.claire/
+
+# jqwik property-based test database (local, regenerated on each test run).
+java/.jqwik-database
+
 # x-release transient state files (created in Step 0, deleted in Step 12)
 /plans/release-state-*.json
 
