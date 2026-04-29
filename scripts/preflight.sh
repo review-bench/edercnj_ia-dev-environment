@@ -119,10 +119,29 @@ run_self_check() {
 }
 
 # ── Gate runners ───────────────────────────────────────────────────────────────
+# Returns 0 if the branch under preflight contains any Java source changes vs
+# origin/develop; non-zero otherwise. Used to skip Java-only gates on
+# documentation/refinement PRs that touch zero *.java files.
+java_sources_changed() {
+    git -C "${REPO_ROOT}" diff --name-only origin/develop...HEAD 2>/dev/null \
+        | grep -E '^java/.*\.java$|^java/pom\.xml$' >/dev/null
+}
+
 run_gate_format() {
     printf '[Gate 5] format check\n' >&2
-    mvn spotless:check -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: FORMAT_VIOLATION — fix: run mvn spotless:apply\n' >&2
+    # Repo layout: pom.xml lives under java/, not at the repo root. Skip the gate
+    # when java/pom.xml is absent (e.g., docs-only branches in nested checkouts).
+    local java_pom="${REPO_ROOT}/java/pom.xml"
+    if [[ ! -f "${java_pom}" ]]; then
+        printf '[Gate 5] no java/pom.xml — skipping format check\n' >&2
+        return 0
+    fi
+    if ! java_sources_changed; then
+        printf '[Gate 5] no Java source changes vs origin/develop — skipping format check\n' >&2
+        return 0
+    fi
+    mvn -f "${java_pom}" spotless:check -q 2>/dev/null || {
+        printf 'PREFLIGHT_FAILED: FORMAT_VIOLATION — fix: (cd java && mvn spotless:apply)\n' >&2
         exit $E_FORMAT
     }
 }
@@ -142,10 +161,15 @@ run_gate_review_content() {
 
 run_gate_telemetry() {
     printf '[Gate 4] telemetry evidence audit\n' >&2
+    # Scope the lookup to the specific epic being preflight'd. A bare repo-wide
+    # find would pick up any events.ndjson (e.g., plans/unknown/telemetry/) and
+    # audit it for the current story — guaranteed false-positive on chore PRs
+    # that touch a fresh epic with no telemetry yet.
     local ndjson
-    ndjson=$(find "${REPO_ROOT}/plans" "${REPO_ROOT}/ai/epics" \
+    ndjson=$(find "${REPO_ROOT}/plans/epic-${EPIC_ID}" \
+                  "${REPO_ROOT}/ai/epics/epic-${EPIC_ID}-"* \
         -name "events.ndjson" -path "*/telemetry/*" 2>/dev/null | head -1 || true)
-    [[ -z "$ndjson" ]] && { printf '[Gate 4] no telemetry file — skip\n' >&2; return 0; }
+    [[ -z "$ndjson" ]] && { printf '[Gate 4] no telemetry file for epic-%s — skip\n' "$EPIC_ID" >&2; return 0; }
     "${CLAUDE_SCRIPTS}/audit-execution-integrity.sh" \
         --scope=telemetry --story-id="story-${STORY_ID}" --ndjson-file "$ndjson" 2>/dev/null || {
         printf 'PREFLIGHT_FAILED: TELEMETRY_EVIDENCE_MISSING — fix: ensure x-review was invoked\n' >&2
@@ -166,15 +190,24 @@ run_gate_self_check_audit() {
 
 run_gate_tests() {
     printf '[Gate 1] mvn test\n' >&2
-    mvn test -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: TESTS_FAILED — fix: run mvn test to see failures\n' >&2
+    local java_pom="${REPO_ROOT}/java/pom.xml"
+    if [[ ! -f "${java_pom}" ]]; then
+        printf '[Gate 1] no java/pom.xml — skipping mvn test\n' >&2
+        return 0
+    fi
+    if ! java_sources_changed; then
+        printf '[Gate 1] no Java source changes vs origin/develop — skipping mvn test\n' >&2
+        return 0
+    fi
+    mvn -f "${java_pom}" test -q 2>/dev/null || {
+        printf 'PREFLIGHT_FAILED: TESTS_FAILED — fix: (cd java && mvn test) to see failures\n' >&2
         exit $E_TESTS_FAILED
     }
 }
 
 run_gate_coverage() {
     printf '[Gate 2] coverage check\n' >&2
-    local csv="${REPO_ROOT}/target/site/jacoco/jacoco.csv"
+    local csv="${REPO_ROOT}/java/target/site/jacoco/jacoco.csv"
     [[ -f "$csv" ]] || { printf '[Gate 2] jacoco.csv not found — skip\n' >&2; return 0; }
     "${CLAUDE_SCRIPTS}/audit-coverage-local.sh" \
         --report-path "$csv" --story-id="story-${STORY_ID}" 2>/dev/null || {
