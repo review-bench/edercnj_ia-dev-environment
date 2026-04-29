@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.AuditScript;
 import dev.iadev.domain.model.AuditScript.ExitCodeEntry;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 @DisplayName("DocsAssembler catalog rendering")
 class DocsAssemblerCatalogTest {
@@ -117,6 +121,33 @@ class DocsAssemblerCatalogTest {
 
             assertThat(output).contains("Stack: java-maven");
             assertThat(output).contains("Total Audits: 0");
+        }
+
+        @Test
+        void noTemplateFile_usesFallbackTemplate(@TempDir Path tempDir) {
+            DocsAssembler noTemplateAssembler = new DocsAssembler(tempDir);
+            List<AuditScript> inventory = List.of(modelSelectionAudit());
+
+            String output = noTemplateAssembler.renderCatalog("spring-boot", inventory);
+
+            assertThat(output).contains("audit-model-selection.sh");
+            assertThat(output).contains("Stack: spring-boot");
+        }
+
+        @Test
+        void templateWithoutLoopMarkers_returnsRenderedPlainTemplate(@TempDir Path tempDir)
+                throws IOException {
+            Path templatesDir =
+                    Files.createDirectories(tempDir.resolve("shared/templates"));
+            Files.writeString(
+                    templatesDir.resolve("_TEMPLATE-AUDIT-GATES-CATALOG.md"),
+                    "Stack: {{STACK}}\nTotal Audits: {{TOTAL_AUDITS}}\n");
+            DocsAssembler plainAssembler = new DocsAssembler(tempDir);
+
+            String output = plainAssembler.renderCatalog("spring-boot", List.of(modelSelectionAudit()));
+
+            assertThat(output).contains("Stack: spring-boot");
+            assertThat(output).contains("Total Audits: 1");
         }
     }
 }

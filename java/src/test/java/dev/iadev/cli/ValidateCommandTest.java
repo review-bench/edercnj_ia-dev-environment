@@ -99,6 +99,23 @@ class ValidateCommandTest {
             invalid: [
             """;
 
+    private static final String WRONG_TYPE_CONFIG =
+            """
+            project:
+              name: "test"
+              purpose: "test"
+            architecture:
+              style: microservice
+            interfaces: "not-a-list"
+            language:
+              name: java
+              version: "21"
+            framework:
+              name: spring-boot
+              version: "3.4"
+              build_tool: maven
+            """;
+
     private Path writeYaml(String content) throws IOException {
         Path file = tempDir.resolve("config.yaml");
         Files.writeString(file, content);
@@ -244,6 +261,17 @@ class ValidateCommandTest {
             assertThat(result.exitCode()).isEqualTo(1);
             assertThat(result.stdout()).contains("Validation failed:");
         }
+
+        @Test
+        @DisplayName("missing section with verbose shows FAIL for sections")
+        void call_missingSectionVerbose_showsVerboseOutput() throws IOException {
+            Path file = writeYaml(MISSING_LANGUAGE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString(), "--verbose");
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("[FAIL] Mandatory sections present");
+        }
     }
 
     @Nested
@@ -343,6 +371,33 @@ class ValidateCommandTest {
 
             assertThat(result.exitCode()).isEqualTo(1);
             assertThat(result.stdout()).contains("Validation failed:");
+        }
+    }
+
+    @Nested
+    @DisplayName("invalid field type")
+    class InvalidFieldType {
+
+        @Test
+        @DisplayName("interfaces as scalar string returns exit 1 with error")
+        void call_interfacesAsScalar_returnsOneWithError() throws IOException {
+            Path file = writeYaml(WRONG_TYPE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString());
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("Error:");
+        }
+
+        @Test
+        @DisplayName("interfaces as scalar with verbose shows error details")
+        void call_interfacesAsScalarVerbose_showsDetails() throws IOException {
+            Path file = writeYaml(WRONG_TYPE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString(), "--verbose");
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("Error:");
         }
     }
 }

@@ -54,6 +54,22 @@ class PlatformVerboseFormatterTest {
                                     + " -> %d assemblers".formatted(all.size())
                                     + " (no filter applied)");
         }
+
+        @Test
+        void sharedOnlyFilter_whenCalled_showsPlatformAndSharedCounts() {
+            List<AssemblerDescriptor> all = allAssemblers();
+            List<AssemblerDescriptor> filtered = List.of(sharedDesc("ConstitutionAssembler"));
+
+            // SHARED is not user-selectable, so isNoFilter() returns false
+            // — exercises the countShared / platformCount / label-join branches.
+            String header =
+                    PlatformVerboseFormatter.formatFilterHeader(
+                            Set.of(Platform.SHARED), filtered, all);
+
+            assertThat(header).contains("shared");
+            assertThat(header).contains("1 assemblers");
+            assertThat(header).contains("platform");
+        }
     }
 
     @Nested

@@ -1,6 +1,7 @@
 package dev.iadev.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -245,6 +246,97 @@ class WaveAAuditorsTest {
         void name_returnsTaskHierarchy() {
             assertThat(auditor.name()).isEqualTo("task-hierarchy");
         }
+
+        @Test
+        void bashEquivalentTemplate_pointsToScript() {
+            assertThat(auditor.bashEquivalentTemplate().toString())
+                    .contains("audit-task-hierarchy.sh.tpl");
+        }
+
+        @Test
+        void twoPhasesFirstLacksTaskCreate_recordsViolationAtTransition() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "## Phase 1 - Plan\n\nNo TaskCreate here.\n"
+                            + "## Phase 2 - Execute\n\nTaskCreate(subject: \"p2\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_TASK_CREATE");
+        }
+
+        @Test
+        void phaseWithExemptionMarker_noViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "<!-- phase-no-gate: read-only -->\n"
+                            + "## Phase 0 - Context\n\nNo TaskCreate — exempt.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void taskCreateBeforeFirstPhaseHeader_notCounted() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "TaskCreate(subject: \"pre-phase\")\n"
+                            + "## Phase 1 - Plan\n\nNo TaskCreate in phase body.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            // TaskCreate before any phase header is not counted; phase lacks TaskCreate → violation
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_TASK_CREATE");
+        }
+
+        @Test
+        void orchestratorWithXStoryImplement_isDetected() throws IOException {
+            Path skillDir = tempDir.resolve("x-story-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-story-implement\n---\n"
+                            + "## Phase 1 - Plan\n\nTaskCreate(subject: \"p1\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void unreadableFile_ignoredByIsOrchestrator() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement-unreadable");
+            Path skillFile =
+                    writeSkill(
+                            skillDir,
+                            "SKILL.md",
+                            "## Phase 1\nTaskCreate(subject: \"p1\")\n");
+            boolean changed = skillFile.toFile().setReadable(false);
+            assumeTrue(changed, "Cannot make file unreadable on this platform");
+            try {
+                AuditCorpus corpus = new AuditCorpus(tempDir);
+                AuditResult result = auditor.audit(corpus);
+                assertThat(result.exitCode()).isEqualTo(0);
+            } finally {
+                skillFile.toFile().setReadable(true);
+            }
+        }
     }
 
     @Nested
@@ -375,6 +467,100 @@ class WaveAAuditorsTest {
         @Test
         void name_returnsPhaseGates() {
             assertThat(auditor.name()).isEqualTo("phase-gates");
+        }
+
+        @Test
+        void bashEquivalentTemplate_pointsToScript() {
+            assertThat(auditor.bashEquivalentTemplate().toString())
+                    .contains("audit-phase-gates.sh.tpl");
+        }
+
+        @Test
+        void twoPhasesFirstHasTaskButNoGate_recordsViolationAtTransition() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "## Phase 1 - Plan\n\nTaskCreate(subject: \"p1\")\n# no gate\n"
+                            + "## Phase 2 - Execute\n\nTaskCreate(subject: \"p2\")\n"
+                            + "x-internal-phase-gate --mode post\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            // Phase 1 lacks gate: violation recorded when Phase 2 header is encountered
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations()).hasSize(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_PHASE_GATE");
+        }
+
+        @Test
+        void phaseWithExemptionMarker_noViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "<!-- phase-no-gate: read-only pre-check -->\n"
+                            + "## Phase 0 - Context\n\nTaskCreate(subject: \"p0\")\n# no gate needed\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void twoPhasesFirstPhaseExempted_noIntermediateViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-implement\n---\n"
+                            + "<!-- phase-no-gate: pre-check -->\n"
+                            + "## Phase 0 - Pre-check\n\nTaskCreate(subject: \"p0\")\n# exempt\n"
+                            + "## Phase 1 - Plan\n\nTaskCreate(subject: \"p1\")\n"
+                            + "x-internal-phase-gate --mode post\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            // Phase 0 is exempt — no violation on transition to Phase 1
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void skillWithTaskCreateButNoPhaseHeader_filteredOut() throws IOException {
+            Path skillDir = tempDir.resolve("x-fake-orchestrator");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-fake-orchestrator\n---\n\nTaskCreate(subject: \"no phase\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void unreadableFile_ignoredByIsOrchestrator() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-implement-unreadable");
+            Path skillFile =
+                    writeSkill(
+                            skillDir,
+                            "SKILL.md",
+                            "## Phase 1\nTaskCreate(subject: \"p1\")\n");
+            boolean changed = skillFile.toFile().setReadable(false);
+            assumeTrue(changed, "Cannot make file unreadable on this platform");
+            try {
+                AuditCorpus corpus = new AuditCorpus(tempDir);
+                AuditResult result = auditor.audit(corpus);
+                assertThat(result.exitCode()).isEqualTo(0);
+            } finally {
+                skillFile.toFile().setReadable(true);
+            }
         }
     }
 
