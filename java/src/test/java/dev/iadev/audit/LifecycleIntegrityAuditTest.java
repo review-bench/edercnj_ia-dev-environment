@@ -201,5 +201,12 @@ class LifecycleIntegrityAuditTest {
             Path p = Path.of("governance/schemas/frontmatter-3.0.json");
             assertThat(isExcludedNamespace(p)).isTrue();
         }
+
+        @Test
+        @DisplayName("planning artifact md not excluded")
+        void isExcludedNamespace_planningArtifactPath_returnsFalse() {
+            Path p = Path.of("plans/epic-0064/plans/story-0064-0001.md");
+            assertThat(isExcludedNamespace(p)).isFalse();
+        }
     }
 }
