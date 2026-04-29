@@ -93,6 +93,22 @@ validate_args() {
         printf 'PREFLIGHT_FAILED: INVALID_ARGS — --scope must be story or epic\n' >&2
         exit $E_INVALID_ARGS
     fi
+    normalize_epic_id
+}
+
+# Normalize EPIC_ID so downstream path expansions never produce
+# double-prefixed paths like "plans/epic-epic-0074". Accepts both bare
+# numbers ("0074") and prefixed forms ("epic-0074", "EPIC-0074") emitted
+# by callers such as enforce-preflight-gates.sh. Derives EPIC_ID from
+# STORY_ID (XXXX-YYYY -> XXXX) when scope=story leaves EPIC_ID empty.
+normalize_epic_id() {
+    if [[ -z "$EPIC_ID" && "$SCOPE" == "story" && "$STORY_ID" =~ ^([0-9]{4})- ]]; then
+        EPIC_ID="${BASH_REMATCH[1]}"
+    fi
+    [[ -n "$EPIC_ID" ]] || return 0
+    # strip case-insensitive "epic-" prefix if present
+    EPIC_ID="${EPIC_ID#epic-}"
+    EPIC_ID="${EPIC_ID#EPIC-}"
 }
 
 # ── Self-check ─────────────────────────────────────────────────────────────────
@@ -119,12 +135,42 @@ run_self_check() {
 }
 
 # ── Gate runners ───────────────────────────────────────────────────────────────
-# Returns 0 if the branch under preflight contains any Java source changes vs
-# origin/develop; non-zero otherwise. Used to skip Java-only gates on
-# documentation/refinement PRs that touch zero *.java files.
+
+# Resolves the base ref for the Java-diff probe. Echoes the ref name on stdout.
+# Exits with E_OPERATIONAL when neither origin/develop nor HEAD@{upstream} is
+# resolvable — must never silently degrade to "no Java diff", which would let
+# Java gates be skipped on a misconfigured remote (shallow clone, missing
+# fetch, branch with no upstream, etc.).
+resolve_java_diff_base_ref() {
+    if git -C "${REPO_ROOT}" rev-parse --verify --quiet origin/develop >/dev/null; then
+        printf '%s\n' 'origin/develop'
+        return 0
+    fi
+    if git -C "${REPO_ROOT}" rev-parse --verify --quiet 'HEAD@{upstream}' >/dev/null; then
+        git -C "${REPO_ROOT}" rev-parse --abbrev-ref 'HEAD@{upstream}'
+        return 0
+    fi
+    printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — unable to resolve git base ref (origin/develop or HEAD@{upstream})\n' >&2
+    exit $E_OPERATIONAL
+}
+
+# Returns 0 if the branch contains any change under java/ vs the resolved base
+# ref; non-zero otherwise. Used to skip Java-only gates on documentation /
+# refinement PRs that touch nothing under the Java module. Matches the entire
+# java/ subtree (not only .java + pom.xml) so changes to src/main/resources/,
+# build configs, and other Java-module assets still trigger format + test
+# gates as expected.
 java_sources_changed() {
-    git -C "${REPO_ROOT}" diff --name-only origin/develop...HEAD 2>/dev/null \
-        | grep -E '^java/.*\.java$|^java/pom\.xml$' >/dev/null
+    local base_ref
+    local changed_files
+
+    base_ref="$(resolve_java_diff_base_ref)"
+    if ! changed_files="$(git -C "${REPO_ROOT}" diff --name-only "${base_ref}...HEAD" 2>&1)"; then
+        printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — git diff failed for base ref %s\n' "${base_ref}" >&2
+        exit $E_OPERATIONAL
+    fi
+
+    grep -E '^java/' >/dev/null <<<"${changed_files}"
 }
 
 run_gate_format() {
