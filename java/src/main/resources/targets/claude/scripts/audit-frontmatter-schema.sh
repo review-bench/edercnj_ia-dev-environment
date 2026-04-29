@@ -2,7 +2,7 @@
 # audit-frontmatter-schema.sh — Rule 26/Rule 28 frontmatter schema validation (EPIC-0064, story-0064-0603)
 # Validates all .md artifacts against frontmatter-3.0.json schema via FrontmatterValidator
 # Exit 0: all valid | Exit 1: SCHEMA_VIOLATION | Exit 2: OPERATIONAL_ERROR
-# Usage: audit-frontmatter-schema.sh [--self-check] [--root <path>] [--baseline <path>]
+# Usage: audit-frontmatter-schema.sh [--self-check] [--root <path>] [--baseline <path>] [--json]
 
 set -euo pipefail
 
@@ -18,10 +18,12 @@ fi
 SKILLS_ROOT="${PROJECT_ROOT}"
 SCHEMA="${PROJECT_ROOT}/governance/schemas/frontmatter-3.0.json"
 VIOLATIONS=()
+JSON_MODE=false
 
 if [[ "${1:-}" == "--self-check" ]]; then
   command -v python3 >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: python3 not found" >&2; exit 2; }
   [[ -f "$SCHEMA" ]] || { echo "OPERATIONAL_ERROR: schema not found: $SCHEMA" >&2; exit 2; }
+  echo "self-check OK" >&2
   exit 0
 fi
 
@@ -31,6 +33,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --root) ROOT="$2"; shift 2;;
     --baseline) BASELINE="$2"; shift 2;;
+    --json) JSON_MODE=true; shift;;
     *) shift;;
   esac
 done
@@ -87,10 +90,31 @@ if [[ -n "$BASELINE" && -f "$BASELINE" ]]; then
   VIOLATIONS=("${REMAINING[@]}")
 fi
 
+if "$JSON_MODE"; then
+  valid_count=$(find "$ROOT" -name "*.md" -not -name "_*" -type f | wc -l | tr -d ' ')
+  invalid_count="${#VIOLATIONS[@]}"
+  echo -n "{\"valid\":$((valid_count - invalid_count)),\"invalid\":$invalid_count,\"errors\":["
+  first=true
+  for v in "${VIOLATIONS[@]:-}"; do
+    [[ -z "$v" ]] && continue
+    $first || echo -n ','
+    file_path="${v#SCHEMA_VIOLATION: }"
+    file_path="${file_path% —*}"
+    reason="${v#* — }"
+    printf '{"file":"%s","reason":"%s"}' "$file_path" "$reason"
+    first=false
+  done
+  echo "]}"
+fi
+
 if [[ ${#VIOLATIONS[@]} -gt 0 ]]; then
-  for v in "${VIOLATIONS[@]}"; do echo "$v" >&2; done
+  if ! "$JSON_MODE"; then
+    for v in "${VIOLATIONS[@]}"; do echo "$v" >&2; done
+  fi
   exit 1
 fi
 
-echo "audit-frontmatter-schema: all artifacts compliant" >&2
+if ! "$JSON_MODE"; then
+  echo "audit-frontmatter-schema: all artifacts compliant" >&2
+fi
 exit 0

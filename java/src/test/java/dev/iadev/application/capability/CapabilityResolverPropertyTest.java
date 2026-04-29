@@ -9,18 +9,18 @@ import dev.iadev.domain.capability.Profile;
 import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import java.util.List;
 import java.util.Map;
+import net.jqwik.api.Arbitrary;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.From;
+import net.jqwik.api.Label;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
-import net.jqwik.api.Arbitrary;
-import net.jqwik.api.Label;
-import net.jqwik.api.constraints.IntRange;
 
 /**
- * Property-based test suite for CapabilityResolver — 4 invariantes (story-0064-0111, RULE-001/RULE-004).
+ * Property-based test suite for CapabilityResolver — 4 invariantes, 10K cases each
+ * (story-0064-0111/0607, RULE-001/RULE-004).
  *
- * <p>Runs with 100 random cases (balanced: full 10K too slow in CI; 100 catches structural bugs).
+ * <p>Story-0064-0607 DoD: 4 invariants × 10K tries = 40K total. Wall clock target: &lt; 5min.
  */
 class CapabilityResolverPropertyTest {
 
@@ -36,7 +36,7 @@ class CapabilityResolverPropertyTest {
         return CapabilityGenerators.profiles(CapabilityGenerators.smallCatalogs());
     }
 
-    @Property(tries = 100)
+    @Property(tries = 10_000)
     @Label("Invariante 1 — idempotência: resolve(p) == resolve(p)")
     void idempotency(
             @ForAll @From("smallCatalogs") List<CapabilityDefinition> catalog,
@@ -50,7 +50,7 @@ class CapabilityResolverPropertyTest {
         }
     }
 
-    @Property(tries = 100)
+    @Property(tries = 10_000)
     @Label("Invariante 2 — determinismo: 3 invocações = mesmo output (RULE-004)")
     void determinism(
             @ForAll @From("smallCatalogs") List<CapabilityDefinition> catalog,
@@ -65,7 +65,7 @@ class CapabilityResolverPropertyTest {
         }
     }
 
-    @Property(tries = 100)
+    @Property(tries = 10_000)
     @Label("Invariante 3 — prerequisites preservados: cada capability tem prereqs no output")
     void prerequisitesClosure(
             @ForAll @From("smallCatalogs") List<CapabilityDefinition> catalog,
@@ -81,7 +81,9 @@ class CapabilityResolverPropertyTest {
                     for (CapabilityId req : def.requires()) {
                         if (!req.isGlob()) {
                             assertThat(resolved.contains(req))
-                                    .as("%s requires %s which should be in resolved set", active, req)
+                                    .as(
+                                            "%s requires %s which should be in resolved set",
+                                            active, req)
                                     .isTrue();
                         }
                     }
@@ -92,7 +94,7 @@ class CapabilityResolverPropertyTest {
         }
     }
 
-    @Property(tries = 100)
+    @Property(tries = 10_000)
     @Label("Invariante 4 — empty profile produz set vazio")
     void emptyProfileProducesEmptySet(
             @ForAll @From("smallCatalogs") List<CapabilityDefinition> catalog) {
