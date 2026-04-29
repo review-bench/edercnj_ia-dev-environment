@@ -171,7 +171,7 @@ graph TD
 | `dev.iadev.application.assembler.ScriptsAssembler.AUDIT_SCRIPTS` | regen | 0005, 0006, 0007 (cada uma adiciona 1 entry) | Hard conflict — **serializar via `x-parallel-eval`** ou rebase incremental |
 | `core/dev/x-story-implement/SKILL.md` (Phase 3 modify) | hard | 0008 (única story que toca) | Sem colisão |
 | `targets/claude/rules/24-execution-integrity.md` | regen | 0008 (artefatos condicionais) | Sem colisão |
-| `docs/audit-gates-catalog.md` | hard | 0001 (reservas precoces opcionais) + 0005 + 0006 + 0007 (entries finais) | Append-only; serializar via `x-parallel-eval` ou rebase incremental |
+| `java/src/main/resources/shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md` (template do catálogo — `docs/audit-gates-catalog.md` final é renderizado no projeto gerado, NÃO existe estaticamente neste repo) | hard | 0001 (reservas precoces opcionais) + 0005 + 0006 + 0007 (entries finais) | Append-only; serializar via `x-parallel-eval` ou rebase incremental |
 | `capabilities/_index.yaml` (regen — quando EPIC-0064 P2 entregar) | regen | 0001 (entries para 3 families) | Contingente; sem colisão hoje |
 
 **Recomendação:** Fase 2 roda 3 stories paralelas **mas com rebase incremental** entre elas devido a `ScriptsAssembler.AUDIT_SCRIPTS` e `audit-gates-catalog.md` serem append-only. Alternativa: serializar 0005 → 0006 → 0007 (custo +1 wave, ganho de simplicidade no rebase).
