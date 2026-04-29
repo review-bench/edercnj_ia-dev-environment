@@ -35,7 +35,7 @@ Read before starting:
 - `.claude/templates/_TEMPLATE-EPIC.md` (RA9 v2: 9 sections)
 - `.claude/templates/_TEMPLATE-STORY.md` (RA9 v2: 9 sections)
 - `.claude/templates/_TEMPLATE-IMPLEMENTATION-MAP.md`
-- `.claude/skills/planning-standards-kp/SKILL.md` — RA9 9-section model, granularity per level, Decision Rationale micro-template
+- `.claude/skills/planning-standards-kp/SKILL.md` — **Mandatory** RA9 9-section model (source of truth), granularity per level (Epic/Story/Task), Packages Hexagonal catalog format, Decision Rationale micro-template
 - `references/decomposition-guide.md` (bundled with this skill)
 
 If any template is missing, stop and tell the user.
