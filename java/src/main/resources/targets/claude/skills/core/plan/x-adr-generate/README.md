@@ -22,18 +22,18 @@ Extracts mini-ADRs embedded in architecture plans (marked with `### ADR:`) and e
 ## Workflow
 
 1. Parse the architecture plan for `### ADR:` markers and extract mini-ADR fields
-2. Scan existing ADRs in `adr/` to determine next sequential number
+2. Scan existing ADRs in `docs/adr/` to determine next sequential number
 3. Check for duplicates by comparing normalized titles against existing ADRs
 4. Expand each non-duplicate mini-ADR to full ADR format with YAML frontmatter
-5. Write ADR files and update `adr/README.md` index
+5. Write ADR files and update `docs/adr/README.md` index
 6. Add cross-references between ADRs, architecture plan, and service architecture document
 
 ## Outputs
 
 | Artifact | Path |
 |----------|------|
-| ADR files | `adr/ADR-NNNN-title-in-kebab-case.md` |
-| ADR index | `adr/README.md` |
+| ADR files | `docs/adr/ADR-NNNN-title-in-kebab-case.md` |
+| ADR index | `docs/adr/README.md` |
 
 ## See Also
 
