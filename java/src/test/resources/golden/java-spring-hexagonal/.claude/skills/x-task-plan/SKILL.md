@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--task-file <path> [--output-dir <dir>] [--no-commit] [--dry-run]  |  [STORY-ID] --task [TASK-ID] [--force] [--no-commit] [--dry-run]"
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -95,7 +96,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task
 
 Resolve the effective epic ID from the task source:
 
-- **Task-file mode (`--task-file`):** extract `XXXX` from the task-file path (`plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md`) or from the task's `**Task ID:**` header.
+- **Task-file mode (`--task-file`):** extract `XXXX` from the task-file path (`ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md`) or from the task's `**Task ID:**` header.
 - **Story-scoped mode:** extract `XXXX` from the `STORY-ID` argument (e.g., `story-0049-0001` → `0049`).
 
 Invoke `x-internal-epic-branch-ensure` so the canonical `epic/<ID>` branch exists locally AND on origin (idempotent). The skill is a no-op when the current checkout is already on `epic/<ID>` or a worktree rooted at that branch.
@@ -130,19 +131,19 @@ If validation fails, abort with descriptive error message.
 
 1. Extract epic ID from story ID (`story-XXXX-YYYY` -> `epic-XXXX`)
 2. Resolve `EPIC_DIR` with a glob that supports both exact and suffix variants:
-   - Exact match: `plans/epic-XXXX`
-   - Suffix variant: `plans/epic-XXXX-*`
+   - Exact match: `ai/epics/epic-XXXX`
+   - Suffix variant: `ai/epics/epic-XXXX-*`
 3. If exactly one directory matches, use that as `EPIC_DIR`
-4. If both exist, prefer exact match `plans/epic-XXXX`
+4. If both exist, prefer exact match `ai/epics/epic-XXXX`
 5. If no directory matches, abort: `"Epic directory not found for epic-XXXX"`
 
 #### 0.3 Resolve Paths
 
 | Path | Pattern | Example |
 |------|---------|---------|
-| Story file | `<EPIC_DIR>/story-XXXX-YYYY.md` | `plans/epic-0029/story-0029-0001.md` |
-| Plan output | `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` | `plans/epic-0029/plans/task-plan-0029-0001-001.md` |
-| Output dir | `<EPIC_DIR>/plans/` | `plans/epic-0029/plans/` |
+| Story file | `<EPIC_DIR>/story-XXXX-YYYY.md` | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` |
+| Plan output | `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` | `ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` |
+| Output dir | `<EPIC_DIR>/plans/` | `ai/epics/epic-XXXX/plans/` |
 
 #### 0.4 Idempotency Check (Staleness)
 
@@ -167,7 +168,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task
 #### 1A. Task-file-first branch (EPIC-0038 — `--task-file` present)
 
 1. Read the file at `<task-file>`. Abort with exit code 1 if missing.
-2. Validate structure per story-0038-0001 schema (`plans/epic-0038/schemas/task-schema.md`):
+2. Validate structure per story-0038-0001 schema (`ai/epics/epic-XXXX/schemas/task-schema.md`):
    - `**ID:** TASK-XXXX-YYYY-NNN` present and matches filename.
    - `**Story:** story-XXXX-YYYY` present and well-formed.
    - `**Status:**` in the allowed enum (`Pendente | Em Andamento | Concluída | Bloqueada | Falha`).
@@ -356,7 +357,20 @@ mkdir -p <EPIC_DIR>/plans/
 
 #### 5.2 Assemble Plan Document
 
-Write the plan to `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` with the following structure:
+Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` with the following structure.
+
+**MANDATORY — Origin Marker (EPIC-0059):** Prepend the YAML frontmatter block before any Markdown content:
+
+```yaml
+---
+generated-by: x-task-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+story-id: story-XXXX-YYYY
+---
+```
+
+This frontmatter is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
+Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
 
 ```markdown
 # Task Plan: TASK-XXXX-YYYY-NNN
@@ -501,29 +515,29 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-p
 
 ## Planning Status Propagation (Rule 22 / EPIC-0046)
 
-> V2-gated: only runs when `SchemaVersionResolver.resolve(plans/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
+> V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
 
 After writing `plan-task-TASK-XXXX-YYYY-NNN.md`, propagate the lifecycle status of the source task artifact (`task-TASK-XXXX-YYYY-NNN.md` in v2, or the Section 8 task entry in v1) from `Pendente` to `Planejada` in the SAME commit as the plan artefact.
 
 **Steps (end of Phase 3, BEFORE the final commit):**
 
 1. Detect v2 via SchemaVersionResolver on the epic's `execution-state.json`. If v1: skip this entire block.
-2. For the source task file `plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md`, read current status with the CLI:
+2. For the source task file `ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md`, read current status with the CLI:
    ```bash
    CURRENT=$(java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       read plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md)
+       read ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md)
    ```
 3. If `CURRENT == "Pendente"`, write `Planejada` atomically:
    ```bash
    java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       write plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md Planejada
+       write ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md Planejada
    ```
    If `CURRENT == "Planejada"`: idempotent re-run, skip the write.
 4. Stage both the source task file and the plan artefact:
    ```bash
-   git add plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md plans/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md
+   git add ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md
    ```
 5. **Commit gate (`--no-commit` aware):**
    - If `--no-commit=false` (default): commit via `x-git-commit` (Rule 13 Pattern 1 INLINE-SKILL):

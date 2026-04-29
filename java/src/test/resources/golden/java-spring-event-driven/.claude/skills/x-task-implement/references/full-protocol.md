@@ -5,11 +5,11 @@
 ## Step 0 — Pre-Check: Plan Reuse (RULE-002)
 
 1. Resolve paths from story ID (XXXX, YYYY):
-   - Implementation plan: `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md`
-   - Architecture plan: `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`
-   - Test plan: `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md`
-   - Task breakdown: `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
-   - Per-task plans: `plans/epic-XXXX/plans/plan-task-TASK-*.md`
+   - Implementation plan: `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md`
+   - Architecture plan: `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`
+   - Test plan: `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md`
+   - Task breakdown: `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
+   - Per-task plans: `ai/epics/epic-XXXX/plans/plan-task-TASK-*.md`
 
 2. Staleness check: if `mtime(story) > mtime(plan)` → plan is stale (log WARNING; still use as context — do NOT regenerate).
 
@@ -154,7 +154,7 @@ Write protocol: write to `{path}.tmp` → rename atomically.
 
 ### Phase 0c — Schema Version Detection
 
-Read `plans/epic-XXXX/execution-state.json` via `SchemaVersionResolver`.
+Read `ai/epics/epic-XXXX/execution-state.json` via `SchemaVersionResolver`.
 - `planningSchemaVersion == "2.0"` → v2 path (this appendix)
 - Absent / `"1.0"` / malformed → v1 path (standard flow above)
 
@@ -164,9 +164,9 @@ Resolves three artifacts from `<task-id>` (e.g. `TASK-0039-0001-003`):
 
 | Artifact | Pattern |
 |----------|---------|
-| Task file | `plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` |
-| Task plan | `plans/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` |
-| Map | `plans/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
+| Task file | `ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` |
+| Task plan | `ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` |
+| Map | `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
 
 Missing any → `TASK_ARTIFACT_NOT_FOUND {path}`.
 
@@ -196,7 +196,7 @@ Between output verification and commit. Writes `**Status:** Concluída` to task 
 
 ```bash
 java -cp target/ia-dev-env.jar dev.iadev.cli.TaskMapRowUpdaterCli \
-  plans/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md \
+  ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md \
   TASK-XXXX-YYYY-NNN Concluída
 ```
 

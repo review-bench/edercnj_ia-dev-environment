@@ -1,6 +1,7 @@
 ---
 name: disaster-recovery
 description: "Disaster recovery patterns: DR strategies, RPO/RTO, failover automation, DR testing, multi-region patterns, and recovery procedures"
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Disaster Recovery

@@ -4,6 +4,8 @@ description: "Observability specialist review: validates distributed tracing, me
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: obs, fragment-order: 40 }
 ---
 
 ## Global Output Policy

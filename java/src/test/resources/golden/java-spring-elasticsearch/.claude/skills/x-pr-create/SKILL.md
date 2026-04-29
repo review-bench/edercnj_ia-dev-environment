@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Skill
 argument-hint: "TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description \"short desc\"] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -38,17 +39,19 @@ Creates standardized Pull Requests for individual tasks in {{PROJECT_NAME}} with
 | `--target-branch` | String | No | Explicit base branch for the PR (overrides `--auto-approve-pr` and default `develop`). Typical orchestrator value: `epic/XXXX` |
 | `--auto-merge` | Enum | No | Post-create auto-merge strategy. One of `merge`, `squash`, `rebase`, `none` (default `none`). Requires `--target-branch` |
 | `--epic-id` | String(4) | No | Four-digit epic identifier (regex `^\d{4}$`). When set, adds label `epic-XXXX` and epic metadata to the PR body |
+| `--no-story-evidence` | Flag | No | Omit `## Orchestrator Evidence` section. Use ONLY for chore/docs PRs without story context. Allowed by `audit-pr-evidence.sh`. |
 
 ## Workflow
 
 ```
-Phase 0  VALIDATE    -> Parse task ID, validate branch naming, parse extension flags
-Phase 1  PRE-CHECK   -> Run {{TEST_COMMAND}} to verify tests pass
-Phase 2  TITLE       -> Format PR title (<=70 chars, Conventional Commits)
-Phase 3  BODY        -> Generate structured PR body
-Phase 4  LABELS      -> Create labels if missing, collect label list
-Phase 5  CREATE      -> Create PR via gh pr create
-Phase 6  AUTO-MERGE  -> If --auto-merge != none, delegate to x-pr-merge
+Phase 0   VALIDATE        -> Parse task ID, validate branch naming, parse extension flags
+Phase 1   PRE-CHECK       -> Run {{TEST_COMMAND}} to verify tests pass
+Phase 2   TITLE           -> Format PR title (<=70 chars, Conventional Commits)
+Phase 3   BODY            -> Generate structured PR body
+Phase 3.5 EVIDENCE        -> Inject ## Orchestrator Evidence (unless --no-story-evidence)
+Phase 4   LABELS          -> Create labels if missing, collect label list
+Phase 5   CREATE          -> Create PR via gh pr create
+Phase 6   AUTO-MERGE      -> If --auto-merge != none, delegate to x-pr-merge
 ```
 
 ### Phase 0 -- Validate Branch and Arguments
@@ -165,7 +168,7 @@ Generate the structured PR body with the following sections:
 | Task ID | TASK-XXXX-YYYY-NNN |
 | Story | story-XXXX-YYYY |
 | Epic | epic-XXXX |
-| Task Plan | `plans/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
+| Task Plan | `ai/epics/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
 
 ## Changes
 
@@ -185,6 +188,81 @@ If `--draft` is set, prepend to the body:
 ```markdown
 > [DRAFT] This PR is not ready for review
 ```
+
+#### Phase 3.5 -- Inject Orchestrator Evidence (EPIC-0059, story-0059-0007)
+
+Unless `--no-story-evidence` is set, append the `## Orchestrator Evidence` section to the PR body. This section is mandatory for all story PRs (validated by `audit-pr-evidence.sh`).
+
+```bash
+# Skip if explicitly opted out (chore/docs PRs without a story context)
+if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
+  # Extract story ID from task ID: TASK-0059-0007-001 -> story-0059-0007
+  STORY_ID_FOR_EVIDENCE="story-${TASK_EPIC_ID}-${TASK_STORY_NUM}"
+
+  # Orchestrator commit SHA: last commit matching x-story-implement in log
+  ORCH_SHA=$(git log --grep="x-story-implement" -1 --format="%H" 2>/dev/null)
+  if [[ -z "$ORCH_SHA" ]]; then
+    # Fallback: use current HEAD SHA
+    ORCH_SHA=$(git rev-parse HEAD)
+  fi
+
+  # Phase 1 artifacts (6 planning artifacts that exist on disk)
+  EPIC_PLANS_DIR="ai/epics/epic-${TASK_EPIC_ID}/plans"
+  P1_ARTIFACTS=""
+  for artifact in \
+    "arch-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "plan-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "tests-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "tasks-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "security-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "compliance-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md"; do
+    full_path="${EPIC_PLANS_DIR}/${artifact}"
+    if [[ -f "$full_path" ]]; then
+      P1_ARTIFACTS="${P1_ARTIFACTS:+${P1_ARTIFACTS}, }${full_path}"
+    fi
+  done
+  [[ -z "$P1_ARTIFACTS" ]] && P1_ARTIFACTS="(none found)"
+
+  # Phase 3 artifacts (4 verification/review artifacts that exist on disk)
+  EPIC_REPORTS_DIR="ai/epics/epic-${TASK_EPIC_ID}/reports"
+  P3_ARTIFACTS=""
+  for artifact in \
+    "verify-envelope-${TASK_EPIC_ID}-${TASK_STORY_NUM}.json" \
+    "story-completion-report-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md"; do
+    full_path="${EPIC_REPORTS_DIR}/${artifact}"
+    if [[ -f "$full_path" ]]; then
+      P3_ARTIFACTS="${P3_ARTIFACTS:+${P3_ARTIFACTS}, }${full_path}"
+    fi
+  done
+  for artifact in \
+    "review-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
+    "techlead-review-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md"; do
+    full_path="${EPIC_PLANS_DIR}/${artifact}"
+    if [[ -f "$full_path" ]]; then
+      P3_ARTIFACTS="${P3_ARTIFACTS:+${P3_ARTIFACTS}, }${full_path}"
+    fi
+  done
+  [[ -z "$P3_ARTIFACTS" ]] && P3_ARTIFACTS="(none found)"
+
+  ORCHESTRATOR_EVIDENCE_SECTION="
+## Orchestrator Evidence
+
+<!-- Filled automatically by x-pr-create. Do not edit manually. -->
+
+| Campo | Valor |
+| :--- | :--- |
+| Story IDs | ${STORY_ID_FOR_EVIDENCE} |
+| Orchestrator Commit SHA | ${ORCH_SHA} |
+| Invocation Skill | x-story-implement |
+| Phase 1 Artifacts | ${P1_ARTIFACTS} |
+| Phase 3 Artifacts | ${P3_ARTIFACTS} |
+"
+
+  BODY="${BODY}${ORCHESTRATOR_EVIDENCE_SECTION}"
+fi
+```
+
+**`--no-story-evidence` flag:** when set, the `## Orchestrator Evidence` section is omitted and `audit-pr-evidence.sh` will accept the PR. Use ONLY for chore/docs PRs that genuinely have no story context (e.g., CHANGELOG-only commits, dependency bumps). When set, `audit-pr-evidence.sh` logs `"no evidence required (--no-story-evidence)"` and exits 0.
 
 ### Phase 4 -- Label Auto-Creation
 
@@ -286,6 +364,8 @@ Backward compatibility: when `--auto-merge` is absent (default `none`), Phase 6 
 | `--auto-merge` != none without `--target-branch` | ABORT exit 6 `AUTO_MERGE_REQUIRES_TARGET`: "--auto-merge requires --target-branch" |
 | `--target-branch develop` combined with `--auto-merge` != none | WARN and continue: "Auto-merge directly to develop is unusual; consider using an epic branch" |
 | `x-pr-merge` delegation fails in Phase 6 | WARN and continue: PR is created, `autoMergeEnabled=false`, orchestrator retries |
+| `git log --grep` returns empty SHA | Fall back to `git rev-parse HEAD` for `Orchestrator Commit SHA` field |
+| No Phase 1/3 artifacts found on disk | Use `(none found)` as value; PR is still created (audit validates at CI time) |
 
 ## Integration Notes
 

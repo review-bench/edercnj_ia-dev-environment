@@ -1,12 +1,11 @@
 package dev.iadev.domain.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("DataConfig")
 class DataConfigTest {
@@ -18,10 +17,11 @@ class DataConfigTest {
         @Test
         @DisplayName("creates config with all sub-components")
         void fromMap_allComponents_allSet() {
-            var map = Map.<String, Object>of(
-                    "database", Map.of("name", "postgresql", "version", "16"),
-                    "migration", Map.of("name", "flyway", "version", "10"),
-                    "cache", Map.of("name", "redis", "version", "7"));
+            var map =
+                    Map.<String, Object>of(
+                            "database", Map.of("name", "postgresql", "version", "16"),
+                            "migration", Map.of("name", "flyway", "version", "10"),
+                            "cache", Map.of("name", "redis", "version", "7"));
 
             var result = DataConfig.fromMap(map);
 
@@ -45,8 +45,7 @@ class DataConfigTest {
         @Test
         @DisplayName("partial map defaults missing components")
         void fromMap_partialMap_defaultsMissing() {
-            var map = Map.<String, Object>of(
-                    "database", Map.of("name", "mysql"));
+            var map = Map.<String, Object>of("database", Map.of("name", "mysql"));
 
             var result = DataConfig.fromMap(map);
 

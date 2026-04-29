@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
-# verify-phase-gates.sh — Camada 2 (Stop hook) of Rule 25 enforcement.
+# requires-capabilities: []
+# Layer:      0 (preventive — fires during LLM turn)
+# Trigger:    Stop
+# Event:      stop
+# Exit codes: 0=OK (no phase gate issues), 2=WARNING (gate missing or failed)
+# Latency:    < 500ms
+# Telemetry:  no direct emission; state read from execution-state.json
+#
+# verify-phase-gates.sh — Camada 0 (Stop hook) of Rule 25 enforcement.
 #
 # Registered in settings.json as a Stop-event hook. Runs at the end of every
 # LLM turn. Reads execution-state.json.taskTracking.phaseGateResults[] for
@@ -35,7 +43,7 @@ case "$BRANCH" in
   *) exit 0 ;;
 esac
 
-# Find the most recent plans/epic-*/execution-state.json under project dir
+# Find the most recent ai/epics/epic-*/execution-state.json under project dir
 STATE_FILE=""
 while IFS= read -r candidate; do
   if [ -z "$STATE_FILE" ] || [ "$candidate" -nt "$STATE_FILE" ]; then

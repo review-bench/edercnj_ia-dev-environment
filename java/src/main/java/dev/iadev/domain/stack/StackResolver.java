@@ -3,19 +3,18 @@ package dev.iadev.domain.stack;
 import dev.iadev.domain.model.FrameworkConfig;
 import dev.iadev.domain.model.LanguageConfig;
 import dev.iadev.domain.model.ProjectConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Resolves all derived stack values from a ProjectConfig.
  *
- * <p>Derives build commands, Docker image, health path, default port,
- * file extension, project type, and protocols by looking up the
- * language/build-tool combination in {@link StackMapping} constants.</p>
+ * <p>Derives build commands, Docker image, health path, default port, file extension, project type,
+ * and protocols by looking up the language/build-tool combination in {@link StackMapping}
+ * constants.
  *
- * <p>This class is stateless and all methods are static. It has zero
- * external framework dependencies (RULE-007).</p>
+ * <p>This class is stateless and all methods are static. It has zero external framework
+ * dependencies (RULE-007).
  */
 public final class StackResolver {
 
@@ -35,8 +34,7 @@ public final class StackResolver {
      * @return an immutable ResolvedStack containing all resolved values
      */
     public static ResolvedStack resolve(ProjectConfig config) {
-        var commands = resolveCommands(
-                config.language(), config.framework());
+        var commands = resolveCommands(config.language(), config.framework());
         var protocols = deriveProtocols(config);
 
         return new ResolvedStack(
@@ -52,8 +50,7 @@ public final class StackResolver {
                 resolveDockerImage(config.language()),
                 inferNativeBuild(config),
                 deriveProjectType(config),
-                protocols
-        );
+                protocols);
     }
 
     private static LanguageCommandSet resolveCommands(
@@ -84,14 +81,11 @@ public final class StackResolver {
         if (!config.framework().nativeBuild()) {
             return false;
         }
-        return StackMapping.NATIVE_SUPPORTED_FRAMEWORKS
-                .contains(config.framework().name());
+        return StackMapping.NATIVE_SUPPORTED_FRAMEWORKS.contains(config.framework().name());
     }
 
     private static List<String> extractInterfaceTypes(ProjectConfig config) {
-        return config.interfaces().stream()
-                .map(iface -> iface.type())
-                .toList();
+        return config.interfaces().stream().map(iface -> iface.type()).toList();
     }
 
     private static String deriveProjectType(ProjectConfig config) {
@@ -99,19 +93,16 @@ public final class StackResolver {
         List<String> interfaceTypes = extractInterfaceTypes(config);
 
         return switch (style) {
-            case "microservice", "hexagonal", "cqrs",
-                    "event-driven", "clean", "ddd" ->
+            case "microservice", "hexagonal", "cqrs", "event-driven", "clean", "ddd" ->
                     microserviceType(interfaceTypes);
-            case "modular-monolith", "monolith",
-                    "serverless" -> "api";
+            case "modular-monolith", "monolith", "serverless" -> "api";
             case "library" -> libraryType(interfaceTypes);
             default -> "api";
         };
     }
 
     private static String microserviceType(List<String> interfaceTypes) {
-        boolean hasEvent =
-                interfaceTypes.contains(EVENT_CONSUMER_INTERFACE);
+        boolean hasEvent = interfaceTypes.contains(EVENT_CONSUMER_INTERFACE);
         boolean hasRest = interfaceTypes.contains(REST_INTERFACE);
         if (hasEvent && !hasRest) {
             return "worker";
@@ -130,8 +121,7 @@ public final class StackResolver {
         List<String> interfaceTypes = extractInterfaceTypes(config);
         List<String> protocols = new ArrayList<>();
         for (String itype : interfaceTypes) {
-            String protocol =
-                    StackMapping.INTERFACE_SPEC_PROTOCOL_MAP.get(itype);
+            String protocol = StackMapping.INTERFACE_SPEC_PROTOCOL_MAP.get(itype);
             if (protocol != null) {
                 protocols.add(protocol);
             }
@@ -139,8 +129,7 @@ public final class StackResolver {
         return protocols;
     }
 
-    private static String fieldOrEmpty(
-            LanguageCommandSet commands, String field) {
+    private static String fieldOrEmpty(LanguageCommandSet commands, String field) {
         if (commands == null) {
             return EMPTY_COMMAND;
         }

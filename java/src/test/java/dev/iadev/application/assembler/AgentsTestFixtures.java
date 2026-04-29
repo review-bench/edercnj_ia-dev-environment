@@ -1,22 +1,17 @@
 package dev.iadev.application.assembler;
 
+import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
 
-import dev.iadev.domain.model.ProjectConfig;
-
-/**
- * Shared test fixtures for AgentsAssembler tests.
- */
+/** Shared test fixtures for AgentsAssembler tests. */
 final class AgentsTestFixtures {
 
-    private AgentsTestFixtures() {
-    }
+    private AgentsTestFixtures() {}
 
     static ProjectConfig buildGoGinConfig() {
         return TestConfigBuilder.builder()
                 .projectName("my-go-service")
-                .purpose(
-                        "Describe your service purpose here")
+                .purpose("Describe your service purpose here")
                 .archStyle("microservice")
                 .domainDriven(false)
                 .eventDriven(true)

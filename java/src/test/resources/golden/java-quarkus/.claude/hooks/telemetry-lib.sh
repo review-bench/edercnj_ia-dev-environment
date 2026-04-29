@@ -7,7 +7,7 @@
 #                       following the RULE-005 resolution order:
 #                         (1) env var CLAUDE_TELEMETRY_CONTEXT (JSON)
 #                         (2) current Git branch (feature/epic-NNNN-...)
-#                         (3) plans/epic-*/execution-state.json currentPhase
+#                         (3) ai/epics/epic-*/execution-state.json currentPhase
 #                         (4) fallback "unknown"
 #   build_event()       jq -n wrapper that produces a minimal event with the
 #                       five mandatory fields + resolved context.
@@ -109,9 +109,14 @@ resolve_context() {
             TELEMETRY_TASK_ID="TASK-${BASH_REMATCH[2]}-${BASH_REMATCH[3]}-${BASH_REMATCH[4]}"
             return 0
         fi
-        # Epic branch: feature/epic-NNNN-...
+        # Epic branch: feature/epic-NNNN-... (legacy)
         if [[ "${branch}" =~ ^(feat|feature|fix|hotfix)/epic-([0-9]{4}) ]]; then
             TELEMETRY_EPIC_ID="EPIC-${BASH_REMATCH[2]}"
+            return 0
+        fi
+        # Epic branch: epic/NNNN (Rule 21 — EPIC-0049 naming)
+        if [[ "${branch}" =~ ^epic/([0-9]{4})$ ]]; then
+            TELEMETRY_EPIC_ID="EPIC-${BASH_REMATCH[1]}"
             return 0
         fi
     fi
@@ -132,7 +137,7 @@ resolve_context() {
         local state_file newest_file="" mtime newest_mtime=0
         # shellcheck disable=SC2044
         for state_file in \
-                "${CLAUDE_PROJECT_DIR}"/plans/epic-*/execution-state.json; do
+                "${CLAUDE_PROJECT_DIR}"/ai/epics/epic-*/execution-state.json; do
             [[ -f "${state_file}" ]] || continue
             local cp
             cp="$(jq -r '

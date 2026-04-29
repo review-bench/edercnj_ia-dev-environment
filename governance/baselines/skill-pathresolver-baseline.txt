@@ -1,0 +1,11 @@
+# EPIC-0060 / story-0060-0004 baseline — skills currently containing
+# hardcoded `plans/epic-N` references in SKILL.md body.
+#
+# Format: one skill path per line (relative to
+# java/src/main/resources/targets/claude/skills/). Lines starting with
+# `#` and blank lines are ignored.
+#
+# Adding NEW lines to this baseline post-EPIC-0060 is FORBIDDEN.
+# CI gate `SkillPathResolverSmokeTest` enforces it.
+#
+# All SKILLs migrated by EPIC-0062

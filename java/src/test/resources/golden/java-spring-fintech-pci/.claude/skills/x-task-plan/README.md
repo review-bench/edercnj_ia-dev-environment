@@ -37,13 +37,13 @@ Produces a self-contained implementation plan for a single task extracted from a
 5. Map TDD cycles in TPP order (minimum 3 cycles, degenerate first)
 6. Analyze affected files organized by architecture layer
 7. Generate security checklist based on task type
-8. Write plan to `plans/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md`
+8. Write plan to `ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md`
 
 ## Outputs
 
 | Artifact | Path |
 |----------|------|
-| Task plan | `plans/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` |
+| Task plan | `ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` |
 
 ## Plan Sections
 

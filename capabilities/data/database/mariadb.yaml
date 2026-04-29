@@ -1,0 +1,13 @@
+id: data.database.mariadb
+category: data
+kind: atomic
+version: "11"
+status: stable
+description: MariaDB relational database (MySQL-compatible)
+excludes:
+  - data.database.postgres
+  - data.database.mysql
+tags:
+  - database
+  - sql
+  - relational

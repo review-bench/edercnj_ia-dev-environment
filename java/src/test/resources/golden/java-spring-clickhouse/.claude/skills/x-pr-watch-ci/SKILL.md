@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash
 argument-hint: "--pr-number <N> [--timeout-seconds 1800] [--poll-interval-seconds 60] [--require-copilot-review true] [--require-checks-passing true] [--copilot-review-timeout 900] [--state-file <path>] [--no-state-file]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

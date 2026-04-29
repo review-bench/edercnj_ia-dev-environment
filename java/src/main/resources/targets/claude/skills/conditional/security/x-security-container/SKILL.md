@@ -4,6 +4,7 @@ description: "Scans Docker images for CVEs and Dockerfile best practices violati
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--image name:tag] [--dockerfile path] [--severity-threshold CRITICAL|HIGH|MEDIUM|LOW] [--ignore-unfixed]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

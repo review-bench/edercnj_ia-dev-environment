@@ -4,6 +4,7 @@ description: "Create Jira Stories from existing local story markdown files. Read
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
 argument-hint: "[EPIC_DIR_PATH or EPIC_ID]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -45,10 +46,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira
 
 1. Accept the epic directory path or epic ID as argument. If not provided, ask:
    ```
-   question: "Informe o caminho do diretorio do epico ou o ID (ex: plans/epic-0012 ou 0012)"
+   question: "Informe o caminho do diretorio do epico ou o ID (ex: ai/epics/epic-XXXX ou XXXX)"
    header: "Epic Directory"
    ```
-2. If only an ID was given (e.g., `0012`), construct the path: `plans/epic-{ID}/`
+2. If only an ID was given (e.g., `0012`), construct the path: `ai/epics/epic-{ID}/`
 3. Verify the directory exists. If not:
    ```
    ERROR: Directory {path} not found. Ensure the epic was created first.

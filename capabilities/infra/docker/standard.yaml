@@ -1,0 +1,6 @@
+id: infra.docker.standard
+name: Docker
+description: Docker containerization with multi-stage builds, non-root user, and health checks.
+parameters:
+  base-image: eclipse-temurin:21-jre-alpine
+excludes: []

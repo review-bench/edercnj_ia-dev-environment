@@ -5,15 +5,15 @@ import java.util.Map;
 /**
  * Represents the project identity containing name and purpose.
  *
- * <p>Both fields are required. A {@link ConfigValidationException}
- * is thrown if either is missing or has an invalid type.</p>
+ * <p>Both fields are required. A {@link ConfigValidationException} is thrown if either is missing
+ * or has an invalid type.
  *
  * <p>Example fromMap usage:
+ *
  * <pre>{@code
  * var map = Map.of("name", "my-project", "purpose", "A CLI tool");
  * ProjectIdentity id = ProjectIdentity.fromMap(map);
  * }</pre>
- * </p>
  *
  * @param name the project name (required, kebab-case)
  * @param purpose a one-line description of the project (required)
@@ -30,7 +30,6 @@ public record ProjectIdentity(String name, String purpose) {
     public static ProjectIdentity fromMap(Map<String, Object> map) {
         return new ProjectIdentity(
                 MapHelper.requireString(map, "name", "ProjectIdentity"),
-                MapHelper.requireString(map, "purpose", "ProjectIdentity")
-        );
+                MapHelper.requireString(map, "purpose", "ProjectIdentity"));
     }
 }

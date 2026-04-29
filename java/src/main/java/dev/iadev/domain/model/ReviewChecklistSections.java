@@ -1,14 +1,14 @@
 package dev.iadev.domain.model;
 
 /**
- * Generates conditional checklist section text for the
- * x-review-pr skill template.
+ * Generates conditional checklist section text for the x-review-pr skill template.
  *
- * <p>Sections are activated based on project config:</p>
+ * <p>Sections are activated based on project config:
+ *
  * <ul>
- *   <li>Section L (Event-Driven): 8 criteria</li>
- *   <li>Section M (PCI-DSS): 7 criteria</li>
- *   <li>Section N (LGPD): 4 criteria</li>
+ *   <li>Section L (Event-Driven): 8 criteria
+ *   <li>Section M (PCI-DSS): 7 criteria
+ *   <li>Section N (LGPD): 4 criteria
  * </ul>
  */
 public final class ReviewChecklistSections {
@@ -20,15 +20,12 @@ public final class ReviewChecklistSections {
     /**
      * Builds the rubric table rows for active sections.
      *
-     * @param hasEvent  true if event interfaces exist
+     * @param hasEvent true if event interfaces exist
      * @param hasPciDss true if PCI-DSS compliance active
-     * @param hasLgpd   true if LGPD compliance active
+     * @param hasLgpd true if LGPD compliance active
      * @return rubric rows or empty string
      */
-    public static String buildRubricRows(
-            boolean hasEvent,
-            boolean hasPciDss,
-            boolean hasLgpd) {
+    public static String buildRubricRows(boolean hasEvent, boolean hasPciDss, boolean hasLgpd) {
         var sb = new StringBuilder();
         if (hasEvent) {
             sb.append(SECTION_L_RUBRIC);
@@ -45,15 +42,13 @@ public final class ReviewChecklistSections {
     /**
      * Builds the detailed criteria for active sections.
      *
-     * @param hasEvent  true if event interfaces exist
+     * @param hasEvent true if event interfaces exist
      * @param hasPciDss true if PCI-DSS compliance active
-     * @param hasLgpd   true if LGPD compliance active
+     * @param hasLgpd true if LGPD compliance active
      * @return criteria text or empty string
      */
     public static String buildDetailedCriteria(
-            boolean hasEvent,
-            boolean hasPciDss,
-            boolean hasLgpd) {
+            boolean hasEvent, boolean hasPciDss, boolean hasLgpd) {
         var sb = new StringBuilder();
         if (hasEvent) {
             sb.append(SECTION_L_CRITERIA);
@@ -69,21 +64,21 @@ public final class ReviewChecklistSections {
 
     private static final String SECTION_L_RUBRIC =
             "| L. Event-Driven Review | 8      "
-            + "| Idempotency, ordering, DLQ,"
-            + " schema evolution, retry, isolation"
-            + "     |\n";
+                    + "| Idempotency, ordering, DLQ,"
+                    + " schema evolution, retry, isolation"
+                    + "     |\n";
 
     private static final String SECTION_M_RUBRIC =
             "| M. PCI-DSS             | 7      "
-            + "| Card data protection, encryption,"
-            + " tokenization, audit trail"
-            + "        |\n";
+                    + "| Card data protection, encryption,"
+                    + " tokenization, audit trail"
+                    + "        |\n";
 
     private static final String SECTION_N_RUBRIC =
             "| N. LGPD                | 4      "
-            + "| Consent tracking, data deletion,"
-            + " processing log, anonymization"
-            + "    |\n";
+                    + "| Consent tracking, data deletion,"
+                    + " processing log, anonymization"
+                    + "    |\n";
 
     private static final String SECTION_L_CRITERIA =
             """

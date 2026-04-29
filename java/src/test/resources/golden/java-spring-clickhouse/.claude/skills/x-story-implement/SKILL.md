@@ -6,21 +6,12 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, TaskUpdate, AskUserQuestion
 argument-hint: "[STORY-ID] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>] [--auto-approve-pr] [--task TASK-ID] [--resume] [--skip-verification] [--skip-smoke] [--skip-review] [--full-lifecycle] [--worktree] [--non-interactive] [--no-auto-remediation] [--no-ci-watch]"
 context-budget: medium
+requires-capabilities: []
 ---
 
-## Global Output Policy
+## Output Policy & Context Management
 
-- **Language**: English ONLY.
-- **Tone**: Technical, Direct, and Concise.
-- **Efficiency**: Remove all conversational fillers and greetings to save tokens.
-
-## CONTEXT MANAGEMENT
-
-- **Task results:** record only compact envelopes from `x-task-implement` (status/taskId/commitSha/coverageLine/coverageBranch). No full TDD logs.
-- **Plan files:** reference by path only. Do NOT re-read after Phase 1.
-- **Execution state:** delegate every mutation to `x-internal-status-update`.
-- **Review outputs:** reference by path + score only; never load content.
-- **Story file:** read once in Phase 0 via `x-internal-story-load-context`.
+English ONLY; technical, direct, concise (no conversational fillers). Record only compact envelopes from `x-task-implement` (status/taskId/commitSha/coverage*) — no full TDD logs. Reference plan/review files by path (+score for reviews); never re-load content. Read story file once in Phase 0 via `x-internal-story-load-context`. Delegate every state mutation to `x-internal-status-update`.
 
 # Skill: Story Implementation (Thin Orchestrator — ADR-0012 + EPIC-0049)
 
@@ -36,7 +27,7 @@ Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load
 - `/x-story-implement story-XXXX-YYYY --resume` — continue from `execution-state.json` via `x-internal-story-resume`
 - `/x-story-implement story-XXXX-YYYY --auto-approve-pr` — parent-branch mode (RULE-004)
 - `/x-story-implement story-XXXX-YYYY --worktree` — standalone opt-in worktree (ADR-0004 Mode 2)
-- `/x-story-implement story-XXXX-YYYY --non-interactive` — skip interactive gate menus (CI / orchestrated calls)
+- `/x-story-implement story-XXXX-YYYY --interactive` — opt-in to gate menus (PROCEED/FIX-PR/ABORT)
 
 ## Review Policy — `MANDATORY — NON-NEGOTIABLE`: Specialist (`x-review`) + Tech-Lead (`x-review-pr`) reviews in Step 3.2 MUST execute unless `--skip-verification` / `--skip-review`; silent omission is a `PROTOCOL_VIOLATION` and subagents MUST abort with `"REVIEW_SKIPPED_WITHOUT_FLAG"`.
 
@@ -53,7 +44,9 @@ Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load
 | `--resume` | Boolean | `false` | Delegates resume-point detection to `x-internal-story-resume`. |
 | `--skip-verification` | Boolean | `false` | **Recovery-only.** Skips Phase 3; flagged outside `## Recovery` blocks. |
 | `--skip-smoke`, `--skip-review` | Boolean | `false` | Bypass smoke gate / specialist + TL reviews (the only supported per-review bypass path). |
-| `--full-lifecycle`, `--worktree`, `--non-interactive` | Boolean | `false` | Full execution / standalone worktree / CI mode. |
+| `--full-lifecycle`, `--worktree` | Boolean | `false` | Full execution / standalone worktree mode. |
+| `--interactive` | Boolean | `false` | Opt-in to 3-option gate menus (PROCEED/FIX-PR/ABORT). Default: non-interactive (Rule 20, EPIC-0061). |
+| `--non-interactive` | Boolean | **DEPRECATED** | Was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--no-auto-remediation`, `--no-ci-watch` | Boolean | `false` | Skip Step 3.5 remediation / Rule 21 CI-watch. |
 
 **Deprecated (no-op, warn-once):** `--manual-contract-approval`, `--manual-task-approval` (both since EPIC-0043).
@@ -211,7 +204,7 @@ Open phase tracker (close with `TaskUpdate(id: phase2TaskId, status: "completed"
 
     TaskCreate(subject: "{STORY_ID} › Phase 2 - Execute", activeForm: "Running task execution loop")
 
-Read tasks from `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 fallback when absent). Apply the `tasksPending` filter from Phase 0.4 when resuming. For each `TASK-XXXX-YYYY-NNN` not in `DONE`/`BLOCKED`:
+Read tasks from `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 fallback when absent). Apply the `tasksPending` filter from Phase 0.4 when resuming. For each `TASK-XXXX-YYYY-NNN` not in `DONE`/`BLOCKED`:
 
 **Per-task tracking (sequential, chained via `addBlockedBy`):**
 
@@ -228,7 +221,7 @@ Read tasks from `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 fall
 2. **Dispatch TDD:** `Skill(skill: "x-task-implement", model: "sonnet", args: "<TASK-ID> --orchestrated --target-branch <targetBranch> [--auto-merge <strategy>] [--epic-id <EPIC-ID>] [--auto-approve-pr] [--non-interactive]")` → RED/GREEN/REFACTOR + atomic commit + push `feat/task-XXXX-YYYY-NNN-desc`. Returns `{status, taskId, commitSha, branchName, coverageLine, coverageBranch}`.
 3. **CI-watch (Rule 21 + Rule 45):** unless `--no-ci-watch`. **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** `Skill(skill: "x-pr-watch-ci", args: "--branch <branchName>")` — 8 exit codes. Persists `.claude/state/pr-watch-{PR}.json`; absence on a merged PR fails Camada 3 audit.
 4. **PR creation (RULE-009 OO propagation):** `Skill(skill: "x-pr-create", model: "haiku", args: "<TASK-ID> --target-branch <targetBranch> --auto-merge <strategy> --epic-id <EPIC-ID> [--auto-approve-pr]")`. With `--auto-approve-pr`, task-PR target becomes parent story branch. Consume `{prUrl, prNumber, prMergeStatus}`.
-5. **Status:** `Skill(skill: "x-internal-status-update", args: "--file plans/epic-XXXX/execution-state.json --type task --id <TASK-ID> --field status --value <STATUS>")`.
+5. **Status:** `Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type task --id <TASK-ID> --field status --value <STATUS>")`.
 
 ### 2.2 Fail-fast + story-level PR
 
@@ -274,7 +267,7 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
     Skill(skill: "x-internal-story-verify", args: "--story-id <STORY-ID> --epic-id <EPIC-ID> [--coverage-threshold-line 95] [--coverage-threshold-branch 90]")
     TaskUpdate(id: p3Tasks.verify, status: "completed")
 
-Persists `plans/epic-XXXX/reports/verify-envelope-STORY-ID.json`. On `passed=false` → `VERIFY_FAILED`.
+Persists `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json`. On `passed=false` → `VERIFY_FAILED`.
 
 ### 3.2 Specialist + Tech-Lead reviews — `MANDATORY — NON-NEGOTIABLE` (unless `--skip-review`)
 > Both `x-review` and `x-review-pr` MUST execute in sequence. Silent omission is a `PROTOCOL_VIOLATION` — subagents MUST abort with `"PROTOCOL_VIOLATION: Step 3.2 specialist/tech-lead review skipped without --skip-verification"`. `MANDATORY — NON-NEGOTIABLE`: the specialist-review step (`x-review`) and tech-lead review step (`x-review-pr`) each persist evidence artifacts validated by CI audit.
@@ -289,7 +282,7 @@ On Tech-Lead GO, optional `Skill(skill: "x-pr-fix", args: "<prNumber>")` unless 
 
 ### 3.3 Final report — MANDATORY TOOL CALL
 
-    Skill(skill: "x-internal-story-report", args: "--story-id <STORY-ID> --epic-id <EPIC-ID> --output plans/epic-XXXX/reports/story-completion-report-STORY-ID.md")
+    Skill(skill: "x-internal-story-report", args: "--story-id <STORY-ID> --epic-id <EPIC-ID> --output ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md")
     TaskUpdate(id: p3Tasks.report, status: "completed")
 
 ### 3.4 Status finalize
@@ -304,7 +297,7 @@ Gated by `STORY_OWNS_WORKTREE`: `true`+passed → `Skill(skill: "x-git-worktree"
 
     TaskUpdate(id: p3Tasks.cleanup, status: "completed")
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts plans/epic-XXXX/reports/verify-envelope-STORY-ID.json,plans/epic-XXXX/plans/review-story-STORY-ID.md,plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md,plans/epic-XXXX/reports/story-completion-report-STORY-ID.md")
+Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json,ai/epics/epic-XXXX/plans/review-story-STORY-ID.md,ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md,ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md")
 
 TaskUpdate(id: phase3TaskId, status: "completed")
 
@@ -331,6 +324,17 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 
 Full retry/backoff schedule + `SubagentResult` error shape live in `references/full-protocol.md` §6.
 
+## Recovery
+
+Resuming after an aborted lifecycle may legitimately skip already-completed steps. The canonical signal is `CLAUDE_RECOVERY_MODE=1` — set automatically by `x-internal-story-resume` when `staleWarnings != []`. The PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) then permits the flags below with a WARNING; skips remain visible in telemetry as `phase.end status=skipped`. **Operator-controlled sessions only — never in automated calls.** `CLAUDE_RECOVERY_MODE=1` is the ONLY accepted bypass variable; `CLAUDE_SKIP_AUDIT=1` / `CLAUDE_NO_ENFORCE=1` do NOT bypass (RULE-059-07).
+
+| Flag | Skips |
+| :--- | :--- |
+| `--skip-verification` | Phase 3 (`x-internal-story-verify`) |
+| `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
+| `--skip-smoke` | Smoke gate inside verify |
+| `--no-ci-watch` | CI-watch step in Phase 2 |
+
 ## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
 
 All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `epicId` auto-derived — identical to EPIC-0048. `--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
@@ -339,7 +343,9 @@ All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `ep
 
 `x-internal-args-normalize` (0.1), `x-internal-story-load-context` (0.2), `x-internal-story-resume` (0.4 cond.), `x-internal-story-build-plan` (1), `x-task-implement` (2 per-task), `x-pr-create` (2 per-task+story), `x-pr-watch-ci` (2), `x-parallel-eval` (1), `x-review`/`x-review-pr`/`x-pr-fix` (3.2), `x-internal-story-verify` (3.1), `x-internal-story-report` (3.3), `x-internal-status-update` (all phases), `x-git-worktree` (0.3+3.5), `x-epic-implement` (caller).
 
-`{{PLACEHOLDER}}` tokens (`{{TEST_COMMAND}}`, `{{COVERAGE_COMMAND}}`) are runtime-filled by the AI agent from project config.
+### `events.ndjson` as Committed Evidence (EPIC-0059 story-0059-0008)
+
+`ai/epics/epic-XXXX/telemetry/events.ndjson` is committed evidence under Rule 24 Camada 4 — `phase.start x-story-implement` events for all 4 phases prove the orchestrator ran (validated by `audit-execution-integrity.sh --scope=telemetry`). The `stage-telemetry.sh` Stop hook stages it at end-of-turn when status=`Em Andamento`. `CLAUDE_TELEMETRY_DISABLED=1` disables staging (Rule 07 fail-open); `CLAUDE_SKIP_AUDIT=1` does NOT bypass (RULE-059-07). `{{PLACEHOLDER}}` tokens are runtime-filled by the agent.
 
 ## Full Protocol
 

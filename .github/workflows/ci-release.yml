@@ -32,6 +32,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # fetch-depth: 0 is required so that Java auditors can resolve git
+          # history (e.g., merged story branches in ExecutionIntegrityAuditor).
+          # A shallow clone (default fetch-depth: 1) makes commits unreachable
+          # and produces false-positive violations.
+          fetch-depth: 0
 
       - name: Setup JDK 21 (Temurin) + Maven cache
         uses: actions/setup-java@v5
@@ -55,30 +61,12 @@ jobs:
           fi
           shellcheck -S warning -e SC2034 "${SCRIPTS[@]}"
 
-      # EPIC-0050 (Rule 23): audit model selection (Opus/Sonnet/Haiku)
-      # enforcement. Fails the PR when a SKILL.md, Agent() dispatch,
-      # Skill() dispatch, or agent metadata violates Rule 23.
-      - name: Audit Model Selection (Rule 23)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-model-selection.sh
-
-      # EPIC-0057 (Rule 24 Camada 3): audit execution-integrity evidence.
-      # Fails the PR when a merged story-* branch lacks the mandatory
-      # evidence artifacts (verify-envelope, review, techlead-review,
-      # story-completion-report) defined in Rule 24 §32-42.
-      - name: Audit Execution Integrity (Camada 3)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-execution-integrity.sh
-
-      # EPIC-0057 story-0057-0005: audit bypass flags (--no-*/--skip-*)
-      # outside ## Recovery / ## Error Handling sections. Per Rule 24
-      # §30 + Rule 45 §--no-ci-watch Constraints. Hard violations fail
-      # the build (exit 1); soft warnings (--no-jira) are surfaced but
-      # do not block (exit 3).
-      - name: Audit Bypass Flags (Rule 24 §30 + Rule 45)
-        working-directory: ${{ github.workspace }}
-        run: scripts/audit-bypass-flags.sh || [[ $? -eq 3 ]]
-
+      # EPIC-0061 (RULE-007): all governance audit gates moved to Java auditors
+      # under dev.iadev.audit.* and run as part of `mvn verify`. The legacy
+      # bash scripts (audit-model-selection.sh, audit-execution-integrity.sh,
+      # audit-bypass-flags.sh, audit-baseline-immutability.sh) were removed
+      # in favor of the local-first architecture (Camada 0-4). See ADR-0017
+      # and Rule 26 §Camada-0.
       - name: mvn -B verify
         run: mvn -B verify
 
@@ -98,6 +86,73 @@ jobs:
           files: java/target/site/jacoco/jacoco.xml
           flags: unit
           fail_ci_if_error: false
+
+  # EPIC-0059 story-0059-0006: Re-runs the pre-commit chain (format → lint → compile)
+  # on PRs that touch Java source or pom.xml. Closes bypass surface E
+  # (git commit --no-verify) by invalidating local hook bypasses at the CI gate.
+  #
+  # Path filter (on.pull_request.paths at the workflow level is the primary gate;
+  # the javadiff step below is a secondary defensive check for re-triggered runs).
+  pre-commit-chain:
+    name: Pre-commit Chain (format/lint/compile)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: java
+        shell: bash
+    steps:
+      - name: Checkout (full depth for diff)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK 21 (Temurin) + Maven cache
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      # Defensive diff detection: checks whether the PR actually touches
+      # src/main/java/ or pom.xml (guards against re-triggered runs that
+      # bypass the path filter via workflow_dispatch or re-run buttons).
+      - name: Detect Java diff
+        id: javadiff
+        run: |
+          set -euo pipefail
+          BASE_REF="${{ github.base_ref }}"
+          HEAD_SHA="${{ github.sha }}"
+          # Fetch base branch so git diff has both sides
+          git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
+          if git diff --name-only "origin/${BASE_REF}...${HEAD_SHA}" \
+              | grep -qE '^(java/src/main/java/|java/pom\.xml$|java/checkstyle-suppressions\.xml$)'; then
+            echo "java_changed=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "java_changed=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      # Step 1 — Format check (Spotless / Google Java Format).
+      # Fails if any Java file in the PR is not formatted according to AOSP style.
+      # Developer fix: run `mvn spotless:apply` locally and re-commit.
+      - name: Format check (Spotless)
+        if: steps.javadiff.outputs.java_changed == 'true'
+        run: mvn spotless:check -q
+
+      # Step 2 — Lint check (Checkstyle / Google Checks).
+      # Suppressions in checkstyle-suppressions.xml exempt existing source;
+      # new files added after EPIC-0059 must pass Google-style checks clean.
+      - name: Lint check (Checkstyle)
+        if: steps.javadiff.outputs.java_changed == 'true'
+        run: mvn checkstyle:check -q
+
+      # Step 3 — Compile.
+      # Ensures no compilation errors sneak in via --no-verify.
+      - name: Compile
+        if: steps.javadiff.outputs.java_changed == 'true'
+        run: mvn compile -q
 
   dependency-review:
     name: Dependency review (PR only)

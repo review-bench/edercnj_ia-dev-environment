@@ -4,6 +4,7 @@ description: "Merge-train automation: discovers, validates, and merges a sequenc
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, TaskUpdate
 argument-hint: "[--prs N,M,...] [--epic ID] [--pattern regex] [--max-parallel N] [--dry-run] [--resume]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -27,7 +28,7 @@ argument-hint: "[--prs N,M,...] [--epic ID] [--pattern regex] [--max-parallel N]
 | Flag | Type | Required | Default | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | `--prs` | `String` (CSV integers) | Mutually exclusive¹ | — | Literal comma-separated PR numbers; order preserved. |
-| `--epic` | `String` (4-digit ID) | Mutually exclusive¹ | — | Reads `plans/epic-{ID}/execution-state.json` to resolve PRs. |
+| `--epic` | `String` (4-digit ID) | Mutually exclusive¹ | — | Reads `ai/epics/epic-{ID}/execution-state.json` to resolve PRs. |
 | `--pattern` | `String` (GitHub search regex) | Mutually exclusive¹ | — | Enumerates open PRs via `gh pr list --search`. Sorted by `createdAt`. |
 | `--max-parallel` | `Integer` | Optional | `3` | Max concurrent rebase workers in Phase 5 (1–8). |
 | `--dry-run` | Flag | Optional | `false` | Report plan and VETOs without merging. Exits after Phase 2. |
@@ -103,7 +104,7 @@ See `references/full-protocol.md §Phase 0` for full implementation.
 
 Enumerate PRs per chosen mode:
 - `--prs`: parse CSV, preserve order.
-- `--epic`: read `plans/epic-{ID}/execution-state.json`, collect merged story PR URLs.
+- `--epic`: read `ai/epics/epic-{ID}/execution-state.json`, collect merged story PR URLs.
 - `--pattern`: `gh pr list --search {pattern} --state open --json number,createdAt | sort by createdAt`.
 
 Write initial `state.json` at `plans/merge-train/{trainId}/state.json` with `phase: DISCOVERY` and the discovered PR list. Advance state to `VALIDATION`.

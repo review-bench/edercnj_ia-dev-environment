@@ -12,12 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Resolves classpath resources to filesystem {@link Path}
- * objects, handling both exploded classpath and fat JAR
- * scenarios.
+ * Resolves classpath resources to filesystem {@link Path} objects, handling both exploded classpath
+ * and fat JAR scenarios.
  *
- * <p>JAR extraction is delegated to
- * {@link JarResourceExtractor}.</p>
+ * <p>JAR extraction is delegated to {@link JarResourceExtractor}.
  *
  * @see JarResourceExtractor
  * @see ResourceDiscovery
@@ -25,8 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 public final class ResourceResolver {
 
     private static final Object LOCK = new Object();
-    private static final ConcurrentMap<String, Path>
-            DIR_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Path> DIR_CACHE = new ConcurrentHashMap<>();
     static volatile Path cachedExtractedDir;
 
     private ResourceResolver() {
@@ -34,77 +31,57 @@ public final class ResourceResolver {
     }
 
     /**
-     * Resolves a resource directory by its relative path
-     * within the resources root, without depth arithmetic.
+     * Resolves a resource directory by its relative path within the resources root, without depth
+     * arithmetic.
      *
-     * <p>Locates the first segment of {@code relativePath}
-     * on the classpath and derives the resources root,
-     * then appends the full relative path. Throws
-     * {@link IllegalArgumentException} if the resolved
-     * directory does not exist.</p>
+     * <p>Locates the first segment of {@code relativePath} on the classpath and derives the
+     * resources root, then appends the full relative path. Throws {@link IllegalArgumentException}
+     * if the resolved directory does not exist.
      *
-     * @param relativePath path relative to resources root
-     *                     (e.g. {@code "knowledge/databases/cache/redis"})
+     * @param relativePath path relative to resources root (e.g. {@code
+     *     "knowledge/databases/cache/redis"})
      * @return absolute filesystem path to the directory
-     * @throws IllegalArgumentException if the directory
-     *         cannot be found
+     * @throws IllegalArgumentException if the directory cannot be found
      */
-    public static Path resolveResourceDir(
-            String relativePath) {
+    public static Path resolveResourceDir(String relativePath) {
         validateRelativePath(relativePath);
 
-        return DIR_CACHE.computeIfAbsent(
-                relativePath,
-                ResourceResolver::doResolveDir);
+        return DIR_CACHE.computeIfAbsent(relativePath, ResourceResolver::doResolveDir);
     }
 
-    private static void validateRelativePath(
-            String relativePath) {
-        if (relativePath == null
-                || relativePath.isBlank()) {
-            throw new IllegalArgumentException(
-                    "relativePath must not be blank");
+    private static void validateRelativePath(String relativePath) {
+        if (relativePath == null || relativePath.isBlank()) {
+            throw new IllegalArgumentException("relativePath must not be blank");
         }
         if (relativePath.contains("..")) {
             throw new IllegalArgumentException(
-                    "Path traversal (..) is not allowed: "
-                            + relativePath);
+                    "Path traversal (..) is not allowed: " + relativePath);
         }
-        if (relativePath.startsWith("/")
-                || relativePath.matches(
-                        "^[A-Za-z]:[\\\\/].*")) {
-            throw new IllegalArgumentException(
-                    "Absolute paths are not allowed: "
-                            + relativePath);
+        if (relativePath.startsWith("/") || relativePath.matches("^[A-Za-z]:[\\\\/].*")) {
+            throw new IllegalArgumentException("Absolute paths are not allowed: " + relativePath);
         }
     }
 
-    private static Path doResolveDir(
-            String relativePath) {
-        String firstSegment = relativePath.contains("/")
-                ? relativePath.substring(
-                        0, relativePath.indexOf('/'))
-                : relativePath;
+    private static Path doResolveDir(String relativePath) {
+        String firstSegment =
+                relativePath.contains("/")
+                        ? relativePath.substring(0, relativePath.indexOf('/'))
+                        : relativePath;
 
         Path root = doResolveRoot(firstSegment, 1);
-        Path resolved =
-                root.resolve(relativePath).normalize();
+        Path resolved = root.resolve(relativePath).normalize();
 
         if (!resolved.startsWith(root)) {
             throw new IllegalArgumentException(
-                    "Resolved path escapes resource root: "
-                            + relativePath);
+                    "Resolved path escapes resource root: " + relativePath);
         }
         if (!Files.isDirectory(resolved)) {
-            throw new IllegalArgumentException(
-                    "Resource directory not found: "
-                            + relativePath);
+            throw new IllegalArgumentException("Resource directory not found: " + relativePath);
         }
         return resolved;
     }
 
-    private static Path doResolveRoot(
-            String probe, int depth) {
+    private static Path doResolveRoot(String probe, int depth) {
         URL url = findOnClasspath(probe);
         if (url == null) {
             return Path.of("src/main/resources");
@@ -122,16 +99,14 @@ public final class ResourceResolver {
     }
 
     private static URL findOnClasspath(String name) {
-        ClassLoader cl = Thread.currentThread()
-                .getContextClassLoader();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (cl == null) {
             cl = ResourceResolver.class.getClassLoader();
         }
         return cl.getResource(name);
     }
 
-    private static Path resolveFromFile(
-            URL url, int depth) {
+    private static Path resolveFromFile(URL url, int depth) {
         try {
             Path path = Path.of(url.toURI());
             for (int i = 0; i < depth; i++) {
@@ -139,37 +114,29 @@ public final class ResourceResolver {
             }
             return path;
         } catch (URISyntaxException e) {
-            throw new UncheckedIOException(
-                    new IOException(
-                            "Invalid resource URI: " + url,
-                            e));
+            throw new UncheckedIOException(new IOException("Invalid resource URI: " + url, e));
         }
     }
 
     static Path resolveFromJar(URL url) {
         synchronized (LOCK) {
-            if (cachedExtractedDir != null
-                    && Files.exists(cachedExtractedDir)) {
+            if (cachedExtractedDir != null && Files.exists(cachedExtractedDir)) {
                 return cachedExtractedDir;
             }
-            cachedExtractedDir =
-                    JarResourceExtractor
-                            .extractJarResources(url);
+            cachedExtractedDir = JarResourceExtractor.extractJarResources(url);
             registerShutdownHook(cachedExtractedDir);
             return cachedExtractedDir;
         }
     }
 
     /**
-     * Delegates to
-     * {@link JarResourceExtractor#extractJarResources}.
+     * Delegates to {@link JarResourceExtractor#extractJarResources}.
      *
      * @param url the JAR URL
      * @return the path to extracted resources
      */
     static Path extractJarResources(URL url) {
-        return JarResourceExtractor
-                .extractJarResources(url);
+        return JarResourceExtractor.extractJarResources(url);
     }
 
     /**
@@ -179,41 +146,33 @@ public final class ResourceResolver {
      * @return the created temp directory path
      * @throws IOException if creation fails
      */
-    static Path createSecureTempDir(String prefix)
-            throws IOException {
+    static Path createSecureTempDir(String prefix) throws IOException {
         if (!isPosixSystem()) {
             return Files.createTempDirectory(prefix);
         }
         FileAttribute<?> perms =
-                PosixFilePermissions.asFileAttribute(
-                        PosixFilePermissions.fromString(
-                                "rwx------"));
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
         return Files.createTempDirectory(prefix, perms);
     }
 
     private static boolean isPosixSystem() {
-        String os = System.getProperty("os.name", "")
-                .toLowerCase();
+        String os = System.getProperty("os.name", "").toLowerCase();
         return !os.contains("win");
     }
 
     static boolean shouldSkip(Path dir) {
-        String name = dir.getFileName() == null
-                ? "" : dir.getFileName().toString();
+        String name = dir.getFileName() == null ? "" : dir.getFileName().toString();
         return "META-INF".equals(name);
     }
 
-    private static void registerShutdownHook(
-            Path extractedDir) {
-        Runtime.getRuntime().addShutdownHook(
-                new Thread(
-                        () -> deleteQuietly(extractedDir),
-                        "ia-dev-env-cleanup"));
+    private static void registerShutdownHook(Path extractedDir) {
+        Runtime.getRuntime()
+                .addShutdownHook(
+                        new Thread(() -> deleteQuietly(extractedDir), "ia-dev-env-cleanup"));
     }
 
     /**
-     * Delegates to
-     * {@link dev.iadev.application.assembler.CopyHelpers#deleteQuietly}.
+     * Delegates to {@link dev.iadev.application.assembler.CopyHelpers#deleteQuietly}.
      *
      * @param dir directory to delete recursively
      */

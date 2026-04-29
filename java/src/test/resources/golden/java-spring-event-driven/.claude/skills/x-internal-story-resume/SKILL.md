@@ -1,12 +1,13 @@
 ---
 name: x-internal-story-resume
-description: "Detects the resumable state of an in-flight story: reads plans/epic-XXXX/execution-state.json via x-internal-status-update --read-only, identifies the first PENDING or IN_PROGRESS task (the resume point), catalogues DONE tasks with their commitSha, extracts the last committed SHA, and flags staleness when the story file's mtime is newer than any DONE task's completion timestamp. Emits a single-line JSON envelope {resumePoint, tasksCompleted, tasksPending, lastCommitSha, staleWarnings}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify). Read-only by construction — never mutates state."
+description: "Detects the resumable state of an in-flight story: reads ai/epics/epic-XXXX/execution-state.json via x-internal-status-update --read-only, identifies the first PENDING or IN_PROGRESS task (the resume point), catalogues DONE tasks with their commitSha, extracts the last committed SHA, and flags staleness when the story file's mtime is newer than any DONE task's completion timestamp. Emits a single-line JSON envelope {resumePoint, tasksCompleted, tasksPending, lastCommitSha, staleWarnings}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify). Read-only by construction — never mutates state."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
 argument-hint: "--story-id <story-XXXX-YYYY> --epic-id <XXXX>"
 category: internal-plan
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -42,7 +43,7 @@ and task-dispatch decisions off the four response fields.
 
 Responsibilities (single):
 
-1. Resolve and read `plans/epic-XXXX/execution-state.json` via
+1. Resolve and read `ai/epics/epic-XXXX/execution-state.json` via
    `x-internal-status-update --read-only` so the concurrency contract
    (shared `flock -s`) is honoured identically to every other
    read consumer (`x-internal-story-load-context`,
@@ -117,7 +118,7 @@ Skill(skill: "x-internal-story-resume",
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form) |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `plans/epic-XXXX/` |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` |
 
 All three argument forms (`--key value`, `--key=value`, and unknown-flag
 rejection) are supported; unknown flags and missing required flags exit
@@ -162,7 +163,7 @@ MUST read `resumePoint` as the authoritative branching signal.
 | Code | Name | Condition | Message Format |
 | :--- | :--- | :--- | :--- |
 | 0 | SUCCESS | Envelope emitted | — |
-| 1 | STATE_FILE_MISSING | `plans/epic-XXXX/execution-state.json` absent | `execution-state.json not found` |
+| 1 | STATE_FILE_MISSING | `ai/epics/epic-XXXX/execution-state.json` absent | `execution-state.json not found` |
 | 2 | STORY_NOT_IN_STATE | Story not registered inside the state file's `stories` map | `Story not in execution-state.json` |
 | 64 | EX_USAGE | Unknown or malformed flag | `usage: --story-id <id> --epic-id <id>` |
 | 127 | DEPENDENCY_MISSING | `jq` absent on `PATH` | `dependency missing: jq` |
@@ -178,7 +179,7 @@ Parse `--story-id` and `--epic-id`; reject unknown flags and missing
 required flags with exit `64`. Derive canonical paths:
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 story_file="${epic_dir}/${story_id}.md"
 state_file="${epic_dir}/execution-state.json"
 ```
@@ -413,7 +414,7 @@ skill reads at most 2 files (1 state file via `jq` + `flock -s`,
 1 story file via `stat`) and spawns a single `jq` pass for envelope
 assembly. No network I/O.
 
-Measured on `plans/epic-0049/` with 22 stories × ~5 tasks each:
+Measured on `ai/epics/epic-XXXX/` with 22 stories × ~5 tasks each:
 
 | Step | Median time |
 | :--- | :--- |

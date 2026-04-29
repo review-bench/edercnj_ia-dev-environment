@@ -3,7 +3,6 @@ package dev.iadev.application.assembler;
 import dev.iadev.domain.model.Platform;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,8 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Generates {@code README.md} from template or minimal
- * fallback (last assembler in pipeline, RULE-005).
+ * Generates {@code README.md} from template or minimal fallback (last assembler in pipeline,
+ * RULE-005).
  *
  * @see Assembler
  * @see ReadmeTables
@@ -21,16 +20,13 @@ public final class ReadmeAssembler implements Assembler {
 
     private final Path resourcesDir;
 
-    /**
-     * Creates a ReadmeAssembler using classpath resources.
-     */
+    /** Creates a ReadmeAssembler using classpath resources. */
     public ReadmeAssembler() {
         this(resolveClasspathResources());
     }
 
     /**
-     * Creates a ReadmeAssembler with an explicit resources
-     * directory.
+     * Creates a ReadmeAssembler with an explicit resources directory.
      *
      * @param resourcesDir the base resources directory
      */
@@ -41,21 +37,16 @@ public final class ReadmeAssembler implements Assembler {
     /**
      * {@inheritDoc}
      *
-     * <p>Generates README.md in the output directory. Uses
-     * template mode if {@code readme-template.md} exists,
-     * otherwise falls back to minimal mode.</p>
+     * <p>Generates README.md in the output directory. Uses template mode if {@code
+     * readme-template.md} exists, otherwise falls back to minimal mode.
      */
     @Override
-    public List<String> assemble(
-            ProjectConfig config,
-            TemplateEngine engine,
-            Path outputDir) {
-        Path templatePath = resourcesDir
-                .resolve("readme-template.md");
-        String content = Files.exists(templatePath)
-                ? generateReadme(config, outputDir,
-                templatePath)
-                : generateMinimalReadme(config);
+    public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {
+        Path templatePath = resourcesDir.resolve("readme-template.md");
+        String content =
+                Files.exists(templatePath)
+                        ? generateReadme(config, outputDir, templatePath)
+                        : generateMinimalReadme(config);
         Path dest = outputDir.resolve("README.md");
         CopyHelpers.writeFile(dest, content);
         return List.of(dest.toString());
@@ -64,69 +55,54 @@ public final class ReadmeAssembler implements Assembler {
     /**
      * Builds full README by replacing 12 placeholder tokens.
      *
-     * @param config       the project configuration
-     * @param outputDir    the .claude/ output directory
+     * @param config the project configuration
+     * @param outputDir the .claude/ output directory
      * @param templatePath path to readme-template.md
      * @return the processed README content
      */
-    static String generateReadme(
-            ProjectConfig config,
-            Path outputDir,
-            Path templatePath) {
-        return generateReadme(
-                config, outputDir, templatePath, Set.of());
+    static String generateReadme(ProjectConfig config, Path outputDir, Path templatePath) {
+        return generateReadme(config, outputDir, templatePath, Set.of());
     }
 
     /**
-     * Builds platform-filtered README by replacing
-     * placeholder tokens with platform-aware content.
+     * Builds platform-filtered README by replacing placeholder tokens with platform-aware content.
      *
-     * @param config       the project configuration
-     * @param outputDir    the .claude/ output directory
+     * @param config the project configuration
+     * @param outputDir the .claude/ output directory
      * @param templatePath path to readme-template.md
-     * @param platforms    the active platforms (empty = all)
+     * @param platforms the active platforms (empty = all)
      * @return the processed README content
      */
     static String generateReadme(
-            ProjectConfig config,
-            Path outputDir,
-            Path templatePath,
-            Set<Platform> platforms) {
+            ProjectConfig config, Path outputDir, Path templatePath, Set<Platform> platforms) {
         String content = CopyHelpers.readFile(templatePath);
-        content = content.replace("{{PROJECT_NAME}}",
-                config.project().name());
-        content = content.replace("{{RULES_COUNT}}",
-                String.valueOf(
-                        ReadmeUtils.countRules(outputDir)));
-        content = content.replace("{{SKILLS_COUNT}}",
-                String.valueOf(
-                        ReadmeUtils.countSkills(outputDir)));
-        content = content.replace("{{AGENTS_COUNT}}",
-                String.valueOf(
-                        ReadmeUtils.countAgents(outputDir)));
-        content = content.replace("{{RULES_TABLE}}",
-                ReadmeTables.buildRulesTable(outputDir));
-        content = content.replace("{{SKILLS_TABLE}}",
-                ReadmeTables.buildSkillsTable(outputDir));
-        content = content.replace("{{AGENTS_TABLE}}",
-                ReadmeTables.buildAgentsTable(outputDir));
-        content = content.replace("{{HOOKS_SECTION}}",
-                ReadmeTables
-                        .buildReadmeHooksSection(config));
-        content = content.replace(
-                "{{KNOWLEDGE_PACKS_TABLE}}",
-                ReadmeTables
-                        .buildKnowledgePacksTable(
-                                outputDir));
-        content = content.replace("{{SETTINGS_SECTION}}",
-                ReadmeTables.buildSettingsSection());
-        content = content.replace("{{MAPPING_TABLE}}",
-                ReadmeTables.buildMappingTable(
-                        outputDir, platforms));
-        content = content.replace(
-                "{{GENERATION_SUMMARY}}",
-                ReadmeTables.buildGenerationSummary(
-                        outputDir, config, platforms));
+        content = content.replace("{{PROJECT_NAME}}", config.project().name());
+        content =
+                content.replace(
+                        "{{RULES_COUNT}}", String.valueOf(ReadmeUtils.countRules(outputDir)));
+        content =
+                content.replace(
+                        "{{SKILLS_COUNT}}", String.valueOf(ReadmeUtils.countSkills(outputDir)));
+        content =
+                content.replace(
+                        "{{AGENTS_COUNT}}", String.valueOf(ReadmeUtils.countAgents(outputDir)));
+        content = content.replace("{{RULES_TABLE}}", ReadmeTables.buildRulesTable(outputDir));
+        content = content.replace("{{SKILLS_TABLE}}", ReadmeTables.buildSkillsTable(outputDir));
+        content = content.replace("{{AGENTS_TABLE}}", ReadmeTables.buildAgentsTable(outputDir));
+        content =
+                content.replace("{{HOOKS_SECTION}}", ReadmeTables.buildReadmeHooksSection(config));
+        content =
+                content.replace(
+                        "{{KNOWLEDGE_PACKS_TABLE}}",
+                        ReadmeTables.buildKnowledgePacksTable(outputDir));
+        content = content.replace("{{SETTINGS_SECTION}}", ReadmeTables.buildSettingsSection());
+        content =
+                content.replace(
+                        "{{MAPPING_TABLE}}", ReadmeTables.buildMappingTable(outputDir, platforms));
+        content =
+                content.replace(
+                        "{{GENERATION_SUMMARY}}",
+                        ReadmeTables.buildGenerationSummary(outputDir, config, platforms));
         return content;
     }
 
@@ -136,17 +112,16 @@ public final class ReadmeAssembler implements Assembler {
      * @param config the project configuration
      * @return the minimal README content
      */
-    static String generateMinimalReadme(
-            ProjectConfig config) {
-        String ifaces = config.interfaces().stream()
-                .map(i -> i.type())
-                .collect(Collectors.joining(" "));
+    static String generateMinimalReadme(ProjectConfig config) {
+        String ifaces =
+                config.interfaces().stream().map(i -> i.type()).collect(Collectors.joining(" "));
         if (ifaces.isEmpty()) {
             ifaces = "none";
         }
         String header =
                 "# .claude/ \u2014 "
-                        + config.project().name() + "\n"
+                        + config.project().name()
+                        + "\n"
                         + "\n"
                         + "This directory contains the"
                         + " Claude Code configuration"
@@ -155,14 +130,12 @@ public final class ReadmeAssembler implements Assembler {
                         + "**.\n"
                         + "\n";
         String structure = buildStructureBlock();
-        String tips = buildTipsBlock(
-                config.architecture().style(), ifaces);
+        String tips = buildTipsBlock(config.architecture().style(), ifaces);
         return header + structure + tips;
     }
 
     /**
-     * Builds the directory structure section for minimal
-     * README.
+     * Builds the directory structure section for minimal README.
      *
      * @return the structure block
      */
@@ -202,21 +175,24 @@ public final class ReadmeAssembler implements Assembler {
      * Builds the tips section for minimal README.
      *
      * @param archStyle the architecture style
-     * @param ifaces    the interfaces string
+     * @param ifaces the interfaces string
      * @return the tips block
      */
-    static String buildTipsBlock(
-            String archStyle, String ifaces) {
+    static String buildTipsBlock(String archStyle, String ifaces) {
         return "## Tips\n\n"
                 + "- **Rules are always active**"
                 + " \u2014 loaded automatically"
                 + " in every conversation\n"
                 + "- **Patterns are selected**"
                 + " \u2014 based on architecture"
-                + " style (" + archStyle + ")\n"
+                + " style ("
+                + archStyle
+                + ")\n"
                 + "- **Protocols are selected**"
                 + " \u2014 based on interfaces"
-                + " (" + ifaces + ")\n"
+                + " ("
+                + ifaces
+                + ")\n"
                 + "- **Skills are lazy**"
                 + " \u2014 only load when you"
                 + " type `/name`\n"
@@ -228,8 +204,6 @@ public final class ReadmeAssembler implements Assembler {
     }
 
     private static Path resolveClasspathResources() {
-        return dev.iadev.util.ResourceResolver
-                .resolveResourceDir("shared")
-                .getParent();
+        return dev.iadev.util.ResourceResolver.resolveResourceDir("shared").getParent();
     }
 }

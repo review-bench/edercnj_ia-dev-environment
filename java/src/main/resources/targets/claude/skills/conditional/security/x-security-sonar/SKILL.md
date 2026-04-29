@@ -4,6 +4,7 @@ description: "Integrates with SonarQube/SonarCloud for security hotspot tracking
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "--server <url> --token <token> [--quality-gate default|strict] [--project-key <key>] [--branch <branch>] [--timeout <seconds>]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

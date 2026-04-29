@@ -4,6 +4,7 @@ description: "Validates GraphQL schema design, resolver implementation, security
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[schema-file or resolver-name]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

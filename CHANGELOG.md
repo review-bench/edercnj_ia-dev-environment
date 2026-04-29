@@ -7,6 +7,136 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-04-29
+
+### Added
+
+- **EPIC-0061 (Local-First Lifecycle & Stack-Aware Governance) — stories 0001-0007:**
+  - `flowVersion: "3"` discriminator in `execution-state.json` marks epics born in the local-first lifecycle (`ExecutionState.localFirstLifecycle = true`)
+  - `StackResolver` + `ScriptsAssembler` stack-aware: 7 stacks (`java-maven`, `java-gradle`, `spring-boot`, `node`, `python`, `go`, `_default`) with `{{BUILD_TOOL}}`/`{{COVERAGE_REPORT_PATH}}` etc. placeholder templates
+  - `DocsAssembler.renderCatalog()`: generates `docs/audit-gates-catalog.md` per stack from `_TEMPLATE-AUDIT-GATES-CATALOG.md`
+  - 8 Java `*Auditor` classes mirroring bash audit scripts (RULE-004 equivalence), `AuditEquivalenceSmokeIT` (32 structural parity tests)
+  - `session-start.sh`: new SessionStart hook writes epoch to `.claude/state/session-start.txt`
+  - `Rule26CamadaZeroSmokeIT`: 5 smoke tests validating Camada 0 contract in Rule 26
+  - `migrate-to-local-first.sh.tpl`: idempotent migration script for legacy `.claude/` projects
+  - `x-internal-worktree-precheck` internal skill: detects dirty/divergent working tree with stable exit code 15 (`WORKTREE_AMBIGUOUS`)
+  - ADR-0017 (Local-First Lifecycle Convention) published
+  - Rule 20 default flipped: non-interactive is now DEFAULT; `--interactive` is opt-in
+
+### Changed
+
+- **EPIC-0061 (Local-First Lifecycle) — story-0061-0005:** Removed `scripts/audit-*.sh` and `.github/workflows/audit.yml` workflow. Audits now run inline via `mvn verify` through Java `*AuditorTest` classes (RULE-007, RULE-008). Canonical bash templates live under `java/src/main/resources/targets/claude/scripts/{stack}/`. Tag `pre-local-first-lifecycle` marks the last commit before removal. CI compute reduced ~38% (no `audit.yml` parallel job).
+- **Rule 26** extended with Camada 0 (preventivo — during LLM turn); 5-layer taxonomy replaces 4-layer.
+
+### Deprecated
+
+- `--non-interactive` flag on orchestrators: now equals default behavior. Use `--interactive` to opt into menus. Will be removed in next MINOR+2 release.
+
+### Breaking
+
+- **EPIC-0064 — Capability-Driven Composition Refactor (v5.0.0 — Major Bump).**
+  - **Schema YAML v3.0 obrigatório:** frontmatter de todos os artefatos gerados (skills, rules, KPs, agents, hooks, templates) requer campo `requires-capabilities`. Artefatos v2 (sem o campo) são hard-fail via `audit-capability-coverage.sh` (story-0064-0215).
+  - **Composição capability-driven:** `CapabilityAwareComposer` substitui o copy-cego em `.claude/`. Artefatos são incluídos/excluídos com base nas capabilities ativas do perfil do projeto. Output Java CLI sem DB reduzido em ≥30% (pruning automático).
+  - **142 artefatos migrados:** skills, KPs, agents, hooks, templates — todos com `requires-capabilities: []` (universal) ou capabilities específicas.
+  - **Domain types novos:** `CapabilityId`, `CapabilityDefinition`, `CapabilityGraph`, `Profile`, `ResolvedCapabilitySet`, `CapabilityError` (sealed hierarchy).
+  - **Pipeline novo:** `CapabilityResolver` → `CapabilityAwareComposer` → `OutputPruner` → `CompositionEngine` → Pebble → LLM.
+  - **Migration:** consumidores downstream devem regenerar `.claude/` com nova versão. Não há fallback v2.
+  - **ADR-0016 accepted:** [docs/adr/ADR-0016-capability-driven-composition.md](docs/adr/ADR-0016-capability-driven-composition.md)
+  - **Rule 28 published:** [.claude/rules/28-capability-frontmatter-contract.md](.claude/rules/28-capability-frontmatter-contract.md)
+  - **SPEC:** [docs/specs/SPEC-capability-composition-v1.md](docs/specs/SPEC-capability-composition-v1.md)
+
+### Added
+
+- **EPIC-0062 (Migração Física v3→v4 — Finalização do EPIC-0060) — Concluída:**
+  Completes the deferred physical migration from EPIC-0060. All artifacts now
+  live at v4 canonical paths with no transitional symlinks remaining.
+  - **story-0062-0001 (PR #743):** `BASELINE_DIR` env var added to 6 governance
+    audit scripts; default remains `audits/` for backward compat.
+  - **story-0062-0002 (PR #745):** `git mv audits/*.txt → governance/baselines/`;
+    default flipped to `governance/baselines`; transitional symlink created.
+  - **story-0062-0003 (PR #744):** `git mv adr/*.md → docs/adr/`; cross-refs
+    updated in `CLAUDE.md`, `Conventions.md`, `README.md`, rules.
+  - **story-0062-0004 (PR #746):** `git mv specs/*.md → docs/specs/`; `README.md`
+    refs updated.
+  - **story-0062-0005 (PR #747):** 5 Java assemblers + `FileCategorizer` updated
+    to emit v4 paths natively; symlinks `adr/` and `specs/` removed; 11 golden
+    fixtures regenerated; 3992 tests GREEN.
+  - **story-0062-0006 (PR #748):** 14 SKILL.md files updated to remove numeric
+    `plans/epic-NNN/` literals; `skill-pathresolver-baseline.txt` cleared.
+  - **story-0062-0007 (PR #749):** Rules 05/13/24/25/26/27 updated to reference
+    `governance/baselines/`, `docs/adr/`, `docs/specs/`; 11 golden fixtures
+    regenerated; full test suite GREEN.
+  - **story-0062-0008 (this PR):** Transitional symlink `audits/ → governance/baselines/`
+    removed; `CHANGELOG.md` updated; epic report generated; `epic-0062.md` marked
+    `Concluída`.
+  Follow-up: EPIC-0063 (freeze hook) and EPIC-0064 (probe removal + MAJOR bump).
+
+- **EPIC-0060 (Folder Reorganization v4) — partial delivery:** introduces the
+  v4 layout convention (`ai/epics/`, `docs/`, `governance/`) alongside the
+  legacy v3 (`plans/`) layout. Auto-detection via filesystem probe; epics with
+  `flowVersion <= 2` remain in `plans/`, new epics target `ai/epics/`.
+  Delivered components:
+  - `dev.iadev.util.PathResolver` + `UnitType` enum (story-0060-0001)
+  - `scripts/migrate-layout.sh` idempotent migrator with `pre-layout-v4`
+    rollback tag (story-0060-0002)
+  - `governance/baselines/`, `docs/{adr,specs}/`, `ai/{epics,runs,releases}/`
+    skeletons (story-0060-0003)
+  - `SkillPathResolverSmokeTest` CI gate to prevent hardcoded-path regression
+    (story-0060-0004)
+  - `FileCategorizer` v4-aware categorization (story-0060-0005)
+  - Rule 19 `flowVersion: "4"` row in fallback matrix
+  Deferred to a coordinated migration session per RULE-010:
+  - Bulk `git mv` of 21 ADRs, 11 SPECs, 7 baselines (story-0060-0003 phase 2)
+  - 14 SKILL.md substitutions of hardcoded `plans/epic-N` (story-0060-0004
+    grandfathered baseline)
+  - Rule 24/26/27/45 textual updates referencing `governance/baselines/`
+    (story-0060-0005 phase 2)
+  - Probe v3 removal + `forbid-writes-to-legacy-plans` hook + MAJOR version
+    bump (story-0060-0006 phase 2 — pre-requisite: 2-sprint co-existence
+    window, scheduled for next major release).
+
+- **EPIC-0059 story-0059-0008 (Telemetry as Orchestrator Proof-of-Life):**
+  Extends `audit-execution-integrity.sh` with `check_telemetry()` — validates
+  that `plans/epic-XXXX/telemetry/events.ndjson` contains 4 mandatory
+  `phase.start x-story-implement` events (Phase-0-Prepare, Phase-1-Plan,
+  Phase-2-Implement, Phase-3-Verify) for each story referenced in PR commits.
+  Closes bypass surfaces A (orchestrator completely skipped) and H (telemetry
+  absent); directly addresses the EPIC-0057 regression pattern (171 non-
+  orchestrator events but zero `x-story-implement` events).
+  - `scripts/audit-execution-integrity.sh`: new `check_telemetry()`,
+    `discover_story_ids_from_commits()`, `--scope=telemetry` flag, and
+    `AUDIT_TEST_STORY_IDS` env var for smoke-test isolation. `--self-check`
+    extended to verify `check_telemetry` is defined.
+  - `.claude/hooks/stage-telemetry.sh` (Stop hook): auto-stages `events.ndjson`
+    at end-of-turn when a story is `Em Andamento`. `CLAUDE_TELEMETRY_DISABLED=1`
+    bypass supported; `CLAUDE_SKIP_AUDIT=1` explicitly does NOT bypass (RULE-059-07).
+  - `x-story-implement/SKILL.md`: documents `events.ndjson` as committed evidence
+    artifact (Rule 24 Camada 4).
+  - 11 smoke tests: 6 telemetry audit + 5 Stop hook.
+
+- **EPIC-0059 story-0059-0006 (CI Re-runs Pre-commit Chain on Merge Commit):**
+  Adds `pre-commit-chain` job to `.github/workflows/ci-release.yml` that
+  re-executes the full pre-commit chain (Spotless format check → Checkstyle lint
+  → `mvn compile`) on every PR that modifies `src/main/java/**` or `pom.xml`.
+  Closes bypass surface E (`git commit --no-verify`): a developer using the
+  `--no-verify` flag locally to skip pre-commit hooks cannot get malformatted
+  or lint-violating code merged, because the CI gate independently validates
+  the same chain on the PR branch.
+  - `pre-commit-chain` CI job: three conditional steps guarded by a defensive
+    `javadiff` step (`git diff origin/<base>...<HEAD>`); job only fires on
+    `pull_request` events; Maven cache via `actions/setup-java cache: maven`
+    targets < 90s re-run time on cache hit.
+  - `java/pom.xml`: adds `spotless-maven-plugin` (Google Java Format / AOSP
+    style) and `maven-checkstyle-plugin` (Google Checks) with pinned versions
+    (`spotless.version`, `google-java-format.version`, `checkstyle.version`).
+  - `java/checkstyle-suppressions.xml`: baseline suppressions for all existing
+    `src/main/java` files — new files added after EPIC-0059 must pass Checkstyle
+    clean without suppressions.
+  - `Epic0059PreCommitChainCiTest` (13 tests) and `Epic0059CiCacheValidationTest`
+    (8 tests): verification tests covering job declaration, Maven plugin presence,
+    cache configuration, conditional step ordering, and path filtering.
+  [story-0059-0006]
+
 ## [4.2.0] - 2026-04-27
 
 ### Added
@@ -281,7 +411,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   consumes the Pebble template `shared/templates/CLAUDE.md` (8
   placeholders: PROJECT_NAME, LANGUAGE, FRAMEWORK, ARCHITECTURE,
   DATABASES, INTERFACE_TYPES, BUILD_COMMAND, TEST_COMMAND). Contract:
-  [ADR-0048-B](adr/ADR-0048-B-claude-md-contract.md). Empirical
+  [ADR-0021](docs/adr/ADR-0021-claude-md-contract.md) (originally numbered ADR-0048-B; renumbered 2026-04-29). Empirical
   verification: `plans/epic-0048/reports/repro-bug-b.sh` now exits 0
   on develop (was exit 1).
 - **`OutputDirectoryIntegrityTest`** (story-0048-0009): permanent
@@ -296,8 +426,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Investigation artifacts in `plans/epic-0048/reports/`** (story
   0048-0001): `investigation-report.md`, `removal-inventory.md`,
   `repro-bug-a.sh`, `repro-bug-b.sh`.
-- **ADR-0048-A** (Java-only scope decision) and **ADR-0048-B** (CLAUDE.md
-  assembler contract) in `adr/`.
+- **ADR-0048** (Java-only scope decision; originally ADR-0048-A) and
+  **ADR-0021** (CLAUDE.md assembler contract; originally ADR-0048-B,
+  renumbered 2026-04-29) in `docs/adr/`.
 - **Template `shared/templates/CLAUDE.md`** (story-0048-0010) with 8
   Pebble placeholders and `ClaudeMdTemplateSyntaxTest` covering parse,
   render, and conditional-block semantics.

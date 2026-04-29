@@ -68,11 +68,11 @@ flowchart TD
 
 | Artifact | Path | Template |
 |----------|------|----------|
-| Task breakdown | `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | `_TEMPLATE-TASK-BREAKDOWN.md` |
-| Task plans (1 per task) | `plans/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | `_TEMPLATE-TASK-PLAN.md` |
-| Planning report | `plans/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | `_TEMPLATE-STORY-PLANNING-REPORT.md` |
-| DoR checklist | `plans/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | `_TEMPLATE-DOR-CHECKLIST.md` |
-| Story file update | `plans/epic-XXXX/story-XXXX-YYYY.md` (Section 8.1) | N/A |
+| Task breakdown | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | `_TEMPLATE-TASK-BREAKDOWN.md` |
+| Task plans (1 per task) | `ai/epics/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | `_TEMPLATE-TASK-PLAN.md` |
+| Planning report | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | `_TEMPLATE-STORY-PLANNING-REPORT.md` |
+| DoR checklist | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | `_TEMPLATE-DOR-CHECKLIST.md` |
+| Story file update | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` (Section 8.1) | N/A |
 
 ## Consolidation Rules
 
@@ -92,7 +92,7 @@ flowchart TD
 ## Prerequisites
 
 - Story file exists at `<EPIC_DIR>/story-XXXX-YYYY.md`
-- Epic directory exists: `plans/epic-XXXX/` (also supports suffix variants like `plans/epic-XXXX-*`; resolved via glob in Phase 0)
+- Epic directory exists: `ai/epics/epic-XXXX/` (also supports suffix variants like `ai/epics/epic-XXXX-*`; resolved via glob in Phase 0)
 
 ## See Also
 

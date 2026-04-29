@@ -18,7 +18,7 @@ Keeps the service architecture document (`steering/service-architecture.md`) up 
 
 ```
 /x-arch-update story-0012-0003
-/x-arch-update plans/epic-0012/plans/architecture-story-0012-0003.md
+/x-arch-update ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
 ```
 
 ## Workflow

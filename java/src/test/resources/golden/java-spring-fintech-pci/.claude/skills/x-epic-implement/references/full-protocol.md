@@ -29,7 +29,7 @@ it to every subsequent phase. The three input sources, in priority order:
 | Priority | Source | Effect |
 | :--- | :--- | :--- |
 | 1 | `--legacy-flow=true` on argv | `flowVersion="1"` (explicit) |
-| 2 | `plans/epic-XXXX/execution-state.json` top-level `flowVersion` | Whatever the file says (`"1"` or `"2"`); absence is treated as `"1"` |
+| 2 | `ai/epics/epic-XXXX/execution-state.json` top-level `flowVersion` | Whatever the file says (`"1"` or `"2"`); absence is treated as `"1"` |
 | 3 | Absence of prior checkpoint | `flowVersion="2"` (new default) |
 
 When priority 2 forces `flowVersion="1"` despite the operator omitting

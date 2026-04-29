@@ -5,15 +5,13 @@ import java.util.List;
 /**
  * Immutable result from a CI/CD sub-assembler.
  *
- * <p>Both lists are defensively copied in the compact
- * constructor to guarantee immutability (L-007 fix).</p>
+ * <p>Both lists are defensively copied in the compact constructor to guarantee immutability (L-007
+ * fix).
  *
- * @param files    generated file paths
+ * @param files generated file paths
  * @param warnings warning messages
  */
-record CicdResult(
-        List<String> files,
-        List<String> warnings) {
+record CicdResult(List<String> files, List<String> warnings) {
 
     CicdResult {
         files = List.copyOf(files);
@@ -26,8 +24,7 @@ record CicdResult(
      * @return an empty CicdResult
      */
     static CicdResult empty() {
-        return new CicdResult(
-                List.of(), List.of());
+        return new CicdResult(List.of(), List.of());
     }
 
     /**
@@ -37,12 +34,8 @@ record CicdResult(
      * @return a combined CicdResult
      */
     static CicdResult merge(List<CicdResult> results) {
-        List<String> allFiles = results.stream()
-                .flatMap(r -> r.files().stream())
-                .toList();
-        List<String> allWarnings = results.stream()
-                .flatMap(r -> r.warnings().stream())
-                .toList();
+        List<String> allFiles = results.stream().flatMap(r -> r.files().stream()).toList();
+        List<String> allWarnings = results.stream().flatMap(r -> r.warnings().stream()).toList();
         return new CicdResult(allFiles, allWarnings);
     }
 }

@@ -1,9 +1,8 @@
 package dev.iadev.application.assembler;
 
+import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.stack.DatabaseSettingsMapping;
 import dev.iadev.domain.stack.StackMapping;
-import dev.iadev.domain.model.ProjectConfig;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,21 +12,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * Collects CLI permissions from JSON source files based on
- * the project configuration.
+ * Collects CLI permissions from JSON source files based on the project configuration.
  *
- * <p>Merges permission arrays from multiple JSON files based
- * on language, build tool, infrastructure, data, and testing
- * configuration. Permission sources are merged in order:
+ * <p>Merges permission arrays from multiple JSON files based on language, build tool,
+ * infrastructure, data, and testing configuration. Permission sources are merged in order:
+ *
  * <ol>
- *   <li>Base permissions (always included)</li>
- *   <li>Language/build-tool permissions</li>
- *   <li>Docker permissions (if container is docker/podman)</li>
- *   <li>Kubernetes permissions (if orchestrator is kubernetes)</li>
- *   <li>Docker Compose permissions (if orchestrator is docker-compose)</li>
- *   <li>Database permissions (if database has settings key)</li>
- *   <li>Cache permissions (if cache has settings key)</li>
- *   <li>Newman/testing permissions (if smoke tests enabled)</li>
+ *   <li>Base permissions (always included)
+ *   <li>Language/build-tool permissions
+ *   <li>Docker permissions (if container is docker/podman)
+ *   <li>Kubernetes permissions (if orchestrator is kubernetes)
+ *   <li>Docker Compose permissions (if orchestrator is docker-compose)
+ *   <li>Database permissions (if database has settings key)
+ *   <li>Cache permissions (if cache has settings key)
+ *   <li>Newman/testing permissions (if smoke tests enabled)
  * </ol>
  *
  * @see SettingsAssembler
@@ -37,110 +35,82 @@ public final class PermissionCollector {
     private static final String BASE_FILE = "base.json";
     private static final String DOCKER_FILE = "docker.json";
     private static final String K8S_FILE = "kubernetes.json";
-    private static final String COMPOSE_FILE =
-            "docker-compose.json";
-    private static final String NEWMAN_FILE =
-            "testing-newman.json";
+    private static final String COMPOSE_FILE = "docker-compose.json";
+    private static final String NEWMAN_FILE = "testing-newman.json";
     private static final String CONTAINER_DOCKER = "docker";
     private static final String CONTAINER_PODMAN = "podman";
     private static final String ORCH_KUBERNETES = "kubernetes";
-    private static final String ORCH_COMPOSE =
-            "docker-compose";
+    private static final String ORCH_COMPOSE = "docker-compose";
 
     PermissionCollector() {
         // package-private constructor
     }
 
     /**
-     * Collects permissions from all applicable JSON source
-     * files based on the project configuration.
+     * Collects permissions from all applicable JSON source files based on the project
+     * configuration.
      *
-     * @param config       the project configuration
+     * @param config the project configuration
      * @param templatesDir the settings templates directory
      * @return deduplicated permission list
      */
-    List<String> collect(
-            ProjectConfig config, Path templatesDir) {
-        List<String> raw =
-                collectRaw(config, templatesDir);
+    List<String> collect(ProjectConfig config, Path templatesDir) {
+        List<String> raw = collectRaw(config, templatesDir);
         return deduplicate(raw);
     }
 
     /**
      * Collects raw permissions (may contain duplicates).
      *
-     * @param config       the project configuration
+     * @param config the project configuration
      * @param templatesDir the settings templates directory
      * @return merged permission list
      */
-    List<String> collectRaw(
-            ProjectConfig config, Path templatesDir) {
-        List<String> result = mergeFile(
-                List.of(), BASE_FILE, templatesDir);
-        String langKey = StackMapping.getSettingsLangKey(
-                config.language().name(),
-                config.framework().buildTool());
+    List<String> collectRaw(ProjectConfig config, Path templatesDir) {
+        List<String> result = mergeFile(List.of(), BASE_FILE, templatesDir);
+        String langKey =
+                StackMapping.getSettingsLangKey(
+                        config.language().name(), config.framework().buildTool());
         if (!langKey.isEmpty()) {
-            result = mergeFile(
-                    result, langKey + ".json", templatesDir);
+            result = mergeFile(result, langKey + ".json", templatesDir);
         }
         result = collectInfra(config, templatesDir, result);
         result = collectData(config, templatesDir, result);
         if (config.testing().smokeTests()) {
-            result = mergeFile(
-                    result, NEWMAN_FILE, templatesDir);
+            result = mergeFile(result, NEWMAN_FILE, templatesDir);
         }
         return result;
     }
 
     private List<String> collectInfra(
-            ProjectConfig config,
-            Path templatesDir,
-            List<String> result) {
-        String container =
-                config.infrastructure().container();
-        if (CONTAINER_DOCKER.equals(container)
-                || CONTAINER_PODMAN.equals(container)) {
-            result = mergeFile(
-                    result, DOCKER_FILE, templatesDir);
+            ProjectConfig config, Path templatesDir, List<String> result) {
+        String container = config.infrastructure().container();
+        if (CONTAINER_DOCKER.equals(container) || CONTAINER_PODMAN.equals(container)) {
+            result = mergeFile(result, DOCKER_FILE, templatesDir);
         }
-        String orch =
-                config.infrastructure().orchestrator();
+        String orch = config.infrastructure().orchestrator();
         if (ORCH_KUBERNETES.equals(orch)) {
-            result = mergeFile(
-                    result, K8S_FILE, templatesDir);
+            result = mergeFile(result, K8S_FILE, templatesDir);
         } else if (ORCH_COMPOSE.equals(orch)) {
-            result = mergeFile(
-                    result, COMPOSE_FILE, templatesDir);
+            result = mergeFile(result, COMPOSE_FILE, templatesDir);
         }
         return result;
     }
 
-    private List<String> collectData(
-            ProjectConfig config,
-            Path templatesDir,
-            List<String> result) {
+    private List<String> collectData(ProjectConfig config, Path templatesDir, List<String> result) {
         String dbKey =
-                DatabaseSettingsMapping.getDatabaseSettingsKey(
-                        config.data().database().name());
+                DatabaseSettingsMapping.getDatabaseSettingsKey(config.data().database().name());
         if (!dbKey.isEmpty()) {
-            result = mergeFile(
-                    result, dbKey + ".json", templatesDir);
+            result = mergeFile(result, dbKey + ".json", templatesDir);
         }
-        String cacheKey =
-                DatabaseSettingsMapping.getCacheSettingsKey(
-                        config.data().cache().name());
+        String cacheKey = DatabaseSettingsMapping.getCacheSettingsKey(config.data().cache().name());
         if (!cacheKey.isEmpty()) {
-            result = mergeFile(
-                    result, cacheKey + ".json", templatesDir);
+            result = mergeFile(result, cacheKey + ".json", templatesDir);
         }
         return result;
     }
 
-    private List<String> mergeFile(
-            List<String> base,
-            String filename,
-            Path templatesDir) {
+    private List<String> mergeFile(List<String> base, String filename, Path templatesDir) {
         Path filePath = templatesDir.resolve(filename);
         if (!Files.exists(filePath)) {
             return base;
@@ -169,8 +139,7 @@ public final class PermissionCollector {
      */
     static List<String> readJsonArray(Path filePath) {
         try {
-            String text = Files.readString(
-                    filePath, StandardCharsets.UTF_8);
+            String text = Files.readString(filePath, StandardCharsets.UTF_8);
             return parseJsonStringArray(text);
         } catch (IOException e) {
             return List.of();
@@ -178,21 +147,17 @@ public final class PermissionCollector {
     }
 
     /**
-     * Parses a JSON string array without external
-     * dependencies.
+     * Parses a JSON string array without external dependencies.
      *
      * @param json the JSON text
      * @return parsed list of strings
      */
     static List<String> parseJsonStringArray(String json) {
         String trimmed = json.trim();
-        if (!trimmed.startsWith("[")
-                || !trimmed.endsWith("]")) {
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
             return List.of();
         }
-        String inner =
-                trimmed.substring(1, trimmed.length() - 1)
-                        .trim();
+        String inner = trimmed.substring(1, trimmed.length() - 1).trim();
         if (inner.isEmpty()) {
             return List.of();
         }
@@ -214,8 +179,7 @@ public final class PermissionCollector {
     }
 
     private static int skipWhitespace(String s, int pos) {
-        while (pos < s.length()
-                && Character.isWhitespace(s.charAt(pos))) {
+        while (pos < s.length() && Character.isWhitespace(s.charAt(pos))) {
             pos++;
         }
         return pos;
@@ -237,8 +201,7 @@ public final class PermissionCollector {
     }
 
     private static int skipToNextElement(String s, int pos) {
-        while (pos < s.length()
-                && s.charAt(pos) != ',') {
+        while (pos < s.length() && s.charAt(pos) != ',') {
             pos++;
         }
         return pos + 1;

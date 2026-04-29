@@ -4,6 +4,7 @@ description: "Runs tests with coverage reporting and threshold validation. Use w
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[ClassName or package or --coverage]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

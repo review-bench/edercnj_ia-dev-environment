@@ -1,6 +1,7 @@
 ---
 name: pci-dss-requirements
 description: "PCI-DSS v4.0 requirements mapped to code practices: 12 requirements with prohibited/correct examples and reviewer checklists."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: PCI-DSS v4.0 Requirements

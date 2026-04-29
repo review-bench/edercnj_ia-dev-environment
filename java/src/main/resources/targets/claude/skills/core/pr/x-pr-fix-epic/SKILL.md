@@ -5,6 +5,7 @@ description: "Discovers all PRs from an epic via execution-state.json, fetches a
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[EPIC-ID] [--dry-run] [--prs N,M,...] [--skip-replies] [--include-suggestions]"
 user-invocable: true
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -37,7 +38,7 @@ user-invocable: true
 
 | Artifact | Path | Description |
 |----------|------|-------------|
-| `pr-comments-report.md` | `plans/epic-{epicId}/reports/pr-comments-report.md` | Consolidated findings report (written BEFORE any fixes — RULE-004). Includes actionable / suggestion / question / praise / resolved counts with deduplication summary and per-finding theme table. |
+| `pr-comments-report.md` | `ai/epics/epic-{epicId}/reports/pr-comments-report.md` | Consolidated findings report (written BEFORE any fixes — RULE-004). Includes actionable / suggestion / question / praise / resolved counts with deduplication summary and per-finding theme table. |
 | Correction PR | `fix/epic-{epicId}-pr-comments` | Single correction PR consolidating all applied fixes. References all source PRs. Created only when actionable findings exist and `--dry-run` is not set. |
 
 **Workflow:** Parse → Validate → Discover PRs → Idempotency check → Batch-fetch comments → Classify (5 categories, priority-ordered) → Dedup cross-PR (SHA-256 fingerprint) → Report → Apply fixes (per-fix compile gate) → Post-correction test suite → Theme-based commits → Push → Create PR.
@@ -48,7 +49,7 @@ user-invocable: true
 
 | Code | Condition | Remediation |
 |------|-----------|-------------|
-| `EPIC_DIR_NOT_FOUND` | `plans/epic-{epicId}/` missing | Run `/x-epic-decompose` first |
+| `EPIC_DIR_NOT_FOUND` | `ai/epics/epic-{epicId}/` missing | Run `/x-epic-decompose` first |
 | `CHECKPOINT_NOT_FOUND` | `execution-state.json` missing and no `--prs` | Provide `--prs` flag |
 | `NO_VALID_PRS` | No PR in explicit list exists | Verify PR numbers |
 | `INVALID_EPIC_ID` | Epic ID not 4 digits | Provide valid 4-digit ID |

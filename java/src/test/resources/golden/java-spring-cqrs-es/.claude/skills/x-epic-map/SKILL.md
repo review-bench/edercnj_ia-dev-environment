@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "<EPIC_FILE> [--dry-run]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Output Policy
@@ -64,7 +65,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-map Phase-P2-Epic-Branch-Ensure`
 
-Derive the epic ID from the `<EPIC_FILE>` path (`plans/epic-<XXXX>/epic-<XXXX>.md`), then ensure the `epic/<XXXX>` branch exists locally AND on origin. The ensure skill is idempotent — a no-op when the caller is already on that branch.
+Derive the epic ID from the `<EPIC_FILE>` path (`ai/epics/epic-<XXXX>/epic-<XXXX>.md`), then ensure the `epic/<XXXX>` branch exists locally AND on origin. The ensure skill is idempotent — a no-op when the caller is already on that branch.
 
     Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id <XXXX>")
 
@@ -362,7 +363,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 
 ### Step 9 — Save and Report
 
-Save as `IMPLEMENTATION-MAP.md` in the same directory as the Epic and Stories (inside `plans/epic-XXXX/`).
+Save as `IMPLEMENTATION-MAP.md` in the same directory as the Epic and Stories (inside `ai/epics/epic-XXXX/`).
 Report: total stories, phases, critical path length, maximum parallelism, main bottleneck.
 If task-level dependencies were computed, also report: total tasks, task phases, cross-story dependencies count.
 
@@ -373,10 +374,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this step entirely.
 
-Otherwise, delegate the commit to `x-planning-commit` so the refreshed `plans/epic-XXXX/IMPLEMENTATION-MAP.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain:
+Otherwise, delegate the commit to `x-planning-commit` so the refreshed `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain:
 
     Skill(skill: "x-planning-commit",
-          args: "--scope docs --epic-id <XXXX> --paths plans/epic-<XXXX>/IMPLEMENTATION-MAP.md --subject \"update implementation map\"")
+          args: "--scope docs --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/IMPLEMENTATION-MAP.md --subject \"update implementation map\"")
 
 Idempotency: when the map is byte-identical to the previously committed version, `x-planning-commit` returns `commitSha=null` and `noOp=true` (silent no-op). No additional diff check is required here.
 
@@ -453,7 +454,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 
 > V2-gated: only runs when the epic declares `planningSchemaVersion: "2.0"` in its `execution-state.json`. For v1 epics: skip silently (Rule 19).
 
-`x-epic-map` reads story files (it does NOT write to them) and emits/refreshes `plans/epic-XXXX/IMPLEMENTATION-MAP.md` with two lifecycle columns:
+`x-epic-map` reads story files (it does NOT write to them) and emits/refreshes `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` with two lifecycle columns:
 
 - **Planejamento** — mirrors the current `**Status:**` of each story (values: `Pendente`, `Planejada`, `Em Andamento`, `Concluída`, `Falha`, `Bloqueada`).
 - **Status** — the execution lifecycle status (same six values; driven by `x-story-implement` / `x-epic-implement` downstream).
@@ -467,13 +468,13 @@ Both columns are populated by reading the story files in situ via the CLI. `x-ep
    ```bash
    STATUS=$(java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       read plans/epic-XXXX/story-XXXX-YYYY.md)
+       read ai/epics/epic-XXXX/story-XXXX-YYYY.md)
    ```
    Use `$STATUS` to fill the `Planejamento` column for that row. Exit code 20 for any story → abort map generation (source-of-truth invariant RULE-046-01 must hold).
 3. The `Status` (execution) column is filled from `execution-state.json` (not from the story file) — the story's `**Status:**` line is authoritative for planning only in v2.
 4. Stage and commit the updated map:
    ```bash
-   git add plans/epic-XXXX/IMPLEMENTATION-MAP.md
+   git add ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md
    ```
 
        Skill(skill: "x-git-commit", args: "docs(epic-XXXX): refresh implementation map with lifecycle columns")

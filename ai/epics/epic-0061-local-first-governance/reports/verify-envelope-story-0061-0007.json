@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0061-0007",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "ExecutionState aceita flowVersion=3", "status": "PASS", "evidence": "ExecutionStateV3Test.flowVersion3_parsesWithLocalFirstTrue" },
+    { "scenario": "flowVersion=2 tem localFirstLifecycle=false", "status": "PASS", "evidence": "ExecutionStateV3Test.flowVersion2_hasLocalFirstFalse" },
+    { "scenario": "Rule 19 fallback matrix lista flowVersion 3", "status": "PASS", "evidence": "MigrateToLocalFirstSmokeIT.rule19_containsFlowVersion3" },
+    { "scenario": "migrate --dry-run reporta diff sem aplicar", "status": "PASS", "evidence": "MigrateToLocalFirstSmokeIT.migrateTemplate_supportsDryRun" },
+    { "scenario": "migrate --apply é idempotente", "status": "PASS", "evidence": "MigrateToLocalFirstSmokeIT.migrateTemplate_isIdempotent" }
+  ],
+  "terminalStory": true,
+  "epicComplete": true,
+  "timestamp": "2026-04-28T00:00:00Z"
+}

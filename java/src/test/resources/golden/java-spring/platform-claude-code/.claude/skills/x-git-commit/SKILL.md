@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Skill
 argument-hint: "--task TASK-XXXX-YYYY-NNN --type <type> --subject <subject> [--tdd RED|GREEN|REFACTOR] [--body <body>] [--skip-chain] [--amend]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -39,6 +40,7 @@ Creates standardized commits for {{PROJECT_NAME}} with the Task ID in the scope,
 ## Output Contract
 
 - **Commit message format:** `<type>(<TASK-XXXX-YYYY-NNN>): <subject> [TDD:TAG]` (tag suffix omitted when `--tdd` absent) followed by optional body/footer.
+- **Orchestrator signature trailer:** every commit produced by `x-git-commit` MUST carry `Co-Authored-By: x-git-commit@<HEAD-sha-40-hex>` (injected via `git commit --trailer`). This trailer is the proof-of-orchestration required by the `.githooks/commit-msg` surface-D guard (EPIC-0059, story-0059-0005). The `<sha>` is `$(git rev-parse HEAD)` captured immediately before the commit executes, so it references the parent commit (not the commit being created — that SHA is unavailable at commit-message composition time).
 - **Git state:** one new commit on the current branch (or last commit amended when `--amend`); staged files are re-staged after format/lint auto-fix.
 - **Report to stdout:** task id, type, subject, TDD tag, chain status (passed/skipped), short SHA, full message first line.
 - **Exit codes:** see `## Error Envelope` below.

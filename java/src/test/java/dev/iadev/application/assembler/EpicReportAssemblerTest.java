@@ -1,25 +1,22 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for EpicReportAssembler — copies epic execution
- * report template to .claude/templates/ and
+ * Tests for EpicReportAssembler — copies epic execution report template to .claude/templates/ and
  * .github/templates/.
  */
 @DisplayName("EpicReportAssembler")
@@ -84,8 +81,7 @@ class EpicReportAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void implements_whenCalled_isAssemblerInstance() {
-            assertThat(new EpicReportAssembler())
-                    .isInstanceOf(Assembler.class);
+            assertThat(new EpicReportAssembler()).isInstanceOf(Assembler.class);
         }
     }
 
@@ -96,30 +92,20 @@ class EpicReportAssemblerTest {
         @Test
         @DisplayName("returns true for complete template")
         void assemble_forComplete_returnsTrue() {
-            assertThat(EpicReportAssembler
-                    .hasAllMandatorySections(
-                            TEMPLATE_CONTENT))
-                    .isTrue();
+            assertThat(EpicReportAssembler.hasAllMandatorySections(TEMPLATE_CONTENT)).isTrue();
         }
 
         @Test
         @DisplayName("returns false when section missing")
         void assemble_whenMissing_returnsFalse() {
-            String incomplete = TEMPLATE_CONTENT
-                    .replace(
-                            "## PR Link",
-                            "## Some Other");
-            assertThat(EpicReportAssembler
-                    .hasAllMandatorySections(incomplete))
-                    .isFalse();
+            String incomplete = TEMPLATE_CONTENT.replace("## PR Link", "## Some Other");
+            assertThat(EpicReportAssembler.hasAllMandatorySections(incomplete)).isFalse();
         }
 
         @Test
         @DisplayName("returns false for empty content")
         void assemble_forEmpty_returnsFalse() {
-            assertThat(EpicReportAssembler
-                    .hasAllMandatorySections(""))
-                    .isFalse();
+            assertThat(EpicReportAssembler.hasAllMandatorySections("")).isFalse();
         }
     }
 
@@ -129,134 +115,109 @@ class EpicReportAssemblerTest {
 
         @Test
         @DisplayName("copies template to .claude/templates/")
-        void assemble_whenCalled_copiesToClaude(
-                @TempDir Path tempDir) throws IOException {
+        void assemble_whenCalled_copiesToClaude(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).hasSize(1);
-            assertThat(outputDir.resolve(
-                    ".claude/templates/"
-                            + "_TEMPLATE-EPIC-EXECUTION"
-                            + "-REPORT.md"))
+            assertThat(
+                            outputDir.resolve(
+                                    ".claude/templates/"
+                                            + "_TEMPLATE-EPIC-EXECUTION"
+                                            + "-REPORT.md"))
                     .exists();
         }
 
         @Test
-        @DisplayName("content is verbatim copy"
-                + " (no rendering)")
-        void assemble_content_isVerbatim(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("content is verbatim copy" + " (no rendering)")
+        void assemble_content_isVerbatim(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String claudeContent = Files.readString(
-                    outputDir.resolve(
-                            ".claude/templates/"
-                                    + "_TEMPLATE-EPIC"
-                                    + "-EXECUTION"
-                                    + "-REPORT.md"),
-                    StandardCharsets.UTF_8);
-            assertThat(claudeContent)
-                    .isEqualTo(TEMPLATE_CONTENT);
-            assertThat(claudeContent)
-                    .contains("{{EPIC_ID}}");
-            assertThat(claudeContent)
-                    .contains("{{BRANCH}}");
+            String claudeContent =
+                    Files.readString(
+                            outputDir.resolve(
+                                    ".claude/templates/"
+                                            + "_TEMPLATE-EPIC"
+                                            + "-EXECUTION"
+                                            + "-REPORT.md"),
+                            StandardCharsets.UTF_8);
+            assertThat(claudeContent).isEqualTo(TEMPLATE_CONTENT);
+            assertThat(claudeContent).contains("{{EPIC_ID}}");
+            assertThat(claudeContent).contains("{{BRANCH}}");
         }
 
         @Test
         @DisplayName("returns empty when template missing")
-        void assemble_whenCalled_returnsEmptyWhenMissing(
-                @TempDir Path tempDir) throws IOException {
+        void assemble_whenCalled_returnsEmptyWhenMissing(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = tempDir.resolve("empty");
             Files.createDirectories(resourcesDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("returns empty when sections"
-                + " incomplete")
-        void assemble_whenCalled_returnsEmptyWhenIncomplete(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("returns empty when sections" + " incomplete")
+        void assemble_whenCalled_returnsEmptyWhenIncomplete(@TempDir Path tempDir)
+                throws IOException {
             Path resourcesDir = tempDir.resolve("res");
-            Path templateDir =
-                    resourcesDir.resolve("shared/templates");
+            Path templateDir = resourcesDir.resolve("shared/templates");
             Files.createDirectories(templateDir);
             Files.writeString(
-                    templateDir.resolve(
-                            "_TEMPLATE-EPIC-EXECUTION"
-                                    + "-REPORT.md"),
+                    templateDir.resolve("_TEMPLATE-EPIC-EXECUTION" + "-REPORT.md"),
                     "# Incomplete\n\n## Sumário Executivo",
                     StandardCharsets.UTF_8);
 
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("preserves {{PLACEHOLDER}} tokens"
-                + " for runtime resolution")
-        void assemble_whenCalled_preservesPlaceholders(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("preserves {{PLACEHOLDER}} tokens" + " for runtime resolution")
+        void assemble_whenCalled_preservesPlaceholders(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content = Files.readString(
-                    outputDir.resolve(
-                            ".claude/templates/"
-                                    + "_TEMPLATE-EPIC"
-                                    + "-EXECUTION"
-                                    + "-REPORT.md"),
-                    StandardCharsets.UTF_8);
+            String content =
+                    Files.readString(
+                            outputDir.resolve(
+                                    ".claude/templates/"
+                                            + "_TEMPLATE-EPIC"
+                                            + "-EXECUTION"
+                                            + "-REPORT.md"),
+                            StandardCharsets.UTF_8);
             assertThat(content)
                     .contains("{{EPIC_ID}}")
                     .contains("{{BRANCH}}")
@@ -264,16 +225,12 @@ class EpicReportAssemblerTest {
                     .contains("{{PR_LINK}}");
         }
 
-        private Path setupResources(Path tempDir)
-                throws IOException {
+        private Path setupResources(Path tempDir) throws IOException {
             Path resourcesDir = tempDir.resolve("res");
-            Path templateDir =
-                    resourcesDir.resolve("shared/templates");
+            Path templateDir = resourcesDir.resolve("shared/templates");
             Files.createDirectories(templateDir);
             Files.writeString(
-                    templateDir.resolve(
-                            "_TEMPLATE-EPIC-EXECUTION"
-                                    + "-REPORT.md"),
+                    templateDir.resolve("_TEMPLATE-EPIC-EXECUTION" + "-REPORT.md"),
                     TEMPLATE_CONTENT,
                     StandardCharsets.UTF_8);
             return resourcesDir;
@@ -285,51 +242,43 @@ class EpicReportAssemblerTest {
     class GoldenFile {
 
         @Test
-        @DisplayName("output matches golden file for"
-                + " kotlin-ktor")
-        void assemble_whenCalled_matchesGoldenFile(
-                @TempDir Path tempDir) throws IOException {
+        @DisplayName("output matches golden file for" + " kotlin-ktor")
+        void assemble_whenCalled_matchesGoldenFile(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            EpicReportAssembler assembler =
-                    new EpicReportAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            EpicReportAssembler assembler = new EpicReportAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             assertThat(files).hasSize(1);
 
-            String golden = loadGolden(
-                    "golden/kotlin-ktor/.claude/templates/"
-                            + "_TEMPLATE-EPIC-EXECUTION"
-                            + "-REPORT.md");
+            String golden =
+                    loadGolden(
+                            "golden/kotlin-ktor/.claude/templates/"
+                                    + "_TEMPLATE-EPIC-EXECUTION"
+                                    + "-REPORT.md");
             if (golden != null) {
-                String actual = Files.readString(
-                        outputDir.resolve(
-                                ".claude/templates/"
-                                        + "_TEMPLATE-EPIC"
-                                        + "-EXECUTION"
-                                        + "-REPORT.md"),
-                        StandardCharsets.UTF_8);
-                assertThat(actual)
-                        .as("Must match golden file")
-                        .isEqualTo(golden);
+                String actual =
+                        Files.readString(
+                                outputDir.resolve(
+                                        ".claude/templates/"
+                                                + "_TEMPLATE-EPIC"
+                                                + "-EXECUTION"
+                                                + "-REPORT.md"),
+                                StandardCharsets.UTF_8);
+                assertThat(actual).as("Must match golden file").isEqualTo(golden);
             }
         }
 
         private String loadGolden(String path) {
-            var url = getClass().getClassLoader()
-                    .getResource(path);
+            var url = getClass().getClassLoader().getResource(path);
             if (url == null) {
                 return null;
             }
             try {
-                return Files.readString(
-                        Path.of(url.getPath()),
-                        StandardCharsets.UTF_8);
+                return Files.readString(Path.of(url.getPath()), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 return null;
             }

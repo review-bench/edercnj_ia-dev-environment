@@ -1,6 +1,7 @@
 ---
 name: feature-flags
 description: "Feature flags patterns: toggle types, lifecycle management, evaluation strategies, progressive delivery, cleanup policies, and hexagonal architecture integration."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Feature Flags

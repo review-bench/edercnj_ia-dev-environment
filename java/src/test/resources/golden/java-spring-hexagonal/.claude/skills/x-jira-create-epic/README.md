@@ -17,7 +17,7 @@ Creates a Jira Epic from an existing local `epic-XXXX.md` file by extracting the
 ## Usage
 
 ```
-/x-jira-create-epic plans/epic-0012/epic-0012.md
+/x-jira-create-epic ai/epics/epic-XXXX/epic-XXXX.md
 /x-jira-create-epic
 ```
 

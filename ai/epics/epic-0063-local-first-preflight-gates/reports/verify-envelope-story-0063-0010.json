@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "failures": [],
+  "acCheckCount": 4,
+  "acCheckResults": [
+    {"id": "AC1", "name": "Implementation complete", "status": "PASS"},
+    {"id": "AC2", "name": "Shell tests passing", "status": "PASS"},
+    {"id": "AC3", "name": "Documentation updated", "status": "PASS"},
+    {"id": "AC4", "name": "Backward compatibility preserved", "status": "PASS"}
+  ],
+  "coverageLine": null,
+  "coverageBranch": null,
+  "smokeTest": "passed",
+  "crossFileConsistency": "passed",
+  "timestamp": "2026-04-28T20:00:00Z",
+  "storyId": "story-0063-0010"
+}

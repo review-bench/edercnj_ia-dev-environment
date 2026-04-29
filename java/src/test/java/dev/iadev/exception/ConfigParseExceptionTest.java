@@ -1,11 +1,10 @@
 package dev.iadev.exception;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("ConfigParseException")
 class ConfigParseExceptionTest {
@@ -14,8 +13,7 @@ class ConfigParseExceptionTest {
     @DisplayName("carries message, filePath, and cause")
     void constructor_whenCalled_carriesAllFields() {
         var cause = new IOException("malformed YAML");
-        var ex = new ConfigParseException(
-                "Failed to parse config", "config.yaml", cause);
+        var ex = new ConfigParseException("Failed to parse config", "config.yaml", cause);
 
         assertThat(ex.getMessage()).isEqualTo("Failed to parse config");
         assertThat(ex.getFilePath()).isEqualTo("config.yaml");
@@ -25,8 +23,7 @@ class ConfigParseExceptionTest {
     @Test
     @DisplayName("extends RuntimeException")
     void load_whenCalled_extendsRuntimeException() {
-        var ex = new ConfigParseException(
-                "error", "file.yaml", new RuntimeException());
+        var ex = new ConfigParseException("error", "file.yaml", new RuntimeException());
 
         assertThat(ex).isInstanceOf(RuntimeException.class);
     }
@@ -35,8 +32,7 @@ class ConfigParseExceptionTest {
     @DisplayName("preserves cause chain for stack trace")
     void load_whenCalled_preservesCauseChain() {
         var rootCause = new IllegalStateException("scanner error");
-        var ex = new ConfigParseException(
-                "Parse failed", "/path/to/config.yaml", rootCause);
+        var ex = new ConfigParseException("Parse failed", "/path/to/config.yaml", rootCause);
 
         assertThat(ex.getCause()).isSameAs(rootCause);
         assertThat(ex.getCause().getMessage()).isEqualTo("scanner error");
@@ -45,11 +41,8 @@ class ConfigParseExceptionTest {
     @Test
     @DisplayName("toString includes filePath")
     void toString_whenCalled_includesFilePath() {
-        var ex = new ConfigParseException(
-                "Parse failed", "config.yaml", new RuntimeException());
+        var ex = new ConfigParseException("Parse failed", "config.yaml", new RuntimeException());
 
-        assertThat(ex.toString())
-                .contains("ConfigParseException")
-                .contains("config.yaml");
+        assertThat(ex.toString()).contains("ConfigParseException").contains("config.yaml");
     }
 }

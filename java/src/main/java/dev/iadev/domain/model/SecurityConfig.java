@@ -6,20 +6,16 @@ import java.util.Map;
 /**
  * Represents the security configuration section.
  *
- * <p>Contains a list of compliance framework names (e.g.,
- * pci-dss, lgpd, sox, hipaa) and a scanning sub-config
- * for security scanning feature flags. Defaults to an
- * empty list and disabled scanning.</p>
+ * <p>Contains a list of compliance framework names (e.g., pci-dss, lgpd, sox, hipaa) and a scanning
+ * sub-config for security scanning feature flags. Defaults to an empty list and disabled scanning.
  *
- * <p>The YAML key {@code compliance} is read; the legacy
- * {@code frameworks} key is supported as fallback.</p>
+ * <p>The YAML key {@code compliance} is read; the legacy {@code frameworks} key is supported as
+ * fallback.
  *
- * <p>Sub-records {@link ScanningConfig} and
- * {@link QualityGateConfig} group scanning flags and
- * quality gate settings respectively.</p>
+ * <p>Sub-records {@link ScanningConfig} and {@link QualityGateConfig} group scanning flags and
+ * quality gate settings respectively.
  *
- * @param frameworks the list of compliance framework
- *     names (default: empty, immutable)
+ * @param frameworks the list of compliance framework names (default: empty, immutable)
  * @param scanning the scanning configuration
  * @param qualityGate the quality gate configuration
  * @param pentest whether pentest is enabled
@@ -56,8 +52,7 @@ public record SecurityConfig(
          * @return default ScanningConfig
          */
         public static ScanningConfig defaults() {
-            return new ScanningConfig(
-                    false, false, false, false, false);
+            return new ScanningConfig(false, false, false, false, false);
         }
 
         /**
@@ -66,39 +61,27 @@ public record SecurityConfig(
          * @param map the map from YAML deserialization
          * @return a new ScanningConfig instance
          */
-        public static ScanningConfig fromMap(
-                Map<String, Object> map) {
+        public static ScanningConfig fromMap(Map<String, Object> map) {
             return new ScanningConfig(
-                    MapHelper.optionalBoolean(
-                            map, "sast", false),
-                    MapHelper.optionalBoolean(
-                            map, "dast", false),
-                    MapHelper.optionalBoolean(
-                            map, "secretScan", false),
-                    MapHelper.optionalBoolean(
-                            map, "containerScan", false),
-                    MapHelper.optionalBoolean(
-                            map, "infraScan", false));
+                    MapHelper.optionalBoolean(map, "sast", false),
+                    MapHelper.optionalBoolean(map, "dast", false),
+                    MapHelper.optionalBoolean(map, "secretScan", false),
+                    MapHelper.optionalBoolean(map, "containerScan", false),
+                    MapHelper.optionalBoolean(map, "infraScan", false));
         }
     }
 
     /**
      * Quality gate configuration for code analysis.
      *
-     * @param provider the provider name (none, sonarqube,
-     *        sonarcloud)
-     * @param serverUrl the server URL (empty when provider
-     *        is none)
+     * @param provider the provider name (none, sonarqube, sonarcloud)
+     * @param serverUrl the server URL (empty when provider is none)
      * @param qualityGate the quality gate profile name
      */
-    public record QualityGateConfig(
-            String provider,
-            String serverUrl,
-            String qualityGate) {
+    public record QualityGateConfig(String provider, String serverUrl, String qualityGate) {
 
         private static final String DEFAULT_PROVIDER = "none";
-        private static final String DEFAULT_QUALITY_GATE =
-                "default";
+        private static final String DEFAULT_QUALITY_GATE = "default";
 
         /**
          * Returns a QualityGateConfig with safe defaults.
@@ -106,9 +89,7 @@ public record SecurityConfig(
          * @return default QualityGateConfig
          */
         public static QualityGateConfig defaults() {
-            return new QualityGateConfig(
-                    DEFAULT_PROVIDER, "",
-                    DEFAULT_QUALITY_GATE);
+            return new QualityGateConfig(DEFAULT_PROVIDER, "", DEFAULT_QUALITY_GATE);
         }
 
         /**
@@ -117,23 +98,15 @@ public record SecurityConfig(
          * @param map the map from YAML deserialization
          * @return a new QualityGateConfig instance
          */
-        public static QualityGateConfig fromMap(
-                Map<String, Object> map) {
+        public static QualityGateConfig fromMap(Map<String, Object> map) {
             return new QualityGateConfig(
-                    MapHelper.optionalString(
-                            map, "provider",
-                            DEFAULT_PROVIDER),
-                    MapHelper.optionalString(
-                            map, "serverUrl", ""),
-                    MapHelper.optionalString(
-                            map, "qualityGate",
-                            DEFAULT_QUALITY_GATE));
+                    MapHelper.optionalString(map, "provider", DEFAULT_PROVIDER),
+                    MapHelper.optionalString(map, "serverUrl", ""),
+                    MapHelper.optionalString(map, "qualityGate", DEFAULT_QUALITY_GATE));
         }
     }
 
-    /**
-     * Compact constructor enforcing immutability.
-     */
+    /** Compact constructor enforcing immutability. */
     public SecurityConfig {
         frameworks = List.copyOf(frameworks);
     }
@@ -141,58 +114,45 @@ public record SecurityConfig(
     /**
      * Convenience constructor with only frameworks.
      *
-     * @param frameworks the list of compliance framework
-     *     names
+     * @param frameworks the list of compliance framework names
      */
     public SecurityConfig(List<String> frameworks) {
-        this(frameworks, ScanningConfig.defaults(),
+        this(
+                frameworks,
+                ScanningConfig.defaults(),
                 QualityGateConfig.defaults(),
-                false, DEFAULT_PENTEST_ENV);
+                false,
+                DEFAULT_PENTEST_ENV);
     }
 
     /**
      * Convenience constructor with frameworks and scanning.
      *
-     * @param frameworks the list of compliance framework
-     *     names
+     * @param frameworks the list of compliance framework names
      * @param scanning the scanning configuration
      */
-    public SecurityConfig(
-            List<String> frameworks,
-            ScanningConfig scanning) {
-        this(frameworks, scanning,
-                QualityGateConfig.defaults(),
-                false, DEFAULT_PENTEST_ENV);
+    public SecurityConfig(List<String> frameworks, ScanningConfig scanning) {
+        this(frameworks, scanning, QualityGateConfig.defaults(), false, DEFAULT_PENTEST_ENV);
     }
 
     /**
      * Creates a SecurityConfig from a YAML-parsed map.
      *
-     * <p>Reads the {@code compliance} key first; falls
-     * back to {@code frameworks} for backward
-     * compatibility. Parses sub-records for scanning
-     * and quality gate from nested maps.</p>
+     * <p>Reads the {@code compliance} key first; falls back to {@code frameworks} for backward
+     * compatibility. Parses sub-records for scanning and quality gate from nested maps.
      *
      * @param map the map from YAML deserialization
      * @return a new SecurityConfig instance
      */
-    public static SecurityConfig fromMap(
-            Map<String, Object> map) {
+    public static SecurityConfig fromMap(Map<String, Object> map) {
         List<String> values = parseFrameworks(map);
-        ScanningConfig scanning = ScanningConfig.fromMap(
-                MapHelper.optionalMap(map, "scanning"));
+        ScanningConfig scanning = ScanningConfig.fromMap(MapHelper.optionalMap(map, "scanning"));
         QualityGateConfig qualityGate =
-                QualityGateConfig.fromMap(
-                        MapHelper.optionalMap(
-                                map, "qualityGate"));
-        boolean pentest = MapHelper.optionalBoolean(
-                map, "pentest", false);
-        String pentestDefaultEnv = MapHelper.optionalString(
-                map, "pentestDefaultEnv",
-                DEFAULT_PENTEST_ENV);
-        return new SecurityConfig(
-                values, scanning, qualityGate,
-                pentest, pentestDefaultEnv);
+                QualityGateConfig.fromMap(MapHelper.optionalMap(map, "qualityGate"));
+        boolean pentest = MapHelper.optionalBoolean(map, "pentest", false);
+        String pentestDefaultEnv =
+                MapHelper.optionalString(map, "pentestDefaultEnv", DEFAULT_PENTEST_ENV);
+        return new SecurityConfig(values, scanning, qualityGate, pentest, pentestDefaultEnv);
     }
 
     /**
@@ -208,13 +168,10 @@ public record SecurityConfig(
                 || scanning.infraScan();
     }
 
-    private static List<String> parseFrameworks(
-            Map<String, Object> map) {
+    private static List<String> parseFrameworks(Map<String, Object> map) {
         if (map.containsKey("compliance")) {
-            return MapHelper.optionalStringList(
-                    map, "compliance");
+            return MapHelper.optionalStringList(map, "compliance");
         }
-        return MapHelper.optionalStringList(
-                map, "frameworks");
+        return MapHelper.optionalStringList(map, "frameworks");
     }
 }

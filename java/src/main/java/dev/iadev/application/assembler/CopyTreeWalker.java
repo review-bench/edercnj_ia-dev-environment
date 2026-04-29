@@ -1,7 +1,6 @@
 package dev.iadev.application.assembler;
 
 import dev.iadev.template.TemplateEngine;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -16,66 +15,49 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * File tree walking operations for copying and
- * placeholder replacement.
+ * File tree walking operations for copying and placeholder replacement.
  *
- * <p>Extracted from {@link CopyHelpers} to keep both
- * classes under 250 lines per RULE-004.</p>
+ * <p>Extracted from {@link CopyHelpers} to keep both classes under 250 lines per RULE-004.
  *
  * @see CopyHelpers
  */
 public final class CopyTreeWalker {
 
-    private static final Logger LOG =
-            Logger.getLogger(CopyTreeWalker.class.getName());
+    private static final Logger LOG = Logger.getLogger(CopyTreeWalker.class.getName());
 
     private CopyTreeWalker() {
         // utility class
     }
 
     /**
-     * Replaces placeholders in all {@code .md} files within
-     * a directory tree recursively.
+     * Replaces placeholders in all {@code .md} files within a directory tree recursively.
      *
-     * <p>Only processes files ending with {@code .md}.
-     * Non-markdown files are left unchanged.</p>
+     * <p>Only processes files ending with {@code .md}. Non-markdown files are left unchanged.
      *
      * @param directory the root directory to process
-     * @param engine    the template engine for replacement
-     * @param context   the context map for placeholder values
+     * @param engine the template engine for replacement
+     * @param context the context map for placeholder values
      */
     public static void replacePlaceholdersInDir(
-            Path directory,
-            TemplateEngine engine,
-            Map<String, Object> context) {
+            Path directory, TemplateEngine engine, Map<String, Object> context) {
         try {
-            Files.walkFileTree(directory,
-                    newPlaceholderVisitor(engine, context));
+            Files.walkFileTree(directory, newPlaceholderVisitor(engine, context));
         } catch (IOException e) {
             throw new UncheckedIOException(
-                    "Failed to replace placeholders in: %s"
-                            .formatted(directory), e);
+                    "Failed to replace placeholders in: %s".formatted(directory), e);
         }
     }
 
-    private static SimpleFileVisitor<Path>
-            newPlaceholderVisitor(
-            TemplateEngine engine,
-            Map<String, Object> context) {
+    private static SimpleFileVisitor<Path> newPlaceholderVisitor(
+            TemplateEngine engine, Map<String, Object> context) {
         return new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(
-                    Path file,
-                    BasicFileAttributes attrs)
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                     throws IOException {
                 if (file.toString().endsWith(".md")) {
-                    String content = Files.readString(
-                            file, StandardCharsets.UTF_8);
-                    String replaced =
-                            engine.replacePlaceholders(
-                                    content, context);
-                    Files.writeString(file, replaced,
-                            StandardCharsets.UTF_8);
+                    String content = Files.readString(file, StandardCharsets.UTF_8);
+                    String replaced = engine.replacePlaceholders(content, context);
+                    Files.writeString(file, replaced, StandardCharsets.UTF_8);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -83,61 +65,43 @@ public final class CopyTreeWalker {
     }
 
     /**
-     * Lists all {@code .md} files in the given directory,
-     * sorted by filename.
+     * Lists all {@code .md} files in the given directory, sorted by filename.
      *
-     * <p>Only regular files are included; subdirectories
-     * whose names end in {@code .md} are excluded.</p>
+     * <p>Only regular files are included; subdirectories whose names end in {@code .md} are
+     * excluded.
      *
-     * <p>Missing or non-directory input paths yield an empty
-     * list (no exception) per
-     * {@link MarkdownFileScanner#listMarkdownFilesSorted(Path)}
-     * contract, to make codegen resilient to absent
-     * optional directories.</p>
+     * <p>Missing or non-directory input paths yield an empty list (no exception) per {@link
+     * MarkdownFileScanner#listMarkdownFilesSorted(Path)} contract, to make codegen resilient to
+     * absent optional directories.
      *
      * @param dir directory to scan
-     * @return sorted list of .md file paths; empty list
-     *         if directory is missing, is not a directory, or
-     *         contains no .md files
-     * @throws UncheckedIOException if listing fails for
-     *         reasons other than absence
-     * @deprecated call
-     *         {@link MarkdownFileScanner#listMarkdownFilesSorted(Path)}
-     *         directly
+     * @return sorted list of .md file paths; empty list if directory is missing, is not a
+     *     directory, or contains no .md files
+     * @throws UncheckedIOException if listing fails for reasons other than absence
+     * @deprecated call {@link MarkdownFileScanner#listMarkdownFilesSorted(Path)} directly
      */
     @Deprecated
     public static List<Path> listMdFilesSorted(Path dir) {
-        return MarkdownFileScanner
-                .listMarkdownFilesSorted(dir);
+        return MarkdownFileScanner.listMarkdownFilesSorted(dir);
     }
 
     /**
-     * Deletes a file or directory without propagating
-     * exceptions. For directories, deletes recursively.
+     * Deletes a file or directory without propagating exceptions. For directories, deletes
+     * recursively.
      *
-     * <p>This method is intended for cleanup / rollback
-     * paths (e.g., {@code finally} blocks after a failed
-     * copy, shutdown hooks, {@code --dry-run} teardown)
-     * where raising an exception would obscure the real
-     * failure or prevent orderly shutdown. The
-     * {@code "Quietly"} suffix signals this contract:
-     * callers accept that a failed deletion is observable
-     * only via the return value.</p>
+     * <p>This method is intended for cleanup / rollback paths (e.g., {@code finally} blocks after a
+     * failed copy, shutdown hooks, {@code --dry-run} teardown) where raising an exception would
+     * obscure the real failure or prevent orderly shutdown. The {@code "Quietly"} suffix signals
+     * this contract: callers accept that a failed deletion is observable only via the return value.
      *
-     * <p>Quiet does NOT mean silent: I/O failures
-     * ({@link IOException} and its subtypes, including
-     * {@code AccessDeniedException}) are logged at
-     * {@link Level#WARNING} via
-     * {@link java.util.logging.Logger} so operators can
-     * diagnose leaked temp files or permission problems
-     * in ops telemetry. Only the exception is suppressed
-     * — never the signal.</p>
+     * <p>Quiet does NOT mean silent: I/O failures ({@link IOException} and its subtypes, including
+     * {@code AccessDeniedException}) are logged at {@link Level#WARNING} via {@link
+     * java.util.logging.Logger} so operators can diagnose leaked temp files or permission problems
+     * in ops telemetry. Only the exception is suppressed — never the signal.
      *
      * @param path path to delete
-     * @return {@code true} if the path existed and was
-     *         deleted successfully; {@code false} if the
-     *         path did not exist or if deletion failed
-     *         (in the latter case, a WARNING is logged)
+     * @return {@code true} if the path existed and was deleted successfully; {@code false} if the
+     *     path did not exist or if deletion failed (in the latter case, a WARNING is logged)
      */
     public static boolean deleteQuietly(Path path) {
         try {
@@ -151,50 +115,39 @@ public final class CopyTreeWalker {
             }
             return true;
         } catch (IOException e) {
-            LOG.log(Level.WARNING,
-                    e,
-                    () -> "deleteQuietly failed for path: "
-                            + path);
+            LOG.log(Level.WARNING, e, () -> "deleteQuietly failed for path: " + path);
             return false;
         }
     }
 
-    private static void deleteTreeQuietly(Path dir)
-            throws IOException {
-        Files.walkFileTree(dir,
+    private static void deleteTreeQuietly(Path dir) throws IOException {
+        Files.walkFileTree(
+                dir,
                 new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(
-                    Path file,
-                    BasicFileAttributes attrs)
-                    throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                            throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult postVisitDirectory(
-                    Path d, IOException exc)
-                    throws IOException {
-                Files.delete(d);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path d, IOException exc)
+                            throws IOException {
+                        Files.delete(d);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
     }
 
     /**
-     * Checks whether a Markdown content string contains
-     * all required H2 sections.
+     * Checks whether a Markdown content string contains all required H2 sections.
      *
-     * @param content  Markdown content
-     * @param sections list of expected section names
-     *                 (without {@code "## "} prefix)
+     * @param content Markdown content
+     * @param sections list of expected section names (without {@code "## "} prefix)
      * @return true if all sections are present
      */
-    public static boolean hasAllMandatorySections(
-            String content, List<String> sections) {
-        return sections.stream()
-                .allMatch(section ->
-                        content.contains("## " + section));
+    public static boolean hasAllMandatorySections(String content, List<String> sections) {
+        return sections.stream().allMatch(section -> content.contains("## " + section));
     }
 }

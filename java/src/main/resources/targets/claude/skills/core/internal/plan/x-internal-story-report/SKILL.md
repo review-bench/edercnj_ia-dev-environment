@@ -1,12 +1,13 @@
 ---
 name: x-internal-story-report
-description: "Generates the final consolidated story-completion report by reading plans/epic-XXXX/execution-state.json, collecting per-task status and commitSha, PR metadata (prNumber, prState), coverage delta, and review findings, then rendering the output via x-internal-report-write with _TEMPLATE-STORY-COMPLETION-REPORT.md to the caller-specified --output path. Eighth skill in the x-internal-* convention and the fifth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify, and x-internal-story-resume). Read-only against state; writes only to --output via x-internal-report-write."
+description: "Generates the final consolidated story-completion report by reading ai/epics/epic-XXXX/execution-state.json, collecting per-task status and commitSha, PR metadata (prNumber, prState), coverage delta, and review findings, then rendering the output via x-internal-report-write with _TEMPLATE-STORY-COMPLETION-REPORT.md to the caller-specified --output path. Eighth skill in the x-internal-* convention and the fifth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify, and x-internal-story-resume). Read-only against state; writes only to --output via x-internal-report-write."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill
 argument-hint: "--story-id <story-XXXX-YYYY> --epic-id <XXXX> --output <path>"
 category: internal-plan
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -45,7 +46,7 @@ template resolution, and rendering delegation.
 
 Responsibilities (single):
 
-1. Locate and read `plans/epic-XXXX/execution-state.json`; exit 1
+1. Locate and read `ai/epics/epic-XXXX/execution-state.json`; exit 1
    (`STATE_NOT_FOUND`) when absent.
 2. Extract the story node (`.stories.<story-id>`) and its tasks map.
 3. Compute the `summary` object:
@@ -115,7 +116,7 @@ orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-story-report",
-      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-0049/reports/story-0049-0001-report.md")
+      args: "--story-id story-0049-0001 --epic-id 0049 --output ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
 ## Parameters
@@ -123,7 +124,7 @@ Skill(skill: "x-internal-story-report",
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form; lowercase-normalised) |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `plans/epic-XXXX/` (zero-padded) |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` (zero-padded) |
 | `--output <path>` | M | — | Target path for the rendered report; forwarded verbatim to `x-internal-report-write --output` |
 
 All three flags support both `--key value` and `--key=value` forms.
@@ -156,13 +157,13 @@ On success the skill writes a single-line JSON object to stdout:
 ### Example envelope (happy path)
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
+{"reportPath":"/repo/ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
 ```
 
 ### Example envelope (story without PR — boundary)
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":4,"tasksDone":2,"commitsCount":2,"prNumber":null,"prState":null,"coverageLine":null,"coverageBranch":null}}
+{"reportPath":"/repo/ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":4,"tasksDone":2,"commitsCount":2,"prNumber":null,"prState":null,"coverageLine":null,"coverageBranch":null}}
 ```
 
 ## Exit Codes
@@ -170,7 +171,7 @@ On success the skill writes a single-line JSON object to stdout:
 | Code | Name | Condition | Message Format |
 | :--- | :--- | :--- | :--- |
 | 0 | SUCCESS | Report rendered and response envelope emitted | — |
-| 1 | STATE_NOT_FOUND | `plans/epic-XXXX/execution-state.json` missing or unreadable | `State missing: plans/epic-XXXX/execution-state.json` |
+| 1 | STATE_NOT_FOUND | `ai/epics/epic-XXXX/execution-state.json` missing or unreadable | `State missing: ai/epics/epic-XXXX/execution-state.json` |
 | 2 | TEMPLATE_MISSING | `.claude/templates/_TEMPLATE-STORY-COMPLETION-REPORT.md` absent | `Template missing: _TEMPLATE-STORY-COMPLETION-REPORT.md` |
 | 64 | EX_USAGE | Unknown or malformed flag | `usage: --story-id <id> --epic-id <id> --output <path>` |
 | 127 | DEPENDENCY_MISSING | `jq` absent on `PATH` | `dependency missing: jq` |
@@ -190,7 +191,7 @@ to `x-internal-args-normalize` (peer skill; same rationale as
 `x-internal-story-resume` §1 of full-protocol).
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 state_file="${epic_dir}/execution-state.json"
 template_name="_TEMPLATE-STORY-COMPLETION-REPORT.md"
 template_path="${CLAUDE_PROJECT_DIR}/.claude/templates/${template_name}"
@@ -345,13 +346,13 @@ Invocation:
 
 ```markdown
 Skill(skill: "x-internal-story-report",
-      args: "--story-id story-0049-0001 --epic-id 0049 --output plans/epic-0049/reports/story-0049-0001-report.md")
+      args: "--story-id story-0049-0001 --epic-id 0049 --output ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
 Envelope:
 
 ```json
-{"reportPath":"/repo/plans/epic-0049/reports/story-0049-0001-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
+{"reportPath":"/repo/ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md","summary":{"tasksCount":5,"tasksDone":5,"commitsCount":5,"prNumber":42,"prState":"MERGED","coverageLine":96.4,"coverageBranch":92.1}}
 ```
 
 Exit: 0.
@@ -372,7 +373,7 @@ Skill(skill: "x-internal-story-report",
 Stderr:
 
 ```
-State missing: plans/epic-0099/execution-state.json
+State missing: ai/epics/epic-XXXX/execution-state.json
 ```
 
 Exit: 1. No envelope emitted.

@@ -1,24 +1,19 @@
 package dev.iadev.domain.stack;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.model.Platform;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for StackValidator — platform validation from
- * YAML config.
- */
+/** Tests for StackValidator — platform validation from YAML config. */
 @DisplayName("StackValidator — platform validation")
 class StackValidatorPlatformTest {
 
@@ -29,17 +24,16 @@ class StackValidatorPlatformTest {
         @Test
         @DisplayName("valid platform has no errors")
         void validatePlatforms_validPlatform_noErrors() {
-            var config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .buildTool("maven")
-                    .architectureStyle("microservice")
-                    .platforms(Set.of(Platform.CLAUDE_CODE))
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .buildTool("maven")
+                            .architectureStyle("microservice")
+                            .platforms(Set.of(Platform.CLAUDE_CODE))
+                            .build();
 
-            var errors =
-                    StackValidator.validatePlatforms(
-                            config);
+            var errors = StackValidator.validatePlatforms(config);
 
             assertThat(errors).isEmpty();
         }
@@ -47,16 +41,15 @@ class StackValidatorPlatformTest {
         @Test
         @DisplayName("empty platforms (all) has no errors")
         void validatePlatforms_empty_noErrors() {
-            var config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .buildTool("maven")
-                    .architectureStyle("microservice")
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .buildTool("maven")
+                            .architectureStyle("microservice")
+                            .build();
 
-            var errors =
-                    StackValidator.validatePlatforms(
-                            config);
+            var errors = StackValidator.validatePlatforms(config);
 
             assertThat(errors).isEmpty();
         }
@@ -64,17 +57,16 @@ class StackValidatorPlatformTest {
         @Test
         @DisplayName("SHARED platform reports error")
         void validatePlatforms_shared_reportsError() {
-            var config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .buildTool("maven")
-                    .architectureStyle("microservice")
-                    .platforms(Set.of(Platform.SHARED))
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .buildTool("maven")
+                            .architectureStyle("microservice")
+                            .platforms(Set.of(Platform.SHARED))
+                            .build();
 
-            var errors =
-                    StackValidator.validatePlatforms(
-                            config);
+            var errors = StackValidator.validatePlatforms(config);
 
             assertThat(errors).hasSize(1);
             assertThat(errors.get(0))
@@ -86,18 +78,16 @@ class StackValidatorPlatformTest {
         @Test
         @DisplayName("single valid platform no errors")
         void validatePlatforms_singleValid_noErrors() {
-            var config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .buildTool("maven")
-                    .architectureStyle("microservice")
-                    .platforms(Set.of(
-                            Platform.CLAUDE_CODE))
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .buildTool("maven")
+                            .architectureStyle("microservice")
+                            .platforms(Set.of(Platform.CLAUDE_CODE))
+                            .build();
 
-            var errors =
-                    StackValidator.validatePlatforms(
-                            config);
+            var errors = StackValidator.validatePlatforms(config);
 
             assertThat(errors).isEmpty();
         }
@@ -105,20 +95,18 @@ class StackValidatorPlatformTest {
         @Test
         @DisplayName("validateStack includes platform check")
         void validateStack_includesPlatformValidation() {
-            var config = TestConfigBuilder.builder()
-                    .language("java", "21")
-                    .framework("quarkus", "3.17")
-                    .buildTool("maven")
-                    .architectureStyle("microservice")
-                    .platforms(Set.of(Platform.SHARED))
-                    .build();
+            var config =
+                    TestConfigBuilder.builder()
+                            .language("java", "21")
+                            .framework("quarkus", "3.17")
+                            .buildTool("maven")
+                            .architectureStyle("microservice")
+                            .platforms(Set.of(Platform.SHARED))
+                            .build();
 
-            var errors =
-                    StackValidator.validateStack(config);
+            var errors = StackValidator.validateStack(config);
 
-            assertThat(errors)
-                    .anyMatch(e -> e.contains(
-                            "Invalid platform value"));
+            assertThat(errors).anyMatch(e -> e.contains("Invalid platform value"));
         }
     }
 
@@ -134,22 +122,18 @@ class StackValidatorPlatformTest {
 
             var config = ProjectConfig.fromMap(map);
 
-            assertThat(config.platforms())
-                    .containsExactly(Platform.CLAUDE_CODE);
+            assertThat(config.platforms()).containsExactly(Platform.CLAUDE_CODE);
         }
 
         @Test
         @DisplayName("valid platform list parses ok")
         void yamlParsing_validList_noErrors() {
             var map = buildMinimalConfigMap();
-            map.put("platform",
-                    List.of("claude-code"));
+            map.put("platform", List.of("claude-code"));
 
             var config = ProjectConfig.fromMap(map);
 
-            assertThat(config.platforms())
-                    .containsExactlyInAnyOrder(
-                            Platform.CLAUDE_CODE);
+            assertThat(config.platforms()).containsExactlyInAnyOrder(Platform.CLAUDE_CODE);
         }
 
         @Test
@@ -165,17 +149,11 @@ class StackValidatorPlatformTest {
 
     private Map<String, Object> buildMinimalConfigMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("project", Map.of(
-                "name", "test", "purpose", "test"));
-        map.put("architecture", Map.of(
-                "style", "microservice"));
-        map.put("interfaces", List.of(
-                Map.of("type", "rest")));
-        map.put("language", Map.of(
-                "name", "java", "version", "21"));
-        map.put("framework", Map.of(
-                "name", "quarkus", "version", "3.17",
-                "build_tool", "maven"));
+        map.put("project", Map.of("name", "test", "purpose", "test"));
+        map.put("architecture", Map.of("style", "microservice"));
+        map.put("interfaces", List.of(Map.of("type", "rest")));
+        map.put("language", Map.of("name", "java", "version", "21"));
+        map.put("framework", Map.of("name", "quarkus", "version", "3.17", "build_tool", "maven"));
         return map;
     }
 }

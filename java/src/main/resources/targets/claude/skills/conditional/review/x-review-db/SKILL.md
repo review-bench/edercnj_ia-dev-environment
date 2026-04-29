@@ -4,6 +4,8 @@ description: "Database specialist review: validates schema design, migration saf
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: db, fragment-order: 30 }
 ---
 
 ## Global Output Policy

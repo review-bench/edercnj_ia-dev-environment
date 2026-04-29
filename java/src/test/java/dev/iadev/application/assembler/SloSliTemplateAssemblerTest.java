@@ -1,25 +1,22 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for SloSliTemplateAssembler -- copies SLO/SLI
- * definition template to specs/_templates/.
+ * Tests for SloSliTemplateAssembler -- copies SLO/SLI definition template to governance/slo-sli/.
  */
 @DisplayName("SloSliTemplateAssembler")
 class SloSliTemplateAssemblerTest {
@@ -31,11 +28,9 @@ class SloSliTemplateAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssembler() {
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -44,67 +39,50 @@ class SloSliTemplateAssemblerTest {
     class AssembleTemplate {
 
         @Test
-        @DisplayName("generates SLO/SLI definition in"
-                + " specs/_templates/")
-        void assemble_whenCalled_generatesFile(
-                @TempDir Path tempDir) {
+        @DisplayName("generates SLO/SLI definition in" + " governance/slo-sli/")
+        void assemble_whenCalled_generatesFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path sloPath = outputDir.resolve(
-                    "specs/_templates/"
-                            + "_TEMPLATE-SLO-SLI-DEFINITION"
-                            + ".md");
+            Path sloPath =
+                    outputDir.resolve(
+                            "governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
             assertThat(sloPath).exists();
         }
 
         @Test
-        @DisplayName("creates specs/_templates/ subdirectory")
-        void assemble_whenCalled_createsSubdir(
-                @TempDir Path tempDir) {
+        @DisplayName("creates governance/slo-sli/ subdirectory")
+        void assemble_whenCalled_createsSubdir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            assertThat(
-                    outputDir.resolve("specs/_templates"))
-                    .exists()
-                    .isDirectory();
+            assertThat(outputDir.resolve("governance/slo-sli")).exists().isDirectory();
         }
 
         @Test
         @DisplayName("returns file path in result list")
-        void assemble_whenCalled_returnsFilePath(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_returnsFilePath(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            assertThat(files.get(0)).endsWith(
-                    "_TEMPLATE-SLO-SLI-DEFINITION.md");
+            assertThat(files.get(0)).endsWith("_TEMPLATE-SLO-SLI-DEFINITION.md");
         }
     }
 
@@ -114,36 +92,25 @@ class SloSliTemplateAssemblerTest {
 
         @Test
         @DisplayName("contains Service Overview section")
-        void assemble_template_containsServiceOverview(
-                @TempDir Path tempDir) {
+        void assemble_template_containsServiceOverview(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## Service Overview");
+            assertThat(content).contains("## Service Overview");
         }
 
         @Test
-        @DisplayName("contains SLI Definitions section"
-                + " with 4 standard SLIs")
-        void assemble_template_containsSliDefinitions(
-                @TempDir Path tempDir) {
+        @DisplayName("contains SLI Definitions section" + " with 4 standard SLIs")
+        void assemble_template_containsSliDefinitions(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## SLI Definitions");
-            assertThat(content)
-                    .contains("Availability");
-            assertThat(content)
-                    .contains("Latency");
-            assertThat(content)
-                    .contains("Throughput");
-            assertThat(content)
-                    .contains("Error Rate");
+            assertThat(content).contains("## SLI Definitions");
+            assertThat(content).contains("Availability");
+            assertThat(content).contains("Latency");
+            assertThat(content).contains("Throughput");
+            assertThat(content).contains("Error Rate");
         }
 
         @Test
-        @DisplayName("SLI Definitions table has required"
-                + " columns")
-        void assemble_template_sliTableHasColumns(
-                @TempDir Path tempDir) {
+        @DisplayName("SLI Definitions table has required" + " columns")
+        void assemble_template_sliTableHasColumns(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
             assertThat(content).contains("| SLI |");
             assertThat(content).contains("Metric");
@@ -153,91 +120,59 @@ class SloSliTemplateAssemblerTest {
 
         @Test
         @DisplayName("contains SLO Targets section")
-        void assemble_template_containsSloTargets(
-                @TempDir Path tempDir) {
+        void assemble_template_containsSloTargets(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## SLO Targets");
-            assertThat(content)
-                    .contains("99.9%");
-            assertThat(content)
-                    .contains("Rolling 30 days");
+            assertThat(content).contains("## SLO Targets");
+            assertThat(content).contains("99.9%");
+            assertThat(content).contains("Rolling 30 days");
         }
 
         @Test
-        @DisplayName("contains Error Budget Policy section"
-                + " with consumption levels")
-        void assemble_template_containsErrorBudget(
-                @TempDir Path tempDir) {
+        @DisplayName("contains Error Budget Policy section" + " with consumption levels")
+        void assemble_template_containsErrorBudget(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## Error Budget Policy");
-            assertThat(content)
-                    .contains("50% consumed");
-            assertThat(content)
-                    .contains("75% consumed");
-            assertThat(content)
-                    .contains("100% consumed");
+            assertThat(content).contains("## Error Budget Policy");
+            assertThat(content).contains("50% consumed");
+            assertThat(content).contains("75% consumed");
+            assertThat(content).contains("100% consumed");
         }
 
         @Test
-        @DisplayName("contains Burn Rate Alerting"
-                + " Configuration with fast and slow burn")
-        void assemble_template_containsBurnRate(
-                @TempDir Path tempDir) {
+        @DisplayName("contains Burn Rate Alerting" + " Configuration with fast and slow burn")
+        void assemble_template_containsBurnRate(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## Burn Rate Alerting"
-                            + " Configuration");
-            assertThat(content)
-                    .contains("14.4x");
+            assertThat(content).contains("## Burn Rate Alerting" + " Configuration");
+            assertThat(content).contains("14.4x");
             assertThat(content).contains("6x");
-            assertThat(content)
-                    .contains("PagerDuty");
+            assertThat(content).contains("PagerDuty");
         }
 
         @Test
-        @DisplayName("contains Dashboard Requirements"
-                + " section")
-        void assemble_template_containsDashboard(
-                @TempDir Path tempDir) {
+        @DisplayName("contains Dashboard Requirements" + " section")
+        void assemble_template_containsDashboard(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## Dashboard Requirements");
-            assertThat(content)
-                    .contains("Remaining Error Budget");
-            assertThat(content)
-                    .contains("Burn Rate");
-            assertThat(content)
-                    .contains("Budget Exhaustion Forecast");
+            assertThat(content).contains("## Dashboard Requirements");
+            assertThat(content).contains("Remaining Error Budget");
+            assertThat(content).contains("Burn Rate");
+            assertThat(content).contains("Budget Exhaustion Forecast");
         }
 
         @Test
         @DisplayName("contains Review Cadence section")
-        void assemble_template_containsReviewCadence(
-                @TempDir Path tempDir) {
+        void assemble_template_containsReviewCadence(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("## Review Cadence");
-            assertThat(content)
-                    .contains("Monthly");
-            assertThat(content)
-                    .contains("Quarterly");
+            assertThat(content).contains("## Review Cadence");
+            assertThat(content).contains("Monthly");
+            assertThat(content).contains("Quarterly");
         }
 
         @Test
         @DisplayName("has all 7 mandatory sections")
-        void assemble_template_hasAllMandatorySections(
-                @TempDir Path tempDir) {
+        void assemble_template_hasAllMandatorySections(@TempDir Path tempDir) {
             String content = generateAndRead(tempDir);
-            assertThat(content)
-                    .contains("# SLO/SLI Definitions");
-            for (String section
-                    : SloSliTemplateAssembler
-                    .MANDATORY_SECTIONS) {
-                assertThat(content)
-                        .as("Missing section: %s", section)
-                        .contains(section);
+            assertThat(content).contains("# SLO/SLI Definitions");
+            for (String section : SloSliTemplateAssembler.MANDATORY_SECTIONS) {
+                assertThat(content).as("Missing section: %s", section).contains(section);
             }
         }
     }
@@ -247,41 +182,28 @@ class SloSliTemplateAssemblerTest {
     class GracefulNoOp {
 
         @Test
-        @DisplayName("returns empty list when template"
-                + " file absent")
-        void assemble_whenCalled_returnsEmptyWhenAbsent(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("returns empty list when template" + " file absent")
+        void assemble_whenCalled_returnsEmptyWhenAbsent(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler(
-                            resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("does not create output directory"
-                + " when template absent")
-        void assemble_whenCalled_doesNotCreateOutput(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("does not create output directory" + " when template absent")
+        void assemble_whenCalled_doesNotCreateOutput(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler(
-                            resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
@@ -296,30 +218,24 @@ class SloSliTemplateAssemblerTest {
 
         @Test
         @DisplayName("generates for minimal config")
-        void assemble_minimalConfig_generatesTemplate(
-                @TempDir Path tempDir) {
+        void assemble_minimalConfig_generatesTemplate(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
         }
 
         @Test
         @DisplayName("generates for java-spring profile")
-        void assemble_javaSpring_generatesTemplate(
-                @TempDir Path tempDir) {
+        void assemble_javaSpring_generatesTemplate(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -327,20 +243,17 @@ class SloSliTemplateAssemblerTest {
                             .build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
         }
 
         @Test
         @DisplayName("generates for python-fastapi profile")
-        void assemble_pythonFastapi_generatesTemplate(
-                @TempDir Path tempDir) {
+        void assemble_pythonFastapi_generatesTemplate(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -348,20 +261,17 @@ class SloSliTemplateAssemblerTest {
                             .build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
         }
 
         @Test
         @DisplayName("generates for go-gin profile")
-        void assemble_goGin_generatesTemplate(
-                @TempDir Path tempDir) {
+        void assemble_goGin_generatesTemplate(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("go", "1.22")
@@ -369,8 +279,7 @@ class SloSliTemplateAssemblerTest {
                             .build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
         }
@@ -382,54 +291,42 @@ class SloSliTemplateAssemblerTest {
 
         @Test
         @DisplayName("renders PROJECT_NAME in title")
-        void assemble_template_rendersProjectName(
-                @TempDir Path tempDir) {
+        void assemble_template_rendersProjectName(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            SloSliTemplateAssembler assembler =
-                    new SloSliTemplateAssembler();
+            SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .projectName("my-awesome-service")
-                            .build();
+                    TestConfigBuilder.builder().projectName("my-awesome-service").build();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            Path sloPath = outputDir.resolve(
-                    "specs/_templates/"
-                            + "_TEMPLATE-SLO-SLI-DEFINITION"
-                            + ".md");
+            Path sloPath =
+                    outputDir.resolve(
+                            "governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION" + ".md");
             String content = readFile(sloPath);
-            assertThat(content)
-                    .contains("my-awesome-service");
+            assertThat(content).contains("my-awesome-service");
         }
     }
 
     private static String generateAndRead(Path tempDir) {
         Path outputDir = tempDir.resolve("output");
 
-        SloSliTemplateAssembler assembler =
-                new SloSliTemplateAssembler();
-        ProjectConfig config =
-                TestConfigBuilder.minimal();
+        SloSliTemplateAssembler assembler = new SloSliTemplateAssembler();
+        ProjectConfig config = TestConfigBuilder.minimal();
         TemplateEngine engine = new TemplateEngine();
 
         assembler.assemble(config, engine, outputDir);
 
-        Path sloPath = outputDir.resolve(
-                "specs/_templates/"
-                        + "_TEMPLATE-SLO-SLI-DEFINITION.md");
+        Path sloPath = outputDir.resolve("governance/slo-sli/" + "_TEMPLATE-SLO-SLI-DEFINITION.md");
         return readFile(sloPath);
     }
 
     private static String readFile(Path path) {
         try {
-            return Files.readString(
-                    path, StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Failed to read: " + path, e);
+            throw new RuntimeException("Failed to read: " + path, e);
         }
     }
 }

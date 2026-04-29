@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--story-id <story-XXXX-YYYY> --epic-id <XXXX>"
 category: internal-plan
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -34,11 +35,11 @@ Carve out Phase 0 of `x-story-implement` into a single-responsibility,
 read-only Bash pipeline. The skill:
 
 1. Resolves and reads the story file under
-   `plans/epic-XXXX/story-XXXX-YYYY.md`.
+   `ai/epics/epic-XXXX/story-XXXX-YYYY.md`.
 2. Parses Section 1 (Dependencies) and validates each predecessor story
    reports status `DONE` (or an accepted synonym: `MERGED` / `COMPLETE`)
-   inside `plans/epic-XXXX/execution-state.json`.
-3. Globs the 7 planning artifacts under `plans/epic-XXXX/plans/` and
+   inside `ai/epics/epic-XXXX/execution-state.json`.
+3. Globs the 7 planning artifacts under `ai/epics/epic-XXXX/plans/` and
    classifies each as `fresh` (artifact mtime ≥ story mtime),
    `stale` (artifact mtime < story mtime), or `missing`.
 4. Assesses scope from Section 8 task count + Section 7 Gherkin
@@ -84,7 +85,7 @@ Skill(skill: "x-internal-story-load-context",
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form) |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `plans/epic-XXXX/` |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` |
 
 ## Response Contract
 
@@ -97,12 +98,12 @@ When successful, the skill writes a single-line JSON object to stdout:
 | `dependencies` | `Array<{id:String, status:String}>` | yes | One entry per Section 1 blocker (empty array when `Blocked By: —`) |
 | `scope` | `String` | yes | `SIMPLE` / `STANDARD` / `COMPLEX` |
 | `planningMode` | `String` | yes | `PRE_PLANNED` / `HYBRID` / `INLINE` |
-| `artifacts` | `{fresh:Array<String>, stale:Array<String>, missing:Array<String>}` | yes | Classification of the 7 planning artifact paths (relative to `plans/epic-XXXX/plans/`) |
+| `artifacts` | `{fresh:Array<String>, stale:Array<String>, missing:Array<String>}` | yes | Classification of the 7 planning artifact paths (relative to `ai/epics/epic-XXXX/plans/`) |
 | `taskCount` | `Number` | yes | Count of `### TASK-XXXX-YYYY-NNN:` headers under Section 8 |
 | `scenarioCount` | `Number` | yes | Count of `Cenario:` / `Scenario:` markers under Section 7 |
 
 The seven planning-artifact basenames scanned under
-`plans/epic-XXXX/plans/` are:
+`ai/epics/epic-XXXX/plans/` are:
 
 1. `plan-story-XXXX-YYYY.md` (implementation plan)
 2. `arch-story-XXXX-YYYY.md` (architecture plan)
@@ -117,9 +118,9 @@ The seven planning-artifact basenames scanned under
 | Code | Name | Condition | Message Format |
 | :--- | :--- | :--- | :--- |
 | 0 | SUCCESS | Context loaded and emitted | — |
-| 1 | STORY_NOT_FOUND | `plans/epic-XXXX/story-XXXX-YYYY.md` absent | `Story file not found: <path>` |
+| 1 | STORY_NOT_FOUND | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` absent | `Story file not found: <path>` |
 | 2 | DEPENDENCY_NOT_DONE | Any Section 1 blocker reports non-`DONE` status | `Blocker <id> is <status>` |
-| 3 | EPIC_NOT_FOUND | `plans/epic-XXXX/` absent | `Epic dir not found: plans/epic-<id>` |
+| 3 | EPIC_NOT_FOUND | `ai/epics/epic-XXXX/` absent | `Epic dir not found: ai/epics/epic-<id>` |
 
 ## Workflow
 
@@ -129,7 +130,7 @@ Parse `--story-id` and `--epic-id`; reject unknown flags and missing
 required flags with exit 64 (sysexits `EX_USAGE`). Derive:
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 story_file="${epic_dir}/${story_id}.md"
 state_file="${epic_dir}/execution-state.json"
 plans_dir="${epic_dir}/plans"
@@ -150,7 +151,7 @@ Extract Section 1 (Dependencies) between the `## 1. Dependências` /
 Section 7 (Acceptance Criteria) and Section 8 (Tasks) likewise. The
 parser is tolerant: accepts both Portuguese (`Dependências`, `Cenario`)
 and English (`Dependencies`, `Scenario`) section titles since current
-stories under `plans/epic-0049/` are authored in Portuguese.
+stories under `ai/epics/epic-XXXX/` are authored in Portuguese.
 
 ### Step 3 — Parse dependencies from Section 1
 
@@ -247,7 +248,7 @@ Skill(skill: "x-internal-story-load-context",
 
 Output:
 ```json
-{"storyFile":"plans/epic-0049/story-0049-0001.md","storyMtime":1745343600,"dependencies":[],"scope":"SIMPLE","planningMode":"INLINE","artifacts":{"fresh":[],"stale":[],"missing":["plan-story-0049-0001.md","arch-story-0049-0001.md","tests-story-0049-0001.md","tasks-story-0049-0001.md","security-story-0049-0001.md","compliance-story-0049-0001.md","task-implementation-map-story-0049-0001.md"]},"taskCount":3,"scenarioCount":4}
+{"storyFile":"ai/epics/epic-XXXX/story-XXXX-0001.md","storyMtime":1745343600,"dependencies":[],"scope":"SIMPLE","planningMode":"INLINE","artifacts":{"fresh":[],"stale":[],"missing":["plan-story-XXXX-0001.md","arch-story-XXXX-0001.md","tests-story-XXXX-0001.md","tasks-story-XXXX-0001.md","security-story-XXXX-0001.md","compliance-story-XXXX-0001.md","task-implementation-map-story-XXXX-0001.md"]},"taskCount":3,"scenarioCount":4}
 ```
 Exit: 0.
 
@@ -266,7 +267,7 @@ Exit: 2.
 
 ### Example 3 — Planning mode PRE_PLANNED
 
-Given all 7 artifacts under `plans/epic-0049/plans/` with mtime ≥ story
+Given all 7 artifacts under `ai/epics/epic-XXXX/plans/` with mtime ≥ story
 mtime, output includes `"planningMode":"PRE_PLANNED"` and every
 artifact in `artifacts.fresh`.
 
@@ -285,7 +286,7 @@ Skill(skill: "x-internal-story-load-context",
 
 Stderr:
 ```
-Epic dir not found: plans/epic-9999
+Epic dir not found: ai/epics/epic-XXXX
 ```
 Exit: 3.
 
@@ -293,7 +294,7 @@ When the epic directory exists but the story file does not:
 
 Stderr:
 ```
-Story file not found: plans/epic-0049/story-0049-9999.md
+Story file not found: ai/epics/epic-XXXX/story-XXXX-9999.md
 ```
 Exit: 1.
 
@@ -328,7 +329,7 @@ Target: < 500 ms for a typical epic with 20 stories in
 implementation reads at most 9 files (1 story, 1 state, 7 artifacts
 via `stat` only — no body read) and spawns a single `jq` invocation
 for JSON assembly. No network I/O; no recursive traversal beyond
-`plans/epic-XXXX/plans/`.
+`ai/epics/epic-XXXX/plans/`.
 
 ## Testing
 

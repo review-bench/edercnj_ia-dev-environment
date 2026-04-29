@@ -1,9 +1,7 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,21 +15,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Smoke tests for content integrity validation across all
- * 8 bundled profiles.
+ * Smoke tests for content integrity validation across all 8 bundled profiles.
  *
- * <p>Validates that pipeline output is usable and free of
- * template artifacts. Organized into nested test classes
- * per validation category.</p>
+ * <p>Validates that pipeline output is usable and free of template artifacts. Organized into nested
+ * test classes per validation category.
  *
- * <p>RULE-001: Parametrized for all 8 profiles.
- * RULE-002: Independent of golden files.
- * RULE-006: Output in {@code @TempDir}.</p>
+ * <p>RULE-001: Parametrized for all 8 profiles. RULE-002: Independent of golden files. RULE-006:
+ * Output in {@code @TempDir}.
  *
  * @see SmokeTestBase
  * @see SmokeTestValidators
@@ -50,15 +46,11 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class EmptyFiles {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName(
-                "No empty files in generated output")
-        void noEmptyFiles_output_allHaveContent(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("No empty files in generated output")
+        void noEmptyFiles_output_allHaveContent(String profile) throws IOException {
             runPipeline(profile);
-            SmokeTestValidators.assertNoEmptyFiles(
-                    getOutputDir(profile));
+            SmokeTestValidators.assertNoEmptyFiles(getOutputDir(profile));
         }
     }
 
@@ -67,49 +59,32 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class PebblePlaceholders {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName("No unresolved Pebble placeholders "
-                + "(excluding allowlist)")
-        void noUnresolved_excludingAllowlist_noneFound(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("No unresolved Pebble placeholders " + "(excluding allowlist)")
+        void noUnresolved_excludingAllowlist_noneFound(String profile) throws IOException {
             runPipeline(profile);
             Path outputDir = getOutputDir(profile);
 
             List<String> violations = new ArrayList<>();
-            Files.walkFileTree(outputDir,
+            Files.walkFileTree(
+                    outputDir,
                     new SimpleFileVisitor<>() {
                         @Override
-                        public FileVisitResult visitFile(
-                                Path file,
-                                BasicFileAttributes a)
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes a)
                                 throws IOException {
-                            if (isTemplateFile(file)
-                                    || isKnowledgePack(
-                                            file,
-                                            outputDir)) {
-                                return FileVisitResult
-                                        .CONTINUE;
+                            if (isTemplateFile(file) || isKnowledgePack(file, outputDir)) {
+                                return FileVisitResult.CONTINUE;
                             }
-                            PlaceholderScanner
-                                    .scanPebble(
-                                            file,
-                                            outputDir,
-                                            violations);
-                            return FileVisitResult
-                                    .CONTINUE;
+                            PlaceholderScanner.scanPebble(file, outputDir, violations);
+                            return FileVisitResult.CONTINUE;
                         }
                     });
 
             if (!violations.isEmpty()) {
-                fail(("Found %d unresolved "
-                        + "placeholder(s) in "
-                        + "profile '%s':\n%s")
-                        .formatted(
-                                violations.size(),
-                                profile,
-                                String.join("\n",
-                                        violations)));
+                fail(
+                        ("Found %d unresolved " + "placeholder(s) in " + "profile '%s':\n%s")
+                                .formatted(
+                                        violations.size(), profile, String.join("\n", violations)));
             }
         }
     }
@@ -119,50 +94,34 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class DataPlaceholders {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName("No unresolved data placeholders "
-                + "in non-template files")
-        void noData_nonTemplate_noneFound(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("No unresolved data placeholders " + "in non-template files")
+        void noData_nonTemplate_noneFound(String profile) throws IOException {
             runPipeline(profile);
             Path outputDir = getOutputDir(profile);
 
             List<String> violations = new ArrayList<>();
-            Files.walkFileTree(outputDir,
+            Files.walkFileTree(
+                    outputDir,
                     new SimpleFileVisitor<>() {
                         @Override
-                        public FileVisitResult visitFile(
-                                Path file,
-                                BasicFileAttributes a)
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes a)
                                 throws IOException {
                             if (isTemplateFile(file)
-                                    || isRulesFile(
-                                    file, outputDir)
-                                    || isSkillDocFile(
-                                    file, outputDir)) {
-                                return FileVisitResult
-                                        .CONTINUE;
+                                    || isRulesFile(file, outputDir)
+                                    || isSkillDocFile(file, outputDir)) {
+                                return FileVisitResult.CONTINUE;
                             }
-                            PlaceholderScanner
-                                    .scanData(
-                                            file,
-                                            outputDir,
-                                            violations);
-                            return FileVisitResult
-                                    .CONTINUE;
+                            PlaceholderScanner.scanData(file, outputDir, violations);
+                            return FileVisitResult.CONTINUE;
                         }
                     });
 
             if (!violations.isEmpty()) {
-                fail(("Found %d data "
-                        + "placeholder(s) in "
-                        + "profile '%s':\n%s")
-                        .formatted(
-                                violations.size(),
-                                profile,
-                                String.join("\n",
-                                        violations)));
+                fail(
+                        ("Found %d data " + "placeholder(s) in " + "profile '%s':\n%s")
+                                .formatted(
+                                        violations.size(), profile, String.join("\n", violations)));
             }
         }
     }
@@ -172,22 +131,15 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class JsonValidity {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName(
-                "All JSON files are valid and parseable")
-        void allJson_parseable_noErrors(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("All JSON files are valid and parseable")
+        void allJson_parseable_noErrors(String profile) throws IOException {
             runPipeline(profile);
             Path outputDir = getOutputDir(profile);
 
-            List<Path> files = FileCollector.byExtension(
-                    outputDir, Set.of(".json"));
+            List<Path> files = FileCollector.byExtension(outputDir, Set.of(".json"));
 
-            assertThat(files)
-                    .as("Expected .json files for '%s'",
-                            profile)
-                    .isNotEmpty();
+            assertThat(files).as("Expected .json files for '%s'", profile).isNotEmpty();
 
             for (Path f : files) {
                 SmokeTestValidators.assertValidJson(f);
@@ -200,23 +152,15 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class YamlValidity {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName("All YAML files are valid and "
-                + "parseable")
-        void allYaml_parseable_noErrors(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("All YAML files are valid and " + "parseable")
+        void allYaml_parseable_noErrors(String profile) throws IOException {
             runPipeline(profile);
             Path outputDir = getOutputDir(profile);
 
-            List<Path> files = FileCollector.byExtension(
-                    outputDir,
-                    Set.of(".yaml", ".yml"));
+            List<Path> files = FileCollector.byExtension(outputDir, Set.of(".yaml", ".yml"));
 
-            assertThat(files)
-                    .as("Expected .yaml files for '%s'",
-                            profile)
-                    .isNotEmpty();
+            assertThat(files).as("Expected .yaml files for '%s'", profile).isNotEmpty();
 
             for (Path f : files) {
                 SmokeTestValidators.assertValidYaml(f);
@@ -229,22 +173,15 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     class MarkdownHeaders {
 
         @ParameterizedTest(name = "[{0}]")
-        @MethodSource(
-                "dev.iadev.smoke.SmokeProfiles#profiles")
-        @DisplayName("All Markdown files start with "
-                + "#, ---, or <!--")
-        void allMd_validHeaders_noErrors(
-                String profile) throws IOException {
+        @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
+        @DisplayName("All Markdown files start with " + "#, ---, or <!--")
+        void allMd_validHeaders_noErrors(String profile) throws IOException {
             runPipeline(profile);
             Path outputDir = getOutputDir(profile);
 
-            List<Path> files = FileCollector.byExtension(
-                    outputDir, Set.of(".md"));
+            List<Path> files = FileCollector.byExtension(outputDir, Set.of(".md"));
 
-            assertThat(files)
-                    .as("Expected .md files for '%s'",
-                            profile)
-                    .isNotEmpty();
+            assertThat(files).as("Expected .md files for '%s'", profile).isNotEmpty();
 
             List<String> violations = new ArrayList<>();
             for (Path f : files) {
@@ -252,23 +189,18 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
             }
 
             if (!violations.isEmpty()) {
-                fail(("Found %d markdown file(s) "
-                        + "without valid header in "
-                        + "profile '%s':\n%s")
-                        .formatted(
-                                violations.size(),
-                                profile,
-                                String.join("\n",
-                                        violations)));
+                fail(
+                        ("Found %d markdown file(s) "
+                                        + "without valid header in "
+                                        + "profile '%s':\n%s")
+                                .formatted(
+                                        violations.size(), profile, String.join("\n", violations)));
             }
         }
 
-        private static void checkHeader(
-                Path file, Path outputDir,
-                List<String> violations)
+        private static void checkHeader(Path file, Path outputDir, List<String> violations)
                 throws IOException {
-            String content = Files.readString(
-                    file, StandardCharsets.UTF_8);
+            String content = Files.readString(file, StandardCharsets.UTF_8);
             String trimmed = content.stripLeading();
 
             boolean valid =
@@ -277,12 +209,9 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
                             || trimmed.startsWith("<!--");
 
             if (!valid) {
-                String rel = SmokeTestValidators
-                        .relativizePosix(outputDir, file);
+                String rel = SmokeTestValidators.relativizePosix(outputDir, file);
                 violations.add(
-                        ("  %s -- does not start "
-                                + "with '#', '---', "
-                                + "or '<!--'")
+                        ("  %s -- does not start " + "with '#', '---', " + "or '<!--'")
                                 .formatted(rel));
             }
         }
@@ -291,191 +220,197 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
     // -- shared helpers --
 
     private static boolean isTemplateFile(Path file) {
-        return file.getFileName().toString()
-                .startsWith(TEMPLATE_FILE_PREFIX);
+        return file.getFileName().toString().startsWith(TEMPLATE_FILE_PREFIX);
     }
 
     /**
-     * Knowledge pack files live under {@code .claude/knowledge/}
-     * and contain generic reference content (including
-     * intentional runtime markers like {@code {{LANGUAGE}}},
-     * {@code {{CACHE_TYPE}}}, Helm template syntax, Terraform
-     * HCL examples). They are consumed as-is by skills and
-     * the AI agent resolves context at runtime — scanning them
-     * for unresolved Pebble placeholders is not meaningful
-     * (EPIC-0051 / ADR-0013).
+     * Knowledge pack files live under {@code .claude/knowledge/} and contain generic reference
+     * content (including intentional runtime markers like {@code {{LANGUAGE}}}, {@code
+     * {{CACHE_TYPE}}}, Helm template syntax, Terraform HCL examples). They are consumed as-is by
+     * skills and the AI agent resolves context at runtime — scanning them for unresolved Pebble
+     * placeholders is not meaningful (EPIC-0051 / ADR-0013).
      */
-    private static boolean isKnowledgePack(
-            Path file, Path outputDir) {
-        String rel = SmokeTestValidators
-                .relativizePosix(outputDir, file);
-        return rel.startsWith(".claude/knowledge/")
-                || rel.contains("/.claude/knowledge/");
+    private static boolean isKnowledgePack(Path file, Path outputDir) {
+        String rel = SmokeTestValidators.relativizePosix(outputDir, file);
+        return rel.startsWith(".claude/knowledge/") || rel.contains("/.claude/knowledge/");
     }
 
-    private static boolean isRulesFile(
-            Path file, Path outputDir) {
-        String rel = SmokeTestValidators
-                .relativizePosix(outputDir, file);
-        return rel.contains("/" + RULES_DIR + "/")
-                || rel.startsWith(RULES_DIR + "/");
+    private static boolean isRulesFile(Path file, Path outputDir) {
+        String rel = SmokeTestValidators.relativizePosix(outputDir, file);
+        return rel.contains("/" + RULES_DIR + "/") || rel.startsWith(RULES_DIR + "/");
     }
 
-    private static boolean isSkillDocFile(
-            Path file, Path outputDir) {
-        String rel = SmokeTestValidators
-                .relativizePosix(outputDir, file);
-        return rel.contains("/skills/")
-                && rel.endsWith(".md");
+    private static boolean isSkillDocFile(Path file, Path outputDir) {
+        String rel = SmokeTestValidators.relativizePosix(outputDir, file);
+        return rel.contains("/skills/") && rel.endsWith(".md");
     }
 
-    /**
-     * Collects files by extension from a directory tree.
-     */
+    /** Collects files by extension from a directory tree. */
     static final class FileCollector {
 
-        private FileCollector() {
-        }
+        private FileCollector() {}
 
-        static List<Path> byExtension(
-                Path dir, Set<String> extensions)
-                throws IOException {
+        static List<Path> byExtension(Path dir, Set<String> extensions) throws IOException {
             List<Path> result = new ArrayList<>();
-            Files.walkFileTree(dir,
+            Files.walkFileTree(
+                    dir,
                     new SimpleFileVisitor<>() {
                         @Override
-                        public FileVisitResult visitFile(
-                                Path f,
-                                BasicFileAttributes a) {
-                            String n = f.getFileName()
-                                    .toString()
-                                    .toLowerCase();
+                        public FileVisitResult visitFile(Path f, BasicFileAttributes a) {
+                            String n = f.getFileName().toString().toLowerCase();
                             for (String e : extensions) {
                                 if (n.endsWith(e)) {
                                     result.add(f);
                                     break;
                                 }
                             }
-                            return FileVisitResult
-                                    .CONTINUE;
+                            return FileVisitResult.CONTINUE;
                         }
                     });
             return result;
         }
     }
 
-    /**
-     * Scans files for placeholder patterns.
-     */
+    /** Scans files for placeholder patterns. */
     static final class PlaceholderScanner {
 
-        /**
-         * Skill placeholders resolved at runtime by the
-         * AI agent or CI system.
-         */
-        static final Set<String> ALLOWED = Set.of(
-                "LANGUAGE", "LANGUAGE_VERSION",
-                "LANGUAGE_EXT",
-                "FRAMEWORK", "ARCHITECTURE",
-                "ARCH_STYLE",
-                "PROJECT_NAME", "project_name",
-                "DB_TYPE", "BUILD_FILE", "BUILD_TOOL",
-                "DATABASE_TYPE", "MIGRATION_TOOL",
-                "LANGUAGE_NAME", "FRAMEWORK_NAME",
-                "language_name", "architecture_style",
-                "TDD_COMPLIANCE_TABLE", "TDD_SUMMARY",
-                "language_version",
-                "ORCHESTRATOR", "PORT", "EXT",
-                "BUILD_COMMAND", "TEST_COMMAND",
-                "COMPILE_COMMAND", "COVERAGE_COMMAND",
-                "SMOKE_COMMAND",
-                "COVERAGE_LINE_THRESHOLD",
-                "COVERAGE_BRANCH_THRESHOLD",
-                "GOLDEN_TEST_COMMAND",
-                "GENERATION_COMMAND",
-                "EPIC_ID", "BRANCH", "PLACEHOLDER",
-                "COMMIT_LOG", "PR_LINK",
-                "STARTED_AT", "FINISHED_AT",
-                "STORIES_COMPLETED", "STORIES_FAILED",
-                "STORIES_BLOCKED", "STORIES_TOTAL",
-                "COMPLETION_PERCENTAGE",
-                "PHASE_TIMELINE_TABLE",
-                "STORY_STATUS_TABLE",
-                "FINDINGS_SUMMARY",
-                "UNRESOLVED_ISSUES",
-                "COVERAGE_BEFORE", "COVERAGE_AFTER",
-                "COVERAGE_DELTA",
-                "entity", "EntityName", "name", "item",
-                "author", "dep", "schema", "table_name",
-                "resource_path", "placeholders",
-                "events_per_snapshot",
-                "BUILD_TOOL_CMD",
-                "PR_LINKS_TABLE",
-                "LAST_VERSION", "NEW_VERSION",
-                "LAST_TAG", "NEW_TAG",
-                "NEXT_SNAPSHOT",
-                "RELEASE_PR", "BACKMERGE_PR",
-                "GITHUB_RELEASE_URL",
-                "*_TAG", "*_VERSION",
-                "PLANNING_STATUS",
-                // Template-grammar docs in
-                // x-internal-report-write / story-report
-                "KEY", "key", "field", "id", "title",
-                "status", "newField", "undefined_key",
-                // JSON-payload sample fields documented in
-                // x-internal-report-write / story-report
-                "epicId", "prNumber",
-                // _TEMPLATE-EPIC-EXECUTION-PLAN runtime
-                // fields documented in
-                // x-internal-epic-build-plan
-                "MODE", "PHASE_COUNT", "STORY_COUNT",
-                "PHASES_TABLE", "CRITICAL_PATH",
-                "OVERLAP_MATRIX", "OVERLAP_SEVERITY",
-                "RENDERED_AT",
-                ".", "...");
+        /** Skill placeholders resolved at runtime by the AI agent or CI system. */
+        static final Set<String> ALLOWED =
+                Set.of(
+                        "LANGUAGE",
+                        "LANGUAGE_VERSION",
+                        "LANGUAGE_EXT",
+                        "FRAMEWORK",
+                        "ARCHITECTURE",
+                        "ARCH_STYLE",
+                        "PROJECT_NAME",
+                        "project_name",
+                        "DB_TYPE",
+                        "BUILD_FILE",
+                        "BUILD_TOOL",
+                        "DATABASE_TYPE",
+                        "MIGRATION_TOOL",
+                        "LANGUAGE_NAME",
+                        "FRAMEWORK_NAME",
+                        "language_name",
+                        "architecture_style",
+                        "TDD_COMPLIANCE_TABLE",
+                        "TDD_SUMMARY",
+                        "language_version",
+                        "ORCHESTRATOR",
+                        "PORT",
+                        "EXT",
+                        "BUILD_COMMAND",
+                        "TEST_COMMAND",
+                        "COMPILE_COMMAND",
+                        "COVERAGE_COMMAND",
+                        "SMOKE_COMMAND",
+                        "COVERAGE_LINE_THRESHOLD",
+                        "COVERAGE_BRANCH_THRESHOLD",
+                        "GOLDEN_TEST_COMMAND",
+                        "GENERATION_COMMAND",
+                        "EPIC_ID",
+                        "BRANCH",
+                        "PLACEHOLDER",
+                        "COMMIT_LOG",
+                        "PR_LINK",
+                        "STARTED_AT",
+                        "FINISHED_AT",
+                        "STORIES_COMPLETED",
+                        "STORIES_FAILED",
+                        "STORIES_BLOCKED",
+                        "STORIES_TOTAL",
+                        "COMPLETION_PERCENTAGE",
+                        "PHASE_TIMELINE_TABLE",
+                        "STORY_STATUS_TABLE",
+                        "FINDINGS_SUMMARY",
+                        "UNRESOLVED_ISSUES",
+                        "COVERAGE_BEFORE",
+                        "COVERAGE_AFTER",
+                        "COVERAGE_DELTA",
+                        "entity",
+                        "EntityName",
+                        "name",
+                        "item",
+                        "author",
+                        "dep",
+                        "schema",
+                        "table_name",
+                        "resource_path",
+                        "placeholders",
+                        "events_per_snapshot",
+                        "BUILD_TOOL_CMD",
+                        "PR_LINKS_TABLE",
+                        "LAST_VERSION",
+                        "NEW_VERSION",
+                        "LAST_TAG",
+                        "NEW_TAG",
+                        "NEXT_SNAPSHOT",
+                        "RELEASE_PR",
+                        "BACKMERGE_PR",
+                        "GITHUB_RELEASE_URL",
+                        "*_TAG",
+                        "*_VERSION",
+                        "PLANNING_STATUS",
+                        // Template-grammar docs in
+                        // x-internal-report-write / story-report
+                        "KEY",
+                        "key",
+                        "field",
+                        "id",
+                        "title",
+                        "status",
+                        "newField",
+                        "undefined_key",
+                        // JSON-payload sample fields documented in
+                        // x-internal-report-write / story-report
+                        "epicId",
+                        "prNumber",
+                        // _TEMPLATE-EPIC-EXECUTION-PLAN runtime
+                        // fields documented in
+                        // x-internal-epic-build-plan
+                        "MODE",
+                        "PHASE_COUNT",
+                        "STORY_COUNT",
+                        "PHASES_TABLE",
+                        "CRITICAL_PATH",
+                        "OVERLAP_MATRIX",
+                        "OVERLAP_SEVERITY",
+                        "RENDERED_AT",
+                        // EPIC-0064 Composer didactic tokens — appear literal
+                        // in rule examples (`{{ fragment-id }}`,
+                        // `{{ description }}`) showing future Composer syntax;
+                        // pipeline never substitutes them (single-curly
+                        // regex only). Same pattern as `{{LANGUAGE}}` in
+                        // Rule 03 (resolved at runtime by the LLM): literal
+                        // by design, catalogued here for the smoke test.
+                        "fragment-id",
+                        "description",
+                        ".",
+                        "...");
 
-        private static final Pattern PEBBLE =
-                Pattern.compile(
-                        "\\{\\{\\s*([^}]+?)\\s*\\}\\}");
+        private static final Pattern PEBBLE = Pattern.compile("\\{\\{\\s*([^}]+?)\\s*\\}\\}");
 
         private static final List<Pattern> CI_PATS =
                 List.of(
-                        Pattern.compile(
-                                "github\\.[a-z_.]+"),
-                        Pattern.compile(
-                                "matrix\\.[a-z_.]+"),
-                        Pattern.compile(
-                                "secrets\\.[A-Z_]+"),
-                        Pattern.compile(
-                                "vars\\.[A-Z_a-z]+"),
-                        Pattern.compile(
-                                "env\\.[A-Z_a-z]+"),
-                        Pattern.compile(
-                                "runner\\.[a-z_]+"),
-                        Pattern.compile(
-                                "steps\\.[a-z_-]+"
-                                        + "\\.outputs"
-                                        + "\\.[a-z_]+"),
-                        Pattern.compile(
-                                "needs\\.[a-z_-]+"
-                                        + "\\.outputs"
-                                        + "\\.[a-z_]+"),
-                        Pattern.compile(
-                                "\\$labels\\.[a-z_]+"),
+                        Pattern.compile("github\\.[a-z_.]+"),
+                        Pattern.compile("matrix\\.[a-z_.]+"),
+                        Pattern.compile("secrets\\.[A-Z_]+"),
+                        Pattern.compile("vars\\.[A-Z_a-z]+"),
+                        Pattern.compile("env\\.[A-Z_a-z]+"),
+                        Pattern.compile("runner\\.[a-z_]+"),
+                        Pattern.compile("steps\\.[a-z_-]+" + "\\.outputs" + "\\.[a-z_]+"),
+                        Pattern.compile("needs\\.[a-z_-]+" + "\\.outputs" + "\\.[a-z_]+"),
+                        Pattern.compile("\\$labels\\.[a-z_]+"),
                         Pattern.compile("\\$value"),
-                        Pattern.compile(
-                                "fromJson\\(.*\\)"),
-                        Pattern.compile(
-                                "hashFiles\\(.*\\)"),
-                        Pattern.compile(
-                                ".*\\|\\s*default"
-                                        + "\\(.*\\)"),
+                        Pattern.compile("fromJson\\(.*\\)"),
+                        Pattern.compile("hashFiles\\(.*\\)"),
+                        Pattern.compile(".*\\|\\s*default" + "\\(.*\\)"),
                         // Handlebars/Pebble control flow
                         // documented in internal template
                         // skills (x-internal-report-write,
                         // x-internal-story-report)
-                        Pattern.compile(
-                                "#each(\\s+.*)?"),
+                        Pattern.compile("#each(\\s+.*)?"),
                         Pattern.compile("/each"),
                         // Meta-syntax placeholders used in
                         // the template-grammar docs
@@ -486,9 +421,14 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
                         // lookups (e.g. {{a.b.c}},
                         // {{stories.0.id}},
                         // {{stories.story-0049-0001.status}})
-                        Pattern.compile(
-                                "[A-Za-z_][A-Za-z0-9_-]*"
-                                        + "(\\.[A-Za-z0-9_-]+)+"));
+                        Pattern.compile("[A-Za-z_][A-Za-z0-9_-]*" + "(\\.[A-Za-z0-9_-]+)+"),
+                        // EPIC-0064 Composer slot syntax (e.g.
+                        // {{ slot: X }}, {{ slot: data-migration }})
+                        // documented in Rule 28 §Examples (b)/(c). Pipeline
+                        // never substitutes (single-curly only); future
+                        // CompositionEngine resolves only outside markdown
+                        // code blocks — examples remain literal by design.
+                        Pattern.compile("slot:\\s*[A-Za-z][A-Za-z0-9_-]*"));
 
         private static final Pattern DATA =
                 Pattern.compile(
@@ -517,57 +457,35 @@ class ContentIntegritySmokeTest extends SmokeTestBase {
                                 + "|GLOSSARY"
                                 + ")\\}(?!\\})");
 
-        private PlaceholderScanner() {
-        }
+        private PlaceholderScanner() {}
 
-        static void scanPebble(
-                Path file, Path outputDir,
-                List<String> violations)
+        static void scanPebble(Path file, Path outputDir, List<String> violations)
                 throws IOException {
-            String content = Files.readString(
-                    file, StandardCharsets.UTF_8);
-            String rel = SmokeTestValidators
-                    .relativizePosix(outputDir, file);
+            String content = Files.readString(file, StandardCharsets.UTF_8);
+            String rel = SmokeTestValidators.relativizePosix(outputDir, file);
 
-            List<String> lines =
-                    content.lines().toList();
+            List<String> lines = content.lines().toList();
             for (int i = 0; i < lines.size(); i++) {
                 Matcher m = PEBBLE.matcher(lines.get(i));
                 while (m.find()) {
                     String inner = m.group(1).trim();
                     if (!isAllowed(inner)) {
-                        violations.add(
-                                "  %s:%d -- %s"
-                                        .formatted(
-                                                rel,
-                                                i + 1,
-                                                m.group()
-                                        ));
+                        violations.add("  %s:%d -- %s".formatted(rel, i + 1, m.group()));
                     }
                 }
             }
         }
 
-        static void scanData(
-                Path file, Path outputDir,
-                List<String> violations)
+        static void scanData(Path file, Path outputDir, List<String> violations)
                 throws IOException {
-            String content = Files.readString(
-                    file, StandardCharsets.UTF_8);
-            String rel = SmokeTestValidators
-                    .relativizePosix(outputDir, file);
+            String content = Files.readString(file, StandardCharsets.UTF_8);
+            String rel = SmokeTestValidators.relativizePosix(outputDir, file);
 
-            List<String> lines =
-                    content.lines().toList();
+            List<String> lines = content.lines().toList();
             for (int i = 0; i < lines.size(); i++) {
                 Matcher m = DATA.matcher(lines.get(i));
                 while (m.find()) {
-                    violations.add(
-                            "  %s:%d -- %s"
-                                    .formatted(
-                                            rel,
-                                            i + 1,
-                                            m.group()));
+                    violations.add("  %s:%d -- %s".formatted(rel, i + 1, m.group()));
                 }
             }
         }

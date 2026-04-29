@@ -40,6 +40,10 @@ case "${1:-install}" in
         echo "OK — core.hooksPath set to .githooks"
         echo "    pre-push hook installed."
         echo "    Bypass for a single push: CLAUDE_SMOKE_DISABLED=1 git push"
+        echo "    commit-msg hook installed (Guard 1: story-0059-0004 surface F)."
+        echo "    Bypass Guard 1 for a single commit: CLAUDE_EXECUTION_STATE_HOOK_DISABLED=1 git commit"
+        echo "    commit-msg hook Guard 2 installed (story-0059-0005 surface D — feat/task-* branches)."
+        echo "    Bypass Guard 2 (recovery only): CLAUDE_TASK_BRANCH_HOOK_DISABLED=1 git commit"
         ;;
     --status)
         current=$(git config --get core.hooksPath || echo "<default>")

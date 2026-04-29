@@ -6,6 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, AskUserQuestion
 argument-hint: "--epic XXXX | --story story-XXXX-YYYY [--apply] [--non-interactive] [--dry-run]"
 category: ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -18,7 +19,7 @@ context-budget: light
 
 ## Purpose
 
-Reconcile drift between `plans/epic-XXXX/execution-state.json`
+Reconcile drift between `ai/epics/epic-XXXX/execution-state.json`
 (telemetry, per RULE-046-07) and the canonical `**Status:**`
 field of Epic / Story markdown artifacts (source of truth, per
 Rule 22 — Lifecycle Integrity).
@@ -64,7 +65,7 @@ audit commit.
 ### Phase 0 — Parse args + locate epic dir
 
 1. Extract epic id from `--epic XXXX` or parse story id from `--story`.
-2. Resolve `plans/epic-XXXX/execution-state.json`.
+2. Resolve `ai/epics/epic-XXXX/execution-state.json`.
 3. If the file is absent → exit 30 with stderr explanation.
 
 ### Phase 1 — Rule 19 check
@@ -151,7 +152,7 @@ preceding is human-readable diagnostics.
 ## Invariants
 
 - NEVER writes `execution-state.json` (RULE-046-07).
-- NEVER modifies files outside `plans/epic-XXXX/` (path
+- NEVER modifies files outside `ai/epics/epic-XXXX/` (path
   canonicalization; no traversal).
 - Every markdown write goes through `StatusFieldParser`
   (atomic temp-file + rename, per Rule 22).

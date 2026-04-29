@@ -1,0 +1,14 @@
+path,stack,content_identified,recommendation
+knowledge/stack-patterns/spring-patterns/index.md,spring,"@SpringBootApplication @Service @ConfigurationProperties Spring DI Health checks",move-to-subdir
+knowledge/stack-patterns/quarkus-patterns/index.md,quarkus,"@ApplicationScoped @ConfigMapping Panache CDI @Inject RESTEasy",move-to-subdir
+knowledge/database-patterns/connection-pool-tuning.md,spring+quarkus+helidon,"HikariCP Agroal Helidon dbclient",fragment
+knowledge/database-patterns/index.md,spring,"JPA Spring Data annotations",fragment
+knowledge/layer-templates.md,spring+quarkus,"@RestController @Inject CDI",fragment
+rules/conditional/anti-patterns/10-anti-patterns.java-spring-boot.md,spring,Spring Boot anti-patterns,keep-conditional
+rules/conditional/anti-patterns/10-anti-patterns.java-quarkus.md,quarkus,Quarkus anti-patterns,keep-conditional
+agents/core/performance-engineer.md,quarkus,@ApplicationScoped CDI reference,fragment
+agents/developers/java-developer.md,quarkus,CDI patterns,fragment
+knowledge/architecture-hexagonal.md,quarkus,CDI example,keep-universal
+skills/conditional/test/x-test-e2e/SKILL.md,spring+quarkus,"@SpringBootTest @QuarkusTest",keep-conditional
+skills/core/dev/x-ci-generate/SKILL.md,spring+quarkus,Framework CI config,fragment
+skills/core/dev/x-story-implement/references/openapi-generator.md,spring+quarkus,OpenAPI generator config,fragment

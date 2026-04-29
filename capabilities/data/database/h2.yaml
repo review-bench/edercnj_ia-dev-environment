@@ -1,0 +1,11 @@
+id: data.database.h2
+category: data
+kind: atomic
+version: "2"
+status: stable
+description: H2 in-memory database — testing and development only
+tags:
+  - database
+  - sql
+  - in-memory
+  - testing

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0",
+  "flowVersion": "4",
+  "epicId": "EPIC-0076",
+  "epicTitle": "Verb-First Skill Naming Refactor",
+  "epicBranch": "epic/0076",
+  "createdAt": "2026-04-28T00:00:00Z",
+  "lastRefinementAt": "2026-04-29T00:00:00Z",
+  "status": "Backlog",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0076-0001": { "status": "Pendente", "phase": "Phase 0", "wave": "A", "size": "S", "predecessors": [] },
+    "story-0076-0002": { "status": "Pendente", "phase": "Phase 1", "wave": "B", "size": "M", "predecessors": ["story-0076-0001"] },
+    "story-0076-0003": { "status": "Pendente", "phase": "Phase 2", "wave": "C", "size": "L", "predecessors": ["story-0076-0002"] },
+    "story-0076-0004": { "status": "Pendente", "phase": "Phase 2", "wave": "C", "size": "L", "predecessors": ["story-0076-0002"] },
+    "story-0076-0005": { "status": "Pendente", "phase": "Phase 2", "wave": "C", "size": "M", "predecessors": ["story-0076-0002"] },
+    "story-0076-0006": { "status": "Pendente", "phase": "Phase 3", "wave": "D", "size": "L", "predecessors": ["story-0076-0003", "story-0076-0004", "story-0076-0005"] },
+    "story-0076-0007": { "status": "Pendente", "phase": "Phase 4", "wave": "E", "size": "M", "predecessors": ["story-0076-0006"] }
+  },
+  "phaseSummary": {
+    "Phase 0": { "totalStories": 1, "pendente": 1, "materialized": 1 },
+    "Phase 1": { "totalStories": 1, "pendente": 1, "materialized": 1 },
+    "Phase 2": { "totalStories": 3, "pendente": 3, "materialized": 3 },
+    "Phase 3": { "totalStories": 1, "pendente": 1, "materialized": 1 },
+    "Phase 4": { "totalStories": 1, "pendente": 1, "materialized": 1 }
+  },
+  "totalStories": 7,
+  "totalWaves": 5,
+  "criticalPath": ["A", "B", "C", "D", "E"],
+  "externalDependencies": {
+    "EPIC-0064": { "status": "Concluída", "blocking": "Baseline atual de composição capability-driven" },
+    "EPIC-0065": { "status": "Pendente", "blocking": "Baseline futura da creation chain" },
+    "EPIC-0066": { "status": "Backlog", "blocking": "Surface de PR body render" },
+    "EPIC-0069": { "status": "Backlog", "blocking": "Skills de refinement" },
+    "EPIC-0072": { "status": "Backlog", "blocking": "Expansão do catálogo de testes" },
+    "EPIC-0073": { "status": "Backlog", "blocking": "Expansão do catálogo de regressão" },
+    "EPIC-0075": { "status": "Backlog", "blocking": "Memory/search internals" }
+  },
+  "documents": {
+    "spec": "docs/specs/SPEC-verb-first-skill-naming-v1.md",
+    "epic": "ai/epics/epic-0076-verb-first-skill-naming-refactor/epic-0076.md",
+    "implementationMap": "ai/epics/epic-0076-verb-first-skill-naming-refactor/IMPLEMENTATION-MAP.md"
+  }
+}

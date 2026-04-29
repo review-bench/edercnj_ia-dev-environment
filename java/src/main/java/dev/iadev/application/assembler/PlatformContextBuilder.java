@@ -1,24 +1,19 @@
 package dev.iadev.application.assembler;
 
 import dev.iadev.domain.model.Platform;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Computes platform-aware template variables from the
- * active platform set.
+ * Computes platform-aware template variables from the active platform set.
  *
- * <p>Produces boolean flags ({@code hasClaude},
- * {@code isMultiPlatform}) and a {@code platforms} list
- * with CLI-friendly names for use in README/CLAUDE.md
- * template rendering.</p>
+ * <p>Produces boolean flags ({@code hasClaude}, {@code isMultiPlatform}) and a {@code platforms}
+ * list with CLI-friendly names for use in README/CLAUDE.md template rendering.
  *
- * <p>When the platform set is empty or contains all
- * user-selectable platforms, all flags are true and the
- * platforms list contains all CLI names (RULE-001).</p>
+ * <p>When the platform set is empty or contains all user-selectable platforms, all flags are true
+ * and the platforms list contains all CLI names (RULE-001).
  *
  * @see Platform
  * @see ReadmeAssembler
@@ -32,23 +27,16 @@ public final class PlatformContextBuilder {
     }
 
     /**
-     * Builds platform flags and platforms list from the
-     * active platform set.
+     * Builds platform flags and platforms list from the active platform set.
      *
-     * @param platforms the active platforms; empty or all
-     *     user-selectable means "all platforms"
-     * @return an ordered map with hasClaude,
-     *     isMultiPlatform, and platforms
+     * @param platforms the active platforms; empty or all user-selectable means "all platforms"
+     * @return an ordered map with hasClaude, isMultiPlatform, and platforms
      */
-    public static Map<String, Object> buildPlatformFlags(
-            Set<Platform> platforms) {
-        Set<Platform> effective =
-                resolveEffective(platforms);
-        Map<String, Object> flags =
-                new LinkedHashMap<>(FLAGS_MAP_CAPACITY);
+    public static Map<String, Object> buildPlatformFlags(Set<Platform> platforms) {
+        Set<Platform> effective = resolveEffective(platforms);
+        Map<String, Object> flags = new LinkedHashMap<>(FLAGS_MAP_CAPACITY);
 
-        boolean claude = effective.contains(
-                Platform.CLAUDE_CODE);
+        boolean claude = effective.contains(Platform.CLAUDE_CODE);
 
         flags.put("hasClaude", claude);
 
@@ -61,18 +49,14 @@ public final class PlatformContextBuilder {
         return flags;
     }
 
-    private static Set<Platform> resolveEffective(
-            Set<Platform> platforms) {
-        if (platforms.isEmpty()
-                || platforms.containsAll(
-                        Platform.allUserSelectable())) {
+    private static Set<Platform> resolveEffective(Set<Platform> platforms) {
+        if (platforms.isEmpty() || platforms.containsAll(Platform.allUserSelectable())) {
             return Platform.allUserSelectable();
         }
         return platforms;
     }
 
-    private static int countActive(
-            boolean claude) {
+    private static int countActive(boolean claude) {
         int count = 0;
         if (claude) {
             count++;
@@ -80,8 +64,7 @@ public final class PlatformContextBuilder {
         return count;
     }
 
-    private static List<String> buildCliNames(
-            Set<Platform> effective) {
+    private static List<String> buildCliNames(Set<Platform> effective) {
         return effective.stream()
                 .filter(p -> p != Platform.SHARED)
                 .map(Platform::cliName)

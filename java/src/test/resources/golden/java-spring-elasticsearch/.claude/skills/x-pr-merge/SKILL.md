@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Write
 argument-hint: "--pr N [--strategy merge|squash|rebase] [--delete-branch true|false] [--auto] [--wait-timeout-min N]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

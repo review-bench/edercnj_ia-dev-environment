@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 argument-hint: "[--level L1|L2|L3] [--category A01-A10|all] [--report-format markdown|sarif|both]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

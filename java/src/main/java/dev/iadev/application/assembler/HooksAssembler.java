@@ -1,9 +1,8 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.domain.stack.StackMapping;
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.domain.stack.StackMapping;
 import dev.iadev.template.TemplateEngine;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -14,30 +13,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Assembles {@code .claude/hooks/} with post-compile hook
- * scripts for compiled languages.
+ * Assembles {@code .claude/hooks/} with post-compile hook scripts for compiled languages.
  *
- * <p>This is the sixth assembler in the pipeline (position 6
- * of 23 per RULE-005). It copies pre-written hook scripts
- * from the {@code targets/claude/hooks/{key}/} resources directory
- * to the output {@code hooks/} directory.</p>
+ * <p>This is the sixth assembler in the pipeline (position 6 of 23 per RULE-005). It copies
+ * pre-written hook scripts from the {@code targets/claude/hooks/{key}/} resources directory to the
+ * output {@code hooks/} directory.
  *
- * <p>Hook scripts are copied verbatim from templates — no
- * placeholder replacement is performed. The {@code engine}
- * parameter is accepted for API uniformity but is not used.
- * After copying, the script is marked as executable.</p>
+ * <p>Hook scripts are copied verbatim from templates — no placeholder replacement is performed. The
+ * {@code engine} parameter is accepted for API uniformity but is not used. After copying, the
+ * script is marked as executable.
  *
- * <p>The hook template key is resolved via
- * {@link StackMapping#getHookTemplateKey}. If the key is
- * empty (e.g., for Python), no hook is generated.</p>
+ * <p>The hook template key is resolved via {@link StackMapping#getHookTemplateKey}. If the key is
+ * empty (e.g., for Python), no hook is generated.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * Assembler hooks = new HooksAssembler();
  * List<String> files = hooks.assemble(
  *     config, engine, outputDir);
  * }</pre>
- * </p>
  *
  * @see Assembler
  * @see StackMapping#getHookTemplateKey
@@ -45,52 +40,53 @@ import java.util.Set;
 public final class HooksAssembler implements Assembler {
 
     private static final String HOOKS_DIR = "hooks";
-    private static final String HOOK_FILENAME =
-            "post-compile-check.sh";
-    private static final String HOOKS_TEMPLATES_DIR =
-            "targets/claude/hooks";
+    private static final String HOOK_FILENAME = "post-compile-check.sh";
+    private static final String HOOKS_TEMPLATES_DIR = "targets/claude/hooks";
 
     /**
-     * Telemetry scripts copied when
-     * {@link ProjectConfig#telemetryEnabled()} is {@code true}
-     * (story-0040-0004). Sourced from
-     * {@code targets/claude/hooks/telemetry-*.sh}.
+     * Telemetry scripts copied when {@link ProjectConfig#telemetryEnabled()} is {@code true}
+     * (story-0040-0004). Sourced from {@code targets/claude/hooks/telemetry-*.sh}.
      */
-    public static final List<String> TELEMETRY_SCRIPTS = List.of(
-            "telemetry-emit.sh",
-            "telemetry-lib.sh",
-            "telemetry-phase.sh",
-            "telemetry-session.sh",
-            "telemetry-pretool.sh",
-            "telemetry-posttool.sh",
-            "telemetry-subagent.sh",
-            "telemetry-stop.sh",
-            "verify-story-completion.sh");
+    public static final List<String> TELEMETRY_SCRIPTS =
+            List.of(
+                    "telemetry-emit.sh",
+                    "telemetry-lib.sh",
+                    "telemetry-phase.sh",
+                    "telemetry-session.sh",
+                    "telemetry-pretool.sh",
+                    "telemetry-posttool.sh",
+                    "telemetry-subagent.sh",
+                    "telemetry-stop.sh",
+                    "session-start.sh",
+                    "verify-story-completion.sh",
+                    "stage-telemetry.sh");
 
     /**
-     * Rule 25 enforcement hooks — always copied, independent of
-     * telemetry. {@code verify-phase-gates.sh} is the Stop-event
-     * Layer-2 enforcement; {@code enforce-phase-sequence.sh} is
-     * the PreToolUse Layer-3 enforcement. Decoupled from the
-     * telemetry toggle because Rule 25 classifies them as runtime
-     * enforcement (not observability).
+     * Rule 25 enforcement hooks — always copied, independent of telemetry. {@code
+     * verify-phase-gates.sh} is the Stop-event Layer-2 enforcement; {@code
+     * enforce-phase-sequence.sh} is the PreToolUse Layer-3 enforcement. Decoupled from the
+     * telemetry toggle because Rule 25 classifies them as runtime enforcement (not observability).
      */
-    public static final List<String> RULE_25_SCRIPTS = List.of(
-            "verify-phase-gates.sh",
-            "enforce-phase-sequence.sh");
+    public static final List<String> RULE_25_SCRIPTS =
+            List.of("verify-phase-gates.sh", "enforce-phase-sequence.sh");
+
+    /**
+     * Rule 59 enforcement hook — always copied, independent of telemetry. {@code
+     * enforce-no-bypass-flags.sh} is the PreToolUse Layer enforcement that blocks {@code --skip-*}
+     * flags on orchestrator skills outside of recovery mode. Story-0059-0003: EPIC-0059 Zero-Bypass
+     * Lifecycle Enforcement.
+     */
+    public static final List<String> RULE_59_SCRIPTS = List.of("enforce-no-bypass-flags.sh");
 
     private final Path resourcesDir;
 
-    /**
-     * Creates a HooksAssembler using classpath resources.
-     */
+    /** Creates a HooksAssembler using classpath resources. */
     public HooksAssembler() {
         this(resolveClasspathResources());
     }
 
     /**
-     * Creates a HooksAssembler with an explicit resources
-     * directory.
+     * Creates a HooksAssembler with an explicit resources directory.
      *
      * @param resourcesDir the base resources directory
      */
@@ -101,93 +97,72 @@ public final class HooksAssembler implements Assembler {
     /**
      * {@inheritDoc}
      *
-     * <p>Copies the post-compile hook script for the project's
-     * language/build-tool combination. Returns an empty list if
-     * no hook template exists for the stack.</p>
+     * <p>Copies the post-compile hook script for the project's language/build-tool combination.
+     * Returns an empty list if no hook template exists for the stack.
      */
     @Override
-    public List<String> assemble(
-            ProjectConfig config,
-            TemplateEngine engine,
-            Path outputDir) {
+    public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {
         List<String> written = new java.util.ArrayList<>();
-        written.addAll(copyPostCompileHook(
-                config, outputDir));
+        written.addAll(copyPostCompileHook(config, outputDir));
         if (config.telemetryEnabled()) {
-            written.addAll(copyScriptList(
-                    outputDir, TELEMETRY_SCRIPTS,
-                    "telemetry"));
+            written.addAll(copyScriptList(outputDir, TELEMETRY_SCRIPTS, "telemetry"));
         }
         // Rule 25 hooks are always copied — decoupled from
         // telemetry so disabling observability cannot silently
         // disable runtime enforcement.
-        written.addAll(copyScriptList(
-                outputDir, RULE_25_SCRIPTS, "rule-25"));
+        written.addAll(copyScriptList(outputDir, RULE_25_SCRIPTS, "rule-25"));
+        // Rule 59 hooks are always copied — bypass-flag
+        // enforcement is runtime enforcement, not observability.
+        written.addAll(copyScriptList(outputDir, RULE_59_SCRIPTS, "rule-59"));
         return List.copyOf(written);
     }
 
-    private List<String> copyPostCompileHook(
-            ProjectConfig config, Path outputDir) {
-        String key = StackMapping.getHookTemplateKey(
-                config.language().name(),
-                config.framework().buildTool());
+    private List<String> copyPostCompileHook(ProjectConfig config, Path outputDir) {
+        String key =
+                StackMapping.getHookTemplateKey(
+                        config.language().name(), config.framework().buildTool());
         if (key.isEmpty()) {
             return List.of();
         }
-        Path hookSrc = resourcesDir.resolve(
-                HOOKS_TEMPLATES_DIR + "/" + key + "/"
-                        + HOOK_FILENAME);
+        Path hookSrc = resourcesDir.resolve(HOOKS_TEMPLATES_DIR + "/" + key + "/" + HOOK_FILENAME);
         if (!Files.exists(hookSrc)) {
             return List.of();
         }
         return copyHook(hookSrc, outputDir);
     }
 
-    private List<String> copyScriptList(
-            Path outputDir,
-            List<String> scripts,
-            String kind) {
+    private List<String> copyScriptList(Path outputDir, List<String> scripts, String kind) {
         Path hooksDir = outputDir.resolve(HOOKS_DIR);
         CopyHelpers.ensureDirectory(hooksDir);
         List<String> copied = new java.util.ArrayList<>();
         for (String name : scripts) {
-            Path src = resourcesDir.resolve(
-                    HOOKS_TEMPLATES_DIR + "/" + name);
+            Path src = resourcesDir.resolve(HOOKS_TEMPLATES_DIR + "/" + name);
             if (!Files.exists(src)) {
                 throw new UncheckedIOException(
-                        new IOException(
-                                kind + " hook source not"
-                                        + " found: " + src));
+                        new IOException(kind + " hook source not" + " found: " + src));
             }
             Path dest = hooksDir.resolve(name);
             try {
-                Files.copy(src, dest,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
                 makeExecutable(dest);
             } catch (IOException e) {
                 throw new UncheckedIOException(
-                        ("Failed to copy " + kind
-                                + " hook: %s")
-                                .formatted(src), e);
+                        ("Failed to copy " + kind + " hook: %s").formatted(src), e);
             }
             copied.add(dest.toString());
         }
         return copied;
     }
 
-    private List<String> copyHook(
-            Path hookSrc, Path outputDir) {
+    private List<String> copyHook(Path hookSrc, Path outputDir) {
         Path hooksDir = outputDir.resolve(HOOKS_DIR);
         CopyHelpers.ensureDirectory(hooksDir);
         Path dest = hooksDir.resolve(HOOK_FILENAME);
         try {
-            Files.copy(hookSrc, dest,
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(hookSrc, dest, StandardCopyOption.REPLACE_EXISTING);
             makeExecutable(dest);
         } catch (IOException e) {
-            throw new UncheckedIOException(
-                    "Failed to copy hook script: %s"
-                            .formatted(hookSrc), e);
+            throw new UncheckedIOException("Failed to copy hook script: %s".formatted(hookSrc), e);
         }
         return List.of(dest.toString());
     }
@@ -195,17 +170,14 @@ public final class HooksAssembler implements Assembler {
     /**
      * Sets the executable permission on the given file.
      *
-     * <p>On POSIX systems, adds owner/group/others execute
-     * permissions. On non-POSIX systems (e.g., Windows),
-     * this is a no-op since POSIX permissions are not
-     * supported.</p>
+     * <p>On POSIX systems, adds owner/group/others execute permissions. On non-POSIX systems (e.g.,
+     * Windows), this is a no-op since POSIX permissions are not supported.
      *
      * @param file the file to make executable
      */
     static void makeExecutable(Path file) {
         try {
-            Set<PosixFilePermission> perms =
-                    Files.getPosixFilePermissions(file);
+            Set<PosixFilePermission> perms = Files.getPosixFilePermissions(file);
             perms.add(PosixFilePermission.OWNER_EXECUTE);
             perms.add(PosixFilePermission.GROUP_EXECUTE);
             perms.add(PosixFilePermission.OTHERS_EXECUTE);
@@ -214,14 +186,11 @@ public final class HooksAssembler implements Assembler {
             // Non-POSIX filesystem (e.g., Windows)
         } catch (IOException e) {
             throw new UncheckedIOException(
-                    "Failed to set executable permission: %s"
-                            .formatted(file), e);
+                    "Failed to set executable permission: %s".formatted(file), e);
         }
     }
 
     private static Path resolveClasspathResources() {
-        return dev.iadev.util.ResourceResolver
-                .resolveResourceDir("shared")
-                .getParent();
+        return dev.iadev.util.ResourceResolver.resolveResourceDir("shared").getParent();
     }
 }

@@ -1,0 +1,17 @@
+{
+  "storyId": "story-0061-0004",
+  "epicId": "EPIC-0061",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "failures": [],
+  "acCheckResults": [
+    { "scenario": "ModelSelectionAuditor detecta SKILL.md sem model:", "status": "PASS", "evidence": "WaveAAuditorsTest.invalidSkillMissingModel_returnsViolation" },
+    { "scenario": "SkillVisibilityAuditor valida x-internal-* tem visibility:internal", "status": "PASS", "evidence": "WaveAAuditorsTest.internalSkillMissingVisibility_returnsViolation" },
+    { "scenario": "BypassFlagsAuditor permite flags em ## Recovery", "status": "PASS", "evidence": "WaveAAuditorsTest.bypassFlagInRecovery_returnsOk" },
+    { "scenario": "ExecutionIntegrityAuditor detecta artefato faltante", "status": "PASS", "evidence": "WaveBRuntimeAuditorsTest.completedStoryMissingReport_returnsViolation" },
+    { "scenario": "AuditEquivalenceSmokeIT verde para todos os audits", "status": "PASS", "evidence": "AuditEquivalenceSmokeIT — 32 tests all green" }
+  ],
+  "testSummary": "75 tests total: 7 AuditCorpusTest + 21 WaveAAuditorsTest + 15 WaveBRuntimeAuditorsTest + 32 AuditEquivalenceSmokeIT",
+  "timestamp": "2026-04-28T00:00:00Z"
+}

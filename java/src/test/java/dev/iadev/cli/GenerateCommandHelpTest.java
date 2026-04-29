@@ -1,26 +1,21 @@
 package dev.iadev.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Tests for GenerateCommand — help, options,
- * mutual exclusivity, no input, config not found.
- */
+/** Tests for GenerateCommand — help, options, mutual exclusivity, no input, config not found. */
 @DisplayName("GenerateCommand — help + validation")
 class GenerateCommandHelpTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Nested
     @DisplayName("Help and Options")
@@ -32,8 +27,7 @@ class GenerateCommandHelpTest {
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "--help");
+            int exitCode = cmd.execute("generate", "--help");
 
             assertThat(exitCode).isZero();
             assertThat(sw.toString()).contains("generate");
@@ -46,8 +40,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-c", "--config");
+            assertThat(sw.toString()).contains("-c", "--config");
         }
 
         @Test
@@ -57,8 +50,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-i", "--interactive");
+            assertThat(sw.toString()).contains("-i", "--interactive");
         }
 
         @Test
@@ -68,8 +60,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-o", "--output");
+            assertThat(sw.toString()).contains("-o", "--output");
         }
 
         @Test
@@ -79,8 +70,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-s", "--stack");
+            assertThat(sw.toString()).contains("-s", "--stack");
         }
 
         @Test
@@ -90,8 +80,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-v", "--verbose");
+            assertThat(sw.toString()).contains("-v", "--verbose");
         }
 
         @Test
@@ -111,8 +100,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("-f", "--force");
+            assertThat(sw.toString()).contains("-f", "--force");
         }
     }
 
@@ -126,9 +114,7 @@ class GenerateCommandHelpTest {
             var errSw = new StringWriter();
             cmd.setErr(new PrintWriter(errSw));
 
-            int exitCode = cmd.execute(
-                    "generate", "--config", "x.yaml",
-                    "--interactive");
+            int exitCode = cmd.execute("generate", "--config", "x.yaml", "--interactive");
 
             assertThat(exitCode).isNotZero();
         }
@@ -141,14 +127,10 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.setErr(new PrintWriter(errSw));
 
-            cmd.execute("generate", "--config", "x.yaml",
-                    "--interactive");
+            cmd.execute("generate", "--config", "x.yaml", "--interactive");
 
-            String combined =
-                    sw.toString() + errSw.toString();
-            assertThat(combined)
-                    .containsIgnoringCase(
-                            "mutually exclusive");
+            String combined = sw.toString() + errSw.toString();
+            assertThat(combined).containsIgnoringCase("mutually exclusive");
         }
     }
 
@@ -164,8 +146,7 @@ class GenerateCommandHelpTest {
 
             int exitCode = cmd.execute("generate");
 
-            assertThat(exitCode).isEqualTo(
-                    GenerateCommand.EXIT_VALIDATION);
+            assertThat(exitCode).isEqualTo(GenerateCommand.EXIT_VALIDATION);
         }
 
         @Test
@@ -175,9 +156,7 @@ class GenerateCommandHelpTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.execute("generate");
 
-            assertThat(sw.toString())
-                    .contains("--config", "--interactive",
-                            "--stack");
+            assertThat(sw.toString()).contains("--config", "--interactive", "--stack");
         }
     }
 
@@ -191,9 +170,7 @@ class GenerateCommandHelpTest {
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-c",
-                    "/nonexistent/config.yaml");
+            int exitCode = cmd.execute("generate", "-c", "/nonexistent/config.yaml");
 
             assertThat(exitCode).isNotZero();
         }
@@ -204,9 +181,7 @@ class GenerateCommandHelpTest {
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            cmd.execute(
-                    "generate", "-c",
-                    "/nonexistent/config.yaml");
+            cmd.execute("generate", "-c", "/nonexistent/config.yaml");
 
             assertThat(sw.toString()).contains("Error:");
         }

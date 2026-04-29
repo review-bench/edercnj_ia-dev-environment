@@ -41,7 +41,7 @@ No positional argument, no `--version` flag → **auto-detect mode**
 [0.1] gh CLI: OK (2.45.0)
 [0.1] jq:    OK (1.7.1)
 [0.1] gh auth: OK (edercnj)
-[0.3] No state file at plans/release-state-3.2.0.json — fresh start.
+[0.3] No state file at ai/releases/release-state-3.2.0.json — fresh start.
 ```
 
 No prompt. The skill proceeds to Phase 1.
@@ -157,7 +157,7 @@ Operator chooses `1`. Skill proceeds to VALIDATE-DEEP.
 ║   PR:       #412 (https://github.com/.../pull/412)           ║
 ║   Status:   OPEN (review in progress)                        ║
 ║   Phase:    APPROVAL_PENDING                                 ║
-║   State:    plans/release-state-3.2.0.json (persisted)       ║
+║   State:    ai/releases/release-state-3.2.0.json (persisted)       ║
 ╚══════════════════════════════════════════════════════════════╝
 
 O que deseja fazer?
@@ -181,7 +181,7 @@ comments via `/x-pr-fix 412`, and eventually merges via the GitHub UI.
 
 ```
 $ /x-release --continue-after-merge
-[0.3] Loaded plans/release-state-3.2.0.json (schemaVersion=2, phase=APPROVAL_PENDING)
+[0.3] Loaded ai/releases/release-state-3.2.0.json (schemaVersion=2, phase=APPROVAL_PENDING)
 [0.3] MODE = RESUME — jumping to Phase 9 (RESUME-AND-TAG)
 ```
 
@@ -296,7 +296,7 @@ restricted to PATCH only.
 
 ```
 [0.1] gh / jq / gh auth: OK
-[0.3] No state file at plans/release-state-hotfix-3.2.1.json — fresh start.
+[0.3] No state file at ai/releases/release-state-hotfix-3.2.1.json — fresh start.
 [0.3] ReleaseContext = HOTFIX (base=main, state=release-state-hotfix-*)
 ```
 

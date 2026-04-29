@@ -1,21 +1,20 @@
 package dev.iadev.targets.claude.skills;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
- * TDD tests for the Error Handling table (≥ 11 codes) in
- * x-pr-merge-train/SKILL.md (story-0042-0003, TASK-0042-0003-004).
+ * TDD tests for the Error Handling table (≥ 11 codes) in x-pr-merge-train/SKILL.md
+ * (story-0042-0003, TASK-0042-0003-004).
  *
- * <p>Reads the golden SKILL.md from the golden output directory
- * and asserts that the Error Handling section contains all key error codes
- * including SMOKE_TEST_FAILED, STATE_CONFLICT, and CODE_CONFLICT_NEEDS_HUMAN.</p>
+ * <p>Reads the golden SKILL.md from the golden output directory and asserts that the Error Handling
+ * section contains all key error codes including SMOKE_TEST_FAILED, STATE_CONFLICT, and
+ * CODE_CONFLICT_NEEDS_HUMAN.
  */
 @DisplayName("MergeTrainSkill — Error Handling Table")
 class MergeTrainSkillErrorHandlingTest {
@@ -25,15 +24,14 @@ class MergeTrainSkillErrorHandlingTest {
                     + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
 
     @Test
-    @DisplayName("error_handling_table_present_in_golden_skillmd: "
-            + "golden SKILL.md contains Error Handling section with all key codes")
+    @DisplayName(
+            "error_handling_table_present_in_golden_skillmd: "
+                    + "golden SKILL.md contains Error Handling section with all key codes")
     void error_handling_table_present_in_golden_skillmd() throws IOException {
         Path javaModuleDir = Path.of(System.getProperty("user.dir"));
         Path goldenFile = javaModuleDir.resolve(GOLDEN_FULL_PROTOCOL_RELATIVE_PATH);
 
-        assertThat(goldenFile)
-                .as("Golden SKILL.md must exist at " + goldenFile)
-                .exists();
+        assertThat(goldenFile).as("Golden SKILL.md must exist at " + goldenFile).exists();
 
         String content = Files.readString(goldenFile);
 

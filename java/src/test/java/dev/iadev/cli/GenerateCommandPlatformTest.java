@@ -1,10 +1,6 @@
 package dev.iadev.cli;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import picocli.CommandLine;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,19 +8,20 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
 
 /**
- * Tests for GenerateCommand — --platform / -p flag
- * integration with CLI parsing, pipeline execution,
- * and YAML platform precedence.
+ * Tests for GenerateCommand — --platform / -p flag integration with CLI parsing, pipeline
+ * execution, and YAML platform precedence.
  */
 @DisplayName("GenerateCommand — platform flag")
 class GenerateCommandPlatformTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Nested
     @DisplayName("Help text")
@@ -39,9 +36,7 @@ class GenerateCommandPlatformTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("--platform")
-                    .contains("-p");
+            assertThat(sw.toString()).contains("--platform").contains("-p");
         }
 
         @Test
@@ -53,9 +48,7 @@ class GenerateCommandPlatformTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .contains("claude-code")
-                    .contains("all");
+            assertThat(sw.toString()).contains("claude-code").contains("all");
         }
 
         @Test
@@ -67,9 +60,7 @@ class GenerateCommandPlatformTest {
 
             cmd.execute("generate", "--help");
 
-            assertThat(sw.toString())
-                    .containsIgnoringCase("default")
-                    .containsIgnoringCase("all");
+            assertThat(sw.toString()).containsIgnoringCase("default").containsIgnoringCase("all");
         }
     }
 
@@ -78,21 +69,23 @@ class GenerateCommandPlatformTest {
     class NoPlatformFlag {
 
         @Test
-        @DisplayName("without --platform generates all "
-                + "artifacts")
+        @DisplayName("without --platform generates all " + "artifacts")
         void noPlatform_dryRun_returnsZero() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
-            assertThat(sw.toString())
-                    .contains("Pipeline: Success");
+            assertThat(sw.toString()).contains("Pipeline: Success");
         }
     }
 
@@ -101,22 +94,25 @@ class GenerateCommandPlatformTest {
     class SinglePlatform {
 
         @Test
-        @DisplayName("--platform claude-code returns "
-                + "success")
+        @DisplayName("--platform claude-code returns " + "success")
         void claudeCode_dryRun_returnsZero() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--platform", "claude-code",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--platform",
+                            "claude-code",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
-            assertThat(sw.toString())
-                    .contains("Pipeline: Success");
+            assertThat(sw.toString()).contains("Pipeline: Success");
         }
 
         @Test
@@ -126,11 +122,16 @@ class GenerateCommandPlatformTest {
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "-p", "claude-code",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "-p",
+                            "claude-code",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
         }
@@ -141,18 +142,22 @@ class GenerateCommandPlatformTest {
     class MultiplePlatforms {
 
         @Test
-        @DisplayName("--platform claude-code,all "
-                + "returns success")
+        @DisplayName("--platform claude-code,all " + "returns success")
         void multiplePlatforms_dryRun_returnsZero() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--platform", "claude-code,all",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--platform",
+                            "claude-code,all",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
         }
@@ -169,28 +174,37 @@ class GenerateCommandPlatformTest {
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--platform", "all",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--platform",
+                            "all",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
         }
 
         @Test
-        @DisplayName("'all' mixed with platform results "
-                + "in all")
+        @DisplayName("'all' mixed with platform results " + "in all")
         void allMixedWithPlatform_dryRun_returnsZero() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "-p", "claude-code,all",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "-p",
+                            "claude-code,all",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isZero();
         }
@@ -201,8 +215,7 @@ class GenerateCommandPlatformTest {
     class InvalidPlatformValues {
 
         @Test
-        @DisplayName("invalid value returns non-zero "
-                + "exit code")
+        @DisplayName("invalid value returns non-zero " + "exit code")
         void invalidPlatform_returnsNonZero() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
@@ -210,18 +223,22 @@ class GenerateCommandPlatformTest {
             cmd.setOut(new PrintWriter(sw));
             cmd.setErr(new PrintWriter(errSw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--platform", "invalid",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--platform",
+                            "invalid",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
 
             assertThat(exitCode).isNotZero();
         }
 
         @Test
-        @DisplayName("invalid value shows error message "
-                + "with accepted values")
+        @DisplayName("invalid value shows error message " + "with accepted values")
         void invalidPlatform_showsErrorMessage() {
             var cmd = buildCommandLine();
             var sw = new StringWriter();
@@ -230,15 +247,17 @@ class GenerateCommandPlatformTest {
             cmd.setErr(new PrintWriter(errSw));
 
             cmd.execute(
-                    "generate", "-s", "java-quarkus",
-                    "--platform", "invalid",
+                    "generate",
+                    "-s",
+                    "java-quarkus",
+                    "--platform",
+                    "invalid",
                     "--dry-run",
-                    "-o", tempDir.toString());
+                    "-o",
+                    tempDir.toString());
 
-            String combined =
-                    sw.toString() + errSw.toString();
-            assertThat(combined)
-                    .contains("Invalid platform:");
+            String combined = sw.toString() + errSw.toString();
+            assertThat(combined).contains("Invalid platform:");
         }
     }
 
@@ -248,9 +267,9 @@ class GenerateCommandPlatformTest {
 
         @Test
         @DisplayName("YAML platform parsed, no CLI = YAML")
-        void yamlPlatform_noCli_usesYaml()
-                throws IOException {
-            String yamlConfig = """
+        void yamlPlatform_noCli_usesYaml() throws IOException {
+            String yamlConfig =
+                    """
                     project:
                       name: "test-app"
                       purpose: "test"
@@ -267,31 +286,30 @@ class GenerateCommandPlatformTest {
                       build_tool: maven
                     platform: claude-code
                     """;
-            Path configFile =
-                    tempDir.resolve("config.yaml");
-            Files.writeString(configFile, yamlConfig,
-                    StandardCharsets.UTF_8);
+            Path configFile = tempDir.resolve("config.yaml");
+            Files.writeString(configFile, yamlConfig, StandardCharsets.UTF_8);
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-c",
-                    configFile.toString(),
-                    "--dry-run",
-                    "-o", tempDir.resolve("out")
-                            .toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-c",
+                            configFile.toString(),
+                            "--dry-run",
+                            "-o",
+                            tempDir.resolve("out").toString());
 
             assertThat(exitCode).isZero();
-            assertThat(sw.toString())
-                    .contains("Pipeline: Success");
+            assertThat(sw.toString()).contains("Pipeline: Success");
         }
 
         @Test
         @DisplayName("CLI overrides YAML platform")
-        void cliOverridesYaml_returnsZero()
-                throws IOException {
-            String yamlConfig = """
+        void cliOverridesYaml_returnsZero() throws IOException {
+            String yamlConfig =
+                    """
                     project:
                       name: "test-app"
                       purpose: "test"
@@ -308,30 +326,31 @@ class GenerateCommandPlatformTest {
                       build_tool: maven
                     platform: all
                     """;
-            Path configFile =
-                    tempDir.resolve("config2.yaml");
-            Files.writeString(configFile, yamlConfig,
-                    StandardCharsets.UTF_8);
+            Path configFile = tempDir.resolve("config2.yaml");
+            Files.writeString(configFile, yamlConfig, StandardCharsets.UTF_8);
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-c",
-                    configFile.toString(),
-                    "--platform", "claude-code",
-                    "--dry-run",
-                    "-o", tempDir.resolve("out2")
-                            .toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-c",
+                            configFile.toString(),
+                            "--platform",
+                            "claude-code",
+                            "--dry-run",
+                            "-o",
+                            tempDir.resolve("out2").toString());
 
             assertThat(exitCode).isZero();
         }
 
         @Test
         @DisplayName("YAML invalid platform fails")
-        void yamlInvalidPlatform_returnsError()
-                throws IOException {
-            String yamlConfig = """
+        void yamlInvalidPlatform_returnsError() throws IOException {
+            String yamlConfig =
+                    """
                     project:
                       name: "test-app"
                       purpose: "test"
@@ -348,31 +367,30 @@ class GenerateCommandPlatformTest {
                       build_tool: maven
                     platform: invalid-value
                     """;
-            Path configFile =
-                    tempDir.resolve("config3.yaml");
-            Files.writeString(configFile, yamlConfig,
-                    StandardCharsets.UTF_8);
+            Path configFile = tempDir.resolve("config3.yaml");
+            Files.writeString(configFile, yamlConfig, StandardCharsets.UTF_8);
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-c",
-                    configFile.toString(),
-                    "--dry-run",
-                    "-o", tempDir.resolve("out3")
-                            .toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-c",
+                            configFile.toString(),
+                            "--dry-run",
+                            "-o",
+                            tempDir.resolve("out3").toString());
 
             assertThat(exitCode).isNotZero();
-            assertThat(sw.toString())
-                    .contains("Invalid platform value");
+            assertThat(sw.toString()).contains("Invalid platform value");
         }
 
         @Test
         @DisplayName("YAML with platform: all succeeds")
-        void yamlPlatformAll_returnsZero()
-                throws IOException {
-            String yamlConfig = """
+        void yamlPlatformAll_returnsZero() throws IOException {
+            String yamlConfig =
+                    """
                     project:
                       name: "test-app"
                       purpose: "test"
@@ -389,20 +407,20 @@ class GenerateCommandPlatformTest {
                       build_tool: maven
                     platform: all
                     """;
-            Path configFile =
-                    tempDir.resolve("config4.yaml");
-            Files.writeString(configFile, yamlConfig,
-                    StandardCharsets.UTF_8);
+            Path configFile = tempDir.resolve("config4.yaml");
+            Files.writeString(configFile, yamlConfig, StandardCharsets.UTF_8);
             var cmd = buildCommandLine();
             var sw = new StringWriter();
             cmd.setOut(new PrintWriter(sw));
 
-            int exitCode = cmd.execute(
-                    "generate", "-c",
-                    configFile.toString(),
-                    "--dry-run",
-                    "-o", tempDir.resolve("out4")
-                            .toString());
+            int exitCode =
+                    cmd.execute(
+                            "generate",
+                            "-c",
+                            configFile.toString(),
+                            "--dry-run",
+                            "-o",
+                            tempDir.resolve("out4").toString());
 
             assertThat(exitCode).isZero();
         }

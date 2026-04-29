@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "2.0.0",
+  "flowVersion": "4",
+  "epicId": "EPIC-0068",
+  "epicSlug": "continuous-flow-heartbeat",
+  "epicTitle": "Continuous-Flow Heartbeat Hook",
+  "epicBranch": "epic/0068",
+  "epicMarkdownPath": "ai/epics/epic-0068-continuous-flow-heartbeat/epic-0068.md",
+  "implementationMapPath": "ai/epics/epic-0068-continuous-flow-heartbeat/IMPLEMENTATION-MAP.md",
+  "createdAt": "2026-04-28T00:00:00Z",
+  "status": "Backlog",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0068-0001": {
+      "status": "Pendente",
+      "phase": 0,
+      "blockedBy": [],
+      "blocks": ["story-0068-0002", "story-0068-0003"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0068-0002": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0068-0001"],
+      "blocks": ["story-0068-0004"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0068-0003": {
+      "status": "Pendente",
+      "phase": 1,
+      "blockedBy": ["story-0068-0001"],
+      "blocks": ["story-0068-0004"],
+      "commitSha": null,
+      "prNumber": null
+    },
+    "story-0068-0004": {
+      "status": "Pendente",
+      "phase": 2,
+      "blockedBy": ["story-0068-0001", "story-0068-0002", "story-0068-0003"],
+      "blocks": [],
+      "commitSha": null,
+      "prNumber": null
+    }
+  }
+}

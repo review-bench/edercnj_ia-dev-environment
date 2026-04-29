@@ -17,7 +17,7 @@ Creates Jira Stories from all local `story-XXXX-YYYY.md` files in an epic direct
 ## Usage
 
 ```
-/x-jira-create-stories plans/epic-0012
+/x-jira-create-stories ai/epics/epic-XXXX
 /x-jira-create-stories 0012
 ```
 
@@ -35,8 +35,8 @@ Creates Jira Stories from all local `story-XXXX-YYYY.md` files in an epic direct
 
 | Artifact | Path |
 |----------|------|
-| Updated story files | `plans/epic-XXXX/story-XXXX-YYYY.md` (Jira key synced) |
-| Updated implementation map | `plans/epic-XXXX/IMPLEMENTATION-MAP.md` (Jira keys added) |
+| Updated story files | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` (Jira key synced) |
+| Updated implementation map | `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` (Jira keys added) |
 
 ## See Also
 

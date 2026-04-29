@@ -208,3 +208,47 @@ story-0047-0001  # squash-merged pre-Rule-24; detected via improved conventional
 story-0047-0002  # squash-merged pre-Rule-24; detected via improved conventional-commit scan
 story-0047-0003  # squash-merged pre-Rule-24; detected via improved conventional-commit scan
 story-0047-0004  # squash-merged pre-Rule-24; detected via improved conventional-commit scan
+# EPIC-0059 amnesty — stories from EPIC-0054 through EPIC-0057 merged before Phase-1
+# artifact enforcement (audit-execution-integrity.sh --scope=fase1) was introduced.
+# Added by story-0059-0001 on 2026-04-27.
+story-0054-0001  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0054-0002  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0054-0003  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0054-0004  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0001  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0002  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0003  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0004  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0005  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0006  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0007  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0008  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0009  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0010  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0011  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0055-0012  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0001  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0002  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0003  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0004  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0005  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0006  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0007  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0056-0008  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0001  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0002  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0003  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0004  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0005  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0006  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0007  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+story-0057-0008  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+
+# Hotfix exception (Rule 27 §Exception 2) — 2026-04-28
+# Branch: hotfix/telemetry-epic-branch-resolution
+# Reason: telemetry-lib.sh::resolve_context did not recognise the epic/NNNN
+# branch convention (Rule 21 / EPIC-0049), so every tool call from those
+# branches fell to the "unknown" fallback and polluted plans/unknown/.
+# Fix: single-line regex addition + 3-case JUnit regression
+# (TelemetryLibResolveContextTest). Source-of-truth + 10 goldens regenerated
+# atomically. No story-id — pure infrastructure hotfix.

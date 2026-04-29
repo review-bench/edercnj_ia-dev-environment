@@ -1,6 +1,7 @@
 <!-- placeholders: PROJECT_NAME, LANGUAGE, FRAMEWORK, ARCHITECTURE, DATABASES, INTERFACE_TYPES, BUILD_COMMAND, TEST_COMMAND -->
-<!-- Schema authoritative: adr/ADR-0048-B-claude-md-contract.md §3.2 -->
+<!-- Schema authoritative: docs/adr/ADR-0021-claude-md-contract.md §3.2 -->
 <!-- Generator-owned: do not hand-edit — regenerated on every `ia-dev-env generate`. -->
+<!-- composition: requires-capabilities: [] fragment-slots: [{slot: domain-specific, ordering: fragment-order}] -->
 
 # my-spring-fintech-pci
 
@@ -18,10 +19,10 @@ Sub-skills may be bypassed only with an explicit `--skip-review` / `--skip-verif
 
 | Sub-skill | Evidence required | Enforced by |
 | :--- | :--- | :--- |
-| `x-review` | `plans/epic-XXXX/plans/review-story-STORY-ID.md` | CI audit + Stop hook |
-| `x-review-pr` | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | CI audit + Stop hook |
-| `x-internal-story-verify` | `plans/epic-XXXX/reports/verify-envelope-STORY-ID.json` | CI audit |
-| `x-internal-story-report` | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` | CI audit |
+| `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | CI audit + Stop hook |
+| `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | CI audit + Stop hook |
+| `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | CI audit |
+| `x-internal-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | CI audit |
 
 ## Build
 

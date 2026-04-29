@@ -4,6 +4,8 @@ description: "QA specialist review: validates test coverage, TDD compliance, tes
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: qa, fragment-order: 100 }
 ---
 
 ## Global Output Policy

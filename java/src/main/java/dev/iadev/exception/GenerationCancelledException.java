@@ -1,12 +1,11 @@
 package dev.iadev.exception;
 
 /**
- * Thrown when the user cancels the generation process
- * (e.g., interactive prompt abort via Ctrl+C or confirmation denial).
+ * Thrown when the user cancels the generation process (e.g., interactive prompt abort via Ctrl+C or
+ * confirmation denial).
  *
- * <p>Application-level exception — not CLI-specific.
- * The process should exit with code 1 and no files should be
- * generated.</p>
+ * <p>Application-level exception — not CLI-specific. The process should exit with code 1 and no
+ * files should be generated.
  */
 public class GenerationCancelledException extends RuntimeException {
 

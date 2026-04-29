@@ -1,14 +1,13 @@
 package dev.iadev.exception;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("ConfigValidationException")
 class ConfigValidationExceptionTest {
@@ -20,8 +19,7 @@ class ConfigValidationExceptionTest {
         @Test
         @DisplayName("includes field and model in message")
         void missingField_message_containsFieldAndModel() {
-            var ex = new ConfigValidationException(
-                    "name", "ProjectIdentity");
+            var ex = new ConfigValidationException("name", "ProjectIdentity");
 
             assertThat(ex.getMessage())
                     .contains("name")
@@ -37,8 +35,7 @@ class ConfigValidationExceptionTest {
         @Test
         @DisplayName("includes field, type, and model in message")
         void invalidType_message_containsFieldTypeAndModel() {
-            var ex = new ConfigValidationException(
-                    "name", "String", "ProjectIdentity");
+            var ex = new ConfigValidationException("name", "String", "ProjectIdentity");
 
             assertThat(ex.getMessage())
                     .contains("name")
@@ -56,11 +53,9 @@ class ConfigValidationExceptionTest {
         @DisplayName("preserves message and cause")
         void causeConstructor_whenCalled_preservesMessageAndCause() {
             var cause = new RuntimeException("root cause");
-            var ex = new ConfigValidationException(
-                    "Custom error message", cause);
+            var ex = new ConfigValidationException("Custom error message", cause);
 
-            assertThat(ex.getMessage())
-                    .isEqualTo("Custom error message");
+            assertThat(ex.getMessage()).isEqualTo("Custom error message");
             assertThat(ex.getCause()).isSameAs(cause);
         }
     }
@@ -73,41 +68,31 @@ class ConfigValidationExceptionTest {
         @DisplayName("carries message and missingSections list")
         void constructor_whenCalled_carriesMessageAndMissingSections() {
             var sections = List.of("language", "framework");
-            var ex = new ConfigValidationException(
-                    "Missing required sections", sections);
+            var ex = new ConfigValidationException("Missing required sections", sections);
 
-            assertThat(ex.getMessage())
-                    .isEqualTo("Missing required sections");
-            assertThat(ex.getMissingSections())
-                    .containsExactly("language", "framework");
+            assertThat(ex.getMessage()).isEqualTo("Missing required sections");
+            assertThat(ex.getMissingSections()).containsExactly("language", "framework");
         }
 
         @Test
         @DisplayName("returned list is immutable")
         void missingSections_whenCalled_isImmutable() {
-            var mutableList = new ArrayList<>(
-                    List.of("language", "framework"));
-            var ex = new ConfigValidationException(
-                    "Missing sections", mutableList);
+            var mutableList = new ArrayList<>(List.of("language", "framework"));
+            var ex = new ConfigValidationException("Missing sections", mutableList);
 
-            assertThatThrownBy(
-                    () -> ex.getMissingSections().add("another"))
-                    .isInstanceOf(
-                            UnsupportedOperationException.class);
+            assertThatThrownBy(() -> ex.getMissingSections().add("another"))
+                    .isInstanceOf(UnsupportedOperationException.class);
         }
 
         @Test
         @DisplayName("mutations to original list do not affect exception")
         void missingSections_whenCalled_defensiveCopy() {
-            var mutableList = new ArrayList<>(
-                    List.of("language", "framework"));
-            var ex = new ConfigValidationException(
-                    "Missing sections", mutableList);
+            var mutableList = new ArrayList<>(List.of("language", "framework"));
+            var ex = new ConfigValidationException("Missing sections", mutableList);
 
             mutableList.add("database");
 
-            assertThat(ex.getMissingSections())
-                    .containsExactly("language", "framework");
+            assertThat(ex.getMissingSections()).containsExactly("language", "framework");
         }
     }
 
@@ -122,9 +107,9 @@ class ConfigValidationExceptionTest {
     @Test
     @DisplayName("toString includes context information")
     void toString_whenCalled_includesContext() {
-        var ex = new ConfigValidationException(
-                "Validation failed",
-                List.of("language", "framework"));
+        var ex =
+                new ConfigValidationException(
+                        "Validation failed", List.of("language", "framework"));
 
         assertThat(ex.toString())
                 .contains("ConfigValidationException")
@@ -133,11 +118,9 @@ class ConfigValidationExceptionTest {
     }
 
     @Test
-    @DisplayName("toString without missingSections"
-            + " includes message only")
+    @DisplayName("toString without missingSections" + " includes message only")
     void toString_whenCalled_noMissingSections() {
-        var ex = new ConfigValidationException(
-                "name", "ProjectIdentity");
+        var ex = new ConfigValidationException("name", "ProjectIdentity");
 
         assertThat(ex.toString())
                 .contains("ConfigValidationException")
@@ -145,11 +128,9 @@ class ConfigValidationExceptionTest {
     }
 
     @Test
-    @DisplayName("toString with empty missingSections"
-            + " uses short format")
+    @DisplayName("toString with empty missingSections" + " uses short format")
     void toString_withEmptyMissingsectionsUsesShortFormat_emptyMissingSections() {
-        var ex = new ConfigValidationException(
-                "Some error", List.of());
+        var ex = new ConfigValidationException("Some error", List.of());
 
         assertThat(ex.toString())
                 .contains("ConfigValidationException")

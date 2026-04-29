@@ -2,6 +2,7 @@
 name: coding-standards
 model: haiku
 description: "Complete coding conventions: Clean Code rules (CC-01 to CC-10), SOLID principles, {{LANGUAGE}} {{LANGUAGE_VERSION}} idioms, naming patterns, constructor injection, mapper conventions, version-specific features, and approved libraries. Read before writing any code."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Coding Standards

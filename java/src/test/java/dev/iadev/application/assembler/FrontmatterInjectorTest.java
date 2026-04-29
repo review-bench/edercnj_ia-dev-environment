@@ -1,16 +1,13 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.domain.model.ContextBudget;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import dev.iadev.domain.model.ContextBudget;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Unit tests for {@link FrontmatterInjector}.
- */
+/** Unit tests for {@link FrontmatterInjector}. */
 @DisplayName("FrontmatterInjector")
 class FrontmatterInjectorTest {
 
@@ -21,7 +18,8 @@ class FrontmatterInjectorTest {
         @Test
         @DisplayName("injects after argument-hint line")
         void inject_afterArgumentHint_insertsField() {
-            String content = """
+            String content =
+                    """
                     ---
                     name: x-git-push
                     description: "Git operations"
@@ -32,23 +30,19 @@ class FrontmatterInjectorTest {
                     ## Content here
                     """;
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.MEDIUM);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.MEDIUM);
 
-            assertThat(result).contains(
-                    "context-budget: medium");
+            assertThat(result).contains("context-budget: medium");
             assertThat(result.indexOf("context-budget"))
-                    .isGreaterThan(
-                            result.indexOf("argument-hint"));
-            assertThat(result.indexOf("context-budget"))
-                    .isLessThan(result.indexOf("---\n##"));
+                    .isGreaterThan(result.indexOf("argument-hint"));
+            assertThat(result.indexOf("context-budget")).isLessThan(result.indexOf("---\n##"));
         }
 
         @Test
         @DisplayName("injects light budget")
         void inject_lightBudget_insertsLight() {
-            String content = """
+            String content =
+                    """
                     ---
                     name: x-test-run
                     argument-hint: "[test-name]"
@@ -56,18 +50,16 @@ class FrontmatterInjectorTest {
                     ## Body
                     """;
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
-            assertThat(result).contains(
-                    "context-budget: light");
+            assertThat(result).contains("context-budget: light");
         }
 
         @Test
         @DisplayName("injects heavy budget")
         void inject_heavyBudget_insertsHeavy() {
-            String content = """
+            String content =
+                    """
                     ---
                     name: x-story-implement
                     argument-hint: "[STORY-ID]"
@@ -75,19 +67,16 @@ class FrontmatterInjectorTest {
                     ## Body
                     """;
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.HEAVY);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.HEAVY);
 
-            assertThat(result).contains(
-                    "context-budget: heavy");
+            assertThat(result).contains("context-budget: heavy");
         }
 
         @Test
-        @DisplayName("no argument-hint appends before"
-                + " closing delimiter")
+        @DisplayName("no argument-hint appends before" + " closing delimiter")
         void inject_noArgumentHint_appendsBeforeClose() {
-            String content = """
+            String content =
+                    """
                     ---
                     name: x-simple
                     user-invocable: true
@@ -95,26 +84,18 @@ class FrontmatterInjectorTest {
                     ## Body
                     """;
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
-            assertThat(result).contains(
-                    "context-budget: light");
-            assertThat(result.indexOf("context-budget"))
-                    .isLessThan(
-                            result.indexOf("---", 4));
+            assertThat(result).contains("context-budget: light");
+            assertThat(result.indexOf("context-budget")).isLessThan(result.indexOf("---", 4));
         }
 
         @Test
-        @DisplayName("no frontmatter returns content"
-                + " unchanged")
+        @DisplayName("no frontmatter returns content" + " unchanged")
         void inject_noFrontmatter_returnsUnchanged() {
             String content = "## No frontmatter\nBody";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
             assertThat(result).isEqualTo(content);
         }
@@ -124,52 +105,39 @@ class FrontmatterInjectorTest {
         void inject_emptyContent_returnsUnchanged() {
             String content = "";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
             assertThat(result).isEqualTo(content);
         }
 
         @Test
-        @DisplayName("starts with delimiter but no"
-                + " closing returns unchanged")
+        @DisplayName("starts with delimiter but no" + " closing returns unchanged")
         void inject_noClosingDelim_returnsUnchanged() {
-            String content = "---\nname: x-test\n"
-                    + "no closing delimiter";
+            String content = "---\nname: x-test\n" + "no closing delimiter";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
             assertThat(result).isEqualTo(content);
         }
 
         @Test
-        @DisplayName("argument-hint after closing"
-                + " delimiter uses delimiter position")
+        @DisplayName("argument-hint after closing" + " delimiter uses delimiter position")
         void inject_hintAfterClose_usesDelimiter() {
-            String content = "---\nname: test\n---\n"
-                    + "argument-hint: outside\n";
+            String content = "---\nname: test\n---\n" + "argument-hint: outside\n";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
-            assertThat(result).contains(
-                    "context-budget: light");
-            int budgetIdx =
-                    result.indexOf("context-budget");
+            assertThat(result).contains("context-budget: light");
+            int budgetIdx = result.indexOf("context-budget");
             int closingIdx = result.indexOf("\n---", 3);
-            assertThat(budgetIdx)
-                    .isLessThan(closingIdx + 1);
+            assertThat(budgetIdx).isLessThan(closingIdx + 1);
         }
 
         @Test
-        @DisplayName("replaces existing context-budget"
-                + " instead of duplicating")
+        @DisplayName("replaces existing context-budget" + " instead of duplicating")
         void inject_existingBudget_replacesValue() {
-            String content = """
+            String content =
+                    """
                     ---
                     name: x-test
                     argument-hint: "[id]"
@@ -178,41 +146,29 @@ class FrontmatterInjectorTest {
                     ## Body
                     """;
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.HEAVY);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.HEAVY);
 
-            assertThat(result).contains(
-                    "context-budget: heavy");
-            assertThat(result)
-                    .doesNotContain("context-budget: light");
-            long count = result.lines()
-                    .filter(l -> l.contains(
-                            "context-budget:"))
-                    .count();
+            assertThat(result).contains("context-budget: heavy");
+            assertThat(result).doesNotContain("context-budget: light");
+            long count = result.lines().filter(l -> l.contains("context-budget:")).count();
             assertThat(count).isEqualTo(1);
         }
 
         @Test
-        @DisplayName("preserves content after"
-                + " frontmatter unchanged")
+        @DisplayName("preserves content after" + " frontmatter unchanged")
         void inject_preservesBodyContent() {
-            String content = "---\nname: x\n"
-                    + "argument-hint: y\n---\n"
-                    + "## Title\nBody text\n";
+            String content = "---\nname: x\n" + "argument-hint: y\n---\n" + "## Title\nBody text\n";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.MEDIUM);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.MEDIUM);
 
-            assertThat(result).endsWith(
-                    "## Title\nBody text\n");
+            assertThat(result).endsWith("## Title\nBody text\n");
         }
 
         @Test
-        @DisplayName("opening delim with inline closing"
-                + " (no newline before ---) inserts at end"
-                + " of frontmatter via hasExistingBudget=false")
+        @DisplayName(
+                "opening delim with inline closing"
+                        + " (no newline before ---) inserts at end"
+                        + " of frontmatter via hasExistingBudget=false")
         void inject_inlineClosingDelim_reachesHasExisting() {
             // hasFrontmatter: true (startsWith --- and
             // indexOf("---", 3) > 0).
@@ -226,17 +182,16 @@ class FrontmatterInjectorTest {
             // closingIdx<0 branch).
             String content = "---foo---rest-of-body";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.LIGHT);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.LIGHT);
 
             assertThat(result).isEqualTo(content);
         }
 
         @Test
-        @DisplayName("argument-hint present with no"
-                + " newline after reaches the"
-                + " newlineAfterHint<0 branch")
+        @DisplayName(
+                "argument-hint present with no"
+                        + " newline after reaches the"
+                        + " newlineAfterHint<0 branch")
         void inject_argumentHintNoNewline_fallbackPath() {
             // Frontmatter has argument-hint AT THE END with
             // no trailing newline before the closing delim.
@@ -245,13 +200,9 @@ class FrontmatterInjectorTest {
             // the closing delim block. This probes the
             // newlineAfterHint branching inside
             // insertInFrontmatter.
-            String content = "---\nname: x\n"
-                    + "argument-hint: y\n---\n"
-                    + "body\n";
+            String content = "---\nname: x\n" + "argument-hint: y\n---\n" + "body\n";
 
-            String result =
-                    FrontmatterInjector.injectContextBudget(
-                            content, ContextBudget.HEAVY);
+            String result = FrontmatterInjector.injectContextBudget(content, ContextBudget.HEAVY);
 
             // Budget field is inserted; body is preserved.
             assertThat(result).contains("context-budget:");

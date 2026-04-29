@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--file <path> --type <epic|story|task> --id <id> --field <name> --value <value> [--initialize] [--read-only]"
 category: internal-ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -28,7 +29,7 @@ context-budget: light
 ## Purpose
 
 Perform atomic read-modify-write mutations of
-`plans/epic-XXXX/execution-state.json` (the telemetry checkpoint file
+`ai/epics/epic-XXXX/execution-state.json` (the telemetry checkpoint file
 consumed by every orchestrator skill). The operation:
 
 1. Acquires a `flock`-based advisory lock with 30s timeout.
@@ -66,7 +67,7 @@ follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -182,7 +183,7 @@ and exits 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -197,7 +198,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
 ```
@@ -212,7 +213,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type epic --id 0049 \
              --field flowVersion --value 2 \
              --initialize")
@@ -228,7 +229,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type task --id TASK-0049-0005-003 \
              --field prNumber --value 612")
 ```
@@ -243,7 +244,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value UNUSED \
              --read-only")
@@ -260,7 +261,7 @@ ignored under `--read-only`.
 
 ```bash
 Skill(skill: "x-internal-status-update",
-      args: "--file plans/epic-0049/execution-state.json \
+      args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id unknown-story \
              --field status --value DONE")
 ```
@@ -302,6 +303,49 @@ Exit: 3.
   `previousValue` — this is the correct "last writer wins" semantic.
 - Lock is released automatically on process exit (file descriptor
   closure). No `trap`-based cleanup required.
+
+## Trailer Injection Contract (story-0059-0004)
+
+Every write operation that stages and commits `execution-state.json`
+**MUST** inject the canonical trailer into the commit message so that
+the `.githooks/commit-msg` hook (story-0059-0004 surface F guard) allows
+the commit to proceed.
+
+### Canonical Trailer Format
+
+```
+Co-Authored-By: x-internal-status-update@<40-char-git-sha>
+```
+
+- The `<sha>` is the HEAD commit of the repository at the moment the
+  skill executes (`$(git rev-parse HEAD)`).
+- Uses the standard Git trailer key `Co-Authored-By:` (parseable via
+  `git interpret-trailers`).
+
+### Commit Invocation Pattern
+
+When this skill issues a `git commit` that includes `execution-state.json`
+in the staged files, it MUST pass the trailer:
+
+```bash
+SKILL_SHA=$(git rev-parse HEAD)
+git commit -m "<subject>" \
+  --trailer "Co-Authored-By: x-internal-status-update@${SKILL_SHA}"
+```
+
+This trailer is validated by `.githooks/commit-msg` which checks:
+
+```bash
+git interpret-trailers --parse < "$COMMIT_MSG_FILE" \
+  | grep -qE '^Co-Authored-By:\s+x-internal-status-update@[0-9a-f]{40}$'
+```
+
+### Recovery escape
+
+In documented recovery operations where the operator manually edits
+`execution-state.json` (e.g., state corruption), the trailer MUST
+still be present. The operator adds the trailer with an approved SHA.
+The hook validates format only, not SHA authenticity (RULE-059).
 
 ## Testing
 

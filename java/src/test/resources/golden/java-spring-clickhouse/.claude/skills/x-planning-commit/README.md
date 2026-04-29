@@ -11,15 +11,15 @@
 
 ## What It Does
 
-Batch-commits the planning artifacts a planning skill just wrote (under `plans/epic-XXXX/**` or `.claude/templates/**`) in one atomic commit, without invoking the heavy code pre-commit chain (`x-code-format -> x-code-lint -> compile`) that `x-git-commit` enforces. RULE-007 of EPIC-0049 requires every planning skill (`x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-epic-orchestrate`, `x-story-create`, `x-story-plan`, `x-task-plan`) to delegate to this skill at end-of-run so the working tree stays clean and every plan mutation has a Git audit trail.
+Batch-commits the planning artifacts a planning skill just wrote (under `ai/epics/epic-XXXX/**` or `.claude/templates/**`) in one atomic commit, without invoking the heavy code pre-commit chain (`x-code-format -> x-code-lint -> compile`) that `x-git-commit` enforces. RULE-007 of EPIC-0049 requires every planning skill (`x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-epic-orchestrate`, `x-story-create`, `x-story-plan`, `x-task-plan`) to delegate to this skill at end-of-run so the working tree stays clean and every plan mutation has a Git audit trail.
 
 ## Usage
 
 ```
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "add epic scaffold"
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md,plans/epic-0049/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "preview" --dry-run
-/x-planning-commit --epic-id 0049 --paths plans/epic-0049/epic-0049.md --subject "chore bump" --scope chore
+/x-planning-commit --epic-id 0049 --paths ai/epics/epic-XXXX/epic-0049.md --subject "add epic scaffold"
+/x-planning-commit --epic-id 0049 --paths ai/epics/epic-XXXX/epic-0049.md,ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"
+/x-planning-commit --epic-id 0049 --paths ai/epics/epic-XXXX/epic-0049.md --subject "preview" --dry-run
+/x-planning-commit --epic-id 0049 --paths ai/epics/epic-XXXX/epic-0049.md --subject "chore bump" --scope chore
 ```
 
 ## Workflow

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Bash, Glob, Grep
 argument-hint: "--target <url> [--scope all|rate-limit|waf|bot-protection|account-lockout|brute-force|csp|permissions] [--intensity passive|moderate|aggressive] [--login-endpoint /path]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

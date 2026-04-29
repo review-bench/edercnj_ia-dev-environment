@@ -1,0 +1,6 @@
+id: messaging.rabbitmq.standard
+name: RabbitMQ
+description: RabbitMQ AMQP broker with queues, exchanges, and dead-letter handling.
+parameters:
+  client-library: spring-amqp
+excludes: []

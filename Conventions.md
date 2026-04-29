@@ -101,9 +101,9 @@ A tese operacional é simples: **padronizar o que pode ser padronizado, delegar 
 
 Observabilidade transversal:
   • Hooks: SessionStart / PreToolUse / PostToolUse / SubagentStop / Stop
-  • Telemetria: plans/epic-XXXX/telemetry/events.ndjson (NDJSON)
-  • Estado: plans/epic-XXXX/execution-state.json (flowVersion, storyStatuses)
-  • Rule 24: evidence files obrigatórios em plans/epic-XXXX/{plans,reports}/
+  • Telemetria: ai/epics/epic-XXXX/telemetry/events.ndjson (NDJSON)
+  • Estado: ai/epics/epic-XXXX/execution-state.json (flowVersion, storyStatuses)
+  • Rule 24: evidence files obrigatórios em ai/epics/epic-XXXX/{plans,reports}/
 ```
 
 ---
@@ -116,9 +116,9 @@ Três níveis canônicos, com schemas de artefato:
 
 | Nível | Identificador | Arquivo | Conteúdo |
 | :--- | :--- | :--- | :--- |
-| Epic | `EPIC-XXXX` | `plans/epic-XXXX/epic-XXXX.md` | Visão, regras transversais, DoR/DoD global, índice de stories |
-| Story | `story-XXXX-YYYY` | `plans/epic-XXXX/story-XXXX-YYYY.md` | Contratos, Gherkin AC, dependências, tasks |
-| Task (v2) | `TASK-XXXX-YYYY-NNN` | `plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` | I/O contract, testability, exit criteria |
+| Epic | `EPIC-XXXX` | `ai/epics/epic-XXXX/epic-XXXX.md` | Visão, regras transversais, DoR/DoD global, índice de stories |
+| Story | `story-XXXX-YYYY` | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` | Contratos, Gherkin AC, dependências, tasks |
+| Task (v2) | `TASK-XXXX-YYYY-NNN` | `ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` | I/O contract, testability, exit criteria |
 
 **Dois schemas convivem (Rule 19 — Backward Compatibility):**
 
@@ -400,7 +400,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start <skill> Phase-N
 Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end <skill> Phase-N-<Name> ok|failed|skipped
 ```
 
-Eventos persistidos em `plans/epic-XXXX/telemetry/events.ndjson` (NDJSON). Helper **fail-open** — telemetria quebrada **não** aborta skill.
+Eventos persistidos em `ai/epics/epic-XXXX/telemetry/events.ndjson` (NDJSON). Helper **fail-open** — telemetria quebrada **não** aborta skill.
 
 Subagent markers (`subagent.start` / `subagent.end`) existem para planning skills com dispatch paralelo.
 
@@ -437,11 +437,11 @@ Escape hatches únicos: flags `--skip-*` (somente em `## Recovery`) e `<!-- audi
 
 | Sub-skill | Artefato | Caminho |
 | :--- | :--- | :--- |
-| `x-internal-story-verify` | `verify-envelope-STORY-ID.json` | `plans/epic-XXXX/reports/` |
-| `x-review` | `review-story-STORY-ID.md` | `plans/epic-XXXX/plans/` |
-| `x-review-pr` | `techlead-review-story-STORY-ID.md` | `plans/epic-XXXX/plans/` |
-| `x-internal-story-report` | `story-completion-report-STORY-ID.md` | `plans/epic-XXXX/reports/` |
-| `x-arch-plan` | `arch-story-STORY-ID.md` | `plans/epic-XXXX/plans/` (soft check) |
+| `x-internal-story-verify` | `verify-envelope-STORY-ID.json` | `ai/epics/epic-XXXX/reports/` |
+| `x-review` | `review-story-STORY-ID.md` | `ai/epics/epic-XXXX/plans/` |
+| `x-review-pr` | `techlead-review-story-STORY-ID.md` | `ai/epics/epic-XXXX/plans/` |
+| `x-internal-story-report` | `story-completion-report-STORY-ID.md` | `ai/epics/epic-XXXX/reports/` |
+| `x-arch-plan` | `arch-story-STORY-ID.md` | `ai/epics/epic-XXXX/plans/` (soft check) |
 
 Ausência em story merged = build falha no CI.
 
@@ -767,14 +767,14 @@ Emitidos em `.claude/templates/` pelo `PlanTemplatesAssembler` (RULE-003). **12 
 - **Rules canônicas:** `.claude/rules/01-project-identity.md` … `24-execution-integrity.md`
 - **CLAUDE.md raiz:** blocos `> **Concluded**` / `> **In progress**` para status de épicos
 - **ADRs relevantes:**
-  - `adr/ADR-0003-skill-taxonomy-and-naming.md` — refatoração de taxonomia (EPIC-0036)
-  - `adr/ADR-0004-worktree-lifecycle.md` — lifecycle de worktrees
-  - `adr/ADR-0005-telemetry-architecture.md` — arquitetura de telemetria
-  - `adr/ADR-0006-file-conflict-aware-parallelism.md` — collisão em paralelo (EPIC-0041)
-  - `adr/ADR-0010-interactive-gates-convention.md` — gates interativos (EPIC-0043)
-  - `adr/ADR-0012-*` — rollout slim (EPIC-0054)
-- **Planos de épicos em evolução:** `plans/epic-0055/epic-0055.md`, `plans/epic-0056/epic-0056.md`, `plans/epic-0057/epic-0057.md`
-- **Especificações:** `plans/epic-0055/spec-task-granularity-phase-gates.md`, `plans/epic-0056/spec-ra9-standardized-planning-templates.md`
+  - `docs/adr/ADR-0003-skill-taxonomy-and-naming.md` — refatoração de taxonomia (EPIC-0036)
+  - `docs/adr/ADR-0004-worktree-lifecycle.md` — lifecycle de worktrees
+  - `docs/adr/ADR-0005-telemetry-architecture.md` — arquitetura de telemetria
+  - `docs/adr/ADR-0006-file-conflict-aware-parallelism.md` — collisão em paralelo (EPIC-0041)
+  - `docs/adr/ADR-0010-interactive-gates-convention.md` — gates interativos (EPIC-0043)
+  - `docs/adr/ADR-0012-*` — rollout slim (EPIC-0054)
+- **Planos de épicos em evolução:** `ai/epics/epic-0055/epic-0055.md`, `ai/epics/epic-0056/epic-0056.md`, `ai/epics/epic-0057/epic-0057.md`
+- **Especificações:** `ai/epics/epic-0055/spec-task-granularity-phase-gates.md`, `ai/epics/epic-0056/spec-ra9-standardized-planning-templates.md`
 
 ---
 

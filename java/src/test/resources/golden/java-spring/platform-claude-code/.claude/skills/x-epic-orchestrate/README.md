@@ -81,13 +81,13 @@ flowchart TD
 
 | Artifact | Path | Producer |
 |----------|------|----------|
-| Execution state (checkpoint) | `plans/epic-XXXX/execution-state.json` | x-epic-orchestrate |
-| Epic planning report | `plans/epic-XXXX/reports/epic-planning-report-XXXX.md` | x-epic-orchestrate |
-| Epic file update (Planning column) | `plans/epic-XXXX/EPIC-XXXX.md` | x-epic-orchestrate |
-| Task breakdown (per story) | `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | x-story-plan |
-| Task plans (per task) | `plans/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | x-story-plan |
-| Planning report (per story) | `plans/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | x-story-plan |
-| DoR checklist (per story) | `plans/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | x-story-plan |
+| Execution state (checkpoint) | `ai/epics/epic-XXXX/execution-state.json` | x-epic-orchestrate |
+| Epic planning report | `ai/epics/epic-XXXX/reports/epic-planning-report-XXXX.md` | x-epic-orchestrate |
+| Epic file update (Planning column) | `ai/epics/epic-XXXX/EPIC-XXXX.md` | x-epic-orchestrate |
+| Task breakdown (per story) | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | x-story-plan |
+| Task plans (per task) | `ai/epics/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | x-story-plan |
+| Planning report (per story) | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | x-story-plan |
+| DoR checklist (per story) | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | x-story-plan |
 
 ## Checkpoint / Resume
 
@@ -98,9 +98,9 @@ flowchart TD
 
 ## Prerequisites
 
-- Epic directory exists: `plans/epic-XXXX/`
-- Implementation map exists: `plans/epic-XXXX/IMPLEMENTATION-MAP.md`
-- At least one story file: `plans/epic-XXXX/story-XXXX-*.md`
+- Epic directory exists: `ai/epics/epic-XXXX/`
+- Implementation map exists: `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md`
+- At least one story file: `ai/epics/epic-XXXX/story-XXXX-*.md`
 
 ## See Also
 

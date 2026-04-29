@@ -1,6 +1,7 @@
 ---
 name: release-management
 description: "Release management practices: semantic versioning, version lifecycle (alpha/beta/RC/GA/LTS/EOL), release branching strategies, artifact registry management, release signing and attestation, hotfix process, rollback procedures, and release communication."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Release Management

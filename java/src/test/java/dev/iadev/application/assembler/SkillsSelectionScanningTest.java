@@ -1,20 +1,17 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for SkillsSelection — security scanning skill
- * selection based on ScanningConfig, QualityGateConfig,
- * and pentest flags.
+ * Tests for SkillsSelection — security scanning skill selection based on ScanningConfig,
+ * QualityGateConfig, and pentest flags.
  */
 @DisplayName("SkillsSelection — scanning")
 class SkillsSelectionScanningTest {
@@ -26,13 +23,9 @@ class SkillsSelectionScanningTest {
         @Test
         @DisplayName("all flags false returns empty list")
         void select_allFlagsFalse_returnsEmpty() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder().build();
+            ProjectConfig config = TestConfigBuilder.builder().build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
             assertThat(skills).isEmpty();
         }
@@ -42,18 +35,12 @@ class SkillsSelectionScanningTest {
         void select_sastEnabled_returnsSastScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    true, false,
-                                    false, false, false)
+                            .scanningFlags(true, false, false, false, false)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-sast");
+            assertThat(skills).containsExactly("x-security-sast");
         }
 
         @Test
@@ -61,147 +48,94 @@ class SkillsSelectionScanningTest {
         void select_dastEnabled_returnsDastScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    false, true,
-                                    false, false, false)
+                            .scanningFlags(false, true, false, false, false)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-dast");
+            assertThat(skills).containsExactly("x-security-dast");
         }
 
         @Test
-        @DisplayName("secretScan enabled returns"
-                + " x-security-secrets")
+        @DisplayName("secretScan enabled returns" + " x-security-secrets")
         void select_secretScanEnabled_returnsSecretScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    false, false,
-                                    true, false, false)
+                            .scanningFlags(false, false, true, false, false)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-secrets");
+            assertThat(skills).containsExactly("x-security-secrets");
         }
 
         @Test
-        @DisplayName("containerScan enabled returns"
-                + " x-security-container")
+        @DisplayName("containerScan enabled returns" + " x-security-container")
         void select_containerScanEnabled_returnsContScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    false, false,
-                                    false, true, false)
+                            .scanningFlags(false, false, false, true, false)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-container");
+            assertThat(skills).containsExactly("x-security-container");
         }
 
         @Test
-        @DisplayName("infraScan enabled returns"
-                + " x-security-infra")
+        @DisplayName("infraScan enabled returns" + " x-security-infra")
         void select_infraScanEnabled_returnsInfraScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    false, false,
-                                    false, false, true)
+                            .scanningFlags(false, false, false, false, true)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-infra");
+            assertThat(skills).containsExactly("x-security-infra");
         }
 
         @Test
-        @DisplayName("pentest enabled does not add"
-                + " x-security-pentest to scanning skills"
-                + " (delegated to selectPentestSkills)")
+        @DisplayName(
+                "pentest enabled does not add"
+                        + " x-security-pentest to scanning skills"
+                        + " (delegated to selectPentestSkills)")
         void select_pentestEnabled_excludesPentest() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .pentest(true)
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().pentest(true).build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .doesNotContain("x-security-pentest");
+            assertThat(skills).doesNotContain("x-security-pentest");
         }
 
         @Test
-        @DisplayName("qualityGate sonarqube returns"
-                + " x-security-sonar")
+        @DisplayName("qualityGate sonarqube returns" + " x-security-sonar")
         void select_sonarqubeProvider_returnsSonarGate() {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .qualityGateProvider("sonarqube")
-                            .build();
+                    TestConfigBuilder.builder().qualityGateProvider("sonarqube").build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-sonar");
+            assertThat(skills).containsExactly("x-security-sonar");
         }
 
         @Test
-        @DisplayName("qualityGate sonarcloud returns"
-                + " x-security-sonar")
+        @DisplayName("qualityGate sonarcloud returns" + " x-security-sonar")
         void select_sonarcloudProvider_returnsSonarGate() {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .qualityGateProvider("sonarcloud")
-                            .build();
+                    TestConfigBuilder.builder().qualityGateProvider("sonarcloud").build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills)
-                    .containsExactly("x-security-sonar");
+            assertThat(skills).containsExactly("x-security-sonar");
         }
 
         @Test
         @DisplayName("qualityGate none returns empty")
         void select_noneProvider_excludesSonarGate() {
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .qualityGateProvider("none")
-                            .build();
+            ProjectConfig config = TestConfigBuilder.builder().qualityGateProvider("none").build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
             assertThat(skills).isEmpty();
         }
@@ -211,25 +145,21 @@ class SkillsSelectionScanningTest {
         void select_allEnabled_returnsAllSkills() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    true, true,
-                                    true, true, true)
+                            .scanningFlags(true, true, true, true, true)
                             .pentest(true)
                             .qualityGateProvider("sonarqube")
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactlyInAnyOrder(
-                    "x-security-sast",
-                    "x-security-dast",
-                    "x-security-secrets",
-                    "x-security-container",
-                    "x-security-infra",
-                    "x-security-sonar");
+            assertThat(skills)
+                    .containsExactlyInAnyOrder(
+                            "x-security-sast",
+                            "x-security-dast",
+                            "x-security-secrets",
+                            "x-security-container",
+                            "x-security-infra",
+                            "x-security-sonar");
         }
 
         @Test
@@ -237,20 +167,13 @@ class SkillsSelectionScanningTest {
         void select_mixedFlags_returnsMatchingSkills() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
-                            .scanningFlags(
-                                    true, false,
-                                    true, false, false)
+                            .scanningFlags(true, false, true, false, false)
                             .pentest(true)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectSecurityScanningSkills(
-                                    config);
+            List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactlyInAnyOrder(
-                    "x-security-sast",
-                    "x-security-secrets");
+            assertThat(skills).containsExactlyInAnyOrder("x-security-sast", "x-security-secrets");
         }
     }
 
@@ -259,38 +182,27 @@ class SkillsSelectionScanningTest {
     class ConditionalIncludesScanning {
 
         @Test
-        @DisplayName("aggregation includes scanning skills"
-                + " when flags enabled")
+        @DisplayName("aggregation includes scanning skills" + " when flags enabled")
         void conditional_scanningEnabled_includesSkills() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .clearInterfaces()
                             .addInterface("rest")
-                            .scanningFlags(
-                                    true, false,
-                                    false, false, false)
+                            .scanningFlags(true, false, false, false, false)
                             .build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectConditionalSkills(config);
+            List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
             assertThat(skills).contains("x-security-sast");
         }
 
         @Test
-        @DisplayName("aggregation excludes scanning skills"
-                + " when all flags false")
+        @DisplayName("aggregation excludes scanning skills" + " when all flags false")
         void conditional_scanningDisabled_excludesSkills() {
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .clearInterfaces()
-                            .addInterface("rest")
-                            .build();
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("rest").build();
 
-            List<String> skills =
-                    SkillsSelection
-                            .selectConditionalSkills(config);
+            List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
             assertThat(skills)
                     .doesNotContain(

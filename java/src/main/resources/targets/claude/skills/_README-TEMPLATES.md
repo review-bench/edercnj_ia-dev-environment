@@ -9,7 +9,7 @@
 >
 > **Invocation is unaffected:** the generated output `.claude/skills/` remains flat, so users continue to invoke skills as `/{skill-name}` without a category prefix. Only the authoring layout changes.
 >
-> **Name changes (see STORY-0036-0004 and STORY-0036-0005):** approximately 19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. See [`adr/ADR-0003-skill-taxonomy-and-naming.md`](../../../../../../../adr/ADR-0003-skill-taxonomy-and-naming.md) for the authoritative mapping and [`plans/epic-0036/skill-renames.md`](../../../../../../../plans/epic-0036/skill-renames.md) for the execution checklist.
+> **Name changes (see STORY-0036-0004 and STORY-0036-0005):** approximately 19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. See [`adr/ADR-0003-skill-taxonomy-and-naming.md`](../../../../../../../adr/ADR-0003-skill-taxonomy-and-naming.md) for the authoritative mapping and `ai/epics/epic-XXXX/skill-renames.md` for the execution checklist (see EPIC-0036).
 >
 > When adding a **new** skill before the renames land: keep using flat placement under `core/` and current naming conventions. Do not pre-emptively move or rename.
 

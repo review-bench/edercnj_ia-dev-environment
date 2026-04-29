@@ -4,6 +4,7 @@ description: "Generate an Epic document from a system specification file with cr
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "<SPEC_FILE> [--epic-id XXXX] [--jira <PROJECT_KEY>] [--no-jira] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Output Policy
@@ -193,8 +194,8 @@ Write the Epic following the `_TEMPLATE-EPIC.md` structure exactly:
 
 **Directory and file naming** (mandatory — see SD-09 in decomposition guide):
 1. Determine the epic number: scan `plans/` for existing `epic-XXXX` folders and use the next available number (default `0001` if none exist). Ask the user if unsure.
-2. Create the directory `plans/epic-XXXX/`
-3. Save the Epic file as `plans/epic-XXXX/epic-XXXX.md`
+2. Create the directory `ai/epics/epic-XXXX/`
+3. Save the Epic file as `ai/epics/epic-XXXX/epic-XXXX.md`
 4. Story IDs in the index use composite format: `story-XXXX-YYYY` (where XXXX = epic number, YYYY = story sequence)
 5. Story links in the index point to `./story-XXXX-YYYY.md` (relative to the epic folder)
 
@@ -288,7 +289,7 @@ If the Jira MCP tool call fails:
 
 ### Step 7 — Save and Report
 
-Save the file to `plans/epic-XXXX/epic-XXXX.md`.
+Save the file to `ai/epics/epic-XXXX/epic-XXXX.md`.
 Report: number of rules extracted, number of stories identified, dependency structure summary.
 
 <!-- TELEMETRY: phase.end -->
@@ -301,10 +302,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this step entirely.
 
-Otherwise, delegate the commit to `x-planning-commit` so the newly written `plans/epic-XXXX/epic-XXXX.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
+Otherwise, delegate the commit to `x-planning-commit` so the newly written `ai/epics/epic-XXXX/epic-XXXX.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
 
     Skill(skill: "x-planning-commit",
-          args: "--scope chore --epic-id <XXXX> --paths plans/epic-<XXXX>/epic-<XXXX>.md --subject \"init epic specification\"")
+          args: "--scope chore --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/epic-<XXXX>.md --subject \"init epic specification\"")
 
 Idempotency: re-executing the skill with identical inputs produces `commitSha=null` (silent no-op, RULE-007 `--dry-run`-like semantics on diff vazio). The contract is enforced by `x-planning-commit` itself — this step does not perform any additional diff check.
 
@@ -377,7 +378,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 
 > V2-gated: only runs when the newly-created epic declares `planningSchemaVersion: "2.0"` in its front matter / execution-state seed. For v1 epics (or epics with no version declaration): skip silently (Rule 19).
 
-`x-epic-create` produces a fresh `plans/epic-XXXX/epic-XXXX.md` from a spec. The epic's initial lifecycle status is `Em Refinamento` (per Rule 22 — an epic starts in refinement, not `Pendente`). There is NO transition at creation time; the skill simply writes `**Status:** Em Refinamento` in the generated artifact.
+`x-epic-create` produces a fresh `ai/epics/epic-XXXX/epic-XXXX.md` from a spec. The epic's initial lifecycle status is `Em Refinamento` (per Rule 22 — an epic starts in refinement, not `Pendente`). There is NO transition at creation time; the skill simply writes `**Status:** Em Refinamento` in the generated artifact.
 
 **Steps (while materialising the epic file template):**
 
@@ -393,7 +394,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
    ```bash
    java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       read plans/epic-XXXX/epic-XXXX.md
+       read ai/epics/epic-XXXX/epic-XXXX.md
    ```
    Exit code 0 required. Exit 20 → abort skill (epic template is malformed).
 

@@ -5,9 +5,8 @@ import java.util.List;
 /**
  * Computed stack values derived from a ProjectConfig.
  *
- * <p>Immutable value object containing all resolved build commands,
- * Docker image, health path, port, project type, and protocols.
- * Produced by {@link StackResolver#resolve}.</p>
+ * <p>Immutable value object containing all resolved build commands, Docker image, health path,
+ * port, project type, and protocols. Produced by {@link StackResolver#resolve}.
  *
  * @param compileCmd the compilation command
  * @param buildCmd the build/package command
@@ -38,9 +37,7 @@ public record ResolvedStack(
         String projectType,
         List<String> protocols) {
 
-    /**
-     * Compact constructor enforcing immutability of the protocols list.
-     */
+    /** Compact constructor enforcing immutability of the protocols list. */
     public ResolvedStack {
         protocols = List.copyOf(protocols);
     }

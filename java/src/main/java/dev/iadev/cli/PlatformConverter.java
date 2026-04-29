@@ -7,42 +7,35 @@ import picocli.CommandLine.TypeConversionException;
 /**
  * Picocli type converter for {@link Platform} values.
  *
- * <p>Converts kebab-case CLI input (e.g., "claude-code")
- * to the corresponding {@link Platform} enum constant.
- * The special value "all" returns the
- * {@link Platform#ALL} sentinel to signal that no platform
- * filter should be applied (Rule 03 — never return null).</p>
+ * <p>Converts kebab-case CLI input (e.g., "claude-code") to the corresponding {@link Platform} enum
+ * constant. The special value "all" returns the {@link Platform#ALL} sentinel to signal that no
+ * platform filter should be applied (Rule 03 — never return null).
  *
- * <p>Invalid values produce a
- * {@link TypeConversionException} with a message listing
- * all accepted values (RULE-005).</p>
+ * <p>Invalid values produce a {@link TypeConversionException} with a message listing all accepted
+ * values (RULE-005).
  *
  * @see Platform#fromCliName(String)
  */
-public final class PlatformConverter
-        implements ITypeConverter<Platform> {
+public final class PlatformConverter implements ITypeConverter<Platform> {
 
     private static final String ALL_KEYWORD = "all";
 
     private static final String ACCEPTED_VALUES =
             Platform.allUserSelectable().stream()
-                    .map(Platform::cliName)
-                    .sorted()
-                    .collect(java.util.stream.Collectors
-                            .joining(", "))
+                            .map(Platform::cliName)
+                            .sorted()
+                            .collect(java.util.stream.Collectors.joining(", "))
                     + ", all";
 
     /**
      * Converts a CLI string to a {@link Platform} value.
      *
-     * <p>Trims whitespace before matching to tolerate
-     * spaces around commas in comma-separated lists.</p>
+     * <p>Trims whitespace before matching to tolerate spaces around commas in comma-separated
+     * lists.
      *
      * @param value the CLI input string
-     * @return the matching {@link Platform}, or
-     *         {@link Platform#ALL} when value equals "all"
-     * @throws TypeConversionException if the value does
-     *         not match any user-selectable platform
+     * @return the matching {@link Platform}, or {@link Platform#ALL} when value equals "all"
+     * @throws TypeConversionException if the value does not match any user-selectable platform
      */
     @Override
     public Platform convert(String value) {
@@ -52,16 +45,12 @@ public final class PlatformConverter
         }
         return Platform.fromCliName(normalized)
                 .filter(Platform.allUserSelectable()::contains)
-                .orElseThrow(
-                        () -> buildException(normalized));
+                .orElseThrow(() -> buildException(normalized));
     }
 
-    private TypeConversionException buildException(
-            String value) {
+    private TypeConversionException buildException(String value) {
         String message =
-                ("Invalid platform: '%s'. "
-                        + "Valid values: %s").formatted(
-                        value, ACCEPTED_VALUES);
+                ("Invalid platform: '%s'. " + "Valid values: %s").formatted(value, ACCEPTED_VALUES);
         return new TypeConversionException(message);
     }
 }

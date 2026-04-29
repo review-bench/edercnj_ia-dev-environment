@@ -1,13 +1,10 @@
 package dev.iadev.domain.model;
 
 /**
- * Security finding severity levels with associated
- * scoring weights.
+ * Security finding severity levels with associated scoring weights.
  *
- * <p>Used by {@link SecurityScore} to calculate the
- * weighted penalty for each severity level. The weight
- * determines how much each finding of that severity
- * reduces the overall security score.</p>
+ * <p>Used by {@link SecurityScore} to calculate the weighted penalty for each severity level. The
+ * weight determines how much each finding of that severity reduces the overall security score.
  *
  * @see SecurityScore
  */

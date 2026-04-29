@@ -4,6 +4,7 @@ description: "PCI-DSS compliance review with 25-point checklist for code changes
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

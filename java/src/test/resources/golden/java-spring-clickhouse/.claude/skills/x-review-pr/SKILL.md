@@ -3,8 +3,9 @@ name: x-review-pr
 description: "Tech Lead holistic review with 45-point checklist covering Clean Code, SOLID, architecture, framework conventions, tests, TDD process, security, and cross-file consistency. Produces GO/NO-GO decision. Use for final review before merge."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
-argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--non-interactive] [--resume-review <pr>]"
+argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -47,15 +48,15 @@ Open (close with `TaskUpdate(id: phase0TaskId, status: "completed")` after Step 
 Before executing the Tech Lead review, check if a report already exists and is still valid.
 
 1. Extract story ID from argument or branch name (e.g., `story-XXXX-YYYY`)
-2. Derive epic directory: `plans/epic-XXXX/reviews/`
+2. Derive epic directory: `ai/epics/epic-XXXX/reviews/`
 3. Check if Tech Lead report exists:
    ```bash
-   ls plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
+   ls ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
    ```
 4. If report exists AND the branch has no new commits since last report:
    ```bash
    # Compare report mtime with latest commit date
-   stat -c %Y plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
+   stat -c %Y ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
    git log -1 --format=%ct HEAD
    ```
    - If `mtime(report) >= commit_date`: log `Reusing existing tech lead review from {date}` and skip to Step 5 (dashboard update)
@@ -93,9 +94,9 @@ Read knowledge packs to calibrate the review:
 - `knowledge/testing/testing-philosophy.md` — TDD workflow, Double-Loop TDD, TPP ordering
 
 Check for existing artifacts (extract epic ID XXXX and story sequence YYYY from story ID):
-- Specialist review reports (`plans/epic-XXXX/reviews/review-*-story-XXXX-YYYY.md`)
-- Implementation plan (`plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md`)
-- Test plan (`plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md`)
+- Specialist review reports (`ai/epics/epic-XXXX/reviews/review-*-story-XXXX-YYYY.md`)
+- Implementation plan (`ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md`)
+- Test plan (`ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md`)
 - Common mistakes document
 
 ### Step 3 — Template Detection
@@ -120,7 +121,7 @@ Open a phase tracker; PRE gate ensures Phase 0 completed:
 
 Close with `TaskUpdate(id: phase1TaskId, status: "completed")` + POST gate after Step 4 finishes (the rubric execution is the evidence):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-1-Review --expected-artifacts plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-1-Review --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md")
 
 ### Step 4 — Execute Tech Lead Review
 
@@ -186,7 +187,7 @@ Open a phase tracker (PRE gate: Phase 1 must have completed):
 
 Close with `TaskUpdate(id: phase2TaskId, status: "completed")` + POST gate after Step 7:
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-2-Verdict --expected-artifacts plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-2-Verdict --expected-artifacts ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md")
 
 ### Step 5 — Update Consolidated Dashboard
 
@@ -196,11 +197,11 @@ The dashboard is **cumulative** (RULE-006): created by `/x-review` (specialist s
 
 1. **Check if dashboard exists:**
    ```bash
-   test -f plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md && echo "DASHBOARD_EXISTS" || echo "DASHBOARD_MISSING"
+   test -f ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md && echo "DASHBOARD_EXISTS" || echo "DASHBOARD_MISSING"
    ```
 
 2. **If dashboard exists (created by x-review):**
-   - Read `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
+   - Read `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
    - Update the **Tech Lead Score** section: replace placeholder `--/45 | Status: Pending` with actual score `XX/45 | Status: GO/NO-GO`
    - Update the **Overall Score** to include Tech Lead score in the total
    - Update the **Overall Status** considering both specialist scores and Tech Lead decision: status is updated to reflect all 8 specialists + Tech Lead combined assessment
@@ -213,7 +214,7 @@ The dashboard is **cumulative** (RULE-006): created by `/x-review` (specialist s
      ```bash
      test -f .claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md && echo "DASHBOARD_TEMPLATE_AVAILABLE" || echo "DASHBOARD_TEMPLATE_MISSING"
      ```
-   - If template available: read template and create `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` with only the Tech Lead Score populated (specialist scores marked as `--` / `Pending`)
+   - If template available: read template and create `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` with only the Tech Lead Score populated (specialist scores marked as `--` / `Pending`)
    - If template missing: skip dashboard creation with warning
 
 <!-- phase-no-gate: remediation is iterative by nature; each cycle K emits its own sub-task. Gate would fire inside the loop. -->
@@ -234,11 +235,11 @@ After updating the dashboard, update the remediation tracking file.
 
 1. **Check if remediation exists:**
    ```bash
-   test -f plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md && echo "REMEDIATION_EXISTS" || echo "REMEDIATION_MISSING"
+   test -f ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md && echo "REMEDIATION_EXISTS" || echo "REMEDIATION_MISSING"
    ```
 
 2. **If remediation exists (created by x-review):**
-   - Read `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
+   - Read `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
    - For each finding in the remediation tracker:
      - If the Tech Lead confirms the finding is fixed (code reviewed and issue resolved): update status from `Open` -> `Fixed`
      - If the finding remains unfixed: keep status as `Open`
@@ -251,7 +252,7 @@ After updating the dashboard, update the remediation tracking file.
      ```bash
      test -f .claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md && echo "REMEDIATION_TEMPLATE_AVAILABLE" || echo "REMEDIATION_TEMPLATE_MISSING"
      ```
-   - If template available: read template and create `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` with only findings from the Tech Lead review (all as `Open`)
+   - If template available: read template and create `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` with only findings from the Tech Lead review (all as `Open`)
    - If template missing: skip remediation creation with warning
 
 ## Phase 4 — Final approval & report
@@ -263,7 +264,7 @@ Open a phase tracker (PRE gate: Phase 2 verdict must be resolved; Phase 3 may ha
 
 Close with `TaskUpdate(id: phase4TaskId, status: "completed")` + FINAL gate (composes with Rule 24 mandatory-artifact scan):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-review-pr --phase Phase-4-Approval --expected-artifacts plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md,plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md,plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-review-pr --phase Phase-4-Approval --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md")
 
 ### Step 7 — Process Result
 
@@ -282,9 +283,9 @@ Close with `TaskUpdate(id: phase4TaskId, status: "completed")` + FINAL gate (com
  Coverage:      XX% line, XX% branch
  Smoke Tests:   PASS/FAIL/SKIP (N tests)
 ------------------------------------------------------------
- Report:      plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md
- Dashboard:   plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md (updated)
- Remediation: plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md (updated)
+ Report:      ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md
+ Dashboard:   ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md (updated)
+ Remediation: ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md (updated)
 ============================================================
 ```
 
@@ -307,7 +308,7 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
    Agent(
      subagent_type: "general-purpose",
      description: "Fix failing tests for NO-GO remediation",
-     prompt: "Read the failing test output from the review report at plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md. Identify the root cause of each failing test. Fix the IMPLEMENTATION (NOT the test) to make tests pass. Run {{TEST_COMMAND}} to verify the fix. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix failing tests from tech lead review\"')."
+     prompt: "Read the failing test output from the review report at ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md. Identify the root cause of each failing test. Fix the IMPLEMENTATION (NOT the test) to make tests pass. Run {{TEST_COMMAND}} to verify the fix. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix failing tests from tech lead review\"')."
    )
    ```
 
@@ -334,15 +335,15 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
 
 Reached when auto-remediation cycles are exhausted (2 retries without convergence) or when `--no-auto-remediation` is set and the review returns NO-GO.
 
-**Non-interactive path (`--non-interactive` present):**
-Skip `AskUserQuestion`. Print legacy HALT text and return NO-GO:
+**Non-interactive path (default — `--interactive` absent or `--non-interactive` deprecated flag):**
+Skip `AskUserQuestion`. Print HALT text and return NO-GO:
 ```
 REVIEW NO-GO: Auto-remediation exhausted without convergence. Remaining issues recorded in report.
-Run with --resume-review <pr> to re-enter the gate interactively.
+Run with --resume-review <pr> --interactive to re-enter the gate interactively.
 ```
-Exit with NO-GO. No state file written.
+Exit with NO-GO. No state file written. (`--non-interactive` DEPRECATED — same as default; WARN emitted per Rule 20 EPIC-0061.)
 
-**Interactive path (default — `--non-interactive` absent):**
+**Interactive path (`--interactive` present):**
 
 Initialize `gateAttempts = 0`.
 
@@ -461,9 +462,9 @@ If the state file fails schema validation, emit `GATE_SCHEMA_INVALID` with the p
 
 ## Output Artifacts
 
-- `plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md` — Tech Lead review report
-- `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` — Updated consolidated dashboard
-- `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` — Updated remediation tracking
+- `ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md` — Tech Lead review report
+- `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` — Updated consolidated dashboard
+- `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` — Updated remediation tracking
 - `plans/review/<pr-number>/state.json` — Gate state (opt-in, written only on FIX-PR selection)
 
 ## Error Handling

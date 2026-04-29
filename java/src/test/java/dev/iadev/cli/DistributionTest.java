@@ -1,5 +1,10 @@
 package dev.iadev.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,27 +13,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Distribution validation tests for the ia-dev-env CLI.
  *
- * <p>Verifies that all CLI commands produce correct output
- * and exit codes, matching the behavior expected from the
- * fat JAR distribution.
+ * <p>Verifies that all CLI commands produce correct output and exit codes, matching the behavior
+ * expected from the fat JAR distribution.
  *
- * <p>Tests follow TPP: help, version, validate, generate
- * with profiles, dry-run, force, verbose.
+ * <p>Tests follow TPP: help, version, validate, generate with profiles, dry-run, force, verbose.
  */
 @DisplayName("Distribution CLI Validation")
 class DistributionTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Nested
     @DisplayName("Help output")
@@ -37,22 +33,19 @@ class DistributionTest {
         @Test
         void help_whenCalled_containsUsageLine() {
             StringWriter sw = execute("--help");
-            assertThat(sw.toString())
-                    .contains("Usage: ia-dev-env");
+            assertThat(sw.toString()).contains("Usage: ia-dev-env");
         }
 
         @Test
         void help_whenCalled_listsGenerateSubcommand() {
             StringWriter sw = execute("--help");
-            assertThat(sw.toString())
-                    .contains("generate");
+            assertThat(sw.toString()).contains("generate");
         }
 
         @Test
         void help_whenCalled_listsValidateSubcommand() {
             StringWriter sw = execute("--help");
-            assertThat(sw.toString())
-                    .contains("validate");
+            assertThat(sw.toString()).contains("validate");
         }
 
         @Test
@@ -76,8 +69,7 @@ class DistributionTest {
 
         @Test
         void version_whenCalled_exitCodeIsZero() {
-            int exitCode =
-                    executeWithCode("--version");
+            int exitCode = executeWithCode("--version");
             assertThat(exitCode).isZero();
         }
     }
@@ -88,26 +80,19 @@ class DistributionTest {
 
         @Test
         void validConfig_whenCalled_exitCodeZero() {
-            int exitCode = executeWithCode(
-                    "validate", "-c",
-                    configPath("java-quarkus"));
+            int exitCode = executeWithCode("validate", "-c", configPath("java-quarkus"));
             assertThat(exitCode).isZero();
         }
 
         @Test
         void validConfig_output_containsValid() {
-            StringWriter sw = execute(
-                    "validate", "-c",
-                    configPath("java-quarkus"));
-            assertThat(sw.toString())
-                    .contains("Configuration is valid");
+            StringWriter sw = execute("validate", "-c", configPath("java-quarkus"));
+            assertThat(sw.toString()).contains("Configuration is valid");
         }
 
         @Test
         void missingFile_whenCalled_exitCodeOne() {
-            int exitCode = executeWithCode(
-                    "validate", "-c",
-                    "/nonexistent/config.yaml");
+            int exitCode = executeWithCode("validate", "-c", "/nonexistent/config.yaml");
             assertThat(exitCode).isEqualTo(1);
         }
     }
@@ -117,53 +102,28 @@ class DistributionTest {
     class GenerateProfiles {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-quarkus",
-                "java-spring"
-        })
-        void profile_generatesSuccessfully(
-                String profile) {
-            Path outputDir =
-                    tempDir.resolve("dist-" + profile);
-            int exitCode = executeWithCode(
-                    "generate", "-s", profile,
-                    "-o", outputDir.toString(), "-f");
-            assertThat(exitCode)
-                    .as("Profile " + profile
-                            + " should succeed")
-                    .isZero();
+        @ValueSource(strings = {"java-quarkus", "java-spring"})
+        void profile_generatesSuccessfully(String profile) {
+            Path outputDir = tempDir.resolve("dist-" + profile);
+            int exitCode =
+                    executeWithCode("generate", "-s", profile, "-o", outputDir.toString(), "-f");
+            assertThat(exitCode).as("Profile " + profile + " should succeed").isZero();
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-quarkus",
-                "java-spring"
-        })
-        void profile_generatesClaudeDir(
-                String profile) {
-            Path outputDir =
-                    tempDir.resolve("claude-" + profile);
-            executeWithCode(
-                    "generate", "-s", profile,
-                    "-o", outputDir.toString(), "-f");
-            assertThat(outputDir.resolve(".claude"))
-                    .isDirectory();
+        @ValueSource(strings = {"java-quarkus", "java-spring"})
+        void profile_generatesClaudeDir(String profile) {
+            Path outputDir = tempDir.resolve("claude-" + profile);
+            executeWithCode("generate", "-s", profile, "-o", outputDir.toString(), "-f");
+            assertThat(outputDir.resolve(".claude")).isDirectory();
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "java-quarkus",
-                "java-spring"
-        })
-        void profile_generatesGithubDir(
-                String profile) {
-            Path outputDir =
-                    tempDir.resolve("gh-" + profile);
-            executeWithCode(
-                    "generate", "-s", profile,
-                    "-o", outputDir.toString(), "-f");
-            assertThat(outputDir.resolve(".github"))
-                    .isDirectory();
+        @ValueSource(strings = {"java-quarkus", "java-spring"})
+        void profile_generatesGithubDir(String profile) {
+            Path outputDir = tempDir.resolve("gh-" + profile);
+            executeWithCode("generate", "-s", profile, "-o", outputDir.toString(), "-f");
+            assertThat(outputDir.resolve(".github")).isDirectory();
         }
     }
 
@@ -173,21 +133,28 @@ class DistributionTest {
 
         @Test
         void dryRun_whenCalled_exitCodeZero() {
-            int exitCode = executeWithCode(
-                    "generate", "-s", "java-quarkus",
-                    "--dry-run",
-                    "-o", tempDir.toString());
+            int exitCode =
+                    executeWithCode(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
             assertThat(exitCode).isZero();
         }
 
         @Test
         void dryRun_output_containsWarning() {
-            StringWriter sw = execute(
-                    "generate", "-s", "java-quarkus",
-                    "--dry-run",
-                    "-o", tempDir.toString());
-            assertThat(sw.toString())
-                    .contains("Dry run");
+            StringWriter sw =
+                    execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "--dry-run",
+                            "-o",
+                            tempDir.toString());
+            assertThat(sw.toString()).contains("Dry run");
         }
     }
 
@@ -197,18 +164,15 @@ class DistributionTest {
 
         @Test
         void force_whenCalled_overwritesExisting() {
-            Path outputDir =
-                    tempDir.resolve("force-test");
+            Path outputDir = tempDir.resolve("force-test");
 
             // First generation
-            executeWithCode(
-                    "generate", "-s", "java-quarkus",
-                    "-o", outputDir.toString(), "-f");
+            executeWithCode("generate", "-s", "java-quarkus", "-o", outputDir.toString(), "-f");
 
             // Second generation with force
-            int exitCode = executeWithCode(
-                    "generate", "-s", "java-quarkus",
-                    "-o", outputDir.toString(), "-f");
+            int exitCode =
+                    executeWithCode(
+                            "generate", "-s", "java-quarkus", "-o", outputDir.toString(), "-f");
 
             assertThat(exitCode).isZero();
         }
@@ -220,21 +184,22 @@ class DistributionTest {
 
         @Test
         void verbose_whenCalled_showsAssemblerNames() {
-            Path outputDir =
-                    tempDir.resolve("verbose-test");
-            StringWriter sw = execute(
-                    "generate", "-s", "java-quarkus",
-                    "-o", outputDir.toString(),
-                    "-f", "-v");
-            assertThat(sw.toString())
-                    .contains("Platform filter:")
-                    .contains("INCLUDED:");
+            Path outputDir = tempDir.resolve("verbose-test");
+            StringWriter sw =
+                    execute(
+                            "generate",
+                            "-s",
+                            "java-quarkus",
+                            "-o",
+                            outputDir.toString(),
+                            "-f",
+                            "-v");
+            assertThat(sw.toString()).contains("Platform filter:").contains("INCLUDED:");
         }
     }
 
     private StringWriter execute(String... args) {
-        var cmd = new CommandLine(
-                new IaDevEnvApplication());
+        var cmd = new CommandLine(new IaDevEnvApplication());
         var sw = new StringWriter();
         cmd.setOut(new PrintWriter(sw));
         cmd.setErr(new PrintWriter(new StringWriter()));
@@ -243,8 +208,7 @@ class DistributionTest {
     }
 
     private int executeWithCode(String... args) {
-        var cmd = new CommandLine(
-                new IaDevEnvApplication());
+        var cmd = new CommandLine(new IaDevEnvApplication());
         var sw = new StringWriter();
         cmd.setOut(new PrintWriter(sw));
         cmd.setErr(new PrintWriter(new StringWriter()));
@@ -252,7 +216,6 @@ class DistributionTest {
     }
 
     private String configPath(String profile) {
-        return "src/main/resources/shared/config-templates/"
-                + "setup-config." + profile + ".yaml";
+        return "src/main/resources/shared/config-templates/" + "setup-config." + profile + ".yaml";
     }
 }

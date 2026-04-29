@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Agent
 argument-hint: "[cpu|memory|io|all] [--duration 30s] [--output flamegraph|report|raw]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

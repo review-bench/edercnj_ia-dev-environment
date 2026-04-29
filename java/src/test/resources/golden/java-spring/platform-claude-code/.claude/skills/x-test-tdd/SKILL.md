@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Skill
 argument-hint: "TASK-XXXX-YYYY-NNN [--from-cycle N] [--dry-run] [--warn-only-coverage] [--orchestrated]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

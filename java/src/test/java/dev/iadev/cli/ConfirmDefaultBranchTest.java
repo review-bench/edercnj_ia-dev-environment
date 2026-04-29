@@ -8,14 +8,12 @@ class ConfirmDefaultBranchTest {
 
     @Test
     void of_trueYieldsDefaultYes() {
-        assertThat(ConfirmDefault.of(true))
-                .isEqualTo(ConfirmDefault.DEFAULT_YES);
+        assertThat(ConfirmDefault.of(true)).isEqualTo(ConfirmDefault.DEFAULT_YES);
     }
 
     @Test
     void of_falseYieldsDefaultNo() {
-        assertThat(ConfirmDefault.of(false))
-                .isEqualTo(ConfirmDefault.DEFAULT_NO);
+        assertThat(ConfirmDefault.of(false)).isEqualTo(ConfirmDefault.DEFAULT_NO);
     }
 
     @Test

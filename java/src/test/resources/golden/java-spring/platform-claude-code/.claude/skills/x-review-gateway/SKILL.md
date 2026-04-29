@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[gateway config files or PR]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

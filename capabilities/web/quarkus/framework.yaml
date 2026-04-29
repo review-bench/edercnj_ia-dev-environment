@@ -1,0 +1,15 @@
+id: web.quarkus.framework
+category: web
+kind: atomic
+version: "3"
+status: stable
+description: Quarkus supersonic subatomic Java (CDI, Panache, RESTEasy Reactive, native build)
+requires:
+  - lang.java.21
+excludes:
+  - web.spring.boot
+tags:
+  - web
+  - quarkus
+  - reactive
+  - native

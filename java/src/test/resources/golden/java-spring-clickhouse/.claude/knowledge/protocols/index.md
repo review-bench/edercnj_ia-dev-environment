@@ -1,6 +1,7 @@
 ---
 name: protocols
 description: "Protocol conventions: REST (OpenAPI 3.1), gRPC (Proto3), GraphQL, WebSocket, and event-driven messaging. URL structure, versioning, error handling per protocol, schema design, and integration patterns."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Protocols

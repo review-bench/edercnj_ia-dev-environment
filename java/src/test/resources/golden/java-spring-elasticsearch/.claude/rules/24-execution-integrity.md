@@ -35,23 +35,40 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 
 | Sub-skill | Artifact path | Enforced by |
 | :--- | :--- | :--- |
-| `x-internal-story-verify` | `plans/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
-| `x-review` | `plans/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
-| `x-review-pr` | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
-| `x-internal-story-report` | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
-| `x-arch-plan` | `plans/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
+| `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
+| `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
+| `x-internal-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
+| `x-arch-plan` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
 | `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
-| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `plans/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
-| `x-test-tdd` / `x-test-run` | `plans/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
+| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `ai/epics/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
+| `x-test-tdd` / `x-test-run` | `ai/epics/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
 | `x-git-commit` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
-| `x-dependency-audit` | `plans/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
-| `x-threat-model` | `plans/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
+| `x-threat-model` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
 ## Enforcement Layers
 
-Four defense-in-depth layers. A violation caught by any layer fails the lifecycle.
+Five defense-in-depth layers (extended by EPIC-0063 with Camada 0). A violation caught by any layer fails the lifecycle.
+
+### Camada 0 — Local Pre-Flight (NEW — EPIC-0063)
+
+Gates that execute on the operator's machine BEFORE any remote operation (`git push`, `gh pr create`, `Skill x-pr-create`). This camada is the only one that can **prevent** a bad action from happening; Camadas 1-4 are detective (catch after the fact).
+
+| Aspect | Detail |
+| :--- | :--- |
+| Trigger | PreToolUse hook (`enforce-preflight-gates.sh`) on `Bash`, `Skill x-pr-create`, etc. |
+| Vinculatividade | PreToolUse hook is physically blocking — `git push` is intercepted before reaching origin |
+| Único bypass | `CLAUDE_RECOVERY_MODE=1` env var (with visible WARNING). No silent escape. |
+| Scripts | `scripts/preflight.sh` orchestrates: `audit-review-content.sh`, `audit-verify-envelope.sh`, `audit-coverage-local.sh`, `audit-execution-integrity.sh --scope=telemetry` |
+| Cross-ref | Rule 27 RULE-059-07 (CLAUDE_RECOVERY_MODE is the only accepted bypass variable) |
+
+**Failure semantics:** when preflight fails, the PreToolUse hook exits with code 2 (blocking) and Claude Code surfaces the error to the LLM with the failed gate's exit code/message. The operator must fix the underlying issue before retrying — there is no `--no-verify` style escape.
+
+**Stories implementing Camada 0:**
+- story-0063-0001 (preflight.sh runner), story-0063-0002 (content audits), story-0063-0003 (telemetry audit), story-0063-0004 (PreToolUse hook), story-0063-0007 (coverage gate), story-0063-0021 (PR-fix gate)
 
 ### Camada 1 — Normative (this rule + assertive SKILL.md + CLAUDE.md)
 
@@ -63,7 +80,7 @@ Four defense-in-depth layers. A violation caught by any layer fails the lifecycl
 
 - `.claude/hooks/verify-story-completion.sh` fires on every `Stop` event (end of LLM turn).
 - Detects recent PR-creation / story-completion activity for the active story (via telemetry NDJSON `gh pr create` events AND the current branch / latest commit message).
-- Checks that the required evidence artifacts for mandatory sub-skills exist on disk (under `plans/epic-XXXX/plans/` and `plans/epic-XXXX/reports/`) for that story, rather than relying on telemetry entries.
+- Checks that the required evidence artifacts for mandatory sub-skills exist on disk (under `ai/epics/epic-XXXX/plans/` and `ai/epics/epic-XXXX/reports/`) for that story, rather than relying on telemetry entries.
 - On missing evidence, emits a visible WARNING on stderr and exits with code 2, which Claude Code surfaces to the LLM as a blocking notification.
 
 ### Camada 3 — CI audit
@@ -71,7 +88,7 @@ Four defense-in-depth layers. A violation caught by any layer fails the lifecycl
 - `scripts/audit-execution-integrity.sh` runs on every PR to `develop` (via the CI workflow) and on every PR to `epic/*` branches.
 - For each story-branch merge detected via `git log`, verifies the mandatory artifact set exists.
 - Fails the CI build with `EIE_EVIDENCE_MISSING` if evidence is absent.
-- Escape hatch: baseline file `audits/execution-integrity-baseline.txt` grandfathers stories merged before this rule was introduced. Newly-merged stories cannot be added to the baseline.
+- Escape hatch: baseline file `governance/baselines/execution-integrity-baseline.txt` grandfathers stories merged before this rule was introduced. Newly-merged stories cannot be added to the baseline.
 - Per-story escape: `<!-- audit-exempt: <reason> -->` line in the story markdown (rare, reviewed exceptions).
 
 ### Camada 4 — Observability (mandatory artifacts)
@@ -86,12 +103,12 @@ Sub-skills that "count" for Rule 24 are required by contract to emit their evide
 | :--- | :--- | :--- |
 | 0 | `OK` | All merged stories have required evidence (or are grandfathered). |
 | 1 | `EIE_EVIDENCE_MISSING` | At least one merged story lacks mandatory artifacts. |
-| 2 | `EIE_BASELINE_CORRUPT` | `audits/execution-integrity-baseline.txt` malformed. |
+| 2 | `EIE_BASELINE_CORRUPT` | `governance/baselines/execution-integrity-baseline.txt` malformed. |
 | 3 | `EIE_INVALID_EXEMPTION` | `audit-exempt` marker missing a reason. |
 
 ## Baseline (Grandfather List)
 
-`audits/execution-integrity-baseline.txt` lists stories merged before Rule 24 was introduced. Format: one `STORY-ID` per line, with trailing `# reason` comment. No new entries may be added after Rule 24 merges — CI refuses additions via a separate immutability check.
+`governance/baselines/execution-integrity-baseline.txt` lists stories merged before Rule 24 was introduced. Format: one `STORY-ID` per line, with trailing `# reason` comment. No new entries may be added after Rule 24 merges — CI refuses additions via a separate immutability check.
 
 Example (initial baseline):
 

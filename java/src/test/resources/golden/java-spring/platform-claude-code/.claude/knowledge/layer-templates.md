@@ -2,6 +2,7 @@
 name: layer-templates
 model: haiku
 description: "Reference code templates for each hexagonal architecture layer. Provides consistent patterns for domain model, ports, DTOs, mappers, entities, repositories, use cases, REST resources, exception mappers, migrations, and configuration. Uses {{LANGUAGE}}, {{FRAMEWORK}} placeholders."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Layer Templates

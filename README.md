@@ -30,7 +30,7 @@ A CLI tool that generates complete `.claude/` boilerplate for AI-assisted develo
 `ia-dev-env` reads a YAML configuration file describing your project's tech stack (language, framework, database, infrastructure, etc.) and generates a complete Claude Code configuration:
 
 - **Claude Code** (`.claude/`) -- rules, skills, agents, hooks, settings
-- **Documentation** (`steering/`, `specs/`, `plans/`, `results/`, `contracts/`, `adr/`) -- architecture, specs, stories, runbooks, contracts, ADRs
+- **Documentation** (`governance/steering/`, `docs/specs/`, `plans/` + `ai/epics/`, `ai/runs/`, `docs/runbooks/`, `docs/contracts/`, `docs/adr/`) -- architecture, specs, epics (legacy + v4), runs, runbooks, contracts, ADRs
 - **CI/CD** -- Dockerfile, docker-compose, GitHub Actions workflows, Kubernetes manifests
 
 All generated artifacts enforce consistent engineering standards: coding conventions, architecture boundaries, TDD workflow, coverage thresholds, and security practices.
@@ -175,22 +175,34 @@ Each profile generates the complete set of skills, agents, and rules tailored to
 ├── templates/                    # 12 plan & review templates (EPIC-0024)
 └── hooks/                        # Automation scripts (post-compile, etc.)
 
-steering/                         # Persistent project context
+governance/steering/              # Persistent project context
 ├── service-architecture.md       # Service architecture doc
 └── product.md, tech-stack.md...  # Project identity files
 
-specs/                            # Human-authored specifications
+docs/specs/                       # Human-authored specifications
 └── _templates/                   # Spec templates (contributing, etc.)
 
-results/                          # Execution outputs
-└── runbooks/                     # Deploy runbook, operational guides
+docs/runbooks/                    # Operational runbooks and templates
+└── deploy-runbook.md             # Deploy runbook, operational guides
 
-contracts/                        # API contracts and schemas
+ai/runs/                          # Local execution outputs
+├── audits/                       # Codebase audit reports
+├── reviews/                      # Review session outputs
+├── test-runs/                    # Test execution snapshots
+└── telemetry/                    # Cross-session telemetry NDJSON
+
+docs/contracts/                   # API contracts and schemas
 └── api/                          # gRPC reference (when applicable)
 
-adr/                              # Architecture Decision Records
+docs/adr/                         # Architecture Decision Records
 ├── README.md                     # ADR index
 └── _TEMPLATE-ADR.md              # ADR template
+
+ai/epics/                         # Epic workspaces (v4 layout, flowVersion 4)
+└── epic-XXXX-<slug>/             # epic.md, IMPLEMENTATION-MAP, stories, plans/, reports/
+
+plans/                            # Legacy epic workspaces (read-only, flowVersion ≤ 2)
+└── epic-XXXX/                    # 60 legacy epics 0001..0060 — kept per SPEC RULE-001
 ```
 
 Plus CI/CD artifacts: `Dockerfile`, `docker-compose.yml`, `.github/workflows/ci.yml`, and Kubernetes manifests (when applicable).
@@ -206,8 +218,8 @@ The generator produces **20 core skills** (always included) and up to **13 condi
 > **EPIC-0036 (Skill Taxonomy Refactor) — renames applied.**
 > The source of truth for skills under `java/src/main/resources/targets/claude/skills/` has been reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`) and 19 skills have been renamed to a consistent `x-{subject}-{action}` scheme. The generated output (`.claude/skills/`) remains **flat** — user-facing invocation paths stay `/{skill-name}` without a category prefix.
 >
-> - Decision record: [`adr/ADR-0003-skill-taxonomy-and-naming.md`](adr/ADR-0003-skill-taxonomy-and-naming.md)
-> - Rename history: [`plans/epic-0036/skill-renames.md`](plans/epic-0036/skill-renames.md)
+> - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
+> - Rename history: [`ai/epics/epic-0036/skill-renames.md`](ai/epics/epic-0036/skill-renames.md)
 > - Release notes (post-merge migration table): [`docs/release-notes/EPIC-0036-skill-renames.md`](docs/release-notes/EPIC-0036-skill-renames.md)
 
 ### Story Planning & Decomposition
@@ -230,7 +242,7 @@ Orchestrates the full decomposition of a system specification into three deliver
 3. Identifies stories by layer (Foundation → Core → Extensions → Compositions)
 4. Maps dependencies between stories
 5. Computes implementation phases and critical path
-6. Generates all three deliverables in `plans/epic-XXXX/`
+6. Generates all three deliverables in `ai/epics/epic-XXXX/`
 
 **Generated artifacts:**
 - `EPIC-XXXX.md` -- scope, rules table, DoR/DoD, story index
@@ -247,7 +259,7 @@ Internally delegates to `/x-epic-create`, `/x-story-create`, and `/x-epic-map`.
 |---|---|
 | **When to use** | When you only need the Epic document, not the full decomposition |
 | **Input** | Specification file |
-| **Output** | `plans/epic-XXXX/EPIC-XXXX.md` |
+| **Output** | `ai/epics/epic-XXXX/EPIC-XXXX.md` |
 
 Generates the top-level Epic file with: scope overview, cross-cutting business rules table, global DoR/DoD (including TDD compliance requirements), and story index with dependency declarations.
 
@@ -381,7 +393,7 @@ Skills for architecture planning, documentation, and decision records.
 |---|---|
 | **When to use** | Before implementing a feature that changes architecture |
 | **Input** | Story ID or feature name |
-| **Output** | `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
+| **Output** | `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
 
 Generates a comprehensive architecture plan:
 - Component diagrams (Mermaid)
@@ -403,7 +415,7 @@ Automatically evaluates scope (Full / Simplified / Skip) based on change impact.
 |---|---|
 | **When to use** | After implementing a feature, to keep architecture docs current |
 | **Input** | Story ID or architecture plan path |
-| **Output** | Updated `steering/service-architecture.md` |
+| **Output** | Updated `governance/steering/service-architecture.md` |
 
 Reads the architecture plan and incrementally updates the service architecture document. **Appends only** -- never rewrites existing content. Updates the Change History section with date, story ID, and summary.
 
@@ -431,7 +443,7 @@ Skills for test planning and execution.
 |---|---|
 | **When to use** | Before implementation, to define the TDD roadmap |
 | **Input** | Story ID |
-| **Output** | `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
+| **Output** | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
 
 Generates a Double-Loop TDD test plan:
 - **Outer loop (Acceptance Tests):** AT-1..N mapping to Gherkin scenarios -- these start RED and drive the implementation
@@ -528,7 +540,7 @@ Applies a **45-point checklist** across 11 dimensions:
 |---|---|
 | **When to use** | Periodic quality assessment of the entire codebase |
 | **Input** | Optional: `--scope all\|rules\|patterns\|architecture\|security\|cross-file` |
-| **Output** | `results/audits/codebase-audit-YYYY-MM-DD.md` |
+| **Output** | `ai/runs/audits/codebase-audit-YYYY-MM-DD.md` |
 
 Like `/x-review-pr` but for the **entire codebase**, not just a single PR. Launches parallel subagents for 6 audit dimensions:
 
@@ -549,7 +561,7 @@ Like `/x-review-pr` but for the **entire codebase**, not just a single PR. Launc
 |---|---|
 | **When to use** | Checking dependencies for security, freshness, and licensing |
 | **Input** | Optional: `--scope all\|vulnerabilities\|outdated\|licenses` |
-| **Output** | `results/audits/dependency-audit-YYYY-MM-DD.md` |
+| **Output** | `ai/runs/audits/dependency-audit-YYYY-MM-DD.md` |
 
 Audits three dimensions with language-specific commands:
 
@@ -787,11 +799,11 @@ ia-dev-environment/
 │       ├── java/                 # 1961 tests (unit + integration + golden)
 │       └── resources/golden/     # Golden files for 8 profiles
 ├── steering/                     # Persistent project context
-├── specs/                        # Human-authored specifications
+├── docs/specs/                   # Human-authored specifications
 ├── plans/                        # SDD artifacts (epics, stories, maps)
 ├── results/                      # Execution outputs (audits, reviews, runbooks)
 ├── contracts/                    # API contracts and schemas
-├── adr/                          # Architecture Decision Records
+├── docs/adr/                     # Architecture Decision Records
 ├── CLAUDE.md                     # Executive summary (auto-loaded by Claude Code)
 └── README.md                     # This file
 ```

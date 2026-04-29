@@ -1,42 +1,42 @@
 package dev.iadev.domain.port.output;
 
 import dev.iadev.domain.model.StackProfile;
-
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Output port for loading technology stack profiles.
  *
- * <p>Abstracts the persistence mechanism for stack profiles.
- * The domain depends on this interface; concrete implementations
- * (e.g., YAML-based loading) reside in the infrastructure adapter
- * layer.</p>
+ * <p>Abstracts the persistence mechanism for stack profiles. The domain depends on this interface;
+ * concrete implementations (e.g., YAML-based loading) reside in the infrastructure adapter layer.
  *
  * <h2>Contract</h2>
+ *
  * <ul>
- *   <li>Implementations MUST return immutable collections.</li>
- *   <li>{@link #findByName(String)} MUST return {@link Optional#empty()}
- *       when no profile matches — never null.</li>
- *   <li>{@link #findAll()} MUST return an empty list (not null)
- *       when no profiles are available.</li>
+ *   <li>Implementations MUST return immutable collections.
+ *   <li>{@link #findByName(String)} MUST return {@link Optional#empty()} when no profile matches —
+ *       never null.
+ *   <li>{@link #findAll()} MUST return an empty list (not null) when no profiles are available.
  * </ul>
  *
  * <h2>Pre-conditions</h2>
+ *
  * <ul>
- *   <li>{@code profileName} parameters must not be null or blank.</li>
+ *   <li>{@code profileName} parameters must not be null or blank.
  * </ul>
  *
  * <h2>Post-conditions</h2>
+ *
  * <ul>
- *   <li>Returned {@link StackProfile} instances are always valid
- *       (non-null name, language, framework).</li>
+ *   <li>Returned {@link StackProfile} instances are always valid (non-null name, language,
+ *       framework).
  * </ul>
  *
  * <h2>Exceptions</h2>
+ *
  * <ul>
- *   <li>{@link IllegalArgumentException} if profileName is null or blank.</li>
- *   <li>Implementation-specific unchecked exceptions for I/O failures.</li>
+ *   <li>{@link IllegalArgumentException} if profileName is null or blank.
+ *   <li>Implementation-specific unchecked exceptions for I/O failures.
  * </ul>
  *
  * @see StackProfile

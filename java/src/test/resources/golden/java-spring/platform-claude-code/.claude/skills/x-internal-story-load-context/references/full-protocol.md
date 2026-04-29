@@ -118,7 +118,7 @@ synonym would hide lifecycle drift (Rule 22 precedent).
 
 ## 6. Performance Profile
 
-Measured on the `plans/epic-0049/` fixture (22 stories, 7 current
+Measured on the `ai/epics/epic-XXXX/` fixture (22 stories, 7 current
 planning artifacts for the pilot story):
 
 | Step | Median time | Dominated by |
@@ -149,13 +149,13 @@ Blocker story-0049-0001 is PENDING
 Envelope for exit 1 (STORY_NOT_FOUND):
 
 ```text
-Story file not found: plans/epic-0049/story-0049-9999.md
+Story file not found: ai/epics/epic-XXXX/story-XXXX-9999.md
 ```
 
 Envelope for exit 3 (EPIC_NOT_FOUND):
 
 ```text
-Epic dir not found: plans/epic-9999
+Epic dir not found: ai/epics/epic-XXXX
 ```
 
 Envelope for exit 64 (usage error):

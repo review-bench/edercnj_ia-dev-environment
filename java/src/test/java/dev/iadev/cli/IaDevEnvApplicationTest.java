@@ -1,9 +1,9 @@
 package dev.iadev.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link IaDevEnvApplication} main CLI entry point.

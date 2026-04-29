@@ -4,6 +4,7 @@ description: "Create a Jira Epic from an existing local epic markdown file. Read
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
 argument-hint: "[EPIC_FILE_PATH]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -44,7 +45,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira
 
 1. Accept the epic file path as argument. If not provided, ask:
    ```
-   question: "Qual o caminho do arquivo do epico? (ex: plans/epic-0012/epic-0012.md)"
+   question: "Qual o caminho do arquivo do epico? (ex: ai/epics/epic-XXXX/epic-XXXX.md)"
    header: "Epic File"
    ```
 2. Read the epic file completely

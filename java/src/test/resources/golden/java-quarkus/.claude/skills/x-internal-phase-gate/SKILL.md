@@ -5,9 +5,10 @@ model: haiku
 visibility: internal
 user-invocable: false
 allowed-tools: Read, Bash
-argument-hint: "--mode pre|post|wave|final [--skill <name>] [--phase <Phase N>] [--parent-task-id <id>] [--expected-tasks id1,id2] [--expected-artifacts path1,path2] [--timeout-s <N>] [--emit-tracker true|false] [--state-file plans/epic-XXXX/execution-state.json]"
+argument-hint: "--mode pre|post|wave|final [--skill <name>] [--phase <Phase N>] [--parent-task-id <id>] [--expected-tasks id1,id2] [--expected-artifacts path1,path2] [--timeout-s <N>] [--emit-tracker true|false] [--state-file ai/epics/epic-XXXX/execution-state.json]"
 category: internal-plan
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -67,17 +68,17 @@ Bare-slash form intentionally omitted — never invoked by a user. All invocatio
 
 ```markdown
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode pre --skill x-story-implement --phase Phase-1 --state-file plans/epic-0060/execution-state.json")
+      args: "--mode pre --skill x-story-implement --phase Phase-1 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ```markdown
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts plans/epic-0060/plans/arch-story-0060-0001.md,plans/epic-0060/plans/plan-story-0060-0001.md --state-file plans/epic-0060/execution-state.json")
+      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ```markdown
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode wave --skill x-review --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --state-file plans/epic-0060/execution-state.json")
+      args: "--mode wave --skill x-review --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ## Parameters
@@ -92,7 +93,7 @@ Skill(skill: "x-internal-phase-gate",
 | `--expected-artifacts <paths>` | O | — | Comma-separated relative paths that MUST exist on disk. Required for `post` and `final`. Optional for `wave`. |
 | `--timeout-s <N>` | O | `10` | Integer seconds to retry-poll if any `--expected-tasks` is still `in_progress`. Exceeded → exit 14. |
 | `--emit-tracker <bool>` | O | `false` | Only legal with `--mode wave`. Emits a single tracker `TaskCreate` with `subject` = `<skill> › <phase> › wave-tracker` for CLI visibility. |
-| `--state-file <path>` | O | auto | Path to `execution-state.json`. Auto-derived from `$CWD/plans/epic-XXXX/execution-state.json` when epic is unambiguous. |
+| `--state-file <path>` | O | auto | Path to `execution-state.json`. Auto-derived from `$CWD/ai/epics/epic-XXXX/execution-state.json` when epic is unambiguous. |
 
 ## Response Contract
 
@@ -141,7 +142,7 @@ Parse arguments with the shared Rule-14 `while (($#))` loop. Normalize `--mode` 
 
 ### Step 2 — Resolve `--state-file`
 
-When `--state-file` absent, search upward from `$PWD` for `plans/epic-*/execution-state.json`. Exactly one match → proceed. Zero or multiple → exit 13 with `STATE_FILE_AMBIGUOUS`.
+When `--state-file` absent, search upward from `$PWD` for `ai/epics/epic-*/execution-state.json`. Exactly one match → proceed. Zero or multiple → exit 13 with `STATE_FILE_AMBIGUOUS`.
 
 ### Step 3 — Short-circuit on `taskTracking.enabled=false`
 
@@ -217,7 +218,7 @@ Target global overhead across an epic with ~30 gates: < 5 seconds, i.e., well be
 
 ```bash
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode pre --skill x-story-implement --phase Phase-2 --state-file plans/epic-0060/execution-state.json")
+      args: "--mode pre --skill x-story-implement --phase Phase-2 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 Output:
@@ -230,12 +231,12 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts plans/epic-0060/plans/arch-story-0060-0001.md,plans/epic-0060/plans/plan-story-0060-0001.md")
+      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md")
 ```
 
 Output:
 ```json
-{"passed":true,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102,103,104,105,106],"completedTasks":[101,102,103,104,105,106],"missingTasks":[],"expectedArtifacts":["plans/epic-0060/plans/arch-story-0060-0001.md","plans/epic-0060/plans/plan-story-0060-0001.md"],"missingArtifacts":[],"wallclockMs":47,"timestamp":"2026-04-24T10:35:00Z"}
+{"passed":true,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102,103,104,105,106],"completedTasks":[101,102,103,104,105,106],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/plan-story-0060-0001.md"],"missingArtifacts":[],"wallclockMs":47,"timestamp":"2026-04-24T10:35:00Z"}
 ```
 Exit: 0.
 
@@ -243,12 +244,12 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102 --expected-artifacts plans/epic-0060/plans/arch-story-0060-0001.md,plans/epic-0060/plans/missing.md")
+      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/missing.md")
 ```
 
 Output:
 ```json
-{"passed":false,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102],"completedTasks":[101,102],"missingTasks":[],"expectedArtifacts":["plans/epic-0060/plans/arch-story-0060-0001.md","plans/epic-0060/plans/missing.md"],"missingArtifacts":["plans/epic-0060/plans/missing.md"],"wallclockMs":38,"timestamp":"2026-04-24T10:40:00Z"}
+{"passed":false,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102],"completedTasks":[101,102],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/missing.md"],"missingArtifacts":["ai/epics/epic-XXXX/plans/missing.md"],"wallclockMs":38,"timestamp":"2026-04-24T10:40:00Z"}
 ```
 Exit: 12.
 

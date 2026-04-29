@@ -1,25 +1,23 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for PermissionCollector — collects CLI permissions
- * from JSON files based on project configuration.
+ * Tests for PermissionCollector — collects CLI permissions from JSON files based on project
+ * configuration.
  */
 @DisplayName("PermissionCollector")
 class PermissionCollectorTest {
@@ -29,14 +27,10 @@ class PermissionCollectorTest {
     class Collect {
 
         @Test
-        @DisplayName("returns deduplicated permissions"
-                + " for java-maven")
-        void collect_forJavaMaven_deduplicated(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        @DisplayName("returns deduplicated permissions" + " for java-maven")
+        void collect_forJavaMaven_deduplicated(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -47,8 +41,7 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collect(config, templatesDir);
+            List<String> perms = collector.collect(config, templatesDir);
 
             assertThat(perms)
                     .contains("Bash(git *)")
@@ -63,12 +56,9 @@ class PermissionCollectorTest {
 
         @Test
         @DisplayName("java-maven includes base + maven")
-        void collectRaw_javaMaven_includesBaseAndMaven(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        void collectRaw_javaMaven_includesBaseAndMaven(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -79,24 +69,16 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(git *)")
-                    .contains("Bash(mvn *)");
+            assertThat(perms).contains("Bash(git *)").contains("Bash(mvn *)");
         }
 
         @Test
-        @DisplayName("docker container adds docker"
-                + " permissions")
-        void collectRaw_docker_addsDockerPerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        @DisplayName("docker container adds docker" + " permissions")
+        void collectRaw_docker_addsDockerPerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .container("docker")
@@ -104,22 +86,16 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(docker build *)");
+            assertThat(perms).contains("Bash(docker build *)");
         }
 
         @Test
         @DisplayName("podman adds docker permissions")
-        void collectRaw_podman_addsDockerPerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        void collectRaw_podman_addsDockerPerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .container("podman")
@@ -127,22 +103,16 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(docker build *)");
+            assertThat(perms).contains("Bash(docker build *)");
         }
 
         @Test
         @DisplayName("kubernetes adds k8s permissions")
-        void collectRaw_k8s_addsK8sPerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        void collectRaw_k8s_addsK8sPerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .container("none")
@@ -150,23 +120,16 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(kubectl get *)");
+            assertThat(perms).contains("Bash(kubectl get *)");
         }
 
         @Test
-        @DisplayName("docker-compose adds compose"
-                + " permissions")
-        void collectRaw_compose_addsComposePerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        @DisplayName("docker-compose adds compose" + " permissions")
+        void collectRaw_compose_addsComposePerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .container("none")
@@ -174,22 +137,16 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(docker compose *)");
+            assertThat(perms).contains("Bash(docker compose *)");
         }
 
         @Test
         @DisplayName("smoke tests add newman permissions")
-        void collectRaw_whenCalled_smokeTestsAddNewman(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
-            PermissionCollector collector =
-                    new PermissionCollector();
+        void collectRaw_whenCalled_smokeTestsAddNewman(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .container("none")
@@ -197,26 +154,20 @@ class PermissionCollectorTest {
                             .smokeTests(true)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(newman *)");
+            assertThat(perms).contains("Bash(newman *)");
         }
 
         @Test
         @DisplayName("database adds db permissions")
-        void collectRaw_database_addsDbPerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
+        void collectRaw_database_addsDbPerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
             Files.writeString(
                     templatesDir.resolve("database-pg.json"),
                     "[\"Bash(psql *)\"]",
                     StandardCharsets.UTF_8);
-            PermissionCollector collector =
-                    new PermissionCollector();
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .database("postgresql", "16")
@@ -225,26 +176,20 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(git *)");
+            assertThat(perms).contains("Bash(git *)");
         }
 
         @Test
         @DisplayName("cache adds cache permissions")
-        void collectRaw_cache_addsCachePerms(
-                @TempDir Path tempDir) throws IOException {
-            Path templatesDir =
-                    setupTemplatesDir(tempDir);
+        void collectRaw_cache_addsCachePerms(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = setupTemplatesDir(tempDir);
             Files.writeString(
                     templatesDir.resolve("cache-redis.json"),
                     "[\"Bash(redis-cli *)\"]",
                     StandardCharsets.UTF_8);
-            PermissionCollector collector =
-                    new PermissionCollector();
+            PermissionCollector collector = new PermissionCollector();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .cache("redis", "7.4")
@@ -253,12 +198,9 @@ class PermissionCollectorTest {
                             .smokeTests(false)
                             .build();
 
-            List<String> perms =
-                    collector.collectRaw(
-                            config, templatesDir);
+            List<String> perms = collector.collectRaw(config, templatesDir);
 
-            assertThat(perms)
-                    .contains("Bash(git *)");
+            assertThat(perms).contains("Bash(git *)");
         }
     }
 
@@ -269,14 +211,11 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("preserves order and removes dupes")
         void deduplicate_preservesOrder_removesDupes() {
-            List<String> input = List.of(
-                    "a", "b", "a", "c", "b");
+            List<String> input = List.of("a", "b", "a", "c", "b");
 
-            List<String> result =
-                    PermissionCollector.deduplicate(input);
+            List<String> result = PermissionCollector.deduplicate(input);
 
-            assertThat(result)
-                    .containsExactly("a", "b", "c");
+            assertThat(result).containsExactly("a", "b", "c");
         }
 
         @Test
@@ -284,11 +223,9 @@ class PermissionCollectorTest {
         void deduplicate_noDuplicatesUnchanged_succeeds() {
             List<String> input = List.of("a", "b", "c");
 
-            List<String> result =
-                    PermissionCollector.deduplicate(input);
+            List<String> result = PermissionCollector.deduplicate(input);
 
-            assertThat(result)
-                    .containsExactly("a", "b", "c");
+            assertThat(result).containsExactly("a", "b", "c");
         }
     }
 
@@ -299,19 +236,15 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("parses simple JSON array")
         void parseJsonStringArray_whenCalled_parsesSimpleArray() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray(
-                            "[\"a\", \"b\", \"c\"]");
+            List<String> result = PermissionCollector.parseJsonStringArray("[\"a\", \"b\", \"c\"]");
 
-            assertThat(result)
-                    .containsExactly("a", "b", "c");
+            assertThat(result).containsExactly("a", "b", "c");
         }
 
         @Test
         @DisplayName("returns empty for empty array")
         void parseJsonStringArray_emptyForEmptyArray_succeeds() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray("[]");
+            List<String> result = PermissionCollector.parseJsonStringArray("[]");
 
             assertThat(result).isEmpty();
         }
@@ -319,8 +252,7 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("returns empty for non-array")
         void parseJsonStringArray_emptyForNonArray_succeeds() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray("{}");
+            List<String> result = PermissionCollector.parseJsonStringArray("{}");
 
             assertThat(result).isEmpty();
         }
@@ -328,23 +260,17 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("handles parentheses in entries")
         void parseJsonStringArray_whenCalled_handlesParentheses() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray(
-                            "[\"Bash(git *)\","
-                                    + " \"Bash(ls *)\"]");
+            List<String> result =
+                    PermissionCollector.parseJsonStringArray(
+                            "[\"Bash(git *)\"," + " \"Bash(ls *)\"]");
 
-            assertThat(result)
-                    .containsExactly(
-                            "Bash(git *)",
-                            "Bash(ls *)");
+            assertThat(result).containsExactly("Bash(git *)", "Bash(ls *)");
         }
 
         @Test
         @DisplayName("handles escaped quotes")
         void parseJsonStringArray_whenCalled_handlesEscapedQuotes() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray(
-                            "[\"a\\\"b\"]");
+            List<String> result = PermissionCollector.parseJsonStringArray("[\"a\\\"b\"]");
 
             assertThat(result).containsExactly("a\\\"b");
         }
@@ -352,8 +278,7 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("handles whitespace-only inner")
         void parseJsonStringArray_whenCalled_handlesWhitespaceOnly() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray("[   ]");
+            List<String> result = PermissionCollector.parseJsonStringArray("[   ]");
 
             assertThat(result).isEmpty();
         }
@@ -361,8 +286,7 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("empty string returns empty")
         void parseJsonStringArray_emptyString_returnsEmpty() {
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray("");
+            List<String> result = PermissionCollector.parseJsonStringArray("");
 
             assertThat(result).isEmpty();
         }
@@ -370,15 +294,35 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("multiline JSON parsed correctly")
         void parseJsonStringArray_whenCalled_handlesMultiline() {
-            String json = "[\n"
-                    + "  \"first\",\n"
-                    + "  \"second\"\n"
-                    + "]";
-            List<String> result = PermissionCollector
-                    .parseJsonStringArray(json);
+            String json = "[\n" + "  \"first\",\n" + "  \"second\"\n" + "]";
+            List<String> result = PermissionCollector.parseJsonStringArray(json);
 
-            assertThat(result)
-                    .containsExactly("first", "second");
+            assertThat(result).containsExactly("first", "second");
+        }
+
+        @Test
+        @DisplayName("non-quoted token is ignored")
+        void parseJsonStringArray_nonQuotedToken_isIgnored() {
+            List<String> result = PermissionCollector.parseJsonStringArray("[abc]");
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("spaces before comma parses both elements")
+        void parseJsonStringArray_spacesBeforeComma_parsesBothElements() {
+            List<String> result =
+                    PermissionCollector.parseJsonStringArray("[\"a\"   ,   \"b\"]");
+
+            assertThat(result).containsExactly("a", "b");
+        }
+
+        @Test
+        @DisplayName("unclosed quote returns entry up to end of string")
+        void parseJsonStringArray_unclosedQuote_returnsEntryToEnd() {
+            List<String> result = PermissionCollector.parseJsonStringArray("[\"unclosed]");
+
+            assertThat(result).containsExactly("unclosed");
         }
     }
 
@@ -388,62 +332,51 @@ class PermissionCollectorTest {
 
         @Test
         @DisplayName("non-existent file returns empty")
-        void readJsonArray_nonExistent_returnsEmpty(
-                @TempDir Path tempDir) {
+        void readJsonArray_nonExistent_returnsEmpty(@TempDir Path tempDir) {
             Path missing = tempDir.resolve("missing.json");
 
-            List<String> result = PermissionCollector
-                    .readJsonArray(missing);
+            List<String> result = PermissionCollector.readJsonArray(missing);
 
             assertThat(result).isEmpty();
         }
 
         @Test
         @DisplayName("valid file returns parsed array")
-        void readJsonArray_validFile_returnsParsed(
-                @TempDir Path tempDir) throws IOException {
+        void readJsonArray_validFile_returnsParsed(@TempDir Path tempDir) throws IOException {
             Path file = tempDir.resolve("test.json");
-            Files.writeString(file, "[\"a\", \"b\"]",
-                    StandardCharsets.UTF_8);
+            Files.writeString(file, "[\"a\", \"b\"]", StandardCharsets.UTF_8);
 
-            List<String> result = PermissionCollector
-                    .readJsonArray(file);
+            List<String> result = PermissionCollector.readJsonArray(file);
 
-            assertThat(result)
-                    .containsExactly("a", "b");
+            assertThat(result).containsExactly("a", "b");
         }
     }
 
-    private static Path setupTemplatesDir(Path tempDir)
-            throws IOException {
-        Path templatesDir = tempDir.resolve(
-                "targets/claude/settings");
+    private static Path setupTemplatesDir(Path tempDir) throws IOException {
+        Path templatesDir = tempDir.resolve("targets/claude/settings");
         Files.createDirectories(templatesDir);
         writeTemplateFiles(templatesDir);
         return templatesDir;
     }
 
-    private static void writeTemplateFiles(
-            Path templatesDir) throws IOException {
+    private static void writeTemplateFiles(Path templatesDir) throws IOException {
         Map.of(
-                "base.json", "[\"Bash(git *)\"]",
-                "java-maven.json", "[\"Bash(mvn *)\"]",
-                "docker.json",
-                        "[\"Bash(docker build *)\"]",
-                "kubernetes.json",
-                        "[\"Bash(kubectl get *)\"]",
-                "docker-compose.json",
-                        "[\"Bash(docker compose *)\"]",
-                "testing-newman.json",
-                        "[\"Bash(newman *)\"]"
-        ).forEach((name, content) -> {
-            try {
-                Files.writeString(
-                        templatesDir.resolve(name),
-                        content, StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new java.io.UncheckedIOException(e);
-            }
-        });
+                        "base.json", "[\"Bash(git *)\"]",
+                        "java-maven.json", "[\"Bash(mvn *)\"]",
+                        "docker.json", "[\"Bash(docker build *)\"]",
+                        "kubernetes.json", "[\"Bash(kubectl get *)\"]",
+                        "docker-compose.json", "[\"Bash(docker compose *)\"]",
+                        "testing-newman.json", "[\"Bash(newman *)\"]")
+                .forEach(
+                        (name, content) -> {
+                            try {
+                                Files.writeString(
+                                        templatesDir.resolve(name),
+                                        content,
+                                        StandardCharsets.UTF_8);
+                            } catch (IOException e) {
+                                throw new java.io.UncheckedIOException(e);
+                            }
+                        });
     }
 }

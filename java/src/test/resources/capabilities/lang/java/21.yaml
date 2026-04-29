@@ -1,0 +1,6 @@
+id: lang.java.21
+category: lang
+kind: atomic
+requires:
+  - runtime.jvm.openjdk
+description: Java 21 language

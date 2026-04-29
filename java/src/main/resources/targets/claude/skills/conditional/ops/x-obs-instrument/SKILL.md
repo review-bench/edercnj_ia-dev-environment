@@ -4,6 +4,7 @@ description: "Adds or reviews distributed tracing, metrics, and structured loggi
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[component-name or 'full']"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

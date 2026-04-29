@@ -1,0 +1,38 @@
+{
+  "storyId": "story-0059-0004",
+  "epicId": "EPIC-0059",
+  "passed": true,
+  "coverageLine": 95.4,
+  "coverageBranch": 91.2,
+  "failures": [],
+  "acCheckResults": [
+    {
+      "scenario": "Commit without execution-state.json passes normally",
+      "status": "PASS",
+      "evidence": "Epic0059CommitMsgHookTest.hookScenario_noExecutionStateStaged_exits0"
+    },
+    {
+      "scenario": "Commit with execution-state.json and trailer valido passa",
+      "status": "PASS",
+      "evidence": "Epic0059CommitMsgHookTest.hookScenario_executionStateWithValidTrailer_exits0"
+    },
+    {
+      "scenario": "Commit with execution-state.json sem trailer é rejeitado",
+      "status": "PASS",
+      "evidence": "Epic0059CommitMsgHookTest.hookScenario_executionStateWithoutTrailer_exits1"
+    },
+    {
+      "scenario": "x-internal-status-update injeta trailer automaticamente",
+      "status": "PASS",
+      "evidence": "Epic0059TrailerInjectionTest.trailerInjection_skillMdDocumentsCanonicalFormat"
+    },
+    {
+      "scenario": "Sweep confirma que nenhum call-site escreve diretamente no JSON",
+      "status": "PASS",
+      "evidence": "Epic0059ExecutionStateCallsiteSweepTest.sweep_noDirectWriteToExecutionState_outsideCanonicalSkill"
+    }
+  ],
+  "testsRun": 10,
+  "testsFailed": 0,
+  "timestamp": "2026-04-27T14:40:00Z"
+}

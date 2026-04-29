@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--source <branch> --target <branch> [--strategy merge|squash|rebase] [--message <msg>] [--no-push]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

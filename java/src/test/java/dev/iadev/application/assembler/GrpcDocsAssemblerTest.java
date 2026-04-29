@@ -1,25 +1,22 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for GrpcDocsAssembler — generates
- * docs/api/grpc-reference.md conditionally when the project
+ * Tests for GrpcDocsAssembler — generates docs/api/grpc-reference.md conditionally when the project
  * has a gRPC interface configured.
  */
 @DisplayName("GrpcDocsAssembler")
@@ -32,11 +29,9 @@ class GrpcDocsAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssemblerInterface() {
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -45,58 +40,41 @@ class GrpcDocsAssemblerTest {
     class GrpcPresent {
 
         @Test
-        @DisplayName("generates grpc-reference.md in"
-                + " contracts/api/ subdirectory")
-        void assemble_whenCalled_generatesGrpcReferenceFile(
-                @TempDir Path tempDir) {
+        @DisplayName("generates grpc-reference.md in" + " contracts/api/ subdirectory")
+        void assemble_whenCalled_generatesGrpcReferenceFile(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .addInterface("grpc")
-                            .build();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
+            ProjectConfig config = TestConfigBuilder.builder().addInterface("grpc").build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            Path expected = outputDir.resolve(
-                    "contracts/api/grpc-reference.md");
+            Path expected = outputDir.resolve("contracts/api/grpc-reference.md");
             assertThat(expected).exists();
         }
 
         @Test
         @DisplayName("creates contracts/api/ subdirectory")
-        void assemble_whenCalled_createsApiSubdir(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_createsApiSubdir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .addInterface("grpc")
-                            .build();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
+            ProjectConfig config = TestConfigBuilder.builder().addInterface("grpc").build();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
 
-            assertThat(outputDir.resolve("contracts/api"))
-                    .exists()
-                    .isDirectory();
+            assertThat(outputDir.resolve("contracts/api")).exists().isDirectory();
         }
 
         @Test
         @DisplayName("resolves project_name variable")
-        void assemble_whenCalled_resolvesProjectName(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_resolvesProjectName(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .projectName("api-pagamentos")
@@ -106,23 +84,18 @@ class GrpcDocsAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve(
-                    "contracts/api/grpc-reference.md");
+            Path file = outputDir.resolve("contracts/api/grpc-reference.md");
             String content = readFile(file);
-            assertThat(content)
-                    .contains("api-pagamentos");
-            assertThat(content)
-                    .doesNotContain("{{ project_name }}");
+            assertThat(content).contains("api-pagamentos");
+            assertThat(content).doesNotContain("{{ project_name }}");
         }
 
         @Test
         @DisplayName("resolves framework_name variable")
-        void assemble_whenCalled_resolvesFrameworkName(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_resolvesFrameworkName(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .framework("quarkus", "3.17")
@@ -132,20 +105,17 @@ class GrpcDocsAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve(
-                    "contracts/api/grpc-reference.md");
+            Path file = outputDir.resolve("contracts/api/grpc-reference.md");
             String content = readFile(file);
             assertThat(content).contains("quarkus");
         }
 
         @Test
         @DisplayName("no unresolved Pebble variables")
-        void assemble_noUnresolvedVariables_succeeds(
-                @TempDir Path tempDir) {
+        void assemble_noUnresolvedVariables_succeeds(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .projectName("my-grpc-svc")
@@ -157,33 +127,24 @@ class GrpcDocsAssemblerTest {
 
             assembler.assemble(config, engine, outputDir);
 
-            Path file = outputDir.resolve(
-                    "contracts/api/grpc-reference.md");
+            Path file = outputDir.resolve("contracts/api/grpc-reference.md");
             String content = readFile(file);
-            assertThat(content)
-                    .doesNotContain("{{ ");
+            assertThat(content).doesNotContain("{{ ");
         }
 
         @Test
         @DisplayName("returns file path in result list")
-        void assemble_whenCalled_returnsFilePath(
-                @TempDir Path tempDir) {
+        void assemble_whenCalled_returnsFilePath(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .addInterface("grpc")
-                            .build();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
+            ProjectConfig config = TestConfigBuilder.builder().addInterface("grpc").build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).hasSize(1);
-            assertThat(files.get(0))
-                    .endsWith("grpc-reference.md");
+            assertThat(files.get(0)).endsWith("grpc-reference.md");
         }
     }
 
@@ -192,57 +153,41 @@ class GrpcDocsAssemblerTest {
     class GrpcAbsent {
 
         @Test
-        @DisplayName("returns empty list when no grpc"
-                + " interface")
-        void assemble_whenCalled_returnsEmptyWhenNoGrpc(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty list when no grpc" + " interface")
+        void assemble_whenCalled_returnsEmptyWhenNoGrpc(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("returns empty list when only rest"
-                + " interface")
-        void assemble_whenCalled_returnsEmptyWhenOnlyRest(
-                @TempDir Path tempDir) {
+        @DisplayName("returns empty list when only rest" + " interface")
+        void assemble_whenCalled_returnsEmptyWhenOnlyRest(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .clearInterfaces()
-                            .addInterface("rest")
-                            .build();
+                    TestConfigBuilder.builder().clearInterfaces().addInterface("rest").build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("does not create contracts/api/ directory"
-                + " when grpc absent")
-        void assemble_whenCalled_doesNotCreateOutputDir(
-                @TempDir Path tempDir) {
+        @DisplayName("does not create contracts/api/ directory" + " when grpc absent")
+        void assemble_whenCalled_doesNotCreateOutputDir(@TempDir Path tempDir) {
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler();
-            ProjectConfig config =
-                    TestConfigBuilder.minimal();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler();
+            ProjectConfig config = TestConfigBuilder.minimal();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
@@ -256,43 +201,28 @@ class GrpcDocsAssemblerTest {
     class DoubleGracefulNoOp {
 
         @Test
-        @DisplayName("returns empty list when grpc present"
-                + " but template absent")
-        void assemble_whenCalled_returnsEmptyWhenTemplateAbsent(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("returns empty list when grpc present" + " but template absent")
+        void assemble_whenCalled_returnsEmptyWhenTemplateAbsent(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .addInterface("grpc")
-                            .build();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.builder().addInterface("grpc").build();
             TemplateEngine engine = new TemplateEngine();
 
-            List<String> files = assembler.assemble(
-                    config, engine, outputDir);
+            List<String> files = assembler.assemble(config, engine, outputDir);
 
             assertThat(files).isEmpty();
         }
 
         @Test
-        @DisplayName("does not create output dir when"
-                + " template absent")
-        void assemble_whenCalled_doesNotCreateOutputDirForMissingTemplate(
-                @TempDir Path tempDir) {
-            Path resourcesDir =
-                    tempDir.resolve("nonexistent");
+        @DisplayName("does not create output dir when" + " template absent")
+        void assemble_whenCalled_doesNotCreateOutputDirForMissingTemplate(@TempDir Path tempDir) {
+            Path resourcesDir = tempDir.resolve("nonexistent");
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler(resourcesDir);
-            ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .addInterface("grpc")
-                            .build();
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler(resourcesDir);
+            ProjectConfig config = TestConfigBuilder.builder().addInterface("grpc").build();
             TemplateEngine engine = new TemplateEngine();
 
             assembler.assemble(config, engine, outputDir);
@@ -306,53 +236,38 @@ class GrpcDocsAssemblerTest {
     class UsesPebbleRendering {
 
         @Test
-        @DisplayName("uses engine.render not"
-                + " replacePlaceholders")
-        void assemble_whenCalled_usesRenderNotReplace(
-                @TempDir Path tempDir)
-                throws IOException {
-            Path templatesDir =
-                    tempDir.resolve("shared/templates");
+        @DisplayName("uses engine.render not" + " replacePlaceholders")
+        void assemble_whenCalled_usesRenderNotReplace(@TempDir Path tempDir) throws IOException {
+            Path templatesDir = tempDir.resolve("shared/templates");
             Files.createDirectories(templatesDir);
-            String template = "{% if language_name"
-                    + " %}lang={{ language_name }}"
-                    + "{% endif %}";
+            String template = "{% if language_name" + " %}lang={{ language_name }}" + "{% endif %}";
             Files.writeString(
-                    templatesDir.resolve(
-                            "_TEMPLATE-GRPC-REFERENCE.md"),
-                    template, StandardCharsets.UTF_8);
+                    templatesDir.resolve("_TEMPLATE-GRPC-REFERENCE.md"),
+                    template,
+                    StandardCharsets.UTF_8);
 
             Path outputDir = tempDir.resolve("output");
 
-            GrpcDocsAssembler assembler =
-                    new GrpcDocsAssembler(tempDir);
+            GrpcDocsAssembler assembler = new GrpcDocsAssembler(tempDir);
             ProjectConfig config =
-                    TestConfigBuilder.builder()
-                            .language("java", "21")
-                            .addInterface("grpc")
-                            .build();
-            TemplateEngine engine =
-                    new TemplateEngine(tempDir);
+                    TestConfigBuilder.builder().language("java", "21").addInterface("grpc").build();
+            TemplateEngine engine = new TemplateEngine(tempDir);
 
             assembler.assemble(config, engine, outputDir);
 
-            Path dest = outputDir.resolve(
-                    "contracts/api/grpc-reference.md");
+            Path dest = outputDir.resolve("contracts/api/grpc-reference.md");
             assertThat(dest).exists();
             String content = readFile(dest);
             assertThat(content).contains("lang=java");
-            assertThat(content)
-                    .doesNotContain("{%");
+            assertThat(content).doesNotContain("{%");
         }
     }
 
     private static String readFile(Path path) {
         try {
-            return Files.readString(
-                    path, StandardCharsets.UTF_8);
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Failed to read: " + path, e);
+            throw new RuntimeException("Failed to read: " + path, e);
         }
     }
 }

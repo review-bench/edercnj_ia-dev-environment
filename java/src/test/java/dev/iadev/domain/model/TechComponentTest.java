@@ -1,13 +1,12 @@
 package dev.iadev.domain.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("TechComponent")
 class TechComponentTest {
@@ -19,9 +18,10 @@ class TechComponentTest {
         @Test
         @DisplayName("creates component with name and version")
         void fromMap_nameAndVersion_bothSet() {
-            var map = Map.<String, Object>of(
-                    "name", "postgresql",
-                    "version", "16");
+            var map =
+                    Map.<String, Object>of(
+                            "name", "postgresql",
+                            "version", "16");
 
             var result = TechComponent.fromMap(map);
 
@@ -73,8 +73,7 @@ class TechComponentTest {
         @Test
         @DisplayName("non-string version value defaults to empty")
         void fromMap_nonStringVersion_defaultsToEmpty() {
-            var map = Map.<String, Object>of(
-                    "name", "pg", "version", 16);
+            var map = Map.<String, Object>of("name", "pg", "version", 16);
 
             var result = TechComponent.fromMap(map);
 

@@ -4,6 +4,7 @@ description: "Detect cross-epic P95 regressions (>= threshold %) and rank top-10
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--last N] [--threshold-pct P] [--baseline mean|median] [--format md|json] [--out path]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -68,7 +69,7 @@ java -cp target/classes:target/dependency/* \
 ## Algorithm
 
 1. Build (or refresh) the per-skill per-epic P95 index by scanning
-   `plans/epic-*\/telemetry/events.ndjson`. The index is persisted at
+   `ai/epics/epic-*\/telemetry/events.ndjson`. The index is persisted at
    `.claude/telemetry/index.json` and invalidated when an epic's NDJSON
    mtime changes.
 2. Restrict to the most-recent `--last N` epics (natural ID order).
@@ -100,7 +101,7 @@ stays bounded in the per-skill duration arrays.
 
 # Strict: threshold 10 %, mean baseline, write JSON to disk
 /x-telemetry-trend --threshold-pct 10 --baseline mean --format json \
-    --out plans/epic-0040/reports/trends.json
+    --out ai/epics/epic-XXXX/reports/trends.json
 
 # Historical deep dive: last 10 epics, report to a custom path
 /x-telemetry-trend --last 10 --out reports/quarterly-trends.md

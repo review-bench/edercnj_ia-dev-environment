@@ -2,26 +2,24 @@ package dev.iadev.cli;
 
 import dev.iadev.domain.model.Platform;
 import dev.iadev.domain.model.ProjectConfig;
-
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Resolves effective platform set using precedence:
- * CLI > YAML > default(all).
+ * Resolves effective platform set using precedence: CLI > YAML > default(all).
  *
  * <p>Priority order:
+ *
  * <ol>
- *   <li>CLI {@code --platform} flag (highest)</li>
- *   <li>YAML {@code platform:} section</li>
- *   <li>Default: empty set (= all platforms)</li>
+ *   <li>CLI {@code --platform} flag (highest)
+ *   <li>YAML {@code platform:} section
+ *   <li>Default: empty set (= all platforms)
  * </ol>
  *
- * <p>CLI platforms arrive as typed {@link Platform} values
- * via {@link PlatformConverter}. The special "all" keyword
- * is represented by the {@link Platform#ALL} sentinel in
- * the list (per PlatformConverter contract).</p>
+ * <p>CLI platforms arrive as typed {@link Platform} values via {@link PlatformConverter}. The
+ * special "all" keyword is represented by the {@link Platform#ALL} sentinel in the list (per
+ * PlatformConverter contract).
  *
  * @see GenerateCommand
  * @see PlatformConverter
@@ -36,14 +34,11 @@ final class PlatformPrecedenceResolver {
      * Resolves effective platforms from CLI and YAML.
      *
      * @param cliPlatforms CLI values (typed), may be null
-     * @param config       project config with YAML platforms
+     * @param config project config with YAML platforms
      * @return resolved set (empty = all)
      */
-    static Set<Platform> resolve(
-            List<Platform> cliPlatforms,
-            ProjectConfig config) {
-        if (cliPlatforms != null
-                && !cliPlatforms.isEmpty()) {
+    static Set<Platform> resolve(List<Platform> cliPlatforms, ProjectConfig config) {
+        if (cliPlatforms != null && !cliPlatforms.isEmpty()) {
             return buildPlatformSet(cliPlatforms);
         }
         return config.platforms();
@@ -52,18 +47,15 @@ final class PlatformPrecedenceResolver {
     /**
      * Converts the CLI platform list to a Set.
      *
-     * <p>Null list or list containing the {@link Platform#ALL}
-     * sentinel (from the "all" converter result) produces an
-     * empty set (no filter). Otherwise produces an EnumSet of
-     * the specified platforms.</p>
+     * <p>Null list or list containing the {@link Platform#ALL} sentinel (from the "all" converter
+     * result) produces an empty set (no filter). Otherwise produces an EnumSet of the specified
+     * platforms.
      *
      * @param platformList the parsed platform list
      * @return immutable set of platforms, empty = no filter
      */
-    static Set<Platform> buildPlatformSet(
-            List<Platform> platformList) {
-        if (platformList == null
-                || platformList.isEmpty()) {
+    static Set<Platform> buildPlatformSet(List<Platform> platformList) {
+        if (platformList == null || platformList.isEmpty()) {
             return Set.of();
         }
         boolean containsAllMarker = false;
@@ -79,8 +71,7 @@ final class PlatformPrecedenceResolver {
         for (Platform p : platformList) {
             if (!Platform.allUserSelectable().contains(p)) {
                 throw new IllegalArgumentException(
-                        "Platform '%s' is not user-selectable"
-                                .formatted(p.cliName()));
+                        "Platform '%s' is not user-selectable".formatted(p.cliName()));
             }
         }
         return Set.copyOf(EnumSet.copyOf(platformList));

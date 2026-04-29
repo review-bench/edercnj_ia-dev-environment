@@ -1,28 +1,24 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.template.TemplateEngine;
+import dev.iadev.testutil.TestConfigBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Tests for story-0022-0014: Enhanced Supply Chain Audit
- * (x-supply-chain-audit) skill generation.
+ * Tests for story-0022-0014: Enhanced Supply Chain Audit (x-supply-chain-audit) skill generation.
  *
- * <p>Validates that the x-supply-chain-audit SKILL.md is
- * generated as a core skill, contains all 6 advanced
- * capabilities, risk scoring formula, SARIF output format,
- * and does not duplicate x-dependency-audit content.</p>
+ * <p>Validates that the x-supply-chain-audit SKILL.md is generated as a core skill, contains all 6
+ * advanced capabilities, risk scoring formula, SARIF output format, and does not duplicate
+ * x-dependency-audit content.
  */
 @DisplayName("Supply Chain Audit Skill (x-supply-chain-audit)")
 class SupplyChainAuditSkillTest {
@@ -32,48 +28,32 @@ class SupplyChainAuditSkillTest {
     class CoreSkillGeneration {
 
         @Test
-        @DisplayName("x-supply-chain-audit SKILL.md exists"
-                + " after assembly")
-        void assemble_minimal_generatesSkillMd(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("x-supply-chain-audit SKILL.md exists" + " after assembly")
+        void assemble_minimal_generatesSkillMd(@TempDir Path tempDir) throws IOException {
             generateOutput(tempDir);
-            Path skillMd = tempDir.resolve(
-                    "output/skills/x-supply-chain-audit"
-                            + "/SKILL.md");
+            Path skillMd = tempDir.resolve("output/skills/x-supply-chain-audit" + "/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("SKILL.md contains correct frontmatter"
-                + " name")
-        void assemble_minimal_hasFrontmatterName(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("SKILL.md contains correct frontmatter" + " name")
+        void assemble_minimal_hasFrontmatterName(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("name: x-supply-chain-audit");
+            assertThat(content).contains("name: x-supply-chain-audit");
         }
 
         @Test
         @DisplayName("SKILL.md contains allowed-tools")
-        void assemble_minimal_hasAllowedTools(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasAllowedTools(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("allowed-tools:");
+            assertThat(content).contains("allowed-tools:");
         }
 
         @Test
         @DisplayName("SKILL.md contains Purpose section")
-        void assemble_minimal_hasPurposeSection(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasPurposeSection(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("## Purpose")
-                    .contains("supply chain security");
+            assertThat(content).contains("## Purpose").contains("supply chain security");
         }
     }
 
@@ -83,69 +63,44 @@ class SupplyChainAuditSkillTest {
 
         @Test
         @DisplayName("contains maintainer risk analysis")
-        void assemble_minimal_hasMaintainerRisk(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasMaintainerRisk(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("Maintainer Risk Analysis")
-                    .contains("bus factor");
+            assertThat(content).contains("Maintainer Risk Analysis").contains("bus factor");
         }
 
         @Test
         @DisplayName("contains typosquatting detection")
-        void assemble_minimal_hasTyposquatting(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasTyposquatting(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("Typosquatting Detection")
-                    .contains("Levenshtein");
+            assertThat(content).contains("Typosquatting Detection").contains("Levenshtein");
         }
 
         @Test
         @DisplayName("contains phantom dependency detection")
-        void assemble_minimal_hasPhantomDeps(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasPhantomDeps(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("Phantom Dependency Detection")
-                    .contains("AST");
+            assertThat(content).contains("Phantom Dependency Detection").contains("AST");
         }
 
         @Test
         @DisplayName("contains dependency age analysis")
-        void assemble_minimal_hasDependencyAge(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasDependencyAge(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("Dependency Age Analysis")
-                    .contains("last release");
+            assertThat(content).contains("Dependency Age Analysis").contains("last release");
         }
 
         @Test
         @DisplayName("contains EPSS scoring")
-        void assemble_minimal_hasEpssScoring(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasEpssScoring(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("EPSS Scoring")
-                    .contains("FIRST.org");
+            assertThat(content).contains("EPSS Scoring").contains("FIRST.org");
         }
 
         @Test
         @DisplayName("contains SLSA assessment")
-        void assemble_minimal_hasSlsaAssessment(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasSlsaAssessment(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("SLSA Assessment")
-                    .contains("SLSA 0")
-                    .contains("SLSA 3");
+            assertThat(content).contains("SLSA Assessment").contains("SLSA 0").contains("SLSA 3");
         }
     }
 
@@ -155,9 +110,7 @@ class SupplyChainAuditSkillTest {
 
         @Test
         @DisplayName("contains weighted risk score formula")
-        void assemble_minimal_hasRiskFormula(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasRiskFormula(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content)
                     .contains("cve_severity * 0.40")
@@ -168,11 +121,8 @@ class SupplyChainAuditSkillTest {
         }
 
         @Test
-        @DisplayName("contains severity classification"
-                + " thresholds")
-        void assemble_minimal_hasSeverityClassification(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("contains severity classification" + " thresholds")
+        void assemble_minimal_hasSeverityClassification(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content)
                     .contains("CRITICAL")
@@ -184,9 +134,7 @@ class SupplyChainAuditSkillTest {
 
         @Test
         @DisplayName("contains grade scale A through F")
-        void assemble_minimal_hasGradeScale(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasGradeScale(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content)
                     .contains("| A |")
@@ -203,43 +151,28 @@ class SupplyChainAuditSkillTest {
 
         @Test
         @DisplayName("contains --depth parameter")
-        void assemble_minimal_hasDepthParam(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasDepthParam(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("--depth")
-                    .contains("shallow")
-                    .contains("deep");
+            assertThat(content).contains("--depth").contains("shallow").contains("deep");
         }
 
         @Test
-        @DisplayName("contains --include-dev-deps"
-                + " parameter")
-        void assemble_minimal_hasIncludeDevDeps(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("contains --include-dev-deps" + " parameter")
+        void assemble_minimal_hasIncludeDevDeps(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("--include-dev-deps");
+            assertThat(content).contains("--include-dev-deps");
         }
 
         @Test
         @DisplayName("contains --risk-threshold parameter")
-        void assemble_minimal_hasRiskThreshold(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasRiskThreshold(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("--risk-threshold");
+            assertThat(content).contains("--risk-threshold");
         }
 
         @Test
-        @DisplayName("contains --focus parameter with all"
-                + " categories")
-        void assemble_minimal_hasFocusParam(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("contains --focus parameter with all" + " categories")
+        void assemble_minimal_hasFocusParam(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content)
                     .contains("--focus")
@@ -258,19 +191,14 @@ class SupplyChainAuditSkillTest {
 
         @Test
         @DisplayName("references SARIF 2.1.0")
-        void assemble_minimal_referencesSarif(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_referencesSarif(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("SARIF 2.1.0");
+            assertThat(content).contains("SARIF 2.1.0");
         }
 
         @Test
         @DisplayName("contains SARIF rule IDs")
-        void assemble_minimal_hasSarifRuleIds(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_minimal_hasSarifRuleIds(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content)
                     .contains("SCA-MAINT-001")
@@ -282,14 +210,10 @@ class SupplyChainAuditSkillTest {
         }
 
         @Test
-        @DisplayName("references sarif-template.md"
-                + " knowledge pack")
-        void assemble_minimal_referencesSarifTemplate(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("references sarif-template.md" + " knowledge pack")
+        void assemble_minimal_referencesSarifTemplate(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("sarif-template.md");
+            assertThat(content).contains("sarif-template.md");
         }
     }
 
@@ -298,47 +222,30 @@ class SupplyChainAuditSkillTest {
     class DependencyAuditRelation {
 
         @Test
-        @DisplayName("documents relationship with"
-                + " x-dependency-audit")
-        void assemble_minimal_hasRelationTable(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("documents relationship with" + " x-dependency-audit")
+        void assemble_minimal_hasRelationTable(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("x-dependency-audit")
-                    .contains("x-supply-chain-audit");
+            assertThat(content).contains("x-dependency-audit").contains("x-supply-chain-audit");
         }
 
         @Test
-        @DisplayName("states it complements not replaces"
-                + " x-dependency-audit")
-        void assemble_minimal_complementsNotReplaces(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("states it complements not replaces" + " x-dependency-audit")
+        void assemble_minimal_complementsNotReplaces(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("complements")
-                    .contains("does NOT replace");
+            assertThat(content).contains("complements").contains("does NOT replace");
         }
 
         @Test
-        @DisplayName("x-dependency-audit skill remains"
-                + " unchanged")
-        void assemble_minimal_depAuditUnchanged(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("x-dependency-audit skill remains" + " unchanged")
+        void assemble_minimal_depAuditUnchanged(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
-            SkillsAssembler assembler =
-                    new SkillsAssembler();
-            assembler.assemble(
-                    TestConfigBuilder.minimal(),
-                    new TemplateEngine(), outputDir);
-            String depAudit = Files.readString(
-                    outputDir.resolve(
-                            "skills/x-dependency-audit"
-                                    + "/SKILL.md"),
-                    StandardCharsets.UTF_8);
+            SkillsAssembler assembler = new SkillsAssembler();
+            assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
+            String depAudit =
+                    Files.readString(
+                            outputDir.resolve("skills/x-dependency-audit" + "/SKILL.md"),
+                            StandardCharsets.UTF_8);
             assertThat(depAudit)
                     .contains("name: x-dependency-audit")
                     .contains("## Workflow")
@@ -353,52 +260,34 @@ class SupplyChainAuditSkillTest {
     class TemplateVariables {
 
         @Test
-        @DisplayName("preserves PROJECT_NAME placeholder"
-                + " for runtime substitution")
-        void assemble_minimal_preservesProjectName(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("preserves PROJECT_NAME placeholder" + " for runtime substitution")
+        void assemble_minimal_preservesProjectName(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("{{PROJECT_NAME}}");
+            assertThat(content).contains("{{PROJECT_NAME}}");
         }
 
         @Test
-        @DisplayName("preserves BUILD_TOOL placeholder"
-                + " for runtime substitution")
-        void assemble_minimal_preservesBuildTool(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("preserves BUILD_TOOL placeholder" + " for runtime substitution")
+        void assemble_minimal_preservesBuildTool(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content)
-                    .contains("{{BUILD_TOOL}}");
+            assertThat(content).contains("{{BUILD_TOOL}}");
         }
     }
 
-    private String generateContent(Path tempDir)
-            throws IOException {
+    private String generateContent(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve(
-                        "skills/x-supply-chain-audit"
-                                + "/SKILL.md"),
+                outputDir.resolve("skills/x-supply-chain-audit" + "/SKILL.md"),
                 StandardCharsets.UTF_8);
     }
 
-    private void generateOutput(Path tempDir)
-            throws IOException {
+    private void generateOutput(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
-        SkillsAssembler assembler =
-                new SkillsAssembler();
-        assembler.assemble(
-                TestConfigBuilder.minimal(),
-                new TemplateEngine(), outputDir);
+        SkillsAssembler assembler = new SkillsAssembler();
+        assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
     }
 }

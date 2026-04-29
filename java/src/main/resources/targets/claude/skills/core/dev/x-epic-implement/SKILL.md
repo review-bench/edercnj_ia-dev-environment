@@ -5,6 +5,7 @@ description: "Thin orchestrator (~460 lines — story-0049-0018 refactor) that d
 user-invocable: true
 allowed-tools: Read, Write, Glob, Skill, Agent, AskUserQuestion, TaskCreate, TaskUpdate
 argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--non-interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy
@@ -37,7 +38,8 @@ argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story stor
 | `--dry-run` | Boolean | `false` | Generate execution plan; exit after Phase 1. |
 | `--skip-review` | Boolean | `false` | Propagated to `x-story-implement` — skips specialist/TL reviews. |
 | `--auto-merge-strategy` | Enum | `merge` | Story-PR auto-merge strategy: `merge\|squash\|rebase`. |
-| `--non-interactive` | Boolean | `false` | Skip all `AskUserQuestion` gates (CI / orchestrated calls). |
+| `--interactive` | Boolean | `false` | Opt-in to 3-option menus (PROCEED/FIX-PR/ABORT) at each gate. Default: non-interactive (Rule 20 EPIC-0061). |
+| `--non-interactive` | Boolean | **DEPRECATED** | Was opt-in; now equals default. Emits deprecation WARN. Removed in 2 releases. |
 | `--skip-pr-comments` | Boolean | `false` | Skip Phase 4b post-gate PR-comment remediation pass. |
 | `--revert-on-failure` | Boolean | `false` | On integrity-gate failure, revert last story merge instead of remediation agent. |
 | `--skip-smoke` | Boolean | `false` | Bypass epic smoke gate (advisory; emergency only). |
@@ -56,7 +58,7 @@ Deprecated (still parsed, warn-once): `--sequential`, `--auto-merge`, `--interac
 | `finalPrUrl/Number` | Final PR `epic/XXXX → develop`; null when legacy |
 | `integrityGatePassed` | Phase 4 gate `passed` value |
 | `coverageLine/Branch` | Filtered coverage from integrity gate envelope |
-| `reportsDir` | `plans/epic-XXXX/reports/` |
+| `reportsDir` | `ai/epics/epic-XXXX/reports/` |
 
 **Delegation Map (RULE-005 — zero inline shell invocations):**
 
@@ -108,11 +110,11 @@ Open phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed"
 
 Build DAG + execution plan:
 
-    Skill(skill: "x-internal-epic-build-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output plans/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
+    Skill(skill: "x-internal-epic-build-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
 
 Consume `{phases, criticalPath, planPath}`. If `--dry-run=true` → print plan path and stop.
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-1-Plan --expected-artifacts plans/epic-XXXX/reports/epic-execution-plan-XXXX.md")
+Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-1-Plan --expected-artifacts ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md")
 
 TaskUpdate(id: phase1TaskId, status: "completed")
 
@@ -219,19 +221,41 @@ On conflict → `FINAL_PR_CONFLICTS`. Then create final PR:
 
     Skill(skill: "x-pr-create", model: "haiku", args: "--epic-id <ID> --head epic/<ID> --target-branch develop --auto-merge none --label epic-integration")
 
-Interactive menu (`--non-interactive` skips): PROCEED / FIX-PR / ABORT.
+Interactive menu (only when `--interactive`): PROCEED / FIX-PR / ABORT. Default is non-interactive (Rule 20, EPIC-0061).
 
     TaskUpdate(id: phase5TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-5-Final-PR ok`
 
+## Recovery
+
+When resuming an epic that partially executed (e.g., some stories completed, CI watch failed mid-run), skip flags may be needed to bypass already-completed steps. Use `CLAUDE_RECOVERY_MODE=1`:
+
+```bash
+export CLAUDE_RECOVERY_MODE=1
+/x-epic-implement EPIC-XXXX --resume --skip-review
+```
+
+### `CLAUDE_RECOVERY_MODE=1`
+
+When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-review` and `--no-ci-watch` flags on this skill without blocking. A WARNING is emitted to stderr for audit trail. The variable is propagated automatically by `x-internal-story-resume` when `staleWarnings != []`.
+
+**RULE-059-07:** `CLAUDE_RECOVERY_MODE=1` is the only accepted bypass variable. No other env var bypasses the enforcement hook.
+
+### Permitted bypass flags (recovery only)
+
+| Flag | Skips |
+| :--- | :--- |
+| `--skip-review` | Specialist + tech-lead reviews per story |
+| `--no-ci-watch` | CI-watch polling per story PR |
+
 ## Error Envelope
 
 | Exit | Code | Condition |
 |------|------|-----------|
 | 1 | `ARGS_INVALID` | Args normalizer exit 1 |
-| 2 | `EPIC_DIR_MISSING` | `plans/epic-XXXX/` absent |
+| 2 | `EPIC_DIR_MISSING` | `ai/epics/epic-XXXX/` absent |
 | 3 | `STORY_FAILED` | Story returned `status=FAILED` |
 | 4 | `INTEGRITY_GATE_FAILED` | Phase 4 `passed=false` after recovery |
 | 5 | `FINAL_PR_CONFLICTS` | Phase 5 develop-sync conflict |

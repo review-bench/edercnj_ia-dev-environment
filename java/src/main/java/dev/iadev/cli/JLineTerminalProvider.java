@@ -1,6 +1,11 @@
 package dev.iadev.cli;
 
 import dev.iadev.exception.GenerationCancelledException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -8,18 +13,11 @@ import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
 /**
  * JLine 3.x implementation of {@link TerminalProvider}.
  *
- * <p>Uses a JLine {@link Terminal} and {@link LineReader} for real terminal
- * interaction. Handles {@link UserInterruptException} (Ctrl+C) by throwing
- * {@link GenerationCancelledException}.</p>
+ * <p>Uses a JLine {@link Terminal} and {@link LineReader} for real terminal interaction. Handles
+ * {@link UserInterruptException} (Ctrl+C) by throwing {@link GenerationCancelledException}.
  */
 public class JLineTerminalProvider implements TerminalProvider {
 
@@ -32,12 +30,8 @@ public class JLineTerminalProvider implements TerminalProvider {
      * @throws IOException if the terminal cannot be created
      */
     public JLineTerminalProvider() throws IOException {
-        Terminal terminal = TerminalBuilder.builder()
-                .system(true)
-                .build();
-        this.reader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .build();
+        Terminal terminal = TerminalBuilder.builder().system(true).build();
+        this.reader = LineReaderBuilder.builder().terminal(terminal).build();
         this.writer = terminal.writer();
     }
 
@@ -57,16 +51,13 @@ public class JLineTerminalProvider implements TerminalProvider {
         try {
             return reader.readLine(prompt + " ");
         } catch (UserInterruptException | EndOfFileException e) {
-            throw new GenerationCancelledException(
-                    InteractivePrompter.CANCELLED_BY_USER);
+            throw new GenerationCancelledException(InteractivePrompter.CANCELLED_BY_USER);
         }
     }
 
     @Override
     public String readLineWithValidation(
-            String prompt,
-            Predicate<String> validator,
-            String errorMsg) {
+            String prompt, Predicate<String> validator, String errorMsg) {
         while (true) {
             String input = readLine(prompt);
             if (validator.test(input)) {
@@ -78,67 +69,53 @@ public class JLineTerminalProvider implements TerminalProvider {
     }
 
     @Override
-    public String selectFromList(
-            String prompt, List<String> options,
-            int defaultIndex) {
+    public String selectFromList(String prompt, List<String> options, int defaultIndex) {
         displayOptions(prompt, options, defaultIndex);
         return readSelection(options, defaultIndex);
     }
 
-    private void displayOptions(
-            String prompt, List<String> options,
-            int defaultIndex) {
+    private void displayOptions(String prompt, List<String> options, int defaultIndex) {
         writer.println(prompt);
         for (int i = 0; i < options.size(); i++) {
-            String marker =
-                    (i == defaultIndex) ? "> " : "  ";
-            writer.printf("%s%d) %s%n",
-                    marker, i + 1, options.get(i));
+            String marker = (i == defaultIndex) ? "> " : "  ";
+            writer.printf("%s%d) %s%n", marker, i + 1, options.get(i));
         }
         writer.flush();
     }
 
-    private String readSelection(
-            List<String> options, int defaultIndex) {
+    private String readSelection(List<String> options, int defaultIndex) {
         while (true) {
-            String input = readLine(
-                    "Select [1-" + options.size()
-                            + "] (default: "
-                            + (defaultIndex + 1) + "):");
+            String input =
+                    readLine(
+                            "Select [1-"
+                                    + options.size()
+                                    + "] (default: "
+                                    + (defaultIndex + 1)
+                                    + "):");
             if (input.isBlank()) {
                 return options.get(defaultIndex);
             }
             try {
-                int choice = Integer.parseInt(
-                        input.trim());
-                if (choice >= 1
-                        && choice <= options.size()) {
+                int choice = Integer.parseInt(input.trim());
+                if (choice >= 1 && choice <= options.size()) {
                     return options.get(choice - 1);
                 }
             } catch (NumberFormatException ignored) {
                 // re-prompt
             }
             writer.println(
-                    "Invalid selection. Enter a number"
-                            + " between 1 and "
-                            + options.size() + ".");
+                    "Invalid selection. Enter a number" + " between 1 and " + options.size() + ".");
             writer.flush();
         }
     }
 
     @Override
-    public List<String> selectMultiple(
-            String prompt, List<String> options,
-            List<String> defaults) {
+    public List<String> selectMultiple(String prompt, List<String> options, List<String> defaults) {
         writer.println(prompt);
-        writer.println(
-                "(Enter comma-separated numbers, "
-                        + "e.g., 1,3)");
+        writer.println("(Enter comma-separated numbers, " + "e.g., 1,3)");
         for (int i = 0; i < options.size(); i++) {
-            String marker = defaults.contains(options.get(i))
-                    ? "[x] " : "[ ] ";
-            writer.printf(
-                    "%s%d) %s%n", marker, i + 1, options.get(i));
+            String marker = defaults.contains(options.get(i)) ? "[x] " : "[ ] ";
+            writer.printf("%s%d) %s%n", marker, i + 1, options.get(i));
         }
         writer.flush();
 
@@ -151,24 +128,20 @@ public class JLineTerminalProvider implements TerminalProvider {
             if (!selected.isEmpty()) {
                 return selected;
             }
-            writer.println(
-                    "At least one interface must be selected.");
+            writer.println("At least one interface must be selected.");
             writer.flush();
         }
     }
 
     @Override
-    public boolean confirm(String prompt,
-                           ConfirmDefault confirmDefault) {
-        String defHint = confirmDefault.isYes()
-                ? "[Y/n]" : "[y/N]";
+    public boolean confirm(String prompt, ConfirmDefault confirmDefault) {
+        String defHint = confirmDefault.isYes() ? "[Y/n]" : "[y/N]";
         String input = readLine(prompt + " " + defHint);
         if (input.isBlank()) {
             return confirmDefault.isYes();
         }
         String trimmed = input.trim().toLowerCase();
-        return "y".equals(trimmed)
-                || "yes".equals(trimmed);
+        return "y".equals(trimmed) || "yes".equals(trimmed);
     }
 
     @Override
@@ -177,8 +150,7 @@ public class JLineTerminalProvider implements TerminalProvider {
         writer.flush();
     }
 
-    private List<String> parseMultiSelect(
-            String input, List<String> options) {
+    private List<String> parseMultiSelect(String input, List<String> options) {
         List<String> selected = new ArrayList<>();
         for (String part : input.split(",")) {
             try {

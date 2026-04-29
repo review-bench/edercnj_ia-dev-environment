@@ -3,12 +3,9 @@ package dev.iadev.application.assembler;
 /**
  * Indicates whether hooks are present in the project.
  *
- * <p>Replaces opaque {@code boolean hasHooks} parameters
- * in method signatures. Call sites become self-documenting:
- * {@code buildSettingsJson(perms, HookPresence.WITH_HOOKS,
- * telemetryEnabled)} instead of
- * {@code buildSettingsJson(perms, true, telemetryEnabled)}.
- * </p>
+ * <p>Replaces opaque {@code boolean hasHooks} parameters in method signatures. Call sites become
+ * self-documenting: {@code buildSettingsJson(perms, HookPresence.WITH_HOOKS, telemetryEnabled)}
+ * instead of {@code buildSettingsJson(perms, true, telemetryEnabled)}.
  *
  * @see SettingsAssembler#buildSettingsJson
  */

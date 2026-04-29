@@ -1,27 +1,24 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.testutil.TestConfigBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import dev.iadev.testutil.TestConfigBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for HooksAssembler — the sixth assembler in the
- * pipeline, generating .claude/hooks/ directory with
- * post-compile hook scripts for compiled languages.
+ * Tests for HooksAssembler — the sixth assembler in the pipeline, generating .claude/hooks/
+ * directory with post-compile hook scripts for compiled languages.
  */
 @DisplayName("HooksAssembler")
 class HooksAssemblerTest {
@@ -33,11 +30,9 @@ class HooksAssemblerTest {
         @Test
         @DisplayName("is instance of Assembler")
         void instanceOf_whenCreated_implementsAssemblerInterface() {
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
 
-            assertThat(assembler)
-                    .isInstanceOf(Assembler.class);
+            assertThat(assembler).isInstanceOf(Assembler.class);
         }
     }
 
@@ -46,16 +41,15 @@ class HooksAssemblerTest {
     class HookGeneration {
 
         @Test
-        @DisplayName("generates post-compile-check.sh"
-                + " for java-maven (plus always-on Rule 25 scripts)")
-        void assemble_whenCalled_generatesHookForJavaMaven(
-                @TempDir Path tempDir)
+        @DisplayName(
+                "generates post-compile-check.sh"
+                        + " for java-maven (plus always-on Rule 25 scripts)")
+        void assemble_whenCalled_generatesHookForJavaMaven(@TempDir Path tempDir)
                 throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -64,22 +58,19 @@ class HooksAssemblerTest {
                             .telemetryEnabled(false)
                             .build();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // 1 post-compile-check + 2 Rule-25 enforcement scripts
+            // 1 post-compile-check + 2 Rule-25 + 1 Rule-59 enforcement scripts
             // (always copied, independent of telemetry).
-            assertThat(files).hasSize(
-                    1 + HooksAssembler.RULE_25_SCRIPTS.size());
-            assertThat(outputDir.resolve(
-                    "hooks/post-compile-check.sh"))
-                    .exists();
-            assertThat(outputDir.resolve(
-                    "hooks/verify-phase-gates.sh"))
-                    .exists();
-            assertThat(outputDir.resolve(
-                    "hooks/enforce-phase-sequence.sh"))
-                    .exists();
+            assertThat(files)
+                    .hasSize(
+                            1
+                                    + HooksAssembler.RULE_25_SCRIPTS.size()
+                                    + HooksAssembler.RULE_59_SCRIPTS.size());
+            assertThat(outputDir.resolve("hooks/post-compile-check.sh")).exists();
+            assertThat(outputDir.resolve("hooks/verify-phase-gates.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-phase-sequence.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-no-bypass-flags.sh")).exists();
         }
 
         // Non-Java hook generation tests removed in EPIC-0048 full
@@ -92,14 +83,11 @@ class HooksAssemblerTest {
 
         @Test
         @DisplayName("hook script starts with shebang line")
-        void assemble_whenCalled_hookStartsWithShebang(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_whenCalled_hookStartsWithShebang(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -107,27 +95,20 @@ class HooksAssemblerTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path hookFile = outputDir.resolve(
-                    "hooks/post-compile-check.sh");
-            String content = Files.readString(
-                    hookFile, StandardCharsets.UTF_8);
-            assertThat(content)
-                    .startsWith("#!/usr/bin/env bash");
+            Path hookFile = outputDir.resolve("hooks/post-compile-check.sh");
+            String content = Files.readString(hookFile, StandardCharsets.UTF_8);
+            assertThat(content).startsWith("#!/usr/bin/env bash");
         }
 
         @Test
         @DisplayName("hook script has executable permission")
-        void assemble_hook_isExecutable(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_hook_isExecutable(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -135,13 +116,10 @@ class HooksAssemblerTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path hookFile = outputDir.resolve(
-                    "hooks/post-compile-check.sh");
-            assertThat(Files.isExecutable(hookFile))
-                    .isTrue();
+            Path hookFile = outputDir.resolve("hooks/post-compile-check.sh");
+            assertThat(Files.isExecutable(hookFile)).isTrue();
         }
 
         // assemble_kotlinHook_containsCompileKotlin removed
@@ -149,14 +127,11 @@ class HooksAssemblerTest {
 
         @Test
         @DisplayName("java-maven hook contains mvn compile")
-        void assemble_javaMavenHook_containsMvnCompile(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_javaMavenHook_containsMvnCompile(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -164,15 +139,11 @@ class HooksAssemblerTest {
                             .buildTool("maven")
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path hookFile = outputDir.resolve(
-                    "hooks/post-compile-check.sh");
-            String content = Files.readString(
-                    hookFile, StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("compile");
+            Path hookFile = outputDir.resolve("hooks/post-compile-check.sh");
+            String content = Files.readString(hookFile, StandardCharsets.UTF_8);
+            assertThat(content).contains("compile");
         }
     }
 
@@ -184,15 +155,12 @@ class HooksAssemblerTest {
         // (non-Java goldens deleted).
 
         private String loadResource(String path) {
-            var url = getClass().getClassLoader()
-                    .getResource(path);
+            var url = getClass().getClassLoader().getResource(path);
             if (url == null) {
                 return null;
             }
             try {
-                return Files.readString(
-                        Path.of(url.getPath()),
-                        StandardCharsets.UTF_8);
+                return Files.readString(Path.of(url.getPath()), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 return null;
             }
@@ -204,27 +172,22 @@ class HooksAssemblerTest {
     class EdgeCases {
 
         @Test
-        @DisplayName("missing post-compile template returns"
-                + " only Rule 25 scripts")
-        void assemble_missingTemplate_returnsRule25Only(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("missing post-compile template returns" + " only Rule 25 scripts")
+        void assemble_missingTemplate_returnsRule25Only(@TempDir Path tempDir) throws IOException {
             Path resourceDir = tempDir.resolve("res");
-            Path hooksResourceDir = resourceDir.resolve(
-                    "targets/claude/hooks");
-            Files.createDirectories(
-                    hooksResourceDir.resolve("exotic"));
-            // Seed Rule 25 script sources (always required).
+            Path hooksResourceDir = resourceDir.resolve("targets/claude/hooks");
+            Files.createDirectories(hooksResourceDir.resolve("exotic"));
+            // Seed Rule 25 + Rule 59 script sources (always required).
             for (String name : HooksAssembler.RULE_25_SCRIPTS) {
-                Files.writeString(
-                        hooksResourceDir.resolve(name),
-                        "#!/usr/bin/env bash\nexit 0\n");
+                Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
+            }
+            for (String name : HooksAssembler.RULE_59_SCRIPTS) {
+                Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
             }
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler(resourceDir);
+            HooksAssembler assembler = new HooksAssembler(resourceDir);
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("kotlin", "2.0")
@@ -233,26 +196,23 @@ class HooksAssemblerTest {
                             .telemetryEnabled(false)
                             .build();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             // No post-compile hook (kotlin has no template),
-            // but Rule 25 scripts are always copied.
-            assertThat(files).hasSize(
-                    HooksAssembler.RULE_25_SCRIPTS.size());
+            // but Rule 25 + Rule 59 scripts are always copied.
+            assertThat(files)
+                    .hasSize(
+                            HooksAssembler.RULE_25_SCRIPTS.size()
+                                    + HooksAssembler.RULE_59_SCRIPTS.size());
         }
 
         @Test
-        @DisplayName("unknown language returns only"
-                + " Rule 25 enforcement scripts")
-        void assemble_unknownLanguage_returnsRule25Only(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("unknown language returns only" + " Rule 25 enforcement scripts")
+        void assemble_unknownLanguage_returnsRule25Only(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("unknown", "1.0")
@@ -261,19 +221,17 @@ class HooksAssemblerTest {
                             .telemetryEnabled(false)
                             .build();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             // No post-compile hook for unknown language, but
-            // Rule 25 scripts are always copied regardless.
-            assertThat(files).hasSize(
-                    HooksAssembler.RULE_25_SCRIPTS.size());
-            assertThat(outputDir.resolve(
-                    "hooks/verify-phase-gates.sh"))
-                    .exists();
-            assertThat(outputDir.resolve(
-                    "hooks/enforce-phase-sequence.sh"))
-                    .exists();
+            // Rule 25 + Rule 59 scripts are always copied regardless.
+            assertThat(files)
+                    .hasSize(
+                            HooksAssembler.RULE_25_SCRIPTS.size()
+                                    + HooksAssembler.RULE_59_SCRIPTS.size());
+            assertThat(outputDir.resolve("hooks/verify-phase-gates.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-phase-sequence.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-no-bypass-flags.sh")).exists();
         }
     }
 
@@ -282,26 +240,22 @@ class HooksAssemblerTest {
     class TelemetryHooks {
 
         private static final String[] TELEMETRY_FILES = {
-                "telemetry-emit.sh",
-                "telemetry-lib.sh",
-                "telemetry-session.sh",
-                "telemetry-pretool.sh",
-                "telemetry-posttool.sh",
-                "telemetry-subagent.sh",
-                "telemetry-stop.sh"
+            "telemetry-emit.sh",
+            "telemetry-lib.sh",
+            "telemetry-session.sh",
+            "telemetry-pretool.sh",
+            "telemetry-posttool.sh",
+            "telemetry-subagent.sh",
+            "telemetry-stop.sh"
         };
 
         @Test
-        @DisplayName("telemetryEnabled=true copies all 7"
-                + " telemetry scripts")
-        void assemble_telemetryEnabled_copiesAllScripts(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("telemetryEnabled=true copies all 7" + " telemetry scripts")
+        void assemble_telemetryEnabled_copiesAllScripts(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -310,29 +264,22 @@ class HooksAssemblerTest {
                             .telemetryEnabled(true)
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path hooksDir = outputDir.resolve("hooks");
             for (String name : TELEMETRY_FILES) {
                 Path f = hooksDir.resolve(name);
-                assertThat(f)
-                        .as("missing %s", name)
-                        .exists();
+                assertThat(f).as("missing %s", name).exists();
             }
         }
 
         @Test
-        @DisplayName("telemetryEnabled=false copies zero"
-                + " telemetry scripts")
-        void assemble_telemetryDisabled_skipsScripts(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("telemetryEnabled=false copies zero" + " telemetry scripts")
+        void assemble_telemetryDisabled_skipsScripts(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -341,8 +288,7 @@ class HooksAssemblerTest {
                             .telemetryEnabled(false)
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path hooksDir = outputDir.resolve("hooks");
             if (!Files.exists(hooksDir)) {
@@ -350,23 +296,18 @@ class HooksAssemblerTest {
             }
             for (String name : TELEMETRY_FILES) {
                 assertThat(hooksDir.resolve(name))
-                        .as("telemetry script %s must NOT"
-                                + " be copied when disabled",
-                                name)
+                        .as("telemetry script %s must NOT" + " be copied when disabled", name)
                         .doesNotExist();
             }
         }
 
         @Test
         @DisplayName("telemetry scripts are executable")
-        void assemble_telemetryEnabled_scriptsExecutable(
-                @TempDir Path tempDir)
-                throws IOException {
+        void assemble_telemetryEnabled_scriptsExecutable(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -375,29 +316,22 @@ class HooksAssemblerTest {
                             .telemetryEnabled(true)
                             .build();
 
-            assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path hooksDir = outputDir.resolve("hooks");
             for (String name : TELEMETRY_FILES) {
                 Path f = hooksDir.resolve(name);
-                assertThat(Files.isExecutable(f))
-                        .as("%s must be executable", name)
-                        .isTrue();
+                assertThat(Files.isExecutable(f)).as("%s must be executable", name).isTrue();
             }
         }
 
         @Test
-        @DisplayName("telemetry coexists with"
-                + " post-compile-check.sh")
-        void assemble_telemetryWithCompiledLang_coexist(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("telemetry coexists with" + " post-compile-check.sh")
+        void assemble_telemetryWithCompiledLang_coexist(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler();
+            HooksAssembler assembler = new HooksAssembler();
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("java", "21")
@@ -406,38 +340,28 @@ class HooksAssemblerTest {
                             .telemetryEnabled(true)
                             .build();
 
-            List<String> files = assembler.assemble(
-                    config, new TemplateEngine(), outputDir);
+            List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             Path hooksDir = outputDir.resolve("hooks");
-            assertThat(hooksDir.resolve(
-                    "post-compile-check.sh")).exists();
+            assertThat(hooksDir.resolve("post-compile-check.sh")).exists();
             for (String name : TELEMETRY_FILES) {
-                assertThat(hooksDir.resolve(name))
-                        .as("missing %s", name).exists();
+                assertThat(hooksDir.resolve(name)).as("missing %s", name).exists();
             }
-            assertThat(files.size())
-                    .isGreaterThanOrEqualTo(
-                            TELEMETRY_FILES.length + 1);
+            assertThat(files.size()).isGreaterThanOrEqualTo(TELEMETRY_FILES.length + 1);
         }
 
         @Test
-        @DisplayName("missing telemetry source aborts with"
-                + " AssemblerException citing path")
-        void assemble_missingTelemetryFile_throws(
-                @TempDir Path tempDir)
-                throws IOException {
+        @DisplayName("missing telemetry source aborts with" + " AssemblerException citing path")
+        void assemble_missingTelemetryFile_throws(@TempDir Path tempDir) throws IOException {
             // Resource dir with hooks/ folder but NO
             // telemetry-*.sh files present.
             Path resourceDir = tempDir.resolve("res");
-            Path hooksSrc = resourceDir.resolve(
-                    "targets/claude/hooks");
+            Path hooksSrc = resourceDir.resolve("targets/claude/hooks");
             Files.createDirectories(hooksSrc);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
 
-            HooksAssembler assembler =
-                    new HooksAssembler(resourceDir);
+            HooksAssembler assembler = new HooksAssembler(resourceDir);
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .language("python", "3.12")
@@ -446,20 +370,16 @@ class HooksAssemblerTest {
                             .telemetryEnabled(true)
                             .build();
 
-            assertThatThrownBy(() -> assembler.assemble(
-                    config, new TemplateEngine(),
-                    outputDir))
+            assertThatThrownBy(() -> assembler.assemble(config, new TemplateEngine(), outputDir))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining(
-                            "telemetry-emit.sh");
+                    .hasMessageContaining("telemetry-emit.sh");
         }
     }
 
     static ProjectConfig buildKotlinKtorConfig() {
         return TestConfigBuilder.builder()
                 .projectName("my-ktor-service")
-                .purpose("Describe your service"
-                        + " purpose here")
+                .purpose("Describe your service" + " purpose here")
                 .archStyle("microservice")
                 .domainDriven(true)
                 .eventDriven(true)

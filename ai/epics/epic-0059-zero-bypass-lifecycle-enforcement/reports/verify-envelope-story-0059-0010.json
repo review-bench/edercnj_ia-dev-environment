@@ -1,0 +1,32 @@
+{
+  "storyId": "story-0059-0010",
+  "epicId": "EPIC-0059",
+  "passed": true,
+  "verifiedAt": "2026-04-27T00:00:00Z",
+  "coverageDelta": "N/A (documentation story)",
+  "failures": [],
+  "acCheckResults": [
+    {
+      "scenario": "Arquivo Rule 27 criado e acessível",
+      "passed": true,
+      "evidence": "java/src/main/resources/targets/claude/rules/27-zero-bypass-lifecycle.md exists with 6 required sections"
+    },
+    {
+      "scenario": "CLAUDE.md contém bloco ZERO-BYPASS",
+      "passed": true,
+      "evidence": "grep 'ZERO-BYPASS LIFECYCLE' CLAUDE.md returns normative block at line 32"
+    },
+    {
+      "scenario": "Índice de rules lista Rule 27",
+      "passed": true,
+      "evidence": "grep '27-zero-bypass' CLAUDE.md returns index entry with correct scope description"
+    },
+    {
+      "scenario": "Rule 27 distingue claramente de Rule 24",
+      "passed": true,
+      "evidence": "## Purpose section explicitly contrasts Rule 24 (sub-skill invocations) vs Rule 27 (root orchestrator invocation)"
+    }
+  ],
+  "tasksVerified": ["TASK-0059-0010-001", "TASK-0059-0010-002"],
+  "prNumbers": [715, 716]
+}

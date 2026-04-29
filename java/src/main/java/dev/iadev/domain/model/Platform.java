@@ -7,21 +7,17 @@ import java.util.Optional;
  * Target AI platform for assembler output generation.
  *
  * <p>Each platform maps to a specific tooling ecosystem:
+ *
  * <ul>
- *   <li>{@link #CLAUDE_CODE} — Anthropic Claude Code
- *       ({@code .claude/})</li>
- *   <li>{@link #SHARED} — Platform-agnostic artifacts
- *       (docs, CI/CD, constitution)</li>
- *   <li>{@link #ALL} — Sentinel value produced ONLY by
- *       {@code PlatformConverter} when the user types
- *       {@code --platform all}. Never user-selectable via
- *       {@link #fromCliName(String)} and excluded from
- *       {@link #allUserSelectable()}.</li>
+ *   <li>{@link #CLAUDE_CODE} — Anthropic Claude Code ({@code .claude/})
+ *   <li>{@link #SHARED} — Platform-agnostic artifacts (docs, CI/CD, constitution)
+ *   <li>{@link #ALL} — Sentinel value produced ONLY by {@code PlatformConverter} when the user
+ *       types {@code --platform all}. Never user-selectable via {@link #fromCliName(String)} and
+ *       excluded from {@link #allUserSelectable()}.
  * </ul>
  *
- * <p>{@link #SHARED} is never user-selectable via CLI;
- * shared assemblers are always included automatically
- * (RULE-003).</p>
+ * <p>{@link #SHARED} is never user-selectable via CLI; shared assemblers are always included
+ * automatically (RULE-003).
  *
  * @see AssemblerDescriptor
  */
@@ -34,10 +30,9 @@ public enum Platform {
     SHARED("shared"),
 
     /**
-     * Sentinel meaning "all platforms — no filter". Produced
-     * by the CLI type converter when the user types "all".
-     * Rule 03 (never return null) forbids the previous
-     * {@code null} representation of this intent.
+     * Sentinel meaning "all platforms — no filter". Produced by the CLI type converter when the
+     * user types "all". Rule 03 (never return null) forbids the previous {@code null}
+     * representation of this intent.
      */
     ALL("__all__");
 
@@ -59,16 +54,14 @@ public enum Platform {
     /**
      * Resolves a platform from its CLI name.
      *
-     * <p>The {@link #ALL} sentinel is never resolvable via
-     * this method — its synthetic cliName ({@code __all__})
-     * is an internal marker, and the {@code "all"} keyword is
-     * handled exclusively by {@code PlatformConverter}.</p>
+     * <p>The {@link #ALL} sentinel is never resolvable via this method — its synthetic cliName
+     * ({@code __all__}) is an internal marker, and the {@code "all"} keyword is handled exclusively
+     * by {@code PlatformConverter}.
      *
      * @param cliName the kebab-case CLI name, may be null
      * @return the matching platform, or empty if not found
      */
-    public static Optional<Platform> fromCliName(
-            String cliName) {
+    public static Optional<Platform> fromCliName(String cliName) {
         if (cliName == null || cliName.isEmpty()) {
             return Optional.empty();
         }
@@ -86,12 +79,10 @@ public enum Platform {
     /**
      * Returns all platforms selectable by the user via CLI.
      *
-     * <p>{@link #SHARED} is excluded because shared
-     * assemblers are always included automatically
-     * (RULE-003).</p>
+     * <p>{@link #SHARED} is excluded because shared assemblers are always included automatically
+     * (RULE-003).
      *
-     * @return an {@link EnumSet} containing all platforms
-     *         except {@link #SHARED}
+     * @return an {@link EnumSet} containing all platforms except {@link #SHARED}
      */
     public static EnumSet<Platform> allUserSelectable() {
         return EnumSet.of(CLAUDE_CODE);

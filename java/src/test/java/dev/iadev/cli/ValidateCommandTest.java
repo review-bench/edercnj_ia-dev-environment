@@ -1,34 +1,31 @@
 package dev.iadev.cli;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import picocli.CommandLine;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
 
 /**
  * Unit tests for {@link ValidateCommand}.
  *
- * <p>Tests follow TPP ordering:
- * help/options → valid config (exit 0) → file not found (exit 1)
- * → invalid YAML → missing section → incompatible framework
- * → version error → verbose mode.
+ * <p>Tests follow TPP ordering: help/options → valid config (exit 0) → file not found (exit 1) →
+ * invalid YAML → missing section → incompatible framework → version error → verbose mode.
  */
 @DisplayName("ValidateCommand")
 class ValidateCommandTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
-    private static final String VALID_CONFIG = """
+    private static final String VALID_CONFIG =
+            """
             project:
               name: "my-app"
               purpose: "A microservice"
@@ -45,7 +42,8 @@ class ValidateCommandTest {
               build_tool: maven
             """;
 
-    private static final String MISSING_LANGUAGE_CONFIG = """
+    private static final String MISSING_LANGUAGE_CONFIG =
+            """
             project:
               name: "test"
               purpose: "test"
@@ -58,7 +56,8 @@ class ValidateCommandTest {
               version: "3.4"
             """;
 
-    private static final String INCOMPATIBLE_CONFIG = """
+    private static final String INCOMPATIBLE_CONFIG =
+            """
             project:
               name: "test"
               purpose: "test"
@@ -75,7 +74,8 @@ class ValidateCommandTest {
               build_tool: maven
             """;
 
-    private static final String VERSION_ERROR_CONFIG = """
+    private static final String VERSION_ERROR_CONFIG =
+            """
             project:
               name: "test"
               purpose: "test"
@@ -92,10 +92,28 @@ class ValidateCommandTest {
               build_tool: maven
             """;
 
-    private static final String INVALID_YAML = """
+    private static final String INVALID_YAML =
+            """
             project:
               name: "test
             invalid: [
+            """;
+
+    private static final String WRONG_TYPE_CONFIG =
+            """
+            project:
+              name: "test"
+              purpose: "test"
+            architecture:
+              style: microservice
+            interfaces: "not-a-list"
+            language:
+              name: java
+              version: "21"
+            framework:
+              name: spring-boot
+              version: "3.4"
+              build_tool: maven
             """;
 
     private Path writeYaml(String content) throws IOException {
@@ -115,12 +133,10 @@ class ValidateCommandTest {
         cmd.setOut(new PrintWriter(outSw));
         cmd.setErr(new PrintWriter(errSw));
         int exitCode = cmd.execute(args);
-        return new ExecutionResult(
-                exitCode, outSw.toString(), errSw.toString());
+        return new ExecutionResult(exitCode, outSw.toString(), errSw.toString());
     }
 
-    private record ExecutionResult(
-            int exitCode, String stdout, String stderr) {
+    private record ExecutionResult(int exitCode, String stdout, String stderr) {
 
         String allOutput() {
             return stdout + stderr;
@@ -145,8 +161,7 @@ class ValidateCommandTest {
         void help_whenCalled_showsConfigOption() {
             var result = execute("validate", "--help");
 
-            assertThat(result.stdout())
-                    .contains("-c", "--config");
+            assertThat(result.stdout()).contains("-c", "--config");
         }
 
         @Test
@@ -154,8 +169,7 @@ class ValidateCommandTest {
         void help_whenCalled_showsVerboseOption() {
             var result = execute("validate", "--help");
 
-            assertThat(result.stdout())
-                    .contains("-v", "--verbose");
+            assertThat(result.stdout()).contains("-v", "--verbose");
         }
 
         @Test
@@ -173,27 +187,21 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("valid config returns exit 0 and success message")
-        void call_validConfig_returnsZeroWithSuccessMessage()
-                throws IOException {
+        void call_validConfig_returnsZeroWithSuccessMessage() throws IOException {
             Path file = writeYaml(VALID_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isZero();
-            assertThat(result.stdout())
-                    .contains("Configuration is valid");
+            assertThat(result.stdout()).contains("Configuration is valid");
         }
 
         @Test
         @DisplayName("valid config with verbose shows all PASS")
-        void call_validConfigVerbose_showsAllPass()
-                throws IOException {
+        void call_validConfigVerbose_showsAllPass() throws IOException {
             Path file = writeYaml(VALID_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString(),
-                    "--verbose");
+            var result = execute("validate", "-c", file.toString(), "--verbose");
 
             assertThat(result.exitCode()).isZero();
             assertThat(result.stdout())
@@ -213,15 +221,12 @@ class ValidateCommandTest {
         @Test
         @DisplayName("non-existent file returns exit 1 with error")
         void call_nonExistentFile_returnsOneWithError() {
-            String missing = tempDir.resolve("missing.yaml")
-                    .toString();
+            String missing = tempDir.resolve("missing.yaml").toString();
 
-            var result = execute(
-                    "validate", "-c", missing);
+            var result = execute("validate", "-c", missing);
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout()).contains(
-                    "Error: Configuration file not found:");
+            assertThat(result.stdout()).contains("Error: Configuration file not found:");
             assertThat(result.stdout()).contains(missing);
         }
     }
@@ -232,12 +237,10 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("invalid YAML returns exit 1 with parse error")
-        void call_invalidYaml_returnsOneWithParseError()
-                throws IOException {
+        void call_invalidYaml_returnsOneWithParseError() throws IOException {
             Path file = writeYaml(INVALID_YAML);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isEqualTo(1);
             assertThat(result.stdout()).contains("Error:");
@@ -250,16 +253,24 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("missing language section returns exit 1")
-        void call_missingLanguage_returnsOneWithErrors()
-                throws IOException {
+        void call_missingLanguage_returnsOneWithErrors() throws IOException {
             Path file = writeYaml(MISSING_LANGUAGE_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout())
-                    .contains("Validation failed:");
+            assertThat(result.stdout()).contains("Validation failed:");
+        }
+
+        @Test
+        @DisplayName("missing section with verbose shows FAIL for sections")
+        void call_missingSectionVerbose_showsVerboseOutput() throws IOException {
+            Path file = writeYaml(MISSING_LANGUAGE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString(), "--verbose");
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("[FAIL] Mandatory sections present");
         }
     }
 
@@ -269,35 +280,26 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("python with spring-boot returns exit 1")
-        void call_incompatibleFramework_returnsOneWithError()
-                throws IOException {
+        void call_incompatibleFramework_returnsOneWithError() throws IOException {
             Path file = writeYaml(INCOMPATIBLE_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout())
-                    .contains("Validation failed:");
-            assertThat(result.stdout())
-                    .contains("spring-boot");
+            assertThat(result.stdout()).contains("Validation failed:");
+            assertThat(result.stdout()).contains("spring-boot");
         }
 
         @Test
         @DisplayName("verbose mode shows FAIL for compatibility")
-        void call_incompatibleVerbose_showsFail()
-                throws IOException {
+        void call_incompatibleVerbose_showsFail() throws IOException {
             Path file = writeYaml(INCOMPATIBLE_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString(),
-                    "--verbose");
+            var result = execute("validate", "-c", file.toString(), "--verbose");
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout()).contains(
-                    "[FAIL] Language-framework compatibility:");
-            assertThat(result.stdout())
-                    .contains("Validation failed:");
+            assertThat(result.stdout()).contains("[FAIL] Language-framework compatibility:");
+            assertThat(result.stdout()).contains("Validation failed:");
         }
     }
 
@@ -307,33 +309,25 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("Java 11 + Quarkus 3 returns exit 1")
-        void call_versionError_returnsOneWithError()
-                throws IOException {
+        void call_versionError_returnsOneWithError() throws IOException {
             Path file = writeYaml(VERSION_ERROR_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout())
-                    .contains("Validation failed:");
-            assertThat(result.stdout()).containsIgnoringCase(
-                    "java 17+");
+            assertThat(result.stdout()).contains("Validation failed:");
+            assertThat(result.stdout()).containsIgnoringCase("java 17+");
         }
 
         @Test
         @DisplayName("verbose mode shows FAIL for version")
-        void call_versionErrorVerbose_showsFail()
-                throws IOException {
+        void call_versionErrorVerbose_showsFail() throws IOException {
             Path file = writeYaml(VERSION_ERROR_CONFIG);
 
-            var result = execute(
-                    "validate", "-c", file.toString(),
-                    "--verbose");
+            var result = execute("validate", "-c", file.toString(), "--verbose");
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout())
-                    .contains("[FAIL] Version requirements:");
+            assertThat(result.stdout()).contains("[FAIL] Version requirements:");
         }
     }
 
@@ -344,11 +338,9 @@ class ValidateCommandTest {
         @Test
         @DisplayName("error output does not contain stack traces")
         void call_error_noStackTrace() {
-            String missing = tempDir.resolve("missing.yaml")
-                    .toString();
+            String missing = tempDir.resolve("missing.yaml").toString();
 
-            var result = execute(
-                    "validate", "-c", missing);
+            var result = execute("validate", "-c", missing);
 
             assertThat(result.allOutput())
                     .doesNotContain("at dev.iadev")
@@ -357,15 +349,12 @@ class ValidateCommandTest {
 
         @Test
         @DisplayName("invalid YAML error has no stack traces")
-        void call_invalidYaml_noStackTrace()
-                throws IOException {
+        void call_invalidYaml_noStackTrace() throws IOException {
             Path file = writeYaml(INVALID_YAML);
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
-            assertThat(result.allOutput())
-                    .doesNotContain("at dev.iadev");
+            assertThat(result.allOutput()).doesNotContain("at dev.iadev");
         }
     }
 
@@ -378,12 +367,37 @@ class ValidateCommandTest {
         void call_emptyFile_returnsOne() throws IOException {
             Path file = writeYaml("");
 
-            var result = execute(
-                    "validate", "-c", file.toString());
+            var result = execute("validate", "-c", file.toString());
 
             assertThat(result.exitCode()).isEqualTo(1);
-            assertThat(result.stdout())
-                    .contains("Validation failed:");
+            assertThat(result.stdout()).contains("Validation failed:");
+        }
+    }
+
+    @Nested
+    @DisplayName("invalid field type")
+    class InvalidFieldType {
+
+        @Test
+        @DisplayName("interfaces as scalar string returns exit 1 with error")
+        void call_interfacesAsScalar_returnsOneWithError() throws IOException {
+            Path file = writeYaml(WRONG_TYPE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString());
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("Error:");
+        }
+
+        @Test
+        @DisplayName("interfaces as scalar with verbose shows error details")
+        void call_interfacesAsScalarVerbose_showsDetails() throws IOException {
+            Path file = writeYaml(WRONG_TYPE_CONFIG);
+
+            var result = execute("validate", "-c", file.toString(), "--verbose");
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.stdout()).contains("Error:");
         }
     }
 }

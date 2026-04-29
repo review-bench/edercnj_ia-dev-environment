@@ -4,6 +4,8 @@ description: "Validates REST API endpoints for RFC 7807 error responses, paginat
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[endpoint-path or feature-name]"
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: api, fragment-order: 50 }
 ---
 
 ## Global Output Policy

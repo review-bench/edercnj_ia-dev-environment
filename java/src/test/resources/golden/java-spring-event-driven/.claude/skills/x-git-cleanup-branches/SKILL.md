@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[--dry-run] [--yes]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

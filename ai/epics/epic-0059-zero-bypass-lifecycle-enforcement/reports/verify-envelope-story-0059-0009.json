@@ -1,0 +1,43 @@
+{
+  "storyId": "story-0059-0009",
+  "epicId": "EPIC-0059",
+  "passed": true,
+  "coverageDelta": null,
+  "scope": "SIMPLE",
+  "tasksCompleted": [
+    {
+      "taskId": "TASK-0059-0009-001",
+      "status": "DONE",
+      "prNumber": 713,
+      "commitSha": "3ea7a70d0"
+    },
+    {
+      "taskId": "TASK-0059-0009-002",
+      "status": "DONE",
+      "prNumber": 714,
+      "commitSha": "454ad023d"
+    }
+  ],
+  "acCheckResults": [
+    {
+      "scenario": "setup-branch-protection.sh configures all required checks",
+      "passed": true
+    },
+    {
+      "scenario": "Script is idempotent (second execution does not fail)",
+      "passed": true
+    },
+    {
+      "scenario": "CODEOWNERS requires review for audit script changes",
+      "passed": true
+    },
+    {
+      "scenario": "Merge without passing checks is blocked by GitHub",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "reviewScore": 9,
+  "reviewVerdict": "GO",
+  "timestamp": "2026-04-27T00:00:00Z"
+}

@@ -4,6 +4,7 @@ description: "Generate detailed User Story files from an Epic and system specifi
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "<SPEC_FILE> <EPIC_FILE> [--quality-threshold 70] [--jira <PROJECT_KEY>] [--no-jira] [--dry-run] [--no-commit]"
+requires-capabilities: []
 ---
 
 ## Output Policy
@@ -654,7 +655,7 @@ Action items: K issue(s) to resolve
 
 ### Step 5 — Save and Report
 
-Save each story as `story-XXXX-YYYY.md` in the same directory as the Epic (inside `plans/epic-XXXX/`).
+Save each story as `story-XXXX-YYYY.md` in the same directory as the Epic (inside `ai/epics/epic-XXXX/`).
 The XXXX is the epic number (extracted from the Epic file) and YYYY is the story sequence (from the Epic's index).
 Report: total stories generated, dependency graph summary, any inconsistencies found.
 
@@ -673,10 +674,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-stor
 
 If `--dry-run` or `--no-commit` is set, log `"dry-run, skipping commit"` (dry-run) or `"orchestrated mode, skipping commit"` (no-commit) and skip this step entirely.
 
-Otherwise, delegate the commit to `x-planning-commit` so the newly written `plans/epic-XXXX/story-XXXX-YYYY.md` files are versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
+Otherwise, delegate the commit to `x-planning-commit` so the newly written `ai/epics/epic-XXXX/story-XXXX-YYYY.md` files are versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
 
     Skill(skill: "x-planning-commit",
-          args: "--scope docs --story-id <XXXX-YYYY> --paths plans/epic-<XXXX>/story-<XXXX-YYYY>.md --subject \"add user story\"")
+          args: "--scope docs --story-id <XXXX-YYYY> --paths ai/epics/epic-<XXXX>/story-<XXXX-YYYY>.md --subject \"add user story\"")
 
 When multiple stories are generated in one invocation, batch them into a single commit by passing all paths at once (comma- or space-separated per `x-planning-commit` contract). Subject becomes `"add N user stories"`.
 

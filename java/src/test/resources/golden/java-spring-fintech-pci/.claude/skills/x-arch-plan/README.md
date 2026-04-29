@@ -17,7 +17,7 @@ Produces a structured architecture plan with 13 sections covering component diag
 ## Usage
 
 ```
-/x-arch-plan plans/epic-0012/story-0012-0003.md
+/x-arch-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md
 /x-arch-plan "Payment Gateway Integration"
 ```
 
@@ -34,7 +34,7 @@ Produces a structured architecture plan with 13 sections covering component diag
 
 | Artifact | Path |
 |----------|------|
-| Architecture plan | `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
+| Architecture plan | `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
 
 ## See Also
 

@@ -303,7 +303,7 @@ verification passes during iterative debugging.
 ## §9 — Concurrency Contract
 
 The skill acquires a shared `flock -s` on
-`plans/epic-${epic_id}/execution-state.json` only to read; it does NOT
+`ai/epics/epic-${epic_id}/execution-state.json` only to read; it does NOT
 acquire exclusive locks. Multiple `x-internal-story-verify` invocations
 across different stories of the same epic may run in parallel without
 coordination. The build tool invocation itself is the bottleneck — use
