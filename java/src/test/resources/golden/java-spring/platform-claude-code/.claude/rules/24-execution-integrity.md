@@ -51,7 +51,24 @@ Absence of any mandatory artifact on a merged story fails the CI audit with `EIE
 
 ## Enforcement Layers
 
-Four defense-in-depth layers. A violation caught by any layer fails the lifecycle.
+Five defense-in-depth layers (extended by EPIC-0063 with Camada 0). A violation caught by any layer fails the lifecycle.
+
+### Camada 0 — Local Pre-Flight (NEW — EPIC-0063)
+
+Gates that execute on the operator's machine BEFORE any remote operation (`git push`, `gh pr create`, `Skill x-pr-create`). This camada is the only one that can **prevent** a bad action from happening; Camadas 1-4 are detective (catch after the fact).
+
+| Aspect | Detail |
+| :--- | :--- |
+| Trigger | PreToolUse hook (`enforce-preflight-gates.sh`) on `Bash`, `Skill x-pr-create`, etc. |
+| Vinculatividade | PreToolUse hook is physically blocking — `git push` is intercepted before reaching origin |
+| Único bypass | `CLAUDE_RECOVERY_MODE=1` env var (with visible WARNING). No silent escape. |
+| Scripts | `scripts/preflight.sh` orchestrates: `audit-review-content.sh`, `audit-verify-envelope.sh`, `audit-coverage-local.sh`, `audit-execution-integrity.sh --scope=telemetry` |
+| Cross-ref | Rule 27 RULE-059-07 (CLAUDE_RECOVERY_MODE is the only accepted bypass variable) |
+
+**Failure semantics:** when preflight fails, the PreToolUse hook exits with code 2 (blocking) and Claude Code surfaces the error to the LLM with the failed gate's exit code/message. The operator must fix the underlying issue before retrying — there is no `--no-verify` style escape.
+
+**Stories implementing Camada 0:**
+- story-0063-0001 (preflight.sh runner), story-0063-0002 (content audits), story-0063-0003 (telemetry audit), story-0063-0004 (PreToolUse hook), story-0063-0007 (coverage gate), story-0063-0021 (PR-fix gate)
 
 ### Camada 1 — Normative (this rule + assertive SKILL.md + CLAUDE.md)
 
