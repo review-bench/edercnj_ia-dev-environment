@@ -8,12 +8,12 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0045-0001 | Criar skill `x-pr-watch-ci` com polling de CI + detecção de Copilot review | — | — | story-0045-0003, story-0045-0004, story-0045-0005 | Pendente |
-| story-0045-0002 | Adicionar Rule 20 (CI-Watch) + audit de regressão | — | — | story-0045-0006 | Pendente |
-| story-0045-0003 | Integrar CI-Watch em `x-story-implement` Phase 2.2 | story-0045-0001, EPIC-0043 mergeado | story-0045-0006 | Pendente |
-| story-0045-0004 | Integrar CI-Watch em `x-task-implement --worktree` standalone | story-0045-0001 | story-0045-0006 | Pendente |
-| story-0045-0005 | Integrar CI-Watch opcional em `x-release` via `--ci-watch` | story-0045-0001 | story-0045-0006 | Pendente |
-| story-0045-0006 | Golden diff regen + smoke test real contra PR | story-0045-0003, story-0045-0004, story-0045-0005 | — | Pendente |
+| story-0045-0001 | Criar skill `x-pr-watch-ci` com polling de CI + detecção de Copilot review | — | — | story-0045-0003, story-0045-0004, story-0045-0005 | Concluída |
+| story-0045-0002 | Adicionar Rule 20 (CI-Watch) + audit de regressão | — | — | story-0045-0006 | Concluída |
+| story-0045-0003 | Integrar CI-Watch em `x-story-implement` Phase 2.2 | story-0045-0001, EPIC-0043 mergeado | story-0045-0006 | Concluída |
+| story-0045-0004 | Integrar CI-Watch em `x-task-implement --worktree` standalone | story-0045-0001 | story-0045-0006 | Concluída |
+| story-0045-0005 | Integrar CI-Watch opcional em `x-release` via `--ci-watch` | story-0045-0001 | story-0045-0006 | Concluída |
+| story-0045-0006 | Golden diff regen + smoke test real contra PR | story-0045-0003, story-0045-0004, story-0045-0005 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

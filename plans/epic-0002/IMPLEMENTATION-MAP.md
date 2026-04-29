@@ -8,11 +8,11 @@
 
 | Story | Título | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| STORY-021 | Templates Nunjucks para Codex | EPIC-001/STORY-005 | STORY-022, STORY-023 | Pendente |
-| STORY-022 | CodexAgentsMdAssembler | STORY-021, EPIC-001/STORY-007, EPIC-001/STORY-008 | STORY-024 | Pendente |
-| STORY-023 | CodexConfigAssembler | STORY-021, EPIC-001/STORY-007, EPIC-001/STORY-008 | STORY-024 | Pendente |
-| STORY-024 | Pipeline + ReadmeAssembler Update | STORY-022, STORY-023, EPIC-001/STORY-016 | STORY-025 | Pendente |
-| STORY-025 | Testes de Integração Codex | STORY-024 | — | Pendente |
+| STORY-021 | Templates Nunjucks para Codex | EPIC-001/STORY-005 | STORY-022, STORY-023 | Concluída |
+| STORY-022 | CodexAgentsMdAssembler | STORY-021, EPIC-001/STORY-007, EPIC-001/STORY-008 | STORY-024 | Concluída |
+| STORY-023 | CodexConfigAssembler | STORY-021, EPIC-001/STORY-007, EPIC-001/STORY-008 | STORY-024 | Concluída |
+| STORY-024 | Pipeline + ReadmeAssembler Update | STORY-022, STORY-023, EPIC-001/STORY-016 | STORY-025 | Concluída |
+| STORY-025 | Testes de Integração Codex | STORY-024 | — | Concluída |
 
 > **Nota:** As dependências com EPIC-001 são externas a este épico. A Phase 0 deste épico só pode iniciar após EPIC-001/STORY-005 (Template Engine) estar concluída. A Phase 1 requer adicionalmente EPIC-001/STORY-007 (Validator/Resolver) e STORY-008 (Assembler Helpers). A Phase 2 requer EPIC-001/STORY-016 (Pipeline Orchestrator).
 

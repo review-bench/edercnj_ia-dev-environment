@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0032-0001 | Documentar Regra de Source of Truth | — | — | 0002, 0003 | Pendente |
-| story-0032-0002 | Renomear Core Skills na Fonte Verdade | — | 0001 | 0004 | Pendente |
-| story-0032-0003 | Renomear Conditional Skills na Fonte Verdade | — | 0001 | 0004 | Pendente |
-| story-0032-0004 | Atualizar Referências Cruzadas nos SKILL.md | — | 0002, 0003 | 0005, 0008 | Pendente |
-| story-0032-0005 | Atualizar Java Source Code | — | 0004 | 0006 | Pendente |
-| story-0032-0006 | Atualizar Testes e Corrigir Falhas Pré-existentes | — | 0005 | 0007 | Pendente |
-| story-0032-0007 | Regenerar Golden Files | — | 0006 | — | Pendente |
-| story-0032-0008 | Atualizar Documentação | — | 0004 | — | Pendente |
+| story-0032-0001 | Documentar Regra de Source of Truth | — | — | 0002, 0003 | Concluída |
+| story-0032-0002 | Renomear Core Skills na Fonte Verdade | — | 0001 | 0004 | Concluída |
+| story-0032-0003 | Renomear Conditional Skills na Fonte Verdade | — | 0001 | 0004 | Concluída |
+| story-0032-0004 | Atualizar Referências Cruzadas nos SKILL.md | — | 0002, 0003 | 0005, 0008 | Concluída |
+| story-0032-0005 | Atualizar Java Source Code | — | 0004 | 0006 | Concluída |
+| story-0032-0006 | Atualizar Testes e Corrigir Falhas Pré-existentes | — | 0005 | 0007 | Concluída |
+| story-0032-0007 | Regenerar Golden Files | — | 0006 | — | Concluída |
+| story-0032-0008 | Atualizar Documentação | — | 0004 | — | Concluída |
 
 > **Nota:** Stories 0002 e 0003 são independentes entre si (paralelas). Story 0008 é independente de 0005-0007 (paralela após fase 2).
 

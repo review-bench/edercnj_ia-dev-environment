@@ -8,12 +8,12 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0025-0001 | Platform Enum e Mapeamento de Assemblers | — | — | story-0025-0002 | Pendente |
-| story-0025-0002 | Filtro de Assemblers no Pipeline | — | story-0025-0001 | story-0025-0003, story-0025-0004, story-0025-0005, story-0025-0006 | Pendente |
-| story-0025-0003 | Flag CLI `--platform` | — | story-0025-0002 | story-0025-0007 | Pendente |
-| story-0025-0004 | Suporte `platform:` no YAML Config | — | story-0025-0002 | story-0025-0007 | Pendente |
-| story-0025-0005 | Contagem Dinâmica de Artefatos no README e CLAUDE.md | — | story-0025-0002 | story-0025-0007, story-0025-0008 | Pendente |
-| story-0025-0006 | Verbose e Dry-Run com Awareness de Plataforma | — | story-0025-0002 | story-0025-0007 | Pendente |
+| story-0025-0001 | Platform Enum e Mapeamento de Assemblers | — | — | story-0025-0002 | Concluída |
+| story-0025-0002 | Filtro de Assemblers no Pipeline | — | story-0025-0001 | story-0025-0003, story-0025-0004, story-0025-0005, story-0025-0006 | Concluída |
+| story-0025-0003 | Flag CLI `--platform` | — | story-0025-0002 | story-0025-0007 | Concluída |
+| story-0025-0004 | Suporte `platform:` no YAML Config | — | story-0025-0002 | story-0025-0007 | Concluída |
+| story-0025-0005 | Contagem Dinâmica de Artefatos no README e CLAUDE.md | — | story-0025-0002 | story-0025-0007, story-0025-0008 | Concluída |
+| story-0025-0006 | Verbose e Dry-Run com Awareness de Plataforma | — | story-0025-0002 | story-0025-0007 | Concluída |
 | story-0025-0007 | Atualização de Testes e Golden Files | — | story-0025-0003, story-0025-0004, story-0025-0005, story-0025-0006 | — | Concluída |
 | story-0025-0008 | Documentação e Help Text | — | story-0025-0005 | — | Concluída |
 

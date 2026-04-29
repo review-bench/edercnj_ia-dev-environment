@@ -8,10 +8,10 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0054-0001 | Slim rewrite — PR-domain (x-pr-fix-epic + x-pr-merge-train) | — | — | — | Pendente |
-| story-0054-0002 | Slim rewrite — Medium orchestrators (x-task-implement + x-security-pipeline + x-git-worktree) | — | — | — | Pendente |
-| story-0054-0003 | Slim rewrite — x-story-plan (com partial-carve existente) | — | — | story-0054-0004 | Pendente |
-| story-0054-0004 | Slim rewrite — High-impact orchestrators (x-epic-implement + x-release) | — | story-0054-0003 | — | Pendente |
+| story-0054-0001 | Slim rewrite — PR-domain (x-pr-fix-epic + x-pr-merge-train) | — | — | — | Concluída |
+| story-0054-0002 | Slim rewrite — Medium orchestrators (x-task-implement + x-security-pipeline + x-git-worktree) | — | — | — | Concluída |
+| story-0054-0003 | Slim rewrite — x-story-plan (com partial-carve existente) | — | — | story-0054-0004 | Concluída |
+| story-0054-0004 | Slim rewrite — High-impact orchestrators (x-epic-implement + x-release) | — | story-0054-0003 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

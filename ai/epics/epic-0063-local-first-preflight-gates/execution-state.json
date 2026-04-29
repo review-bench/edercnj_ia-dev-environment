@@ -13,7 +13,7 @@
   },
   "storyStatuses": {
     "story-0063-0001": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Pre-Flight Runner Script",
       "blockedBy": [
         "story-0063-0002",
@@ -24,21 +24,21 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/793"
     },
     "story-0063-0002": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Content-Quality Audits (Review + Verify Envelope)",
       "blockedBy": [],
       "prNumber": 781,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/781"
     },
     "story-0063-0003": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Telemetry-as-Evidence Audit + Stage Hook",
       "blockedBy": [],
       "prNumber": 783,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/783"
     },
     "story-0063-0004": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "PreToolUse Blocking Hook (enforce-preflight-gates.sh)",
       "blockedBy": [
         "story-0063-0001"
@@ -47,7 +47,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/798"
     },
     "story-0063-0005": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "x-story-implement Phase Shift (Reviews ANTES do PR)",
       "blockedBy": [
         "story-0063-0001",
@@ -57,7 +57,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/804"
     },
     "story-0063-0006": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "x-epic-implement Phase 4.5 (Epic-Level Review)",
       "blockedBy": [
         "story-0063-0004"
@@ -66,35 +66,35 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/805"
     },
     "story-0063-0007": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Local Coverage Gate (audit-coverage-local.sh)",
       "blockedBy": [],
       "prNumber": 784,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/784"
     },
     "story-0063-0008": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Branch Protection Automation (--apply-strict)",
       "blockedBy": [],
       "prNumber": 787,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/787"
     },
     "story-0063-0009": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Bypass-Skill Catalog (docs/audit-bypass-catalog.md)",
       "blockedBy": [],
       "prNumber": 785,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/785"
     },
     "story-0063-0010": {
-      "status": "COMPLETE",
-      "title": "Rule 24 \u00a7Camada 0 + CLAUDE.md Update",
+      "status": "Concluída",
+      "title": "Rule 24 §Camada 0 + CLAUDE.md Update",
       "blockedBy": [],
       "prNumber": 786,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/786"
     },
     "story-0063-0011": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "E2E Smoke Test (Epic0063LocalFirstSmokeTest)",
       "blockedBy": [
         "story-0063-0001",
@@ -117,7 +117,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/812"
     },
     "story-0063-0012": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "SKILL.md Tool-Call Grammar (Rule 28)",
       "blockedBy": [
         "story-0063-0003",
@@ -127,7 +127,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/794"
     },
     "story-0063-0013": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "PreToolUse Hook v2 (15 vetores adicionais)",
       "blockedBy": [
         "story-0063-0004"
@@ -136,7 +136,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/803"
     },
     "story-0063-0014": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Sub-Skill Wave Dispatch Audit",
       "blockedBy": [
         "story-0063-0003",
@@ -146,7 +146,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/799"
     },
     "story-0063-0015": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Planning-Content Audits (6 artefatos Phase 1)",
       "blockedBy": [
         "story-0063-0002",
@@ -156,8 +156,8 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/795"
     },
     "story-0063-0016": {
-      "status": "COMPLETE",
-      "title": "Rollout WARN\u2192FAIL Execution + ADR-0016",
+      "status": "Concluída",
+      "title": "Rollout WARN→FAIL Execution + ADR-0016",
       "blockedBy": [
         "story-0063-0004",
         "story-0063-0013",
@@ -167,7 +167,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/811"
     },
     "story-0063-0017": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Recovery-Mode Periodic Audit + Dashboard",
       "blockedBy": [
         "story-0063-0003",
@@ -177,7 +177,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/809"
     },
     "story-0063-0018": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Hooks --self-check Contract",
       "blockedBy": [
         "story-0063-0003",
@@ -187,7 +187,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/808"
     },
     "story-0063-0019": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "NDJSON Integrity Hash Chain",
       "blockedBy": [
         "story-0063-0003"
@@ -196,7 +196,7 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/796"
     },
     "story-0063-0020": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "Epic-Review Reconciliation",
       "blockedBy": [
         "story-0063-0002",
@@ -206,11 +206,12 @@
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/810"
     },
     "story-0063-0021": {
-      "status": "COMPLETE",
+      "status": "Concluída",
       "title": "x-pr-fix Real-Diff Gate",
       "blockedBy": [],
       "prNumber": 788,
       "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/788"
     }
-  }
+  },
+  "status": "Concluída"
 }

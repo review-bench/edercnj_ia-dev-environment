@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [story-0057-0001](./story-0057-0001.md) | Expandir tabela "Mandatory Evidence Artifacts" na Rule 24 | — | — | story-0057-0002, story-0057-0005, story-0057-0006 | Pendente |
-| [story-0057-0002](./story-0057-0002.md) | Implementar `scripts/audit-execution-integrity.sh` (Camada 3) | — | story-0057-0001, story-0057-0003 | story-0057-0004 | Pendente |
-| [story-0057-0003](./story-0057-0003.md) | Criar Rule 45 (CI-Watch Integrity) | — | — | story-0057-0002, story-0057-0005 | Pendente |
-| [story-0057-0004](./story-0057-0004.md) | Adicionar markers MANDATORY em 6 SKILL.md orquestradoras | — | story-0057-0002 | story-0057-0007, story-0057-0008 | Pendente |
-| [story-0057-0005](./story-0057-0005.md) | Implementar `scripts/audit-bypass-flags.sh` e remediar flags em happy-path | — | story-0057-0001, story-0057-0003 | story-0057-0007, story-0057-0008 | Pendente |
-| [story-0057-0006](./story-0057-0006.md) | Estender Stop hook (Camada 2) para novos artefatos | — | story-0057-0001 | story-0057-0007, story-0057-0008 | Pendente |
-| [story-0057-0007](./story-0057-0007.md) | Promover smoke tests críticos para `mvn test` ou hook pre-push | — | story-0057-0004, story-0057-0005, story-0057-0006 | — | Pendente |
-| [story-0057-0008](./story-0057-0008.md) | Aplicação retroativa EPIC-0053 — backfill ou baseline grandfather | — | story-0057-0004, story-0057-0005, story-0057-0006 | — | Pendente |
+| [story-0057-0001](./story-0057-0001.md) | Expandir tabela "Mandatory Evidence Artifacts" na Rule 24 | — | — | story-0057-0002, story-0057-0005, story-0057-0006 | Concluída |
+| [story-0057-0002](./story-0057-0002.md) | Implementar `scripts/audit-execution-integrity.sh` (Camada 3) | — | story-0057-0001, story-0057-0003 | story-0057-0004 | Concluída |
+| [story-0057-0003](./story-0057-0003.md) | Criar Rule 45 (CI-Watch Integrity) | — | — | story-0057-0002, story-0057-0005 | Concluída |
+| [story-0057-0004](./story-0057-0004.md) | Adicionar markers MANDATORY em 6 SKILL.md orquestradoras | — | story-0057-0002 | story-0057-0007, story-0057-0008 | Concluída |
+| [story-0057-0005](./story-0057-0005.md) | Implementar `scripts/audit-bypass-flags.sh` e remediar flags em happy-path | — | story-0057-0001, story-0057-0003 | story-0057-0007, story-0057-0008 | Concluída |
+| [story-0057-0006](./story-0057-0006.md) | Estender Stop hook (Camada 2) para novos artefatos | — | story-0057-0001 | story-0057-0007, story-0057-0008 | Concluída |
+| [story-0057-0007](./story-0057-0007.md) | Promover smoke tests críticos para `mvn test` ou hook pre-push | — | story-0057-0004, story-0057-0005, story-0057-0006 | — | Concluída |
+| [story-0057-0008](./story-0057-0008.md) | Aplicação retroativa EPIC-0053 — backfill ou baseline grandfather | — | story-0057-0004, story-0057-0005, story-0057-0006 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

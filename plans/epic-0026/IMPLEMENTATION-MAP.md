@@ -8,13 +8,13 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0026-0001 | SKILL.md core: input parsing, prerequisitos e PR discovery | — | — | story-0026-0002 | Pendente |
-| story-0026-0002 | Batch comment fetching e classificação cross-PR | — | story-0026-0001 | story-0026-0003 | Pendente |
-| story-0026-0003 | Relatório consolidado de findings | — | story-0026-0002 | story-0026-0004 | Pendente |
-| story-0026-0004 | Fix orchestration e criação de PR único | — | story-0026-0003 | story-0026-0005, story-0026-0006 | Pendente |
-| story-0026-0005 | Reply engine e status tracking | — | story-0026-0004 | story-0026-0007 | Pendente |
-| story-0026-0006 | Source template Java, assembler e golden tests | — | story-0026-0004 | story-0026-0007 | Pendente |
-| story-0026-0007 | Hook no x-dev-epic-implement | — | story-0026-0005, story-0026-0006 | — | Pendente |
+| story-0026-0001 | SKILL.md core: input parsing, prerequisitos e PR discovery | — | — | story-0026-0002 | Concluída |
+| story-0026-0002 | Batch comment fetching e classificação cross-PR | — | story-0026-0001 | story-0026-0003 | Concluída |
+| story-0026-0003 | Relatório consolidado de findings | — | story-0026-0002 | story-0026-0004 | Concluída |
+| story-0026-0004 | Fix orchestration e criação de PR único | — | story-0026-0003 | story-0026-0005, story-0026-0006 | Concluída |
+| story-0026-0005 | Reply engine e status tracking | — | story-0026-0004 | story-0026-0007 | Concluída |
+| story-0026-0006 | Source template Java, assembler e golden tests | — | story-0026-0004 | story-0026-0007 | Concluída |
+| story-0026-0007 | Hook no x-dev-epic-implement | — | story-0026-0005, story-0026-0006 | — | Concluída |
 
 ---
 

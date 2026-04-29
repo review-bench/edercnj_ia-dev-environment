@@ -8,13 +8,13 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0031-0001 | Transient Error Retry with Backoff | — | — | story-0031-0002, story-0031-0004 | Pendente |
-| story-0031-0002 | Subagent Failure Recovery | — | story-0031-0001, story-0031-0005 | story-0031-0004 | Pendente |
-| story-0031-0003 | Circuit Breaker for Epic Execution | — | story-0031-0005 | — | Pendente |
-| story-0031-0004 | Graceful Degradation on Context Pressure | — | story-0031-0002, story-0031-0005 | — | Pendente |
-| story-0031-0005 | Error Catalog & Standardized Responses | — | — | story-0031-0002, story-0031-0003, story-0031-0004, story-0031-0007 | Pendente |
-| story-0031-0006 | Merge Gate Between Phases | — | — | — | Pendente |
-| story-0031-0007 | Checkpoint Error History | — | story-0031-0005 | — | Pendente |
+| story-0031-0001 | Transient Error Retry with Backoff | — | — | story-0031-0002, story-0031-0004 | Concluída |
+| story-0031-0002 | Subagent Failure Recovery | — | story-0031-0001, story-0031-0005 | story-0031-0004 | Concluída |
+| story-0031-0003 | Circuit Breaker for Epic Execution | — | story-0031-0005 | — | Concluída |
+| story-0031-0004 | Graceful Degradation on Context Pressure | — | story-0031-0002, story-0031-0005 | — | Concluída |
+| story-0031-0005 | Error Catalog & Standardized Responses | — | — | story-0031-0002, story-0031-0003, story-0031-0004, story-0031-0007 | Concluída |
+| story-0031-0006 | Merge Gate Between Phases | — | — | — | Concluída |
+| story-0031-0007 | Checkpoint Error History | — | story-0031-0005 | — | Concluída |
 
 > **Nota:** story-0031-0004 (Graceful Degradation) também depende de EPIC-0030/story-0030-0001 (Context Budget Tracking) como dependência cross-epic. Essa dependência não está declarada no BlockedBy formal para evitar acoplamento rígido entre epics, mas DEVE ser implementada antes.
 

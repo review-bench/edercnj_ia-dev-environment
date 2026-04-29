@@ -8,24 +8,24 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0029-0001 | Formal Task Definition & Story Template Update | — | — | story-0029-0007, story-0029-0013, story-0029-0014 | Pendente |
-| story-0029-0002 | Task Status Model & Execution State Schema | — | — | story-0029-0015, story-0029-0016 | Pendente |
-| story-0029-0003 | x-format — Code Formatting Skill | — | — | story-0029-0005 | Pendente |
-| story-0029-0004 | x-lint — Code Linting Skill | — | — | story-0029-0005 | Pendente |
-| story-0029-0005 | x-commit — Conventional Commit Skill | — | story-0029-0003, story-0029-0004 | story-0029-0008, story-0029-0009, story-0029-0015, story-0029-0017 | Pendente |
-| story-0029-0006 | x-worktree — Git Worktree Management Skill | — | — | story-0029-0016 | Pendente |
-| story-0029-0007 | x-plan-task — Task Planning Skill | — | story-0029-0001 | story-0029-0008, story-0029-0013 | Pendente |
-| story-0029-0008 | x-tdd — TDD Execution Skill | — | story-0029-0005, story-0029-0007 | story-0029-0015 | Pendente |
-| story-0029-0009 | x-pr-create — Task PR Creation Skill | — | story-0029-0005 | story-0029-0015, story-0029-0017 | Pendente |
-| story-0029-0010 | x-docs — Documentation Skill | — | — | — | Pendente |
-| story-0029-0011 | Individual Review Skills Extraction | — | — | story-0029-0012 | Pendente |
-| story-0029-0012 | x-review Orchestrator Refactor | — | story-0029-0011 | story-0029-0015 | Pendente |
-| story-0029-0013 | x-story-create — Testable Tasks & Value Delivery | — | story-0029-0001, story-0029-0007 | story-0029-0014 | Pendente |
-| story-0029-0014 | x-story-map — Task-Level Dependency Graph | — | story-0029-0001, story-0029-0013 | — | Pendente |
-| story-0029-0015 | x-dev-lifecycle — Task-Centric Workflow | — | story-0029-0002, story-0029-0005, story-0029-0007, story-0029-0008, story-0029-0009, story-0029-0012 | story-0029-0016 | Pendente |
-| story-0029-0016 | x-dev-epic-implement — Auto-Approve & Task Tracking | — | story-0029-0002, story-0029-0006, story-0029-0015 | story-0029-0018 | Pendente |
-| story-0029-0017 | x-git-push — Task Branch Naming & Conventions | — | story-0029-0005, story-0029-0009 | — | Pendente |
-| story-0029-0018 | Golden File Regeneration & Integration Tests | — | story-0029-0001 a story-0029-0017 | — | Pendente |
+| story-0029-0001 | Formal Task Definition & Story Template Update | — | — | story-0029-0007, story-0029-0013, story-0029-0014 | Concluída |
+| story-0029-0002 | Task Status Model & Execution State Schema | — | — | story-0029-0015, story-0029-0016 | Concluída |
+| story-0029-0003 | x-format — Code Formatting Skill | — | — | story-0029-0005 | Concluída |
+| story-0029-0004 | x-lint — Code Linting Skill | — | — | story-0029-0005 | Concluída |
+| story-0029-0005 | x-commit — Conventional Commit Skill | — | story-0029-0003, story-0029-0004 | story-0029-0008, story-0029-0009, story-0029-0015, story-0029-0017 | Concluída |
+| story-0029-0006 | x-worktree — Git Worktree Management Skill | — | — | story-0029-0016 | Concluída |
+| story-0029-0007 | x-plan-task — Task Planning Skill | — | story-0029-0001 | story-0029-0008, story-0029-0013 | Concluída |
+| story-0029-0008 | x-tdd — TDD Execution Skill | — | story-0029-0005, story-0029-0007 | story-0029-0015 | Concluída |
+| story-0029-0009 | x-pr-create — Task PR Creation Skill | — | story-0029-0005 | story-0029-0015, story-0029-0017 | Concluída |
+| story-0029-0010 | x-docs — Documentation Skill | — | — | — | Concluída |
+| story-0029-0011 | Individual Review Skills Extraction | — | — | story-0029-0012 | Concluída |
+| story-0029-0012 | x-review Orchestrator Refactor | — | story-0029-0011 | story-0029-0015 | Concluída |
+| story-0029-0013 | x-story-create — Testable Tasks & Value Delivery | — | story-0029-0001, story-0029-0007 | story-0029-0014 | Concluída |
+| story-0029-0014 | x-story-map — Task-Level Dependency Graph | — | story-0029-0001, story-0029-0013 | — | Concluída |
+| story-0029-0015 | x-dev-lifecycle — Task-Centric Workflow | — | story-0029-0002, story-0029-0005, story-0029-0007, story-0029-0008, story-0029-0009, story-0029-0012 | story-0029-0016 | Concluída |
+| story-0029-0016 | x-dev-epic-implement — Auto-Approve & Task Tracking | — | story-0029-0002, story-0029-0006, story-0029-0015 | story-0029-0018 | Concluída |
+| story-0029-0017 | x-git-push — Task Branch Naming & Conventions | — | story-0029-0005, story-0029-0009 | — | Concluída |
+| story-0029-0018 | Golden File Regeneration & Integration Tests | — | story-0029-0001 a story-0029-0017 | — | Concluída |
 
 > **Nota:** story-0029-0018 depende de TODAS as 17 stories anteriores, pois regenera golden files que refletem todas as mudanças. story-0029-0010 e story-0029-0006 são folhas independentes sem dependências, maximizando paralelismo na Fase 0.
 

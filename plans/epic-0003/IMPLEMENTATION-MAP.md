@@ -8,22 +8,22 @@
 
 | Story | Título | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0003-0001 | Testing KP — TDD Workflow & TPP | — | 0003, 0004, 0006, 0007 | Pendente |
-| story-0003-0002 | Coding Standards KP — Refactoring Guidelines | — | 0003, 0006 | Pendente |
-| story-0003-0003 | Rules 03 & 05 — TDD Practices & Compliance | 0001, 0002 | 0005, 0013 | Pendente |
-| story-0003-0004 | Rule 13 — Gherkin Enriquecido | 0001 | 0005, 0009 | Pendente |
-| story-0003-0005 | Templates — Seções TDD | 0003, 0004 | 0009, 0010 | Pendente |
-| story-0003-0006 | Agents — TDD Workflows (Dev, QA, TL) | 0001, 0002 | 0012, 0015, 0016 | Pendente |
-| story-0003-0007 | x-test-plan — Driver com TPP | 0001 | 0008, 0012, 0014 | Pendente |
-| story-0003-0008 | x-lib-task-decomposer — Tasks de Cenários | 0007 | 0012, 0014 | Pendente |
-| story-0003-0009 | x-story-create — Gherkin Enriquecido | 0004, 0005 | 0011 | Pendente |
-| story-0003-0010 | x-story-epic — DoD com TDD | 0005 | 0011 | Pendente |
-| story-0003-0011 | x-story-epic-full — Propagação TDD | 0009, 0010 | — | Pendente |
-| story-0003-0012 | x-dev-implement — Red-Green-Refactor | 0006, 0007, 0008 | 0014 | Pendente |
-| story-0003-0013 | x-git-push — Commits Atômicos TDD | 0003 | 0014 | Pendente |
-| story-0003-0014 | x-dev-lifecycle — Fases TDD | 0007, 0008, 0012, 0013 | 0015, 0016 | Pendente |
-| story-0003-0015 | x-review — Checklist TDD QA | 0006, 0014 | — | Pendente |
-| story-0003-0016 | x-review-pr — Rubric TDD Tech Lead | 0006, 0014 | — | Pendente |
+| story-0003-0001 | Testing KP — TDD Workflow & TPP | — | 0003, 0004, 0006, 0007 | Concluída |
+| story-0003-0002 | Coding Standards KP — Refactoring Guidelines | — | 0003, 0006 | Concluída |
+| story-0003-0003 | Rules 03 & 05 — TDD Practices & Compliance | 0001, 0002 | 0005, 0013 | Concluída |
+| story-0003-0004 | Rule 13 — Gherkin Enriquecido | 0001 | 0005, 0009 | Concluída |
+| story-0003-0005 | Templates — Seções TDD | 0003, 0004 | 0009, 0010 | Concluída |
+| story-0003-0006 | Agents — TDD Workflows (Dev, QA, TL) | 0001, 0002 | 0012, 0015, 0016 | Concluída |
+| story-0003-0007 | x-test-plan — Driver com TPP | 0001 | 0008, 0012, 0014 | Concluída |
+| story-0003-0008 | x-lib-task-decomposer — Tasks de Cenários | 0007 | 0012, 0014 | Concluída |
+| story-0003-0009 | x-story-create — Gherkin Enriquecido | 0004, 0005 | 0011 | Concluída |
+| story-0003-0010 | x-story-epic — DoD com TDD | 0005 | 0011 | Concluída |
+| story-0003-0011 | x-story-epic-full — Propagação TDD | 0009, 0010 | — | Concluída |
+| story-0003-0012 | x-dev-implement — Red-Green-Refactor | 0006, 0007, 0008 | 0014 | Concluída |
+| story-0003-0013 | x-git-push — Commits Atômicos TDD | 0003 | 0014 | Concluída |
+| story-0003-0014 | x-dev-lifecycle — Fases TDD | 0007, 0008, 0012, 0013 | 0015, 0016 | Concluída |
+| story-0003-0015 | x-review — Checklist TDD QA | 0006, 0014 | — | Concluída |
+| story-0003-0016 | x-review-pr — Rubric TDD Tech Lead | 0006, 0014 | — | Concluída |
 
 > **Nota:** As dependências são estritamente entre recursos de template/skill. Não há dependências de banco de dados, APIs ou infraestrutura. Todas as mudanças são em arquivos Markdown dentro de `resources/`.
 

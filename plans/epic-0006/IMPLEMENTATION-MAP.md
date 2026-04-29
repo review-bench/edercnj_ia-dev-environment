@@ -8,37 +8,37 @@
 
 | Story | Titulo | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0006-0001 | Projeto Maven, pom.xml e Bootstrap CLI (Picocli) | — | story-0006-0005, story-0006-0006, story-0006-0007, story-0006-0022, story-0006-0023, story-0006-0027 | Pendente |
-| story-0006-0002 | Modelos de Dominio — 17 Data Classes Java | — | story-0006-0005, story-0006-0006, story-0006-0008, story-0006-0009, story-0006-0024, story-0006-0025 | Pendente |
-| story-0006-0003 | Hierarquia de Excecoes — 7 Custom Exceptions | — | story-0006-0005, story-0006-0007, story-0006-0024, story-0006-0025 | Pendente |
-| story-0006-0004 | Empacotamento de Resources e Templates no Classpath | — | story-0006-0006, story-0006-0009 | Pendente |
-| story-0006-0005 | Carregador de Configuracao YAML (SnakeYAML) | story-0006-0002, story-0006-0003 | story-0006-0008, story-0006-0022, story-0006-0023, story-0006-0027 | Pendente |
-| story-0006-0006 | Motor de Templates Pebble com Filtro Python-Bool | story-0006-0002, story-0006-0004 | story-0006-0009 | Pendente |
-| story-0006-0007 | Utilitarios de I/O, Seguranca de Caminhos e Output Atomico | story-0006-0003 | story-0006-0009 | Pendente |
-| story-0006-0008 | Resolucao de Stack, Validacao e Mapeamentos de Dominio | story-0006-0002, story-0006-0005 | story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0022, story-0006-0027 | Pendente |
-| story-0006-0009 | Interface Assembler, Pipeline Orquestrador e Helpers | story-0006-0002, story-0006-0006, story-0006-0007 | story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0021, story-0006-0027 | Pendente |
-| story-0006-0010 | RulesAssembler — Regras Core e Condicionais | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0011 | SkillsAssembler — Skills Core, Condicionais e Knowledge Packs | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0012 | AgentsAssembler — Agents Core, Condicionais e Developer | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0013 | PatternsAssembler e ProtocolsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0014 | HooksAssembler e SettingsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0015 | GithubInstructionsAssembler e GithubMcpAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0016 | GithubSkillsAssembler e GithubAgentsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0017 | GithubHooksAssembler e GithubPromptsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0018 | DocsAssembler e GrpcDocsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0019 | RunbookAssembler, DocsAdrAssembler e CicdAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0020 | Assemblers Codex (AGENTS.md, Config, Skills) e EpicReportAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0021 | ReadmeAssembler, Auditor e Tabelas de Resumo | story-0006-0009 | story-0006-0027 | Pendente |
-| story-0006-0022 | Comando Validate | story-0006-0001, story-0006-0005, story-0006-0008 | — | Pendente |
-| story-0006-0023 | Modo Interativo (JLine) | story-0006-0001, story-0006-0005 | — | Pendente |
-| story-0006-0024 | Sistema de Checkpoint (Gerenciamento de Estado de Execucao) | story-0006-0002, story-0006-0003 | story-0006-0026 | Pendente |
-| story-0006-0025 | Parser de Implementation Map (DAG, Fases e Caminho Critico) | story-0006-0002, story-0006-0003 | — | Pendente |
-| story-0006-0026 | Relatorios de Progresso (Metricas e Formatacao) | story-0006-0024 | — | Pendente |
-| story-0006-0027 | Comando Generate End-to-End e CLI Display | story-0006-0001, story-0006-0005, story-0006-0008, story-0006-0009, story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0021 | story-0006-0028, story-0006-0029, story-0006-0030 | Pendente |
-| story-0006-0028 | Testes Golden File — Paridade Byte-a-Byte (8 Perfis) | story-0006-0027 | story-0006-0031 | Pendente |
-| story-0006-0029 | Suite Completa de Testes e Cobertura JaCoCo | story-0006-0027 | story-0006-0031 | Pendente |
-| story-0006-0030 | Build Nativo GraalVM e Configuracao de Reflexao | story-0006-0027 | — | Pendente |
-| story-0006-0031 | Empacotamento Fat JAR e Documentacao de Distribuicao | story-0006-0028, story-0006-0029 | — | Pendente |
+| story-0006-0001 | Projeto Maven, pom.xml e Bootstrap CLI (Picocli) | — | story-0006-0005, story-0006-0006, story-0006-0007, story-0006-0022, story-0006-0023, story-0006-0027 | Concluída |
+| story-0006-0002 | Modelos de Dominio — 17 Data Classes Java | — | story-0006-0005, story-0006-0006, story-0006-0008, story-0006-0009, story-0006-0024, story-0006-0025 | Concluída |
+| story-0006-0003 | Hierarquia de Excecoes — 7 Custom Exceptions | — | story-0006-0005, story-0006-0007, story-0006-0024, story-0006-0025 | Concluída |
+| story-0006-0004 | Empacotamento de Resources e Templates no Classpath | — | story-0006-0006, story-0006-0009 | Concluída |
+| story-0006-0005 | Carregador de Configuracao YAML (SnakeYAML) | story-0006-0002, story-0006-0003 | story-0006-0008, story-0006-0022, story-0006-0023, story-0006-0027 | Concluída |
+| story-0006-0006 | Motor de Templates Pebble com Filtro Python-Bool | story-0006-0002, story-0006-0004 | story-0006-0009 | Concluída |
+| story-0006-0007 | Utilitarios de I/O, Seguranca de Caminhos e Output Atomico | story-0006-0003 | story-0006-0009 | Concluída |
+| story-0006-0008 | Resolucao de Stack, Validacao e Mapeamentos de Dominio | story-0006-0002, story-0006-0005 | story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0022, story-0006-0027 | Concluída |
+| story-0006-0009 | Interface Assembler, Pipeline Orquestrador e Helpers | story-0006-0002, story-0006-0006, story-0006-0007 | story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0021, story-0006-0027 | Concluída |
+| story-0006-0010 | RulesAssembler — Regras Core e Condicionais | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0011 | SkillsAssembler — Skills Core, Condicionais e Knowledge Packs | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0012 | AgentsAssembler — Agents Core, Condicionais e Developer | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0013 | PatternsAssembler e ProtocolsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0014 | HooksAssembler e SettingsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0015 | GithubInstructionsAssembler e GithubMcpAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0016 | GithubSkillsAssembler e GithubAgentsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0017 | GithubHooksAssembler e GithubPromptsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0018 | DocsAssembler e GrpcDocsAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0019 | RunbookAssembler, DocsAdrAssembler e CicdAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0020 | Assemblers Codex (AGENTS.md, Config, Skills) e EpicReportAssembler | story-0006-0008, story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0021 | ReadmeAssembler, Auditor e Tabelas de Resumo | story-0006-0009 | story-0006-0027 | Concluída |
+| story-0006-0022 | Comando Validate | story-0006-0001, story-0006-0005, story-0006-0008 | — | Concluída |
+| story-0006-0023 | Modo Interativo (JLine) | story-0006-0001, story-0006-0005 | — | Concluída |
+| story-0006-0024 | Sistema de Checkpoint (Gerenciamento de Estado de Execucao) | story-0006-0002, story-0006-0003 | story-0006-0026 | Concluída |
+| story-0006-0025 | Parser de Implementation Map (DAG, Fases e Caminho Critico) | story-0006-0002, story-0006-0003 | — | Concluída |
+| story-0006-0026 | Relatorios de Progresso (Metricas e Formatacao) | story-0006-0024 | — | Concluída |
+| story-0006-0027 | Comando Generate End-to-End e CLI Display | story-0006-0001, story-0006-0005, story-0006-0008, story-0006-0009, story-0006-0010, story-0006-0011, story-0006-0012, story-0006-0013, story-0006-0014, story-0006-0015, story-0006-0016, story-0006-0017, story-0006-0018, story-0006-0019, story-0006-0020, story-0006-0021 | story-0006-0028, story-0006-0029, story-0006-0030 | Concluída |
+| story-0006-0028 | Testes Golden File — Paridade Byte-a-Byte (8 Perfis) | story-0006-0027 | story-0006-0031 | Concluída |
+| story-0006-0029 | Suite Completa de Testes e Cobertura JaCoCo | story-0006-0027 | story-0006-0031 | Concluída |
+| story-0006-0030 | Build Nativo GraalVM e Configuracao de Reflexao | story-0006-0027 | — | Concluída |
+| story-0006-0031 | Empacotamento Fat JAR e Documentacao de Distribuicao | story-0006-0028, story-0006-0029 | — | Concluída |
 
 > **Nota:** story-0006-0006 (Pebble) depende de story-0006-0004 (Resources) porque o motor de templates precisa dos templates disponiveis no classpath para testes. story-0006-0021 (ReadmeAssembler) nao depende de story-0006-0008 (Stack) porque opera apenas sobre a lista de artefatos gerados pelo pipeline, sem necessidade de resolver stack. story-0006-0022 (Validate) e story-0006-0023 (Interactive) sao historias folha — nao bloqueiam nenhuma outra, podendo absorver atrasos.
 

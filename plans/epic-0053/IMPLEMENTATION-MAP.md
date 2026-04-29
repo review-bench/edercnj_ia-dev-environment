@@ -8,8 +8,8 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [story-0053-0001](./story-0053-0001.md) | Adicionar Review Policy e marcadores MANDATORY ao SKILL.md source | — | — | story-0053-0002 | Pendente |
-| [story-0053-0002](./story-0053-0002.md) | Teste de golden file para marcadores de review obrigatórios | — | story-0053-0001 | — | Pendente |
+| [story-0053-0001](./story-0053-0001.md) | Adicionar Review Policy e marcadores MANDATORY ao SKILL.md source | — | — | story-0053-0002 | Concluída |
+| [story-0053-0002](./story-0053-0002.md) | Teste de golden file para marcadores de review obrigatórios | — | story-0053-0001 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

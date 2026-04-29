@@ -4,19 +4,19 @@
 
 | Story ID | Titulo | Camada | Sizing | Blocked By | Blocks | Status |
 |---|---|---|---|---|---|---|
-| STORY-0019-001 | Fix subagent prompt para invocar x-dev-lifecycle completo | FOUNDATION | M | -- | 002, 008 | Pendente |
-| STORY-0019-002 | Estender SubagentResult e validacao | FOUNDATION | S | 001 | 004, 008, 009 | Pendente |
-| STORY-0019-003 | DoD Enforcement Gate | CORE | S | -- | 006, 007 | Pendente |
-| STORY-0019-004 | Rollback strategy e retry | CORE | M | 002 | 012 | Pendente |
-| STORY-0019-005 | Conventional Commits validation | CORE | S | -- | 008 | Pendente |
-| STORY-0019-006 | Changelog timing fix | CORE | XS | 003 | -- | Pendente |
-| STORY-0019-007 | PO Acceptance Gate | INTEGRATION | S | 003 | 008 | Pendente |
-| STORY-0019-008 | Execution report novas secoes | INTEGRATION | S | 001, 002, 005, 007 | -- | Pendente |
-| STORY-0019-009 | Cross-Story Consistency Gate | INTEGRATION | M | 002 | -- | Pendente |
-| STORY-0019-010 | Architecture plan quality validation | INTEGRATION | S | -- | -- | Pendente |
-| STORY-0019-011 | Story decomposition INVEST validation | INTEGRATION | S | -- | -- | Pendente |
-| STORY-0019-012 | Cleanup placeholders e progress reporting | COMPOSITION | S | 004 | 013 | Pendente |
-| STORY-0019-013 | Reconciliacao de status e prevencao de status stale | COMPOSITION | M | 012 | -- | Pendente |
+| STORY-0019-001 | Fix subagent prompt para invocar x-dev-lifecycle completo | FOUNDATION | M | -- | 002, 008 | Concluída |
+| STORY-0019-002 | Estender SubagentResult e validacao | FOUNDATION | S | 001 | 004, 008, 009 | Concluída |
+| STORY-0019-003 | DoD Enforcement Gate | CORE | S | -- | 006, 007 | Concluída |
+| STORY-0019-004 | Rollback strategy e retry | CORE | M | 002 | 012 | Concluída |
+| STORY-0019-005 | Conventional Commits validation | CORE | S | -- | 008 | Concluída |
+| STORY-0019-006 | Changelog timing fix | CORE | XS | 003 | -- | Concluída |
+| STORY-0019-007 | PO Acceptance Gate | INTEGRATION | S | 003 | 008 | Concluída |
+| STORY-0019-008 | Execution report novas secoes | INTEGRATION | S | 001, 002, 005, 007 | -- | Concluída |
+| STORY-0019-009 | Cross-Story Consistency Gate | INTEGRATION | M | 002 | -- | Concluída |
+| STORY-0019-010 | Architecture plan quality validation | INTEGRATION | S | -- | -- | Concluída |
+| STORY-0019-011 | Story decomposition INVEST validation | INTEGRATION | S | -- | -- | Concluída |
+| STORY-0019-012 | Cleanup placeholders e progress reporting | COMPOSITION | S | 004 | 013 | Concluída |
+| STORY-0019-013 | Reconciliacao de status e prevencao de status stale | COMPOSITION | M | 012 | -- | Concluída |
 
 ## 2. Execution Phases
 

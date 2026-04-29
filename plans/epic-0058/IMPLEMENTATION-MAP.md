@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [story-0058-0001](./story-0058-0001.md) | Formalizar Rule 25 + ADR | — | — | 0058-0002, 0058-0003, 0058-0004, 0058-0005, 0058-0006 | Pendente |
-| [story-0058-0002](./story-0058-0002.md) | Catálogo canônico `audit-gates-catalog.md` | — | 0058-0001 | — | Pendente |
-| [story-0058-0003](./story-0058-0003.md) | `audit-flow-version.sh` (Rule 19) | — | 0058-0001 | 0058-0006 | Pendente |
-| [story-0058-0004](./story-0058-0004.md) | `audit-epic-branches.sh` (Rule 21) | — | 0058-0001 | 0058-0006 | Pendente |
-| [story-0058-0005](./story-0058-0005.md) | `audit-skill-visibility.sh` (Rule 22) | — | 0058-0001 | 0058-0006 | Pendente |
-| [story-0058-0006](./story-0058-0006.md) | `ScriptsAssembler` + source-of-truth | — | 0058-0003, 0058-0004, 0058-0005 | 0058-0007 | Pendente |
-| [story-0058-0007](./story-0058-0007.md) | Golden files regen + `GoldenFileTest` asserts | — | 0058-0006 | 0058-0008 | Pendente |
-| [story-0058-0008](./story-0058-0008.md) | Workflow CI `audit.yml` + `CicdAssembler` | — | 0058-0007 | — | Pendente |
+| [story-0058-0001](./story-0058-0001.md) | Formalizar Rule 25 + ADR | — | — | 0058-0002, 0058-0003, 0058-0004, 0058-0005, 0058-0006 | Concluída |
+| [story-0058-0002](./story-0058-0002.md) | Catálogo canônico `audit-gates-catalog.md` | — | 0058-0001 | — | Concluída |
+| [story-0058-0003](./story-0058-0003.md) | `audit-flow-version.sh` (Rule 19) | — | 0058-0001 | 0058-0006 | Concluída |
+| [story-0058-0004](./story-0058-0004.md) | `audit-epic-branches.sh` (Rule 21) | — | 0058-0001 | 0058-0006 | Concluída |
+| [story-0058-0005](./story-0058-0005.md) | `audit-skill-visibility.sh` (Rule 22) | — | 0058-0001 | 0058-0006 | Concluída |
+| [story-0058-0006](./story-0058-0006.md) | `ScriptsAssembler` + source-of-truth | — | 0058-0003, 0058-0004, 0058-0005 | 0058-0007 | Concluída |
+| [story-0058-0007](./story-0058-0007.md) | Golden files regen + `GoldenFileTest` asserts | — | 0058-0006 | 0058-0008 | Concluída |
+| [story-0058-0008](./story-0058-0008.md) | Workflow CI `audit.yml` + `CicdAssembler` | — | 0058-0007 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

@@ -8,22 +8,22 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0024-0001 | Templates de artefatos de planejamento | — | — | story-0024-0005 | Pendente |
-| story-0024-0002 | Templates de avaliação de segurança e compliance | — | — | story-0024-0005 | Pendente |
-| story-0024-0003 | Templates de review | — | — | story-0024-0005 | Pendente |
-| story-0024-0004 | Templates de orquestração de épico | — | — | story-0024-0005 | Pendente |
-| story-0024-0005 | PlanTemplatesAssembler | — | story-0024-0001, story-0024-0002, story-0024-0003, story-0024-0004 | story-0024-0006, story-0024-0007, story-0024-0008, story-0024-0009, story-0024-0010, story-0024-0011, story-0024-0012, story-0024-0015 | Pendente |
-| story-0024-0006 | Pre-checks no x-dev-lifecycle | — | story-0024-0005 | story-0024-0013, story-0024-0014 | Pendente |
-| story-0024-0007 | Pre-check no x-test-plan | — | story-0024-0005 | story-0024-0013, story-0024-0014 | Pendente |
-| story-0024-0008 | Pre-check no x-dev-architecture-plan | — | story-0024-0005 | story-0024-0014 | Pendente |
-| story-0024-0009 | Pre-check no x-lib-task-decomposer | — | story-0024-0005 | story-0024-0014 | Pendente |
-| story-0024-0010 | Templates e dashboard no x-review | — | story-0024-0005 | story-0024-0011, story-0024-0014 | Pendente |
-| story-0024-0011 | Template e dashboard update no x-review-pr | — | story-0024-0005, story-0024-0010 | story-0024-0014 | Pendente |
-| story-0024-0012 | Epic execution plan no x-dev-epic-implement | — | story-0024-0005 | story-0024-0014 | Pendente |
-| story-0024-0013 | Pre-check no x-dev-implement | — | story-0024-0006, story-0024-0007 | story-0024-0014 | Pendente |
-| story-0024-0014 | Auditoria de consistência | — | story-0024-0006, story-0024-0007, story-0024-0008, story-0024-0009, story-0024-0010, story-0024-0011, story-0024-0012, story-0024-0013 | story-0024-0016 | Pendente |
-| story-0024-0015 | Golden tests | — | story-0024-0005 | — | Pendente |
-| story-0024-0016 | Documentação e CHANGELOG | — | story-0024-0014 | — | Pendente |
+| story-0024-0001 | Templates de artefatos de planejamento | — | — | story-0024-0005 | Concluída |
+| story-0024-0002 | Templates de avaliação de segurança e compliance | — | — | story-0024-0005 | Concluída |
+| story-0024-0003 | Templates de review | — | — | story-0024-0005 | Concluída |
+| story-0024-0004 | Templates de orquestração de épico | — | — | story-0024-0005 | Concluída |
+| story-0024-0005 | PlanTemplatesAssembler | — | story-0024-0001, story-0024-0002, story-0024-0003, story-0024-0004 | story-0024-0006, story-0024-0007, story-0024-0008, story-0024-0009, story-0024-0010, story-0024-0011, story-0024-0012, story-0024-0015 | Concluída |
+| story-0024-0006 | Pre-checks no x-dev-lifecycle | — | story-0024-0005 | story-0024-0013, story-0024-0014 | Concluída |
+| story-0024-0007 | Pre-check no x-test-plan | — | story-0024-0005 | story-0024-0013, story-0024-0014 | Concluída |
+| story-0024-0008 | Pre-check no x-dev-architecture-plan | — | story-0024-0005 | story-0024-0014 | Concluída |
+| story-0024-0009 | Pre-check no x-lib-task-decomposer | — | story-0024-0005 | story-0024-0014 | Concluída |
+| story-0024-0010 | Templates e dashboard no x-review | — | story-0024-0005 | story-0024-0011, story-0024-0014 | Concluída |
+| story-0024-0011 | Template e dashboard update no x-review-pr | — | story-0024-0005, story-0024-0010 | story-0024-0014 | Concluída |
+| story-0024-0012 | Epic execution plan no x-dev-epic-implement | — | story-0024-0005 | story-0024-0014 | Concluída |
+| story-0024-0013 | Pre-check no x-dev-implement | — | story-0024-0006, story-0024-0007 | story-0024-0014 | Concluída |
+| story-0024-0014 | Auditoria de consistência | — | story-0024-0006, story-0024-0007, story-0024-0008, story-0024-0009, story-0024-0010, story-0024-0011, story-0024-0012, story-0024-0013 | story-0024-0016 | Concluída |
+| story-0024-0015 | Golden tests | — | story-0024-0005 | — | Concluída |
+| story-0024-0016 | Documentação e CHANGELOG | — | story-0024-0014 | — | Concluída |
 
 > **Nota:** story-0024-0011 depende de story-0024-0010 porque o dashboard consolidado é criado pelo x-review (0010) e atualizado pelo x-review-pr (0011). story-0024-0013 depende de story-0024-0006 e story-0024-0007 porque o x-dev-implement reutiliza padrões de pre-check estabelecidos por essas stories.
 
