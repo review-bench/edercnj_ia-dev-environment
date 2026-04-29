@@ -15,7 +15,7 @@
 #   CLAUDE_TELEMETRY_DIR         → override storage root (used by tests).
 #
 # Storage (RULE-007):
-#   ${CLAUDE_PROJECT_DIR}/plans/epic-XXXX/telemetry/events.ndjson
+#   ${CLAUDE_PROJECT_DIR}/ai/epics/epic-XXXX/telemetry/events.ndjson
 #   ${CLAUDE_PROJECT_DIR}/plans/unknown/telemetry/events.ndjson   (fallback)
 
 # Fail-open: never abort the session even if a helper fails.
@@ -89,7 +89,7 @@ fi
 
 # ---------------------------------------------------------------------------
 # Resolve storage path. epicId ("EPIC-NNNN" or "unknown") maps to
-# ${CLAUDE_PROJECT_DIR}/plans/epic-NNNN/telemetry/events.ndjson.
+# ${CLAUDE_PROJECT_DIR}/ai/epics/epic-NNNN/telemetry/events.ndjson.
 # ---------------------------------------------------------------------------
 PROJECT_DIR="${CLAUDE_TELEMETRY_DIR:-${CLAUDE_PROJECT_DIR:-}}"
 if [[ -z "${PROJECT_DIR}" ]]; then
@@ -99,7 +99,7 @@ fi
 
 EPIC_ID="$(printf '%s' "${EVENT_JSON}" | jq -r '.epicId // "unknown"')"
 
-# Canonical directory name: EPIC-0040 → plans/epic-0040/telemetry/.
+# Canonical directory name: EPIC-0040 → ai/epics/epic-0040/telemetry/.
 # "unknown" stays as plans/unknown/telemetry/.
 if [[ "${EPIC_ID}" == unknown ]]; then
     EPIC_DIR_NAME="unknown"
