@@ -8,7 +8,7 @@
   "epicMarkdownPath": "ai/epics/epic-0066-pr-body-templates/epic-0066.md",
   "implementationMapPath": "ai/epics/epic-0066-pr-body-templates/IMPLEMENTATION-MAP.md",
   "createdAt": "2026-04-28T00:00:00Z",
-  "status": "Backlog",
+  "status": "Em Andamento",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
@@ -16,12 +16,12 @@
   },
   "storyStatuses": {
     "story-0066-0001": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0066-0003", "story-0066-0004", "story-0066-0007", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "43a8f4df8",
+      "prNumber": 850
     },
     "story-0066-0002": {
       "status": "Pendente",
