@@ -236,11 +236,62 @@ On success, emit the final path to stdout and exit 0.
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-4-Write ok`
 
-## Backlog Extension (kind=backlog — story-0066-0004)
+<!-- phase-no-gate: Phase 1.5 is a conditional sub-phase inside Phase 1 — no independent gate -->
+## Phase 1.5 — BACKLOG-GATHER (conditional on --kind=backlog)
 
-Phase 1b (backlog variant) reads different sources: epic markdown, IMPLEMENTATION-MAP.md,
-story list. This extension is added by story-0066-0004 to this same SKILL.md. Phase 0, 2,
-3, and 4 are reused with minor template selection change (Phase 3).
+Executed only when `--kind=backlog`. Reads backlog-specific sources to build the backlog
+JSON envelope (distinct from the implementation envelope built in Phase 1).
+
+### Source 1 — Epic markdown
+
+Locate `epic-XXXX.md` via PathResolver (searches `ai/epics/epic-XXXX-*/`, `plans/epic-XXXX/`).
+Parse:
+- `summary`: first paragraph under `## 1. Contexto & Escopo` or `## 1.1 Problema`
+- `stories`: table rows in `## 9.2 Stories` — extract Phase, Story ID, Layer, Bloqueada por
+- `successMetrics`: bullet items under `## 5.2 Métricas Quantitativas` or `## Métricas de Sucesso`
+- `outOfScopeList`: bullet items under section containing "Fora do escopo"
+
+**Escape all string values before JSON injection**: replace `|` with `\|`, backticks with `` \` ``, newlines with space.
+
+Fallbacks: `summary: "(no summary)"`, `stories: []`, `successMetrics: ["(no metrics declared)"]`, `outOfScopeList: "(not documented)"`.
+
+### Source 2 — IMPLEMENTATION-MAP.md
+
+Locate `IMPLEMENTATION-MAP.md` in the epic directory. Parse:
+- `criticalPath`: regex `\*\*Critical path.*?:\*\*\s*(.+)` or `Caminho crítico.*?:\s*(.+)`
+- `maxParallelism`: regex `\*\*Maximum parallelism.*?:\*\*\s*(\d+)` or `Paralelismo máximo.*?:\s*(\d+)`
+- `maxParallelPhase`: regex `\(Phase\s+([\w ]+)\)` after maxParallelism
+- `totalPhases`: count of `## Phase N` headers
+
+If IMPLEMENTATION-MAP.md absent:
+```bash
+echo "WARN: IMPLEMENTATION-MAP.md not found for ${EPIC_ID}" >&2
+criticalPath="(map missing)"
+maxParallelism=0
+totalPhases=0
+```
+
+### Source 3 — Spec markdown
+
+Search for spec file:
+```bash
+SPEC=$(find "${REPO_ROOT}" -name "spec-*.md" -path "*/epic-XXXX-*/*" 2>/dev/null | head -1)
+```
+If found: `specPath=$(realpath --relative-to="${REPO_ROOT}" "$SPEC")`, `specSha=$(git rev-parse "HEAD:${specPath}" 2>/dev/null || echo "(unknown)")`.
+If not found: `specPath="(spec not found)"`, `specSha="(unknown)"`.
+
+### Source 4 — Coordinations with in-progress epics
+
+```bash
+for state_file in "${REPO_ROOT}"/ai/epics/*/execution-state.json; do
+  status=$(jq -r '.status // empty' "$state_file" 2>/dev/null)
+  if [[ "$status" == "Em Andamento" ]]; then
+    epic_id=$(jq -r '.epicId // empty' "$state_file" 2>/dev/null)
+    coordinations+="{\"epicId\":\"$epic_id\",\"status\":\"in_progress\"}"
+  fi
+done
+```
+Fallback if none: `coordinations: [{"epicId":"(none)","status":"none","hotFiles":"","risk":"none"}]`.
 
 ## Error Handling
 
