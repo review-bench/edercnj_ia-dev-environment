@@ -10,16 +10,16 @@
 
 ## 0. Cross-Epic Landscape
 
-### Recent Epics Status (relevant subset)
+### Recent Epics Status (snapshot 2026-04-29)
 
 | Epic ID | Title | Status atual | Safe to Cite? |
 | :--- | :--- | :--- | :--- |
-| EPIC-0064 | Capability-Driven Composition Refactor | Em Refinamento | Parcial |
+| EPIC-0064 | Capability-Driven Composition Refactor | Concluída | Sim — baseline atual |
 | EPIC-0065 | Feature Creation Chain Refactor | Pendente | Não — baseline futura |
-| EPIC-0066 | PR Body Templates | Pendente | Não — baseline futura |
-| EPIC-0069 | Refinement and DoR Gate | Pendente | Não — baseline futura |
-| EPIC-0072 | Comprehensive Test Strategy | Pendente | Não — baseline futura |
-| EPIC-0073 | Regression Shell and DAST | Pendente | Não — baseline futura |
+| EPIC-0066 | PR Body Templates | Backlog | Não — baseline futura |
+| EPIC-0069 | Refinement and DoR Gate | Backlog | Não — baseline futura |
+| EPIC-0072 | Comprehensive Test Strategy | Backlog | Não — baseline futura |
+| EPIC-0073 | Regression Shell and DAST | Backlog | Não — baseline futura |
 | EPIC-0075 | AI Memory Layer | Backlog | Não — baseline futura |
 
 > EPIC-0076 depende da conclusão dos épicos acima que alteram ou ampliam o catálogo de skills. A decomposição já os considera como baseline funcional futura.

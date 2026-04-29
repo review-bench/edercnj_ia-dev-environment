@@ -5,7 +5,7 @@
   "epicTitle": "Verb-First Skill Naming Refactor",
   "epicBranch": "epic/0076",
   "createdAt": "2026-04-28T00:00:00Z",
-  "lastRefinementAt": "2026-04-28T00:00:00Z",
+  "lastRefinementAt": "2026-04-29T00:00:00Z",
   "status": "Backlog",
   "taskTracking": {
     "enabled": true,
@@ -32,11 +32,12 @@
   "totalWaves": 5,
   "criticalPath": ["A", "B", "C", "D", "E"],
   "externalDependencies": {
+    "EPIC-0064": { "status": "Concluída", "blocking": "Baseline atual de composição capability-driven" },
     "EPIC-0065": { "status": "Pendente", "blocking": "Baseline futura da creation chain" },
-    "EPIC-0066": { "status": "Pendente", "blocking": "Surface de PR body render" },
-    "EPIC-0069": { "status": "Pendente", "blocking": "Skills de refinement" },
-    "EPIC-0072": { "status": "Pendente", "blocking": "Expansão do catálogo de testes" },
-    "EPIC-0073": { "status": "Pendente", "blocking": "Expansão do catálogo de regressão" },
+    "EPIC-0066": { "status": "Backlog", "blocking": "Surface de PR body render" },
+    "EPIC-0069": { "status": "Backlog", "blocking": "Skills de refinement" },
+    "EPIC-0072": { "status": "Backlog", "blocking": "Expansão do catálogo de testes" },
+    "EPIC-0073": { "status": "Backlog", "blocking": "Expansão do catálogo de regressão" },
     "EPIC-0075": { "status": "Backlog", "blocking": "Memory/search internals" }
   },
   "documents": {
