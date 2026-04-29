@@ -81,5 +81,80 @@ class CompositionPlanReporterTest {
             assertThat(json).startsWith("{");
             assertThat(json).endsWith("}");
         }
+
+        @Test
+        @DisplayName("JSON with empty included list does not produce trailing comma")
+        void jsonFormat_emptyIncluded() {
+            CompositionPlan plan =
+                    new CompositionPlan(
+                            List.of(),
+                            List.of(excluded("skills/x-db/SKILL.md", "no capability")),
+                            List.of());
+            String json = reporter.report(plan, CompositionPlanReporter.Format.JSON);
+            assertThat(json).contains("\"included\": 0");
+            assertThat(json).contains("\"excluded\": 1");
+            assertThat(json).contains("skills/x-db/SKILL.md");
+        }
+
+        @Test
+        @DisplayName("JSON with empty excluded list does not produce trailing comma")
+        void jsonFormat_emptyExcluded() {
+            CompositionPlan plan =
+                    new CompositionPlan(
+                            List.of(included("skills/x-a/SKILL.md")), List.of(), List.of());
+            String json = reporter.report(plan, CompositionPlanReporter.Format.JSON);
+            assertThat(json).contains("\"excluded\": 0");
+            assertThat(json).contains("skills/x-a/SKILL.md");
+        }
+
+        @Test
+        @DisplayName("JSON escapes tab, carriage-return, backspace, and form-feed in paths")
+        void jsonFormat_escapesSpecialChars() {
+            assertThat(reporter.report(
+                    new CompositionPlan(List.of(included("a\tb")), List.of(), List.of()),
+                    CompositionPlanReporter.Format.JSON)).contains("a\\tb");
+
+            assertThat(reporter.report(
+                    new CompositionPlan(List.of(included("a\rb")), List.of(), List.of()),
+                    CompositionPlanReporter.Format.JSON)).contains("a\\rb");
+
+            assertThat(reporter.report(
+                    new CompositionPlan(List.of(included("a\bb")), List.of(), List.of()),
+                    CompositionPlanReporter.Format.JSON)).contains("a\\bb");
+
+            assertThat(reporter.report(
+                    new CompositionPlan(List.of(included("a\fb")), List.of(), List.of()),
+                    CompositionPlanReporter.Format.JSON)).contains("a\\fb");
+        }
+
+        @Test
+        @DisplayName("JSON escapes control characters (0x01) as unicode escape")
+        void jsonFormat_escapesControlChar() {
+            String pathWithCtrl = "a" + (char) 0x01 + "b";
+            String json = reporter.report(
+                    new CompositionPlan(List.of(included(pathWithCtrl)), List.of(), List.of()),
+                    CompositionPlanReporter.Format.JSON);
+            assertThat(json).contains("a\\u0001b");
+        }
+    }
+
+    @Nested
+    @DisplayName("ArtifactEntry")
+    class ArtifactEntryTest {
+
+        @Test
+        @DisplayName("isExcluded returns false when no reason")
+        void isExcluded_falseWhenReasonAbsent() {
+            CompositionPlan.ArtifactEntry entry = included("skills/x-test/SKILL.md");
+            assertThat(entry.isExcluded()).isFalse();
+        }
+
+        @Test
+        @DisplayName("isExcluded returns true when reason present")
+        void isExcluded_trueWhenReasonPresent() {
+            CompositionPlan.ArtifactEntry entry =
+                    excluded("skills/x-db/SKILL.md", "capability not active");
+            assertThat(entry.isExcluded()).isTrue();
+        }
     }
 }

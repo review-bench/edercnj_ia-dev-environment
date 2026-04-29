@@ -1,6 +1,10 @@
 package dev.iadev.application.composition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import dev.iadev.domain.capability.CapabilityId;
 import dev.iadev.domain.capability.ResolvedCapabilitySet;
@@ -75,6 +79,25 @@ class TelemetryCapabilityAwareComposerTest {
                 // No cleanup needed — System.getenv is read-only
                 assertThat(original).isNull(); // env not set in test context
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("exception handling")
+    class ExceptionTests {
+
+        @Test
+        @DisplayName("plan propagates RuntimeException from delegate — fail-open for telemetry")
+        void plan_delegateThrows_exceptionPropagates() {
+            CapabilityAwareComposer throwingDelegate = mock(CapabilityAwareComposer.class);
+            when(throwingDelegate.plan(any(), any()))
+                    .thenThrow(new IllegalStateException("simulated delegate failure"));
+            TelemetryCapabilityAwareComposer composer =
+                    new TelemetryCapabilityAwareComposer(throwingDelegate);
+
+            assertThatThrownBy(() -> composer.plan(universalSet(), tempDir))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("simulated delegate failure");
         }
     }
 

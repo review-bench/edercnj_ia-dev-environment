@@ -155,6 +155,34 @@ class FrontmatterValidatorTest {
             assertThat(result.ok()).isTrue();
             assertThat(result.warnings()).isNotEmpty();
         }
+
+        @Test
+        @DisplayName("requires-capabilities as scalar (not list) with knownIds — no warning emitted")
+        void requiresCapabilitiesNotList_noWarning(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("scalar.md");
+            Files.writeString(file, "---\nname: x\nrequires-capabilities: just_a_string\n---\n");
+            var result = validator.validate(file, java.util.Set.of("some.cap.id"));
+            assertThat(result.ok()).isTrue();
+            assertThat(result.warnings()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("frontmatter without closing delimiter returns failure")
+        void unclosedFrontmatterFails(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("unclosed.md");
+            Files.writeString(file, "---\nname: x\nrequires-capabilities: []\n(no closing)");
+            var result = validator.validate(file);
+            assertThat(result.ok()).isFalse();
+        }
+
+        @Test
+        @DisplayName("YAML frontmatter that parses to non-Map returns failure")
+        void yamlFrontmatterNotMap(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("listfm.md");
+            Files.writeString(file, "---\n- item1\n- item2\n---\n# content");
+            var result = validator.validate(file);
+            assertThat(result.ok()).isFalse();
+        }
     }
 
     @Nested

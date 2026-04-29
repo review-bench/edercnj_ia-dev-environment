@@ -236,10 +236,13 @@ class Epic0064FrameworkSplitSmokeTest {
 
     // --- Stories 0410-0411: Audit scripts ---
 
+    private static final Path SCRIPTS_ROOT =
+            Path.of("src/main/resources/targets/claude/scripts");
+
     @Test
     @DisplayName("audit-fragment-coherence.sh must exist and be executable")
     void auditFragmentCoherence_exists() {
-        var script = Path.of("../scripts/audit-fragment-coherence.sh");
+        var script = SCRIPTS_ROOT.resolve("audit-fragment-coherence.sh");
         assertThat(script).exists();
         assertThat(script.toFile().canExecute()).isTrue();
     }
@@ -247,7 +250,7 @@ class Epic0064FrameworkSplitSmokeTest {
     @Test
     @DisplayName("audit-output-pruning.sh must exist and be executable")
     void auditOutputPruning_exists() {
-        var script = Path.of("../scripts/audit-output-pruning.sh");
+        var script = SCRIPTS_ROOT.resolve("audit-output-pruning.sh");
         assertThat(script).exists();
         assertThat(script.toFile().canExecute()).isTrue();
     }

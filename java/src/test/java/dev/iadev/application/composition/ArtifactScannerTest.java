@@ -110,6 +110,22 @@ class ArtifactScannerTest {
         }
 
         @Test
+        @DisplayName("non-.md file in directory is skipped")
+        void nonMdFileSkipped(@TempDir Path dir) throws IOException {
+            Files.writeString(dir.resolve("script.sh"), "#!/bin/bash\necho hello");
+            assertThat(scanner.scan(dir)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("frontmatter without requires-capabilities field returns universal (empty list)")
+        void frontmatterMissingRequiresCapabilities(@TempDir Path dir) throws IOException {
+            Files.writeString(dir.resolve("norequires.md"), "---\nname: x\nmodel: sonnet\n---\n# Content\n");
+            var result = scanner.scan(dir);
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).requiredCapabilities()).isEmpty();
+        }
+
+        @Test
         @DisplayName("results sorted alphabetically by relative path (RULE-004)")
         void sortedByPath(@TempDir Path dir) throws IOException {
             Path sub = dir.resolve("z-skills");
