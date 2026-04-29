@@ -66,7 +66,10 @@ class PrePushHookSmokeTest {
     @Test
     @DisplayName("smoke-promotion-decision.md documents the chosen option")
     void decisionDoc_documentsChosenOption() throws IOException {
-        Path doc = repoRoot().resolve("plans/epic-0057/reports/smoke-promotion-decision.md");
+        Path doc =
+                repoRoot()
+                        .resolve(
+                                "ai/epics/epic-0057-rule24-execution-integrity-extension/reports/smoke-promotion-decision.md");
         assertThat(doc).exists();
 
         String body = Files.readString(doc, StandardCharsets.UTF_8);
