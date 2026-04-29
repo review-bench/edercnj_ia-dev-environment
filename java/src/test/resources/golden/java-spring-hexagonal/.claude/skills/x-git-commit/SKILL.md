@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Skill
 argument-hint: "--task TASK-XXXX-YYYY-NNN --type <type> --subject <subject> [--tdd RED|GREEN|REFACTOR] [--body <body>] [--skip-chain] [--amend]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

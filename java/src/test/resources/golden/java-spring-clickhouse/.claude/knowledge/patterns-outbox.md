@@ -1,6 +1,7 @@
 ---
 name: patterns-outbox
 description: "Transactional Outbox Pattern: reliable event publishing with polling publisher and CDC strategies, outbox table design, and anti-patterns."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Transactional Outbox Pattern

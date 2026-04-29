@@ -4,6 +4,7 @@ description: "Creates a bare git branch (no worktree) from a configurable base w
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--name <branch> [--base <branch>] [--push] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

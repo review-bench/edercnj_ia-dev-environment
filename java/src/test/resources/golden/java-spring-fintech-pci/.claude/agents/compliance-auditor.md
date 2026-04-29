@@ -1,3 +1,7 @@
+---
+name: compliance-auditor
+requires-capabilities: [compliance.*]
+---
 # Global Behavior & Language Policy
 - **Output Language**: English ONLY. (Mandatory for all responses and internal reasoning).
 - **Token Optimization**: Eliminate all greetings, apologies, and conversational fluff. Start responses directly with technical information.

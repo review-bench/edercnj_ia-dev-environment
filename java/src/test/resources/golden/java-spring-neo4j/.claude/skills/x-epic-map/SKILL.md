@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "<EPIC_FILE> [--dry-run]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Output Policy

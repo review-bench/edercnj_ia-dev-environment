@@ -5,6 +5,7 @@ description: "Complete decomposition of a system specification into an Epic, ind
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "[SPEC-FILE-PATH] [--jira <PROJECT_KEY>] [--no-jira] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Output Policy

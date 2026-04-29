@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--template <name> --output <path> --data <json-or-@path> [--append]"
 category: internal-ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

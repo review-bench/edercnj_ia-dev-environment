@@ -4,6 +4,7 @@ description: "Git operations: branch creation, atomic commits (Conventional Comm
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[branch-name or commit-message]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

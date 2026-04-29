@@ -1,0 +1,6 @@
+id: data.database.mongo
+category: data
+kind: atomic
+description: MongoDB database
+excludes:
+  - data.database.postgres

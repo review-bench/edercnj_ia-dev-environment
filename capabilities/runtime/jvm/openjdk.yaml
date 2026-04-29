@@ -1,0 +1,12 @@
+id: runtime.jvm.openjdk
+category: runtime
+kind: atomic
+version: "21"
+status: stable
+description: OpenJDK JVM runtime — standard bytecode execution
+requires:
+  - lang.java.21
+tags:
+  - runtime
+  - jvm
+  - openjdk

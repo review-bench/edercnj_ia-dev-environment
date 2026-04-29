@@ -1,0 +1,10 @@
+# capability-graph-baseline.txt
+# Generated on: 2026-04-29 (PR: epic/0064 → develop, story-0064-0706)
+# Schema: capability-baseline-v1.0
+# Status: SEALED — immutable post-merge
+#
+# This file intentionally empty — EPIC-0064 ships without backward compatibility.
+# All capability graph references (ID lookups, mutex symmetry, cycle detection) MUST
+# resolve cleanly. No grandfathered unknown-capability references are permitted.
+# See: .claude/rules/28-capability-frontmatter-contract.md §Forbidden post-merge
+# See: docs/adr/ADR-0016-capability-driven-composition.md

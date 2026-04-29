@@ -1,0 +1,13 @@
+id: web.spring.boot
+category: web
+kind: atomic
+version: "3"
+status: stable
+description: Spring Boot web framework (servlet-based, JPA, Spring Security)
+requires:
+  - lang.java.21
+tags:
+  - web
+  - spring
+  - jpa
+  - servlet

@@ -1,6 +1,7 @@
 ---
 name: k8s-helm
 description: "Helm chart patterns: chart structure, values templates, multi-environment configuration, dependencies, testing, GitOps integration, and Helmfile."
+requires-capabilities: []
 ---
 
 # Pattern: Helm Chart Patterns

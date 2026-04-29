@@ -7,6 +7,7 @@ allowed-tools: Bash, Skill
 argument-hint: "--epic-id <XXXX> --mode <sequential|parallel> --output <path> [--strict-overlap]"
 category: internal-plan
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Global Output Policy

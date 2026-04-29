@@ -4,7 +4,8 @@ description: "Multi-agent story planning: launches 5 specialized agents (Archite
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[STORY-ID] [--force] [--skip-dor] [--dry-run] [--no-commit]"
-context-budget: light
+context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

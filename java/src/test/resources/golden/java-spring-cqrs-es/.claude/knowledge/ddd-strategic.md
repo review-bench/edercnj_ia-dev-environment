@@ -1,6 +1,7 @@
 ---
 name: ddd-strategic
 description: "DDD Strategic Design: bounded context identification, context map with 6 integration patterns, Anti-Corruption Layer template, and /x-ddd-context-map skill."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: DDD Strategic Design

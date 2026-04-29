@@ -5,6 +5,7 @@ description: "Manages git worktrees for parallel task and story execution. Opera
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "<create|list|remove|cleanup|detect-context> [--branch <name>] [--base <base>] [--id <identifier>] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

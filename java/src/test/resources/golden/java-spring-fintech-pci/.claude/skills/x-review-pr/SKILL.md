@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Global Output Policy

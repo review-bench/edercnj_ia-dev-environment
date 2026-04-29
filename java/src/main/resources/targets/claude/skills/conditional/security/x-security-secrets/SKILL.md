@@ -4,6 +4,7 @@ description: "Scans code and git history for leaked credentials, API keys, token
 user-invocable: true
 allowed-tools: Bash, Read, Write, Glob, Grep
 argument-hint: "[--scope current|history|both] [--baseline path] [--since-commit SHA] [--format sarif|markdown|both]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

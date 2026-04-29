@@ -5,6 +5,7 @@ description: "Discovers all PRs from an epic via execution-state.json, fetches a
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[EPIC-ID] [--dry-run] [--prs N,M,...] [--skip-replies] [--include-suggestions]"
 user-invocable: true
+requires-capabilities: []
 ---
 
 ## Global Output Policy

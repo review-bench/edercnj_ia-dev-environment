@@ -5,6 +5,8 @@ description: "Parallel code review with specialist engineers (Security, QA, Perf
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, TaskCreate, TaskUpdate
 argument-hint: "[STORY-ID or --scope reviewer1,reviewer2] [--no-auto-fix-story]"
+requires-capabilities: []
+fragment-slots: [{ slot: review-specialist, ordering: fragment-order }]
 ---
 
 ## Global Output Policy
@@ -98,6 +100,13 @@ If `--scope` provided, filter to listed specialists only.
 | Event | `/x-review-events` | /28 | event-driven or event interfaces |
 
 > Each individual skill contains its own checklist, knowledge pack references, and scoring logic. The orchestrator does NOT duplicate these -- it delegates entirely.
+
+## Composition Pattern (RULE-007 — EPIC-0064)
+
+Fragment-slot composition — only specialists relevant to active capabilities are included.
+See [`references/composition-architecture.md`](references/composition-architecture.md) for the canonical fragment table and contribution guide.
+
+{{ #each fragments.review-specialist }}
 
 ## Phase 2 -- Parallel Reviews (Skills via Skill Tool)
 

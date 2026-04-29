@@ -1,0 +1,6 @@
+id: compliance.pci.dss
+name: PCI DSS Compliance
+description: Payment Card Industry Data Security Standard controls (logging, encryption, access control, audit trails).
+parameters:
+  level: "4"
+excludes: []

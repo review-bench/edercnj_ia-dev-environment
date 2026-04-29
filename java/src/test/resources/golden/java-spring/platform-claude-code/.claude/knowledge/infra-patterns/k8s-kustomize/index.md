@@ -1,6 +1,7 @@
 ---
 name: k8s-kustomize
 description: "Kustomize patterns: directory structure, patches, components, secret management, generators, and patch types for environment management."
+requires-capabilities: []
 ---
 
 # Pattern: Kustomize Patterns

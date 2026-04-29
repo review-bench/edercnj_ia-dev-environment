@@ -4,6 +4,7 @@ description: "Tech Lead holistic review with {review_max_score}-point checklist 
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

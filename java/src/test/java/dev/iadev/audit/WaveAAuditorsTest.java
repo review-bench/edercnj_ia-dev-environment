@@ -375,7 +375,90 @@ class WaveAAuditorsTest {
         }
 
         @Test
+        void phaseWithNoGateExemption_returnsOk() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-exempt");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-exempt\n---\n<!-- phase-no-gate: prose only -->\n## Phase 1 - Prose\n\nTaskCreate(subject: \"Phase 1\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void multiplePhases_firstMissingGate_lastOk_returnsViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-multi");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-multi\n---\n"
+                            + "## Phase 1\n\nTaskCreate(subject: \"Phase 1\")\n# no gate\n"
+                            + "## Phase 2\n\nTaskCreate(subject: \"Phase 2\")\nx-internal-phase-gate --mode post\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations()).hasSize(1);
+        }
+
+        @Test
         void emptyCorpus_returnsOk() {
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void skillWithTaskCreateButNoPhaseHeader_notOrchestrator() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-nophase");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-nophase\n---\nTaskCreate(subject: \"no phase\")\nNo phase header here.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void lastPhaseNoTaskCreate_isOk() throws IOException {
+            // Last phase has no TaskCreate — not a violation (only phases WITH TaskCreate need a gate)
+            Path skillDir = tempDir.resolve("x-epic-notask");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-notask\n---\n"
+                    + "TaskCreate(subject: \"pre-phase\")\n"
+                    + "## Phase 1 - Prose\n\nNo task here, no gate needed.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void twoPhases_firstNoTask_secondHasTaskAndGate_isOk() throws IOException {
+            // Phase 1 has no TaskCreate (not a violation), Phase 2 has task + gate
+            Path skillDir = tempDir.resolve("x-epic-firstnotask");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-firstnotask\n---\n"
+                    + "## Phase 1 - Intro\n\nNo task here.\n"
+                    + "## Phase 2 - Main\n\nTaskCreate(subject: \"Phase 2\")\n"
+                    + "x-internal-phase-gate --mode post\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void twoPhases_firstExempt_secondHasTaskAndGate_isOk() throws IOException {
+            // Phase 1 has exemption + task (no gate needed), Phase 2 has task + gate
+            Path skillDir = tempDir.resolve("x-epic-exemptfirst");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-exemptfirst\n---\n"
+                    + "<!-- phase-no-gate: prose only -->\n"
+                    + "## Phase 1 - Exempt\n\nTaskCreate(subject: \"Phase 1\")\n"
+                    + "## Phase 2 - Main\n\nTaskCreate(subject: \"Phase 2\")\n"
+                    + "x-internal-phase-gate --mode post\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
@@ -478,6 +561,101 @@ class WaveAAuditorsTest {
             } finally {
                 skillFile.toFile().setReadable(true);
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("TaskHierarchyAuditor — exemption and multi-phase")
+    class TaskHierarchyAuditorExtraTest {
+
+        private final TaskHierarchyAuditor auditor = new TaskHierarchyAuditor();
+
+        @Test
+        void phaseWithNoGateExemption_isNotViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-th-exempt");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-th-exempt\n---\nx-epic-implement\n"
+                            + "<!-- phase-no-gate: prose only -->\n## Phase 1 - Prose\n\nNo task here.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void multiplePhasesSecondMissingTaskCreate_returnsViolation() throws IOException {
+            Path skillDir = tempDir.resolve("x-epic-th-multi");
+            writeSkill(
+                    skillDir,
+                    "SKILL.md",
+                    "---\nname: x-epic-th-multi\n---\nx-story-implement\n"
+                            + "## Phase 1\n\nTaskCreate(subject: \"Phase 1\")\n"
+                            + "## Phase 2\n\nNo task create here.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_TASK_CREATE");
+        }
+
+        @Test
+        void xTaskImplementReference_isOrchestrator() throws IOException {
+            // Skill referencing x-task-implement is treated as orchestrator
+            Path skillDir = tempDir.resolve("x-epic-taskimpl");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-taskimpl\n---\nx-task-implement\n"
+                    + "## Phase 1\n\nTaskCreate(subject: \"Phase 1\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
+        }
+
+        @Test
+        void taskCreateBeforePhase_doesNotCount_violationFired() throws IOException {
+            // TaskCreate before any ## Phase is not counted → Phase 1 lacks TaskCreate → violation
+            Path skillDir = tempDir.resolve("x-epic-pretask");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-pretask\n---\nx-epic-implement\n"
+                    + "TaskCreate(subject: \"Pre-phase\")\n"
+                    + "## Phase 1\n\nNo task inside phase.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_TASK_CREATE");
+        }
+
+        @Test
+        void firstPhaseNoTask_secondHasTask_firstIsViolation() throws IOException {
+            // Phase 1 no task → violation detected at Phase 2 transition; Phase 2 has task → ok at end
+            Path skillDir = tempDir.resolve("x-epic-firstnotask");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-firstnotask\n---\nx-story-implement\n"
+                    + "## Phase 1\n\nNo task here.\n"
+                    + "## Phase 2\n\nTaskCreate(subject: \"Phase 2\")\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            AuditResult result = auditor.audit(corpus);
+
+            assertThat(result.exitCode()).isEqualTo(1);
+            assertThat(result.violations()).hasSize(1);
+            assertThat(result.violations().get(0).rule()).isEqualTo("MISSING_TASK_CREATE");
+        }
+
+        @Test
+        void orchestratorWithNoPhaseHeaders_isOk() throws IOException {
+            // File matches isOrchestrator but has no ## Phase headers — no violations
+            Path skillDir = tempDir.resolve("x-epic-nophase");
+            writeSkill(skillDir, "SKILL.md",
+                    "---\nname: x-epic-nophase\n---\nx-epic-implement\nSome content without phase headers.\n");
+            AuditCorpus corpus = new AuditCorpus(tempDir);
+
+            assertThat(auditor.audit(corpus).exitCode()).isEqualTo(0);
         }
     }
 }

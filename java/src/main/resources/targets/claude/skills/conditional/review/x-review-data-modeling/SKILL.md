@@ -4,6 +4,8 @@ description: "Data modeling specialist review: validates entity design, aggregat
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
+fragment-slot: { slot: review-specialist, fragment-id: data-modeling, fragment-order: 80 }
 ---
 
 ## Global Output Policy

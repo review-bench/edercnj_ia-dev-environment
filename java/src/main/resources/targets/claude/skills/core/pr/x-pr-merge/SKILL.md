@@ -4,6 +4,7 @@ description: "Merges a single PR via gh CLI with configurable strategy (merge/sq
 user-invocable: true
 allowed-tools: Bash, Read, Write
 argument-hint: "--pr N [--strategy merge|squash|rebase] [--delete-branch true|false] [--auto] [--wait-timeout-min N]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

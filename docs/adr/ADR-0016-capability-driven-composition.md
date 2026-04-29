@@ -2,8 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Proposed |
+| **Status** | Accepted |
 | **Date** | 2026-04-28 |
+| **Accepted** | 2026-04-29 |
 | **Deciders** | Eder Junior, Claude Code (Opus 4.7) |
 | **Supersedes** | — |
 | **Related** | ADR-0003 (Skill Taxonomy), ADR-0006 (File-Conflict-Aware Parallelism), ADR-0014 (Task Hierarchy), ADR-0015 (Audit Gate Lifecycle) |

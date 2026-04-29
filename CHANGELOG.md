@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-04-29
+
 ### Added
 
 - **EPIC-0061 (Local-First Lifecycle & Stack-Aware Governance) — stories 0001-0007:**
@@ -32,7 +34,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking
 
-- **EPIC-0064 — Capability-Driven Composition Refactor.** Schema YAML do projeto-alvo salta para v3.0 (sem retrocompat com v2). Composição de `.claude/` passa a ser dirigida por **capabilities** declaradas em frontmatter universal (Rule 28), substituindo o copy-cego atual. Todo `.claude/` gerado precisa ser regenerado. Detalhes: [ADR-0016](docs/adr/ADR-0016-capability-driven-composition.md), [SPEC-capability-composition-v1](docs/specs/SPEC-capability-composition-v1.md), [Rule 28](.claude/rules/28-capability-frontmatter-contract.md), [EPIC-0064](ai/epics/epic-0064-capability-driven-composition/epic-0064.md). Scope: 79 stories em 8 fases (Phase 0 entregue nesta birth; Phases 1-7 TBD). Bump major reservado para Phase 7.
+- **EPIC-0064 — Capability-Driven Composition Refactor (v5.0.0 — Major Bump).**
+  - **Schema YAML v3.0 obrigatório:** frontmatter de todos os artefatos gerados (skills, rules, KPs, agents, hooks, templates) requer campo `requires-capabilities`. Artefatos v2 (sem o campo) são hard-fail via `audit-capability-coverage.sh` (story-0064-0215).
+  - **Composição capability-driven:** `CapabilityAwareComposer` substitui o copy-cego em `.claude/`. Artefatos são incluídos/excluídos com base nas capabilities ativas do perfil do projeto. Output Java CLI sem DB reduzido em ≥30% (pruning automático).
+  - **142 artefatos migrados:** skills, KPs, agents, hooks, templates — todos com `requires-capabilities: []` (universal) ou capabilities específicas.
+  - **Domain types novos:** `CapabilityId`, `CapabilityDefinition`, `CapabilityGraph`, `Profile`, `ResolvedCapabilitySet`, `CapabilityError` (sealed hierarchy).
+  - **Pipeline novo:** `CapabilityResolver` → `CapabilityAwareComposer` → `OutputPruner` → `CompositionEngine` → Pebble → LLM.
+  - **Migration:** consumidores downstream devem regenerar `.claude/` com nova versão. Não há fallback v2.
+  - **ADR-0016 accepted:** [docs/adr/ADR-0016-capability-driven-composition.md](docs/adr/ADR-0016-capability-driven-composition.md)
+  - **Rule 28 published:** [.claude/rules/28-capability-frontmatter-contract.md](.claude/rules/28-capability-frontmatter-contract.md)
+  - **SPEC:** [docs/specs/SPEC-capability-composition-v1.md](docs/specs/SPEC-capability-composition-v1.md)
 
 ### Added
 

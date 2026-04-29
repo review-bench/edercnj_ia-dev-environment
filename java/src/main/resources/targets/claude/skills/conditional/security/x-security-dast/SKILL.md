@@ -4,6 +4,7 @@ description: "Dynamic Application Security Testing -- tests the running applicat
 user-invocable: true
 allowed-tools: Read, Bash
 argument-hint: "--target <URL> [--env local|dev|homolog|prod] [--mode passive|active|full] [--confirm-prod] [--openapi <path>] [--auth-token <token>]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

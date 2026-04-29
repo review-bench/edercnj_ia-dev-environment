@@ -4,6 +4,7 @@ description: "Merge-train automation: discovers, validates, and merges a sequenc
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, TaskUpdate
 argument-hint: "[--prs N,M,...] [--epic ID] [--pattern regex] [--max-parallel N] [--dry-run] [--resume]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

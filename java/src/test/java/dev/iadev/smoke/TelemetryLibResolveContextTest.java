@@ -12,8 +12,8 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 /**
- * Regression test for the hotfix that taught {@code telemetry-lib.sh::resolve_context} to
- * recognise the {@code epic/NNNN} branch convention introduced by Rule 21 (EPIC-0049).
+ * Regression test for the hotfix that taught {@code telemetry-lib.sh::resolve_context} to recognise
+ * the {@code epic/NNNN} branch convention introduced by Rule 21 (EPIC-0049).
  *
  * <p>Before the hotfix, only {@code feature/epic-NNNN} / {@code feat/epic-NNNN} matched, so any
  * tool call from an {@code epic/NNNN} branch fell through to the {@code "unknown"} fallback and

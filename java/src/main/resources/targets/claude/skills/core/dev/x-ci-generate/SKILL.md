@@ -4,6 +4,7 @@ description: "Generate or update CI/CD pipelines based on project stack: detect 
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 argument-hint: "[ci|cd|release|security|all] [--monorepo] [--force]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--period last-7d|last-30d|last-90d|all] [--format markdown|json] [--compare-previous]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

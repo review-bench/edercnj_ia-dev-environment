@@ -1,0 +1,13 @@
+id: data.database.postgres
+category: data
+kind: atomic
+version: "16"
+status: stable
+description: PostgreSQL relational database
+excludes:
+  - data.database.mysql
+  - data.database.mariadb
+tags:
+  - database
+  - sql
+  - relational

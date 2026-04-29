@@ -4,6 +4,7 @@ description: "Analyze telemetry NDJSON for one or more epics and produce a Markd
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "--epic EPIC-XXXX | --epics A,B [--export json|csv --out path] [--since YYYY-MM-DD]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

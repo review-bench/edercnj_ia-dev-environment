@@ -1,0 +1,44 @@
+{
+  "storyId": "story-0064-0601",
+  "epicId": "EPIC-0064",
+  "passed": true,
+  "timestamp": "2026-04-29T06:30:00Z",
+  "coverageLine": 95.09,
+  "coverageBranch": 90.03,
+  "testsRun": 4304,
+  "testsFailed": 0,
+  "testsSkipped": 14,
+  "gherkinScenariosValidated": [
+    {
+      "scenario": "Catálogo válido passa (happy)",
+      "testMethod": "Epic0064CapabilityResolutionSmokeTest",
+      "status": "PASS"
+    },
+    {
+      "scenario": "audit-capability-graph.sh --self-check passes",
+      "testMethod": "bash audit-capability-graph.sh --self-check",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Ciclo detectado falha",
+      "testMethod": "CycleDetectorTest.directCycle",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Mutex assimétrico falha",
+      "testMethod": "MutexValidatorTest.asymmetricThrows",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Capability órfã detectada",
+      "testMethod": "CapabilityAwareComposerTest.nonMatchingCapabilityExcluded",
+      "status": "PASS"
+    }
+  ],
+  "consistencyChecks": {
+    "uniformExceptionPattern": true,
+    "immutableRecords": true,
+    "noNullReturns": true
+  },
+  "reviewConclusion": "PARTIAL_GO — coverage gates passed after remediation; TDD commit pattern and CapabilityDefinition 12-param constructor are MEDIUM findings deferred to follow-up"
+}

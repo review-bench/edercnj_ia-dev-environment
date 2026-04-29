@@ -4,6 +4,7 @@ description: "Runs automated smoke tests against the TCP socket server using a s
 user-invocable: true
 allowed-tools: Read, Bash
 argument-hint: "[--scenario echo|all] [--k8s] [--host <host>] [--port <port>]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

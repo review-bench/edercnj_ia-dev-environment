@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Grep, Glob
 argument-hint: "[STORY-ID]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

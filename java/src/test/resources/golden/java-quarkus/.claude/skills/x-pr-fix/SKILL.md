@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[PR-number]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

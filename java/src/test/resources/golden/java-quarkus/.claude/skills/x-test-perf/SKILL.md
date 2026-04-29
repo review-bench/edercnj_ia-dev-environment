@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[scenario: baseline|normal|peak|sustained|all] [--save-baseline] [--compare-baseline]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

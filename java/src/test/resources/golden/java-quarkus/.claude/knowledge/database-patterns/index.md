@@ -1,6 +1,7 @@
 ---
 name: database-patterns
 description: "Database conventions for {{DB_TYPE}} + {{CACHE_TYPE}}: schema design, migrations, indexing, query optimization, caching patterns, and connection pool management."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Database Patterns

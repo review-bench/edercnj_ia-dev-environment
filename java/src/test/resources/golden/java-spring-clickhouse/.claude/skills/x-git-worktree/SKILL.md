@@ -6,6 +6,7 @@ user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "<create|list|remove|cleanup|detect-context> [--branch <name>] [--base <base>] [--id <identifier>] [--dry-run]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

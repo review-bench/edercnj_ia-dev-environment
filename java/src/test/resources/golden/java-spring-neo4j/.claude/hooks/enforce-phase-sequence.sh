@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# requires-capabilities: []
 # Layer:      0 (preventive — fires during LLM turn)
 # Trigger:    PreToolUse
 # Event:      pre_tool_use (matcher: "*")

@@ -1,6 +1,7 @@
 ---
 name: ci-cd-patterns
 description: "CI/CD pipeline patterns: build stages, test parallelization, security scanning, artifact management, environment promotion, approval gates, caching strategies, and language-specific pipeline configurations."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: CI/CD Patterns

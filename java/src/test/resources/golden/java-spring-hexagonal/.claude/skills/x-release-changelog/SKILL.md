@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[version-tag | --unreleased | --full]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

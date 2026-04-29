@@ -1,6 +1,7 @@
 ---
 name: infrastructure
 description: "Infrastructure patterns: Docker multi-stage builds, Kubernetes manifests (cloud-agnostic), security context, 12-Factor App principles, graceful shutdown, resource management, and cloud-native design."
+requires-capabilities: []
 ---
 
 # Knowledge Pack: Infrastructure

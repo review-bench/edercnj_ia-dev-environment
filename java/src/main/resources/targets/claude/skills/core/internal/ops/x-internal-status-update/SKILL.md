@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--file <path> --type <epic|story|task> --id <id> --field <name> --value <value> [--initialize] [--read-only]"
 category: internal-ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

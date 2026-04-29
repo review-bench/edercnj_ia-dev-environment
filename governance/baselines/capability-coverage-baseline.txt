@@ -1,0 +1,11 @@
+# capability-coverage-baseline.txt
+# EPIC-0064 Phase 7 story-0064-0706 — grandfathered baseline (intentionally empty)
+#
+# Rationale: All 142 artifacts were migrated to frontmatter v3.0 in Phase 2 (Wave F).
+# No pre-existing exemptions remain — baseline is empty as required by Rule 28 §Forbidden post-merge.
+# Any new artifact MUST declare requires-capabilities before merging.
+#
+# Immutable after EPIC-0064 merges to develop (audit-immutability.sh).
+# Date: 2026-04-29
+# Epic: EPIC-0064
+# Story: story-0064-0706

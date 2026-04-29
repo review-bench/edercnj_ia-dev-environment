@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--scope all|vulnerabilities|outdated|licenses|sbom|license-report|tree]"
 context-budget: medium
+requires-capabilities: []
 ---
 
 ## Global Output Policy

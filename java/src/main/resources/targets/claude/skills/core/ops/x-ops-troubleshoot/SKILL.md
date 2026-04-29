@@ -4,6 +4,7 @@ description: "Diagnoses errors, stacktraces, build failures, and unexpected beha
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
 argument-hint: "[error-description or test-name]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

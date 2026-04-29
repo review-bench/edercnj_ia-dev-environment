@@ -1,6 +1,7 @@
 ---
 name: container-registry
 description: "Container registry patterns: tagging strategy, immutability, retention policies, vulnerability scanning, multi-arch builds, and CI/CD integration."
+requires-capabilities: []
 ---
 
 # Pattern: Container Registry Management

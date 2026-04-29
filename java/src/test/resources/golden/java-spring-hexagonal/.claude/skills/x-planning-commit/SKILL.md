@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--epic-id <NNNN> --paths <p1,p2,...> --subject <msg> [--scope chore|docs] [--body <text>] [--dry-run]"
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

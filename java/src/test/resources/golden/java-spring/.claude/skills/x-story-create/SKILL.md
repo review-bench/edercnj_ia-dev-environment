@@ -5,6 +5,7 @@ user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "<SPEC_FILE> <EPIC_FILE> [--quality-threshold 70] [--jira <PROJECT_KEY>] [--no-jira] [--dry-run] [--no-commit]"
 context-budget: heavy
+requires-capabilities: []
 ---
 
 ## Output Policy
