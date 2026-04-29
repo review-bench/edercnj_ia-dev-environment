@@ -46,6 +46,22 @@ argument-hint: "{{ARGUMENT_HINT}}"
 |----------|--------|
 | {{ERROR_SCENARIO}} | {{ERROR_ACTION}} |
 
+## Integration Notes (Feature Creation Chain — EPIC-0065)
+
+When this skill is part of the Feature Creation Chain, document its position:
+
+```
+x-feature-ideate  ──→  spec.md + PR docs/feature-<slug> → develop  (manual gate)
+x-feature-create  ──→  epic + stories + map + PR docs/<id>-<slug> → epic/XXXX  (auto-merge)
+x-epic-orchestrate ──→  planning multi-agent for each story (Phase 1 artifacts)
+```
+
+Example caller invocation (Rule 13 INLINE-SKILL pattern):
+
+```markdown
+Skill(skill: "x-feature-create", model: "sonnet", args: "docs/specs/SPEC-csv-export-v1.md --epic-id 0066")
+```
+
 ## Telemetry (Optional)
 
 Use the canonical marker shape below — an HTML comment discriminator (so the
