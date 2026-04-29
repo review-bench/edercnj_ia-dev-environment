@@ -130,17 +130,17 @@ Check for `--resume` and `--story` flags. Validate mutual exclusivity.
 
 ### 0.3 Resolve Epic Directory
 
-Resolve the epic directory using a glob to support suffix variants (e.g., `plans/epic-XXXX-title-slug/`):
+Resolve the epic directory using a glob to support suffix variants (e.g., `ai/epics/epic-XXXX-title-slug/`):
 
 ```bash
 # Resolve epic directory (exact match first, then suffix variant)
-epicDir=$(ls -d plans/epic-{epicId}/ plans/epic-{epicId}-*/ 2>/dev/null | head -1)
+epicDir=$(ls -d ai/epics/epic-{epicId}/ ai/epics/epic-{epicId}-*/ 2>/dev/null | head -1)
 ```
 
 If no match is found, abort:
 
 ```
-ERROR: Directory plans/epic-{epicId}/ (or suffix variant) not found. Run /x-epic-decompose first.
+ERROR: Directory ai/epics/epic-{epicId}/ (or suffix variant) not found. Run /x-epic-decompose first.
 ```
 
 Use the resolved `epicDir` path for ALL subsequent reads/writes (IMPLEMENTATION-MAP.md, stories, execution-state.json, reports).
@@ -150,7 +150,7 @@ Use the resolved `epicDir` path for ALL subsequent reads/writes (IMPLEMENTATION-
 Check that `IMPLEMENTATION-MAP.md` exists in the epic directory.
 
 ```
-ERROR: IMPLEMENTATION-MAP.md not found in plans/epic-{epicId}/. Run /x-epic-map first.
+ERROR: IMPLEMENTATION-MAP.md not found in ai/epics/epic-{epicId}/. Run /x-epic-map first.
 ```
 
 ### 0.5 Validate Story Files
@@ -158,7 +158,7 @@ ERROR: IMPLEMENTATION-MAP.md not found in plans/epic-{epicId}/. Run /x-epic-map 
 Glob for `story-XXXX-*.md` files in the epic directory. At least one must exist.
 
 ```
-ERROR: No story files found matching story-{epicId}-*.md in plans/epic-{epicId}/.
+ERROR: No story files found matching story-{epicId}-*.md in ai/epics/epic-{epicId}/.
 ```
 
 ### 0.6 Resume Checkpoint Validation (Conditional)
@@ -313,7 +313,7 @@ Execution order:
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-orchestrate Phase-1-Discovery ok`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-orchestrate --phase Phase-1-Discovery --expected-artifacts plans/epic-{epicId}/execution-state.json")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-orchestrate --phase Phase-1-Discovery --expected-artifacts ai/epics/epic-{epicId}/execution-state.json")
     TaskUpdate(id: phase1TaskId, status: "completed")
 
 >>> Phase 1/3 completed. Proceeding to Phase 2...
@@ -452,19 +452,19 @@ After all stories in the current wave (phase) have completed planning and `execu
 1. `execution-state.json` (wave-level checkpoint update)
 2. Every story file touched during the wave (Section 8 updates via status flip)
 3. Every planning artifact produced by the wave's stories:
-   - `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
-   - `plans/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md`
-   - `plans/epic-XXXX/plans/dor-story-XXXX-YYYY.md`
-   - `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md` (if present)
-   - `plans/epic-XXXX/plans/task-TASK-*.md` (v2)
-   - `plans/epic-XXXX/plans/plan-task-TASK-*.md` (v2)
-   - `plans/epic-XXXX/plans/task-implementation-map-STORY-*.md` (v2)
-4. Any reports written during the wave (`plans/epic-XXXX/reports/**` — added in Phase 3 but may accumulate incrementally).
+   - `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
+   - `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md`
+   - `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md`
+   - `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md` (if present)
+   - `ai/epics/epic-XXXX/plans/task-TASK-*.md` (v2)
+   - `ai/epics/epic-XXXX/plans/plan-task-TASK-*.md` (v2)
+   - `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-*.md` (v2)
+4. Any reports written during the wave (`ai/epics/epic-XXXX/reports/**` — added in Phase 3 but may accumulate incrementally).
 
 Delegate to `x-planning-commit`:
 
     Skill(skill: "x-planning-commit",
-          args: "--scope chore --epic-id <XXXX> --paths plans/epic-<XXXX>/execution-state.json plans/epic-<XXXX>/story-<XXXX>-*.md plans/epic-<XXXX>/plans/ plans/epic-<XXXX>/reports/ --subject \"planning orchestration cycle (wave <N>)\"")
+          args: "--scope chore --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/execution-state.json ai/epics/epic-<XXXX>/story-<XXXX>-*.md ai/epics/epic-<XXXX>/plans/ ai/epics/epic-<XXXX>/reports/ --subject \"planning orchestration cycle (wave <N>)\"")
 
 Where `<N>` is the current phase number (0-based per Phase 1 — or the wave sequence number when a multi-wave orchestration runs phase-by-phase).
 
@@ -492,7 +492,7 @@ Stories in subsequent phases that depend on a `NOT_READY` story are still planne
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-orchestrate Phase-2-Story-Orchestration ok`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-orchestrate --phase Phase-2-PlanLoop --expected-artifacts plans/epic-{epicId}/execution-state.json")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-orchestrate --phase Phase-2-PlanLoop --expected-artifacts ai/epics/epic-{epicId}/execution-state.json")
     TaskUpdate(id: phase2TaskId, status: "completed")
 
 >>> Phase 2/3 completed. Proceeding to Phase 3...
@@ -614,14 +614,14 @@ EPIC-{epicId}: {overall_status}
   Not Ready: {stories_not_ready}
   Pending: {stories_pending}
 
-  Report: plans/epic-{epicId}/reports/epic-planning-report-{epicId}.md
-  State:  plans/epic-{epicId}/execution-state.json
+  Report: ai/epics/epic-{epicId}/reports/epic-planning-report-{epicId}.md
+  State:  ai/epics/epic-{epicId}/execution-state.json
 ```
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-orchestrate Phase-3-Consolidation ok`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-epic-orchestrate --phase Phase-3-Report --expected-artifacts plans/epic-{epicId}/reports/epic-planning-report-{epicId}.md,plans/epic-{epicId}/execution-state.json")
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-epic-orchestrate --phase Phase-3-Report --expected-artifacts ai/epics/epic-{epicId}/reports/epic-planning-report-{epicId}.md,ai/epics/epic-{epicId}/execution-state.json")
     TaskUpdate(id: phase3TaskId, status: "completed")
 
 ## Step P5 — Push Epic Branch to Origin (optional, EPIC-0049)

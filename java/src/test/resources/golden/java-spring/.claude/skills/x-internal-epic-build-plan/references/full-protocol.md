@@ -62,7 +62,7 @@ Parser rules:
    are cosmetic and contained within their own cell.
 
 When no header row matches within the first 200 lines, emit:
-`IMPLEMENTATION-MAP.md missing header row under plans/epic-<id>`
+`IMPLEMENTATION-MAP.md missing header row under ai/epics/epic-<id>`
 and exit 2 (treated equivalently to a missing file — the contract
 is on the table, not on file presence alone).
 
@@ -130,7 +130,7 @@ ordering".
 
 ## 5. File-Footprint Parser
 
-Each plan file under `plans/epic-XXXX/plans/plan-story-*.md`,
+Each plan file under `ai/epics/epic-XXXX/plans/plan-story-*.md`,
 `plan-task-*.md`, and `tasks-story-*.md` may contain a
 `## File Footprint` or `## Story File Footprint` block introduced
 by EPIC-0041:
@@ -270,7 +270,7 @@ larger epics (up to 30 stories).
 | IMPLEMENTATION-MAP references a story in a DIFFERENT epic (`story-YYYY-NNNN` with YYYY ≠ epic_id) | Treat as `STORY_FILE_MISSING` (exit 4) — cross-epic edges are not supported by the current schema |
 | `--mode parallel` but epic has only 1 story | `overlapMatrix: {}` (empty object, not null); `overlapSeverity: "none"` |
 | Two stories in the same phase both have `footprint-unknown` | Both listed in `warnings`; no entry in `overlapMatrix` for either; `overlapSeverity` computed across known-footprint pairs only (may be `none`) |
-| `--output` equals a path inside `plans/epic-${epic_id}/` | Supported — the skill resolves relative paths from `$CLAUDE_PROJECT_DIR`; no recursion guard needed since the skill does not re-read its own output |
+| `--output` equals a path inside `ai/epics/epic-${epic_id}/` | Supported — the skill resolves relative paths from `$CLAUDE_PROJECT_DIR`; no recursion guard needed since the skill does not re-read its own output |
 
 These cases are covered by the acceptance scenarios in the SKILL.md
 Testing section and by the future regression goldens under

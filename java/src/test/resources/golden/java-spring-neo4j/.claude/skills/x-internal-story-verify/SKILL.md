@@ -45,7 +45,7 @@ remediation / tech-lead-review branching off the four response fields.
 Responsibilities (single):
 
 1. Identify the files "owned" by the story via the task breakdown at
-   `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8
+   `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8
    fallback of the story file when the breakdown is absent).
 2. Run `{{TEST_COMMAND}}` (Maven default: `mvn test`) filtered to the
    identified file set via the build-tool-native filter (Maven:
@@ -116,7 +116,7 @@ Skill(skill: "x-internal-story-verify",
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form) |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `plans/epic-XXXX/` |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` |
 | `--coverage-threshold-line <N>` | O | `95` | Minimum line coverage percentage (integer, 0-100) |
 | `--coverage-threshold-branch <N>` | O | `90` | Minimum branch coverage percentage (integer, 0-100) |
 
@@ -176,7 +176,7 @@ Parse the four flags; reject unknown and missing required flags with
 exit `64`. Resolve canonical paths:
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 story_file="${epic_dir}/${story_id}.md"
 tasks_file="${epic_dir}/plans/tasks-${story_id}.md"
 ```

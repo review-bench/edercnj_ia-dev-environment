@@ -43,7 +43,7 @@ case "$BRANCH" in
   *) exit 0 ;;
 esac
 
-# Find the most recent plans/epic-*/execution-state.json under project dir
+# Find the most recent ai/epics/epic-*/execution-state.json under project dir
 STATE_FILE=""
 while IFS= read -r candidate; do
   if [ -z "$STATE_FILE" ] || [ "$candidate" -nt "$STATE_FILE" ]; then

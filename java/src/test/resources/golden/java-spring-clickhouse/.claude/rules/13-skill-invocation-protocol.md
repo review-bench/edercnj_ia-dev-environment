@@ -56,7 +56,7 @@ Agent(
 Agent(
   subagent_type: "general-purpose",
   description: "Plan implementation for story X",
-  prompt: "FIRST ACTION: TaskCreate(...). You are a Senior Architect. Read context files. Produce implementation plan at plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md. LAST ACTION: TaskUpdate(...)."
+  prompt: "FIRST ACTION: TaskCreate(...). You are a Senior Architect. Read context files. Produce implementation plan at ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md. LAST ACTION: TaskUpdate(...)."
 )
 ```
 
@@ -151,7 +151,7 @@ After EPIC-0033:
 | `Skill(skill: ...)` canonical | ≥ 13 |
 | `Invoke /x-foo` / bare-slash in delegation | 0 |
 
-Rule 13 was created as part of **STORY-0033-0001** (see `plans/epic-0033/`) to make the above invariant permanent. Any delegation added to a skill template after this epic MUST follow one of the 3 permitted patterns. CI audit (via the grep commands above) enforces the invariant going forward.
+Rule 13 was created as part of **STORY-0033-0001** (see `ai/epics/epic-0033/`) to make the above invariant permanent. Any delegation added to a skill template after this epic MUST follow one of the 3 permitted patterns. CI audit (via the grep commands above) enforces the invariant going forward.
 
 ## Forbidden Additions
 

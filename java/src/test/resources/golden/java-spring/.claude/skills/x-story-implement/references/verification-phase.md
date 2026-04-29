@@ -44,10 +44,10 @@ If no documentable interfaces configured: skip interface generators with log `"N
 - Append to CHANGELOG.md
 
 **Architecture Document Update (Recommended):**
-If an architecture plan exists at `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`:
+If an architecture plan exists at `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`:
 1. Invoke `x-arch-update` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-       Skill(skill: "x-arch-update", args: "plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")
+       Skill(skill: "x-arch-update", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")
 
    This incrementally updates `steering/service-architecture.md`.
 2. New components, integrations, flows, and ADR references are added to the appropriate sections
@@ -71,7 +71,7 @@ Collect the consolidated review report with scores and severity counts.
 After collecting all specialist review results, generate a consolidated dashboard:
 1. Read template at `.claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` for required output format (RULE-007). If not found, use inline format as fallback (RULE-012).
 2. Aggregate scores from all specialists into a single dashboard.
-3. Save to `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`.
+3. Save to `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`.
 
 ### Step 8.5 -- Fixes + Remediation
 
@@ -79,7 +79,7 @@ After collecting all specialist review results, generate a consolidated dashboar
    - Read template at `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md` for required output format (RULE-007). If not found, use inline format as fallback (RULE-012).
    - Map open findings from the review dashboard to remediation items.
    - For each finding: record original finding, assigned fix action, status (Open/Fixed/Deferred/Accepted), and resolution notes.
-   - Save to `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
+   - Save to `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
 2. Fix ALL failed items from review (every specialist must reach STATUS: Approved)
 3. For each fix, follow TDD discipline: write/update the test FIRST, then apply the fix
 4. Use atomic commits via `/x-git-commit` for fixes
@@ -95,7 +95,7 @@ Invoke the `x-review-pr` skill via the Skill tool (Rule 13 — INLINE-SKILL patt
 Requires all items passing for GO. If NO-GO, fix all failed items and re-review (max 2 cycles).
 
 **Dashboard Update (RULE-006):**
-After the Tech Lead review completes, update the consolidated review dashboard at `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` with Tech Lead findings.
+After the Tech Lead review completes, update the consolidated review dashboard at `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` with Tech Lead findings.
 
 ### Step 8.7 -- Story-Level PR (Auto-Approve Mode Only)
 

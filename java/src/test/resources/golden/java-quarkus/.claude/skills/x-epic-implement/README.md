@@ -125,7 +125,7 @@ flowchart TD
 | Exit | Code | Phase | Cause |
 |------|------|-------|-------|
 | 1 | `ARGS_INVALID` | 0 | Normalizer rejects argv |
-| 2 | `EPIC_DIR_MISSING` | 0 | `plans/epic-XXXX/` absent |
+| 2 | `EPIC_DIR_MISSING` | 0 | `ai/epics/epic-XXXX/` absent |
 | 3 | `STORY_FAILED` | 3 | One or more stories FAILED |
 | 4 | `INTEGRITY_GATE_FAILED` | 4 | Gate failed twice after recovery |
 | 5 | `FINAL_PR_CONFLICTS` | 5 | `x-git-merge` sync conflicted |
@@ -138,5 +138,5 @@ flowchart TD
 - Main skill body: [`SKILL.md`](SKILL.md)
 - Full protocol + retry/circuit-breaker/legacy semantics: [`references/full-protocol.md`](references/full-protocol.md)
 - Args schema consumed by `x-internal-args-normalize`: [`references/args-schema.json`](references/args-schema.json)
-- Parent story: `plans/epic-XXXX/story-XXXX-YYYY.md`
+- Parent story: `ai/epics/epic-XXXX/story-XXXX-YYYY.md`
 - ADR-0006 (file-conflict-aware parallelism), ADR-0010 (interactive gates), ADR-0012 (thin-skill pattern)

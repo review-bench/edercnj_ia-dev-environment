@@ -5,7 +5,7 @@
 
 ## Phase 1 -- Architecture Planning (Skill Invocation + Subagent Fallback)
 
-**If the architecture plan file already exists at `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` (as checked in Phase 0), skip Step 1A and proceed directly to Step 1B, ensuring Step 1B reads the existing plan.**
+**If the architecture plan file already exists at `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` (as checked in Phase 0), skip Step 1A and proceed directly to Step 1B, ensuring Step 1B reads the existing plan.**
 
 ### Step 1A: Architecture Plan via x-arch-plan
 
@@ -33,7 +33,7 @@ After the skill returns (success, failure, or WARNING fallback), close the track
 
     TaskUpdate(id: archPlanTaskId, status: "completed")
 
-Output: `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`
+Output: `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`
 If the skill invocation fails: emit WARNING, still call `TaskUpdate(id: archPlanTaskId, status: "completed")`, and proceed to Step 1B.
 
 **If Skip:** Log `"Architecture plan not needed for this change scope"` and proceed to Step 1B.
@@ -83,7 +83,7 @@ Launch a single `general-purpose` subagent via the `Agent` tool (Rule 13 — SUB
 > 10. Architecture decisions -- mini-ADRs
 > 11. Risk assessment
 >
-> Save to `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md`.
+> Save to `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION (Story 0033-0003):** Close the tracking task created in the FIRST ACTION:
 >
@@ -123,7 +123,7 @@ After the skill returns, close the tracking task:
 
     TaskUpdate(id: testPlanTaskId, status: "completed")
 
-Produces `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md`.
+Produces `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md`.
 
 The test plan produces: Acceptance tests (AT-N) as outer loop, Unit tests (UT-N) in TPP order as inner loop, Integration tests (IT-N), `Depends On: TASK-N` and `Parallel` markers.
 
@@ -147,7 +147,7 @@ After the skill returns, close the tracking task:
 
     TaskUpdate(id: taskDecompTaskId, status: "completed")
 
-Produces `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`.
+Produces `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`.
 
 Auto-detects mode: test-driven tasks (if test plan exists) or G1-G7 layer-based decomposition.
 
@@ -173,7 +173,7 @@ Launch a `general-purpose` subagent via the `Agent` tool (Rule 13 — SUBAGENT-G
 >
 > Read `knowledge/protocols.md`.
 > Read implementation plan. Produce event schema design: event names, CloudEvents envelope, topic naming, partition key, producer/consumer contracts.
-> Save to `plans/epic-XXXX/plans/events-story-XXXX-YYYY.md`.
+> Save to `ai/epics/epic-XXXX/plans/events-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION (Story 0033-0003):** Close the tracking task:
 >
@@ -197,7 +197,7 @@ After the skill returns, close the tracking task:
 
     TaskUpdate(id: securityTaskId, status: "completed")
 
-Output: `plans/epic-XXXX/plans/security-story-XXXX-YYYY.md`
+Output: `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md`
 
 If `x-threat-model` is unavailable, fall back to a `general-purpose` subagent. The orchestrator's `TaskCreate(description: "Planning: Security Assessment — ...")` above **already fired**, so the orchestrator MUST close `securityTaskId` explicitly before launching the fallback (otherwise the original tracking task stays open forever). The fallback subagent then emits its OWN independent TaskCreate/TaskUpdate pair:
 
@@ -224,7 +224,7 @@ Then launch the fallback `general-purpose` subagent via the `Agent` tool (Rule 1
 > Read template `_TEMPLATE-SECURITY-ASSESSMENT.md` (RULE-007, fallback RULE-012).
 > Read `knowledge/security/index.md` -> then read its references.
 > Read implementation plan. Produce security assessment: threat model, OWASP Top 10 mapping, auth review, input validation, data protection, secrets management.
-> Save to `plans/epic-XXXX/plans/security-story-XXXX-YYYY.md`.
+> Save to `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION (Story 0033-0003 fallback):** Close the tracking task:
 >
@@ -257,7 +257,7 @@ Launch a `general-purpose` subagent via the `Agent` tool (Rule 13 — SUBAGENT-G
 > Read template `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` (RULE-007, fallback RULE-012).
 > Read `knowledge/compliance.md` -> then read its references.
 > Read implementation plan. Produce compliance impact assessment.
-> Save to `plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md`.
+> Save to `ai/epics/epic-XXXX/plans/compliance-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION (Story 0033-0003):** Close the tracking task:
 >

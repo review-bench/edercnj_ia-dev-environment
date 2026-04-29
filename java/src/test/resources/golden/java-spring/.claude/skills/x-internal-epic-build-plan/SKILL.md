@@ -1,6 +1,6 @@
 ---
 name: x-internal-epic-build-plan
-description: "Builds the canonical ExecutionPlan for an epic (Phase 0/0.5 carve-out of x-epic-implement): loads epic-XXXX.md, IMPLEMENTATION-MAP.md, and every story-*.md; constructs the inter-story dependency DAG; runs Kahn's algorithm with cycle detection; optionally computes a file-overlap matrix (mode=parallel) and the critical path; then renders plans/epic-XXXX/epic-execution-plan.md via x-internal-report-write using the _TEMPLATE-EPIC-EXECUTION-PLAN.md template. Emits a stable JSON envelope on stdout for orchestrator consumption. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-story-load-context and x-internal-story-build-plan)."
+description: "Builds the canonical ExecutionPlan for an epic (Phase 0/0.5 carve-out of x-epic-implement): loads epic-XXXX.md, IMPLEMENTATION-MAP.md, and every story-*.md; constructs the inter-story dependency DAG; runs Kahn's algorithm with cycle detection; optionally computes a file-overlap matrix (mode=parallel) and the critical path; then renders ai/epics/epic-XXXX/epic-execution-plan.md via x-internal-report-write using the _TEMPLATE-EPIC-EXECUTION-PLAN.md template. Emits a stable JSON envelope on stdout for orchestrator consumption. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-story-load-context and x-internal-story-build-plan)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill
@@ -42,9 +42,9 @@ to a read-the-envelope consumer that then dispatches waves.
 
 Responsibilities (single):
 
-1. Load `plans/epic-${epic_id}/epic-${epic_id}.md` and parse the story
+1. Load `ai/epics/epic-${epic_id}/epic-${epic_id}.md` and parse the story
    table.
-2. Load `plans/epic-${epic_id}/IMPLEMENTATION-MAP.md` and extract the
+2. Load `ai/epics/epic-${epic_id}/IMPLEMENTATION-MAP.md` and extract the
    inter-story dependency matrix.
 3. For every `story-${epic_id}-NNNN.md`, cross-validate declared
    dependencies against the matrix and detect missing story files.
@@ -103,7 +103,7 @@ calling orchestrator:
 
 ```markdown
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id XXXX --mode sequential --output plans/epic-XXXX/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode sequential --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
 ## Parameters
@@ -112,7 +112,7 @@ Skill(skill: "x-internal-epic-build-plan",
 | :--- | :--- | :--- | :--- |
 | `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`); zero-padded to 4 digits before use |
 | `--mode <tier>` | M | — | `sequential` or `parallel`; case-insensitive; controls whether the overlap matrix is computed |
-| `--output <path>` | M | — | Absolute or repo-relative path where the rendered markdown is written (typically `plans/epic-XXXX/epic-execution-plan.md`); must be writable |
+| `--output <path>` | M | — | Absolute or repo-relative path where the rendered markdown is written (typically `ai/epics/epic-XXXX/epic-execution-plan.md`); must be writable |
 | `--strict-overlap` | O | `false` | When `true` in parallel mode, annotates hard collisions in the envelope with `overlapSeverity: "hard"`; does NOT abort the run — the caller's Phase 1.5 gate decides |
 
 All four argument forms (`--key value`, `--key=value`, empty, and
@@ -134,7 +134,7 @@ On success the skill writes a single-line JSON object to stdout:
 | `planPath` | `String` | yes | Echo of `--output` after normalisation — also the path of the rendered markdown |
 | `mode` | `String` | yes | Echo of the resolved mode (`sequential` / `parallel`) |
 | `epicId` | `String` | yes | Echo of the 4-digit epic id |
-| `storyCount` | `Integer` | yes | Count of distinct stories discovered under `plans/epic-${epic_id}/story-*.md` |
+| `storyCount` | `Integer` | yes | Count of distinct stories discovered under `ai/epics/epic-${epic_id}/story-*.md` |
 | `strictOverlap` | `Boolean` | yes | Echo of `--strict-overlap` |
 
 The envelope shape is authoritative; callers must NOT assume field
@@ -147,8 +147,8 @@ schema.
 | Code | Name | Condition | Message Format |
 | :--- | :--- | :--- | :--- |
 | 0 | SUCCESS | All steps succeeded; envelope emitted | — |
-| 1 | EPIC_NOT_FOUND | `plans/epic-${epic_id}/` directory does not exist | `Epic dir not found: plans/epic-<id>` |
-| 2 | MAP_NOT_FOUND | `plans/epic-${epic_id}/IMPLEMENTATION-MAP.md` is missing | `IMPLEMENTATION-MAP.md missing under plans/epic-<id>` |
+| 1 | EPIC_NOT_FOUND | `ai/epics/epic-${epic_id}/` directory does not exist | `Epic dir not found: ai/epics/epic-<id>` |
+| 2 | MAP_NOT_FOUND | `ai/epics/epic-${epic_id}/IMPLEMENTATION-MAP.md` is missing | `IMPLEMENTATION-MAP.md missing under ai/epics/epic-<id>` |
 | 3 | CYCLIC_DEPENDENCY | Kahn's algorithm detected a cycle in the DAG | `Cycle detected: <storyA> -> <storyB> -> … -> <storyA>` |
 | 4 | STORY_FILE_MISSING | Dependency matrix references a story whose `.md` file is absent | `Story file missing: <storyId>.md` |
 | 5 | REPORT_WRITE_FAILED | Downstream `x-internal-report-write` returned non-zero or did not produce `${output}` | `Report write failed: <detail>` |
@@ -173,7 +173,7 @@ exists and is writable; reject with exit `64` if not.
 Derive:
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 epic_file="${epic_dir}/epic-${epic_id}.md"
 map_file="${epic_dir}/IMPLEMENTATION-MAP.md"
 ```
@@ -192,7 +192,7 @@ Parse the epic file's story table (Markdown `| storyId | …` rows)
 into a `Set<storyId>` of DECLARED stories. Parse
 `IMPLEMENTATION-MAP.md` dependency section into a
 `Map<storyId, List<storyId>>` of EDGES (each key's list is its
-`blockedBy` set). Enumerate `plans/epic-${epic_id}/story-*.md` to
+`blockedBy` set). Enumerate `ai/epics/epic-${epic_id}/story-*.md` to
 a `Set<storyId>` of ON_DISK stories.
 
 Cross-validation:
@@ -310,12 +310,12 @@ Emit on stdout as a single line terminated by `\n`. Exit `0`.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id XXXX --mode sequential --output plans/epic-XXXX/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode sequential --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
 Output:
 ```json
-{"epicId":"XXXX","mode":"sequential","phases":[{"index":0,"stories":["story-XXXX-0001","story-XXXX-0002","story-XXXX-0003","story-XXXX-0004"]},{"index":1,"stories":["story-XXXX-0005","story-XXXX-0006","story-XXXX-0007","story-XXXX-0008"]},{"index":2,"stories":["story-XXXX-0009","story-XXXX-0010","story-XXXX-0011","story-XXXX-0012","story-XXXX-0013","story-XXXX-0014","story-XXXX-0015","story-XXXX-0016","story-XXXX-0017"]},{"index":3,"stories":["story-XXXX-0018","story-XXXX-0019"]},{"index":4,"stories":["story-XXXX-0020","story-XXXX-0021","story-XXXX-0022"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-XXXX-0001","story-XXXX-0005","story-XXXX-0018","story-XXXX-0020"],"planPath":"plans/epic-XXXX/epic-execution-plan.md","storyCount":22,"strictOverlap":false}
+{"epicId":"XXXX","mode":"sequential","phases":[{"index":0,"stories":["story-XXXX-0001","story-XXXX-0002","story-XXXX-0003","story-XXXX-0004"]},{"index":1,"stories":["story-XXXX-0005","story-XXXX-0006","story-XXXX-0007","story-XXXX-0008"]},{"index":2,"stories":["story-XXXX-0009","story-XXXX-0010","story-XXXX-0011","story-XXXX-0012","story-XXXX-0013","story-XXXX-0014","story-XXXX-0015","story-XXXX-0016","story-XXXX-0017"]},{"index":3,"stories":["story-XXXX-0018","story-XXXX-0019"]},{"index":4,"stories":["story-XXXX-0020","story-XXXX-0021","story-XXXX-0022"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-XXXX-0001","story-XXXX-0005","story-XXXX-0018","story-XXXX-0020"],"planPath":"ai/epics/epic-XXXX/epic-execution-plan.md","storyCount":22,"strictOverlap":false}
 ```
 Exit: 0.
 
@@ -323,7 +323,7 @@ Exit: 0.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id XXXX --mode parallel --output plans/epic-XXXX/epic-execution-plan.md")
+      args: "--epic-id XXXX --mode parallel --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
 Output (truncated):
@@ -352,7 +352,7 @@ Skill(skill: "x-internal-epic-build-plan",
 
 Stderr:
 ```
-Epic dir not found: plans/epic-XXXX
+Epic dir not found: ai/epics/epic-XXXX
 ```
 Exit: 1.
 
@@ -371,12 +371,12 @@ Exit: 4.
 
 ```bash
 Skill(skill: "x-internal-epic-build-plan",
-      args: "--epic-id YYYY --mode sequential --output plans/epic-YYYY/epic-execution-plan.md")
+      args: "--epic-id YYYY --mode sequential --output ai/epics/epic-YYYY/epic-execution-plan.md")
 ```
 
 Output:
 ```json
-{"epicId":"YYYY","mode":"sequential","phases":[{"index":0,"stories":["story-YYYY-0001"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-YYYY-0001"],"planPath":"plans/epic-YYYY/epic-execution-plan.md","storyCount":1,"strictOverlap":false}
+{"epicId":"YYYY","mode":"sequential","phases":[{"index":0,"stories":["story-YYYY-0001"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-YYYY-0001"],"planPath":"ai/epics/epic-YYYY/epic-execution-plan.md","storyCount":1,"strictOverlap":false}
 ```
 Exit: 0.
 
@@ -386,7 +386,7 @@ Exit: 0.
 | :--- | :--- | :--- |
 | Response envelope | stdout | Single-line JSON matching the Response Contract |
 | Error diagnostic | stderr | Single line, non-empty only on exit ≠ 0 |
-| Execution plan markdown | `${output}` (typically `plans/epic-XXXX/epic-execution-plan.md`) | Rendered by `x-internal-report-write` using the `_TEMPLATE-EPIC-EXECUTION-PLAN.md` template |
+| Execution plan markdown | `${output}` (typically `ai/epics/epic-XXXX/epic-execution-plan.md`) | Rendered by `x-internal-report-write` using the `_TEMPLATE-EPIC-EXECUTION-PLAN.md` template |
 
 The skill DOES create files — specifically the `${output}` markdown —
 but only via the `x-internal-report-write` delegation. The
@@ -403,9 +403,9 @@ from this skill's body.
 | Malformed `--epic-id` | `usage: --epic-id must be a 4-digit integer`; exit 64 |
 | `--mode` unrecognised | `usage: --mode must be sequential / parallel`; exit 64 |
 | `--output` path unwritable | `usage: --output path not writable`; exit 64 |
-| Missing epic dir | `Epic dir not found: plans/epic-<id>`; exit 1 |
-| Missing epic file | `Epic file not found: plans/epic-<id>/epic-<id>.md`; exit 1 |
-| Missing IMPLEMENTATION-MAP | `IMPLEMENTATION-MAP.md missing under plans/epic-<id>`; exit 2 |
+| Missing epic dir | `Epic dir not found: ai/epics/epic-<id>`; exit 1 |
+| Missing epic file | `Epic file not found: ai/epics/epic-<id>/epic-<id>.md`; exit 1 |
+| Missing IMPLEMENTATION-MAP | `IMPLEMENTATION-MAP.md missing under ai/epics/epic-<id>`; exit 2 |
 | Cycle detected in DAG | `Cycle detected: <chain>`; exit 3 |
 | Story-file referenced by map but absent | `Story file missing: <storyId>.md`; exit 4 |
 | `x-internal-report-write` non-zero | `Report write failed: <child stderr line>`; exit 5 |

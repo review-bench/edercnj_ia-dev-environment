@@ -108,11 +108,11 @@ Findings are classified by severity: `CRITICAL | HIGH | MEDIUM | LOW`. Any item 
 
 | Artifact | Path | Description |
 |----------|------|-------------|
-| Individual reports | `plans/epic-XXXX/reviews/review-{engineer}-story-XXXX-YYYY.md` | Per-specialist scored review |
-| Consolidated dashboard | `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` | Aggregate scores, severity distribution, review history |
-| Remediation tracking | `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` | Finding tracker with status and fix commit references |
+| Individual reports | `ai/epics/epic-XXXX/reviews/review-{engineer}-story-XXXX-YYYY.md` | Per-specialist scored review |
+| Consolidated dashboard | `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` | Aggregate scores, severity distribution, review history |
+| Remediation tracking | `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` | Finding tracker with status and fix commit references |
 | Threat model update | `results/security/threat-model.md` | STRIDE-classified threats from security findings |
-| Correction story | `plans/epic-XXXX/reviews/correction-story-XXXX-YYYY.md` | Generated only when user confirms (Phase 4) |
+| Correction story | `ai/epics/epic-XXXX/reviews/correction-story-XXXX-YYYY.md` | Generated only when user confirms (Phase 4) |
 
 ## See Also
 

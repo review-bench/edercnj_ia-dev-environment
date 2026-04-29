@@ -1,7 +1,7 @@
 # x-release State File Schema (schemaVersion: 2)
 
 > **Source of Truth:** This document is the authoritative contract for the
-> `plans/release-state-<X.Y.Z>.json` state file produced and consumed by the
+> `ai/releases/release-state-<X.Y.Z>.json` state file produced and consumed by the
 > `x-release` skill. Every phase of the skill reads and writes this file
 > atomically (write-to-temp + rename). Downstream stories and tests validate
 > against this schema.
@@ -26,13 +26,13 @@ progress. It enables:
 
 | Condition | Path |
 |:---|:---|
-| Default | `plans/release-state-<X.Y.Z>.json` |
+| Default | `ai/releases/release-state-<X.Y.Z>.json` |
 | `--state-file <path>` | `<path>` (operator-provided absolute or relative path) |
 
 The file is created during Step 0 (Resume Detection) with phase
 `INITIALIZED`, then advances to `DETERMINED` after Step 1 and through
 subsequent phases. It is removed (or moved to
-`plans/release-state-<X.Y.Z>.json.done`) after `COMPLETED` by the
+`ai/releases/release-state-<X.Y.Z>.json.done`) after `COMPLETED` by the
 CLEANUP phase.
 
 ## Canonical JSON Example

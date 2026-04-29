@@ -2,7 +2,7 @@
 #
 # audit-flow-version.sh — Rule 19 (Backward Compatibility) CI audit.
 #
-# Validates that every execution-state.json under plans/epic-*/ carries
+# Validates that every execution-state.json under ai/epics/epic-*/ carries
 # a valid `flowVersion` field ("1" or "2"). Prevents silent fallback to
 # legacy flow when flowVersion is absent or malformed.
 #
@@ -35,7 +35,7 @@ SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 # AUDIT_FLOW_VERSION_PLANS_GLOB env var overrides the default scan target.
 # Used by bats tests and CI workflows that need to point at fixture dirs.
-PLANS_GLOB="${AUDIT_FLOW_VERSION_PLANS_GLOB:-${REPO_ROOT}/plans/epic-*/execution-state.json}"
+PLANS_GLOB="${AUDIT_FLOW_VERSION_PLANS_GLOB:-${REPO_ROOT}/ai/epics/epic-*/execution-state.json}"
 VALID_VALUES=("1" "2")
 
 # ---------------------------------------------------------------------------
@@ -45,7 +45,7 @@ usage() {
   cat <<-EOF
 Usage: ${SCRIPT_NAME} [--strict] [--self-check] [-h|--help]
 
-  Validate flowVersion in all plans/epic-*/execution-state.json files.
+  Validate flowVersion in all ai/epics/epic-*/execution-state.json files.
 
   Options:
     --strict      Treat absent flowVersion as a hard violation (exit 1).

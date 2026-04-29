@@ -74,16 +74,16 @@ With all three flags absent, behavior is identical to EPIC-0048 (backward compat
 
 - Story file exists with acceptance criteria and sub-tasks
 - Predecessor stories (dependencies) are complete (validated by `x-internal-story-load-context`)
-- Epic directory structure: `plans/epic-XXXX/plans/`, `plans/epic-XXXX/reports/`
+- Epic directory structure: `ai/epics/epic-XXXX/plans/`, `ai/epics/epic-XXXX/reports/`
 - Git working tree is clean on the base branch
 
 ## Outputs
 
 | Artifact | Path | Producer |
 |----------|------|----------|
-| Architecture / Implementation / Test / Task / Security / Compliance Plans | `plans/epic-XXXX/plans/*-story-XXXX-YYYY.md` | `x-internal-story-build-plan` (Phase 1) |
-| Story Completion Report | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` | `x-internal-story-report` (Phase 3.3) |
-| Review Dashboard | `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` | `x-review` (Phase 3.2) |
+| Architecture / Implementation / Test / Task / Security / Compliance Plans | `ai/epics/epic-XXXX/plans/*-story-XXXX-YYYY.md` | `x-internal-story-build-plan` (Phase 1) |
+| Story Completion Report | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | `x-internal-story-report` (Phase 3.3) |
+| Review Dashboard | `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` | `x-review` (Phase 3.2) |
 | Per-task PRs | GitHub (targeting `--target-branch` or `develop`) | `x-pr-create` (Phase 2) |
 | Story-level PR (`--auto-approve-pr` only) | GitHub (parent `feat/story-...` → `--target-branch`) | `x-pr-create` (Phase 2.2) |
 

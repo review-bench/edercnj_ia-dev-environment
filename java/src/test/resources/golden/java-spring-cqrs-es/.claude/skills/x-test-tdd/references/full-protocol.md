@@ -37,8 +37,8 @@ If invalid: **ABORT** with `"Task ID invalid -- expected format: TASK-XXXX-YYYY-
 ### 2.2 Resolve Task Plan Path
 
 1. Compute `EPIC_DIR` by searching for the epic directory:
-   - Try exact: `plans/epic-XXXX`
-   - Try suffix variant: `plans/epic-XXXX-*`
+   - Try exact: `ai/epics/epic-XXXX`
+   - Try suffix variant: `ai/epics/epic-XXXX-*`
 2. Resolve task plan: `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md`
 3. If file does not exist: **ABORT** with `"Task plan not found: task-plan-XXXX-YYYY-NNN.md"`.
 

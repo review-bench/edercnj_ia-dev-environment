@@ -273,7 +273,7 @@ gh pr create \
 
 Story: story-XXXX-YYYY
 Epic: epic-XXXX
-Task Plan: plans/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md
+Task Plan: ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md
 
 ## Changed Files
 
@@ -331,7 +331,7 @@ EOF
 |---------|---------|----------|
 | Story reference | `Story: story-XXXX-YYYY` | Yes |
 | Epic reference | `Epic: epic-XXXX` | Yes |
-| Task plan link | `Task Plan: plans/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` | Optional |
+| Task plan link | `Task Plan: ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` | Optional |
 | Changed files | Table with file path, layer, and change type | Yes |
 | TDD summary | Number of RED/GREEN/REFACTOR cycles | Yes |
 | Checklist | DoD items from the task | Yes |

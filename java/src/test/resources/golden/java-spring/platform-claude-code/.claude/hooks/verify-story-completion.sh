@@ -11,8 +11,8 @@
 #
 # Detects when a turn just completed story-level work (PR created, merge done,
 # or git commit on a feat/story-* branch) and verifies that the required
-# sub-skills produced their evidence artifacts in plans/epic-*/plans/ and
-# plans/epic-*/reports/.
+# sub-skills produced their evidence artifacts in ai/epics/epic-*/plans/ and
+# ai/epics/epic-*/reports/.
 #
 # On missing evidence, exits with code 2 and emits a visible warning on stderr
 # — Claude Code surfaces this to the LLM as a blocking notification that MUST
@@ -42,7 +42,7 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "${PROJECT_DIR}" 2>/dev/null || exit 0
 
 # Discover most recent epic telemetry file
-TELEMETRY="$(ls -t plans/epic-*/telemetry/events.ndjson 2>/dev/null | head -1)"
+TELEMETRY="$(ls -t ai/epics/epic-*/telemetry/events.ndjson 2>/dev/null | head -1)"
 [[ -z "${TELEMETRY}" ]] && exit 0
 
 # Heuristic: story-completion signals SCOPED TO THIS SESSION ONLY.
@@ -108,8 +108,8 @@ else
     exit 0
 fi
 
-PLANS_DIR="plans/epic-${EPIC_ID}/plans"
-REPORTS_DIR="plans/epic-${EPIC_ID}/reports"
+PLANS_DIR="ai/epics/epic-${EPIC_ID}/plans"
+REPORTS_DIR="ai/epics/epic-${EPIC_ID}/reports"
 
 # Check mandatory evidence artifacts (Rule 24 §4.1)
 MISSING=()

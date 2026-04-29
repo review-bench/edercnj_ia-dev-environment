@@ -27,7 +27,7 @@ recurring operator questions:
    via `--epics` (tables stay aligned by epic id).
 
 The report is written to
-`plans/epic-XXXX/reports/telemetry-report-EPIC-XXXX.md` by default and
+`ai/epics/epic-XXXX/reports/telemetry-report-EPIC-XXXX.md` by default and
 follows the layout in `_TEMPLATE-TELEMETRY-REPORT.md`.
 
 ## When to Use
@@ -48,7 +48,7 @@ follows the layout in `_TEMPLATE-TELEMETRY-REPORT.md`.
 | `--by-tool` | Emphasize the tool breakdown in the Markdown report. |
 | `--base-dir path` | Override `plans/` (useful in tests). |
 
-The default Markdown report lands in `plans/epic-XXXX/reports/` — no extra
+The default Markdown report lands in `ai/epics/epic-XXXX/reports/` — no extra
 flag required.
 
 ## Invocation

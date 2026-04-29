@@ -159,7 +159,7 @@ Examples:
 PHASE_GATE_MALFORMED — --mode wave requires --expected-tasks
 PHASE_GATE_TIMEOUT — task 203 still in_progress after 10s
 PHASE_GATE_FAILED — missing 1 task(s), 2 artifact(s)
-STATE_FILE_AMBIGUOUS — multiple plans/epic-*/execution-state.json found under $PWD
+STATE_FILE_AMBIGUOUS — multiple ai/epics/epic-*/execution-state.json found under $PWD
 STATE_UPDATE_FAILED — x-internal-status-update returned exit 3
 ```
 

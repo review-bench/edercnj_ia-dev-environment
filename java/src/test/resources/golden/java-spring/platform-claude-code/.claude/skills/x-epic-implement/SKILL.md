@@ -59,7 +59,7 @@ Deprecated (still parsed, warn-once): `--sequential`, `--auto-merge`, `--interac
 | `finalPrUrl/Number` | Final PR `epic/XXXX → develop`; null when legacy |
 | `integrityGatePassed` | Phase 4 gate `passed` value |
 | `coverageLine/Branch` | Filtered coverage from integrity gate envelope |
-| `reportsDir` | `plans/epic-XXXX/reports/` |
+| `reportsDir` | `ai/epics/epic-XXXX/reports/` |
 
 **Delegation Map (RULE-005 — zero inline shell invocations):**
 
@@ -111,11 +111,11 @@ Open phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed"
 
 Build DAG + execution plan:
 
-    Skill(skill: "x-internal-epic-build-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output plans/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
+    Skill(skill: "x-internal-epic-build-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
 
 Consume `{phases, criticalPath, planPath}`. If `--dry-run=true` → print plan path and stop.
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-1-Plan --expected-artifacts plans/epic-XXXX/reports/epic-execution-plan-XXXX.md")
+Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-1-Plan --expected-artifacts ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md")
 
 TaskUpdate(id: phase1TaskId, status: "completed")
 
@@ -256,7 +256,7 @@ When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPI
 | Exit | Code | Condition |
 |------|------|-----------|
 | 1 | `ARGS_INVALID` | Args normalizer exit 1 |
-| 2 | `EPIC_DIR_MISSING` | `plans/epic-XXXX/` absent |
+| 2 | `EPIC_DIR_MISSING` | `ai/epics/epic-XXXX/` absent |
 | 3 | `STORY_FAILED` | Story returned `status=FAILED` |
 | 4 | `INTEGRITY_GATE_FAILED` | Phase 4 `passed=false` after recovery |
 | 5 | `FINAL_PR_CONFLICTS` | Phase 5 develop-sync conflict |

@@ -53,7 +53,7 @@ Orchestrates Git Flow release with approval gate and PR-flow.
 
 ## State File
 
-The skill persists its progress in `plans/release-state-<X.Y.Z>.json`.
+The skill persists its progress in `ai/releases/release-state-<X.Y.Z>.json`.
 See `references/state-file-schema.md` for the full schema.
 
 ## References

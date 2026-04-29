@@ -4,10 +4,10 @@
 # Scans git history for merged story PRs (branches matching feat/story-*)
 # and verifies that each merged story has the mandatory evidence artifacts
 # produced by the x-story-implement pipeline:
-#   - plans/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-story-verify)
-#   - plans/epic-XXXX/plans/review-story-STORY-ID.md         (x-review)
-#   - plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md (x-review-pr)
-#   - plans/epic-XXXX/reports/story-completion-report-STORY-ID.md (x-internal-story-report)
+#   - ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-story-verify)
+#   - ai/epics/epic-XXXX/plans/review-story-STORY-ID.md         (x-review)
+#   - ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md (x-review-pr)
+#   - ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md (x-internal-story-report)
 #
 # Grandfathered stories (merged before Rule 24) listed in
 # audits/execution-integrity-baseline.txt are exempted. Per-story exemption
@@ -126,8 +126,8 @@ check_evidence() {
     local story_id="$1"
     local epic_id
     epic_id="$(echo "${story_id}" | grep -oE '[0-9]{4}' | head -1)"
-    local plans_dir="plans/epic-${epic_id}/plans"
-    local reports_dir="plans/epic-${epic_id}/reports"
+    local plans_dir="ai/epics/epic-${epic_id}/plans"
+    local reports_dir="ai/epics/epic-${epic_id}/reports"
     local missing=()
 
     if [[ ! -f "${reports_dir}/verify-envelope-${story_id}.json" ]]; then
@@ -165,7 +165,7 @@ check_evidence() {
     local pr_number=""
     local epic_num
     epic_num=$(echo "${story_id}" | grep -oE '^story-[0-9]{4}' | sed 's/story-//')
-    local exec_state="plans/epic-${epic_num}/execution-state.json"
+    local exec_state="ai/epics/epic-${epic_num}/execution-state.json"
     if [[ -f "${exec_state}" ]] && command -v jq >/dev/null 2>&1; then
         pr_number=$(jq -r --arg sid "${story_id}" \
             '.storyStatuses[$sid].prNumber // empty' \
@@ -240,7 +240,7 @@ audit_telemetry_scope() {
         fi
         # Try v3 layout first, then v4
         for candidate in \
-            "plans/epic-${epic_id}/telemetry/events.ndjson" \
+            "ai/epics/epic-${epic_id}/telemetry/events.ndjson" \
             "ai/epics/epic-${epic_id}-"*"/telemetry/events.ndjson"; do
             if [[ -f "${candidate}" ]]; then
                 ndjson_file="${candidate}"

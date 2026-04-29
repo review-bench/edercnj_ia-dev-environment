@@ -69,7 +69,7 @@ java -cp target/classes:target/dependency/* \
 ## Algorithm
 
 1. Build (or refresh) the per-skill per-epic P95 index by scanning
-   `plans/epic-*\/telemetry/events.ndjson`. The index is persisted at
+   `ai/epics/epic-*\/telemetry/events.ndjson`. The index is persisted at
    `.claude/telemetry/index.json` and invalidated when an epic's NDJSON
    mtime changes.
 2. Restrict to the most-recent `--last N` epics (natural ID order).
@@ -101,7 +101,7 @@ stays bounded in the per-skill duration arrays.
 
 # Strict: threshold 10 %, mean baseline, write JSON to disk
 /x-telemetry-trend --threshold-pct 10 --baseline mean --format json \
-    --out plans/epic-XXXX/reports/trends.json
+    --out ai/epics/epic-XXXX/reports/trends.json
 
 # Historical deep dive: last 10 epics, report to a custom path
 /x-telemetry-trend --last 10 --out reports/quarterly-trends.md

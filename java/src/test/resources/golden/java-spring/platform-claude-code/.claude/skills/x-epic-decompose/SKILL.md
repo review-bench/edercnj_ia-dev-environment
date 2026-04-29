@@ -219,11 +219,11 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 Follow the instructions in `.claude/skills/x-epic-create/SKILL.md`:
 
 - Determine the epic number (scan `plans/` for existing `epic-XXXX` folders, use next available; default `0001`)
-- Create directory `plans/epic-XXXX/`
+- Create directory `ai/epics/epic-XXXX/`
 - Extract rules → RULE-001..N table
 - Build story index with titles and dependencies (using `story-XXXX-YYYY` IDs)
 - Define DoR/DoD from spec quality requirements — the DoD must include TDD Compliance (test-first commits, explicit refactoring after green, incremental tests via TPP) and Double-Loop TDD (acceptance tests from Gherkin as outer loop, unit tests as inner loop)
-- Generate `plans/epic-XXXX/epic-XXXX.md` following `_TEMPLATE-EPIC.md`
+- Generate `ai/epics/epic-XXXX/epic-XXXX.md` following `_TEMPLATE-EPIC.md`
 
 **Jira Integration (if `jiraContext.enabled == true`):**
 
@@ -267,7 +267,7 @@ For each story in the Epic's index:
 - Gherkin acceptance criteria with mandatory categories (degenerate case, happy path, error paths, boundary values) ordered by Transformation Priority Premise (simplest degenerate → complex edge cases)
 - Sub-tasks tagged `[Dev]`, `[Test]`, `[Doc]` — MUST include at least one `[Test] Smoke/E2E` sub-task
 
-Generate files as `plans/epic-XXXX/story-XXXX-YYYY.md` following `_TEMPLATE-STORY.md`.
+Generate files as `ai/epics/epic-XXXX/story-XXXX-YYYY.md` following `_TEMPLATE-STORY.md`.
 
 **Jira Integration (if `jiraContext.cascadeToStories == true`):**
 
@@ -306,7 +306,7 @@ Follow the instructions in `.claude/skills/x-epic-map/SKILL.md`:
 - Phase summary and detail tables
 - Strategic observations (bottleneck, leaves, parallelism, convergences, validation milestone)
 
-Generate `plans/epic-XXXX/IMPLEMENTATION-MAP.md` following `_TEMPLATE-IMPLEMENTATION-MAP.md`.
+Generate `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` following `_TEMPLATE-IMPLEMENTATION-MAP.md`.
 
 If Jira keys are available (from Phase 3), include them in the dependency matrix's
 `Chave Jira` column.
@@ -346,7 +346,7 @@ If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this phase enti
 Otherwise, collect the full path set produced by Phases 2, 3, and 4 (epic file + all story files + implementation map + any templates newly written) and issue a **single consolidated commit** via `x-planning-commit`:
 
     Skill(skill: "x-planning-commit",
-          args: "--scope chore --epic-id <XXXX> --paths plans/epic-<XXXX>/epic-<XXXX>.md,plans/epic-<XXXX>/story-<XXXX>-0001.md,...,plans/epic-<XXXX>/IMPLEMENTATION-MAP.md --subject \"full decomposition (epic + <N> stories + map)\"")
+          args: "--scope chore --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/epic-<XXXX>.md,ai/epics/epic-<XXXX>/story-<XXXX>-0001.md,...,ai/epics/epic-<XXXX>/IMPLEMENTATION-MAP.md --subject \"full decomposition (epic + <N> stories + map)\"")
 
 Rationale for consolidation over per-sub-skill commits (see Workflow Overview note above): the operator experiences `x-epic-decompose` as one logical mutation; history reads as `chore(epic-XXXX): full decomposition (epic + 22 stories + map)` rather than 24 interleaved commits.
 
@@ -378,7 +378,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-d
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-decompose Phase-5-Report`
 
-All files are saved inside `plans/epic-XXXX/` (the epic's dedicated folder).
+All files are saved inside `ai/epics/epic-XXXX/` (the epic's dedicated folder).
 
 Report summary:
 - Total rules extracted
@@ -496,7 +496,7 @@ Before delivering, verify:
    ```bash
    java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       write plans/epic-XXXX/epic-XXXX.md Pendente
+       write ai/epics/epic-XXXX/epic-XXXX.md Pendente
    ```
    Note: `LifecycleTransitionMatrix` does NOT currently list `Em Refinamento` (it is a pre-lifecycle marker). If the CLI returns exit 40 because the current status is `Em Refinamento` (not in the 6-value enum), treat that as the accepted initial state and proceed: re-invoke with a direct file edit fallback (sed-replace the line) when and only when the current literal is `Em Refinamento`. Otherwise respect exit 40 and abort.
 3. For each generated story file, verify the literal `**Status:** Pendente` is present (`StatusFieldParserCli read` returns `Pendente`). Exit 0 required per story; exit 20 on any story aborts the decomposition.

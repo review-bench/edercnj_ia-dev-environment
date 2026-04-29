@@ -25,7 +25,7 @@ Breaks down an Architect's implementation plan into granular, implementable task
 2. **Read context** -- load architecture principles, layer templates, Architect plan, story file, and output template
 3. **Detect mode** -- check for test plan with TPP markers; use test-driven decomposition (STEP 2A) if found, layer-based fallback (STEP 2B) otherwise
 4. **Decompose** -- generate tasks with dependencies, parallelism flags, tier assignments, and context budgets
-5. **Write output** -- save task breakdown to `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
+5. **Write output** -- save task breakdown to `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md`
 
 ## See Also
 

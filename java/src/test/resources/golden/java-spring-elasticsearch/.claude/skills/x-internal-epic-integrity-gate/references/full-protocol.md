@@ -132,7 +132,7 @@ depend on ordering.
 
 ### 4.1 `all-tasks-done`
 
-Scan every `plans/epic-<id>/story-*.md`. For each story:
+Scan every `ai/epics/epic-<id>/story-*.md`. For each story:
 
 - Read Section 8 `## 8. Tasks`.
 - Count lines matching `^- \[ \] TASK-` (undone) and `^- \[x\] TASK-`
@@ -186,7 +186,7 @@ Failure message: `dod: <N> file(s) without corresponding test`.
 
 ### 4.4 `adr-references-resolvable`
 
-Scan every `plans/epic-<id>/story-*.md` for patterns `ADR-\d{4}` or
+Scan every `ai/epics/epic-<id>/story-*.md` for patterns `ADR-\d{4}` or
 `adr/ADR-\d{4}-`. For each referenced ID, verify the file
 `adr/ADR-<id>-*.md` exists (glob match).
 
@@ -194,7 +194,7 @@ Failure message: `dod: <N> ADR reference(s) unresolved`.
 
 ### 4.5 `story-status-concluida`
 
-For every `plans/epic-<id>/story-*.md`:
+For every `ai/epics/epic-<id>/story-*.md`:
 - Read the `**Status:**` header line (first 30 lines).
 - Accept `Concluida` / `Concluída` / `Done` / `COMPLETE` (accent +
   case agnostic).

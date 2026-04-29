@@ -68,8 +68,8 @@ follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 ```markdown
 Skill(skill: "x-internal-report-write",
       args: "--template _TEMPLATE-EPIC-EXECUTION-PLAN.md \
-             --output plans/epic-XXXX/reports/exec-plan.md \
-             --data @plans/epic-XXXX/reports/exec-plan.data.json")
+             --output ai/epics/epic-XXXX/reports/exec-plan.md \
+             --data @ai/epics/epic-XXXX/reports/exec-plan.data.json")
 ```
 
 ## Parameters
@@ -267,7 +267,7 @@ Invocation:
 ```markdown
 Skill(skill: "x-internal-report-write",
       args: "--template _TEMPLATE-EPIC-HEADER.md \
-             --output plans/epic-XXXX/reports/header.md \
+             --output ai/epics/epic-XXXX/reports/header.md \
              --data '{\"epicId\":\"XXXX\",\"title\":\"Skill hygiene\",\"status\":\"IN_PROGRESS\"}'")
 ```
 
@@ -275,7 +275,7 @@ Output file contains `Epic XXXX — Skill hygiene` and `Status: IN_PROGRESS`.
 Stdout:
 
 ```json
-{"outputPath":"plans/epic-XXXX/reports/header.md","bytesWritten":52,"placeholdersReplaced":3,"entriesAppended":null}
+{"outputPath":"ai/epics/epic-XXXX/reports/header.md","bytesWritten":52,"placeholdersReplaced":3,"entriesAppended":null}
 ```
 
 Exit: 0.
@@ -310,7 +310,7 @@ Rendered body:
 
 ### Example 3 — `--append` with update in place (no duplication)
 
-Existing `plans/epic-XXXX/reports/status.md`:
+Existing `ai/epics/epic-XXXX/reports/status.md`:
 
 ```markdown
 ## ID: story-XXXX-0001
@@ -326,7 +326,7 @@ template producing the two-line `## ID: ... / status: ...` block:
 ```markdown
 Skill(skill: "x-internal-report-write",
       args: "--template _TEMPLATE-STATUS-ENTRY.md \
-             --output plans/epic-XXXX/reports/status.md \
+             --output ai/epics/epic-XXXX/reports/status.md \
              --data '{\"id\":\"story-XXXX-0001\",\"status\":\"DONE\"}' \
              --append true")
 ```
@@ -344,7 +344,7 @@ status: PENDING
 Stdout:
 
 ```json
-{"outputPath":"plans/epic-XXXX/reports/status.md","bytesWritten":74,"placeholdersReplaced":2,"entriesAppended":0}
+{"outputPath":"ai/epics/epic-XXXX/reports/status.md","bytesWritten":74,"placeholdersReplaced":2,"entriesAppended":0}
 ```
 
 Exit: 0. Note `entriesAppended=0` because the rendered ID already

@@ -17,7 +17,7 @@ Produces a test plan that serves as the implementation roadmap for TDD. It maps 
 ## Usage
 
 ```
-/x-test-plan plans/epic-XXXX/story-XXXX-YYYY.md
+/x-test-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md
 /x-test-plan story-0012-0003
 ```
 
@@ -34,7 +34,7 @@ Produces a test plan that serves as the implementation roadmap for TDD. It maps 
 
 | Artifact | Path |
 |----------|------|
-| Test plan | `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
+| Test plan | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
 
 ## See Also
 

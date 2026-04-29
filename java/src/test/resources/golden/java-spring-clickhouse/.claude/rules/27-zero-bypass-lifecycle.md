@@ -40,18 +40,18 @@ prohibited are:
 
 | # | Surface | Required orchestrator | Evidence artifact |
 | :--- | :--- | :--- | :--- |
-| 01 | Story implementation | `x-story-implement` | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` |
+| 01 | Story implementation | `x-story-implement` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` |
 | 02 | Task implementation | `x-task-implement` | Git log on `feat/task-*` branch (Camada 4) |
-| 03 | Story verification gate | `x-internal-story-verify` | `plans/epic-XXXX/reports/verify-envelope-STORY-ID.json` |
-| 04 | Specialist review | `x-review` | `plans/epic-XXXX/plans/review-story-STORY-ID.md` |
-| 05 | Tech-lead review | `x-review-pr` | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` |
+| 03 | Story verification gate | `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` |
+| 04 | Specialist review | `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` |
+| 05 | Tech-lead review | `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` |
 | 06 | PR CI-watch | `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` |
-| 07 | Architecture plan | `x-arch-plan` | `plans/epic-XXXX/plans/arch-story-STORY-ID.md` |
-| 08 | Dependency audit | `x-dependency-audit` | `plans/epic-XXXX/reports/dependency-audit-STORY-ID.md` |
-| 09 | Phase-1 planning wave | `x-internal-story-build-plan` | 6 artifacts under `plans/epic-XXXX/plans/` |
-| 10 | Epic integrity gate | `x-internal-epic-integrity-gate` | `plans/epic-XXXX/reports/verify-envelope-epic-XXXX.json` |
+| 07 | Architecture plan | `x-arch-plan` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` |
+| 08 | Dependency audit | `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` |
+| 09 | Phase-1 planning wave | `x-internal-story-build-plan` | 6 artifacts under `ai/epics/epic-XXXX/plans/` |
+| 10 | Epic integrity gate | `x-internal-epic-integrity-gate` | `ai/epics/epic-XXXX/reports/verify-envelope-epic-XXXX.json` |
 | 11 | Story-level PR body | `x-pr-create` (structured body) | `## Orchestrator Evidence` section in PR description |
-| 12 | Telemetry stream | `telemetry-phase.sh` markers | `plans/epic-XXXX/telemetry/events.ndjson` (phase.start + phase.end pairs) |
+| 12 | Telemetry stream | `telemetry-phase.sh` markers | `ai/epics/epic-XXXX/telemetry/events.ndjson` (phase.start + phase.end pairs) |
 
 ## Enforcement Layers
 
@@ -84,7 +84,7 @@ Orchestrator SKILL.md files phrase every mandatory invocation as
 
 ### Camada 4 — Observability
 
-Telemetry NDJSON under `plans/epic-XXXX/telemetry/events.ndjson` provides a
+Telemetry NDJSON under `ai/epics/epic-XXXX/telemetry/events.ndjson` provides a
 continuous audit trail. The `/x-telemetry-analyze` skill consumes it to produce
 Gantt timelines and phase aggregates. Absence of `phase.start`/`phase.end` pairs
 for `x-story-implement` phases is a Camada 4 signal that the orchestrator was
