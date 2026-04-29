@@ -227,8 +227,7 @@ class CliDisplayTest {
 
         @Test
         void longLabelCategory_whenCalled_labelFitsInTable() {
-            Map<String, List<String>> classified =
-                    Map.of("ABCDEFGHIJKLMNOPQRSTU", List.of("x"));
+            Map<String, List<String>> classified = Map.of("ABCDEFGHIJKLMNOPQRSTU", List.of("x"));
 
             String table = CliDisplay.formatSummaryTable(classified);
 

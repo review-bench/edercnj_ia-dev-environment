@@ -62,8 +62,7 @@ class CiPipelineLeanSmokeIT {
     @Test
     @DisplayName("targets/claude/scripts/ has java-maven stack templates (replacement exists)")
     void scriptTemplates_existForJavaMavenStack() throws Exception {
-        Path stackDir =
-                REPO_ROOT.resolve("src/main/resources/targets/claude/scripts/java-maven");
+        Path stackDir = REPO_ROOT.resolve("src/main/resources/targets/claude/scripts/java-maven");
 
         assertThat(stackDir.toFile())
                 .as(

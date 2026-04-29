@@ -28,8 +28,7 @@ class Rule26CamadaZeroSmokeIT {
     private static final Path REPO_ROOT = Path.of(System.getProperty("user.dir"));
 
     private static final Path RULE_26_PATH =
-            REPO_ROOT.resolve(
-                    "src/main/resources/targets/claude/rules/26-audit-gate-lifecycle.md");
+            REPO_ROOT.resolve("src/main/resources/targets/claude/rules/26-audit-gate-lifecycle.md");
     private static final Path HOOKS_DIR =
             REPO_ROOT.resolve("src/main/resources/targets/claude/hooks");
     private static final Path ADR_DIR = REPO_ROOT.resolve("docs/adr");

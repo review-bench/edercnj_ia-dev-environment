@@ -28,8 +28,7 @@ import org.junit.jupiter.api.condition.OS;
 class Rule45SmokeTest {
 
     private static final String REFERENCE_GOLDEN_PATH =
-            "src/test/resources/golden/java-spring/"
-                    + ".claude/rules/45-ci-watch-integrity.md";
+            "src/test/resources/golden/java-spring/" + ".claude/rules/45-ci-watch-integrity.md";
 
     @Test
     @DisplayName("reference golden Rule 45 references SUCCESS and CI_FAILED")

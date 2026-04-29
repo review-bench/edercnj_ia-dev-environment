@@ -24,21 +24,20 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * <p><b>Rationale:</b> Full cross-product of 9 capability dimensions (lang, web, data, infra,
  * messaging, compliance, test, build, observability) would produce ~10^9 combinations — not
- * feasible. Pairwise covering (All-Pairs) guarantees that every pair of dimension-values appears
- * in at least one test combination, while reducing the matrix to ≤ 50 combinations.
+ * feasible. Pairwise covering (All-Pairs) guarantees that every pair of dimension-values appears in
+ * at least one test combination, while reducing the matrix to ≤ 50 combinations.
  *
- * <p><b>Algorithm:</b> Greedy pair-coverage. Iterate uncovered pairs; for each uncovered pair,
- * find the combination that covers the most remaining pairs and add it to the set. This is an
+ * <p><b>Algorithm:</b> Greedy pair-coverage. Iterate uncovered pairs; for each uncovered pair, find
+ * the combination that covers the most remaining pairs and add it to the set. This is an
  * approximation of the NP-hard optimal set cover, sufficient for our purposes.
  *
- * <p><b>Coverage guarantee:</b> After generation, every pair (dim_i=val_x, dim_j=val_y) where
- * i≠j appears in ≥ 1 combination. The test verifies this invariant explicitly.
+ * <p><b>Coverage guarantee:</b> After generation, every pair (dim_i=val_x, dim_j=val_y) where i≠j
+ * appears in ≥ 1 combination. The test verifies this invariant explicitly.
  */
 @DisplayName("PairwiseCapabilityMatrixTest")
 class PairwiseCapabilityMatrixTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     /**
      * Capability dimensions and their representative values (capability IDs). Each dimension
@@ -76,9 +75,10 @@ class PairwiseCapabilityMatrixTest {
         for (int i = 0; i < matrix.size(); i++) {
             final int idx = i;
             final Map<String, String> combo = matrix.get(i);
-            tests.add(DynamicTest.dynamicTest(
-                    "combo-" + (idx + 1) + " " + describeCombo(combo),
-                    () -> runCombo(composer, combo)));
+            tests.add(
+                    DynamicTest.dynamicTest(
+                            "combo-" + (idx + 1) + " " + describeCombo(combo),
+                            () -> runCombo(composer, combo)));
         }
         return tests;
     }
@@ -91,7 +91,8 @@ class PairwiseCapabilityMatrixTest {
                 capIds.add(CapabilityId.of(val));
             }
         }
-        ResolvedCapabilitySet capSet = new ResolvedCapabilitySet("pairwise", capIds, Map.of(), List.of());
+        ResolvedCapabilitySet capSet =
+                new ResolvedCapabilitySet("pairwise", capIds, Map.of(), List.of());
         Path targetsRoot = tempDir.resolve("targets-" + System.nanoTime());
         writeMinimalTargets(targetsRoot);
         CompositionPlan plan = composer.plan(capSet, targetsRoot);
@@ -141,9 +142,7 @@ class PairwiseCapabilityMatrixTest {
     }
 
     private static Map<String, String> greedyBestCombo(
-            List<String> dimNames,
-            Map<String, List<String>> dims,
-            Set<String> uncoveredPairs) {
+            List<String> dimNames, Map<String, List<String>> dims, Set<String> uncoveredPairs) {
         Map<String, String> best = null;
         int bestScore = -1;
 
@@ -210,7 +209,8 @@ class PairwiseCapabilityMatrixTest {
     }
 
     /** Verifies every pair of dimension-values is covered by ≥ 1 combination. */
-    static void assertPairCoverage(List<Map<String, String>> matrix, Map<String, List<String>> dims) {
+    static void assertPairCoverage(
+            List<Map<String, String>> matrix, Map<String, List<String>> dims) {
         List<String> dimNames = new ArrayList<>(dims.keySet());
         for (int i = 0; i < dimNames.size(); i++) {
             for (int j = i + 1; j < dimNames.size(); j++) {
@@ -218,10 +218,14 @@ class PairwiseCapabilityMatrixTest {
                 String dj = dimNames.get(j);
                 for (String vi : dims.get(di)) {
                     for (String vj : dims.get(dj)) {
-                        boolean covered = matrix.stream()
-                                .anyMatch(c -> vi.equals(c.get(di)) && vj.equals(c.get(dj)));
+                        boolean covered =
+                                matrix.stream()
+                                        .anyMatch(
+                                                c -> vi.equals(c.get(di)) && vj.equals(c.get(dj)));
                         assertThat(covered)
-                                .as("Pair (%s=%s, %s=%s) not covered by any combination", di, vi, dj, vj)
+                                .as(
+                                        "Pair (%s=%s, %s=%s) not covered by any combination",
+                                        di, vi, dj, vj)
                                 .isTrue();
                     }
                 }
@@ -240,10 +244,18 @@ class PairwiseCapabilityMatrixTest {
     private static void writeArtifact(Path root, String name, String... capIds) throws IOException {
         Path file = root.resolve(name);
         Files.createDirectories(file.getParent());
-        String capList = capIds.length == 0
-                ? "[]"
-                : "\n" + String.join("\n", Arrays.stream(capIds).map(c -> "  - " + c).toList());
-        Files.writeString(file, "---\nname: " + name.replace(".md", "")
-                + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
+        String capList =
+                capIds.length == 0
+                        ? "[]"
+                        : "\n"
+                                + String.join(
+                                        "\n", Arrays.stream(capIds).map(c -> "  - " + c).toList());
+        Files.writeString(
+                file,
+                "---\nname: "
+                        + name.replace(".md", "")
+                        + "\nrequires-capabilities:"
+                        + capList
+                        + "\n---\n# Content\n");
     }
 }

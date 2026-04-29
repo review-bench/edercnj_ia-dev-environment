@@ -45,8 +45,8 @@ public final class ScriptsAssembler implements Assembler {
                     PosixFilePermission.OTHERS_EXECUTE);
 
     /**
-     * The canonical list of audit scripts bundled in the flat source-of-truth directory (legacy).
-     * Ordered alphabetically. Golden tests assert all 5 are present in generated output.
+     * The canonical list of audit and utility scripts bundled in the flat source-of-truth directory
+     * (legacy). Ordered alphabetically. Golden tests assert all 7 are present in generated output.
      */
     public static final List<String> AUDIT_SCRIPTS =
             List.of(
@@ -54,7 +54,9 @@ public final class ScriptsAssembler implements Assembler {
                     "audit-execution-integrity.sh",
                     "audit-flow-version.sh",
                     "audit-model-selection.sh",
-                    "audit-skill-visibility.sh");
+                    "audit-pr-template.sh",
+                    "audit-skill-visibility.sh",
+                    "telemetry-consolidate.sh");
 
     private static final Map<String, Map<String, String>> PLACEHOLDER_TABLE =
             Map.of(

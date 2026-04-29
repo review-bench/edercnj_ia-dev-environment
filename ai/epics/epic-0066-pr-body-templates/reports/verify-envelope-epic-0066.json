@@ -1,0 +1,22 @@
+{
+  "epicId": "EPIC-0066",
+  "branch": "epic/0066",
+  "timestamp": "2026-04-29T22:51:28Z",
+  "passed": true,
+  "coverageLine": 100.0,
+  "coverageBranch": 100.0,
+  "testsRun": 5402,
+  "unitTestsRun": 4465,
+  "integrationTestsRun": 937,
+  "failures": [],
+  "errors": [],
+  "dodChecklist": {
+    "9_stories_complete": true,
+    "mvn_verify_green": true,
+    "coverage_gate_passed": true,
+    "smoke_test_green": true,
+    "audit_pr_template_self_check": true,
+    "changelog_entry_added": true,
+    "all_prs_merged_to_epic_branch": true
+  }
+}

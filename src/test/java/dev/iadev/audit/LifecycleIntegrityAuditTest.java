@@ -118,8 +118,8 @@ class LifecycleIntegrityAuditTest {
     /**
      * Resolves the {@code plans/} directory if present, returning {@code null} when absent so the
      * caller can no-op gracefully. The legacy plans/ tree was migrated to {@code ai/epics/} in the
-     * v4 layout cleanup; until the baseline is re-keyed, this audit only runs against plans/ when
-     * a checkout still carries it.
+     * v4 layout cleanup; until the baseline is re-keyed, this audit only runs against plans/ when a
+     * checkout still carries it.
      */
     private Path resolvePlansRoot() {
         for (Path candidate : PLANS_CANDIDATES) {

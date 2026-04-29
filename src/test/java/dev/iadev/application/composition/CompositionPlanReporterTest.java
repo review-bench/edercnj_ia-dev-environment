@@ -110,30 +110,44 @@ class CompositionPlanReporterTest {
         @Test
         @DisplayName("JSON escapes tab, carriage-return, backspace, and form-feed in paths")
         void jsonFormat_escapesSpecialChars() {
-            assertThat(reporter.report(
-                    new CompositionPlan(List.of(included("a\tb")), List.of(), List.of()),
-                    CompositionPlanReporter.Format.JSON)).contains("a\\tb");
+            assertThat(
+                            reporter.report(
+                                    new CompositionPlan(
+                                            List.of(included("a\tb")), List.of(), List.of()),
+                                    CompositionPlanReporter.Format.JSON))
+                    .contains("a\\tb");
 
-            assertThat(reporter.report(
-                    new CompositionPlan(List.of(included("a\rb")), List.of(), List.of()),
-                    CompositionPlanReporter.Format.JSON)).contains("a\\rb");
+            assertThat(
+                            reporter.report(
+                                    new CompositionPlan(
+                                            List.of(included("a\rb")), List.of(), List.of()),
+                                    CompositionPlanReporter.Format.JSON))
+                    .contains("a\\rb");
 
-            assertThat(reporter.report(
-                    new CompositionPlan(List.of(included("a\bb")), List.of(), List.of()),
-                    CompositionPlanReporter.Format.JSON)).contains("a\\bb");
+            assertThat(
+                            reporter.report(
+                                    new CompositionPlan(
+                                            List.of(included("a\bb")), List.of(), List.of()),
+                                    CompositionPlanReporter.Format.JSON))
+                    .contains("a\\bb");
 
-            assertThat(reporter.report(
-                    new CompositionPlan(List.of(included("a\fb")), List.of(), List.of()),
-                    CompositionPlanReporter.Format.JSON)).contains("a\\fb");
+            assertThat(
+                            reporter.report(
+                                    new CompositionPlan(
+                                            List.of(included("a\fb")), List.of(), List.of()),
+                                    CompositionPlanReporter.Format.JSON))
+                    .contains("a\\fb");
         }
 
         @Test
         @DisplayName("JSON escapes control characters (0x01) as unicode escape")
         void jsonFormat_escapesControlChar() {
             String pathWithCtrl = "a" + (char) 0x01 + "b";
-            String json = reporter.report(
-                    new CompositionPlan(List.of(included(pathWithCtrl)), List.of(), List.of()),
-                    CompositionPlanReporter.Format.JSON);
+            String json =
+                    reporter.report(
+                            new CompositionPlan(
+                                    List.of(included(pathWithCtrl)), List.of(), List.of()),
+                            CompositionPlanReporter.Format.JSON);
             assertThat(json).contains("a\\u0001b");
         }
     }

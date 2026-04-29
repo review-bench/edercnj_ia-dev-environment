@@ -117,9 +117,11 @@ class ArtifactScannerTest {
         }
 
         @Test
-        @DisplayName("frontmatter without requires-capabilities field returns universal (empty list)")
+        @DisplayName(
+                "frontmatter without requires-capabilities field returns universal (empty list)")
         void frontmatterMissingRequiresCapabilities(@TempDir Path dir) throws IOException {
-            Files.writeString(dir.resolve("norequires.md"), "---\nname: x\nmodel: sonnet\n---\n# Content\n");
+            Files.writeString(
+                    dir.resolve("norequires.md"), "---\nname: x\nmodel: sonnet\n---\n# Content\n");
             var result = scanner.scan(dir);
             assertThat(result).hasSize(1);
             assertThat(result.get(0).requiredCapabilities()).isEmpty();

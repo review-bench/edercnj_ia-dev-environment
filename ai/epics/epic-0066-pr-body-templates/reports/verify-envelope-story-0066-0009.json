@@ -1,0 +1,23 @@
+{
+  "storyId": "story-0066-0009",
+  "epicId": "EPIC-0066",
+  "timestamp": "2026-04-29T22:00:00Z",
+  "passed": true,
+  "coverageLine": 100.0,
+  "coverageBranch": 100.0,
+  "failures": [],
+  "acCheckResults": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "scenarios": [
+      "degenerate — skill with 0 phases requires no markers",
+      "happy path x-story-implement — balanced markers per phase",
+      "happy path x-task-implement — balanced markers per phase",
+      "boundary — error phase documents failed status"
+    ]
+  },
+  "rcaArtifact": "ai/epics/epic-0066-pr-body-templates/reports/phase-marker-rca.md",
+  "rootCause": "H2-confirmed — audited epics predated marker retrofits; SKILL.md files have complete coverage",
+  "skillMdModified": false
+}

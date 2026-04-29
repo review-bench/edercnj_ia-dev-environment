@@ -21,9 +21,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  *   <li>{@code x-feature-create} is present as a public skill (replaces x-epic-decompose)
  *   <li>{@code x-internal-epic-create}, {@code x-internal-epic-map}, {@code
  *       x-internal-story-create} are present as internal skills
- *   <li>{@code x-epic-decompose}, {@code x-epic-create}, {@code x-epic-map}, {@code
- *       x-story-create} are NOT present as public skills (hard-cut per Rule 19 §Hard-cut
- *       autorizado)
+ *   <li>{@code x-epic-decompose}, {@code x-epic-create}, {@code x-epic-map}, {@code x-story-create}
+ *       are NOT present as public skills (hard-cut per Rule 19 §Hard-cut autorizado)
  *   <li>Rule 09 contains the {@code docs/} branch type addition
  *   <li>Rule 19 contains the "Hard-cut autorizado" clause
  *   <li>Rule 22 contains the 3 new internal skills table
@@ -59,7 +58,9 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(ideateSkill, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: x-feature-ideate must declare model: opus (Deep Planner tier, Rule 23)", profile)
+                .as(
+                        "profile %s: x-feature-ideate must declare model: opus (Deep Planner tier, Rule 23)",
+                        profile)
                 .contains("model: opus");
         assertThat(content)
                 .as("profile %s: x-feature-ideate must be user-invocable", profile)
@@ -83,10 +84,14 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(createSkill, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: x-feature-create must declare model: sonnet (Orchestrator tier, Rule 23)", profile)
+                .as(
+                        "profile %s: x-feature-create must declare model: sonnet (Orchestrator tier, Rule 23)",
+                        profile)
                 .contains("model: sonnet");
         assertThat(content)
-                .as("profile %s: x-feature-create must declare Phase P7 (CI-watch, Rule 45)", profile)
+                .as(
+                        "profile %s: x-feature-create must declare Phase P7 (CI-watch, Rule 45)",
+                        profile)
                 .contains("x-pr-watch-ci");
         assertThat(content)
                 .as("profile %s: x-feature-create must reference docs/ branch", profile)
@@ -95,7 +100,8 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_internalSkillsExist — 3 internalized skills present with visibility: internal")
+    @DisplayName(
+            "smoke_internalSkillsExist — 3 internalized skills present with visibility: internal")
     void smoke_internalSkillsExist(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
@@ -103,25 +109,34 @@ class Epic0065SmokeIT extends SmokeTestBase {
         for (String internal : EXPECTED_INTERNAL_SKILLS) {
             Path skillMd = skillsDir.resolve(internal + "/SKILL.md");
             assertThat(Files.isRegularFile(skillMd))
-                    .as("profile %s: %s/SKILL.md must exist (story-0065-0004/0005/0006)", profile, internal)
+                    .as(
+                            "profile %s: %s/SKILL.md must exist (story-0065-0004/0005/0006)",
+                            profile, internal)
                     .isTrue();
 
             String content = Files.readString(skillMd, StandardCharsets.UTF_8);
             assertThat(content)
-                    .as("profile %s: %s must have visibility: internal (Rule 22)", profile, internal)
+                    .as(
+                            "profile %s: %s must have visibility: internal (Rule 22)",
+                            profile, internal)
                     .contains("visibility: internal");
             assertThat(content)
-                    .as("profile %s: %s must have user-invocable: false (Rule 22)", profile, internal)
+                    .as(
+                            "profile %s: %s must have user-invocable: false (Rule 22)",
+                            profile, internal)
                     .contains("user-invocable: false");
             assertThat(content)
-                    .as("profile %s: %s must have INTERNAL SKILL body marker (Rule 22)", profile, internal)
+                    .as(
+                            "profile %s: %s must have INTERNAL SKILL body marker (Rule 22)",
+                            profile, internal)
                     .contains("INTERNAL SKILL");
         }
     }
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_hardCutSkillsAbsent — 4 removed public skills NOT present (Rule 19 hard-cut)")
+    @DisplayName(
+            "smoke_hardCutSkillsAbsent — 4 removed public skills NOT present (Rule 19 hard-cut)")
     void smoke_hardCutSkillsAbsent(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
@@ -144,7 +159,9 @@ class Epic0065SmokeIT extends SmokeTestBase {
             // Primary assertion: x-epic-decompose must not exist at all
             if ("x-epic-decompose".equals(removed)) {
                 assertThat(Files.isDirectory(skillDir))
-                        .as("profile %s: x-epic-decompose must be completely removed (story-0065-0003 hard-cut)", profile)
+                        .as(
+                                "profile %s: x-epic-decompose must be completely removed (story-0065-0003 hard-cut)",
+                                profile)
                         .isFalse();
             }
         }
@@ -164,13 +181,16 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(rule09, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: Rule 09 must document docs/ branch type (story-0065-0001)", profile)
+                .as(
+                        "profile %s: Rule 09 must document docs/ branch type (story-0065-0001)",
+                        profile)
                 .contains("`docs/*`");
     }
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_rule19HardCut — Rule 19 contains Hard-cut autorizado clause (story-0065-0001)")
+    @DisplayName(
+            "smoke_rule19HardCut — Rule 19 contains Hard-cut autorizado clause (story-0065-0001)")
     void smoke_rule19HardCut(String profile) throws IOException {
         runPipeline(profile);
         Path rulesDir = getOutputDir(profile).resolve(".claude/rules");
@@ -182,7 +202,9 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(rule19, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: Rule 19 must contain Hard-cut autorizado clause (story-0065-0001)", profile)
+                .as(
+                        "profile %s: Rule 19 must contain Hard-cut autorizado clause (story-0065-0001)",
+                        profile)
                 .contains("Hard-cut autorizado");
         assertThat(content)
                 .as("profile %s: Rule 19 Hard-cut must document x-epic-decompose case", profile)
@@ -191,7 +213,8 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_rule22InternalSkills — Rule 22 documents 3 EPIC-0065 internals (story-0065-0001)")
+    @DisplayName(
+            "smoke_rule22InternalSkills — Rule 22 documents 3 EPIC-0065 internals (story-0065-0001)")
     void smoke_rule22InternalSkills(String profile) throws IOException {
         runPipeline(profile);
         Path rulesDir = getOutputDir(profile).resolve(".claude/rules");
@@ -215,7 +238,8 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_auditEpicBranchesCheckD — audit-epic-branches.sh has Check D for docs/ (story-0065-0001)")
+    @DisplayName(
+            "smoke_auditEpicBranchesCheckD — audit-epic-branches.sh has Check D for docs/ (story-0065-0001)")
     void smoke_auditEpicBranchesCheckD(String profile) throws IOException {
         runPipeline(profile);
         Path scriptsDir = getOutputDir(profile).resolve(".claude/scripts");
@@ -227,10 +251,14 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(auditScript, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: audit-epic-branches.sh must have Check D for docs/ branches", profile)
+                .as(
+                        "profile %s: audit-epic-branches.sh must have Check D for docs/ branches",
+                        profile)
                 .contains("Check D");
         assertThat(content)
-                .as("profile %s: audit-epic-branches.sh must have v4 layout PathResolver (EPICS_DIR)", profile)
+                .as(
+                        "profile %s: audit-epic-branches.sh must have v4 layout PathResolver (EPICS_DIR)",
+                        profile)
                 .contains("EPICS_DIR");
     }
 
@@ -244,20 +272,27 @@ class Epic0065SmokeIT extends SmokeTestBase {
         // x-feature-ideate + x-feature-create (new public entry points)
         for (String pub : EXPECTED_PUBLIC_SKILLS) {
             assertThat(Files.isRegularFile(skillsDir.resolve(pub + "/SKILL.md")))
-                    .as("profile %s: %s/SKILL.md must exist (Feature Creation Chain, EPIC-0065)", profile, pub)
+                    .as(
+                            "profile %s: %s/SKILL.md must exist (Feature Creation Chain, EPIC-0065)",
+                            profile, pub)
                     .isTrue();
         }
 
         // x-epic-orchestrate still exists (planning-only, not hard-cut)
         assertThat(Files.isRegularFile(skillsDir.resolve("x-epic-orchestrate/SKILL.md")))
-                .as("profile %s: x-epic-orchestrate/SKILL.md must still exist (story-0065-0007, RULE-006)", profile)
+                .as(
+                        "profile %s: x-epic-orchestrate/SKILL.md must still exist (story-0065-0007, RULE-006)",
+                        profile)
                 .isTrue();
 
         // x-epic-orchestrate SKILL.md must warn about not creating epic/stories
-        String orchContent = Files.readString(
-                skillsDir.resolve("x-epic-orchestrate/SKILL.md"), StandardCharsets.UTF_8);
+        String orchContent =
+                Files.readString(
+                        skillsDir.resolve("x-epic-orchestrate/SKILL.md"), StandardCharsets.UTF_8);
         assertThat(orchContent)
-                .as("profile %s: x-epic-orchestrate must warn it does NOT create epic/stories (story-0065-0007)", profile)
+                .as(
+                        "profile %s: x-epic-orchestrate must warn it does NOT create epic/stories (story-0065-0007)",
+                        profile)
                 .contains("NÃO cria épico nem stories");
     }
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 final class PlanTemplateDefinitions {
 
     /** Number of templates currently managed. */
-    static final int TEMPLATE_COUNT = 21;
+    static final int TEMPLATE_COUNT = 23;
 
     private static final List<Map.Entry<String, List<String>>> STORY_PLANNING_TEMPLATES =
             List.of(
@@ -262,6 +262,32 @@ final class PlanTemplateDefinitions {
                                     "6. Detalhamento por Fase",
                                     "7. Observações Estratégicas")));
 
+    private static final List<Map.Entry<String, List<String>>> PR_BODY_TEMPLATES =
+            List.of(
+                    Map.entry(
+                            "_TEMPLATE-PR-BACKLOG.md",
+                            List.of(
+                                    "Summary",
+                                    "Backlog Entregue",
+                                    "Estrutura do DAG",
+                                    "Coordenação com Epics em Andamento",
+                                    "Métricas de Sucesso",
+                                    "Test Plan",
+                                    "Out of Scope",
+                                    "Origem (Plan Mode)",
+                                    "Orchestrator Evidence")),
+                    Map.entry(
+                            "_TEMPLATE-PR-IMPLEMENTATION.md",
+                            List.of(
+                                    "Summary",
+                                    "Story / Task Context",
+                                    "Acceptance Criteria",
+                                    "Review Status",
+                                    "Verify Gate",
+                                    "Telemetry",
+                                    "Changes",
+                                    "Orchestrator Evidence")));
+
     /**
      * Template definitions: filename to mandatory sections mapping. {@link LinkedHashMap} preserves
      * insertion order for deterministic processing.
@@ -281,7 +307,8 @@ final class PlanTemplateDefinitions {
                         REVIEW_TEMPLATES,
                         EPIC_EXECUTION_TEMPLATES,
                         TASK_FIRST_TEMPLATES,
-                        EPIC_STORY_TEMPLATES);
+                        EPIC_STORY_TEMPLATES,
+                        PR_BODY_TEMPLATES);
         for (List<Map.Entry<String, List<String>>> group : groups) {
             for (Map.Entry<String, List<String>> e : group) {
                 map.put(e.getKey(), e.getValue());

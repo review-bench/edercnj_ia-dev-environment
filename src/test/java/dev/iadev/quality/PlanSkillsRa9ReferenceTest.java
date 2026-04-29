@@ -24,7 +24,8 @@ class PlanSkillsRa9ReferenceTest {
 
     @ParameterizedTest(name = "{0} references planning-standards-kp")
     // x-epic-create and x-epic-decompose were hard-cut in EPIC-0065 (Rule 19 §Hard-cut autorizado).
-    // x-feature-create is the successor public orchestrator; x-story-plan and x-task-plan unchanged.
+    // x-feature-create is the successor public orchestrator; x-story-plan and x-task-plan
+    // unchanged.
     @ValueSource(strings = {"x-feature-create", "x-story-plan", "x-task-plan"})
     @DisplayName("planSkill_referencesKp_inPrerequisitesOrIntegration")
     void planSkill_referencesKp_inPrerequisitesOrIntegration(String skillName) throws IOException {

@@ -79,8 +79,7 @@ public final class AuditCorpus {
      * @return list of template paths
      */
     public List<Path> listAuditTemplates(String stack) {
-        Path scriptsDir =
-                rootDir.resolve("src/main/resources/targets/claude/scripts/" + stack);
+        Path scriptsDir = rootDir.resolve("src/main/resources/targets/claude/scripts/" + stack);
         try {
             if (!Files.isDirectory(scriptsDir)) {
                 return List.of();

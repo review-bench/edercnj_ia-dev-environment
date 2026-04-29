@@ -8,7 +8,7 @@
   "epicMarkdownPath": "ai/epics/epic-0066-pr-body-templates/epic-0066.md",
   "implementationMapPath": "ai/epics/epic-0066-pr-body-templates/IMPLEMENTATION-MAP.md",
   "createdAt": "2026-04-28T00:00:00Z",
-  "status": "Backlog",
+  "status": "Concluída",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
@@ -16,76 +16,76 @@
   },
   "storyStatuses": {
     "story-0066-0001": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0066-0003", "story-0066-0004", "story-0066-0007", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "43a8f4df8",
+      "prNumber": 850
     },
     "story-0066-0002": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0066-0003", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "8beb5f8ee",
+      "prNumber": 851
     },
     "story-0066-0003": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0066-0001", "story-0066-0002"],
       "blocks": ["story-0066-0004", "story-0066-0005", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "70128043b",
+      "prNumber": 854
     },
     "story-0066-0004": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0066-0003"],
       "blocks": ["story-0066-0006", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "dfd233b88",
+      "prNumber": 855
     },
     "story-0066-0005": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 2,
       "blockedBy": ["story-0066-0003"],
       "blocks": ["story-0066-0007", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "cf06252e0",
+      "prNumber": 856
     },
     "story-0066-0006": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 2,
       "blockedBy": ["story-0066-0004"],
       "blocks": ["story-0066-0007", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "f67a5e7bd",
+      "prNumber": 857
     },
     "story-0066-0007": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 3,
       "blockedBy": ["story-0066-0001", "story-0066-0005", "story-0066-0006"],
       "blocks": ["story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "fcf372959",
+      "prNumber": 858
     },
     "story-0066-0008": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 3,
       "blockedBy": ["story-0066-0001", "story-0066-0002", "story-0066-0003", "story-0066-0004", "story-0066-0005", "story-0066-0006", "story-0066-0007", "story-0066-0009"],
       "blocks": [],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "f4692dab8",
+      "prNumber": 859
     },
     "story-0066-0009": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "b988faef8",
+      "prNumber": 853
     }
   },
   "externalDependencies": {

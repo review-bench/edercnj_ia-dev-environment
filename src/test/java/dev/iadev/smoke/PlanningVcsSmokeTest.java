@@ -30,9 +30,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  *   <li>P5 — Push to origin ({@code x-git-push --branch epic/...})
  * </ol>
  *
- * <p>The tests assert source-of-truth presence at {@code
- * src/main/resources/targets/claude/skills /core/plan/&lt;skill&gt;/SKILL.md}. The generated
- * {@code .claude/} outputs are locked by golden-file regeneration in a separate dimension.
+ * <p>The tests assert source-of-truth presence at {@code src/main/resources/targets/claude/skills
+ * /core/plan/&lt;skill&gt;/SKILL.md}. The generated {@code .claude/} outputs are locked by
+ * golden-file regeneration in a separate dimension.
  *
  * @see SmokeTestBase
  */
@@ -51,13 +51,12 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
             List.of("x-feature-create", "x-task-plan", "x-story-plan", "x-epic-orchestrate");
 
     // x-feature-create uses Phase P1.5 — creates worktree (not detect-context like x-story-create)
-    private static final List<String> P1_MARKERS =
-            List.of("x-git-worktree", "worktree");
+    private static final List<String> P1_MARKERS = List.of("x-git-worktree", "worktree");
 
-    private static final List<String> P2_MARKERS =
-            List.of("x-internal-epic-branch-ensure");
+    private static final List<String> P2_MARKERS = List.of("x-internal-epic-branch-ensure");
 
-    // x-feature-create uses raw "git push" in Phase P5; x-task/story/epic-orchestrate use x-git-push
+    // x-feature-create uses raw "git push" in Phase P5; x-task/story/epic-orchestrate use
+    // x-git-push
     // "P5" is the common token present in all 4 skills
     private static final List<String> P5_MARKERS = List.of("P5", "push");
 
@@ -189,9 +188,7 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
                                 + "consolidated commit (EPIC-0065)")
                 .contains("x-planning-commit");
         assertThat(content)
-                .as(
-                        "x-feature-create P4 commit subject "
-                                + "must mention 'full decomposition'")
+                .as("x-feature-create P4 commit subject " + "must mention 'full decomposition'")
                 .contains("full decomposition");
     }
 

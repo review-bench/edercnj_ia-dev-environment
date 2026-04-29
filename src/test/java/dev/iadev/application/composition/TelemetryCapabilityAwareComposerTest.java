@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import dev.iadev.domain.capability.CapabilityId;
 import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,8 +22,7 @@ class TelemetryCapabilityAwareComposerTest {
 
     private final TelemetryCapabilityAwareComposer sut = new TelemetryCapabilityAwareComposer();
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private static ResolvedCapabilitySet universalSet() {
         return new ResolvedCapabilitySet("test", List.of(), Map.of(), List.of());
@@ -32,10 +30,22 @@ class TelemetryCapabilityAwareComposerTest {
 
     private static void writeArtifact(Path dir, String name, String... capIds) throws IOException {
         Files.createDirectories(dir);
-        String capList = capIds.length == 0 ? "[]" : "\n" +
-                String.join("\n", java.util.Arrays.stream(capIds).map(c -> "  - " + c).toList());
-        Files.writeString(dir.resolve(name),
-                "---\nname: " + name.replace(".md", "") + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
+        String capList =
+                capIds.length == 0
+                        ? "[]"
+                        : "\n"
+                                + String.join(
+                                        "\n",
+                                        java.util.Arrays.stream(capIds)
+                                                .map(c -> "  - " + c)
+                                                .toList());
+        Files.writeString(
+                dir.resolve(name),
+                "---\nname: "
+                        + name.replace(".md", "")
+                        + "\nrequires-capabilities:"
+                        + capList
+                        + "\n---\n# Content\n");
     }
 
     @Nested
@@ -72,7 +82,8 @@ class TelemetryCapabilityAwareComposerTest {
             writeArtifact(tempDir, "x.md");
             String original = System.getenv("CLAUDE_TELEMETRY_DISABLED");
             try {
-                // Simulated: env cannot be set programmatically in tests, but decorator must not throw
+                // Simulated: env cannot be set programmatically in tests, but decorator must not
+                // throw
                 CompositionPlan plan = sut.plan(universalSet(), tempDir);
                 assertThat(plan.included()).hasSize(1);
             } finally {
