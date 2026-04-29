@@ -190,11 +190,11 @@ while IFS= read -r br; do
   # epic/* branches: always skip (Rule 21)
   if [[ "$br" == epic/* ]]; then continue; fi
   # docs/* branches: skip if an open PR exists (gh CLI check)
+  # When gh is unavailable, treat docs/* as protected by default (fail-safe — avoids deleting a branch with an open PR)
   if [[ "$br" == docs/* ]]; then
-    if command -v gh &>/dev/null; then
-      open_prs=$(gh pr list --head "$br" --state open --json number --jq '. | length' 2>/dev/null || echo 0)
-      [ "$open_prs" -gt 0 ] && continue
-    fi
+    if ! command -v gh &>/dev/null; then continue; fi
+    open_prs=$(gh pr list --head "$br" --state open --json number --jq '. | length' 2>/dev/null || echo 0)
+    [ "$open_prs" -gt 0 ] && continue
   fi
   BRANCH_CANDIDATES="${BRANCH_CANDIDATES}${br}"$'\n'
 done <<< "$RAW_CANDIDATES"
