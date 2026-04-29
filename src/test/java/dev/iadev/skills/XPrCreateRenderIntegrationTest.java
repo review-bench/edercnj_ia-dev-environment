@@ -28,12 +28,25 @@ class XPrCreateRenderIntegrationTest {
     private static final Path SKILL_MD =
             Path.of("src/main/resources/targets/claude/skills/core/pr/x-pr-create/SKILL.md");
 
+    private static final Path REFERENCES_RECOVERY =
+            Path.of(
+                    "src/main/resources/targets/claude/skills/core/pr/x-pr-create"
+                            + "/references/recovery.md");
+
     private static String content;
+    private static String combined;
 
     @BeforeAll
     static void loadContent() throws IOException {
         assertThat(SKILL_MD).as("x-pr-create/SKILL.md must exist").exists();
         content = Files.readString(SKILL_MD, StandardCharsets.UTF_8);
+        // ADR-0007 carve-out: recovery detail may live in references/recovery.md.
+        // Combined view is used by tests that allow either location.
+        StringBuilder sb = new StringBuilder(content);
+        if (Files.exists(REFERENCES_RECOVERY)) {
+            sb.append("\n").append(Files.readString(REFERENCES_RECOVERY, StandardCharsets.UTF_8));
+        }
+        combined = sb.toString();
     }
 
     @Nested
@@ -115,19 +128,20 @@ class XPrCreateRenderIntegrationTest {
         }
 
         @Test
-        @DisplayName("Recovery preserves legacy inline body sections (Summary, Task Details, Changes, Review Checklist)")
+        @DisplayName("Recovery preserves legacy inline body sections (in SKILL.md or references/)")
         void recoverySection_preservesLegacyBody() {
-            assertThat(content)
-                    .as("Recovery section must contain Summary heading")
+            // ADR-0007: detail may be carved out to references/recovery.md to keep SKILL.md ≤ 500 lines.
+            assertThat(combined)
+                    .as("Recovery context must contain Summary heading")
                     .contains("## Summary");
-            assertThat(content)
-                    .as("Recovery section must contain Task Details heading")
+            assertThat(combined)
+                    .as("Recovery context must contain Task Details heading")
                     .contains("## Task Details");
-            assertThat(content)
-                    .as("Recovery section must contain Changes heading")
+            assertThat(combined)
+                    .as("Recovery context must contain Changes heading")
                     .contains("## Changes");
-            assertThat(content)
-                    .as("Recovery section must contain Review Checklist heading")
+            assertThat(combined)
+                    .as("Recovery context must contain Review Checklist heading")
                     .contains("## Review Checklist");
         }
 
