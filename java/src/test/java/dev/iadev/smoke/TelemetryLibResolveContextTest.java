@@ -27,19 +27,19 @@ class TelemetryLibResolveContextTest {
 
     @Test
     @DisplayName("resolves EPIC-0063 from a bare epic/0063 branch")
-    void resolves_epicSlashNNNN() throws Exception {
+    void resolveContext_epicSlashBranch_returnsEpicId() throws Exception {
         assertThat(resolveOnBranch("epic/0063")).isEqualTo("EPIC-0063");
     }
 
     @Test
     @DisplayName("still resolves EPIC-0042 from legacy feat/epic-0042-foo branch")
-    void resolves_legacyFeatEpic() throws Exception {
+    void resolveContext_legacyFeatEpicBranch_returnsEpicId() throws Exception {
         assertThat(resolveOnBranch("feat/epic-0042-foo")).isEqualTo("EPIC-0042");
     }
 
     @Test
     @DisplayName("falls back to 'unknown' on develop (no match)")
-    void fallback_onDevelop() throws Exception {
+    void resolveContext_nonMatchingBranch_returnsUnknown() throws Exception {
         assertThat(resolveOnBranch("develop")).isEqualTo("unknown");
     }
 
@@ -78,7 +78,7 @@ class TelemetryLibResolveContextTest {
                                     + " && resolve_context"
                                     + " && printf '%s' \"$TELEMETRY_EPIC_ID\"");
             pb.directory(fakeRepo.toFile());
-            pb.redirectErrorStream(false);
+            pb.redirectErrorStream(true);
             pb.environment().put("CLAUDE_PROJECT_DIR", fakeRepo.toString());
             pb.environment().remove("CLAUDE_TELEMETRY_CONTEXT");
             Process p = pb.start();
@@ -103,6 +103,10 @@ class TelemetryLibResolveContextTest {
         if (!p.waitFor(15, TimeUnit.SECONDS)) {
             p.destroyForcibly();
             throw new RuntimeException("Timeout: " + String.join(" ", cmd));
+        }
+        if (p.exitValue() != 0) {
+            throw new RuntimeException(
+                    "Command failed (exit " + p.exitValue() + "): " + String.join(" ", cmd));
         }
     }
 
