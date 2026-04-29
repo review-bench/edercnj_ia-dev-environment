@@ -1,0 +1,29 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0065",
+  "epicSlug": "feature-creation-chain-refactor",
+  "epicBranch": "epic/0065",
+  "targetBranch": "develop",
+  "mode": "sequential",
+  "interactive": false,
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0065-0001": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0002": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0003": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0004": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0005": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0006": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0007": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0008": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0009": { "status": "PENDING", "flowVersion": "4" },
+    "story-0065-0010": { "status": "PENDING", "flowVersion": "4" }
+  },
+  "parallelismDowngrades": [],
+  "localFirstLifecycle": true,
+  "createdAt": "2026-04-29T00:00:00Z"
+}

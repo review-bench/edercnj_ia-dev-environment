@@ -26,6 +26,10 @@
 #
 # Introduced by story-0058-0005 (EPIC-0058). See Rule 22 at
 # .claude/rules/22-skill-visibility.md for the contract.
+# Extended by story-0065-0001 (EPIC-0065): recognizes 3 new x-internal-* skills
+# under core/internal/plan/ (x-internal-epic-create, x-internal-epic-map,
+# x-internal-story-create). No code change needed — the recursive find already
+# covers all subdirectories under SKILLS_ROOT.
 #
 # Catalogado em: docs/audit-gates-catalog.md
 

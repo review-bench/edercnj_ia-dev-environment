@@ -88,6 +88,25 @@ When a skill is renamed (e.g., EPIC-0036 taxonomy refactor), both names MUST con
 - Any skill invocation via the old name emits a one-time warning directing the user / orchestrator to the new name.
 - After one release, the old name is removed. Documentation, CHANGELOG, and `/help` update simultaneously.
 
+### Hard-cut autorizado (EPIC-0065 amendment)
+
+A **hard-cut** (immediate removal with no deprecation window) is permitted when the rename represents a fundamental change in the skill's **semantic role** — not merely a cosmetic name change. Hard-cuts are authorized under any one of these three disjoint conditions:
+
+1. **Visibility change** — the skill moves from `public` (user-invocable) to `internal` (`x-internal-*`). The old public name ceases to exist at user-facing entry points; the new internal name is invoked only by orchestrators.
+2. **Taxonomic merge** — two or more skills are merged into one orchestrating skill. The old names no longer correspond to a coherent responsibility and alias resolution would produce ambiguous behavior.
+3. **Semantic redefinition** — the skill's responsibility changes so completely that running the old name with the same arguments would produce incorrect behavior (e.g., the old skill created an artifact now owned by a different layer).
+
+**EPIC-0065 hard-cut examples (authorized by condition 1 + 2 above):**
+
+| Old name (public) | New name | Condition | Release |
+| :--- | :--- | :--- | :--- |
+| `x-epic-decompose` | `x-feature-create` (public) + `x-internal-epic-create` / `x-internal-epic-map` / `x-internal-story-create` (internal) | Taxonomic merge + visibility change | EPIC-0065 |
+| `x-epic-create` | `x-internal-epic-create` | Visibility change (public → internal) | EPIC-0065 |
+| `x-epic-map` | `x-internal-epic-map` | Visibility change (public → internal) | EPIC-0065 |
+| `x-story-create` | `x-internal-story-create` | Visibility change (public → internal) | EPIC-0065 |
+
+Hard-cuts MUST be documented in the CHANGELOG under `## Removed` with a migration note pointing to the new names. CI `audit-skill-visibility.sh` validates that no public alias remains for hard-cut skills.
+
 ## Field Additions to `execution-state.json`
 
 New fields added to `execution-state.json` (e.g., `parallelismDowngrades` in EPIC-0041, `flowVersion` in EPIC-0049) MUST:

@@ -66,6 +66,8 @@ Git worktrees enable parallel task / story / epic execution by creating addition
 | Task (within a story) | `.claude/worktrees/task-XXXX-YYYY-NNN/` | Parent story branch |
 | Story (within an epic) | `.claude/worktrees/story-XXXX-YYYY/` | `epic/XXXX` (not `develop` — see Rule 21) |
 | Epic integration | `.claude/worktrees/epic-XXXX/` | `develop` |
+| Feature creation (EPIC-0065) | `.claude/worktrees/feature-XXXX-<slug>/` | `epic/XXXX` — owned by `x-feature-create`; sub-skills inherit via §3 re-entrancy |
+| Feature ideation (EPIC-0065) | `.claude/worktrees/feature-ideation-<slug>/` | `develop` — owned by `x-feature-ideate`; produces spec PR to `develop` |
 
 ### Invariants
 
