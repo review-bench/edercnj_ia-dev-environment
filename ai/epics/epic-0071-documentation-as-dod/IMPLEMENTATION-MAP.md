@@ -177,3 +177,37 @@ graph TD
 - **Fase 1 (3 paralelas):** seguras — stories 0002, 0003, 0004 tocam arquivos disjuntos.
 - **Fase 2 (3 paralelas):** seguras com ressalva — 0007 toca `CHANGELOG.md`; 0008 também tocará. Ordem: 0007 ANTES de 0008. Stories 0005, 0006 podem rodar concorrentes com 0007.
 - **Fase 3 (1 sequencial):** 0008 final, depois de todas demais.
+
+---
+
+## 9. Refinement Consolidado (PR `chore/refine-epic-0071 → develop`)
+
+> Sumariza o passe de refinement aplicado sobre o épico-0071 e suas 8 stories. Refere-se ao bloco **§10. Decisões de Refinement (D-R1..D-R12)** do `epic-0071.md`. **Status das stories permanece `Pendente`** — refinement não muda status (mesma convenção dos refinements EPIC-0063/0064/0065/0067/0069/0070).
+
+### 9.1 Decisões aplicadas
+
+| ID | Resumo | Stories afetadas |
+| :--- | :--- | :--- |
+| D-R1 | Path source-of-truth `core/<categoria>/` (não `core/doc/`). | 0002, 0003, 0004, 0006 |
+| D-R2 | Path Rule plano vigente em `targets/claude/rules/`. | 0001 |
+| D-R3 | Numeração Rule TBD (palpite Rule 31). | 0001 |
+| D-R4 | Numeração ADR TBD (palpite ADR-0020). | 0001 |
+| D-R5 | Exit codes Rule 26 §Standardized + `--self-check`. | 0005 |
+| D-R6 | Frontmatter v3.0 obrigatório nos artefatos novos/modificados. | 0001..0006 |
+| D-R7 | Critério Rule fundida vs separada com EPIC-0070 (≥30% sobreposição → fundir; default = separada). | 0001 |
+| D-R8 | `flowVersion=4` + `taskTracking.enabled=true`; exit code Phase 3 abort TBD. | epic + 0001..0008, especialmente 0006 |
+| D-R9 | EPIC-0064 Phase 2 (capabilities directory + schemas) é hard prereq. | 0001 |
+| D-R10 | EPIC-0070 hard prereq + modo degradado documentado para Highlights. | 0004 |
+| D-R11 | `--skip-doc` restrito a `## Recovery`/hotfix (Rule 27 Exceptions 1+2). | 0006 |
+| D-R12 | CHANGELOG MAJOR sem versão pinada (release-time materializa). | 0007, 0008 |
+
+### 9.2 Próximo passo após merge deste refinement
+
+1. `Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id 0071 --layout v4")` cria/garante `epic/0071`.
+2. `/x-epic-implement EPIC-0071` orquestra Phase 0..3 conforme caminho crítico §3.
+
+### 9.3 Bloqueios externos a destravar antes do kickoff
+
+- **EPIC-0064 Phase 2** (capabilities directory + schemas) — D-R9. Hard.
+- **EPIC-0070** (Templates v2) — D-R10. Hard prereq para Highlights; modo degradado é fallback aceito.
+- **EPIC-0069** (Refinement Gate) — soft prereq; refinement manual atual cobre o gap.
