@@ -183,21 +183,21 @@ class LifecycleIntegrityAuditTest {
 
         @Test
         @DisplayName("capabilities YAML not flagged as missing Status")
-        void capabilitiesYaml_notFlaggedAsMissingStatus() {
+        void isExcludedNamespace_capabilitiesPath_returnsTrue() {
             Path p = Path.of("capabilities/data/database/postgres.yaml");
             assertThat(isExcludedNamespace(p)).isTrue();
         }
 
         @Test
         @DisplayName("fragment md treated as fragment — no standalone Status needed")
-        void fragmentMd_treatedAsFragmentNotLifecycle() {
+        void isExcludedNamespace_fragmentsPath_returnsTrue() {
             Path p = Path.of("targets/claude/skills/x-review/fragments/db.md");
             assertThat(isExcludedNamespace(p)).isTrue();
         }
 
         @Test
         @DisplayName("governance schema JSON exempted from Status check")
-        void governanceSchemaJson_exemptedFromStatusCheck() {
+        void isExcludedNamespace_governanceSchemasPath_returnsTrue() {
             Path p = Path.of("governance/schemas/frontmatter-3.0.json");
             assertThat(isExcludedNamespace(p)).isTrue();
         }
