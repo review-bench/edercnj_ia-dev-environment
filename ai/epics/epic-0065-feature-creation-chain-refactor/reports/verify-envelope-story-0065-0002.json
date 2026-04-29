@@ -1,0 +1,1 @@
+{"storyId":"story-0065-0002","epicId":"EPIC-0065","passed":true,"coverageDelta":null,"failures":[],"acCheckResults":{"spec-generated-in-docs-specs":"PASS","pr-created-docs-branch":"PASS","rule005-no-auto-chain":"PASS","ra9-5-sections":"PASS","worktree-isolated":"PASS"},"goldenFileTests":"10/10 PASS","prNumber":840,"prMergeStatus":"MERGED","mergedInto":"epic/0065"}
