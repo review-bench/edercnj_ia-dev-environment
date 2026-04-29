@@ -111,47 +111,67 @@ graph TD
 ## 6. Detalhamento por Fase
 
 ### Fase 0
-- **0072-0001**: schema YAML novo `quality.{performance,mutation,contract}`, classes Java sub-records, capabilities families, KP-base shared.
+- **0072-0001**: schema YAML novo `quality.{performance,mutation,contract}` em `dev.iadev.config.QualityConfig` (`java/src/main/java/dev/iadev/config/QualityConfig.java`); 3 famílias de capabilities sob `capabilities/quality/{performance,mutation,contract}/*.yaml` (D-R7 — `capabilities/` directory contingente ao avanço de EPIC-0064 P2); ADR `ADR-NNNN-comprehensive-test-strategy.md` (NNNN TBD — D-R4).
 
 ### Fase 1
-- **0072-0002**: skill stack-aware (REST→Newman, gRPC→ghz, CLI→hyperfine, GraphQL→Artillery, Socket→custom).
-- **0072-0003**: skill stack-aware (Java→PIT, JS/TS→Stryker, Python→mutmut, Go→go-mutesting).
-- **0072-0004**: skill stack-aware (REST→openapi-diff, gRPC→buf, Spring→SCC, opt-in Pact).
+- **0072-0002**: skill stack-aware em `java/src/main/resources/targets/claude/skills/core/test/x-test-performance/SKILL.md` (path D-R1 — categoria `core/test/`); template `_TEMPLATE-PERFORMANCE-PLAN.md` em `java/src/main/resources/shared/templates/` (path D-R2); 5 KPs `knowledge/testing/performance-{rest,grpc,cli,graphql,socket}.md`. Frontmatter v3.0 + capabilities `requires-any` (D-R6).
+- **0072-0003**: skill stack-aware `core/test/x-test-mutation/SKILL.md` (D-R1); template `_TEMPLATE-MUTATION-PLAN.md` (D-R2); 4 KPs.
+- **0072-0004**: skill stack-aware `core/test/x-test-contract/SKILL.md` (D-R1); template `_TEMPLATE-CONTRACT-PLAN.md` (D-R2); 3 KPs.
 
 ### Fase 2
-- **0072-0005, 0006, 0007**: 3 CI scripts (Camada 2 — Rule 26).
-- **0072-0006**: também atualiza Rule 05 com mutation threshold + perf budget.
-- **0072-0008**: Phase 3 ganha 3 MANDATORY conditional invocations.
+- **0072-0005, 0006, 0007**: 3 CI scripts (Camada 2 — Rule 26 §Taxonomy) em `java/src/main/resources/targets/claude/scripts/audit-{perf-baseline,mutation-score,contract-breaking}.sh` (path consistente com Rule 26); cada um com `--self-check`, exit codes 0/1/2/3 (D-R5), entry simultânea em `docs/audit-gates-catalog.md` (RULE-004). `ScriptsAssembler.AUDIT_SCRIPTS` ganha 3 entries (5 → 8 totais; ver D-R5).
+- **0072-0006**: também estende `targets/claude/rules/05-quality-gates.md` IN-PLACE (D-R3 — sem Rule número novo) adicionando §"Mutation Score Threshold" + §"Performance Budget".
+- **0072-0008**: Phase 3 de `core/dev/x-story-implement/SKILL.md` ganha 3 MANDATORY conditional invocations (Rule 24 §Camada-1; D-R11 — sequência sequencial perf→mutation→contract com fast-fail). Rule 24 §Mandatory Evidence Artifacts ganha 3 entries condicionais.
 
 ### Fase 3
-- **0072-0009**: smoke E2E 8 cenários + CHANGELOG MAJOR (mudança de contrato de Phase 3).
+- **0072-0009**: smoke E2E `Epic0072TestStrategySmokeIT.java` (8 cenários — perf-fail/perf-ok/mutation-fail/mutation-ok/contract-fail-no-doc/contract-ok-with-doc/opt-out/stack-awareness); CHANGELOG entry **sem pinar versão** (D-R10 — `x-release` materializa MAJOR em release-time conforme Rule 08); update CLAUDE.md root + `ai/memory/epic-0072-summary.md`.
 
 ---
 
 ## 7. Observações Estratégicas
 
 ### Gargalo Principal
-**story-0072-0008** consolida 3 skills em Phase 3. Bug aqui afeta todos os projetos cliente — code-review extra.
+**story-0072-0008** consolida 3 skills em Phase 3 do orquestrador canônico (`x-story-implement`). Bug aqui afeta TODOS os projetos cliente — code-review extra (tech-lead + sre + qa em x-review-pr).
 
 ### Histórias Folha
 **0072-0009**.
 
 ### Otimização de Tempo
-- Fase 1: **3 paralelas** (skills independentes).
-- Fase 2: **4 paralelas** (CI scripts + Phase 3 mod independentes em arquivos distintos).
+- Fase 1: **3 paralelas** (skills independentes — files distintos sob `core/test/<name>/`).
+- Fase 2: **4 paralelas** (CI scripts + Phase 3 modify em arquivos distintos; story-0006 toca Rule 05, story-0008 toca `x-story-implement/SKILL.md` — sem colisão).
 
 ### Marco de Validação Arquitetural
-**story-0072-0001** define schema do YAML — drift aqui é caro pra reverter. Spike + revisão antes de prosseguir.
+**story-0072-0001** define schema do YAML `quality:` + classes Java + capabilities families. Drift aqui é caro pra reverter porque os 3 sibling skills (0002/0003/0004) o consomem. Spike + revisão por tech-lead/sre antes de prosseguir.
 
 ---
 
-## 8 + 8.5
+## 8. Cross-Story Task Dependencies (populadas pós-refinement)
 
-A ser populadas pós-refinement.
+| De → Para | Razão | Bloqueio? |
+| :--- | :--- | :--- |
+| task-0072-0001-005..007 (3 capabilities families) → task-0072-0002-001 / 0003-001 / 0004-001 | Skills declaram `requires-any:` apontando para esses YAMLs; sem eles, frontmatter v3.0 quebra `audit-capability-graph.sh` (quando EPIC-0064 P2 entregar) | HARD |
+| task-0072-0001-002 (ADR NNNN) → task-0072-0002/0003/0004 (SKILL.md descriptions) | SKILL.md description pode citar a ADR; pinar antes evita rework | SOFT |
+| task-0072-0001-003 (`QualityConfig.java`) → task-0072-0002-002 / 0003-002 / 0004-002 (SKILL.md body lê QualityConfig) | Skills delegam o parse do bloco `quality:` para `QualityConfig` | HARD |
+| task-0072-0002-005 (formato baseline JSON) → task-0072-0005-003 (audit valida o formato) | Audit precisa do schema antes de implementar parse + validação | HARD |
+| task-0072-0003-002 (mutation-report formato) → task-0072-0006-003 (audit consome o report) | Mesma razão acima | HARD |
+| task-0072-0004-005 (classificação breaking) → task-0072-0007-003 (audit usa mesma classificação) | Defesa em profundidade (Camada 3 + Camada 2) deve ter mesmo critério | HARD |
+| task-0072-0008-003 (Rule 24 update — 3 artefatos esperados) → task-0072-0008-004 (audit-execution-integrity verifica condicionalmente) | Sequência local dentro da story | HARD |
+| task-0072-0009-006 (Status: Backlog→Concluída) é a ÚNICA tarefa em todo o épico que muda §Status do epic | Convenção EPIC-0063+ — gate normativo em `x-review-pr` | HARD |
 
-**Hotspots esperados:**
-- `Rule 05` (regen) — story 0006.
-- `CHANGELOG.md` — story 0009.
-- 3 SKILL.md novos (independentes entre si).
-- 3 CI scripts novos (independentes).
-- `capabilities/_index.yaml` (regen) — story 0001.
+## 8.5 Restrições de Paralelismo (EPIC-0041 — File Footprint)
+
+**Hotspots de colisão (regen / hard / soft):**
+
+| Arquivo | Categoria | Stories que tocam | Decisão |
+| :--- | :--- | :--- | :--- |
+| `targets/claude/rules/05-quality-gates.md` | regen | 0006 (extensão in-place) | Sem colisão — única story que toca |
+| `CHANGELOG.md` | hard | 0009 (entry final) | Sem colisão — única story que toca |
+| 3 SKILL.md novos (`x-test-performance/SKILL.md`, `x-test-mutation/SKILL.md`, `x-test-contract/SKILL.md`) | independentes | 0002 / 0003 / 0004 (1 por story) | **3 paralelas seguras** — files distintos |
+| 3 CI scripts (`audit-*.sh`) | independentes | 0005 / 0006 / 0007 (1 por story) | **3 paralelas seguras** — files distintos |
+| `dev.iadev.application.assembler.ScriptsAssembler.AUDIT_SCRIPTS` | regen | 0005, 0006, 0007 (cada uma adiciona 1 entry) | Hard conflict — **serializar via `x-parallel-eval`** ou rebase incremental |
+| `core/dev/x-story-implement/SKILL.md` (Phase 3 modify) | hard | 0008 (única story que toca) | Sem colisão |
+| `targets/claude/rules/24-execution-integrity.md` | regen | 0008 (artefatos condicionais) | Sem colisão |
+| `docs/audit-gates-catalog.md` | hard | 0001 (reservas precoces opcionais) + 0005 + 0006 + 0007 (entries finais) | Append-only; serializar via `x-parallel-eval` ou rebase incremental |
+| `capabilities/_index.yaml` (regen — quando EPIC-0064 P2 entregar) | regen | 0001 (entries para 3 families) | Contingente; sem colisão hoje |
+
+**Recomendação:** Fase 2 roda 3 stories paralelas **mas com rebase incremental** entre elas devido a `ScriptsAssembler.AUDIT_SCRIPTS` e `audit-gates-catalog.md` serem append-only. Alternativa: serializar 0005 → 0006 → 0007 (custo +1 wave, ganho de simplicidade no rebase).
