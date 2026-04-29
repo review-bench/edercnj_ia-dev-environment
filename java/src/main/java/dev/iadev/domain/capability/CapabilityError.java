@@ -4,7 +4,8 @@ public sealed class CapabilityError extends RuntimeException
         permits CapabilityError.UnknownCapability,
                 CapabilityError.AsymmetricMutex,
                 CapabilityError.CyclicDependency,
-                CapabilityError.InvalidExpression {
+                CapabilityError.InvalidExpression,
+                CapabilityError.MutexConflict {
 
     private CapabilityError(String message) {
         super(message);
@@ -30,6 +31,12 @@ public sealed class CapabilityError extends RuntimeException
 
     public static final class InvalidExpression extends CapabilityError {
         public InvalidExpression(String message) {
+            super(message);
+        }
+    }
+
+    public static final class MutexConflict extends CapabilityError {
+        public MutexConflict(String message) {
             super(message);
         }
     }
