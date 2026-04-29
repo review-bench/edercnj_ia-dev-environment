@@ -1,7 +1,7 @@
 ---
-name: quarkus-patterns
+name: quarkus
 description: "Quarkus patterns: CDI, @ConfigMapping, Panache Repository, RESTEasy Reactive, native build constraints, and @RegisterForReflection."
-requires-capabilities: []
+requires-capabilities: [web.quarkus.framework]
 ---
 
 # Pattern: Quarkus Patterns

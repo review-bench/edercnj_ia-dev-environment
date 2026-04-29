@@ -1,0 +1,17 @@
+id: cli.picocli.framework
+category: cli
+kind: atomic
+version: "4.7"
+status: stable
+description: picocli CLI framework for Java — annotations-based command parsing
+requires:
+  - lang.java.21
+excludes:
+  - web.spring.boot
+  - web.quarkus.framework
+  - web.helidon.framework
+  - web.micronaut.framework
+tags:
+  - cli
+  - picocli
+  - command-line

@@ -1,7 +1,7 @@
 ---
-name: spring-patterns
+name: spring
 description: "Spring Boot patterns: DI, @ConfigurationProperties, Spring Data JPA, @RestController, @ControllerAdvice, Spring AOT, and health checks."
-requires-capabilities: []
+requires-capabilities: [web.spring.boot]
 ---
 
 # Pattern: Spring Boot Patterns

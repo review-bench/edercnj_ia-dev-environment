@@ -1,0 +1,13 @@
+id: data.database.mysql
+category: data
+kind: atomic
+version: "8"
+status: stable
+description: MySQL relational database
+excludes:
+  - data.database.postgres
+  - data.database.mariadb
+tags:
+  - database
+  - sql
+  - relational

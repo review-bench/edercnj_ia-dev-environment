@@ -1,0 +1,15 @@
+id: web.helidon.framework
+category: web
+kind: atomic
+version: "4"
+status: stable
+description: Helidon microservices framework (Helidon SE / MP, MicroProfile)
+requires:
+  - lang.java.21
+excludes:
+  - web.spring.boot
+  - web.quarkus.framework
+tags:
+  - web
+  - helidon
+  - microprofile

@@ -1,0 +1,16 @@
+id: web.micronaut.framework
+category: web
+kind: atomic
+version: "4"
+status: stable
+description: Micronaut framework (AOT compilation, low memory, GraalVM native)
+requires:
+  - lang.java.21
+excludes:
+  - web.spring.boot
+  - web.quarkus.framework
+tags:
+  - web
+  - micronaut
+  - aot
+  - native

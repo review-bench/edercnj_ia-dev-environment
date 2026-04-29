@@ -1,0 +1,11 @@
+id: build.maven.standard
+category: build
+kind: atomic
+version: "3.9"
+status: stable
+description: Apache Maven build tool (standard lifecycle, plugins, dependencies)
+requires:
+  - lang.java.21
+tags:
+  - build
+  - maven

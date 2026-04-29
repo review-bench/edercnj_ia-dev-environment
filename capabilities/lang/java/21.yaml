@@ -1,0 +1,10 @@
+id: lang.java.21
+category: lang
+kind: atomic
+version: "21"
+status: stable
+description: Java 21 LTS (records, sealed classes, virtual threads, pattern matching)
+tags:
+  - java
+  - jvm
+  - lts
