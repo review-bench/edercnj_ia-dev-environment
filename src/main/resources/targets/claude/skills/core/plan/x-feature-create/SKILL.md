@@ -261,6 +261,42 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-featur
 
 ---
 
+## Phase P5.5 — BACKLOG-RENDER (EPIC-0066, story-0066-0006)
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-create Phase-P55-Render`
+
+**MANDATORY TOOL CALL — Rule 24 §Camada-1 / Rule 13 Pattern 1 (INLINE-SKILL):**
+
+Render the backlog PR body from the committed epic.md + IMPLEMENTATION-MAP.md + stories. This produces a body Markdown that includes the `<!-- template-version: 1.0 -->` marker required by `audit-pr-template.sh` (story-0066-0007).
+
+```bash
+TMP_BODY_PATH=$(mktemp -t feature-pr-body-XXXXXX.md)
+chmod 600 "$TMP_BODY_PATH"
+trap 'rm -f "$TMP_BODY_PATH"' EXIT
+echo "INFO: Invoking x-internal-pr-body-render --kind=backlog --epic-id=$EPIC_ID"
+```
+
+Invoke the `x-internal-pr-body-render` skill via the Skill tool:
+
+    Skill(skill: "x-internal-pr-body-render", model: "haiku", args: "--kind=backlog --epic-id=epic-<EPIC_ID> --out=$TMP_BODY_PATH")
+
+```bash
+RENDER_EXIT=$?
+if [[ $RENDER_EXIT -eq 0 ]]; then
+  PR_BODY_FILE="$TMP_BODY_PATH"   # rendered body with template-version marker
+else
+  echo "WARN [render-fallback]: x-internal-pr-body-render falhou (exit $RENDER_EXIT). Usando body manual." >&2
+  echo "     audit-pr-template.sh reportará PR_TEMPLATE_VIOLATION para este PR." >&2
+  PR_BODY_FILE=""   # empty → fallback path in Phase P6
+fi
+```
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-create Phase-P55-Render ok`
+
+---
+
 ## Phase P6 — PR Creation (docs → epic/XXXX)
 
 <!-- TELEMETRY: phase.start -->
@@ -268,12 +304,40 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feat
 
 If `--dry-run`: skip.
 
-Create PR via `x-pr-create` (auto-merge authorized for `docs/<epic-id>-*` → `epic/XXXX` per Rule 21 §Anti-Patterns exception):
+Create the docs PR using the body rendered in Phase P5.5. Auto-merge is authorized for `docs/<epic-id>-*` → `epic/XXXX` per Rule 21 §Anti-Patterns exception. The flow uses `gh pr create --body-file` (not the `x-pr-create` skill) because `x-pr-create` is task-scoped and renders `--kind=implementation`; backlog PRs need `--kind=backlog` (story-0066-0006).
 
-    Skill(skill: "x-pr-create", model: "haiku",
-          args: "--head docs/<epic-id>-<slug> --target-branch epic/<epic-id> --auto-merge merge --label docs --label epic-<epic-id> --title \"chore(epic-XXXX): full decomposition (epic + N stories + map)\"")
+```bash
+PR_TITLE="chore(epic-${EPIC_ID}): full decomposition (epic + ${STORY_COUNT} stories + map)"
 
-Capture `{prUrl, prNumber}`.
+if [[ -n "$PR_BODY_FILE" ]]; then
+  # Happy path — use rendered body with template-version marker
+  PR_URL=$(gh pr create \
+    --base "epic/${EPIC_ID}" \
+    --head "docs/${EPIC_ID}-${SLUG}" \
+    --title "$PR_TITLE" \
+    --body-file "$PR_BODY_FILE" \
+    --label docs --label "epic-${EPIC_ID}")
+else
+  # Fallback path — see ## Recovery (manual body without template-version marker)
+  PR_URL=$(gh pr create \
+    --base "epic/${EPIC_ID}" \
+    --head "docs/${EPIC_ID}-${SLUG}" \
+    --title "$PR_TITLE" \
+    --body "$(cat <<EOF
+chore(epic-${EPIC_ID}): full decomposition (epic + ${STORY_COUNT} stories + map)
+
+(rendered via fallback path — body lacks template-version marker; audit will block merge)
+EOF
+)" \
+    --label docs --label "epic-${EPIC_ID}")
+fi
+
+# Enable auto-merge (Rule 21 §Anti-Patterns docs/* exception)
+PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+gh pr merge "$PR_NUMBER" --merge --auto
+
+# Capture {prUrl, prNumber} for Phase P7
+```
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-create Phase-P6-PR ok`
@@ -344,6 +408,12 @@ Print:
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-create Phase-5-Report ok`
 
 ---
+
+## Recovery (Render Skill Fallback — EPIC-0066, story-0066-0006)
+
+When `x-internal-pr-body-render` returns exit ≠ 0 in Phase P5.5, this skill falls back to a minimal manual body in Phase P6 to ensure PR creation never aborts (RULE-004 fail-open). The fallback body lacks the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will block the merge with `PR_TEMPLATE_VIOLATION`. This is intentional: the preventive render path produces the marker; the detective audit gate enforces it.
+
+The WARN message includes `RENDER_EXIT` (the render skill exit code) so the operator can diagnose the cause: typically `OPERATIONAL_ERROR` (exit 2) when `_TEMPLATE-PR-BACKLOG.md` is missing from `.claude/templates/` (rerun `mvn process-resources`).
 
 ## Error Handling
 
