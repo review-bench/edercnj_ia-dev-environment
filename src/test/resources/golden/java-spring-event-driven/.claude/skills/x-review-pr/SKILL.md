@@ -453,6 +453,82 @@ WARNING: State file not found at plans/review/<pr>/state.json. Starting gate fro
 ```
 If the state file fails schema validation, emit `GATE_SCHEMA_INVALID` with the path and the missing/malformed field name.
 
+## Phase 5 — Emit Frontmatter (MANDATORY — Rule 24 §Camada-1)
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-review-pr Phase-5-Frontmatter`
+
+> **MANDATORY TOOL CALL (Rule 24 §Camada-1):** This phase MUST NOT be inlined, simulated,
+> or omitted. The LLM MUST prepend the populated YAML frontmatter to the tech-lead review
+> artifact. Absent frontmatter is detected by `audit-review-frontmatter.sh` (Layer 3 CI)
+> and the Stop hook (Layer 2 runtime). There is no fallback when frontmatter emission fails.
+
+TaskCreate(
+  subject: "<STORY_ID> › Phase 5 › Emit tech-lead review frontmatter",
+  activeForm: "Emitting tech-lead review frontmatter",
+  metadata: {
+    "phase": "Phase 5",
+    "parentSkill": "x-review-pr",
+    "storyId": "<STORY_ID>",
+    "epicId": "<EPIC_ID>",
+    "expectedArtifacts": ["<path to techlead-review-story-XXXX-YYYY.md>"]
+  }
+)
+
+Invoke pre-gate (Rule 25 §Invariants 4):
+
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-pr")
+
+After Phase 4 has produced the prose body of `techlead-review-story-<STORY_ID>.md`,
+prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`:
+
+```
+<!-- template-version: 1.0 -->
+---
+schema-version: "1.0"
+generated-by: x-review-pr@<git rev-parse HEAD>
+story-id: <STORY_ID>
+epic-id: <EPIC_ID>
+date: <date -u +%Y-%m-%dT%H:%M:%SZ>
+decision: <GO|NO-GO|GO-WITH-RESERVATIONS>
+score: <integer 0-55>
+score-max: 55
+severity-counts:
+  critical: <count>
+  high: <count>
+  medium: <count>
+  low: <count>
+  info: <count>
+blocking-findings:
+<YAML list of critical/high findings, empty list [] if none>
+checklist:
+  passed: <integer 0-45>
+  total: 45
+  failed-sections:
+<YAML list of failed section IDs, empty list [] if none>
+---
+# Tech Lead Review — <STORY_ID>
+...existing prose body...
+```
+
+**Note:** `x-review-pr` does NOT emit the `reviewers` field — the Tech Lead is the sole
+reviewer; `checklist` replaces `reviewers` as the optional field per schema spec.
+
+After writing the artifact, validate:
+
+    Bash command: `$CLAUDE_PROJECT_DIR/.claude/scripts/audit-review-frontmatter.sh --story <STORY_ID>`
+
+If the script returns exit ≠ 0, abort with `REVIEW_FRONTMATTER_INVALID`. No fallback.
+
+Invoke post-gate (Rule 25 §Invariants 4):
+
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-pr --expected-artifacts <path to techlead-review-story-XXXX-YYYY.md>")
+
+TaskUpdate(taskId: <id from TaskCreate above>, status: "completed")
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review-pr Phase-5-Frontmatter ok`
+
 ## Error Codes
 
 | Code | Condition | Message |
