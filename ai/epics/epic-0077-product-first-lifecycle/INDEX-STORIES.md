@@ -77,47 +77,47 @@
 
 ---
 
-## Template Structure (RA9 v2 — 9 Sections)
+## Estrutura do Template (RA9 v2 — 9 Seções)
 
-Each story contains:
+Cada story contém:
 
-1. **Contexto & Escopo** — User story persona-driven, context, 1.1 Regras Transversais, 1.2 Entrega de Valor
-2. **Packages (Hexagonal)** — Domain, Application, Adapter In/Out, Infrastructure layers per story
-3. **Contratos & Endpoints** — Request/Response schemas, error codes, event schemas
-4. **Materialização SOLID** — Regras EPIC, SOLID principles application, coding constraints
-5. **Quality Gates** — DoR Local, Gherkin scenarios (4 categorias obrigatórias), DoD Local, Global DoD
-6. **Segurança** — Input validation, authentication, sensitive data, path operations
-7. **Observabilidade** — Structured logging, metrics, correlation ID propagation
-8. **Decision Rationale** — Decisão (statement), Motivo (why), Alternativa descartada, Consequência
-9. **Dependências & File Footprint** — Blocked by/Blocks, 3-4 tasks per story, File footprint (write/read/regen)
-
----
-
-## Key Metrics
-
-- **Total Deliverable:** 28 stories, ~400-600 palavras each
-- **Gherkin Scenarios:** Minimum 3-4 per story, covering: degenerate, happy path, error, boundary cases
-- **Task Breakdown:** 3-4 tasks per story, each with Layer, Test Type, Size (S/M/L), Dependencies, Files, Acceptance Criteria
-- **Smoke/E2E Tests:** Minimum 1 test per story with label [Test] or smoke/E2E
-- **Non-functional Value:** Cada story tem mensurável non-functional deliverable (não técnico)
+1. **Contexto & Escopo** — `User story` orientada por persona, contexto, 1.1 Regras Transversais, 1.2 Entrega de Valor
+2. **Packages (Hexagonal)** — camadas `Domain`, `Application`, `Adapter In/Out` e `Infrastructure` por story
+3. **Contratos & Endpoints** — schemas de `Request/Response`, códigos de erro, `event schemas`
+4. **Materialização SOLID** — regras do EPIC, aplicação dos princípios SOLID, restrições de código
+5. **Quality Gates** — DoR Local, cenários Gherkin (4 categorias obrigatórias), DoD Local, DoD Global
+6. **Segurança** — validação de entrada, autenticação, dados sensíveis, operações de path
+7. **Observabilidade** — `structured logging`, `metrics`, propagação de `correlation ID`
+8. **Racional da Decisão** — Decisão (`statement`), Motivo (`why`), Alternativa descartada, Consequência
+9. **Dependências & File Footprint** — `Blocked by/Blocks`, 3-4 tasks por story, `File footprint` (`write/read/regen`)
 
 ---
 
-## Implementation Readiness
+## Métricas-Chave
 
-✓ All 28 stories are ready for implementation  
-✓ Dependency graph is complete and validated (DAG - no cycles)  
-✓ Templates (IDEATION, PRODUCT, CAPABILITY, FEATURE, EPIC) are preconditions for Phase 1+  
-✓ Skills (x-create-product, x-create-capability, x-create-feature) are dependent on Phase 1 templates  
-✓ C4 validation and RNF gates are Phase 3+ dependencies  
+- **Entrega Total:** 28 stories, ~400-600 palavras cada
+- **Cenários Gherkin:** mínimo de 3-4 por story, cobrindo: degenerado, caminho feliz, erro e casos de fronteira
+- **Quebra de Tasks:** 3-4 tasks por story, cada uma com `Layer`, `Test Type`, tamanho (S/M/L), dependências, arquivos e `Acceptance Criteria`
+- **Testes Smoke/E2E:** mínimo de 1 teste por story com label `[Test]` ou smoke/E2E
+- **Valor Não Funcional:** cada story tem um deliverable não funcional mensurável (não técnico)
+
+---
+
+## Prontidão para Implementação
+
+✓ Todas as 28 stories estão prontas para implementação  
+✓ O grafo de dependências está completo e validado (DAG — sem ciclos)  
+✓ Os templates (IDEATION, PRODUCT, CAPABILITY, FEATURE, EPIC) são pré-condições para a Fase 1+  
+✓ As skills (`x-create-product`, `x-create-capability`, `x-create-feature`) dependem dos templates da Fase 1  
+✓ A validação C4 e os gates de RNF são dependências da Fase 3+  
 
 ---
 
 ## Próximas Etapas
 
-1. **Validação:** Rodar smoke tests de integrity de cada story (markdown syntax, dependency DAG, task completeness)
-2. **Jira Integration:** Converter 28 stories para Jira via `x-jira-create-stories skill`
-3. **Persistência:** Executar `x-planning-commit` para commit artifacts em git
-4. **Fase 0 Execução:** Iniciar stories 0001, 0002, 0003 como bloqueadores críticos
-5. **Fase 1 Kickoff:** Templates upstream (stories 0004-0008) após Phase 0 completada
+1. **Validação:** Rodar smoke tests de integridade de cada story (sintaxe Markdown, DAG de dependências, completude de tasks)
+2. **Integração com Jira:** Converter 28 stories para Jira via skill `x-jira-create-stories`
+3. **Persistência:** Executar `x-planning-commit` para registrar os artefatos em git
+4. **Execução da Fase 0:** Iniciar stories 0001, 0002, 0003 como bloqueadores críticos
+5. **Início da Fase 1:** Templates upstream (stories 0004-0008) após a conclusão da Fase 0
 

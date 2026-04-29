@@ -126,55 +126,73 @@ application/planning/rnf-validation/ # RNFGate, RNFEnforcer, RNFValidator
 
 **Impacto:** 8 packages novos em application. Refatoração de planning/* para descentralizar responsabilidades.
 
-### Adapter Inbound
+### Adapter Inbound (CLI)
+
+> Layout real do repositório: comandos CLI em `dev.iadev.cli`; assets de skill em `java/src/main/resources/targets/claude/skills/<skill-id>/SKILL.md` (montados em `.claude/skills/` pelo build).
 
 ```
-adapter/inbound/skills/
-  ├── x-create-product/              # NEW — UnicodeScript wrapper
-  ├── x-create-capability/           # NEW — UnicodeScript wrapper
-  ├── x-create-feature/              # NEW — UnicodeScript wrapper
-  ├── x-promote-ideation/            # NEW — UnicodeScript wrapper
-  ├── x-epic-create/                 # REFACTOR — deprecate steps 0-2
-  ├── x-story-create/                # REFACTOR — validate Product/Capability base
-  ├── x-arch-plan/                   # REFACTOR — add C4 mandatory input
-  ├── x-task-plan/                   # REFACTOR — inherit C4 from epic
-  └── x-story-plan/                  # REFACTOR — add RNF validation
+java/src/main/java/dev/iadev/cli/
+  ├── XCreateProductCommand.java        # NEW
+  ├── XCreateCapabilityCommand.java     # NEW
+  ├── XCreateFeatureCommand.java        # NEW
+  ├── XPromoteIdeationCommand.java      # NEW
+  ├── XEpicCreateCommand.java           # REFACTOR — deprecate steps 0-2
+  ├── XStoryCreateCommand.java          # REFACTOR — validate Product/Capability base
+  ├── XArchPlanCommand.java             # REFACTOR — add C4 mandatory input
+  ├── XTaskPlanCommand.java             # REFACTOR — inherit C4 from epic
+  └── XStoryPlanCommand.java            # REFACTOR — add RNF validation
+
+java/src/main/resources/targets/claude/skills/
+  ├── x-create-product/SKILL.md         # NEW
+  ├── x-create-capability/SKILL.md      # NEW
+  ├── x-create-feature/SKILL.md         # NEW
+  ├── x-promote-ideation/SKILL.md       # NEW
+  ├── x-epic-create/SKILL.md            # REFACTOR
+  ├── x-story-create/SKILL.md           # REFACTOR
+  ├── x-arch-plan/SKILL.md              # REFACTOR
+  ├── x-task-plan/SKILL.md              # REFACTOR
+  └── x-story-plan/SKILL.md             # REFACTOR
 ```
 
 **Impacto:** 4 skills novas, 5 refatoradas. Zero breaking changes em invoke interface.
 
 ### Adapter Outbound
 
+> Não há `adapter/outbound/` separado: integrações outbound vivem em `dev.iadev.infrastructure`. Agentes de planning são assets em `java/src/main/resources/targets/claude/agents/{core,conditional}/`.
+
 ```
-adapter/outbound/agents/
-  ├── planning-refinement/           # REFACTOR — add Product/Capability checks
-  └── planning-decompose/            # REFACTOR — propagate C4 to stories
+java/src/main/resources/targets/claude/agents/
+  ├── core/qa-engineer.md               # REFACTOR (story-0077-0018)
+  ├── core/pentest-engineer.md          # PROMOTE de conditional/ (story-0077-0019)
+  └── core/{architect,product-owner,tech-lead,security-engineer,
+              performance-engineer,sre-engineer}.md  # READ-ONLY
 ```
 
-**Impacto:** 2 agents refatorados, zero new endpoints.
+**Impacto:** 1 charter refatorado (qa-engineer), 1 promovido (pentest-engineer); zero novos agents.
 
 ### Infrastructure
 
+> Source-of-truth de scripts em `java/src/main/resources/targets/claude/scripts/<stack>/` (montado em `.claude/scripts/` pelo `ScriptsAssembler`); templates em `java/src/main/resources/shared/templates/`.
+
 ```
-scripts/audit/
-  ├── product-validate.sh            # NEW — verify product.yaml structure + links
-  ├── capability-validate.sh         # NEW — verify capability ID, product ref
-  ├── feature-validate.sh            # NEW — verify feature ID, capability ref
-  └── rnf-audit.sh                   # NEW — RNF table 100% coverage scan
+java/src/main/resources/targets/claude/scripts/<stack>/
+  ├── audit-product-upstream.sh         # NEW — verify product hierarchy + links
+  ├── audit-c4-completeness.sh          # NEW — C4 Context+Container+Component+Code coverage
+  ├── audit-rnf-gates.sh                # NEW — RNF table 100% coverage + no-relax
+  └── audit-pentest-coverage.sh         # NEW — pentest plan presence per story
 
-templates/
-  ├── _TEMPLATE-PRODUCT.md           # NEW — product artifact v1
-  ├── _TEMPLATE-CAPABILITY.md        # NEW — capability artifact v1
-  ├── _TEMPLATE-FEATURE.md           # NEW — feature artifact v1
-  ├── _TEMPLATE-EPIC.md              # REFACTOR — upgrade to v3, add C4 field
-  └── quality/
-      ├── _TEMPLATE-RNF-VALIDATION.md # NEW — RNF specification v1
+java/src/main/resources/shared/templates/
+  ├── _TEMPLATE-IDEATION.md             # NEW — ideation artifact v1
+  ├── _TEMPLATE-PRODUCT.md              # NEW — product artifact v1 (RNFs Root mandatory)
+  ├── _TEMPLATE-CAPABILITY.md           # NEW — capability artifact v1 (no-relax)
+  ├── _TEMPLATE-FEATURE.md              # NEW — feature artifact v1
+  └── _TEMPLATE-EPIC.md                 # REFACTOR — v3 (Source Feature + Inherited RNFs)
 ```
 
-**Impacto:** 4 templates novos, 1 refatorado, 4 scripts audit novos.
+**Impacto:** 5 templates (4 novos + 1 refatorado), 4 scripts audit Camada 2. Output gerado em `.claude/scripts/` via `ScriptsAssembler.AUDIT_SCRIPTS` — registrado no pipeline de geração, não criado em `ci/audit/` ad-hoc.
 
-**Dependency direction:** `adapter.inbound/outbound → application → domain` (inward only).
-Domain MUST NOT import adapter or framework code (Rule 04).
+**Dependency direction:** `cli → application → domain` (inward only).
+Domain MUST NOT import CLI or framework code (Rule 04).
 
 ---
 
