@@ -4,7 +4,7 @@ description: "Task-level PR creation with formatted title, automatic labels, str
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Skill
 argument-hint: "TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description \"short desc\"] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>]"
-context-budget: medium
+context-budget: heavy
 requires-capabilities: []
 ---
 
@@ -152,35 +152,43 @@ if [[ ${#TITLE} -gt 70 ]]; then
 fi
 ```
 
-### Phase 3 -- Generate PR Body
+### Phase 3 -- Generate PR Body (via render skill)
 
-Generate the structured PR body with the following sections:
+**MANDATORY TOOL CALL — Rule 24 §Camada-1 / Rule 13 Pattern 1 (INLINE-SKILL):**
 
-```markdown
-## Summary
+Delegate body generation to `x-internal-pr-body-render` (story-0066-0003). The render skill produces a body Markdown that includes the `<!-- template-version: 1.0 -->` marker required by `audit-pr-template.sh` (story-0066-0007).
 
-{description derived from commits or --description flag}
+```bash
+# Derive story-id from task-id: TASK-XXXX-YYYY-NNN -> story-XXXX-YYYY
+STORY_ID_FOR_RENDER="story-${TASK_EPIC_ID}-${TASK_STORY_NUM}"
 
-## Task Details
+# Create temp file for render output (Rule 06 §Temp files — chmod 600 implicit via mktemp)
+TMP_BODY_PATH=$(mktemp -t pr-body-XXXXXX.md)
+chmod 600 "$TMP_BODY_PATH"
+trap 'rm -f "$TMP_BODY_PATH"' EXIT
 
-| Field | Value |
-|-------|-------|
-| Task ID | TASK-XXXX-YYYY-NNN |
-| Story | story-XXXX-YYYY |
-| Epic | epic-XXXX |
-| Task Plan | `ai/epics/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
+echo "INFO: Invoking x-internal-pr-body-render --kind=implementation --story-id=$STORY_ID_FOR_RENDER"
+```
 
-## Changes
+Invoke the `x-internal-pr-body-render` skill via the Skill tool:
 
-{list each commit in the branch using: git log --oneline develop..HEAD}
+    Skill(skill: "x-internal-pr-body-render", model: "haiku", args: "--kind=implementation --story-id=$STORY_ID_FOR_RENDER --out=$TMP_BODY_PATH")
 
-## Review Checklist
+```bash
+RENDER_EXIT=$?
 
-- [ ] Tests pass locally
-- [ ] Coverage thresholds met (>=95% line, >=90% branch)
-- [ ] TDD commits present (RED -> GREEN -> REFACTOR)
-- [ ] No TODO/FIXME/HACK comments
-- [ ] Conventional Commits format followed
+if [[ $RENDER_EXIT -eq 0 ]]; then
+  # Happy path: render skill produced body with template-version marker
+  BODY=$(cat "$TMP_BODY_PATH")
+else
+  # Fallback path — see ## Recovery section
+  echo "WARN [render-fallback]: PR body gerado via fallback inline (sem template-version marker)." >&2
+  echo "     audit-pr-template.sh reportará PR_TEMPLATE_VIOLATION para este PR." >&2
+  echo "     Investigar: x-internal-pr-body-render exit code = $RENDER_EXIT." >&2
+
+  # Generate legacy inline body (see ## Recovery for full template)
+  BODY="<inline body — see ## Recovery section>"
+fi
 ```
 
 If `--draft` is set, prepend to the body:
@@ -189,13 +197,19 @@ If `--draft` is set, prepend to the body:
 > [DRAFT] This PR is not ready for review
 ```
 
-#### Phase 3.5 -- Inject Orchestrator Evidence (EPIC-0059, story-0059-0007)
+#### Phase 3.5 -- Inject Orchestrator Evidence (EPIC-0059, story-0059-0007 + EPIC-0066, story-0066-0005 dedup)
 
-Unless `--no-story-evidence` is set, append the `## Orchestrator Evidence` section to the PR body. This section is mandatory for all story PRs (validated by `audit-pr-evidence.sh`).
+Unless `--no-story-evidence` is set, ensure the body contains exactly one `## Orchestrator Evidence` section. The render skill (Phase 3 happy path) already includes the section via `_TEMPLATE-PR-IMPLEMENTATION.md`; the fallback inline body (Phase 3 ## Recovery path) does NOT — it must be injected manually here.
+
+**Deduplication rule (story-0066-0005):**
 
 ```bash
 # Skip if explicitly opted out (chore/docs PRs without a story context)
 if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
+  # Dedup: if render skill already produced ## Orchestrator Evidence, skip injection
+  if echo "$BODY" | grep -q "^## Orchestrator Evidence"; then
+    echo "INFO: ## Orchestrator Evidence already present in rendered template — skipping injection"
+  else
   # Extract story ID from task ID: TASK-0059-0007-001 -> story-0059-0007
   STORY_ID_FOR_EVIDENCE="story-${TASK_EPIC_ID}-${TASK_STORY_NUM}"
 
@@ -258,9 +272,12 @@ if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
 | Phase 3 Artifacts | ${P3_ARTIFACTS} |
 "
 
-  BODY="${BODY}${ORCHESTRATOR_EVIDENCE_SECTION}"
+    BODY="${BODY}${ORCHESTRATOR_EVIDENCE_SECTION}"
+  fi
 fi
 ```
+
+**Invariant (story-0066-0005):** the final PR body always contains exactly one `## Orchestrator Evidence` occurrence, regardless of whether it came from the render skill (template) or the fallback inline body.
 
 **`--no-story-evidence` flag:** when set, the `## Orchestrator Evidence` section is omitted and `audit-pr-evidence.sh` will accept the PR. Use ONLY for chore/docs PRs that genuinely have no story context (e.g., CHANGELOG-only commits, dependency bumps). When set, `audit-pr-evidence.sh` logs `"no evidence required (--no-story-evidence)"` and exits 0.
 
@@ -348,6 +365,51 @@ Skill(skill: "x-pr-merge", args: "--pr <PR_NUMBER> --strategy <AUTO_MERGE_STRATE
 Set `autoMergeEnabled=true` in the skill response when the delegated call succeeds; otherwise fall through with `autoMergeEnabled=false` and a WARN line so the orchestrator can decide whether to retry.
 
 Backward compatibility: when `--auto-merge` is absent (default `none`), Phase 6 is a no-op and the response reports `autoMergeEnabled=false`.
+
+## Recovery (Render Skill Fallback — EPIC-0066, story-0066-0005)
+
+When `x-internal-pr-body-render` returns exit ≠ 0 in Phase 3, this skill **falls back to the legacy inline body generator** to ensure PR creation never aborts. The fallback body does NOT contain the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will report `PR_TEMPLATE_VIOLATION` for PRs created via this fallback path. This is intentional fail-open behavior (RULE-004) — the audit gate downstream will block the merge if the marker is missing.
+
+### Fallback Inline Body (legacy generator — preserved verbatim from pre-EPIC-0066)
+
+```markdown
+## Summary
+
+{description derived from commits or --description flag}
+
+## Task Details
+
+| Field | Value |
+|-------|-------|
+| Task ID | TASK-XXXX-YYYY-NNN |
+| Story | story-XXXX-YYYY |
+| Epic | epic-XXXX |
+| Task Plan | `ai/epics/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
+
+## Changes
+
+{list each commit in the branch using: git log --oneline develop..HEAD}
+
+## Review Checklist
+
+- [ ] Tests pass locally
+- [ ] Coverage thresholds met (>=95% line, >=90% branch)
+- [ ] TDD commits present (RED -> GREEN -> REFACTOR)
+- [ ] No TODO/FIXME/HACK comments
+- [ ] Conventional Commits format followed
+```
+
+The fallback body lacks `## Orchestrator Evidence` — Phase 3.5 dedup logic detects the absence and injects the section manually (legacy path). The final body therefore always contains exactly one `## Orchestrator Evidence` section.
+
+### When Fallback Triggers
+
+| Render exit code | Cause | Fallback action |
+| :--- | :--- | :--- |
+| 1 (`INVALID_KIND`) | Bug in x-pr-create — should never happen | Use fallback + emit WARN |
+| 2 (`OPERATIONAL_ERROR`) | Template missing, write permission denied | Use fallback + emit WARN |
+| 3 (`INVALID_SCOPE`) | story-id derivation failed | Use fallback + emit WARN |
+
+The WARN message includes the exit code so the operator can diagnose the underlying issue (e.g., re-run `mvn process-resources` if the template is missing from `.claude/templates/`).
 
 ## Error Handling
 
