@@ -214,7 +214,7 @@ serialization_recommendation: none
 | Epic | Estado em 2026-04-28 | Hot files compartilhados | Risco | Mitigação |
 | :--- | :--- | :--- | :--- | :--- |
 | EPIC-0063 (Pre-Flight Gates) | In progress (`epic/0063`) | nenhum compartilhado diretamente; depende lógica (Phase 2.5) | Médio | EPIC-0066 sequencial após 0063 mergear (D3) |
-| EPIC-0065 (Feature Creation Chain Refactor) | In progress (`epic/0065`) | `x-feature-create/SKILL.md` (story 0066-0006 depende do rename) | Alto | Bloqueia 0066-0006; aguardar EPIC-0065 mergear |
+| EPIC-0065 (Feature Creation Chain Refactor) | **Pendente** em 2026-04-28 — sem `epic/0065`, sem skill `x-feature-create` em `develop` | `x-feature-create/SKILL.md` (story 0066-0006 depende do rename) | **Alto** | Bloqueia 0066-0006. **Plano B (story-0066-0006 §9.1.1):** se 0065 não mergear antes de Phase 2 iniciar, serializar Phase 2 com apenas 0066-0005; deferir 0066-0006 até 0065 mergear. Registrar downgrade em `execution-state.json.parallelismDowngrades`. |
 | EPIC-0067 (Review YAML Frontmatter) | A ser planejado em paralelo | reviews mds (0067 produz YAML; 0066 consome) | Alto | Sequencial: 0067 mergeia → 0066 inicia |
 | EPIC-0064 (Capability-Driven Composition) | In progress (`epic/0064`) | `PlanTemplatesAssembler.java`, `ScriptsAssembler.java`, golden files | Médio | EPIC-0066 inicia depois de 0064 mergear OU coordenar timing de regen |
 

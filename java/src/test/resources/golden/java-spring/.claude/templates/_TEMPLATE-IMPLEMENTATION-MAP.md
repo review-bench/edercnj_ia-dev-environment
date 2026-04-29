@@ -4,6 +4,20 @@
 
 ---
 
+## 0. Cross-Epic Landscape
+
+> **<epic-XXXX> Context — Last 20 Epics**
+> Snapshot of recent epics and their status to inform citation safety.
+
+### Recent Epics Status (Latest 20)
+
+| Epic ID   | Title | Status | Branch | Last Story | Safe to Cite? |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| <EPIC-XXXX> | <Título> | Concluída | — | <story-XXXX-YYYY> | <Critério de citação> |
+| <EPIC-XXXX> | <Título> | Em Andamento | <branch> | <story-XXXX-YYYY> | <Critério de citação> |
+
+---
+
 ## 1. Matriz de Dependências
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |

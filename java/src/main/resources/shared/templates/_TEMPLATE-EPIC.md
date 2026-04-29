@@ -21,10 +21,10 @@
 
 ## 0.5 Cross-Epic Dependencies
 
-> **Rule 29 — Cross-Epic Dependency Awareness**
-> Epic-level dependencies are declared here and mirrored in `execution-state.json.blockedBy[]`.
-> `x-epic-implement` Phase 0.5 performs a synchronous gate: if any dependency's `expectedStatus` is not met, the epic aborts with exit 1.
-> See `.claude/rules/29-cross-epic-dependencies.md` and ADR-0017.
+> **Cross-Epic Dependency Awareness (EPIC-0076)**
+> Epic-level dependencies are declared in this section and used by the implementation workflow as a Phase 0.5 gate.
+> If any dependency's `expectedStatus` is not met, `x-epic-implement` aborts synchronously with exit 1.
+> TODO: link to the dedicated cross-epic dependency rule and ADR once those artifacts land in subsequent stories of EPIC-0076.
 
 ### Blocked By Epics
 
@@ -32,24 +32,13 @@
 | --------- | -------------------------- | ----------------------- | ------------------------------------------------------ |
 | (none)    | —                          | —                       | —                                                      |
 
-> Replace rows above with actual dependencies. Allowed values for "Expected Status @ Start":
-> - `COMPLETE` — Epic MUST be concluded before this epic starts (hard block)
-> - `IN_PROGRESS_OK` — Epic is OK to cite while in-flight, but requires explicit allowance entry below
-
 ### Blocks (informational, derived)
 
 | Epic ID   |
 | --------- |
 | (none)    |
 
-> This section is auto-derived from upstream epics that declare this epic as a blocker.
-> It is informational and read-only — do NOT edit it manually.
-
 ### In-Flight Reference Allowance
-
-> **Mandatory when any row above has `expectedStatus = IN_PROGRESS_OK`.**
-> For each in-flight dependency above, list which artifacts/classes you cite and mark with `PENDING VALIDATION`.
-> Cite specific story IDs where the artifact is introduced.
 
 (Nenhuma dependência em voo declarada.)
 

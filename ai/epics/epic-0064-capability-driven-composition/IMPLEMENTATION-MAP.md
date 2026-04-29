@@ -6,6 +6,12 @@
 **Total waves:** 15
 **Critical path:** A→B→C→D→E→F→G→H→I→J→K→L→M→N→O (15 hops)
 
+> **Refinement (2026-04-28):**
+> (a) **D1**: paths `adr/ADR-0016-*.md` migrados para `docs/adr/ADR-0016-*.md` no Phase 0 file footprint (story-0001).
+> (b) **D2**: Rule 28 source-of-truth adicionada ao file footprint da story-0005 (`java/src/main/resources/targets/claude/rules/28-capability-frontmatter-contract.md`).
+> (c) Story-0006 (sync EPIC-0062) marcada como **Concluída por antecipação** — EPIC-0062 mergeado em PR #751 (commit `91129cc24`); cross-refs corrigidos neste refinement.
+> (d) Hard fence "EPIC-0062 mergeado" no DAG visual atualizado para "✅ resolvido".
+
 ---
 
 ## DAG Visual
@@ -27,7 +33,7 @@ graph LR
   M --> N[Phase 6 audit]
   N --> O[Phase 7 cleanup]
 
-  EPIC0062[EPIC-0062<br/>Folder v4] -.hard-fence.-> A
+  EPIC0062[EPIC-0062<br/>Folder v4 ✅ MERGEADO<br/>PR #751] -.resolved.-> A
   EPIC0036[EPIC-0036<br/>Skill rename] -.hard-fence.-> K
 ```
 
@@ -37,12 +43,12 @@ graph LR
 
 | Story | Título | Sz | Pred | Wave | File footprint (write) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0064-0001 | ADR-0016 draft | S | — | A | `adr/ADR-0016-capability-driven-composition.md` |
+| story-0064-0001 | ADR-0016 draft | S | — | A | `docs/adr/ADR-0016-capability-driven-composition.md` |
 | story-0064-0002 | SPEC-capability-composition-v1 | M | 0001 | A | `docs/specs/SPEC-capability-composition-v1.md` |
 | story-0064-0003 | Schema 3.0 frontmatter | S | 0002 | A | `governance/schemas/frontmatter-3.0.json` |
 | story-0064-0004 | Schema 1.0 capabilities.yaml | S | 0002 | A | `governance/schemas/capabilities-1.0.json` |
-| story-0064-0005 | Rule 28 — Capability Frontmatter Contract | S | 0003 | A | `.claude/rules/28-capability-frontmatter-contract.md` |
-| story-0064-0006 | Sync com EPIC-0062 (rebase paths v4) | M | externo | A | — (rebase op) |
+| story-0064-0005 | Rule 28 — Capability Frontmatter Contract | S | 0003 | A | `java/src/main/resources/targets/claude/rules/28-capability-frontmatter-contract.md` (source-of-truth) + `.claude/rules/28-capability-frontmatter-contract.md` (output) |
+| story-0064-0006 | Sync com EPIC-0062 (rebase paths v4) — **Concluída por antecipação** | M | externo (EPIC-0062 mergeado PR #751) | A | — (cross-refs corrigidos no refinement chore/refine-epic-0064) |
 | story-0064-0007 | LifecycleIntegrity para artefatos novos | S | 0005 | A | `LifecycleIntegrityAuditTest.java` |
 | story-0064-0008 | CHANGELOG seed `[Unreleased] [Breaking]` | S | 0001 | A | `CHANGELOG.md` |
 
@@ -172,7 +178,7 @@ graph LR
 
 | Wave | Conteúdo | Stories paralelas | Pre-condition |
 | :--- | :--- | :--- | :--- |
-| A | Phase 0 (8 stories) | 5 paralelas + 0006 espera externo | EPIC-0062 mergeado |
+| A | Phase 0 (8 stories) | 5 paralelas; 0006 já Concluída (EPIC-0062 mergeado) | EPIC-0062 ✅ mergeado (PR #751) |
 | B | Phase 1 core (4) | 4 paralelas | A done |
 | C | Phase 1 integração (3) | 0105+0106 paralelas; 0107 serial | B done |
 | D | Phase 1 qualidade (5) | 5 paralelas | C done |
@@ -243,6 +249,7 @@ Stories Phase 4 (split de stack-patterns) tocam `targets/claude/knowledge/stack-
 ## Status & Telemetria
 
 - **Status atual:** `Em Refinamento`
-- **Stories materializadas:** 8 (Phase 0)
+- **Stories materializadas:** 8 (Phase 0) — refinadas em 2026-04-28 (chore/refine-epic-0064)
+- **Phase 0 progress:** 5 Concluída (0001–0004 + 0006 antecipada) · 1 Em Andamento (0005, source-of-truth seed) · 2 Pendente (0007, 0008)
 - **Stories TBD:** 71 (Phase 1-7) — materializadas por `x-story-create` em waves subsequentes
-- **`execution-state.json`:** inicializado em `ai/epics/epic-0064-*/` com `flowVersion: "2"`, `taskTracking.enabled: true`.
+- **`execution-state.json`:** `flowVersion: "4"` (D3, layout v4 sob `ai/epics/`), `taskTracking.enabled: true`.
