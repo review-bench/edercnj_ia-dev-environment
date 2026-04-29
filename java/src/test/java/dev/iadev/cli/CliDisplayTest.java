@@ -3,6 +3,8 @@ package dev.iadev.cli;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.PipelineResult;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -210,6 +212,39 @@ class CliDisplayTest {
 
             assertThat(table).contains("\u2500");
         }
+
+        @Test
+        void emptyListCategory_whenCalled_categorySkippedInTable() {
+            Map<String, List<String>> classified = new LinkedHashMap<>();
+            classified.put("Rules", List.of("a"));
+            classified.put("Empty", List.of());
+
+            String table = CliDisplay.formatSummaryTable(classified);
+
+            assertThat(table).contains("Rules");
+            assertThat(table).doesNotContain("Empty");
+        }
+
+        @Test
+        void longLabelCategory_whenCalled_labelFitsInTable() {
+            Map<String, List<String>> classified =
+                    Map.of("ABCDEFGHIJKLMNOPQRSTU", List.of("x"));
+
+            String table = CliDisplay.formatSummaryTable(classified);
+
+            assertThat(table).contains("ABCDEFGHIJKLMNOPQRSTU");
+        }
+
+        @Test
+        void largeCount_whenCalled_countDisplayedCorrectly() {
+            List<String> files = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) files.add("f" + i);
+            Map<String, List<String>> classified = Map.of("Rules", files);
+
+            String table = CliDisplay.formatSummaryTable(classified);
+
+            assertThat(table).contains("10000");
+        }
     }
 
     @Nested
@@ -270,6 +305,17 @@ class CliDisplayTest {
 
             assertThat(output).contains(".claude/rules/01.md");
             assertThat(output).contains(".github/agents/a.md");
+        }
+
+        @Test
+        void dryRunResultWithEmptyFiles_whenCalled_noFileListSection() {
+            PipelineResult result =
+                    new PipelineResult(true, "/tmp/output", List.of(), List.of(), 100);
+
+            String output = CliDisplay.formatResult(result, DisplayMode.DRY_RUN);
+
+            assertThat(output).contains("[DRY RUN]");
+            assertThat(output).doesNotContain("Files that would be generated");
         }
     }
 }

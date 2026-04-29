@@ -299,6 +299,31 @@ class PermissionCollectorTest {
 
             assertThat(result).containsExactly("first", "second");
         }
+
+        @Test
+        @DisplayName("non-quoted token is ignored")
+        void parseJsonStringArray_nonQuotedToken_isIgnored() {
+            List<String> result = PermissionCollector.parseJsonStringArray("[abc]");
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("spaces before comma parses both elements")
+        void parseJsonStringArray_spacesBeforeComma_parsesBothElements() {
+            List<String> result =
+                    PermissionCollector.parseJsonStringArray("[\"a\"   ,   \"b\"]");
+
+            assertThat(result).containsExactly("a", "b");
+        }
+
+        @Test
+        @DisplayName("unclosed quote returns entry up to end of string")
+        void parseJsonStringArray_unclosedQuote_returnsEntryToEnd() {
+            List<String> result = PermissionCollector.parseJsonStringArray("[\"unclosed]");
+
+            assertThat(result).containsExactly("unclosed");
+        }
     }
 
     @Nested
