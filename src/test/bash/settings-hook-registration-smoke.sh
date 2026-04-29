@@ -164,7 +164,7 @@ at09
 
 # AT-10: Source-of-truth hook matches deployed hook
 at10() {
-  local source_hook="${REPO_ROOT}/java/src/main/resources/targets/claude/hooks/enforce-no-bypass-flags.sh"
+  local source_hook="${REPO_ROOT}/src/main/resources/targets/claude/hooks/enforce-no-bypass-flags.sh"
   if [ ! -f "${source_hook}" ]; then
     fail "AT-10: source-of-truth hook" "not found at ${source_hook}"
     return

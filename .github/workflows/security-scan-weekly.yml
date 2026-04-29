@@ -33,7 +33,6 @@ jobs:
           cache: maven
 
       - name: Build target/ for scanning (no tests)
-        working-directory: java
         run: mvn -B -DskipTests package
 
       - name: Trivy scan (filesystem)
@@ -42,7 +41,7 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
-          scan-ref: java/
+          scan-ref: ./
           format: sarif
           output: trivy.sarif
           severity: HIGH,CRITICAL

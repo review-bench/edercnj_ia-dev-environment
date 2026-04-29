@@ -35,18 +35,18 @@ Thumbs.db
 *.bak
 
 # Java
-java/target/
-java/dependency-reduced-pom.xml
+target/
+dependency-reduced-pom.xml
 *.class
 *.jar
-!java/lib/*.jar
+!lib/*.jar
 
 # Maven
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # Coverage
-java/target/site/
+target/site/
 *.exec
 
 # Test output
@@ -54,10 +54,10 @@ test-output/
 test-output-ts/
 output/
 # Re-include Java source 'output' directories (hexagonal architecture ports/adapters)
-!java/src/**/output/
+!src/**/output/
 
 # .claude/ is a generated output of ia-dev-env (source of truth lives in
-# java/src/main/resources/targets/claude/). It is no longer versioned —
+# src/main/resources/targets/claude/). It is no longer versioned —
 # regenerate locally instead of committing diffs.
 /.claude/
 
@@ -65,7 +65,7 @@ output/
 /.claire/
 
 # jqwik property-based test database (local, regenerated on each test run).
-java/.jqwik-database
+.jqwik-database
 
 # x-release transient state files (created in Step 0, deleted in Step 12)
 /ai/releases/release-state-*.json
