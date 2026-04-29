@@ -93,6 +93,22 @@ validate_args() {
         printf 'PREFLIGHT_FAILED: INVALID_ARGS — --scope must be story or epic\n' >&2
         exit $E_INVALID_ARGS
     fi
+    normalize_epic_id
+}
+
+# Normalize EPIC_ID so downstream path expansions never produce
+# double-prefixed paths like "plans/epic-epic-0074". Accepts both bare
+# numbers ("0074") and prefixed forms ("epic-0074", "EPIC-0074") emitted
+# by callers such as enforce-preflight-gates.sh. Derives EPIC_ID from
+# STORY_ID (XXXX-YYYY -> XXXX) when scope=story leaves EPIC_ID empty.
+normalize_epic_id() {
+    if [[ -z "$EPIC_ID" && "$SCOPE" == "story" && "$STORY_ID" =~ ^([0-9]{4})- ]]; then
+        EPIC_ID="${BASH_REMATCH[1]}"
+    fi
+    [[ -n "$EPIC_ID" ]] || return 0
+    # strip case-insensitive "epic-" prefix if present
+    EPIC_ID="${EPIC_ID#epic-}"
+    EPIC_ID="${EPIC_ID#EPIC-}"
 }
 
 # ── Self-check ─────────────────────────────────────────────────────────────────
@@ -119,10 +135,59 @@ run_self_check() {
 }
 
 # ── Gate runners ───────────────────────────────────────────────────────────────
+
+# Resolves the base ref for the Java-diff probe. Echoes the ref name on stdout.
+# Exits with E_OPERATIONAL when neither origin/develop nor HEAD@{upstream} is
+# resolvable — must never silently degrade to "no Java diff", which would let
+# Java gates be skipped on a misconfigured remote (shallow clone, missing
+# fetch, branch with no upstream, etc.).
+resolve_java_diff_base_ref() {
+    if git -C "${REPO_ROOT}" rev-parse --verify --quiet origin/develop >/dev/null; then
+        printf '%s\n' 'origin/develop'
+        return 0
+    fi
+    if git -C "${REPO_ROOT}" rev-parse --verify --quiet 'HEAD@{upstream}' >/dev/null; then
+        git -C "${REPO_ROOT}" rev-parse --abbrev-ref 'HEAD@{upstream}'
+        return 0
+    fi
+    printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — unable to resolve git base ref (origin/develop or HEAD@{upstream})\n' >&2
+    exit $E_OPERATIONAL
+}
+
+# Returns 0 if the branch contains any change under java/ vs the resolved base
+# ref; non-zero otherwise. Used to skip Java-only gates on documentation /
+# refinement PRs that touch nothing under the Java module. Matches the entire
+# java/ subtree (not only .java + pom.xml) so changes to src/main/resources/,
+# build configs, and other Java-module assets still trigger format + test
+# gates as expected.
+java_sources_changed() {
+    local base_ref
+    local changed_files
+
+    base_ref="$(resolve_java_diff_base_ref)"
+    if ! changed_files="$(git -C "${REPO_ROOT}" diff --name-only "${base_ref}...HEAD" 2>&1)"; then
+        printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — git diff failed for base ref %s\n' "${base_ref}" >&2
+        exit $E_OPERATIONAL
+    fi
+
+    grep -E '^java/' >/dev/null <<<"${changed_files}"
+}
+
 run_gate_format() {
     printf '[Gate 5] format check\n' >&2
-    mvn spotless:check -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: FORMAT_VIOLATION — fix: run mvn spotless:apply\n' >&2
+    # Repo layout: pom.xml lives under java/, not at the repo root. Skip the gate
+    # when java/pom.xml is absent (e.g., docs-only branches in nested checkouts).
+    local java_pom="${REPO_ROOT}/java/pom.xml"
+    if [[ ! -f "${java_pom}" ]]; then
+        printf '[Gate 5] no java/pom.xml — skipping format check\n' >&2
+        return 0
+    fi
+    if ! java_sources_changed; then
+        printf '[Gate 5] no Java source changes vs origin/develop — skipping format check\n' >&2
+        return 0
+    fi
+    mvn -f "${java_pom}" spotless:check -q 2>/dev/null || {
+        printf 'PREFLIGHT_FAILED: FORMAT_VIOLATION — fix: (cd java && mvn spotless:apply)\n' >&2
         exit $E_FORMAT
     }
 }
@@ -142,10 +207,15 @@ run_gate_review_content() {
 
 run_gate_telemetry() {
     printf '[Gate 4] telemetry evidence audit\n' >&2
+    # Scope the lookup to the specific epic being preflight'd. A bare repo-wide
+    # find would pick up any events.ndjson (e.g., plans/unknown/telemetry/) and
+    # audit it for the current story — guaranteed false-positive on chore PRs
+    # that touch a fresh epic with no telemetry yet.
     local ndjson
-    ndjson=$(find "${REPO_ROOT}/plans" "${REPO_ROOT}/ai/epics" \
+    ndjson=$(find "${REPO_ROOT}/plans/epic-${EPIC_ID}" \
+                  "${REPO_ROOT}/ai/epics/epic-${EPIC_ID}-"* \
         -name "events.ndjson" -path "*/telemetry/*" 2>/dev/null | head -1 || true)
-    [[ -z "$ndjson" ]] && { printf '[Gate 4] no telemetry file — skip\n' >&2; return 0; }
+    [[ -z "$ndjson" ]] && { printf '[Gate 4] no telemetry file for epic-%s — skip\n' "$EPIC_ID" >&2; return 0; }
     "${CLAUDE_SCRIPTS}/audit-execution-integrity.sh" \
         --scope=telemetry --story-id="story-${STORY_ID}" --ndjson-file "$ndjson" 2>/dev/null || {
         printf 'PREFLIGHT_FAILED: TELEMETRY_EVIDENCE_MISSING — fix: ensure x-review was invoked\n' >&2
@@ -166,15 +236,24 @@ run_gate_self_check_audit() {
 
 run_gate_tests() {
     printf '[Gate 1] mvn test\n' >&2
-    mvn test -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: TESTS_FAILED — fix: run mvn test to see failures\n' >&2
+    local java_pom="${REPO_ROOT}/java/pom.xml"
+    if [[ ! -f "${java_pom}" ]]; then
+        printf '[Gate 1] no java/pom.xml — skipping mvn test\n' >&2
+        return 0
+    fi
+    if ! java_sources_changed; then
+        printf '[Gate 1] no Java source changes vs origin/develop — skipping mvn test\n' >&2
+        return 0
+    fi
+    mvn -f "${java_pom}" test -q 2>/dev/null || {
+        printf 'PREFLIGHT_FAILED: TESTS_FAILED — fix: (cd java && mvn test) to see failures\n' >&2
         exit $E_TESTS_FAILED
     }
 }
 
 run_gate_coverage() {
     printf '[Gate 2] coverage check\n' >&2
-    local csv="${REPO_ROOT}/target/site/jacoco/jacoco.csv"
+    local csv="${REPO_ROOT}/java/target/site/jacoco/jacoco.csv"
     [[ -f "$csv" ]] || { printf '[Gate 2] jacoco.csv not found — skip\n' >&2; return 0; }
     "${CLAUDE_SCRIPTS}/audit-coverage-local.sh" \
         --report-path "$csv" --story-id="story-${STORY_ID}" 2>/dev/null || {
