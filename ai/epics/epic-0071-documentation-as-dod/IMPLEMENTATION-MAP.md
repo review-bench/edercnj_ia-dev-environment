@@ -152,7 +152,7 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | `governance/baselines/doc-freshness-baseline.txt` | story-0071-0005 task-004 (cria initial empty) | story-0071-0008 task-002 (verifica consistência) | Mesmo arquivo; 0005 cria, 0008 valida. |
 | `docs/audit-gates-catalog.md` entry | story-0071-0001 task-009 (reserva opcional) → story-0071-0005 task-006 (entry simultâneo com script) → story-0071-0008 task-003 (consolida com link final) | encadeamento RULE-004 Catalog-before-Add | 0001 reserva precoce; 0005 cria entry junto com script; 0008 consolida e pode editar. |
-| `targets/claude/rules/24-execution-integrity.md` §Mandatory Evidence Artifacts | story-0071-0006 task-002 (adiciona entry para `x-doc-validate`) | story-0071-0008 task-008 (sincroniza/valida) | Mesmo arquivo; ambas stories editam — rodar 0006 ANTES de 0008. |
+| `java/src/main/resources/targets/claude/rules/24-execution-integrity.md` §Mandatory Evidence Artifacts | story-0071-0006 task-002 (adiciona entry para `x-doc-validate`) | story-0071-0008 task-008 (sincroniza/valida) | Mesmo arquivo (source-of-truth — `.claude/rules/` é gerado); ambas stories editam — rodar 0006 ANTES de 0008. |
 | `CHANGELOG.md` | story-0071-0007 task-004 (dogfood entry) | story-0071-0008 task-004 (consolida MAJOR placeholder) | Mesmo arquivo; ordem mandatória 0007 → 0008. |
 | `audit-bypass-flags.sh` extension | story-0071-0006 task-003 (estende para `--skip-doc`) | story-0071-0008 (smoke valida) | 0006 modifica script; 0008 valida via cenário 5 do smoke. |
 | `ScriptsAssembler.AUDIT_SCRIPTS` | story-0071-0005 task-007 (adiciona `audit-doc-freshness.sh`) | story-0071-0008 (smoke valida instalação determinística) | 0005 wire; 0008 valida. |
@@ -167,7 +167,7 @@ graph TD
 - `java/src/main/resources/targets/claude/skills/core/ops/x-release-changelog/SKILL.md` (regen) — só story 0004.
 - `java/src/main/resources/targets/claude/skills/core/dev/x-story-implement/SKILL.md` (regen) — só story 0006.
 - `CHANGELOG.md` — stories 0007 e 0008. **Ordem mandatória:** 0007 ANTES de 0008.
-- `targets/claude/rules/24-execution-integrity.md` — stories 0006 e 0008. **Ordem mandatória:** 0006 ANTES de 0008.
+- `java/src/main/resources/targets/claude/rules/24-execution-integrity.md` — stories 0006 e 0008. **Ordem mandatória:** 0006 ANTES de 0008. (Path canônico source-of-truth — `.claude/rules/` é output gerado.)
 - `docs/audit-gates-catalog.md` — stories 0001 (reserva opcional), 0005 (entry com script), 0008 (consolida). Sequencial: 0001 → 0005 → 0008.
 - `governance/baselines/doc-freshness-baseline.txt` — story 0005 cria; 0008 valida. Sequencial.
 - `capabilities/governance/doc-as-dod.yaml` — story 0001 cria. Single-writer.
@@ -189,7 +189,7 @@ graph TD
 | ID | Resumo | Stories afetadas |
 | :--- | :--- | :--- |
 | D-R1 | Path source-of-truth `core/<categoria>/` (não `core/doc/`). | 0002, 0003, 0004, 0006 |
-| D-R2 | Path Rule plano vigente em `targets/claude/rules/`. | 0001 |
+| D-R2 | Path Rule plano vigente em `java/src/main/resources/targets/claude/rules/` (source-of-truth; `.claude/rules/` é output gerado). | 0001 |
 | D-R3 | Numeração Rule TBD (palpite Rule 31). | 0001 |
 | D-R4 | Numeração ADR TBD (palpite ADR-0020). | 0001 |
 | D-R5 | Exit codes Rule 26 §Standardized + `--self-check`. | 0005 |
