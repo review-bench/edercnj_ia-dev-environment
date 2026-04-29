@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0066 (PR Body Templates & Telemetry-Aware Review Visibility)
+
+- **Two new PR body templates** under `shared/templates/`:
+  - `_TEMPLATE-PR-IMPLEMENTATION.md` — for implementation/story/task PRs (9 sections).
+  - `_TEMPLATE-PR-BACKLOG.md` — for scaffolding PRs (12 sections).
+- **`x-internal-pr-body-render`** (new internal skill, `model: haiku`): renders PR body Markdown from disk artifacts using one of the two templates. 5 numbered phases + Phase 1.5 BACKLOG-GATHER for `--kind=backlog`. Fail-open per RULE-004.
+- **`scripts/telemetry-consolidate.sh`**: aggregates `events.ndjson` by scope; emits JSON/MD/table. Rule 26 exit codes.
+- **`audit-pr-template.sh`** (CI audit — Rule 26 §CI script): hard gate validating PR body has `<!-- template-version: -->` marker and mandatory sections. `AuditPrTemplateAuditorTest` invokes it during `mvn verify` (EPIC-0061 pattern).
+- **`x-pr-create` Phase 3** refactored to delegate body generation to render skill (MANDATORY TOOL CALL — Rule 24); Phase 3.5 dedup; ## Recovery fallback (carved out per ADR-0007).
+- **`x-feature-create` Phase P5.5 BACKLOG-RENDER**: invokes render with `--kind=backlog`, uses `gh pr create --body-file`.
+- **`PhaseMarkerEmissionTest`**: catches ABSENT markers (gap `TelemetryMarkerLint` doesn't detect).
+- **`Epic0066PrTemplateSmokeTest`**: E2E smoke wiring all chain pieces under `mvn verify`.
+- **`pr-template-baseline.txt`**: empty grandfather file for `audit-pr-template.sh` (immutable post-merge).
+
 ### Added — EPIC-0065 (Feature Creation Chain Refactor)
 
 - **`x-feature-ideate`** (new public skill, model: opus): converts free-form prose or a text file into a structured RA9 v2 spec (5 mandatory sections) and opens a PR on `docs/feature-<slug>` targeting `develop` for human review.
