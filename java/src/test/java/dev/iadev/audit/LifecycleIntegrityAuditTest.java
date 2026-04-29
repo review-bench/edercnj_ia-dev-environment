@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,6 +53,15 @@ class LifecycleIntegrityAuditTest {
 
     private static final Set<String> PLANNING_ARTIFACT_PREFIXES =
             Set.of("epic-", "story-", "task-");
+
+    /**
+     * Path segments that identify EPIC-0064 config/schema/fragment artifacts — excluded from RA9
+     * lifecycle enforcement (story-0064-0007). Capabilities are pure config YAML, fragments carry
+     * {@code fragment-slot} frontmatter instead of {@code Status}, and governance schemas are JSON
+     * validators with no lifecycle state.
+     */
+    private static final List<String> EXCLUDED_NAMESPACE_SEGMENTS =
+            List.of("capabilities/", "fragments/", "governance/schemas/");
 
     private final Ra9SectionsChecker sectionsChecker = new Ra9SectionsChecker();
     private final Ra9RationaleChecker rationaleChecker = new Ra9RationaleChecker();
@@ -114,7 +124,14 @@ class LifecycleIntegrityAuditTest {
 
     private boolean isPlanningArtifact(Path path) {
         String name = path.getFileName().toString();
-        return PLANNING_ARTIFACT_PREFIXES.stream().anyMatch(name::startsWith);
+        return PLANNING_ARTIFACT_PREFIXES.stream().anyMatch(name::startsWith)
+                && !isExcludedNamespace(path);
+    }
+
+    static boolean isExcludedNamespace(Path path) {
+        String normalized = path.toString().replace('\\', '/');
+        return EXCLUDED_NAMESPACE_SEGMENTS.stream()
+                .anyMatch(seg -> normalized.startsWith(seg) || normalized.contains("/" + seg));
     }
 
     private boolean isBaselined(Path path, Set<String> patterns) {
@@ -150,6 +167,46 @@ class LifecycleIntegrityAuditTest {
                     .collect(Collectors.toSet());
         } catch (IOException e) {
             return Set.of();
+        }
+    }
+
+    /**
+     * Verifies the three EPIC-0064 namespace exclusions (story-0064-0007).
+     *
+     * <p>Capabilities are config YAML (not lifecycle-controlled), fragments carry {@code
+     * fragment-slot} frontmatter (not standalone Status), and governance schemas are pure JSON
+     * validators. All three must be excluded from the RA9 lifecycle audit.
+     */
+    @Nested
+    @DisplayName("EPIC-0064 namespace exclusions (story-0064-0007)")
+    class Epic0064NamespaceExclusionsTest {
+
+        @Test
+        @DisplayName("capabilities YAML not flagged as missing Status")
+        void isExcludedNamespace_capabilitiesPath_returnsTrue() {
+            Path p = Path.of("capabilities/data/database/postgres.yaml");
+            assertThat(isExcludedNamespace(p)).isTrue();
+        }
+
+        @Test
+        @DisplayName("fragment md treated as fragment — no standalone Status needed")
+        void isExcludedNamespace_fragmentsPath_returnsTrue() {
+            Path p = Path.of("targets/claude/skills/x-review/fragments/db.md");
+            assertThat(isExcludedNamespace(p)).isTrue();
+        }
+
+        @Test
+        @DisplayName("governance schema JSON exempted from Status check")
+        void isExcludedNamespace_governanceSchemasPath_returnsTrue() {
+            Path p = Path.of("governance/schemas/frontmatter-3.0.json");
+            assertThat(isExcludedNamespace(p)).isTrue();
+        }
+
+        @Test
+        @DisplayName("planning artifact md not excluded")
+        void isExcludedNamespace_planningArtifactPath_returnsFalse() {
+            Path p = Path.of("plans/epic-0064/plans/story-0064-0001.md");
+            assertThat(isExcludedNamespace(p)).isFalse();
         }
     }
 }
