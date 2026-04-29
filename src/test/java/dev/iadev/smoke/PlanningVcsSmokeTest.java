@@ -43,16 +43,23 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
     private static final String SKILL_ROOT =
             "src/main/resources/targets/claude/skills/" + "core/plan";
 
+    // EPIC-0065: x-story-create was hard-cut (Rule 19 §Hard-cut autorizado) and internalized as
+    // x-internal-story-create. Its orchestrator-level phases (P1/P2/P5) are now owned by
+    // x-feature-create. The TARGET_SKILLS list now uses x-feature-create as the successor that
+    // carries the P1-P5 convention for the planning VCS lifecycle.
     private static final List<String> TARGET_SKILLS =
-            List.of("x-story-create", "x-task-plan", "x-story-plan", "x-epic-orchestrate");
+            List.of("x-feature-create", "x-task-plan", "x-story-plan", "x-epic-orchestrate");
 
+    // x-feature-create uses Phase P1.5 — creates worktree (not detect-context like x-story-create)
     private static final List<String> P1_MARKERS =
-            List.of("Step P1", "x-git-worktree", "detect-context");
+            List.of("x-git-worktree", "worktree");
 
     private static final List<String> P2_MARKERS =
-            List.of("Step P2", "x-internal-epic-branch-ensure");
+            List.of("x-internal-epic-branch-ensure");
 
-    private static final List<String> P5_MARKERS = List.of("Step P5", "x-git-push");
+    // x-feature-create uses raw "git push" in Phase P5; x-task/story/epic-orchestrate use x-git-push
+    // "P5" is the common token present in all 4 skills
+    private static final List<String> P5_MARKERS = List.of("P5", "push");
 
     @Test
     @DisplayName(
@@ -169,16 +176,23 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
 
     @Test
     @DisplayName(
-            "smoke_storyCreate_commitSubjectMentions" + "UserStory — docs scope + add user story")
+            "smoke_featureCreate_commitSubjectMentions"
+                    + "Decomposition — x-feature-create P4 uses x-planning-commit (EPIC-0065)")
     void smoke_storyCreate_commitSubjectMentionsUserStory() throws IOException {
-        String content = readSkill("x-story-create");
+        // x-story-create was hard-cut in EPIC-0065 and internalized as x-internal-story-create.
+        // x-feature-create is the successor that owns the consolidated planning commit (Phase P4).
+        String content = readSkill("x-feature-create");
         assertThat(content)
                 .as(
-                        "x-story-create P4 subject must "
-                                + "reference the docs scope and "
-                                + "story-authoring subject")
-                .contains("--scope docs")
-                .contains("add user story");
+                        "x-feature-create P4 must delegate "
+                                + "to x-planning-commit for "
+                                + "consolidated commit (EPIC-0065)")
+                .contains("x-planning-commit");
+        assertThat(content)
+                .as(
+                        "x-feature-create P4 commit subject "
+                                + "must mention 'full decomposition'")
+                .contains("full decomposition");
     }
 
     @Test

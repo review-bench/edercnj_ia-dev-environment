@@ -1,0 +1,70 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0065",
+  "epicSlug": "feature-creation-chain-refactor",
+  "epicBranch": "epic/0065",
+  "targetBranch": "develop",
+  "mode": "sequential",
+  "interactive": false,
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0065-0001": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 839,
+      "mergedAt": "2026-04-29"
+    },
+    "story-0065-0002": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 840
+    },
+    "story-0065-0003": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 841
+    },
+    "story-0065-0004": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 842
+    },
+    "story-0065-0005": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 842
+    },
+    "story-0065-0006": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 842
+    },
+    "story-0065-0007": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 843
+    },
+    "story-0065-0008": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 844
+    },
+    "story-0065-0009": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 845
+    },
+    "story-0065-0010": {
+      "status": "COMPLETE",
+      "flowVersion": "4",
+      "prNumber": 846
+    }
+  },
+  "parallelismDowngrades": [],
+  "localFirstLifecycle": true,
+  "createdAt": "2026-04-29T00:00:00Z"
+}

@@ -122,11 +122,10 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-code-lint** | `/x-code-lint` | Analyzes source code with the appropriate linter for {{LANGUAGE}}. Second step in the pre-commit chain (RULE-007: format -> lint -> compile -> commit). Supports --fix, --changed-only, and --strict modes. |
 | **x-dependency-audit** | `/x-dependency-audit` | Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report. |
 | **x-doc-generate** | `/x-doc-generate` | Documentation automation: detects documentation type needed (API, README, ADR, changelog) from code changes, delegates to specialized skills or generates inline. Single entry point for all documentation updates. |
-| **x-epic-create** | `/x-epic-create` | Generate an Epic document from a system specification file with cross-cutting business rules, global quality definitions (DoR/DoD), a complete story index with dependency declarations, and optional Jira integration. |
-| **x-epic-decompose** | `/x-epic-decompose` | Complete decomposition of a system specification into an Epic, individual Story files, and an Implementation Map with dependency graph and phased execution plan. Orchestrates spec analysis, rule extraction, story identification, and implementation planning. |
 | **x-epic-implement** | `/x-epic-implement` | Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-args-normalize), Phase 1 (load+plan via x-internal-epic-build-plan), Phase 2 (epic branch via x-internal-epic-branch-ensure), Phase 3 (sequential-by-default story loop via x-story-implement), Phase 4 (integrity gate + report via x-internal-epic-integrity-gate + x-internal-report-write), Phase 5 (final PR epic/XXXX → develop via x-git-merge + x-pr-create). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill. |
-| **x-epic-map** | `/x-epic-map` | Generate an Implementation Map from an Epic and its Stories with dependency matrix, phase computation, critical path analysis, ASCII phase diagrams, Mermaid dependency graphs, phase summary tables, and strategic observations. |
 | **x-epic-orchestrate** | `/x-epic-orchestrate` | Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support. |
+| **x-feature-create** | `/x-feature-create` | Create a complete feature (Epic + N Stories + Implementation Map) from a spec file, with a worktree-isolated docs/ branch, consolidated commit, and auto-merged PR into epic/XXXX. |
+| **x-feature-ideate** | `/x-feature-ideate` | Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-feature-create. |
 | **x-git-branch** | `/x-git-branch` | Creates a bare git branch (no worktree) from a configurable base with naming validation and idempotency. Single source of truth for branch creation logic consumed by orchestrators (x-internal-epic-branch-ensure, x-story-implement) and users. |
 | **x-git-cleanup-branches** | `/x-git-cleanup-branches` | Cleans local git state in one pass: fetches origin with prune, removes all non-main worktrees (any path), and deletes all local branches except main/master/develop. Destructive by default with an interactive y/N confirmation gate; supports --dry-run (preview) and --yes (non-interactive). |
 | **x-git-commit** | `/x-git-commit` | Creates Conventional Commits with Task ID in scope and pre-commit chain (format -> lint -> compile). Central commit point in the task-centric workflow with TDD tag support. |
@@ -164,7 +163,6 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-setup-env** | `/x-setup-env` | Validate and configure local development environment: detect stack, check prerequisites, verify versions, validate IDE config, test database connectivity, run initial build, and report status with fix suggestions. |
 | **x-spec-drift** | `/x-spec-drift` | Detects spec-code drift by comparing story data contracts, endpoints, and Gherkin scenarios against implemented code. Supports standalone mode (full report) and inline mode (compact output for TDD loop integration in x-story-implement Phase 2). |
 | **x-status-reconcile** | `/x-status-reconcile` | Reconciles execution-state.json (telemetry) against the **Status:** field of Epic / Story markdown artifacts. Default mode (diagnose) is read-only and prints a divergence table. Opt-in --apply rewrites the markdowns atomically via StatusFieldParser and commits via x-git-commit. Respects Rule 19 (legacy v1 epics skip silently) and Rule 22 (markdown is SoT; state.json is telemetry). Use for manual recovery of legacy epics whose markdown status drifted from execution checkpoints. |
-| **x-story-create** | `/x-story-create` | Generate detailed User Story files from an Epic and system specification with full data contracts, Gherkin acceptance criteria, Mermaid sequence diagrams, dependency declarations, tagged sub-tasks, quality gate validation, and optional Jira integration. |
 | **x-story-implement** | `/x-story-implement` | Thin orchestrator (~320 lines — story-0049-0019 refactor) that drives a story end-to-end via 4 delegated phases: Phase 0 (args via x-internal-args-normalize + context via x-internal-story-load-context + resume via x-internal-story-resume), Phase 1 (parallel planning via x-internal-story-build-plan), Phase 2 (task execution loop via x-task-implement per task, then final story PR via x-pr-create), Phase 3 (verify via x-internal-story-verify + report via x-internal-story-report + optional worktree cleanup via x-git-worktree). New EPIC-0049 flags --target-branch / --auto-merge / --epic-id propagate OO-style to x-task-implement and x-pr-create. Backward compatible: absent flags preserve legacy EPIC-0048 behavior (target=develop, auto-merge=none). |
 | **x-story-plan** | `/x-story-plan` | Multi-agent story planning: launches 5 specialized agents (Architect, QA, Security, Tech Lead, Product Owner) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-task-plan in parallel. |
 | **x-supply-chain-audit** | `/x-supply-chain-audit` | Enhanced supply chain security audit beyond x-dependency-audit. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring. |
@@ -180,7 +178,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-test-tdd** | `/x-test-tdd` | Executes systematic Red-Green-Refactor TDD cycles for a task. Reads the task plan generated by x-task-plan, runs each cycle in TPP order, validates RED/GREEN/REFACTOR phases, delegates atomic commits to x-git-commit with TDD tags, and supports resume and dry-run. |
 | **x-threat-model** | `/x-threat-model` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 
-**Total: 87 skills**
+**Total: 88 skills**
 
 ### Usage Examples
 
@@ -206,11 +204,14 @@ to inject domain knowledge. Configured with `user-invocable: false`.
 | `x-internal-args-normalize` | Referenced internally by agents |
 | `x-internal-epic-branch-ensure` | Referenced internally by agents |
 | `x-internal-epic-build-plan` | Referenced internally by agents |
+| `x-internal-epic-create` | Referenced internally by agents |
 | `x-internal-epic-integrity-gate` | Referenced internally by agents |
+| `x-internal-epic-map` | Referenced internally by agents |
 | `x-internal-phase-gate` | Referenced internally by agents |
 | `x-internal-report-write` | Referenced internally by agents |
 | `x-internal-status-update` | Referenced internally by agents |
 | `x-internal-story-build-plan` | Referenced internally by agents |
+| `x-internal-story-create` | Referenced internally by agents |
 | `x-internal-story-load-context` | Referenced internally by agents |
 | `x-internal-story-report` | Referenced internally by agents |
 | `x-internal-story-resume` | Referenced internally by agents |
@@ -337,8 +338,8 @@ See the files directly for current configuration.
 | Component | Count |
 |-----------|-------|
 | Rules (.claude) | 25 |
-| Skills (.claude) | 72 |
-| Knowledge Packs (.claude) | 15 |
+| Skills (.claude) | 70 |
+| Knowledge Packs (.claude) | 18 |
 | Agents (.claude) | 12 |
 | Hooks (.claude) | 15 |
 | Settings (.claude) | 2 |

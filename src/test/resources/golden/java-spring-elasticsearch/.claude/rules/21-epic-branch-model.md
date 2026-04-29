@@ -60,6 +60,8 @@ epic/XXXX ●──●──●──●──●──●──●──●─�
 - **Force-pushing `epic/XXXX`** — prohibited once any story PR has been merged in (rewriting history invalidates the merge record).
 - **Skipping the manual gate** — automating `epic/XXXX → develop` defeats the purpose of Rule 21.
 
+**Exception — `docs/` planning PRs (EPIC-0065):** PRs from `docs/<epic-id>-<slug>` branches targeting `epic/XXXX` with label `docs` are auto-merged by GitHub native auto-merge (same as story PRs). This is the only authorized path for automatic `epic/XXXX` merges outside story PRs. The audit `audit-epic-branches.sh` explicitly permits this pattern. PRs from `docs/feature-<slug>` targeting `develop` (ideation flow) remain **manual gates** — they are NOT auto-merged.
+
 ## Backward Compatibility
 
 - Epics created before EPIC-0049 merged (flowVersion `"1"` or absent) use legacy flow — story PRs target `develop` directly, no `epic/XXXX` branch exists.

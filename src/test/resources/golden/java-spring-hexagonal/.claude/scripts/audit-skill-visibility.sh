@@ -26,6 +26,17 @@
 #
 # Introduced by story-0058-0005 (EPIC-0058). See Rule 22 at
 # .claude/rules/22-skill-visibility.md for the contract.
+# Extended by story-0065-0001 (EPIC-0065): recognizes 3 new x-internal-* skills
+# under core/internal/plan/ (x-internal-epic-create, x-internal-epic-map,
+# x-internal-story-create). No code change needed — the recursive find already
+# covers all subdirectories under SKILLS_ROOT.
+# Extended by story-0065-0008 (EPIC-0065): explicitly documents permitted internal
+# paths for the EPIC-0065 chain. These are checked automatically by the prefix
+# validation (any x-internal-* must have visibility: internal + user-invocable: false).
+# Permitted EPIC-0065 internals (core/internal/plan/):
+#   - x-internal-epic-create (rebaixado de x-epic-create)
+#   - x-internal-epic-map    (rebaixado de x-epic-map)
+#   - x-internal-story-create (rebaixado de x-story-create)
 #
 # Catalogado em: docs/audit-gates-catalog.md
 

@@ -178,6 +178,12 @@ Domain MUST NOT import adapter or framework code (Rule 04).
 
 ## 9. Dependências & File Footprint
 
+> **Branching (EPIC-0065 — Feature Creation Chain):**
+> Planning artifacts for this epic are committed on branch `docs/<epic-id>-<slug>`
+> (base: `epic/XXXX`, target: `epic/XXXX`) via `x-feature-create`.
+> The branch is auto-merged after CI passes (Rule 21 §Anti-Patterns EPIC-0065 exception).
+> The final epic-to-develop PR (`epic/XXXX → develop`) is always a **manual gate**.
+
 ### Índice de Histórias
 
 | ID | Título | Dependências (Blocked By) | Entrega de Valor | Planejamento |

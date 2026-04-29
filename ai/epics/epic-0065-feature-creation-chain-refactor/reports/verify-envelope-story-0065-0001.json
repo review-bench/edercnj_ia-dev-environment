@@ -1,0 +1,20 @@
+{
+  "storyId": "story-0065-0001",
+  "epicId": "EPIC-0065",
+  "passed": true,
+  "coverageDelta": null,
+  "failures": [],
+  "acCheckResults": {
+    "rule09-docs-branch-type": "PASS",
+    "rule14-worktree-patterns": "PASS",
+    "rule19-hard-cut": "PASS",
+    "rule21-docs-exception": "PASS",
+    "rule22-internal-examples": "PASS",
+    "audit-skill-visibility-check": "PASS (bash syntax valid)",
+    "audit-epic-branches-check": "PASS (bash syntax valid + check D added)"
+  },
+  "goldenFileTests": "10/10 PASS",
+  "prNumber": 839,
+  "prMergeStatus": "MERGED",
+  "mergedInto": "epic/0065"
+}

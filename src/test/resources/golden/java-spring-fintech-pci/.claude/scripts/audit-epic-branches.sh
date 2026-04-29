@@ -11,6 +11,10 @@
 #       comparison; full check requires reflog access to origin).
 #   (c) Cleanup configuration excludes epic/* (any tooling that prunes branches
 #       must whitelist epic/* — checked via grep over scripts/setup-hooks.sh).
+#   (d) docs/<epic-id>-<slug> branches (EPIC-0065): validate that the corresponding
+#       epic/XXXX branch exists. docs/feature-<slug> branches are ideation-only and
+#       are NOT checked for epic/ correlation. docs/* branches are NOT violations
+#       for any check that expects epic/* format.
 #
 # Exit codes:
 #   0   All checks PASS.
@@ -26,14 +30,19 @@
 #
 # Introduced by story-0058-0004 (EPIC-0058). See Rule 21 at
 # .claude/rules/21-epic-branch-model.md for the contract.
+# Extended by story-0065-0001 (EPIC-0065): adds Check D for docs/ branch type.
 #
 # Catalogado em: docs/audit-gates-catalog.md
 
 set -euo pipefail
 
-SCRIPT_VERSION="1.1.0"
+SCRIPT_VERSION="1.2.0"
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+# v4 layout: execution-state.json lives under ai/epics/<epic-XXXX-slug>/
+# v3 layout (legacy): lives under plans/epic-XXXX/
+# PathResolver-style: try v4 first, fall back to v3
+EPICS_DIR="${REPO_ROOT}/ai/epics"
 PLANS_DIR="${REPO_ROOT}/plans"
 SETUP_HOOKS_FILE="${REPO_ROOT}/scripts/setup-hooks.sh"
 
@@ -105,14 +114,23 @@ if command -v gh &>/dev/null; then
     }
     [[ -z "$epic_id" ]] && continue
 
-    state_file="${PLANS_DIR}/epic-${epic_id}/execution-state.json"
-    if [[ -f "$state_file" ]]; then
+    # PathResolver: try v4 layout first (ai/epics/epic-XXXX-*/), then v3 (plans/epic-XXXX/)
+    state_file=""
+    if [[ -d "${EPICS_DIR}" ]]; then
+      state_file=$(find "${EPICS_DIR}" -maxdepth 2 -name "execution-state.json" \
+                   -path "*/epic-${epic_id}-*/*" 2>/dev/null | head -1 || true)
+    fi
+    if [[ -z "$state_file" ]] && [[ -f "${PLANS_DIR}/epic-${epic_id}/execution-state.json" ]]; then
+      state_file="${PLANS_DIR}/epic-${epic_id}/execution-state.json"
+    fi
+    if [[ -n "$state_file" ]] && [[ -f "$state_file" ]]; then
       flow=$(jq -r '.flowVersion // "ABSENT"' "$state_file" 2>&1) || {
         echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: failed to parse ${state_file}: ${flow}" >&2
         exit 2
       }
-      if [[ "$flow" != "2" ]]; then
-        echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: PR #${pr_number} (epic/${epic_id}) has flowVersion=\"${flow}\" (Rule 21 requires \"2\")" >&2
+      # flowVersion "2", "3", "4" are all valid new-flow variants (Rule 19)
+      if [[ "$flow" != "2" && "$flow" != "3" && "$flow" != "4" ]]; then
+        echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: PR #${pr_number} (epic/${epic_id}) has flowVersion=\"${flow}\" (Rule 21 requires 2/3/4)" >&2
         violations=$((violations + 1))
       fi
     fi
@@ -164,5 +182,22 @@ if [[ -f "$SETUP_HOOKS_FILE" ]]; then
   fi
 fi
 
-echo "${SCRIPT_NAME}: checked PRs + local epic/* branches + cleanup config; violations: ${violations}"
+# ---------------------------------------------------------------------------
+# Check D — docs/<epic-id>-<slug> branches: validate epic/XXXX exists (EPIC-0065)
+# ---------------------------------------------------------------------------
+while IFS= read -r ref; do
+  [[ -z "$ref" ]] && continue
+  branch="${ref#origin/}"
+  # Match docs/<4-digit-epic-id>-<slug> (creation flow) but NOT docs/feature-<slug> (ideation flow)
+  if [[ "$branch" =~ ^docs/([0-9]{4})-.+ ]]; then
+    epic_id="${BASH_REMATCH[1]}"
+    epic_branch="epic/${epic_id}"
+    if ! git rev-parse --verify "origin/${epic_branch}" &>/dev/null; then
+      echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: ${branch} requires ${epic_branch} to exist on origin (Rule 21 §Anti-Patterns EPIC-0065 exception)" >&2
+      violations=$((violations + 1))
+    fi
+  fi
+done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ 2>/dev/null | grep "^origin/docs/" || true)
+
+echo "${SCRIPT_NAME}: checked PRs + local epic/* branches + cleanup config + docs/ branches; violations: ${violations}"
 [[ $violations -eq 0 ]] && exit 0 || exit 1

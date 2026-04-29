@@ -26,4 +26,5 @@
 #   (click-cli-patterns, k8s-helm, axum-patterns, iac-terraform,
 #   dotnet-patterns); now 20 entries remain
 core/plan/x-epic-orchestrate/SKILL.md
-core/plan/x-story-create/SKILL.md
+# core/plan/x-story-create/SKILL.md — hard-cut in EPIC-0065 (story-0065-0006); replaced by:
+core/internal/plan/x-internal-story-create/SKILL.md

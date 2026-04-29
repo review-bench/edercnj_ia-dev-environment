@@ -16,10 +16,18 @@ Internal skills are implementation details extracted from orchestrators to reduc
 
 ## Naming Convention
 
-- Public skills: `x-{subject}-{action}` — 2-to-3-token kebab-case name (e.g., `x-epic-create`, `x-task-implement`, `x-pr-watch-ci`).
+- Public skills: `x-{subject}-{action}` — 2-to-3-token kebab-case name (e.g., `x-feature-create`, `x-task-implement`, `x-pr-watch-ci`).
 - Internal skills: `x-internal-{subject}-{action}` — MUST carry the `x-internal-` prefix exactly. No exceptions.
-- Subdir convention (source of truth): `src/main/resources/targets/claude/skills/internal/{group}/x-internal-{name}/SKILL.md` where `{group}` is one of `epic`, `story`, `task`, `git`, `pr`, `report`, `state`.
+- Subdir convention (source of truth): `src/main/resources/targets/claude/skills/core/internal/{group}/x-internal-{name}/SKILL.md` where `{group}` is one of `plan`, `git`, `ops`.
 - Generated output: **flat** under `.claude/skills/` — the subdir structure exists only in source-of-truth to aid navigation.
+
+**EPIC-0065 chain internals** (visibility: internal, source path: `core/internal/plan/`):
+
+| Internal skill | Replaced public skill | Source path | Invoked by |
+| :--- | :--- | :--- | :--- |
+| `x-internal-epic-create` | `x-epic-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-epic-create/SKILL.md` | `x-feature-create` |
+| `x-internal-epic-map` | `x-epic-map` (hard-cut — Rule 19) | `core/internal/plan/x-internal-epic-map/SKILL.md` | `x-feature-create` |
+| `x-internal-story-create` | `x-story-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-story-create/SKILL.md` | `x-feature-create` |
 
 ## Frontmatter Contract
 
