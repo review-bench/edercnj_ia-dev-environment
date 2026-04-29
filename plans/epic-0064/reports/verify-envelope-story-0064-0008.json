@@ -1,0 +1,52 @@
+{
+  "storyId": "story-0064-0008",
+  "epicId": "EPIC-0064",
+  "verifiedAt": "2026-04-29T10:00:00Z",
+  "passed": false,
+  "warnings": [
+    "Coverage gate: LINE 94.34% < 95%, BRANCH 88.45% < 90% — pre-existing on develop, not caused by this story"
+  ],
+  "testSuite": {
+    "total": 4095,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 14,
+    "status": "PASS"
+  },
+  "smokeTests": {
+    "total": 439,
+    "failures": 0,
+    "status": "PASS"
+  },
+  "coverage": {
+    "line": 94.34,
+    "branch": 88.45,
+    "lineThreshold": 95.0,
+    "branchThreshold": 90.0,
+    "linePass": false,
+    "branchPass": false,
+    "preExistingOnDevelop": true
+  },
+  "specialistReview": {
+    "overall": "REJECTED",
+    "totalScore": 41,
+    "maxScore": 48,
+    "specialists": ["QA", "Performance", "Security", "DevOps"]
+  },
+  "techLeadReview": {
+    "decision": "NO-GO",
+    "score": 50,
+    "maxScore": 55,
+    "remediation": "QA-8 fixed in 6dfdd5187; coverage gap persistent (epic-level action required)"
+  },
+  "artifacts": {
+    "archPlan": "plans/epic-0064/plans/arch-story-0064-0008.md",
+    "implPlan": "plans/epic-0064/plans/plan-story-0064-0008.md",
+    "testPlan": "plans/epic-0064/plans/tests-story-0064-0008.md",
+    "taskBreakdown": "plans/epic-0064/plans/tasks-story-0064-0008.md",
+    "specialistReview": "plans/epic-0064/plans/review-story-0064-0008.md",
+    "techLeadReview": "plans/epic-0064/reviews/review-tech-lead-story-0064-0008.md",
+    "dashboard": "plans/epic-0064/reviews/dashboard-story-0064-0008.md",
+    "remediation": "plans/epic-0064/reviews/remediation-story-0064-0008.md"
+  }
+}
