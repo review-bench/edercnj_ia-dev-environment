@@ -243,3 +243,12 @@ story-0057-0005  # amnesty EPIC-0059: merged before Phase-1 artifact gate
 story-0057-0006  # amnesty EPIC-0059: merged before Phase-1 artifact gate
 story-0057-0007  # amnesty EPIC-0059: merged before Phase-1 artifact gate
 story-0057-0008  # amnesty EPIC-0059: merged before Phase-1 artifact gate
+
+# Hotfix exception (Rule 27 §Exception 2) — 2026-04-28
+# Branch: hotfix/telemetry-epic-branch-resolution
+# Reason: telemetry-lib.sh::resolve_context did not recognise the epic/NNNN
+# branch convention (Rule 21 / EPIC-0049), so every tool call from those
+# branches fell to the "unknown" fallback and polluted plans/unknown/.
+# Fix: single-line regex addition + 3-case JUnit regression
+# (TelemetryLibResolveContextTest). Source-of-truth + 10 goldens regenerated
+# atomically. No story-id — pure infrastructure hotfix.

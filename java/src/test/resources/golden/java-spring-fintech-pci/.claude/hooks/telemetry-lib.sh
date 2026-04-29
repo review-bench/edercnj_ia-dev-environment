@@ -109,9 +109,14 @@ resolve_context() {
             TELEMETRY_TASK_ID="TASK-${BASH_REMATCH[2]}-${BASH_REMATCH[3]}-${BASH_REMATCH[4]}"
             return 0
         fi
-        # Epic branch: feature/epic-NNNN-...
+        # Epic branch: feature/epic-NNNN-... (legacy)
         if [[ "${branch}" =~ ^(feat|feature|fix|hotfix)/epic-([0-9]{4}) ]]; then
             TELEMETRY_EPIC_ID="EPIC-${BASH_REMATCH[2]}"
+            return 0
+        fi
+        # Epic branch: epic/NNNN (Rule 21 — EPIC-0049 naming)
+        if [[ "${branch}" =~ ^epic/([0-9]{4})$ ]]; then
+            TELEMETRY_EPIC_ID="EPIC-${BASH_REMATCH[1]}"
             return 0
         fi
     fi
