@@ -5,7 +5,8 @@ public sealed class CapabilityError extends RuntimeException
                 CapabilityError.AsymmetricMutex,
                 CapabilityError.CyclicDependency,
                 CapabilityError.InvalidExpression,
-                CapabilityError.MutexConflict {
+                CapabilityError.MutexConflict,
+                CapabilityError.MissingPrerequisite {
 
     private CapabilityError(String message) {
         super(message);
@@ -37,6 +38,12 @@ public sealed class CapabilityError extends RuntimeException
 
     public static final class MutexConflict extends CapabilityError {
         public MutexConflict(String message) {
+            super(message);
+        }
+    }
+
+    public static final class MissingPrerequisite extends CapabilityError {
+        public MissingPrerequisite(String message) {
             super(message);
         }
     }
