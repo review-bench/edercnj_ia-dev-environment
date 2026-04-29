@@ -7,13 +7,11 @@ import java.util.Objects;
 /**
  * Immutable composition plan produced by {@link CapabilityAwareComposer#plan}.
  *
- * <p>Separates the decision (which artifacts to include) from execution (writing to disk).
- * This separation enables dry-run and testing without side effects (RULE-004 determinism).
+ * <p>Separates the decision (which artifacts to include) from execution (writing to disk). This
+ * separation enables dry-run and testing without side effects (RULE-004 determinism).
  */
 public record CompositionPlan(
-        List<ArtifactEntry> included,
-        List<ArtifactEntry> excluded,
-        List<String> warnings) {
+        List<ArtifactEntry> included, List<ArtifactEntry> excluded, List<String> warnings) {
 
     public record ArtifactEntry(Path sourcePath, String relativePath, String excludeReason) {
 
@@ -43,7 +41,8 @@ public record CompositionPlan(
     }
 
     public String toSummary() {
-        return String.format("CompositionPlan{included=%d, excluded=%d, warnings=%d}",
+        return String.format(
+                "CompositionPlan{included=%d, excluded=%d, warnings=%d}",
                 included.size(), excluded.size(), warnings.size());
     }
 }

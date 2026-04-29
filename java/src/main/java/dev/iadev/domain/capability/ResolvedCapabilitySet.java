@@ -8,8 +8,8 @@ import java.util.Optional;
 /**
  * Immutable result of capability resolution — the effective set of capabilities for a profile.
  *
- * <p>Contains all transitive prerequisites in topological order, effective parameter values,
- * and any resolution warnings emitted during expansion.
+ * <p>Contains all transitive prerequisites in topological order, effective parameter values, and
+ * any resolution warnings emitted during expansion.
  */
 public record ResolvedCapabilitySet(
         String profileName,
@@ -20,7 +20,8 @@ public record ResolvedCapabilitySet(
     public ResolvedCapabilitySet {
         Objects.requireNonNull(profileName, "profileName must not be null");
         capabilities = capabilities == null ? List.of() : List.copyOf(capabilities);
-        effectiveParameters = effectiveParameters == null ? Map.of() : Map.copyOf(effectiveParameters);
+        effectiveParameters =
+                effectiveParameters == null ? Map.of() : Map.copyOf(effectiveParameters);
         warnings = warnings == null ? List.of() : List.copyOf(warnings);
     }
 

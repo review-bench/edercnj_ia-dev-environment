@@ -12,7 +12,10 @@ public record ParameterSpec(
         String description) {
 
     public enum ParameterType {
-        STRING, INT, BOOLEAN, ENUM
+        STRING,
+        INT,
+        BOOLEAN,
+        ENUM
     }
 
     public ParameterSpec {

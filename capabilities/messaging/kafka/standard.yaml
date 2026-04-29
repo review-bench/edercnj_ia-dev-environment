@@ -1,0 +1,6 @@
+id: messaging.kafka.standard
+name: Apache Kafka
+description: Apache Kafka event streaming with producers, consumers, and dead-letter topics.
+parameters:
+  client-library: kafka-clients
+excludes: []

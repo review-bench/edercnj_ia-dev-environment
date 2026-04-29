@@ -1,19 +1,14 @@
 package dev.iadev.application.assembler;
 
-import dev.iadev.application.capability.CapabilityResolver;
 import dev.iadev.application.composition.CapabilityAwareComposer;
 import dev.iadev.application.composition.CompositionPlan;
 import dev.iadev.application.composition.OutputPruner;
-import dev.iadev.domain.capability.CapabilityDefinition;
-import dev.iadev.domain.capability.CapabilityId;
-import dev.iadev.domain.capability.Profile;
 import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,7 +21,8 @@ import java.util.logging.Logger;
  */
 public final class CapabilityCompositionAssembler implements Assembler {
 
-    private static final Logger LOG = Logger.getLogger(CapabilityCompositionAssembler.class.getName());
+    private static final Logger LOG =
+            Logger.getLogger(CapabilityCompositionAssembler.class.getName());
 
     private final CapabilityAwareComposer composer;
     private final OutputPruner pruner;
@@ -75,14 +71,17 @@ public final class CapabilityCompositionAssembler implements Assembler {
         try {
             return dev.iadev.util.ResourceResolver.resolveResourceDir("targets/claude");
         } catch (IllegalArgumentException e) {
-            LOG.fine("CapabilityCompositionAssembler: targets/claude not found on classpath — skip");
+            LOG.fine(
+                    "CapabilityCompositionAssembler: targets/claude not found on classpath — skip");
             return null;
         }
     }
 
     private ResolvedCapabilitySet buildActiveSet(ProjectConfig config) {
-        // Phase 7 (story-0064-0701): replace with CapabilityResolver + YamlCapabilityCatalogAdapter.
-        // Until then, empty active set includes only requires-capabilities:[] (universal) artifacts.
+        // Phase 7 (story-0064-0701): replace with CapabilityResolver +
+        // YamlCapabilityCatalogAdapter.
+        // Until then, empty active set includes only requires-capabilities:[] (universal)
+        // artifacts.
         return new ResolvedCapabilitySet("default", List.of(), java.util.Map.of(), List.of());
     }
 }

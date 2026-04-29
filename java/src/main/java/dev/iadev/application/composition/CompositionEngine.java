@@ -12,20 +12,22 @@ import java.util.regex.Pattern;
  * Resolves slot/each fragment markers in parent artifact bodies — runs before Pebble (RULE-005).
  *
  * <p>Supported markers:
+ *
  * <ul>
  *   <li>{@code {{ slot: name }}} — replaced by concatenated fragment bodies matching that slot
  *   <li>{@code {{ #each fragments.name }} ... {{ /each }}} — iterates fragments for that slot
  * </ul>
  *
- * <p>LLM placeholders ({@code {{UPPER_SNAKE}}}) are preserved unchanged.
- * Fragments ordered by {@code fragment-order} ascending, then alphabetical by fragment-id (RULE-004).
+ * <p>LLM placeholders ({@code {{UPPER_SNAKE}}}) are preserved unchanged. Fragments ordered by
+ * {@code fragment-order} ascending, then alphabetical by fragment-id (RULE-004).
  */
 public final class CompositionEngine {
 
     private static final Pattern SLOT_PATTERN =
             Pattern.compile("\\{\\{\\s*slot:\\s*([\\w-]+)\\s*\\}\\}");
     private static final Pattern EACH_PATTERN =
-            Pattern.compile("\\{\\{\\s*#each\\s+fragments\\.([\\w-]+)\\s*\\}\\}(.*?)\\{\\{\\s*/each\\s*\\}\\}",
+            Pattern.compile(
+                    "\\{\\{\\s*#each\\s+fragments\\.([\\w-]+)\\s*\\}\\}(.*?)\\{\\{\\s*/each\\s*\\}\\}",
                     Pattern.DOTALL);
 
     public record Fragment(String slotName, String fragmentId, int fragmentOrder, String body) {}
@@ -71,10 +73,10 @@ public final class CompositionEngine {
         if (fragments.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         for (Fragment f : fragments) {
-            String item = template
-                    .replace("{{ fragment-id }}", f.fragmentId())
-                    .replace("{{ description }}", f.body().lines().findFirst().orElse(""))
-                    .replace("{{ body }}", f.body());
+            String item =
+                    template.replace("{{ fragment-id }}", f.fragmentId())
+                            .replace("{{ description }}", f.body().lines().findFirst().orElse(""))
+                            .replace("{{ body }}", f.body());
             sb.append(item);
         }
         return sb.toString();
@@ -100,8 +102,9 @@ public final class CompositionEngine {
         for (Fragment f : fragments) {
             map.computeIfAbsent(f.slotName(), k -> new ArrayList<>()).add(f);
         }
-        Comparator<Fragment> order = Comparator.comparingInt(Fragment::fragmentOrder)
-                .thenComparing(Fragment::fragmentId);
+        Comparator<Fragment> order =
+                Comparator.comparingInt(Fragment::fragmentOrder)
+                        .thenComparing(Fragment::fragmentId);
         map.values().forEach(list -> list.sort(order));
         return map;
     }

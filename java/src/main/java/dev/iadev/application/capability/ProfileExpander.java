@@ -3,8 +3,8 @@ package dev.iadev.application.capability;
 import dev.iadev.domain.capability.CapabilityDefinition;
 import dev.iadev.domain.capability.CapabilityId;
 import dev.iadev.domain.capability.Profile;
-import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import dev.iadev.domain.capability.ResolutionWarning;
+import dev.iadev.domain.capability.ResolvedCapabilitySet;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -16,8 +16,8 @@ import java.util.Set;
 /**
  * Expands a {@link Profile} against a catalog to produce a {@link ResolvedCapabilitySet}.
  *
- * <p>Orchestrates: glob expansion → prerequisite resolution → parameter override application.
- * Does NOT run cycle or mutex validation — those belong to {@link CapabilityResolver}.
+ * <p>Orchestrates: glob expansion → prerequisite resolution → parameter override application. Does
+ * NOT run cycle or mutex validation — those belong to {@link CapabilityResolver}.
  */
 public final class ProfileExpander {
 
@@ -47,24 +47,23 @@ public final class ProfileExpander {
         }
 
         Map<String, String> effectiveParams = new LinkedHashMap<>();
-        for (Map.Entry<String, String> override : (parameterOverrides == null
-                ? Map.<String, String>of() : parameterOverrides).entrySet()) {
+        for (Map.Entry<String, String> override :
+                (parameterOverrides == null ? Map.<String, String>of() : parameterOverrides)
+                        .entrySet()) {
             String key = override.getKey();
             String capId = extractCapabilityId(key);
             if (capId != null && !isCapabilityActive(capId, allCapabilities)) {
-                warnings.add(ResolutionWarning.of(
-                        ResolutionWarning.Kind.UNKNOWN_CAPABILITY,
-                        "override target '" + capId + "' not in profile — skipping"));
+                warnings.add(
+                        ResolutionWarning.of(
+                                ResolutionWarning.Kind.UNKNOWN_CAPABILITY,
+                                "override target '" + capId + "' not in profile — skipping"));
             } else {
                 effectiveParams.put(key, override.getValue());
             }
         }
 
         return new ResolvedCapabilitySet(
-                profile.name(),
-                List.copyOf(allCapabilities),
-                effectiveParams,
-                warnings);
+                profile.name(), List.copyOf(allCapabilities), effectiveParams, warnings);
     }
 
     private String extractCapabilityId(String paramKey) {

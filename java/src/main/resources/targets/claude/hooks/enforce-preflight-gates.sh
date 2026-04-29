@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# requires-capabilities: []
 # enforce-preflight-gates.sh — Camada 0 PreToolUse hook (Rule 26 §Camada 0)
 #
 # Layer:      0 (preventive — fires during LLM turn)

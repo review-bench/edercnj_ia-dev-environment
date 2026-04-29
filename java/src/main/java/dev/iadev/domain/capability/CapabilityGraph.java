@@ -15,8 +15,8 @@ import java.util.Set;
 /**
  * Immutable read-only DAG of capability definitions.
  *
- * <p>Provides topological traversal with deterministic alphabetical tie-breaking (RULE-004).
- * Nodes are keyed by {@link CapabilityId#value()} in a {@link LinkedHashMap} for stable order.
+ * <p>Provides topological traversal with deterministic alphabetical tie-breaking (RULE-004). Nodes
+ * are keyed by {@link CapabilityId#value()} in a {@link LinkedHashMap} for stable order.
  */
 public final class CapabilityGraph {
 
@@ -84,7 +84,8 @@ public final class CapabilityGraph {
         return Collections.unmodifiableList(result);
     }
 
-    private static Map<String, Set<String>> buildDependents(Map<String, CapabilityDefinition> nodes) {
+    private static Map<String, Set<String>> buildDependents(
+            Map<String, CapabilityDefinition> nodes) {
         Map<String, Set<String>> deps = new HashMap<>();
         for (CapabilityDefinition def : nodes.values()) {
             for (CapabilityId req : def.requires()) {

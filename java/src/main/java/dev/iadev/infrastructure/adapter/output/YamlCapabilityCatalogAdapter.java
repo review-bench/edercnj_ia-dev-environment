@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.LoaderOptions;
 
 public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepository {
 
@@ -29,8 +29,7 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
     @Override
     public List<CapabilityDefinition> loadAll(Path catalogRoot) {
         if (!Files.isDirectory(catalogRoot)) {
-            throw new CapabilityError.UnknownCapability(
-                    "catalog root not found: " + catalogRoot);
+            throw new CapabilityError.UnknownCapability("catalog root not found: " + catalogRoot);
         }
         List<CapabilityDefinition> all = new ArrayList<>();
         try (Stream<Path> paths = Files.walk(catalogRoot)) {
@@ -48,8 +47,7 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
     @Override
     public Optional<CapabilityDefinition> load(Path capabilityFile) {
         if (!Files.exists(capabilityFile)) {
-            throw new CapabilityError.UnknownCapability(
-                    "file not found: " + capabilityFile);
+            throw new CapabilityError.UnknownCapability("file not found: " + capabilityFile);
         }
         Map<String, Object> raw = parseYaml(capabilityFile);
         validateRequiredFields(raw, capabilityFile);
@@ -63,8 +61,7 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
         try (InputStream is = Files.newInputStream(file)) {
             Object parsed = yaml.load(is);
             if (!(parsed instanceof Map)) {
-                throw new CapabilityError.UnknownCapability(
-                        "expected YAML map at: " + file);
+                throw new CapabilityError.UnknownCapability("expected YAML map at: " + file);
             }
             return (Map<String, Object>) parsed;
         } catch (IOException e) {
@@ -82,7 +79,8 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
     }
 
     private void validateRequiredFields(Map<String, Object> raw, Path file) {
-        for (String field : List.of(REQUIRED_FIELD_ID, REQUIRED_FIELD_KIND, REQUIRED_FIELD_CATEGORY)) {
+        for (String field :
+                List.of(REQUIRED_FIELD_ID, REQUIRED_FIELD_KIND, REQUIRED_FIELD_CATEGORY)) {
             if (!raw.containsKey(field)) {
                 throw new CapabilityError.UnknownCapability(
                         "schema v3.0 required — missing field '" + field + "' in: " + file);
@@ -106,8 +104,19 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
         List<String> tags = toStringList(raw, "tags");
         Map<String, ParameterSpec> params = new LinkedHashMap<>();
 
-        return new CapabilityDefinition(id, kind, category, version, status,
-                description, params, requires, provides, excludes, expandsTo, tags);
+        return new CapabilityDefinition(
+                id,
+                kind,
+                category,
+                version,
+                status,
+                description,
+                params,
+                requires,
+                provides,
+                excludes,
+                expandsTo,
+                tags);
     }
 
     private String str(Map<String, Object> raw, String key, Path file) {
@@ -124,8 +133,9 @@ public final class YamlCapabilityCatalogAdapter implements CapabilityCatalogRepo
             case "atomic" -> CapabilityKind.ATOMIC;
             case "composite" -> CapabilityKind.COMPOSITE;
             case "profile" -> CapabilityKind.PROFILE;
-            default -> throw new CapabilityError.UnknownCapability(
-                    "unknown kind '" + kind + "' in: " + file);
+            default ->
+                    throw new CapabilityError.UnknownCapability(
+                            "unknown kind '" + kind + "' in: " + file);
         };
     }
 

@@ -31,7 +31,9 @@ public final class CapabilityId {
         if (CapabilityGlob.isGlob(raw)) {
             if (!GLOB_PATTERN.matcher(raw).matches()) {
                 throw new CapabilityError.UnknownCapability(
-                        "'" + raw + "' is not a valid glob — must follow category.subcategory.* format");
+                        "'"
+                                + raw
+                                + "' is not a valid glob — must follow category.subcategory.* format");
             }
         } else {
             if (!CANONICAL.matcher(raw).matches()) {

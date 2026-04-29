@@ -24,16 +24,18 @@ final class ArtifactScanner {
         try (Stream<Path> paths = Files.walk(root)) {
             paths.filter(this::isMarkdownArtifact)
                     .sorted()
-                    .forEach(p -> {
-                        try {
-                            String content = Files.readString(p);
-                            List<String> caps = extractRequiredCapabilities(content);
-                            if (caps != null) {
-                                String rel = root.relativize(p).toString();
-                                result.add(new ScannedArtifact(p, rel, caps));
-                            }
-                        } catch (IOException ignored) {}
-                    });
+                    .forEach(
+                            p -> {
+                                try {
+                                    String content = Files.readString(p);
+                                    List<String> caps = extractRequiredCapabilities(content);
+                                    if (caps != null) {
+                                        String rel = root.relativize(p).toString();
+                                        result.add(new ScannedArtifact(p, rel, caps));
+                                    }
+                                } catch (IOException ignored) {
+                                }
+                            });
         }
         return result;
     }
@@ -54,9 +56,11 @@ final class ArtifactScanner {
         if (endFm < 0) return null;
         String fm = stripped.substring(firstNl + 1, endFm);
         if (!fm.contains("requires-capabilities")) {
-            LOG.warning(() -> "ArtifactScanner: frontmatter v2 artifact missing requires-capabilities"
-                    + " (Rule 28 violation — treating as universal): "
-                    + content.substring(0, Math.min(80, content.length())));
+            LOG.warning(
+                    () ->
+                            "ArtifactScanner: frontmatter v2 artifact missing requires-capabilities"
+                                    + " (Rule 28 violation — treating as universal): "
+                                    + content.substring(0, Math.min(80, content.length())));
             return List.of();
         }
 

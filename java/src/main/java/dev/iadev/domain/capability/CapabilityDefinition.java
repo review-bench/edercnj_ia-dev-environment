@@ -9,8 +9,8 @@ import java.util.Optional;
 /**
  * Immutable record reflecting a {@code capabilities/<category>/<id>.yaml} file.
  *
- * <p>Fields map 1:1 to schema v1.0 ({@code governance/schemas/capabilities-1.0.json}).
- * Uses {@link LinkedHashMap} internally to guarantee deterministic field ordering (RULE-004).
+ * <p>Fields map 1:1 to schema v1.0 ({@code governance/schemas/capabilities-1.0.json}). Uses {@link
+ * LinkedHashMap} internally to guarantee deterministic field ordering (RULE-004).
  */
 public record CapabilityDefinition(
         CapabilityId id,
@@ -41,22 +41,43 @@ public record CapabilityDefinition(
         tags = tags == null ? List.of() : List.copyOf(tags);
 
         if (kind == CapabilityKind.PROFILE && expandsTo.isEmpty()) {
-            throw new IllegalArgumentException("Profile capability '" + id + "' must declare expands-to");
+            throw new IllegalArgumentException(
+                    "Profile capability '" + id + "' must declare expands-to");
         }
     }
 
-    public static CapabilityDefinition atomic(CapabilityId id, String category, String description) {
+    public static CapabilityDefinition atomic(
+            CapabilityId id, String category, String description) {
         return new CapabilityDefinition(
-                id, CapabilityKind.ATOMIC, category,
-                Optional.empty(), "stable", description,
-                new LinkedHashMap<>(), List.of(), List.of(), List.of(), List.of(), List.of());
+                id,
+                CapabilityKind.ATOMIC,
+                category,
+                Optional.empty(),
+                "stable",
+                description,
+                new LinkedHashMap<>(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of());
     }
 
-    public static CapabilityDefinition profile(CapabilityId id, String category, List<CapabilityId> expandsTo) {
+    public static CapabilityDefinition profile(
+            CapabilityId id, String category, List<CapabilityId> expandsTo) {
         return new CapabilityDefinition(
-                id, CapabilityKind.PROFILE, category,
-                Optional.empty(), "stable", "",
-                new LinkedHashMap<>(), List.of(), List.of(), List.of(), expandsTo, List.of());
+                id,
+                CapabilityKind.PROFILE,
+                category,
+                Optional.empty(),
+                "stable",
+                "",
+                new LinkedHashMap<>(),
+                List.of(),
+                List.of(),
+                List.of(),
+                expandsTo,
+                List.of());
     }
 
     public boolean isDeprecated() {

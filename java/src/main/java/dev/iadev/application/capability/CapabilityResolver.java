@@ -12,6 +12,7 @@ import java.util.Objects;
  * Public facade for capability resolution.
  *
  * <p>Orchestration order (RULE-001 — each step is part of the contract):
+ *
  * <ol>
  *   <li>Mutex validation (catalog-level symmetry check)
  *   <li>Cycle detection (Tarjan SCC on capability graph)
@@ -46,12 +47,17 @@ public final class CapabilityResolver {
 
         mutexValidator.validateCatalog(catalog);
         CapabilityGraph graph = CapabilityGraph.of(catalog);
-        cycleDetector.detect(graph).ifPresent(cycle -> {
-            throw new dev.iadev.domain.capability.CapabilityError.CyclicDependency(
-                    "cyclic dependency detected: " + cycle.cyclePath(), cycle.cyclePath());
-        });
+        cycleDetector
+                .detect(graph)
+                .ifPresent(
+                        cycle -> {
+                            throw new dev.iadev.domain.capability.CapabilityError.CyclicDependency(
+                                    "cyclic dependency detected: " + cycle.cyclePath(),
+                                    cycle.cyclePath());
+                        });
 
-        ResolvedCapabilitySet resolved = profileExpander.expand(profile, catalog, parameterOverrides);
+        ResolvedCapabilitySet resolved =
+                profileExpander.expand(profile, catalog, parameterOverrides);
         mutexValidator.validateProfile(profile, catalog);
 
         return resolved;

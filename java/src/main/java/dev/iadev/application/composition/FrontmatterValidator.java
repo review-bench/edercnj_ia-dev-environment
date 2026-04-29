@@ -1,6 +1,5 @@
 package dev.iadev.application.composition;
 
-import dev.iadev.domain.capability.CapabilityId;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,15 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * Validates frontmatter blocks in markdown files against schema v3.0 (RULE-002, RULE-006).
  *
- * <p>Required fields: {@code name}, {@code requires-capabilities}.
- * Missing {@code requires-capabilities} = frontmatter v2 = hard-fail (RULE-006).
+ * <p>Required fields: {@code name}, {@code requires-capabilities}. Missing {@code
+ * requires-capabilities} = frontmatter v2 = hard-fail (RULE-006).
  */
 public final class FrontmatterValidator {
 
@@ -80,13 +79,20 @@ public final class FrontmatterValidator {
             if (reqs instanceof List<?> list) {
                 for (Object item : list) {
                     if (item instanceof String capId && !knownCapabilityIds.contains(capId)) {
-                        warnings.add("capability " + capId + " not found in catalog (file: " + file + ")");
+                        warnings.add(
+                                "capability "
+                                        + capId
+                                        + " not found in catalog (file: "
+                                        + file
+                                        + ")");
                     }
                 }
             }
         }
 
-        return warnings.isEmpty() ? ValidationResult.pass() : ValidationResult.withWarnings(warnings);
+        return warnings.isEmpty()
+                ? ValidationResult.pass()
+                : ValidationResult.withWarnings(warnings);
     }
 
     public List<ValidationResult> validateAll(Path root) {
@@ -96,7 +102,9 @@ public final class FrontmatterValidator {
                     .sorted()
                     .forEach(p -> results.add(validate(p)));
         } catch (IOException e) {
-            results.add(ValidationResult.failed(List.of("error scanning root: " + root + ": " + e.getMessage())));
+            results.add(
+                    ValidationResult.failed(
+                            List.of("error scanning root: " + root + ": " + e.getMessage())));
         }
         return results;
     }
@@ -116,7 +124,8 @@ public final class FrontmatterValidator {
             LoaderOptions opts = new LoaderOptions();
             Object parsed = new Yaml(new SafeConstructor(opts)).load(yaml);
             if (parsed instanceof Map) return (Map<String, Object>) parsed;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 }

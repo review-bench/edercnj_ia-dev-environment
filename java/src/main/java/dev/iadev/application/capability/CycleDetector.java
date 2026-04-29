@@ -18,16 +18,18 @@ import java.util.Set;
 /**
  * Cycle detector using iterative Tarjan SCC (O(V+E), RULE-004 deterministic).
  *
- * <p>Reports the first SCC (size ≥ 2) sorted alphabetically by minimum capability ID.
- * Additional SCCs surface as {@link ResolutionWarning}.
+ * <p>Reports the first SCC (size ≥ 2) sorted alphabetically by minimum capability ID. Additional
+ * SCCs surface as {@link ResolutionWarning}.
  */
 public final class CycleDetector {
 
-    public record CycleDetected(List<String> cyclePath, List<ResolutionWarning> additionalWarnings) {
+    public record CycleDetected(
+            List<String> cyclePath, List<ResolutionWarning> additionalWarnings) {
         public CycleDetected {
             Objects.requireNonNull(cyclePath);
             cyclePath = List.copyOf(cyclePath);
-            additionalWarnings = additionalWarnings == null ? List.of() : List.copyOf(additionalWarnings);
+            additionalWarnings =
+                    additionalWarnings == null ? List.of() : List.copyOf(additionalWarnings);
         }
     }
 
@@ -37,10 +39,11 @@ public final class CycleDetector {
         if (nodes.isEmpty()) return Optional.empty();
 
         List<List<String>> sccs = findAllSccs(nodes, graph);
-        List<List<String>> cyclicSccs = sccs.stream()
-                .filter(scc -> scc.size() >= 2)
-                .sorted((a, b) -> minId(a).compareTo(minId(b)))
-                .toList();
+        List<List<String>> cyclicSccs =
+                sccs.stream()
+                        .filter(scc -> scc.size() >= 2)
+                        .sorted((a, b) -> minId(a).compareTo(minId(b)))
+                        .toList();
 
         if (cyclicSccs.isEmpty()) return Optional.empty();
 
@@ -48,9 +51,10 @@ public final class CycleDetector {
         List<ResolutionWarning> warnings = new ArrayList<>();
         for (int i = 1; i < cyclicSccs.size(); i++) {
             List<String> extra = cyclicSccs.get(i);
-            warnings.add(ResolutionWarning.of(
-                    ResolutionWarning.Kind.CYCLIC_DEPENDENCY_SUSPECT,
-                    "additional cycle detected: " + extra));
+            warnings.add(
+                    ResolutionWarning.of(
+                            ResolutionWarning.Kind.CYCLIC_DEPENDENCY_SUSPECT,
+                            "additional cycle detected: " + extra));
         }
 
         List<String> cyclePath = buildCyclePath(primary, graph);
@@ -78,10 +82,14 @@ public final class CycleDetector {
     }
 
     private void tarjan(
-            String startId, CapabilityGraph graph,
-            Map<String, Integer> index, Map<String, Integer> lowLink,
-            Set<String> onStack, Deque<String> stack,
-            List<List<String>> result, int[] counter) {
+            String startId,
+            CapabilityGraph graph,
+            Map<String, Integer> index,
+            Map<String, Integer> lowLink,
+            Set<String> onStack,
+            Deque<String> stack,
+            List<List<String>> result,
+            int[] counter) {
 
         Deque<Frame> callStack = new ArrayDeque<>();
         callStack.push(new Frame(startId, new ArrayList<>(), false));

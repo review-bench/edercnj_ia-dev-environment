@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Batch migration service: adds {@code requires-capabilities: []} to artifacts lacking it (v2→v3.0).
+ * Batch migration service: adds {@code requires-capabilities: []} to artifacts lacking it
+ * (v2→v3.0).
  *
  * <p>Used by stories 0203-0214 of EPIC-0064 to migrate ~182 artifacts in one pass (RULE-008).
  * Stack-specific capabilities should be refined manually or via {@code x-frontmatter-migrate}.
@@ -33,15 +34,16 @@ public final class FrontmatterMigrationService {
         try (Stream<Path> paths = Files.walk(dir)) {
             paths.filter(p -> matchesGlob(p, glob))
                     .sorted()
-                    .forEach(p -> {
-                        counts[0]++;
-                        try {
-                            if (migrateFile(p)) counts[1]++;
-                            else counts[2]++;
-                        } catch (IOException e) {
-                            failures.add(p + ": " + e.getMessage());
-                        }
-                    });
+                    .forEach(
+                            p -> {
+                                counts[0]++;
+                                try {
+                                    if (migrateFile(p)) counts[1]++;
+                                    else counts[2]++;
+                                } catch (IOException e) {
+                                    failures.add(p + ": " + e.getMessage());
+                                }
+                            });
         } catch (IOException e) {
             failures.add("error walking dir: " + e.getMessage());
         }

@@ -9,9 +9,11 @@ import java.util.Objects;
  * Decides whether a scanned artifact should be included given the active capability set.
  *
  * <p>Rules:
+ *
  * <ul>
  *   <li>Empty requires-capabilities ({@code []}) → always include (universal artifact)
- *   <li>Non-empty list → include if ANY required capability matches an active capability (glob-aware)
+ *   <li>Non-empty list → include if ANY required capability matches an active capability
+ *       (glob-aware)
  *   <li>No match → exclude with reason
  * </ul>
  */

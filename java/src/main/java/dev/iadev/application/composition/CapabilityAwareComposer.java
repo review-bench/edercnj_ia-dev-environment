@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Core capability-aware composition engine — replaces blind copy of targets/ with capability-filtered output.
+ * Core capability-aware composition engine — replaces blind copy of targets/ with
+ * capability-filtered output.
  *
  * <p>API is split into two deterministic operations:
+ *
  * <ul>
  *   <li>{@link #plan}: pure decision-making, no I/O (testable, RULE-004 deterministic)
  *   <li>{@link #execute}: writes the plan to disk (side-effects isolated here)
@@ -39,7 +41,9 @@ public final class CapabilityAwareComposer {
         try {
             artifacts = scanner.scan(targetsRoot);
         } catch (IOException e) {
-            return new CompositionPlan(List.of(), List.of(),
+            return new CompositionPlan(
+                    List.of(),
+                    List.of(),
                     List.of("error scanning targets root: " + e.getMessage()));
         }
 
@@ -50,11 +54,13 @@ public final class CapabilityAwareComposer {
             CapabilityMatcher.MatchResult result =
                     matcher.matches(artifact.requiredCapabilities(), activeSet);
             if (result.included()) {
-                included.add(new CompositionPlan.ArtifactEntry(
-                        artifact.path(), artifact.relativePath()));
+                included.add(
+                        new CompositionPlan.ArtifactEntry(
+                                artifact.path(), artifact.relativePath()));
             } else {
-                excluded.add(new CompositionPlan.ArtifactEntry(
-                        artifact.path(), artifact.relativePath(), result.excludeReason()));
+                excluded.add(
+                        new CompositionPlan.ArtifactEntry(
+                                artifact.path(), artifact.relativePath(), result.excludeReason()));
             }
         }
         return new CompositionPlan(included, excluded, List.of());
@@ -67,8 +73,8 @@ public final class CapabilityAwareComposer {
         for (CompositionPlan.ArtifactEntry entry : plan.included()) {
             Path target = outputRoot.resolve(entry.relativePath());
             Files.createDirectories(target.getParent());
-            Files.copy(entry.sourcePath(), target,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                    entry.sourcePath(), target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

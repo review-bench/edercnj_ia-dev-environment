@@ -1,0 +1,6 @@
+id: infra.cicd.github-actions
+name: GitHub Actions CI/CD
+description: GitHub Actions workflow for CI, test execution, and deployment gates.
+parameters:
+  runner: ubuntu-latest
+excludes: []

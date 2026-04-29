@@ -9,7 +9,10 @@ import java.util.Objects;
  */
 public final class CompositionPlanReporter {
 
-    public enum Format { TEXT, JSON }
+    public enum Format {
+        TEXT,
+        JSON
+    }
 
     public String report(CompositionPlan plan, Format format) {
         Objects.requireNonNull(plan, "plan must not be null");
@@ -33,8 +36,14 @@ public final class CompositionPlanReporter {
         }
         if (!plan.excluded().isEmpty()) {
             sb.append("\nExcluded:\n");
-            plan.excluded().forEach(e -> sb.append("  - ").append(e.relativePath())
-                    .append(" [").append(e.excludeReason()).append("]\n"));
+            plan.excluded()
+                    .forEach(
+                            e ->
+                                    sb.append("  - ")
+                                            .append(e.relativePath())
+                                            .append(" [")
+                                            .append(e.excludeReason())
+                                            .append("]\n"));
         }
         return sb.toString();
     }
@@ -46,13 +55,21 @@ public final class CompositionPlanReporter {
         sb.append("  \"excluded\": ").append(plan.excluded().size()).append(",\n");
         sb.append("  \"warnings\": ").append(plan.warnings().size()).append(",\n");
         sb.append("  \"includedArtifacts\": [\n");
-        plan.included().forEach(e -> sb.append("    \"")
-                .append(escapeJson(e.relativePath())).append("\",\n"));
+        plan.included()
+                .forEach(
+                        e ->
+                                sb.append("    \"")
+                                        .append(escapeJson(e.relativePath()))
+                                        .append("\",\n"));
         if (!plan.included().isEmpty()) sb.setLength(sb.length() - 2);
         sb.append("\n  ],\n");
         sb.append("  \"excludedArtifacts\": [\n");
-        plan.excluded().forEach(e -> sb.append("    \"")
-                .append(escapeJson(e.relativePath())).append("\",\n"));
+        plan.excluded()
+                .forEach(
+                        e ->
+                                sb.append("    \"")
+                                        .append(escapeJson(e.relativePath()))
+                                        .append("\",\n"));
         if (!plan.excluded().isEmpty()) sb.setLength(sb.length() - 2);
         sb.append("\n  ]\n}");
         return sb.toString();

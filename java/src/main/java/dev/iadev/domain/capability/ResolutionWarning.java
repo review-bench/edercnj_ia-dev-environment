@@ -24,6 +24,10 @@ public record ResolutionWarning(ResolutionWarning.Kind kind, String message, Str
 
     @Override
     public String toString() {
-        return "[" + kind + "] " + message + (context.isEmpty() ? "" : " (context: " + context + ")");
+        return "["
+                + kind
+                + "] "
+                + message
+                + (context.isEmpty() ? "" : " (context: " + context + ")");
     }
 }

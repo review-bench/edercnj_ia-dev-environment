@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 /**
  * Telemetry decorator for {@link CapabilityResolver} — emits phase.start/phase.end events.
  *
- * <p>Fail-open: if telemetry emission fails, resolution continues normally. Respects
- * {@code CLAUDE_TELEMETRY_DISABLED=1} env variable (ADR-0005, RULE-007 fail-open contract).
+ * <p>Fail-open: if telemetry emission fails, resolution continues normally. Respects {@code
+ * CLAUDE_TELEMETRY_DISABLED=1} env variable (ADR-0005, RULE-007 fail-open contract).
  */
 public final class TelemetryCapabilityResolver {
 
@@ -46,8 +46,8 @@ public final class TelemetryCapabilityResolver {
         try {
             ResolvedCapabilitySet result = delegate.resolve(profile, catalog, parameterOverrides);
             if (telemetryEnabled) {
-                emitPhaseEnd("ok", System.currentTimeMillis() - start,
-                        result.capabilities().size(), 1);
+                emitPhaseEnd(
+                        "ok", System.currentTimeMillis() - start, result.capabilities().size(), 1);
             }
             return result;
         } catch (RuntimeException e) {
@@ -60,8 +60,10 @@ public final class TelemetryCapabilityResolver {
 
     private void emitPhaseStart() {
         try {
-            LOG.fine("{\"type\":\"phase.start\",\"skill\":\"x-internal-resolver\",\"phase\":\"resolve\",\"timestamp\":\""
-                    + Instant.now() + "\"}");
+            LOG.fine(
+                    "{\"type\":\"phase.start\",\"skill\":\"x-internal-resolver\",\"phase\":\"resolve\",\"timestamp\":\""
+                            + Instant.now()
+                            + "\"}");
         } catch (Exception e) {
             // fail-open
         }
@@ -69,11 +71,20 @@ public final class TelemetryCapabilityResolver {
 
     private void emitPhaseEnd(String status, long elapsedMs, int numCapabilities, int numProfiles) {
         try {
-            LOG.fine("{\"type\":\"phase.end\",\"skill\":\"x-internal-resolver\",\"phase\":\"resolve\","
-                    + "\"status\":\"" + status + "\","
-                    + "\"tempoResolveMs\":" + elapsedMs + ","
-                    + "\"numCapabilitiesAtivas\":" + numCapabilities + ","
-                    + "\"numProfilesExpandidos\":" + numProfiles + "}");
+            LOG.fine(
+                    "{\"type\":\"phase.end\",\"skill\":\"x-internal-resolver\",\"phase\":\"resolve\","
+                            + "\"status\":\""
+                            + status
+                            + "\","
+                            + "\"tempoResolveMs\":"
+                            + elapsedMs
+                            + ","
+                            + "\"numCapabilitiesAtivas\":"
+                            + numCapabilities
+                            + ","
+                            + "\"numProfilesExpandidos\":"
+                            + numProfiles
+                            + "}");
         } catch (Exception e) {
             // fail-open
         }

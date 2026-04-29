@@ -7,10 +7,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 /**
- * Applies a {@link CompositionPlan} to an output directory — writes included artifacts, omits excluded.
+ * Applies a {@link CompositionPlan} to an output directory — writes included artifacts, omits
+ * excluded.
  *
- * <p>Replaces the blind copy of {@code targets/claude/} → {@code .claude/} (RULE-008: single writer).
- * Idempotent: re-running with the same plan produces the same output.
+ * <p>Replaces the blind copy of {@code targets/claude/} → {@code .claude/} (RULE-008: single
+ * writer). Idempotent: re-running with the same plan produces the same output.
  */
 public final class OutputPruner {
 

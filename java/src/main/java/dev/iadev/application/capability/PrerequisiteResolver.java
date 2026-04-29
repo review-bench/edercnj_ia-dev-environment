@@ -14,19 +14,20 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * Transitively expands a capability's prerequisites using Kahn's algorithm (RULE-004: deterministic).
+ * Transitively expands a capability's prerequisites using Kahn's algorithm (RULE-004:
+ * deterministic).
  *
- * <p>Returns all prerequisites in topological order (leaves first), ending with the requested capability.
- * Glob requires are expanded against the catalog before sorting.
+ * <p>Returns all prerequisites in topological order (leaves first), ending with the requested
+ * capability. Glob requires are expanded against the catalog before sorting.
  */
 public final class PrerequisiteResolver {
 
-    public List<CapabilityId> expand(String capabilityId, Map<String, CapabilityDefinition> catalog) {
+    public List<CapabilityId> expand(
+            String capabilityId, Map<String, CapabilityDefinition> catalog) {
         CapabilityDefinition root = catalog.get(capabilityId);
         if (root == null) {
             throw new CapabilityError.MissingPrerequisite(
-                    "capability '" + capabilityId + "' not found in catalog",
-                    capabilityId, "");
+                    "capability '" + capabilityId + "' not found in catalog", capabilityId, "");
         }
 
         Set<String> visited = new HashSet<>();
@@ -37,8 +38,10 @@ public final class PrerequisiteResolver {
     }
 
     private void collectTransitive(
-            String id, Map<String, CapabilityDefinition> catalog,
-            Set<String> visited, Map<String, Set<String>> deps) {
+            String id,
+            Map<String, CapabilityDefinition> catalog,
+            Set<String> visited,
+            Map<String, Set<String>> deps) {
         if (visited.contains(id)) return;
         visited.add(id);
 
@@ -62,7 +65,8 @@ public final class PrerequisiteResolver {
             if (!catalog.containsKey(req.value())) {
                 throw new CapabilityError.MissingPrerequisite(
                         req.value() + " referenced by " + referencedBy + " not found in catalog",
-                        req.value(), referencedBy);
+                        req.value(),
+                        referencedBy);
             }
             return List.of(req.value());
         }
