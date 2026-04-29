@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0063-0005",
+  "epicId": "EPIC-0063",
+  "passed": true,
+  "timestamp": "2026-04-28T00:00:00Z",
+  "coverageDelta": 0,
+  "failures": [],
+  "acCheckResults": {
+    "scenariosTotal": 1,
+    "scenariosCovered": 1,
+    "uncoveredScenarios": []
+  },
+  "artifactsVerified": [
+    "docs/phase-shift-0063-0005.md",
+    "ai/epics/epic-0063-local-first-preflight-gates/plans/review-story-story-0063-0005.md",
+    "ai/epics/epic-0063-local-first-preflight-gates/plans/techlead-review-story-story-0063-0005.md"
+  ]
+}

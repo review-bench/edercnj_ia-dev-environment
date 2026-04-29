@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "failures": [],
+  "acCheckCount": 9,
+  "acCheckResults": [
+    {"id": "AC1", "name": "Hook executable and registered in settings.json PreToolUse", "status": "PASS"},
+    {"id": "AC2", "name": "9 Gherkin scenarios tested (TDD: RED=0/9, GREEN=9/9)", "status": "PASS"},
+    {"id": "AC3", "name": "CLAUDE_RECOVERY_MODE=1 → exit 0 with WARNING + telemetry event", "status": "PASS"},
+    {"id": "AC4", "name": "git commit -n / --no-verify → exit 2 (unconditional block)", "status": "PASS"},
+    {"id": "AC5", "name": "gh pr merge --admin → exit 2 (unconditional block)", "status": "PASS"},
+    {"id": "AC6", "name": "Preflight absent → exit 2 (fail-CLOSED per RULE-005)", "status": "PASS"},
+    {"id": "AC7", "name": "Non-matched tool calls → exit 0 (no-op)", "status": "PASS"},
+    {"id": "AC8", "name": "Skill x-pr-create intercepted → preflight invoked", "status": "PASS"},
+    {"id": "AC9", "name": "Malformed stdin JSON → exit 2 (fail-CLOSED)", "status": "PASS"}
+  ],
+  "coverageLine": null,
+  "coverageBranch": null,
+  "smokeTest": "passed",
+  "crossFileConsistency": "passed",
+  "timestamp": "2026-04-28T22:00:00Z",
+  "storyId": "story-0063-0004"
+}

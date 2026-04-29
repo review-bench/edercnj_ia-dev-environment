@@ -58,7 +58,8 @@ public final class HooksAssembler implements Assembler {
                     "telemetry-subagent.sh",
                     "telemetry-stop.sh",
                     "session-start.sh",
-                    "verify-story-completion.sh");
+                    "verify-story-completion.sh",
+                    "stage-telemetry.sh");
 
     /**
      * Rule 25 enforcement hooks — always copied, independent of telemetry. {@code

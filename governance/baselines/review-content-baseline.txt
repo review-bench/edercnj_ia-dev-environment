@@ -1,0 +1,90 @@
+# Review Content Audit Baseline — Rule 24 / EPIC-0063
+#
+# Grandfather list for stories merged before audit-review-content.sh was introduced.
+# Format: one STORY-ID per line with trailing '# reason' comment.
+# Lines starting with '#' or blank lines are ignored.
+#
+# DO NOT add stories merged after 2026-04-28 — use <!-- audit-exempt-content: <reason> -->
+# in the review file instead, or close the gap.
+#
+# Baseline cut: 2026-04-28 (epic/0063 — EPIC-0063 audit-review-content.sh introduction)
+
+# Pre-EPIC-0063 stories (all reviews predating content heuristics)
+story-0049-0001  # pre-content-audit, merged before EPIC-0063
+story-0049-0002  # pre-content-audit, merged before EPIC-0063
+story-0049-0003  # pre-content-audit, merged before EPIC-0063
+story-0049-0004  # pre-content-audit, merged before EPIC-0063
+story-0049-0005  # pre-content-audit, merged before EPIC-0063
+story-0049-0006  # pre-content-audit, merged before EPIC-0063
+story-0049-0007  # pre-content-audit, merged before EPIC-0063
+story-0049-0008  # pre-content-audit, merged before EPIC-0063
+story-0049-0009  # pre-content-audit, merged before EPIC-0063
+story-0049-0010  # pre-content-audit, merged before EPIC-0063
+story-0049-0011  # pre-content-audit, merged before EPIC-0063
+story-0049-0012  # pre-content-audit, merged before EPIC-0063
+story-0049-0013  # pre-content-audit, merged before EPIC-0063
+story-0049-0014  # pre-content-audit, merged before EPIC-0063
+story-0049-0015  # pre-content-audit, merged before EPIC-0063
+story-0049-0016  # pre-content-audit, merged before EPIC-0063
+story-0049-0017  # pre-content-audit, merged before EPIC-0063
+story-0049-0018  # pre-content-audit, merged before EPIC-0063
+story-0049-0019  # pre-content-audit, merged before EPIC-0063
+story-0050-0001  # pre-content-audit, merged before EPIC-0063
+story-0050-0002  # pre-content-audit, merged before EPIC-0063
+story-0050-0003  # pre-content-audit, merged before EPIC-0063
+story-0050-0004  # pre-content-audit, merged before EPIC-0063
+story-0050-0005  # pre-content-audit, merged before EPIC-0063
+story-0050-0006  # pre-content-audit, merged before EPIC-0063
+story-0050-0007  # pre-content-audit, merged before EPIC-0063
+story-0050-0008  # pre-content-audit, merged before EPIC-0063
+story-0050-0009  # pre-content-audit, merged before EPIC-0063
+story-0051-0001  # pre-content-audit, merged before EPIC-0063
+story-0052-0001  # pre-content-audit, merged before EPIC-0063
+story-0052-0002  # pre-content-audit, merged before EPIC-0063
+story-0052-0003  # pre-content-audit, merged before EPIC-0063
+story-0052-0004  # pre-content-audit, merged before EPIC-0063
+story-0052-0005  # pre-content-audit, merged before EPIC-0063
+story-0052-0006  # pre-content-audit, merged before EPIC-0063
+story-0055-0001  # pre-content-audit, merged before EPIC-0063
+story-0055-0002  # pre-content-audit, merged before EPIC-0063
+story-0055-0003  # pre-content-audit, merged before EPIC-0063
+story-0055-0004  # pre-content-audit, merged before EPIC-0063
+story-0055-0005  # pre-content-audit, merged before EPIC-0063
+story-0055-0006  # pre-content-audit, merged before EPIC-0063
+story-0055-0007  # pre-content-audit, merged before EPIC-0063
+story-0055-0008  # pre-content-audit, merged before EPIC-0063
+story-0057-0001  # pre-content-audit, merged before EPIC-0063
+story-0057-0002  # pre-content-audit, merged before EPIC-0063
+story-0057-0003  # pre-content-audit, merged before EPIC-0063
+story-0057-0004  # pre-content-audit, merged before EPIC-0063
+story-0057-0005  # pre-content-audit, merged before EPIC-0063
+story-0057-0006  # pre-content-audit, merged before EPIC-0063
+story-0058-0001  # pre-content-audit, merged before EPIC-0063
+story-0058-0002  # pre-content-audit, merged before EPIC-0063
+story-0058-0003  # pre-content-audit, merged before EPIC-0063
+story-0058-0004  # pre-content-audit, merged before EPIC-0063
+story-0058-0005  # pre-content-audit, merged before EPIC-0063
+story-0059-0001  # pre-content-audit, merged before EPIC-0063
+story-0059-0002  # pre-content-audit, merged before EPIC-0063
+story-0059-0003  # pre-content-audit, merged before EPIC-0063
+story-0059-0004  # pre-content-audit, merged before EPIC-0063
+story-0059-0005  # pre-content-audit, merged before EPIC-0063
+story-0059-0006  # pre-content-audit, merged before EPIC-0063
+story-0059-0007  # pre-content-audit, merged before EPIC-0063
+story-0059-0008  # pre-content-audit, merged before EPIC-0063
+story-0059-0009  # pre-content-audit, merged before EPIC-0063
+story-0059-0010  # pre-content-audit, merged before EPIC-0063
+story-0061-0001  # pre-content-audit, merged before EPIC-0063
+story-0061-0002  # pre-content-audit, merged before EPIC-0063
+story-0061-0003  # pre-content-audit, merged before EPIC-0063
+story-0061-0004  # pre-content-audit, merged before EPIC-0063
+story-0061-0005  # pre-content-audit, merged before EPIC-0063
+story-0061-0006  # pre-content-audit, merged before EPIC-0063
+story-0062-0001  # EPIC-0062 stub — pre-content-audit, this is the motivating case
+story-0062-0002  # EPIC-0062 stub — pre-content-audit
+story-0062-0003  # EPIC-0062 stub — pre-content-audit
+story-0062-0004  # EPIC-0062 stub — pre-content-audit
+story-0062-0005  # EPIC-0062 stub — pre-content-audit
+story-0062-0006  # EPIC-0062 stub — pre-content-audit
+story-0062-0007  # EPIC-0062 stub — pre-content-audit
+story-0062-0008  # EPIC-0062 stub — pre-content-audit

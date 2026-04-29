@@ -90,9 +90,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle |
 | 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
+| 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 24 rules**
+**Total: 25 rules**
 
 ### Numbering
 
@@ -327,11 +328,11 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 24 |
+| Rules (.claude) | 25 |
 | Skills (.claude) | 66 |
 | Knowledge Packs (.claude) | 14 |
 | Agents (.claude) | 11 |
-| Hooks (.claude) | 14 |
+| Hooks (.claude) | 15 |
 | Settings (.claude) | 2 |
 | Plan Templates (.claude) | 22 |
 

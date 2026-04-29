@@ -9,6 +9,14 @@
 set +e
 set -u
 
+# --self-check mode (Rule 26 §Camada 0 Hook Contract)
+case "${1:-}" in
+  --self-check)
+    echo "telemetry-stop.sh: self-check passed"
+    exit 0
+    ;;
+esac
+
 if [[ "${CLAUDE_TELEMETRY_DISABLED:-0}" == "1" ]]; then
     cat >/dev/null 2>&1
     exit 0
