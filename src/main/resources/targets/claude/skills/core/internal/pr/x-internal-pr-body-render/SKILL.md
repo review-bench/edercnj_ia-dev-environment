@@ -310,7 +310,7 @@ Fallback if none: `coordinations: [{"epicId":"(none)","status":"none","hotFiles"
 | Skill | Relationship |
 | :--- | :--- |
 | `x-pr-create` | Primary caller for `--kind=implementation` |
-| `x-feature-create` | Caller for `--kind=backlog` (story-0066-0006) |
+| `x-feature-create` | Caller for `--kind=backlog` (story-0066-0006) — RULE-007: backlog PR `## Orchestrator Evidence` is reduced (no Story IDs; accrues in subsequent story PRs) |
 | `x-internal-report-write` | Delegate for template rendering (Phase 3) |
 | `scripts/telemetry-consolidate.sh` | Telemetry aggregator (Phase 2, story-0066-0002) |
 | `_TEMPLATE-PR-IMPLEMENTATION.md` | Template consumed by Phase 3 (story-0066-0001) |
