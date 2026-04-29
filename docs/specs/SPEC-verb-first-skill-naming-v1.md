@@ -7,7 +7,7 @@
 **Epic:** EPIC-0076
 
 > **v1.1 — Refinamento (2026-04-29):**
-> - 11 skills do catálogo atual ausentes na v1.0 foram adicionadas à matriz canônica nas seções 6.1, 6.4 e 6.6.
+> - 11 skills do catálogo atual ausentes na v1.0 foram adicionadas à matriz canônica nas seções 6.1 e 6.4.
 > - Reordenadas seções para refletir presença real de `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create`, `x-parallel-eval`, `x-spec-drift`, `x-mcp-recommend`, `x-frontmatter-migrate`, `x-ci-generate`, `x-setup-env`, `x-setup-stack`.
 > - Esclarecido que `x-setup-env` e `x-setup-stack` já estão em forma verb-first aceitável (não renomear).
 
