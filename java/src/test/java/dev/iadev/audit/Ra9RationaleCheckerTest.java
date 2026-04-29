@@ -105,4 +105,21 @@ class Ra9RationaleCheckerTest {
         List<String> violations = checker.check(content, "legacy.md");
         assertThat(violations).isEmpty();
     }
+
+    @Test
+    @DisplayName("task with lowercase n/a is accepted")
+    void check_taskWithLowercaseNa_noViolations() {
+        String content = SECTION_HEADER + "n/a — value object, no trade-off.\n";
+        List<String> violations = checker.check(content, "task-0060-0001-002.md");
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("task with valid rationale (not N/A) passes — isNaAccepted false branch")
+    void check_taskWithValidRationale_noViolations() {
+        String content = VALID_RATIONALE.replace("## 8. Decision Rationale\n\n", "");
+        String full = SECTION_HEADER + content;
+        List<String> violations = checker.check(full, "task-0060-0001-003.md");
+        assertThat(violations).isEmpty();
+    }
 }
