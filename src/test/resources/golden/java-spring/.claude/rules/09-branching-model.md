@@ -12,8 +12,11 @@
 | `feature/*` | New feature development | Temporary | `develop` | `develop` |
 | `release/*` | Release stabilization | Temporary | `develop` | `main` + `develop` |
 | `hotfix/*` | Critical production fix | Temporary | `main` | `main` + `develop` |
+| `docs/*` | Planning artifacts for feature creation (EPIC-0065) | Temporary | `epic/XXXX` or `develop` | `epic/XXXX` (auto-merge, label `docs`) or `develop` (manual) |
 
 > **Epic branches (Rule 21):** `epic/XXXX` branches are the single integration point for all story PRs of an epic. Stories auto-merge into `epic/XXXX` (not `develop`); the epic-to-develop PR is a manual gate. See Rule 21 for details.
+>
+> **Docs branches (EPIC-0065):** `docs/<epic-id>-<slug>` branches carry planning artifacts produced by the feature creation chain (`x-feature-create`). They auto-merge into `epic/XXXX` with label `docs`. `docs/feature-<slug>` branches carry ideation specs produced by `x-feature-ideate` and target `develop` via a **manual gate**.
 
 ## Naming Conventions
 
@@ -24,6 +27,8 @@
 | Release | `release/{version}` | `release/1.2.0` |
 | Hotfix | `hotfix/{ticket-id}-{short-desc}` | `hotfix/PROJ-456-fix-crash` |
 | Bugfix | `fix/{ticket-id}-{short-desc}` | `fix/PROJ-789-null-check` |
+| Docs (creation) | `docs/{epic-id}-{short-slug}` | `docs/0065-feature-create`, `docs/0065-rules-update` |
+| Docs (ideation) | `docs/feature-{short-slug}` | `docs/feature-csv-export` |
 
 - Branch names MUST be lowercase with hyphens (no underscores, no camelCase)
 - Ticket ID prefix is recommended but not mandatory for personal branches
