@@ -79,7 +79,8 @@ if [[ -n "$BASELINE" && -f "$BASELINE" ]]; then
   for v in "${VIOLATIONS[@]}"; do
     file_path="${v#SCHEMA_VIOLATION: }"
     file_path="${file_path% —*}"
-    if ! grep -qF "$(basename "$file_path")" "$BASELINE" 2>/dev/null; then
+    rel_path="${file_path#"${ROOT}/"}"
+    if ! grep -qF "$rel_path" "$BASELINE" 2>/dev/null; then
       REMAINING+=("$v")
     fi
   done

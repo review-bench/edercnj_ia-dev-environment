@@ -57,7 +57,9 @@ public final class CapabilityGraph {
         for (String key : nodes.keySet()) indegree.put(key, 0);
         for (CapabilityDefinition def : nodes.values()) {
             for (CapabilityId req : def.requires()) {
-                indegree.merge(def.id().value(), 1, Integer::sum);
+                if (nodes.containsKey(req.value())) {
+                    indegree.merge(def.id().value(), 1, Integer::sum);
+                }
             }
         }
 

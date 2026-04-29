@@ -24,11 +24,13 @@ class CapabilityCompositionAssemblerTest {
     class NoTargetsRoot {
 
         @Test
-        @DisplayName("returns empty list when targets root not resolvable (default)")
+        @DisplayName("returns empty list when targets root directory does not exist")
         void returnsEmptyWhenNoTargetsRoot(@TempDir Path output) {
+            Path nonExistent = output.resolve("non-existent-targets");
+            CapabilityCompositionAssembler assembler = new CapabilityCompositionAssembler(nonExistent);
             ProjectConfig config = mock(ProjectConfig.class);
             TemplateEngine engine = mock(TemplateEngine.class);
-            List<String> result = defaultAssembler.assemble(config, engine, output);
+            List<String> result = assembler.assemble(config, engine, output);
             assertThat(result).isEmpty();
         }
     }

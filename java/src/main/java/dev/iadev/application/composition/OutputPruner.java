@@ -32,6 +32,10 @@ public final class OutputPruner {
             written++;
         }
 
+        for (CompositionPlan.ArtifactEntry entry : plan.excluded()) {
+            Files.deleteIfExists(outputRoot.resolve(entry.relativePath()));
+        }
+
         return new PruneResult(written, plan.excluded().size());
     }
 }

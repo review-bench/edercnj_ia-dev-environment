@@ -71,10 +71,18 @@ public final class CapabilityCompositionAssembler implements Assembler {
     }
 
     private Path resolveTargetsRoot(ProjectConfig config) {
-        return overrideTargetsRoot;
+        if (overrideTargetsRoot != null) return overrideTargetsRoot;
+        try {
+            return dev.iadev.util.ResourceResolver.resolveResourceDir("targets/claude");
+        } catch (IllegalArgumentException e) {
+            LOG.fine("CapabilityCompositionAssembler: targets/claude not found on classpath — skip");
+            return null;
+        }
     }
 
     private ResolvedCapabilitySet buildActiveSet(ProjectConfig config) {
+        // Phase 7 (story-0064-0701): replace with CapabilityResolver + YamlCapabilityCatalogAdapter.
+        // Until then, empty active set includes only requires-capabilities:[] (universal) artifacts.
         return new ResolvedCapabilitySet("default", List.of(), java.util.Map.of(), List.of());
     }
 }

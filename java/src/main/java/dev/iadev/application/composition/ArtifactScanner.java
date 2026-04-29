@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -13,6 +14,8 @@ import java.util.stream.Stream;
  * <p>Returns artifacts in sorted (deterministic) order (RULE-004).
  */
 final class ArtifactScanner {
+
+    private static final Logger LOG = Logger.getLogger(ArtifactScanner.class.getName());
 
     record ScannedArtifact(Path path, String relativePath, List<String> requiredCapabilities) {}
 
@@ -50,7 +53,12 @@ final class ArtifactScanner {
         int endFm = stripped.indexOf("\n---", firstNl);
         if (endFm < 0) return null;
         String fm = stripped.substring(firstNl + 1, endFm);
-        if (!fm.contains("requires-capabilities")) return null;
+        if (!fm.contains("requires-capabilities")) {
+            LOG.warning(() -> "ArtifactScanner: frontmatter v2 artifact missing requires-capabilities"
+                    + " (Rule 28 violation — treating as universal): "
+                    + content.substring(0, Math.min(80, content.length())));
+            return List.of();
+        }
 
         List<String> caps = new ArrayList<>();
         boolean inList = false;
