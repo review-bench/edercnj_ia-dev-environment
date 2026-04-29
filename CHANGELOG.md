@@ -411,7 +411,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   consumes the Pebble template `shared/templates/CLAUDE.md` (8
   placeholders: PROJECT_NAME, LANGUAGE, FRAMEWORK, ARCHITECTURE,
   DATABASES, INTERFACE_TYPES, BUILD_COMMAND, TEST_COMMAND). Contract:
-  [ADR-0048-B](adr/ADR-0048-B-claude-md-contract.md). Empirical
+  [ADR-0021](docs/adr/ADR-0021-claude-md-contract.md) (originally numbered ADR-0048-B; renumbered 2026-04-29). Empirical
   verification: `plans/epic-0048/reports/repro-bug-b.sh` now exits 0
   on develop (was exit 1).
 - **`OutputDirectoryIntegrityTest`** (story-0048-0009): permanent
@@ -426,8 +426,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Investigation artifacts in `plans/epic-0048/reports/`** (story
   0048-0001): `investigation-report.md`, `removal-inventory.md`,
   `repro-bug-a.sh`, `repro-bug-b.sh`.
-- **ADR-0048-A** (Java-only scope decision) and **ADR-0048-B** (CLAUDE.md
-  assembler contract) in `adr/`.
+- **ADR-0048** (Java-only scope decision; originally ADR-0048-A) and
+  **ADR-0021** (CLAUDE.md assembler contract; originally ADR-0048-B,
+  renumbered 2026-04-29) in `docs/adr/`.
 - **Template `shared/templates/CLAUDE.md`** (story-0048-0010) with 8
   Pebble placeholders and `ClaudeMdTemplateSyntaxTest` covering parse,
   render, and conditional-block semantics.

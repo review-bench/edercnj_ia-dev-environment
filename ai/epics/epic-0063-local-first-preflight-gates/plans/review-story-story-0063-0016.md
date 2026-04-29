@@ -11,13 +11,13 @@ A implementação segue padrões consistentes com EPIC-0063 e os scripts de audi
 - `audit-rollout-status.sh` reside em `java/src/main/resources/targets/claude/scripts/` (source-of-truth)
 - Cópia gerada em `.claude/scripts/audit-rollout-status.sh`
 - Testes em `src/test/shell/audit_rollout_status_test.sh` (5 cenários, 7 assertivas, TDD RED→GREEN)
-- ADR documentado em `docs/adr/ADR-0016-preflight-warn-to-fail-rollout.md`
+- ADR documentado em `docs/adr/ADR-0019-preflight-warn-to-fail-rollout.md`
 - Sem violações de domain purity
 
 ### File Analysis
 - `audit-rollout-status.sh`: bash strict mode (`set -uo pipefail`), exit codes Rule 26 compliant
 - `src/test/shell/audit_rollout_status_test.sh`: 7 assertivas cobrindo todos os cenários Gherkin
-- `docs/adr/ADR-0016-preflight-warn-to-fail-rollout.md`: ADR com status Accepted, alternativas documentadas
+- `docs/adr/ADR-0019-preflight-warn-to-fail-rollout.md`: ADR com status Accepted, alternativas documentadas
 
 ## Code Quality Assessment
 
