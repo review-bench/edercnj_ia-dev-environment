@@ -105,4 +105,49 @@ class Ra9RationaleCheckerTest {
         List<String> violations = checker.check(content, "legacy.md");
         assertThat(violations).isEmpty();
     }
+
+    @Test
+    @DisplayName("check_taskWithLowercaseNa_noViolations")
+    void check_taskWithLowercaseNa_noViolations() {
+        String content = SECTION_HEADER + "n/a — immutable VO, no trade-off.\n";
+        List<String> violations = checker.check(content, "task-0060-0001-001.md");
+        assertThat(violations).as("Task with lowercase n/a must not flag violation").isEmpty();
+    }
+
+    @Test
+    @DisplayName("check_sectionFollowedByAnotherSection_bodyTruncatedCorrectly")
+    void check_sectionFollowedByAnotherSection_bodyTruncatedCorrectly() {
+        String content =
+                SECTION_HEADER
+                        + "**Decisão:** Use X.\n"
+                        + "**Motivo:** Reason.\n"
+                        + "**Alternativa descartada:** Y.\n"
+                        + "**Consequência:** Z.\n"
+                        + "\n## 9. Next Section\n\nContent here.\n";
+        List<String> violations = checker.check(content, "epic-0060.md");
+        assertThat(violations)
+                .as("Section 8 body truncated at next ## — valid rationale must pass")
+                .isEmpty();
+    }
+
+    @Test
+    @DisplayName("check_taskWithValidRationale_noViolations")
+    void check_taskWithValidRationale_noViolations() {
+        // Task artifact with full 4-field rationale (not N/A):
+        // isTaskArtifact=true, isNaAccepted=false → continues to full rationale check
+        List<String> violations = checker.check(VALID_RATIONALE, "task-0060-0001-001.md");
+        assertThat(violations).as("Task with full rationale must pass").isEmpty();
+    }
+
+    @Test
+    @DisplayName("check_section8HeaderWithNoNewline_treatedAsEmpty")
+    void check_section8HeaderWithNoNewline_treatedAsEmpty() {
+        // Section 8 header at end of string with no newline — bodyStart < 0 path returns ""
+        // empty body is treated as RA9_RATIONALE_EMPTY violation for a story
+        String content = "## 8. Decision Rationale";
+        List<String> violations = checker.check(content, "story-0060-0001.md");
+        assertThat(violations)
+                .as("Section 8 with no body (no newline after header) treated as empty → violation")
+                .isNotEmpty();
+    }
 }
