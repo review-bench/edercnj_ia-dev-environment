@@ -40,7 +40,7 @@ The primary consumers are:
 | Flag | Required | Description |
 | :--- | :--- | :--- |
 | `--scope` | Yes | `epic`, `story`, or `task` |
-| `--epic` | If `--scope=epic` | Path to the epic directory (e.g., `plans/epic-XXXX`) |
+| `--epic` | If `--scope=epic` | Path to the epic directory (e.g., `ai/epics/epic-XXXX`) |
 | `--a` / `--b` | If `--scope=story\|task` | IDs of the pair to compare |
 | `--out` | No | Output file path (writes to stdout by default) |
 | `--format` | No | `markdown` (default) or `json` |
@@ -109,8 +109,8 @@ regardless of the nominal write / regen sets.
 ## Invocation Examples
 
 ```bash
-/x-parallel-eval --scope=epic --epic plans/epic-XXXX
-/x-parallel-eval --scope=epic --epic plans/epic-XXXX --out reports/parallelism.md
+/x-parallel-eval --scope=epic --epic ai/epics/epic-XXXX
+/x-parallel-eval --scope=epic --epic ai/epics/epic-XXXX --out reports/parallelism.md
 /x-parallel-eval --scope=story --a story-0041-0002 --b story-0041-0003
 /x-parallel-eval --scope=task --a TASK-0041-0002-001 --b TASK-0041-0003-001
 ```

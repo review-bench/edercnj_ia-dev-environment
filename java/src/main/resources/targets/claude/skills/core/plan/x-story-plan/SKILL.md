@@ -48,12 +48,12 @@ requires-capabilities: []
 
 | Artifact | Path |
 |----------|------|
-| Task breakdown | `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` |
-| Planning report | `plans/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` |
-| DoR checklist | `plans/epic-XXXX/plans/dor-story-XXXX-YYYY.md` |
-| Task files (v2) | `plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` per task |
-| Task plans (v2) | `plans/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` per task |
-| Task map (v2) | `plans/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
+| Task breakdown | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` |
+| Planning report | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` |
+| DoR checklist | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` |
+| Task files (v2) | `ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` per task |
+| Task plans (v2) | `ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` per task |
+| Task map (v2) | `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
 
 **Phase execution with telemetry:**
 
@@ -139,7 +139,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-stor
 **Phase 4b (v2 only — batch task-plan dispatch):** For each TASK-XXXX-YYYY-NNN, invoke `x-task-plan` in parallel (batch ≤ 4) with `--no-commit` so the caller aggregates into a single Step P4 commit:
 
     Skill(skill: "x-task-plan",
-          args: "--task-file plans/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md --no-commit")
+          args: "--task-file ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md --no-commit")
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-plan Phase-4-Artifact-Generation ok`
@@ -162,7 +162,7 @@ If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this step. If `
 Otherwise, issue ONE consolidated commit covering every planning artifact produced by this story (task breakdown, planning report, DoR checklist, plan-story, all task files, all plan-task files, task map, and the updated `execution-state.json`):
 
     Skill(skill: "x-planning-commit",
-          args: "--scope docs --epic-id <XXXX> --paths plans/epic-<XXXX>/plans/ plans/epic-<XXXX>/execution-state.json --subject \"docs(story-<XXXX>-<YYYY>): add planning artifacts\"")
+          args: "--scope docs --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/plans/ ai/epics/epic-<XXXX>/execution-state.json --subject \"docs(story-<XXXX>-<YYYY>): add planning artifacts\"")
 
 Idempotency: re-executing with identical inputs returns `commitSha=null` (silent no-op). On `COMMIT_FAILED` (exit 4), abort with the same code.
 
@@ -189,10 +189,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 
 | Code | Condition |
 |------|-----------|
-| `STORY_NOT_FOUND` | Story file absent at `plans/epic-XXXX/story-XXXX-YYYY.md` |
+| `STORY_NOT_FOUND` | Story file absent at `ai/epics/epic-XXXX/story-XXXX-YYYY.md` |
 | `EPIC_BRANCH_ENSURE_FAILED` | Step P2 `x-internal-epic-branch-ensure` non-zero |
 | `CONSOLIDATION_FAILED` | No TASK_PROPOSAL entries returned by any subagent |
-| `WRITE_FAILED` | Unable to write output artifact to `plans/epic-XXXX/plans/` |
+| `WRITE_FAILED` | Unable to write output artifact to `ai/epics/epic-XXXX/plans/` |
 | `DOR_NOT_MET` | DoR validation returns < 12/12 checks passed |
 
 ## Full Protocol

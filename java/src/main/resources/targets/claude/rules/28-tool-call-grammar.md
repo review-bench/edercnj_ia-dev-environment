@@ -150,7 +150,7 @@ For each SKILL.md in scope:
 
 For the given `--story-id`:
 
-1. Locate `events.ndjson` via PathResolver (v3 = `plans/epic-XXXX/telemetry/`, v4 = `ai/epics/epic-XXXX-*/telemetry/`).
+1. Locate `events.ndjson` via PathResolver (v3 = `ai/epics/epic-XXXX/telemetry/`, v4 = `ai/epics/epic-XXXX-*/telemetry/`).
 2. Extract all skills with a `tool.call` event where `storyId` matches `story-XXXX-YYYY`.
 3. For each orchestrator SKILL.md in the story's execution chain, collect all `[required]` and `[conditional: <expr>]` declarations.
 4. For `[required]`: verify presence in step 2 result. Absent → `GRAMMAR_TELEMETRY_MISSING`.

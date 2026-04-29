@@ -219,7 +219,7 @@ The generator produces **20 core skills** (always included) and up to **13 condi
 > The source of truth for skills under `java/src/main/resources/targets/claude/skills/` has been reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`) and 19 skills have been renamed to a consistent `x-{subject}-{action}` scheme. The generated output (`.claude/skills/`) remains **flat** — user-facing invocation paths stay `/{skill-name}` without a category prefix.
 >
 > - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
-> - Rename history: [`plans/epic-0036/skill-renames.md`](plans/epic-0036/skill-renames.md)
+> - Rename history: [`ai/epics/epic-0036/skill-renames.md`](ai/epics/epic-0036/skill-renames.md)
 > - Release notes (post-merge migration table): [`docs/release-notes/EPIC-0036-skill-renames.md`](docs/release-notes/EPIC-0036-skill-renames.md)
 
 ### Story Planning & Decomposition
@@ -242,7 +242,7 @@ Orchestrates the full decomposition of a system specification into three deliver
 3. Identifies stories by layer (Foundation → Core → Extensions → Compositions)
 4. Maps dependencies between stories
 5. Computes implementation phases and critical path
-6. Generates all three deliverables in `plans/epic-XXXX/`
+6. Generates all three deliverables in `ai/epics/epic-XXXX/`
 
 **Generated artifacts:**
 - `EPIC-XXXX.md` -- scope, rules table, DoR/DoD, story index
@@ -259,7 +259,7 @@ Internally delegates to `/x-epic-create`, `/x-story-create`, and `/x-epic-map`.
 |---|---|
 | **When to use** | When you only need the Epic document, not the full decomposition |
 | **Input** | Specification file |
-| **Output** | `plans/epic-XXXX/EPIC-XXXX.md` |
+| **Output** | `ai/epics/epic-XXXX/EPIC-XXXX.md` |
 
 Generates the top-level Epic file with: scope overview, cross-cutting business rules table, global DoR/DoD (including TDD compliance requirements), and story index with dependency declarations.
 
@@ -393,7 +393,7 @@ Skills for architecture planning, documentation, and decision records.
 |---|---|
 | **When to use** | Before implementing a feature that changes architecture |
 | **Input** | Story ID or feature name |
-| **Output** | `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
+| **Output** | `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
 
 Generates a comprehensive architecture plan:
 - Component diagrams (Mermaid)
@@ -443,7 +443,7 @@ Skills for test planning and execution.
 |---|---|
 | **When to use** | Before implementation, to define the TDD roadmap |
 | **Input** | Story ID |
-| **Output** | `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
+| **Output** | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
 
 Generates a Double-Loop TDD test plan:
 - **Outer loop (Acceptance Tests):** AT-1..N mapping to Gherkin scenarios -- these start RED and drive the implementation

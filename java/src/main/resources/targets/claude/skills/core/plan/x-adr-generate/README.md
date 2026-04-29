@@ -16,7 +16,7 @@ Extracts mini-ADRs embedded in architecture plans (marked with `### ADR:`) and e
 ## Usage
 
 ```
-/x-adr-generate plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md story-XXXX-YYYY
+/x-adr-generate ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md story-XXXX-YYYY
 ```
 
 ## Workflow

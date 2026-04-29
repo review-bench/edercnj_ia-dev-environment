@@ -113,7 +113,7 @@ Skill(skill: "x-internal-epic-integrity-gate",
 
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve default branch name and `plans/epic-XXXX/` |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve default branch name and `ai/epics/epic-XXXX/` |
 | `--branch <name>` | O | `epic/<id>` | Branch to validate; defaults to `epic/<epic-id>` (the phase-integration branch) |
 | `--coverage-threshold-line <N>` | O | `95` | Minimum line coverage percentage (integer, 0-100) |
 | `--coverage-threshold-branch <N>` | O | `90` | Minimum branch coverage percentage (integer, 0-100) |
@@ -178,7 +178,7 @@ exit `64`. Resolve canonical paths:
 ```bash
 epic_id="$(printf '%04d' "${raw_epic_id}")"
 branch="${branch:-epic/${epic_id}}"
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 jacoco_csv="target/site/jacoco/jacoco.csv"
 ```
 
@@ -256,11 +256,11 @@ Default catalogue (v1):
 
 | Item | Predicate | Failure Message |
 | :--- | :--- | :--- |
-| `all-tasks-done` | Every `- [ ]` checkbox in `plans/epic-<id>/story-*.md` Section 8 is either `- [x]` OR the story `**Status:**` is `Concluida` | `dod: <N> task(s) not marked DONE` |
+| `all-tasks-done` | Every `- [ ]` checkbox in `ai/epics/epic-<id>/story-*.md` Section 8 is either `- [x]` OR the story `**Status:**` is `Concluida` | `dod: <N> task(s) not marked DONE` |
 | `changelog-entry` | `CHANGELOG.md` contains at least one `### Added` / `### Fixed` / `### Changed` entry under `## [Unreleased]` OR under a version header newer than the previous release tag | `dod: changelog-entry missing` |
 | `tests-present` | Every `src/main/**/*.{java,kt,ts,py,go,rs}` file touched on this branch (diff vs `main`) has at least one corresponding test file under `src/test/` matching the class-name convention | `dod: <N> file(s) without corresponding test` |
 | `adr-references-resolvable` | Every `adr/ADR-NNNN-*.md` referenced in story markdowns actually exists | `dod: <N> ADR reference(s) unresolved` |
-| `story-status-concluida` | Every `plans/epic-<id>/story-*.md` has `**Status:** Concluida` (or `Concluída`, accent-agnostic) | `dod: <N> story(ies) not Concluida` |
+| `story-status-concluida` | Every `ai/epics/epic-<id>/story-*.md` has `**Status:** Concluida` (or `Concluída`, accent-agnostic) | `dod: <N> story(ies) not Concluida` |
 
 Extension contract: additional predicates are appended to the
 catalogue in the full-protocol reference; the envelope schema is

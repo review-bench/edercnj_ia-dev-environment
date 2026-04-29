@@ -36,9 +36,9 @@ Performs a senior-level holistic code review using a {review_max_score}-point ru
 
 | Artifact | Path |
 |----------|------|
-| Tech Lead report | `plans/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md` |
-| Dashboard (updated) | `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` |
-| Remediation (updated) | `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` |
+| Tech Lead report | `ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md` |
+| Dashboard (updated) | `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md` |
+| Remediation (updated) | `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md` |
 
 ## See Also
 
