@@ -4,6 +4,7 @@ description: "Database specialist review: validates schema design, migration saf
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

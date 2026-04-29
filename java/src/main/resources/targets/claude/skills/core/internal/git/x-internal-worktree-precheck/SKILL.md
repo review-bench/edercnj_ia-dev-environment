@@ -6,6 +6,7 @@ user-invocable: false
 model: haiku
 allowed-tools: [Bash]
 argument-hint: "[--allow-dirty] [--repo-path <path>]"
+requires-capabilities: []
 ---
 
 > 🔒 **INTERNAL SKILL** — Invoked only by other skills via the Skill tool. Not user-invocable.

@@ -4,6 +4,7 @@ description: "Static Application Security Testing -- scans source code for secur
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[--scope all|owasp|custom-rules] [--severity-threshold CRITICAL|HIGH|MEDIUM|LOW|INFO]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

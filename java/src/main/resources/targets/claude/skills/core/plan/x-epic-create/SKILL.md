@@ -4,6 +4,7 @@ description: "Generate an Epic document from a system specification file with cr
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "<SPEC_FILE> [--epic-id XXXX] [--jira <PROJECT_KEY>] [--no-jira] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Output Policy

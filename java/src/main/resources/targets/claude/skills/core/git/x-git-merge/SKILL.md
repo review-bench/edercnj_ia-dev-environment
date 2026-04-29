@@ -4,6 +4,7 @@ description: "Merges a source branch into a target branch locally with configura
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--source <branch> --target <branch> [--strategy merge|squash|rebase] [--message <msg>] [--no-push]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

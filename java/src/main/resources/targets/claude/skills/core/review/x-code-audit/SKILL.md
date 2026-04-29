@@ -4,6 +4,7 @@ description: "Full codebase review against all project standards. Launches paral
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 argument-hint: "[--scope all|rules|patterns|architecture|cross-file]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

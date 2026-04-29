@@ -5,6 +5,7 @@ description: "Implements a feature/story/task using TDD (Red-Green-Refactor) wor
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, TaskCreate, TaskUpdate
 argument-hint: "[TASK-ID (TASK-XXXX-YYYY-NNN) or STORY-ID or feature-description] [--worktree] [--no-ci-watch]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -4,6 +4,7 @@ description: "Cleans local git state in one pass: fetches origin with prune, rem
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[--dry-run] [--yes]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

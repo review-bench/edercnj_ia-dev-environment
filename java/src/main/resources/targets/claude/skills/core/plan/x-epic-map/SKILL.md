@@ -4,6 +4,7 @@ description: "Generate an Implementation Map from an Epic and its Stories with d
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "<EPIC_FILE> [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Output Policy

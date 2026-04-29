@@ -1,6 +1,7 @@
 ---
 name: iac-crossplane
 description: "Crossplane patterns: CompositeResourceDefinitions, Compositions, Claims, Provider configuration, and comparison with Terraform."
+requires-capabilities: []
 ---
 
 # Pattern: Crossplane Patterns

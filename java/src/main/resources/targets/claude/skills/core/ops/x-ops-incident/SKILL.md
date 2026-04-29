@@ -4,6 +4,7 @@ description: "Guides incident response with severity-based checklists, communica
 user-invocable: true
 argument-hint: "[severity SEV1|SEV2|SEV3|SEV4] [--postmortem] [--notify]"
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -4,6 +4,7 @@ description: "Validates event schemas, producer/consumer patterns, error handlin
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[event-name or consumer/producer class]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -5,6 +5,7 @@ description: "Parallel code review with specialist engineers (Security, QA, Perf
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, TaskCreate, TaskUpdate
 argument-hint: "[STORY-ID or --scope reviewer1,reviewer2] [--no-auto-fix-story]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

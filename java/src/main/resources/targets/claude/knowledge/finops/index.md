@@ -1,6 +1,7 @@
 ---
 name: finops
 description: "FinOps practices: resource rightsizing, cost allocation, spot instances, reserved capacity, cost alerting, and cloud-specific cost optimization tools"
+requires-capabilities: []
 ---
 
 # Knowledge Pack: FinOps

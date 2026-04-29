@@ -4,6 +4,7 @@ description: "Data modeling specialist review: validates entity design, aggregat
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

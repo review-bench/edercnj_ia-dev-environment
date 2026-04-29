@@ -7,6 +7,7 @@ allowed-tools: Bash
 argument-hint: "--schema <json-or-@path> --argv <string>"
 category: internal-ops
 context-budget: light
+requires-capabilities: []
 ---
 
 ## Global Output Policy

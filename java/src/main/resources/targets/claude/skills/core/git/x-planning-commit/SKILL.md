@@ -4,6 +4,7 @@ description: "Batch-commits planning artifacts under plans/** (or whitelisted te
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--epic-id <NNNN> --paths <p1,p2,...> --subject <msg> [--scope chore|docs] [--body <text>] [--dry-run]"
+requires-capabilities: []
 ---
 
 ## Global Output Policy

@@ -8,6 +8,7 @@ allowed-tools: Read, Bash
 argument-hint: "--mode pre|post|wave|final [--skill <name>] [--phase <Phase N>] [--parent-task-id <id>] [--expected-tasks id1,id2] [--expected-artifacts path1,path2] [--timeout-s <N>] [--emit-tracker true|false] [--state-file plans/epic-XXXX/execution-state.json]"
 category: internal-plan
 context-budget: tiny
+requires-capabilities: []
 ---
 
 ## Global Output Policy
