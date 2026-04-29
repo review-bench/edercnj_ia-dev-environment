@@ -24,12 +24,12 @@
       "prNumber": 850
     },
     "story-0066-0002": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0066-0003", "story-0066-0008"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "8beb5f8ee",
+      "prNumber": 851
     },
     "story-0066-0003": {
       "status": "Pendente",
