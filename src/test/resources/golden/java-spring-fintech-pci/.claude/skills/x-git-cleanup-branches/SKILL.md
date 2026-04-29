@@ -178,11 +178,33 @@ WORKTREE_CANDIDATES=$(git worktree list --porcelain \
 
 ```bash
 PROTECTED_REGEX='^(main|master|develop)$'
-BRANCH_CANDIDATES=$(git for-each-ref --format='%(refname:short)' refs/heads/ \
+# Also preserve epic/* branches (Rule 21) and docs/* branches with open PRs (EPIC-0065 D-R6)
+RAW_CANDIDATES=$(git for-each-ref --format='%(refname:short)' refs/heads/ \
   | grep -Ev "$PROTECTED_REGEX" || true)
+
+# Filter out epic/* (always protected per Rule 21 §Anti-Patterns)
+# Filter out docs/* branches that have an open PR (preserve until PR is merged/closed)
+BRANCH_CANDIDATES=""
+while IFS= read -r br; do
+  [ -n "$br" ] || continue
+  # epic/* branches: always skip (Rule 21)
+  if [[ "$br" == epic/* ]]; then continue; fi
+  # docs/* branches: skip if an open PR exists (gh CLI check)
+  if [[ "$br" == docs/* ]]; then
+    if command -v gh &>/dev/null; then
+      open_prs=$(gh pr list --head "$br" --state open --json number --jq '. | length' 2>/dev/null || echo 0)
+      [ "$open_prs" -gt 0 ] && continue
+    fi
+  fi
+  BRANCH_CANDIDATES="${BRANCH_CANDIDATES}${br}"$'\n'
+done <<< "$RAW_CANDIDATES"
 ```
 
 `grep -Ev … || true` prevents a non-match (exit 1) from aborting the script under `set -e` style shells.
+
+**Epic branch protection (Rule 21):** `epic/*` branches are NEVER deleted by this skill — they are protected until the manual epic-to-develop PR gate is merged.
+
+**Docs branch protection (EPIC-0065):** `docs/*` branches with open PRs are preserved until the PR is merged or closed. Once merged, they become cleanup candidates on the next run.
 
 ### Step 7 — Print Plan
 
