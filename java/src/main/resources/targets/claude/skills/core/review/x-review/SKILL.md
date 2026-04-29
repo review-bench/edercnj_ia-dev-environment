@@ -47,15 +47,15 @@ Open a phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "complete
 Before executing a review, check if reports already exist and are still valid.
 
 1. Extract story ID from argument or branch name (e.g., `story-XXXX-YYYY`)
-2. Derive epic directory: `plans/epic-XXXX/reviews/`
+2. Derive epic directory: `ai/epics/epic-XXXX/reviews/`
 3. Check if report files exist:
    ```bash
-   ls plans/epic-XXXX/reviews/review-*-story-XXXX-YYYY.md 2>/dev/null
+   ls ai/epics/epic-XXXX/reviews/review-*-story-XXXX-YYYY.md 2>/dev/null
    ```
 4. If reports exist AND the branch has no new commits since last report:
    ```bash
    # Compare latest report mtime with latest commit date
-   stat -c %Y plans/epic-XXXX/reviews/review-security-story-XXXX-YYYY.md 2>/dev/null
+   stat -c %Y ai/epics/epic-XXXX/reviews/review-security-story-XXXX-YYYY.md 2>/dev/null
    git log -1 --format=%ct HEAD
    ```
    - If `mtime(report) >= commit_date`: log `Reusing existing review reports from {date}` and skip to Phase 3c (dashboard regeneration)
@@ -197,7 +197,7 @@ Only emit `TaskUpdate` for specialists that were active in Batch A. If a special
 
     Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode wave --skill x-review --phase Phase-2-SpecialistReviews --expected-tasks {comma-separated-reviewTasks-ids} --expected-artifacts {comma-separated-report-paths}")
 
-`--expected-tasks` = the `reviewTasks` IDs recorded in Batch A for the active specialists (same filter as Batch A/B — Rule 25 Invariant 3). `--expected-artifacts` = `plans/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` for each active specialist; reports are written in Step 3c. On gate exit 12, surface the failure and return — Phase 3 is skipped until the broken specialist is resolved.
+`--expected-tasks` = the `reviewTasks` IDs recorded in Batch A for the active specialists (same filter as Batch A/B — Rule 25 Invariant 3). `--expected-artifacts` = `ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` for each active specialist; reports are written in Step 3c. On gate exit 12, surface the failure and return — Phase 3 is skipped until the broken specialist is resolved.
 
 Each skill produces output in the standard review format:
 
@@ -254,11 +254,11 @@ OVERALL: APPROVED only when every specialist has STATUS: Approved.
 
 ### 3c. Save Individual Reports
 
-Save each specialist's report to `plans/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p plans/epic-XXXX/reviews`.
+Save each specialist's report to `ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p ai/epics/epic-XXXX/reviews`.
 
 **Persistence (EPIC-0042):** Use the Write tool explicitly to save each specialist report:
 
-    Write(file_path: "plans/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md", content: "{report_content}")
+    Write(file_path: "ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md", content: "{report_content}")
 
 Do NOT rely on generating report content in the conversation alone -- every report MUST be written to disk via the Write tool.
 
@@ -273,7 +273,7 @@ After saving all individual reports, generate a consolidated dashboard.
 
 2. **If template available:**
    - Read template at `.claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`
-   - Create `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
+   - Create `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
    - Populate with:
      - **Engineer Scores Table:** One row per specialist with Score, Max, and Status
      - **Overall Score:** Sum of all specialist scores / sum of all max scores, with percentage
@@ -286,7 +286,7 @@ After saving all individual reports, generate a consolidated dashboard.
 
    **Persistence (EPIC-0042):** Use the Write tool explicitly to save the dashboard:
 
-       Write(file_path: "plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md", content: "{dashboard_content}")
+       Write(file_path: "ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md", content: "{dashboard_content}")
 
    Do NOT rely on generating dashboard content in the conversation alone -- the dashboard MUST be written to disk via the Write tool.
 
@@ -305,7 +305,7 @@ After generating the dashboard, create a remediation tracking file.
 
 2. **If template available:**
    - Read template at `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md`
-   - Create `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
+   - Create `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
    - **Extract findings:** Parse all individual reports for items with status FAILED or PARTIAL
    - **Populate Findings Tracker:** One row per finding with:
      - `Finding ID`: Sequential `FIND-NNN`
@@ -319,7 +319,7 @@ After generating the dashboard, create a remediation tracking file.
 
    **Persistence (EPIC-0042):** Use the Write tool explicitly to save the remediation file:
 
-       Write(file_path: "plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md", content: "{remediation_content}")
+       Write(file_path: "ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md", content: "{remediation_content}")
 
    Do NOT rely on generating remediation content in the conversation alone -- the remediation file MUST be written to disk via the Write tool.
 
@@ -376,8 +376,8 @@ After ALL specialists complete and all artifacts (reports, dashboard, remediatio
  Critical Issues: N
  Open Findings:   N
 ------------------------------------------------------------
- Dashboard:   plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md
- Remediation: plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md
+ Dashboard:   ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md
+ Remediation: ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md
 ============================================================
 ```
 
@@ -464,7 +464,7 @@ generate a correction story following these steps:
    - **Sub-tarefas**: One `[Dev]` task per CRITICAL finding, grouped `[Dev]` tasks for MEDIUM findings by specialist, one `[Test]` task to re-run `/x-review` after fixes
    - **DoD Local**: All CRITICAL findings resolved, all MEDIUM findings resolved or justified, `/x-review` re-run with no new CRITICAL findings
 
-3. **Save the story** to `plans/epic-XXXX/reviews/correction-story-XXXX-YYYY.md`
+3. **Save the story** to `ai/epics/epic-XXXX/reviews/correction-story-XXXX-YYYY.md`
 
 4. **Report** to the user: story file path, number of findings converted, and suggested next step (`/x-task-implement` or manual fix).
 

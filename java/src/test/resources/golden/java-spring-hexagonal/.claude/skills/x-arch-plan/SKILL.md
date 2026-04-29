@@ -24,7 +24,7 @@ Generates a comprehensive architecture plan for {{PROJECT_NAME}} with component 
 
 - `/x-arch-plan STORY-ID` — generate architecture plan from story
 - `/x-arch-plan "Feature Name"` — generate from feature description
-- `/x-arch-plan plans/epic-XXXX/story-XXXX-YYYY.md` — generate from story file path
+- `/x-arch-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md` — generate from story file path
 
 ## Parameters
 
@@ -87,7 +87,7 @@ Before generating an architecture plan, check whether one already exists and is 
 
 ```
 1. Resolve the expected output path:
-   plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
+   ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
 
 2. IF the file does NOT exist:
    - Log: "Generating architecture plan for {story}"
@@ -246,7 +246,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-p
 ### Output Path
 
 ```
-plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md
+ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md
 ```
 
 Where `XXXX` is the epic ID and `YYYY` is the story sequence number extracted from the story ID.
@@ -374,7 +374,7 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 > Then write the full document content after the closing `---`. The frontmatter is required by
 > `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24). Output path:
 > ```
-> plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md
+> ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md
 > ```
 >
 > **Step 8 — Validate sections post-generation:**
@@ -438,7 +438,7 @@ For in-depth guidance on architecture patterns, consult:
 
 ## Planning Status Propagation (Rule 22 / EPIC-0046)
 
-> V2-gated: only runs when `SchemaVersionResolver.resolve(plans/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
+> V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
 
 After writing `arch-story-XXXX-YYYY.md`, this skill checks the associated story's lifecycle status. The architecture plan does NOT itself drive the `Pendente → Planejada` transition — that is owned by `x-story-plan` (Rule 22 single-writer invariant). If the story is still `Pendente` when the architecture plan is generated standalone (i.e. `x-arch-plan` invoked directly without `x-story-plan`), transition it to `Planejada` here (idempotent if already `Planejada`).
 
@@ -449,18 +449,18 @@ After writing `arch-story-XXXX-YYYY.md`, this skill checks the associated story'
    ```bash
    CURRENT=$(java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       read plans/epic-XXXX/story-XXXX-YYYY.md)
+       read ai/epics/epic-XXXX/story-XXXX-YYYY.md)
    ```
 3. If `CURRENT == "Pendente"`, write `Planejada`:
    ```bash
    java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       write plans/epic-XXXX/story-XXXX-YYYY.md Planejada
+       write ai/epics/epic-XXXX/story-XXXX-YYYY.md Planejada
    ```
    If `CURRENT == "Planejada"`: idempotent no-op.
 4. Stage both files and commit via `x-git-commit`:
    ```bash
-   git add plans/epic-XXXX/story-XXXX-YYYY.md plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md
+   git add ai/epics/epic-XXXX/story-XXXX-YYYY.md ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md
    ```
    Then:
 

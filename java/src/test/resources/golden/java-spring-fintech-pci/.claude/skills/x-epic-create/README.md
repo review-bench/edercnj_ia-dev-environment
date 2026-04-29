@@ -34,7 +34,7 @@ Reads a system specification document and generates the Epic -- the top-level ar
 
 | Artifact | Path |
 |----------|------|
-| Epic file | `plans/epic-XXXX/epic-XXXX.md` |
+| Epic file | `ai/epics/epic-XXXX/epic-XXXX.md` |
 
 ## See Also
 

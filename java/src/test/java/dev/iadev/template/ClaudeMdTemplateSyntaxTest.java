@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * context.
  *
  * <p>Part of EPIC-0048 / story-0048-0010. The template is consumed in story-0048-0011 by the new
- * ClaudeMdAssembler; this test is the RED-first contract gate per ADR-0048-B.
+ * ClaudeMdAssembler; this test is the RED-first contract gate per ADR-0021.
  */
 @DisplayName("CLAUDE.md template (Pebble)")
 class ClaudeMdTemplateSyntaxTest {

@@ -53,7 +53,7 @@ if [[ -z "$PLANS_DIR" ]]; then
     if [[ -n "$EPIC_ID" ]]; then
         # Try canonical layout locations
         for candidate in \
-            "plans/epic-${EPIC_ID}/plans" \
+            "ai/epics/epic-${EPIC_ID}/plans" \
             "ai/epics/epic-${EPIC_ID}-*/plans"; do
             for d in $candidate; do
                 if [[ -d "$d" ]]; then

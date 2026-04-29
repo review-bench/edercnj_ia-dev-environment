@@ -70,7 +70,7 @@ class StopHookExtendedTest {
         // Seed minimal telemetry directory + events.ndjson with a
         // recent gh pr create event so the hook treats this as a
         // story-completion turn.
-        Path telDir = fakeRepo.resolve("plans/epic-0057/telemetry");
+        Path telDir = fakeRepo.resolve("ai/epics/epic-0057/telemetry");
         Files.createDirectories(telDir);
         Files.writeString(
                 telDir.resolve("events.ndjson"),
@@ -79,8 +79,8 @@ class StopHookExtendedTest {
 
         // Seed the four ORIGINAL hard artefacts so only the new
         // dependency-audit absence is the failure cause.
-        Path plansDir = fakeRepo.resolve("plans/epic-0057/plans");
-        Path reportsDir = fakeRepo.resolve("plans/epic-0057/reports");
+        Path plansDir = fakeRepo.resolve("ai/epics/epic-0057/plans");
+        Path reportsDir = fakeRepo.resolve("ai/epics/epic-0057/reports");
         Files.createDirectories(plansDir);
         Files.createDirectories(reportsDir);
         Files.writeString(reportsDir.resolve("verify-envelope-story-0057-0006.json"), "{}");

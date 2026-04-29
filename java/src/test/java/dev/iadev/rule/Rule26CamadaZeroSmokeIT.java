@@ -32,7 +32,7 @@ class Rule26CamadaZeroSmokeIT {
                     "java/src/main/resources/targets/claude/rules/26-audit-gate-lifecycle.md");
     private static final Path HOOKS_DIR =
             REPO_ROOT.resolve("java/src/main/resources/targets/claude/hooks");
-    private static final Path ADR_DIR = REPO_ROOT.resolve("adr");
+    private static final Path ADR_DIR = REPO_ROOT.resolve("docs/adr");
 
     @Test
     @DisplayName("Rule 26 contains ## Camada 0 section (RULE-006)")

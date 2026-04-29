@@ -89,7 +89,7 @@ resolve_ndjson_path() {
             echo "$v4_path"
             return 0
         fi
-        local v3_path="${PROJECT_DIR}/plans/epic-${epic_id}/telemetry/events.ndjson"
+        local v3_path="${PROJECT_DIR}/ai/epics/epic-${epic_id}/telemetry/events.ndjson"
         if [ -f "$v3_path" ]; then
             echo "$v3_path"
             return 0

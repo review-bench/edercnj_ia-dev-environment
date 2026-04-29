@@ -16,16 +16,16 @@ requires-capabilities: []
 
 # Skill: Planning Artifact Commit (batch, no pre-commit chain)
 
-Batch-commits planning artifacts produced by planning skills (`x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-epic-orchestrate`, `x-story-create`, `x-story-plan`, `x-task-plan`) under `plans/epic-XXXX/**`. Unlike `x-git-commit`, this skill does NOT invoke the code pre-commit chain (format / lint / compile) because planning outputs are pure docs/markdown/json and running the chain over them is both overkill and breaks (e.g., markdown linting may fail the whole batch).
+Batch-commits planning artifacts produced by planning skills (`x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-epic-orchestrate`, `x-story-create`, `x-story-plan`, `x-task-plan`) under `ai/epics/epic-XXXX/**`. Unlike `x-git-commit`, this skill does NOT invoke the code pre-commit chain (format / lint / compile) because planning outputs are pure docs/markdown/json and running the chain over them is both overkill and breaks (e.g., markdown linting may fail the whole batch).
 
 RULE-007 of EPIC-0049 requires every planning skill to delegate to this skill at end-of-run so the working tree stays clean and every plan mutation has a Git audit trail.
 
 ## Triggers
 
-- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "add epic scaffold"` -- single-file commit
-- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md,plans/epic-XXXX/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"` -- batch commit
-- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "preview" --dry-run` -- dry-run preview
-- `/x-planning-commit --epic-id XXXX --paths plans/epic-XXXX/epic-XXXX.md --subject "chore bump" --scope chore` -- chore scope
+- `/x-planning-commit --epic-id XXXX --paths ai/epics/epic-XXXX/epic-XXXX.md --subject "add epic scaffold"` -- single-file commit
+- `/x-planning-commit --epic-id XXXX --paths ai/epics/epic-XXXX/epic-XXXX.md,ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md --subject "add planning artifacts (22 stories)"` -- batch commit
+- `/x-planning-commit --epic-id XXXX --paths ai/epics/epic-XXXX/epic-XXXX.md --subject "preview" --dry-run` -- dry-run preview
+- `/x-planning-commit --epic-id XXXX --paths ai/epics/epic-XXXX/epic-XXXX.md --subject "chore bump" --scope chore` -- chore scope
 
 ## Parameters
 
@@ -94,7 +94,7 @@ No-op (diff vazio) is NOT an error — exit 0 with `noOp=true`.
 
 | Skill | Relationship | Context |
 |-------|--------------|---------|
-| `x-epic-create` | invokes | At end-of-run commits `plans/epic-XXXX/epic-XXXX.md` + `IMPLEMENTATION-MAP.md`. |
+| `x-epic-create` | invokes | At end-of-run commits `ai/epics/epic-XXXX/epic-XXXX.md` + `IMPLEMENTATION-MAP.md`. |
 | `x-epic-decompose` | invokes | Commits full batch of story files + implementation map. |
 | `x-epic-map` | invokes | Commits `IMPLEMENTATION-MAP.md` updates. |
 | `x-epic-orchestrate` | invokes | Commits per-story planning artifacts in batch after each wave. |

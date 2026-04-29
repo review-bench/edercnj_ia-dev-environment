@@ -59,7 +59,7 @@ Update `state.json`: `phase = "DISCOVERY"`.
 Parse comma-separated integers; preserve declared order; assign `discoveredPrs`.
 
 #### Mode B: `--epic ID`
-Resolve `plans/epic-{ID}/execution-state.json`. Traverse `stories[].tasks[].prNumber` for non-null entries. Sort by `storyId` ascending then `TASK-ID` ascending.
+Resolve `ai/epics/epic-{ID}/execution-state.json`. Traverse `stories[].tasks[].prNumber` for non-null entries. Sort by `storyId` ascending then `TASK-ID` ascending.
 
 #### Mode C: `--pattern regex`
 Execute: `gh pr list --search "{pattern}" --state open --json number,createdAt --jq '.[] | [.number, .createdAt] | @csv'`

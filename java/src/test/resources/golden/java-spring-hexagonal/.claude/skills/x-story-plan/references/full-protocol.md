@@ -13,7 +13,7 @@ Extract `XXXX` and `YYYY` from `story-XXXX-YYYY`. If argument does not match →
 
 ### 0.2 Resolve Epic Directory
 
-Glob: `plans/epic-XXXX` or `plans/epic-XXXX-*`. If both exist, prefer exact match. No match → abort.
+Glob: `ai/epics/epic-XXXX` or `ai/epics/epic-XXXX-*`. If both exist, prefer exact match. No match → abort.
 
 ### 0.3 Resolve Paths
 
@@ -42,13 +42,13 @@ If reusing: skip to Phase 5 (DoR only). Do NOT invoke subagents.
 
 ### 0.5 Verify Story File
 
-`test -f plans/epic-XXXX/story-XXXX-YYYY.md` → NOT_FOUND aborts.
+`test -f ai/epics/epic-XXXX/story-XXXX-YYYY.md` → NOT_FOUND aborts.
 
 ---
 
 ## Phase 0b — Schema Version Detection
 
-1. Read `plans/epic-XXXX/execution-state.json` via `SchemaVersionResolver`.
+1. Read `ai/epics/epic-XXXX/execution-state.json` via `SchemaVersionResolver`.
 2. `planningSchemaVersion == "2.0"` → v2 path (run Phases 4a-4c after Phase 4).
 3. Absent / `"1.0"` / malformed → v1 path (standard flow through Phase 5).
 
@@ -110,7 +110,7 @@ Apply deterministic merge rules from [`planning-guide.md §Consolidation Rules`]
 **Phase 4b — Parallel task plans:** Invoke `x-task-plan` per task in parallel (batch size ≤ 4):
 ```
 Agent(subagent_type: "general-purpose", model: "sonnet", description: "x-task-plan for {TASK-ID}",
-      prompt: "Invoke x-task-plan via Skill(skill: 'x-task-plan', args: '--task-file plans/epic-XXXX/plans/task-{TASK-ID}.md')")
+      prompt: "Invoke x-task-plan via Skill(skill: 'x-task-plan', args: '--task-file ai/epics/epic-XXXX/plans/task-{TASK-ID}.md')")
 ```
 
 **Phase 4c — Task map:** Generate `task-implementation-map-STORY-XXXX-YYYY.md` with topological sort + parallelism analysis via `x-parallel-eval`.

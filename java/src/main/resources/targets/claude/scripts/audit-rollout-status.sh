@@ -162,7 +162,7 @@ fi
 BYPASS_COUNT=0
 for ndjson_candidate in \
     "${PROJECT_DIR}/ai/epics/"*/telemetry/events.ndjson \
-    "${PROJECT_DIR}/plans/epic-"*/telemetry/events.ndjson; do
+    "${PROJECT_DIR}/ai/epics/epic-"*/telemetry/events.ndjson; do
     if [[ -f "$ndjson_candidate" ]]; then
         count=$(grep -c '"recovery_mode_used"' "$ndjson_candidate" 2>/dev/null || echo 0)
         BYPASS_COUNT=$((BYPASS_COUNT + count))

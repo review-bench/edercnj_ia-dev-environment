@@ -21,8 +21,8 @@
 
 ### Path A (without `--prs`): checkpoint-based discovery
 
-1. `plans/epic-{epicId}/` must exist → `EPIC_DIR_NOT_FOUND` if absent.
-2. `plans/epic-{epicId}*/execution-state.json` must exist → `CHECKPOINT_NOT_FOUND` if absent.
+1. `ai/epics/epic-{epicId}/` must exist → `EPIC_DIR_NOT_FOUND` if absent.
+2. `ai/epics/epic-{epicId}*/execution-state.json` must exist → `CHECKPOINT_NOT_FOUND` if absent.
 
 ### Path B (with `--prs`): explicit PR list
 

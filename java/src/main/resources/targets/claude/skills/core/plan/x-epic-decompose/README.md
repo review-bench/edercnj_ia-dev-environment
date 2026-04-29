@@ -116,9 +116,9 @@ flowchart TD
 
 | Artifact | Path | Description |
 |----------|------|-------------|
-| Epic | `plans/epic-XXXX/epic-XXXX.md` | Scope, cross-cutting rules, story index, DoR/DoD |
-| Stories | `plans/epic-XXXX/story-XXXX-YYYY.md` | One file per story with contracts, Gherkin, diagrams, sub-tasks |
-| Implementation Map | `plans/epic-XXXX/IMPLEMENTATION-MAP.md` | Phases, critical path, dependency graph, strategic analysis |
+| Epic | `ai/epics/epic-XXXX/epic-XXXX.md` | Scope, cross-cutting rules, story index, DoR/DoD |
+| Stories | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` | One file per story with contracts, Gherkin, diagrams, sub-tasks |
+| Implementation Map | `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` | Phases, critical path, dependency graph, strategic analysis |
 | Jira Issues | Jira project (remote) | Epic and Story issues with parent links and dependency links (optional) |
 
 ## Decomposition Layers

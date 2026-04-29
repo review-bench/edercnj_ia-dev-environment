@@ -69,12 +69,12 @@ Two locations share the same per-event schema:
 
 | Path | Committed? | Purpose |
 |------|:----------:|---------|
-| `plans/epic-XXXX/telemetry/events.ndjson` | **yes** | Canonical append-only log per epic. One event per line (RULE-002). |
-| `plans/epic-XXXX/telemetry/sessions/{sessionId}.ndjson` | yes (optional) | Optional per-session shard for high-volume epics. |
+| `ai/epics/epic-XXXX/telemetry/events.ndjson` | **yes** | Canonical append-only log per epic. One event per line (RULE-002). |
+| `ai/epics/epic-XXXX/telemetry/sessions/{sessionId}.ndjson` | yes (optional) | Optional per-session shard for high-volume epics. |
 | `.claude/telemetry/index.json` | **no** — gitignored | Local cache of aggregated metadata; rebuildable from the committed NDJSON. |
 
 The project `.gitignore` excludes `.claude/telemetry/index.json` so the cache
-never leaks into commits. The `plans/epic-*/telemetry/` directory structure IS
+never leaks into commits. The `ai/epics/epic-*/telemetry/` directory structure IS
 versioned.
 
 ## 5. Canonical Examples
@@ -147,7 +147,7 @@ error paths: `invalid-type.json` (type not in enum) and `negative-duration.json`
 
 ## 7. References
 
-- Story: `plans/epic-0040/story-0040-0001.md`
-- Epic: `plans/epic-0040/epic-0040.md`
+- Story: `ai/epics/epic-0040/story-0040-0001.md`
+- Epic: `ai/epics/epic-0040/epic-0040.md`
 - Schema: `_TEMPLATE-TELEMETRY-EVENT.json` (sibling file)
 - Tests: `java/src/test/java/dev/iadev/telemetry/schema/`

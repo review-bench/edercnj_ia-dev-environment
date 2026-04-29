@@ -45,7 +45,7 @@ Before generating a test plan, verify whether a valid plan already exists:
 
 1. **Resolve paths:** Extract epic ID (XXXX) and story sequence (YYYY) from the story ID. Compute:
    - Story path: the story file provided as input
-   - Plan path: `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md`
+   - Plan path: `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md`
 
 2. **Check existence:** If the plan file does NOT exist, proceed to generation (Step 1).
 
@@ -231,7 +231,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-p
 
 ### Output
 
-Save to: `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p plans/epic-XXXX/plans`.
+Save to: `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p ai/epics/epic-XXXX/plans`.
 
 #### Origin Marker (EPIC-0059 — mandatory)
 
@@ -361,7 +361,7 @@ This ensures backward compatibility with projects that have not yet adopted temp
 
 ## Planning Status Propagation (Rule 22 / EPIC-0046)
 
-> V2-gated: only runs when `SchemaVersionResolver.resolve(plans/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
+> V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
 
 After writing `tests-story-XXXX-YYYY.md`, check the associated story's lifecycle status. The test plan, like the architecture plan, is a secondary writer — the primary transition `Pendente → Planejada` is owned by `x-story-plan`. When `x-test-plan` runs standalone (without `x-story-plan`), it promotes the story from `Pendente` to `Planejada` so the source artifact reflects that the test plan is in place.
 
@@ -372,12 +372,12 @@ After writing `tests-story-XXXX-YYYY.md`, check the associated story's lifecycle
    ```bash
    CURRENT=$(java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
-       read plans/epic-XXXX/story-XXXX-YYYY.md)
+       read ai/epics/epic-XXXX/story-XXXX-YYYY.md)
    ```
 3. If `CURRENT == "Pendente"` → `write Planejada`. Idempotent when already `Planejada`.
 4. Stage and commit:
    ```bash
-   git add plans/epic-XXXX/story-XXXX-YYYY.md plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md
+   git add ai/epics/epic-XXXX/story-XXXX-YYYY.md ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md
    ```
 
        Skill(skill: "x-git-commit", args: "docs(story-XXXX-YYYY): add test plan + update status to Planejada")

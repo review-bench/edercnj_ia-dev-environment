@@ -74,12 +74,12 @@ in that case the FIRST/LAST action slots degrade to a no-op comment
 description: "Implementation plan for <story_id>"
 prompt: |
   You are a Senior Architect. Read:
-    - plans/epic-<epic_id>/<story_id>.md (story)
-    - plans/epic-<epic_id>/plans/arch-story-<story_id>.md (arch plan, produced by Step 1A)
+    - ai/epics/epic-<epic_id>/<story_id>.md (story)
+    - ai/epics/epic-<epic_id>/plans/arch-story-<story_id>.md (arch plan, produced by Step 1A)
     - .claude/templates/_TEMPLATE-IMPLEMENTATION-PLAN.md (template)
     - .claude/rules/04-architecture-summary.md
   Produce the implementation plan at
-    plans/epic-<epic_id>/plans/plan-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/plan-story-<story_id>.md
   The plan MUST cover: (a) layer-by-layer breakdown (domain/application/
   adapter), (b) ports + contracts, (c) integration notes, (d) risks and
   mitigations, (e) a rollback plan.
@@ -95,7 +95,7 @@ prompt: |
   You are a QA Engineer. Invoke x-test-plan via the Skill tool:
     Skill(skill: "x-test-plan", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes
-    plans/epic-<epic_id>/plans/tests-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/tests-story-<story_id>.md
   directly. Verify the file exists after the call; return its
   absolute path.
 ```
@@ -109,8 +109,8 @@ prompt: |
   Skill tool:
     Skill(skill: "x-lib-task-decomposer", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes TWO artifacts:
-    plans/epic-<epic_id>/plans/tasks-story-<story_id>.md
-    plans/epic-<epic_id>/plans/task-implementation-map-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/tasks-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/task-implementation-map-story-<story_id>.md
   Verify both exist; return both absolute paths as a JSON object
   {"tasks":"…","taskMap":"…"}.
 ```
@@ -124,7 +124,7 @@ prompt: |
   tool:
     Skill(skill: "x-threat-model", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes
-    plans/epic-<epic_id>/plans/security-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/security-story-<story_id>.md
   directly. Verify the file exists after the call; return its
   absolute path.
 ```
@@ -135,12 +135,12 @@ prompt: |
 description: "Compliance assessment for <story_id>"
 prompt: |
   You are a Compliance Engineer. Read:
-    - plans/epic-<epic_id>/<story_id>.md (story)
-    - plans/epic-<epic_id>/plans/arch-story-<story_id>.md
+    - ai/epics/epic-<epic_id>/<story_id>.md (story)
+    - ai/epics/epic-<epic_id>/plans/arch-story-<story_id>.md
     - .claude/templates/_TEMPLATE-COMPLIANCE-ASSESSMENT.md
     - .claude/rules/12-security-anti-patterns.md
   Produce the compliance assessment at
-    plans/epic-<epic_id>/plans/compliance-story-<story_id>.md
+    ai/epics/epic-<epic_id>/plans/compliance-story-<story_id>.md
   covering: (a) data-classification, (b) retention policy, (c)
   regulatory scope (GDPR / LGPD / PCI-DSS as applicable), (d)
   audit-trail requirements, (e) rights-enforcement hooks.

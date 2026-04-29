@@ -17,12 +17,12 @@ For each artifact type listed below, check existence and staleness. If `mtime(st
 
 | # | Artifact Type | File Pattern | Phase that Generates | Template Reference |
 |---|---------------|--------------|----------------------|--------------------|
-| 1 | Test Plan | `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | 1B (parallel) | `_TEMPLATE-TEST-PLAN.md` |
-| 2 | Architecture Plan | `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` | 1A | `_TEMPLATE-ARCHITECTURE-PLAN.md` |
-| 3 | Implementation Plan | `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md` | 1 (Step 1B) | `_TEMPLATE-IMPLEMENTATION-PLAN.md` |
-| 4 | Task Breakdown | `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | 1C (parallel) | `_TEMPLATE-TASK-BREAKDOWN.md` |
-| 5 | Security Assessment | `plans/epic-XXXX/plans/security-story-XXXX-YYYY.md` | 1E | `_TEMPLATE-SECURITY-ASSESSMENT.md` |
-| 6 | Compliance Assessment | `plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md` | 1F | `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` |
+| 1 | Test Plan | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | 1B (parallel) | `_TEMPLATE-TEST-PLAN.md` |
+| 2 | Architecture Plan | `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` | 1A | `_TEMPLATE-ARCHITECTURE-PLAN.md` |
+| 3 | Implementation Plan | `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md` | 1 (Step 1B) | `_TEMPLATE-IMPLEMENTATION-PLAN.md` |
+| 4 | Task Breakdown | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | 1C (parallel) | `_TEMPLATE-TASK-BREAKDOWN.md` |
+| 5 | Security Assessment | `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md` | 1E | `_TEMPLATE-SECURITY-ASSESSMENT.md` |
+| 6 | Compliance Assessment | `ai/epics/epic-XXXX/plans/compliance-story-XXXX-YYYY.md` | 1F | `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` |
 
 **Staleness Check Logic:**
 
@@ -247,7 +247,7 @@ Evaluate change scope:
     Skill(skill: "x-arch-plan", args: "{STORY_PATH}")
     TaskUpdate(id: archPlanTaskId, status: "completed")
 
-Output: `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`. On failure: emit `WARNING: Architecture plan generation failed. Continuing without architecture plan.`, still close tracking, proceed to 1B.
+Output: `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`. On failure: emit `WARNING: Architecture plan generation failed. Continuing without architecture plan.`, still close tracking, proceed to 1B.
 
 ### 2.2 Parallel Planning — Batch Protocol
 
@@ -298,11 +298,11 @@ Prompt content:
 > - `knowledge/architecture.md` (layer structure, dependency direction).
 > - `knowledge/layer-templates.md` (per-layer code templates).
 > - Relevant ADRs in `adr/`.
-> - Architecture plan at `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` (if exists).
+> - Architecture plan at `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` (if exists).
 >
 > **Step 2 — Produce implementation plan** following the template. Inline fallback sections: (1) Affected layers and components, (2) New classes/interfaces, (3) Existing classes to modify, (4) Class diagram (Mermaid), (5) Method signatures, (6) Dependency direction validation, (7) Integration points, (8) DB changes, (9) API changes, (10) Event changes, (11) Configuration changes, (12) TDD strategy — map classes to UT-N/AT-N/IT-N, (13) Mini-ADRs, (14) Risk assessment.
 >
-> Save to `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md`.
+> Save to `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION:** `TaskUpdate(id: implPlanTaskId, status: "completed")`.
 
@@ -318,7 +318,7 @@ Prompt content:
 
 > **FIRST ACTION:** `TaskCreate(description: "Planning: Event Schema — Story {storyId}")` → record as `eventSchemaTaskId`.
 >
-> You are an Event Engineer. Read `knowledge/protocols.md` and the implementation plan. Produce event schema: event names (past tense), CloudEvents envelope, topic naming, partition key, producer/consumer contracts. Save to `plans/epic-XXXX/plans/events-story-XXXX-YYYY.md`.
+> You are an Event Engineer. Read `knowledge/protocols.md` and the implementation plan. Produce event schema: event names (past tense), CloudEvents envelope, topic naming, partition key, producer/consumer contracts. Save to `ai/epics/epic-XXXX/plans/events-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION:** `TaskUpdate(id: eventSchemaTaskId, status: "completed")`.
 
@@ -336,7 +336,7 @@ Prompt content:
 
 > **FIRST ACTION:** `TaskCreate(description: "Planning: Security Assessment (fallback) — Story {storyId}")` → record as `securityFallbackTaskId`.
 >
-> You are a Security Engineer. Read template `.claude/templates/_TEMPLATE-SECURITY-ASSESSMENT.md`, `knowledge/security/application-security.md` (OWASP Top 10 + headers + dependency security), `knowledge/security/security-principles.md` (data classification, input validation, secure error handling), and the implementation plan. Produce threat model, OWASP mapping, authN/authZ review, input validation, data protection, secrets management. Save to `plans/epic-XXXX/plans/security-story-XXXX-YYYY.md`.
+> You are a Security Engineer. Read template `.claude/templates/_TEMPLATE-SECURITY-ASSESSMENT.md`, `knowledge/security/application-security.md` (OWASP Top 10 + headers + dependency security), `knowledge/security/security-principles.md` (data classification, input validation, secure error handling), and the implementation plan. Produce threat model, OWASP mapping, authN/authZ review, input validation, data protection, secrets management. Save to `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION:** `TaskUpdate(id: securityFallbackTaskId, status: "completed")`.
 
@@ -354,7 +354,7 @@ Prompt content:
 
 > **FIRST ACTION:** `TaskCreate(description: "Planning: Compliance Assessment — Story {storyId}")` → record as `complianceTaskId`.
 >
-> You are a Security Engineer. Read template `.claude/templates/_TEMPLATE-COMPLIANCE-ASSESSMENT.md`, the active compliance reference under `knowledge/compliance.md` (the one matching project config: `gdpr.md` / `lgpd.md` / `pci-dss.md` / `hipaa.md` / `sox.md`), `knowledge/security/security-principles.md`, and the implementation plan. Produce compliance impact assessment: data classification, encryption requirements, audit logging needs, regulatory considerations. Save to `plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md`.
+> You are a Security Engineer. Read template `.claude/templates/_TEMPLATE-COMPLIANCE-ASSESSMENT.md`, the active compliance reference under `knowledge/compliance.md` (the one matching project config: `gdpr.md` / `lgpd.md` / `pci-dss.md` / `hipaa.md` / `sox.md`), `knowledge/security/security-principles.md`, and the implementation plan. Produce compliance impact assessment: data classification, encryption requirements, audit logging needs, regulatory considerations. Save to `ai/epics/epic-XXXX/plans/compliance-story-XXXX-YYYY.md`.
 >
 > **LAST ACTION:** `TaskUpdate(id: complianceTaskId, status: "completed")`.
 
@@ -440,7 +440,7 @@ Verify uniform error handling patterns across classes of the same role. Verify c
 | `graphql` | GraphQL schema doc generator | `contracts/api/graphql-reference.md` |
 | `websocket` / `kafka` / `event-consumer` / `event-producer` | Event doc generator | `contracts/api/event-reference.md` |
 
-No documentable interfaces ⇒ skip with `"No documentable interfaces configured"`. Always generate CHANGELOG entry from Conventional Commits. If `plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` exists, invoke `Skill(skill: "x-arch-update", args: "plans/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")` to update `steering/service-architecture.md`.
+No documentable interfaces ⇒ skip with `"No documentable interfaces configured"`. Always generate CHANGELOG entry from Conventional Commits. If `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` exists, invoke `Skill(skill: "x-arch-update", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")` to update `steering/service-architecture.md`.
 
 ### 5.5 Step 3.4 — Specialist Reviews
 
@@ -448,11 +448,11 @@ No documentable interfaces ⇒ skip with `"No documentable interfaces configured
 
 The review skill launches its own 8 parallel specialist subagents (Security, QA, Performance, Database, Observability, DevOps, API, Event). Instruct each specialist to read `.claude/templates/_TEMPLATE-SPECIALIST-REVIEW.md`. On missing template, WARN and fall back to inline format.
 
-Consolidated dashboard (RULE-006): read `.claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`, aggregate specialist scores, save to `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`.
+Consolidated dashboard (RULE-006): read `.claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`, aggregate specialist scores, save to `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`.
 
 ### 5.6 Step 3.5 — Fixes + Remediation
 
-1. Read `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md`. Map open findings from dashboard to remediation items. Save to `plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
+1. Read `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md`. Map open findings from dashboard to remediation items. Save to `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
 2. Fix ALL failed items (every specialist must reach STATUS: Approved).
 3. TDD discipline: write/update test FIRST, then apply fix.
 4. Atomic commits via `Skill(skill: "x-git-commit", ...)`.
@@ -463,7 +463,7 @@ Consolidated dashboard (RULE-006): read `.claude/templates/_TEMPLATE-CONSOLIDATE
     Agent(
       subagent_type: "general-purpose",
       description: "Fix review finding FIND-NNN",
-      prompt: "Read finding FIND-NNN from plans/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md. Apply TDD discipline: write/update test FIRST for the finding, then fix implementation. Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}}. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix FIND-NNN: [description]\"'). Update remediation tracking: mark FIND-NNN as Fixed with commit SHA."
+      prompt: "Read finding FIND-NNN from ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md. Apply TDD discipline: write/update test FIRST for the finding, then fix implementation. Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}}. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix FIND-NNN: [description]\"'). Update remediation tracking: mark FIND-NNN as Fixed with commit SHA."
     )
 
 After all finding agents complete, re-run test + coverage. Step 3.6 re-validates (max 2 cycles).
@@ -619,7 +619,7 @@ Same `SchemaVersionResolver` as `x-story-plan` (story-0038-0004). When `planning
 
 ### 10.2 Phase 1 (v2) — Read Task Implementation Map
 
-1. Resolve `plans/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md`.
+1. Resolve `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md`.
 2. If missing, abort with `MAP_NOT_FOUND {path}` (the map should already exist from `x-story-plan` v2 Phase 4c; if not, the epic orchestrator or operator should re-run planning).
 3. Parse the Execution Order table to recover wave structure (Wave N → list of TASK-IDs). Coalesced super-nodes appear as `(TASK-A, TASK-B)` and map to a single `x-task-implement` invocation (the child skill's Phase 0e COALESCED check handles partner presence).
 
@@ -644,7 +644,7 @@ A wave row containing a coalesced super-node `(TASK-A, TASK-B)`:
 
 After the final wave:
 
-1. Aggregate per-task results into a story-level commit summary `plans/epic-XXXX/reports/story-implementation-report-STORY-XXXX-YYYY.md`:
+1. Aggregate per-task results into a story-level commit summary `ai/epics/epic-XXXX/reports/story-implementation-report-STORY-XXXX-YYYY.md`:
    - Table of TASK-ID → commit SHA → wallclock → coverage delta.
    - Wave execution timing.
    - Any rebases / conflict-resolution events.

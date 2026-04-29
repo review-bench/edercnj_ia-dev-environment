@@ -15,30 +15,32 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > **Concluded — EPIC-0041 (File-Conflict-Aware Parallelism Analysis).**
 > Planning now emits a structured `## File Footprint` / `## Story File Footprint` block on every task/story plan (`write:` / `read:` / `regen:`). The new skill `/x-parallel-eval --scope=epic|story|task` consumes those footprints, produces a collision matrix (hard / regen / soft), and recommends demotions to serial when two plans touch the same hotspot. `x-epic-map` Step 8.5 annotates the Implementation Map with "Restrições de Paralelismo"; `x-epic-implement` Phase 0.5.0 and `x-story-implement` Phase 1.5 run the gate and **degrade waves to serial with a visible warning** when a collision is detected (`ExecutionState.parallelismDowngrades`). Hotspots catalogued in RULE-004 (`SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`, `pom.xml`, `.gitignore`, `src/test/resources/golden/**`). Plans predating this epic are treated as "footprint unknown" — warn, do not block (RULE-006).
 > - Decision record: [`docs/adr/ADR-0006-file-conflict-aware-parallelism.md`](docs/adr/ADR-0006-file-conflict-aware-parallelism.md)
-> - Retroactive diff patches for epics 0036–0040: [`plans/epic-0041/migrations/`](plans/epic-0041/migrations/) (EPIC-0040 flagged HIGH — hard conflict on `telemetry-phase.sh`).
+> - Retroactive diff patches for epics 0036–0040: [`ai/epics/epic-0041/migrations/`](ai/epics/epic-0041/migrations/) (EPIC-0040 flagged HIGH — hard conflict on `telemetry-phase.sh`).
 > - Skill inventory gained `/x-parallel-eval` (category `plan/`).
 
 > **Concluded — EPIC-0045 (CI Watch no Fluxo de PR).**
 > Delivered `x-pr-watch-ci` skill (CI polling + Copilot review detection, 8 stable exit codes — RULE-045-05), Rule 21 (CI-Watch, RULE-045-01) with fallback matrix and opt-out via `--no-ci-watch`, and retrofits to `x-story-implement` (Phase 2.2.8.5), `x-task-implement --worktree` (Step 4.5), and `x-release` (flag `--ci-watch`). `Epic0045SmokeTest` validates end-to-end contract. `PrWatchStatusClassifier` + `PrWatchExitCode` (zero-I/O, fully testable). All 6 stories merged to develop.
-> - Story index: [`plans/epic-0045/`](plans/epic-0045/)
+> - Story index: [`ai/epics/epic-0045/`](ai/epics/epic-0045/)
 
 > **Concluded — EPIC-0055 (Task Hierarchy & Phase Gate Enforcement).**
 > Introduces Rule 25 (hierarchical task tracking, 4-level depth via `›` separator: Epic › Story › Phase › Wave/Cycle), skill `x-internal-phase-gate` (internal, `haiku`, 4 modes: pre/post/wave/final), and ADR-0014. Phase gates block `## Phase N` transitions until child tasks are `completed` AND expected artifacts exist on disk. Operators can see `"EPIC-0065 › Phase 3 › story-0065-0001 (in_progress)"` during execution. 4-layer enforcement: normative (Rule 25 + CLAUDE.md), Stop hook (`verify-phase-gates.sh`), PreToolUse hook (`enforce-phase-sequence.sh`), CI audit (`audit-task-hierarchy.sh` + `audit-phase-gates.sh`). All 8 canonical orchestrators retrofitted: `x-task-implement`, `x-story-implement`, `x-epic-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`. Backward compatible via Rule 19: `taskTracking.enabled` defaults `false` for legacy epics (gates become no-ops); 28 legacy execution-state.json files migrated. `Epic0055FoundationSmokeTest` validates end-to-end.
 > - Rule: [`.claude/rules/25-task-hierarchy.md`](.claude/rules/25-task-hierarchy.md)
 > - Skill (internal): `x-internal-phase-gate` (not user-invocable)
 > - Decision record: [`docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md`](docs/adr/ADR-0014-task-hierarchy-and-phase-gates.md)
-> - Epic index: [`plans/epic-0055/`](plans/epic-0055/)
+> - Epic index: [`ai/epics/epic-0055/`](ai/epics/epic-0055/)
 
 > **Concluded — EPIC-0061 (Local-First Lifecycle & Stack-Aware Governance).** `flowVersion: "3"` marks epics born in local-first lifecycle. Key changes: (1) Rule 20 flipped — non-interactive is DEFAULT; (2) ScriptsAssembler stack-aware (7 stacks × bash templates); (3) Java audit harness (8 `*Auditor` + `AuditEquivalenceSmokeIT`); (4) `audit.yml` deleted; (5) Rule 26 extended with Camada 0 (preventivo, during LLM turn); (6) ADR-0017 published; (7) `migrate-to-local-first.sh` for legacy projects. Tag `local-first-lifecycle-frozen` marks epic closure.
 
+> **Concluded — Folder Cleanup Post-v4 (2026-04-29).** Finishes the EPIC-0062 migration by relocating the 60 legacy epics (`plans/epic-0001..0060`) into `ai/epics/epic-NNNN-<slug>/` via `git mv` (history preserved); merges runtime artifacts of epics 0062–0064 into their canonical `ai/epics/` siblings; removes `plans/` and the orphan `/adr/` folder. ADR housekeeping: the orphan `ADR-0017-local-first-lifecycle.md` is consolidated into `docs/adr/`, four duplicate-numbering ADRs are renumbered to free slots (`ADR-0015-zero-bypass→ADR-0018`, `ADR-0016-preflight→ADR-0019`, `ADR-001-hexagonal→ADR-0020`, `ADR-0048-B→ADR-0021`), and the `docs/adr/README.md` index is rebuilt with all 22 ADRs. Skill `x-adr-generate` is fixed to write to `docs/adr/` (was the root cause of the orphan). Hooks/scripts (`telemetry-*`, `verify-*`, `enforce-preflight-*`, `audit-*`) and 85 source-of-truth skills/rules/agents/templates retrofitted from `plans/epic-*/` to `ai/epics/epic-*/`. 920 golden fixtures regenerated from updated templates; `GoldenFileTest` + `PlatformGoldenFileTest` green. `release-state-X.Y.Z.json` lifecycle path repointed to `ai/releases/` (with corresponding `.gitignore` update).
+
 > **ZERO-BYPASS LIFECYCLE — INEGOCIÁVEL:** Toda story/task DEVE ser implementada
 > via `/x-story-implement`. Nenhum PR pode ser mergeado sem:
-> (1) 6 artefatos de Fase 1 em `plans/epic-XXXX/plans/`;
-> (2) 4 artefatos de Fase 3 em `plans/epic-XXXX/reports/`;
+> (1) 6 artefatos de Fase 1 em `ai/epics/epic-XXXX/plans/`;
+> (2) 4 artefatos de Fase 3 em `ai/epics/epic-XXXX/reports/`;
 > (3) Eventos de telemetria de `x-story-implement` em `events.ndjson`;
 > (4) Seção "## Orchestrator Evidence" preenchida no PR body.
 > Bypass é detectado e bloqueado em CI. Não há escape hatch para happy-path.
-> Ver [Rule 27](.claude/rules/27-zero-bypass-lifecycle.md) e [EPIC-0059](plans/epic-0059/).
+> Ver [Rule 27](.claude/rules/27-zero-bypass-lifecycle.md) e [EPIC-0059](ai/epics/epic-0059/).
 
 > **EXECUTION INTEGRITY — Camada 0 (NEW — EPIC-0063):** Gates locais pré-flight via
 > PreToolUse hook `enforce-preflight-gates.sh`. `git push`, `gh pr create`, `Skill x-pr-create`
@@ -48,24 +50,24 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > Ver [Rule 24 §Camada 0](.claude/rules/24-execution-integrity.md).
 
 > **In progress — EPIC-0046 (Lifecycle Integrity Phase 2 — CI enforcement).**
-> Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `plans/epic-*/reports/` with no `x-git-commit` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
-> - Story: [`plans/epic-0046/story-0046-0007.md`](plans/epic-0046/story-0046-0007.md)
+> Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `ai/epics/epic-*/reports/` with no `x-git-commit` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
+> - Story: [`ai/epics/epic-0046/story-0046-0007.md`](ai/epics/epic-0046/story-0046-0007.md)
 
 > **In progress — EPIC-0043 (Interactive Gates Convention).**
 > Standardizes interactive decision gates across orchestrating skills (`x-release`, `x-story-implement`, `x-epic-implement`, `x-review-pr`) with a fixed 3-option menu (PROCEED / FIX-PR / ABORT) as the default behavior. Menu is now default; `--non-interactive` replaces the patchwork of opt-in flags for CI/automation. FIX-PR slot invokes `x-pr-fix`/`x-pr-fix-epic` via Rule 13 INLINE-SKILL and loops back to the same menu. Guard-rail caps 3 consecutive fix attempts with `GATE_FIX_LOOP_EXCEEDED`. Rule 20 + ADR-0010 published in story-0043-0001; retrofits follow in stories 0043-0002 through 0043-0006.
 > - Decision record: [`docs/adr/ADR-0010-interactive-gates-convention.md`](docs/adr/ADR-0010-interactive-gates-convention.md)
-> - Story index: [`plans/epic-0043/`](plans/epic-0043/)
+> - Story index: [`ai/epics/epic-0043/`](ai/epics/epic-0043/)
 
 > **Concluded — EPIC-0058 (Audit Scripts Lifecycle & Generation).**
 > Formalizes the lifecycle of governance audit gates: creates Rule 26 "Audit Gate Lifecycle" + ADR-0015 (4-layer taxonomy: Hook/CI script/Java test/Workflow); creates 3 missing CI scripts referenced in Rules 19/21/22 (`audit-flow-version.sh`, `audit-epic-branches.sh`, `audit-skill-visibility.sh`); introduces `ScriptsAssembler` so generated projects inherit governance gates; regenerates golden files for 9 profiles. **Note (EPIC-0061 story-0061-0005):** `audit.yml` CI workflow removed — audits now run inline via `mvn verify` through Java `*AuditorTest` classes (RULE-007, RULE-008).
 > - Rule: [`.claude/rules/26-audit-gate-lifecycle.md`](.claude/rules/26-audit-gate-lifecycle.md)
 > - Decision record: [`docs/adr/ADR-0015-audit-gate-lifecycle.md`](docs/adr/ADR-0015-audit-gate-lifecycle.md)
-> - Epic index: [`plans/epic-0058/`](plans/epic-0058/)
+> - Epic index: [`ai/epics/epic-0058/`](ai/epics/epic-0058/)
 
 > **In progress — EPIC-0036 (Skill Taxonomy Refactor).**
 > The source of truth for skills under `java/src/main/resources/targets/claude/skills/` is being reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`), and ~19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. The generated output `.claude/skills/` remains **flat** — user-facing invocation paths are preserved.
 > - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
-> - Rename staging checklist: [`plans/epic-0036/skill-renames.md`](plans/epic-0036/skill-renames.md)
+> - Rename staging checklist: [`ai/epics/epic-0036/skill-renames.md`](ai/epics/epic-0036/skill-renames.md)
 > - Current skill names are the renamed forms (e.g., `/x-epic-create`, `/x-task-implement`, `/x-test-e2e`). Do not use the old pre-rename names.
 
 ## Structure
@@ -155,7 +157,7 @@ A complete list of skills with descriptions is generated in `.claude/README.md` 
 
 ## Telemetry
 
-Every `ia-dev-env`-generated project ships with telemetry capture enabled by default. Skill executions, phase boundaries, subagent lifecycles, and tool calls are recorded as NDJSON under `plans/epic-*/telemetry/events.ndjson`, producing an auditable timeline of how long each part of an epic / story / task actually took. The design is documented in [`docs/adr/ADR-0005-telemetry-architecture.md`](docs/adr/ADR-0005-telemetry-architecture.md); the privacy contract is enforced by [Rule 20 — Telemetry Privacy](.claude/rules/20-telemetry-privacy.md) and the scrubber at `dev.iadev.telemetry.TelemetryScrubber`.
+Every `ia-dev-env`-generated project ships with telemetry capture enabled by default. Skill executions, phase boundaries, subagent lifecycles, and tool calls are recorded as NDJSON under `ai/epics/epic-*/telemetry/events.ndjson`, producing an auditable timeline of how long each part of an epic / story / task actually took. The design is documented in [`docs/adr/ADR-0005-telemetry-architecture.md`](docs/adr/ADR-0005-telemetry-architecture.md); the privacy contract is enforced by [Rule 20 — Telemetry Privacy](.claude/rules/20-telemetry-privacy.md) and the scrubber at `dev.iadev.telemetry.TelemetryScrubber`.
 
 Capture happens through two cooperating layers:
 
@@ -235,18 +237,18 @@ Content is copied verbatim by `PlanTemplatesAssembler` (RULE-003).
 
 | Template | Produced By | Saved To | Pre-Check |
 |----------|-------------|----------|-----------|
-| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | x-story-implement (Phase 1B) | `plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-TEST-PLAN.md` | x-test-plan | `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-ARCHITECTURE-PLAN.md` | x-arch-plan | `plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-TASK-BREAKDOWN.md` | x-lib-task-decomposer | `plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-SECURITY-ASSESSMENT.md` | x-story-implement (Phase 1E) | `plans/epic-XXXX/plans/security-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | x-story-implement (Phase 1F) | `plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md` | Yes |
-| `_TEMPLATE-SPECIALIST-REVIEW.md` | x-review | `plans/epic-XXXX/plans/review-story-XXXX-YYYY.md` | No |
-| `_TEMPLATE-TECH-LEAD-REVIEW.md` | x-review-pr | `plans/epic-XXXX/plans/techlead-review-story-XXXX-YYYY.md` | No |
-| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | x-review | `plans/epic-XXXX/plans/review-dashboard-story-XXXX-YYYY.md` | No |
-| `_TEMPLATE-REVIEW-REMEDIATION.md` | x-story-implement (Phase 5) | `plans/epic-XXXX/plans/remediation-story-XXXX-YYYY.md` | No |
-| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | x-epic-implement | `plans/epic-XXXX/plans/execution-plan-epic-XXXX.md` | Yes |
-| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | x-epic-implement | `plans/epic-XXXX/reports/phase-report-epic-XXXX.md` | No |
+| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | x-story-implement (Phase 1B) | `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-TEST-PLAN.md` | x-test-plan | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-ARCHITECTURE-PLAN.md` | x-arch-plan | `ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-TASK-BREAKDOWN.md` | x-lib-task-decomposer | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-SECURITY-ASSESSMENT.md` | x-story-implement (Phase 1E) | `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | x-story-implement (Phase 1F) | `ai/epics/epic-XXXX/plans/compliance-story-XXXX-YYYY.md` | Yes |
+| `_TEMPLATE-SPECIALIST-REVIEW.md` | x-review | `ai/epics/epic-XXXX/plans/review-story-XXXX-YYYY.md` | No |
+| `_TEMPLATE-TECH-LEAD-REVIEW.md` | x-review-pr | `ai/epics/epic-XXXX/plans/techlead-review-story-XXXX-YYYY.md` | No |
+| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | x-review | `ai/epics/epic-XXXX/plans/review-dashboard-story-XXXX-YYYY.md` | No |
+| `_TEMPLATE-REVIEW-REMEDIATION.md` | x-story-implement (Phase 5) | `ai/epics/epic-XXXX/plans/remediation-story-XXXX-YYYY.md` | No |
+| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | x-epic-implement | `ai/epics/epic-XXXX/plans/execution-plan-epic-XXXX.md` | Yes |
+| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | x-epic-implement | `ai/epics/epic-XXXX/reports/phase-report-epic-XXXX.md` | No |
 
 **Total: 12 plan & review templates** (copied to `.claude/templates/`)
 

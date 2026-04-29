@@ -32,8 +32,8 @@ keeping the hex zone strict.
 
 Historically, ADR-0001 (2026-03-20) justified the project's flat layout at a
 high level, on the grounds that a CLI code-generation tool has no external
-I/O complexity that warrants full hexagonal scaffolding. ADR-001
-(`ADR-001-hexagonal-architecture-migration.md`, 2026-04-04) subsequently
+I/O complexity that warrants full hexagonal scaffolding. ADR-0020
+(`ADR-0020-hexagonal-architecture-migration.md`, 2026-04-04) subsequently
 migrated the domain-adjacent core of the generator (project configuration,
 template assembly, DAG-driven task dispatch) to a true Ports & Adapters
 structure under `domain/`, `application/`, and `infrastructure/`. The two
@@ -192,7 +192,7 @@ this decision and SHOULD be blocked in code review.
 - [`ADR-0001-intentional-architectural-deviations-for-cli-tool.md`](ADR-0001-intentional-architectural-deviations-for-cli-tool.md)
   — original flat-layout precedent; this ADR refines it by drawing the
   explicit hex-vs-flat boundary.
-- [`ADR-001-hexagonal-architecture-migration.md`](ADR-001-hexagonal-architecture-migration.md)
+- [`ADR-0020-hexagonal-architecture-migration.md`](ADR-0020-hexagonal-architecture-migration.md)
   — introduced the hex core; this ADR is the companion document that pins
   which packages belong to the migrated core and which stay outside.
 - [`ADR-0007-console-progress-reporter-stdout-contract.md`](ADR-0007-console-progress-reporter-stdout-contract.md)

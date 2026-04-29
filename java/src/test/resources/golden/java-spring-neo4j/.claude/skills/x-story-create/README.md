@@ -17,7 +17,7 @@ Generates self-contained story files that developers can implement without refer
 ## Usage
 
 ```
-/x-story-create plans/epic-XXXX/epic-XXXX.md specs/payment-gateway.md
+/x-story-create ai/epics/epic-XXXX/epic-XXXX.md specs/payment-gateway.md
 ```
 
 ## Workflow
@@ -33,7 +33,7 @@ Generates self-contained story files that developers can implement without refer
 
 | Artifact | Path |
 |----------|------|
-| Story files | `plans/epic-XXXX/story-XXXX-YYYY.md` |
+| Story files | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` |
 
 ## See Also
 

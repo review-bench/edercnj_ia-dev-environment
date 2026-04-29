@@ -81,12 +81,12 @@ The `TaskCreate` `metadata` field carries structured context that `x-internal-ph
   "storyId": "story-0060-0001",
   "epicId": "EPIC-0060",
   "expectedArtifacts": [
-    "plans/epic-0060/plans/arch-story-0060-0001.md",
-    "plans/epic-0060/plans/plan-story-0060-0001.md",
-    "plans/epic-0060/plans/tests-story-0060-0001.md",
-    "plans/epic-0060/plans/tasks-story-0060-0001.md",
-    "plans/epic-0060/plans/security-story-0060-0001.md",
-    "plans/epic-0060/plans/compliance-story-0060-0001.md"
+    "ai/epics/epic-0060/plans/arch-story-0060-0001.md",
+    "ai/epics/epic-0060/plans/plan-story-0060-0001.md",
+    "ai/epics/epic-0060/plans/tests-story-0060-0001.md",
+    "ai/epics/epic-0060/plans/tasks-story-0060-0001.md",
+    "ai/epics/epic-0060/plans/security-story-0060-0001.md",
+    "ai/epics/epic-0060/plans/compliance-story-0060-0001.md"
   ]
 }
 ```

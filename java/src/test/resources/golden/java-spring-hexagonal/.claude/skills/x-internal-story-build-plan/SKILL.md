@@ -99,7 +99,7 @@ Skill(skill: "x-internal-story-build-plan",
 | Parameter | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form) |
-| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `plans/epic-XXXX/` |
+| `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` |
 | `--scope <tier>` | O | `STANDARD` | `SIMPLE` / `STANDARD` / `COMPLEX`; `SIMPLE` skips Steps 1E (security) and 1F (compliance) |
 | `--skip-review` | O | `false` | When `true`, signals downstream subagents to omit inline peer-review passes in the generated artifacts (advisory only — does not affect artifact count) |
 
@@ -116,7 +116,7 @@ On success the skill writes a single-line JSON object to stdout:
 
 | Field | Type | Always Present | Description |
 | :--- | :--- | :--- | :--- |
-| `archPlan` | `String` (path) | yes | Path of the architecture plan (`plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md`) |
+| `archPlan` | `String` (path) | yes | Path of the architecture plan (`ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md`) |
 | `implPlan` | `String` (path) | yes | Path of the implementation plan (`plan-story-XXXX-YYYY.md`) |
 | `testPlan` | `String` (path) | yes | Path of the test plan (`tests-story-XXXX-YYYY.md`) |
 | `taskBreakdown` | `String` (path) | yes | Path of the task breakdown (`tasks-story-XXXX-YYYY.md`) |
@@ -126,7 +126,7 @@ On success the skill writes a single-line JSON object to stdout:
 | `scope` | `String` | yes | Echo of the resolved scope tier — lets the caller verify the gate applied |
 | `skipped` | `Array<String>` | yes | Names of gated steps skipped (e.g., `["1E", "1F"]` in SIMPLE; `[]` otherwise) |
 
-The six artifact basenames (all under `plans/epic-XXXX/plans/`):
+The six artifact basenames (all under `ai/epics/epic-XXXX/plans/`):
 
 1. `arch-story-XXXX-YYYY.md` (Step 1A — `x-arch-plan`)
 2. `plan-story-XXXX-YYYY.md` (Step 1B — Senior Architect subagent)
@@ -164,13 +164,13 @@ exit `64`. Normalise `--story-id` to lowercase and verify against
 Derive:
 
 ```bash
-epic_dir="plans/epic-${epic_id}"
+epic_dir="ai/epics/epic-${epic_id}"
 story_file="${epic_dir}/${story_id}.md"
 plans_dir="${epic_dir}/plans"
 ```
 
 When `${epic_dir}` is not a directory, exit 64 with
-`usage: epic dir not found: plans/epic-<id>`. The skill does NOT
+`usage: epic dir not found: ai/epics/epic-<id>`. The skill does NOT
 re-validate the story file existence — that is the caller's
 responsibility (`x-internal-story-load-context` runs upstream).
 
@@ -206,8 +206,8 @@ Each subagent prompt follows the structure:
 ```markdown
 FIRST ACTION: <no-op — TaskCreate/TaskUpdate unavailable in this harness>.
 You are a <role>. Read context files:
-- plans/epic-${epic_id}/${story_id}.md (story)
-- plans/epic-${epic_id}/plans/arch-story-${story_id}.md (arch plan)
+- ai/epics/epic-${epic_id}/${story_id}.md (story)
+- ai/epics/epic-${epic_id}/plans/arch-story-${story_id}.md (arch plan)
 - <role-specific templates under .claude/templates/>.
 Produce <artifact> at ${plans_dir}/<basename>.
 LAST ACTION: return the absolute path of the artifact you produced.
@@ -304,7 +304,7 @@ Skill(skill: "x-internal-story-build-plan",
 
 Output:
 ```json
-{"archPlan":"plans/epic-XXXX/plans/arch-story-XXXX-YYYY.md","implPlan":"plans/epic-XXXX/plans/plan-story-XXXX-YYYY.md","testPlan":"plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md","taskBreakdown":"plans/epic-XXXX/plans/tasks-story-XXXX-YYYY.md","taskMap":"plans/epic-XXXX/plans/task-implementation-map-story-XXXX-YYYY.md","securityAssessment":"plans/epic-XXXX/plans/security-story-XXXX-YYYY.md","complianceAssessment":"plans/epic-XXXX/plans/compliance-story-XXXX-YYYY.md","scope":"STANDARD","skipped":[]}
+{"archPlan":"ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md","implPlan":"ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md","testPlan":"ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md","taskBreakdown":"ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md","taskMap":"ai/epics/epic-XXXX/plans/task-implementation-map-story-XXXX-YYYY.md","securityAssessment":"ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md","complianceAssessment":"ai/epics/epic-XXXX/plans/compliance-story-XXXX-YYYY.md","scope":"STANDARD","skipped":[]}
 ```
 Exit: 0.
 
@@ -357,7 +357,7 @@ Exit: 2.
 | :--- | :--- | :--- |
 | Response envelope | stdout | Single-line JSON matching the Response Contract |
 | Error diagnostic | stderr | Single line, non-empty only on exit ≠ 0 |
-| Planning artifacts | `plans/epic-${epic_id}/plans/*.md` | Written by `x-arch-plan` + Step 1B-1F subagents |
+| Planning artifacts | `ai/epics/epic-${epic_id}/plans/*.md` | Written by `x-arch-plan` + Step 1B-1F subagents |
 
 This skill DOES create files — unlike `x-internal-story-load-context`,
 which is strictly read-only. The `allowed-tools` frontmatter
@@ -372,7 +372,7 @@ directly from this skill's body.
 | Missing required flag | Print `usage:` banner to stderr; exit 64 |
 | Unknown flag | Print `usage: unknown flag …` to stderr; exit 64 |
 | Malformed `--story-id` | `usage: --story-id must match story-NNNN-NNNN`; exit 64 |
-| Missing epic dir | `usage: epic dir not found: plans/epic-<id>`; exit 64 |
+| Missing epic dir | `usage: epic dir not found: ai/epics/epic-<id>`; exit 64 |
 | `x-arch-plan` non-zero | `Architecture plan failed: <detail>`; exit 1 |
 | Expected `arch-story-*.md` absent after Step 1A | `Architecture plan failed: arch-story-*.md not produced`; exit 1 |
 | Any subagent returns error | `Subagent <step> failed: <detail>`; exit 2 |

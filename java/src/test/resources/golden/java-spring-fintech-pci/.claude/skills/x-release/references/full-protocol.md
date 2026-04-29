@@ -65,7 +65,7 @@ Hotfix dry-run shows: `hotfix mode`, `Source branch: main`, `patch (forced)`, `H
 
 ### Step 0 — Resume Detection
 
-Resume Detection entry point (RULE-002). Loads or creates `plans/release-state-X.Y.Z.json`; detects resume mode. Checks `DEP_GH_MISSING` (gh absent), `DEP_GH_AUTH` (gh not authenticated), `DEP_JQ_MISSING`.
+Resume Detection entry point (RULE-002). Loads or creates `ai/releases/release-state-X.Y.Z.json`; detects resume mode. Checks `DEP_GH_MISSING` (gh absent), `DEP_GH_AUTH` (gh not authenticated), `DEP_JQ_MISSING`.
 
 ```bash
 gh pr view <prNumber> --json state --jq '.state'

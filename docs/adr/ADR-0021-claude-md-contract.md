@@ -6,7 +6,7 @@ deciders:
 story-ref: "story-0048-0002"
 ---
 
-# ADR-0048-B: `CLAUDE.md` Contract (Root File via Dedicated Assembler)
+# ADR-0021: `CLAUDE.md` Contract (Root File via Dedicated Assembler)
 
 ## Status
 
@@ -48,7 +48,7 @@ Introduce a new `ClaudeMdAssembler` class implementing the `Assembler` interface
    | Placeholder | Source | Example |
    | :--- | :--- | :--- |
    | `{{PROJECT_NAME}}` | `ProjectConfig.projectName` | `my-java-cli` |
-   | `{{LANGUAGE}}` | Always `"java"` (ADR-0048-A) | `java` |
+   | `{{LANGUAGE}}` | Always `"java"` (ADR-0048) | `java` |
    | `{{FRAMEWORK}}` | `ResolvedStack.framework` | `spring-boot`, `quarkus` |
    | `{{ARCHITECTURE}}` | `ResolvedStack.architectureStyle` | `hexagonal`, `layered` |
    | `{{DATABASES}}` | `ResolvedStack.databases` joined by `, ` (empty → `none`) | `postgres, redis` |
@@ -71,10 +71,10 @@ Introduce a new `ClaudeMdAssembler` class implementing the `Assembler` interface
    The existing `--overwrite-constitution` flag (which explicitly protects `CONSTITUTION.md` from regeneration unless the flag is set) is **not applied** to `CLAUDE.md` — the generator owns this file unconditionally.
 
 7. **Feature flag `--no-claude-md`.**
-   Introduced in v4.0.0 for users migrating from v3.x who do not want `CLAUDE.md` regenerated yet. When the flag is present, `ClaudeMdAssembler` is skipped entirely (no output file created, existing file preserved if present). Flag is **removed in v5.0.0** — parallel to the treatment of `--legacy-empty-dirs` per ADR-0048-A.
+   Introduced in v4.0.0 for users migrating from v3.x who do not want `CLAUDE.md` regenerated yet. When the flag is present, `ClaudeMdAssembler` is skipped entirely (no output file created, existing file preserved if present). Flag is **removed in v5.0.0** — parallel to the treatment of `--legacy-empty-dirs` per ADR-0048.
 
 8. **Interaction with `FileCategorizer.isRootFile`.**
-   `isRootFile("CLAUDE.md")` already returns `true`. ADR-0048-B confirms this behavior is correct — no change needed to `FileCategorizer`. The existing declaration was incomplete (recognized without producer); the addition of `ClaudeMdAssembler` closes the loop.
+   `isRootFile("CLAUDE.md")` already returns `true`. ADR-0021 confirms this behavior is correct — no change needed to `FileCategorizer`. The existing declaration was incomplete (recognized without producer); the addition of `ClaudeMdAssembler` closes the loop.
 
 ## Consequences
 
@@ -111,7 +111,7 @@ Ship a single canonical `CLAUDE.md` shared across all profiles; no per-profile c
 
 ## Related ADRs
 
-- [ADR-0048-A: Java-Only Scope](ADR-0048-java-only-scope.md) — companion decision that fixes `{{LANGUAGE}}` to `"java"` and removes one layer of complexity from the placeholder resolver.
+- [ADR-0048: Java-Only Scope](ADR-0048-java-only-scope.md) — companion decision that fixes `{{LANGUAGE}}` to `"java"` and removes one layer of complexity from the placeholder resolver.
 - [ADR-0009: Wide Records Bound to External Schemas](ADR-0009-wide-records-bound-to-external-schemas.md) — precedent for how domain objects (`ResolvedStack`) map into generated artifacts.
 
 ## Story Reference

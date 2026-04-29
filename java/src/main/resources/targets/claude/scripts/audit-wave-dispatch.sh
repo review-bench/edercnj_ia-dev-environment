@@ -27,7 +27,7 @@
 #   audit-wave-dispatch.sh --self-check
 #
 # Examples:
-#   audit-wave-dispatch.sh --ndjson-file plans/epic-0063/telemetry/events.ndjson \
+#   audit-wave-dispatch.sh --ndjson-file ai/epics/epic-0063/telemetry/events.ndjson \
 #       --story-id story-0063-0014 --expected-wave-size 5
 #   audit-wave-dispatch.sh --self-check
 

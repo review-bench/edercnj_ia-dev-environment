@@ -6,7 +6,7 @@ deciders:
 story-ref: "story-0048-0002"
 ---
 
-# ADR-0048-A: Java-Only Scope for the `ia-dev-env` Generator
+# ADR-0048: Java-Only Scope for the `ia-dev-env` Generator
 
 ## Status
 
@@ -83,7 +83,7 @@ Delete `csharp-dotnet` entries from `StackMapping.java`; preserve python / go / 
 
 ## Related ADRs
 
-- [ADR-0048-B: CLAUDE.md Contract](ADR-0048-B-claude-md-contract.md) — companion architectural decision introduced in the same epic to resolve Bug B. ADR-0048-A provides the single-language assumption that ADR-0048-B's `ClaudeMdAssembler` relies on for simplifying the `{{LANGUAGE}}` placeholder (always "java").
+- [ADR-0021: CLAUDE.md Contract](ADR-0021-claude-md-contract.md) — companion architectural decision introduced in the same epic to resolve Bug B. ADR-0048 provides the single-language assumption that ADR-0021's `ClaudeMdAssembler` relies on for simplifying the `{{LANGUAGE}}` placeholder (always "java").
 - [ADR-0001: Intentional Architectural Deviations for CLI Tool](ADR-0001-intentional-architectural-deviations-for-cli-tool.md) — establishes the precedent that pragmatic simplifications of the generator's scope are acceptable when they align with actual usage.
 
 ## Story Reference

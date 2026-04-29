@@ -35,17 +35,17 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 
 | Sub-skill | Artifact path | Enforced by |
 | :--- | :--- | :--- |
-| `x-internal-story-verify` | `plans/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
-| `x-review` | `plans/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
-| `x-review-pr` | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
-| `x-internal-story-report` | `plans/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
-| `x-arch-plan` | `plans/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
+| `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
+| `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
+| `x-internal-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
+| `x-arch-plan` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
 | `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
-| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `plans/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
-| `x-test-tdd` / `x-test-run` | `plans/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
+| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `ai/epics/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
+| `x-test-tdd` / `x-test-run` | `ai/epics/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
 | `x-git-commit` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
-| `x-dependency-audit` | `plans/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
-| `x-threat-model` | `plans/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
+| `x-threat-model` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
@@ -80,7 +80,7 @@ Gates that execute on the operator's machine BEFORE any remote operation (`git p
 
 - `.claude/hooks/verify-story-completion.sh` fires on every `Stop` event (end of LLM turn).
 - Detects recent PR-creation / story-completion activity for the active story (via telemetry NDJSON `gh pr create` events AND the current branch / latest commit message).
-- Checks that the required evidence artifacts for mandatory sub-skills exist on disk (under `plans/epic-XXXX/plans/` and `plans/epic-XXXX/reports/`) for that story, rather than relying on telemetry entries.
+- Checks that the required evidence artifacts for mandatory sub-skills exist on disk (under `ai/epics/epic-XXXX/plans/` and `ai/epics/epic-XXXX/reports/`) for that story, rather than relying on telemetry entries.
 - On missing evidence, emits a visible WARNING on stderr and exits with code 2, which Claude Code surfaces to the LLM as a blocking notification.
 
 ### Camada 3 — CI audit

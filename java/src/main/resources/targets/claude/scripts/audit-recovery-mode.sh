@@ -52,7 +52,7 @@ command -v jq >/dev/null 2>&1 || { printf 'OPERATIONAL_ERROR: jq required\n' >&2
 if [[ -z "$NDJSON_FILE" ]]; then
     # Look for events.ndjson in common locations relative to CWD
     for candidate in \
-        "plans/epic-*/telemetry/events.ndjson" \
+        "ai/epics/epic-*/telemetry/events.ndjson" \
         "ai/epics/*/telemetry/events.ndjson"; do
         # Use glob expansion carefully
         for f in $candidate; do

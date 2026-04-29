@@ -135,7 +135,7 @@ WARN [taskTracking-flowVersion2] execution-state.json has flowVersion=2 but task
 
 ## Audit
 
-CI script `scripts/audit-flow-version.sh` checks every `execution-state.json` under `plans/epic-*/`:
+CI script `scripts/audit-flow-version.sh` checks every `execution-state.json` under `ai/epics/epic-*/`:
 
 - Field `flowVersion` present and in `{"1", "2"}`.
 - If the enclosing epic uses Rule 21 (`epic/XXXX` branch exists on the remote), `flowVersion` MUST be `"2"` unless `--legacy-flow` was recorded in the epic's metadata.

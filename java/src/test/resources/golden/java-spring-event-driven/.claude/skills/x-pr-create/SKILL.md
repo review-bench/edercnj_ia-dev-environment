@@ -168,7 +168,7 @@ Generate the structured PR body with the following sections:
 | Task ID | TASK-XXXX-YYYY-NNN |
 | Story | story-XXXX-YYYY |
 | Epic | epic-XXXX |
-| Task Plan | `plans/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
+| Task Plan | `ai/epics/epic-XXXX/tasks/task-plan-XXXX-YYYY-NNN.md` |
 
 ## Changes
 
@@ -207,7 +207,7 @@ if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
   fi
 
   # Phase 1 artifacts (6 planning artifacts that exist on disk)
-  EPIC_PLANS_DIR="plans/epic-${TASK_EPIC_ID}/plans"
+  EPIC_PLANS_DIR="ai/epics/epic-${TASK_EPIC_ID}/plans"
   P1_ARTIFACTS=""
   for artifact in \
     "arch-story-${TASK_EPIC_ID}-${TASK_STORY_NUM}.md" \
@@ -224,7 +224,7 @@ if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
   [[ -z "$P1_ARTIFACTS" ]] && P1_ARTIFACTS="(none found)"
 
   # Phase 3 artifacts (4 verification/review artifacts that exist on disk)
-  EPIC_REPORTS_DIR="plans/epic-${TASK_EPIC_ID}/reports"
+  EPIC_REPORTS_DIR="ai/epics/epic-${TASK_EPIC_ID}/reports"
   P3_ARTIFACTS=""
   for artifact in \
     "verify-envelope-${TASK_EPIC_ID}-${TASK_STORY_NUM}.json" \

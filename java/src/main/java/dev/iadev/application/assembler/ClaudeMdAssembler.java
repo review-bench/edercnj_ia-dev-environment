@@ -14,12 +14,12 @@ import java.util.Map;
  * Assembles {@code CLAUDE.md} at the output root — the executive summary auto-loaded by Claude Code
  * on every conversation.
  *
- * <p>Introduced in EPIC-0048 (v4.0.0) per ADR-0048-B as a <b>single-responsibility</b> assembler
+ * <p>Introduced in EPIC-0048 (v4.0.0) per ADR-0021 as a <b>single-responsibility</b> assembler
  * dedicated to the root {@code CLAUDE.md} file. Consumes the Pebble template {@code
  * shared/templates/CLAUDE.md} authored in story-0048-0010.
  *
  * <p>Target: {@link AssemblerTarget#ROOT}. Platforms: Claude Code only. Overwrites any existing
- * file unconditionally (generator-owned, per ADR-0048-B). The {@code --no-claude-md} v4.0.0-only
+ * file unconditionally (generator-owned, per ADR-0021). The {@code --no-claude-md} v4.0.0-only
  * feature flag opts out by excluding this assembler from {@link AssemblerFactory#buildAssemblers}.
  *
  * @see Assembler
