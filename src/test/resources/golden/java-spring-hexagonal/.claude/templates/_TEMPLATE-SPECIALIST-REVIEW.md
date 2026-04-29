@@ -1,4 +1,27 @@
-# Specialist Review -- {{ENGINEER_TYPE}}
+<!-- template-version: 1.0 -->
+---
+schema-version: "1.0"
+generated-by: x-review@{{COMMIT_SHA}}
+story-id: {{STORY_ID}}
+epic-id: {{EPIC_ID}}
+date: {{ISO_TIMESTAMP}}
+decision: {{DECISION}}
+score: {{SCORE}}
+score-max: 50
+severity-counts:
+  critical: {{CRITICAL_COUNT}}
+  high: {{HIGH_COUNT}}
+  medium: {{MEDIUM_COUNT}}
+  low: {{LOW_COUNT}}
+  info: {{INFO_COUNT}}
+blocking-findings:
+{{BLOCKING_FINDINGS_YAML}}
+reviewers:
+{{REVIEWERS_YAML}}
+---
+# Specialist Review — {{STORY_ID}}
+
+> **Decision:** {{DECISION}} | **Score:** {{SCORE}}/50
 
 > **Story ID:** {{STORY_ID}}
 > **Date:** {{DATE}}
