@@ -52,11 +52,12 @@ public final class CapabilityGraph {
     }
 
     public List<CapabilityId> topologicalSort() {
+        // indegree = number of prerequisites; nodes with 0 prerequisites come first
         Map<String, Integer> indegree = new HashMap<>();
         for (String key : nodes.keySet()) indegree.put(key, 0);
         for (CapabilityDefinition def : nodes.values()) {
             for (CapabilityId req : def.requires()) {
-                indegree.merge(req.value(), 1, Integer::sum);
+                indegree.merge(def.id().value(), 1, Integer::sum);
             }
         }
 

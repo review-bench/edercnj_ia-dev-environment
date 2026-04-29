@@ -36,6 +36,14 @@ public final class CapabilityCompositionAssembler implements Assembler {
         this.pruner = new OutputPruner();
     }
 
+    CapabilityCompositionAssembler(Path overrideTargetsRoot) {
+        this.composer = new CapabilityAwareComposer();
+        this.pruner = new OutputPruner();
+        this.overrideTargetsRoot = overrideTargetsRoot;
+    }
+
+    private Path overrideTargetsRoot;
+
     @Override
     public List<String> assemble(ProjectConfig config, TemplateEngine engine, Path outputDir) {
         Path targetsRoot = resolveTargetsRoot(config);
@@ -63,7 +71,7 @@ public final class CapabilityCompositionAssembler implements Assembler {
     }
 
     private Path resolveTargetsRoot(ProjectConfig config) {
-        return null;
+        return overrideTargetsRoot;
     }
 
     private ResolvedCapabilitySet buildActiveSet(ProjectConfig config) {

@@ -50,6 +50,22 @@ class CompositionPlanReporterTest {
     }
 
     @Nested
+    @DisplayName("text with warnings")
+    class TextWithWarnings {
+
+        @Test
+        @DisplayName("text report includes warning count")
+        void textReportWithWarnings() {
+            CompositionPlan plan = new CompositionPlan(
+                    List.of(),
+                    List.of(),
+                    List.of("warning 1"));
+            String report = reporter.report(plan, CompositionPlanReporter.Format.TEXT);
+            assertThat(report).contains("Warnings: 1");
+        }
+    }
+
+    @Nested
     @DisplayName("JSON format")
     class JsonFormat {
 

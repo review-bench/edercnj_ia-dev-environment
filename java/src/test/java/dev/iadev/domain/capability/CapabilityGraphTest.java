@@ -23,6 +23,43 @@ class CapabilityGraphTest {
     }
 
     @Nested
+    @DisplayName("nodes()")
+    class Nodes {
+
+        @Test
+        @DisplayName("nodes() returns all defined nodes")
+        void returnsAllNodes() {
+            CapabilityGraph g = CapabilityGraph.of(List.of(
+                    atomic("data.database.postgres"),
+                    atomic("data.database.mysql")
+            ));
+            assertThat(g.nodes()).hasSize(2);
+            assertThat(g.nodes()).containsKey("data.database.postgres");
+        }
+
+        @Test
+        @DisplayName("empty graph returns empty nodes")
+        void emptyGraphEmptyNodes() {
+            CapabilityGraph g = CapabilityGraph.of(List.of());
+            assertThat(g.nodes()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("topological sort of graph with indegree > 0 after processing respects order")
+        void sortWithMultipleDependents() {
+            CapabilityId base = CapabilityId.of("aaa.bbb.base");
+            CapabilityGraph g = CapabilityGraph.of(List.of(
+                    atomic("aaa.bbb.base"),
+                    atomicWithReqs("aaa.bbb.dep1", List.of(base)),
+                    atomicWithReqs("aaa.bbb.dep2", List.of(base))
+            ));
+            List<CapabilityId> sorted = g.topologicalSort();
+            assertThat(sorted).hasSize(3);
+            assertThat(sorted.get(0)).isEqualTo(base);
+        }
+    }
+
+    @Nested
     @DisplayName("topologicalSort()")
     class TopologicalSort {
 

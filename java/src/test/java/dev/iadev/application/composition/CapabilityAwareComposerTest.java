@@ -27,10 +27,64 @@ class CapabilityAwareComposerTest {
 
     private static Path writeArtifact(Path dir, String name, String... capIds) throws IOException {
         Path file = dir.resolve(name);
+        Files.createDirectories(file.getParent());
         String capList = capIds.length == 0 ? "[]" : "\n" + String.join("\n",
                 java.util.Arrays.stream(capIds).map(c -> "  - " + c).toList());
-        Files.writeString(file, "---\nname: " + name.replace(".md", "") + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
+        Files.writeString(file, "---\nname: " + name.replace(".md", "").replace("/", "-") + "\nrequires-capabilities:" + capList + "\n---\n# Content\n");
         return file;
+    }
+
+    @Nested
+    @DisplayName("execute()")
+    class ExecuteMethod {
+
+        @Test
+        @DisplayName("execute writes included artifacts to outputRoot")
+        void executesWritesArtifacts(@TempDir Path targets, @TempDir Path output) throws IOException {
+            writeArtifact(targets, "skills/skill.md");
+            ResolvedCapabilitySet active = activeSet(List.of());
+            CompositionPlan plan = composer.plan(active, targets);
+            composer.execute(plan, output);
+            assertThat(Files.exists(output.resolve("skills/skill.md"))).isTrue();
+        }
+
+        @Test
+        @DisplayName("execute with empty plan creates no files")
+        void executesEmptyPlanNoFiles(@TempDir Path output) throws IOException {
+            composer.execute(CompositionPlan.empty(), output);
+            assertThat(java.util.stream.StreamSupport.stream(
+                    java.nio.file.Files.walk(output).spliterator(), false)
+                    .filter(Files::isRegularFile).count()).isZero();
+        }
+    }
+
+    @Nested
+    @DisplayName("totalArtifacts() and toSummary()")
+    class PlanHelpers {
+
+        @Test
+        @DisplayName("totalArtifacts sums included + excluded")
+        void totalArtifacts(@TempDir Path targets) throws IOException {
+            writeArtifact(targets, "skills/incl.md");
+            writeArtifact(targets, "skills/excl.md", "data.database.postgres");
+            CompositionPlan plan = composer.plan(activeSet(List.of()), targets);
+            assertThat(plan.totalArtifacts()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("toSummary contains counts")
+        void toSummary(@TempDir Path targets) throws IOException {
+            writeArtifact(targets, "skill.md");
+            CompositionPlan plan = composer.plan(activeSet(List.of()), targets);
+            assertThat(plan.toSummary()).contains("included=1");
+        }
+
+        @Test
+        @DisplayName("non-existent targets root returns empty plan")
+        void missingTargetsRoot() {
+            CompositionPlan plan = composer.plan(activeSet(List.of()), Path.of("/does/not/exist"));
+            assertThat(plan).isEqualTo(CompositionPlan.empty());
+        }
     }
 
     @Nested

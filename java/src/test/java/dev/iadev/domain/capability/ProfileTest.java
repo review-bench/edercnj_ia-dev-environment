@@ -32,6 +32,21 @@ class ProfileTest {
     }
 
     @Nested
+    @DisplayName("capabilities() accessor")
+    class Capabilities {
+
+        @Test
+        @DisplayName("capabilities() includes globs")
+        void capabilitiesIncludesGlobs() {
+            Profile profile = Profile.of("test", List.of(
+                    CapabilityId.of("data.database.postgres"),
+                    CapabilityId.of("data.cache.*")
+            ));
+            assertThat(profile.capabilities()).hasSize(2);
+        }
+    }
+
+    @Nested
     @DisplayName("expand()")
     class ExpandMethod {
 

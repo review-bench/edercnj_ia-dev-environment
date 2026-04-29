@@ -96,6 +96,57 @@ class FrontmatterValidatorTest {
     }
 
     @Nested
+    @DisplayName("ValidationResult helpers")
+    class ValidationResultHelpers {
+
+        @Test
+        @DisplayName("ok() returns true for passed result")
+        void passedResultOk() throws IOException {
+            Path file = Files.createTempFile("v3", ".md");
+            Files.writeString(file, "---\nname: x\nrequires-capabilities: []\n---\n");
+            assertThat(validator.validate(file).ok()).isTrue();
+            Files.delete(file);
+        }
+
+        @Test
+        @DisplayName("validate missing file returns failure with cannot-read message")
+        void missingFileReturnsCannotRead(@TempDir Path tmp) {
+            var result = validator.validate(tmp.resolve("nonexistent.md"));
+            assertThat(result.ok()).isFalse();
+            assertThat(result.errors()).anyMatch(e -> e.contains("cannot read") || e.contains("missing"));
+        }
+
+        @Test
+        @DisplayName("invalid YAML in frontmatter returns failure")
+        void invalidYamlFrontmatterFails(@TempDir Path tmp) throws java.io.IOException {
+            Path file = tmp.resolve("bad-yaml.md");
+            java.nio.file.Files.writeString(file, "---\n{invalid: yaml: [\n---\n");
+            var result = validator.validate(file);
+            assertThat(result.ok()).isFalse();
+        }
+
+        @Test
+        @DisplayName("requires-capabilities with known ID emits no warning")
+        void knownCapabilityNoWarning(@TempDir Path tmp) throws java.io.IOException {
+            Path file = tmp.resolve("known.md");
+            java.nio.file.Files.writeString(file, "---\nname: x\nrequires-capabilities: [data.database.postgres]\n---\n");
+            var result = validator.validate(file, java.util.Set.of("data.database.postgres"));
+            assertThat(result.ok()).isTrue();
+            assertThat(result.warnings()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("withWarnings result has ok=true and non-empty warnings")
+        void withWarningsIsOk(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("warn.md");
+            Files.writeString(file, "---\nname: x\nrequires-capabilities:\n  - unknown.cap.ability\n---\n");
+            var result = validator.validate(file, java.util.Set.of("data.database.postgres"));
+            assertThat(result.ok()).isTrue();
+            assertThat(result.warnings()).isNotEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("batch validation")
     class BatchValidation {
 

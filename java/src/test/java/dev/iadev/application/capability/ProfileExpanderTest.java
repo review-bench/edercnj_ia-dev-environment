@@ -29,6 +29,37 @@ class ProfileExpanderTest {
     }
 
     @Nested
+    @DisplayName("edge cases")
+    class EdgeCases {
+
+        @Test
+        @DisplayName("null overrides treated as empty map")
+        void nullOverridesTreatedAsEmpty() {
+            List<CapabilityDefinition> catalog = List.of(def("runtime.jvm.openjdk", List.of()));
+            Profile profile = Profile.of("test", List.of(CapabilityId.of("runtime.jvm.openjdk")));
+            ResolvedCapabilitySet result = expander.expand(profile, catalog, null);
+            assertThat(result.capabilities()).hasSize(1);
+            assertThat(result.effectiveParameters()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("profile with glob capability skips it during expansion")
+        void globCapabilitySkippedDuringExpansion() {
+            List<CapabilityDefinition> catalog = List.of(
+                    def("data.database.postgres", List.of()),
+                    def("data.database.mysql", List.of())
+            );
+            Profile profile = Profile.of("glob-test", List.of(
+                    CapabilityId.of("data.database.*"),
+                    CapabilityId.of("data.database.postgres")
+            ));
+            // Glob capabilities are excluded by Profile.expand(), only atomic is expanded
+            ResolvedCapabilitySet result = expander.expand(profile, catalog, Map.of());
+            assertThat(result.contains(CapabilityId.of("data.database.postgres"))).isTrue();
+        }
+    }
+
+    @Nested
     @DisplayName("basic expansion")
     class BasicExpansion {
 

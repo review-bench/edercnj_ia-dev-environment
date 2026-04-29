@@ -59,6 +59,34 @@ class TelemetryCapabilityResolverTest {
         }
 
         @Test
+        @DisplayName("propagates exceptions from delegate with telemetry phase.end failed")
+        void propagatesWithTelemetry() {
+            List<CapabilityDefinition> catalog = List.of(
+                    new CapabilityDefinition(
+                            CapabilityId.of("aaa.bbb.alpha"), CapabilityKind.ATOMIC, "aaa",
+                            Optional.empty(), "stable", "", Map.of(),
+                            List.of(CapabilityId.of("aaa.bbb.beta")), List.of(), List.of(), List.of(), List.of()),
+                    new CapabilityDefinition(
+                            CapabilityId.of("aaa.bbb.beta"), CapabilityKind.ATOMIC, "aaa",
+                            Optional.empty(), "stable", "", Map.of(),
+                            List.of(CapabilityId.of("aaa.bbb.alpha")), List.of(), List.of(), List.of(), List.of())
+            );
+            Profile profile = Profile.of("cyclic", List.of(CapabilityId.of("aaa.bbb.alpha")));
+            assertThatThrownBy(() -> resolver.resolve(profile, catalog))
+                    .isInstanceOf(CapabilityError.CyclicDependency.class);
+        }
+
+        @Test
+        @DisplayName("resolves with parameter overrides")
+        void resolvesWithOverrides() {
+            List<CapabilityDefinition> catalog = List.of(def("runtime.jvm.openjdk"));
+            Profile profile = Profile.of("test", List.of(CapabilityId.of("runtime.jvm.openjdk")));
+            Map<String, String> overrides = Map.of("runtime.jvm.openjdk.version", "21");
+            var result = resolver.resolve(profile, catalog, overrides);
+            assertThat(result).isNotNull();
+        }
+
+        @Test
         @DisplayName("fail-open: resolve still works when CLAUDE_TELEMETRY_DISABLED=1")
         void failOpenWithDisabledTelemetry() {
             List<CapabilityDefinition> catalog = List.of(def("runtime.jvm.openjdk"));

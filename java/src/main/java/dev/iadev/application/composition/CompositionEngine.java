@@ -91,7 +91,8 @@ public final class CompositionEngine {
     }
 
     private String resolveEmptySlots(String body) {
-        return SLOT_PATTERN.matcher(body).replaceAll("");
+        String noSlots = SLOT_PATTERN.matcher(body).replaceAll("");
+        return EACH_PATTERN.matcher(noSlots).replaceAll("");
     }
 
     private Map<String, List<Fragment>> groupBySlot(List<Fragment> fragments) {

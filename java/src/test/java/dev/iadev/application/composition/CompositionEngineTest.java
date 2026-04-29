@@ -67,8 +67,48 @@ class CompositionEngineTest {
     }
 
     @Nested
+    @DisplayName("multiple slots in one body")
+    class MultipleSlots {
+
+        @Test
+        @DisplayName("two slots in same body both resolved")
+        void twoSlotsResolved() {
+            var f1 = frag("slot-a", "id1", 10, "Content A");
+            var f2 = frag("slot-b", "id2", 10, "Content B");
+            String result = engine.render("{{slot: slot-a}} and {{slot: slot-b}}", List.of(f1, f2));
+            assertThat(result).contains("Content A").contains("Content B");
+        }
+
+        @Test
+        @DisplayName("each block with no matching fragments renders empty string")
+        void eachWithNoFragmentsEmpty() {
+            String result = engine.render("{{ #each fragments.absent-slot }}item{{ /each }}", List.of());
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("each block expands each fragment with body template")
+        void eachExpandsBody() {
+            var f1 = frag("spec", "qa", 10, "QA Body");
+            var f2 = frag("spec", "perf", 20, "Perf Body");
+            String result = engine.render(
+                    "{{ #each fragments.spec }}\n{{ body }}\n{{ /each }}", List.of(f1, f2));
+            assertThat(result).contains("QA Body").contains("Perf Body");
+        }
+    }
+
+    @Nested
     @DisplayName("no markers")
     class NoMarkers {
+
+        @Test
+        @DisplayName("multiple fragments concatenated with newline separator")
+        void multipleFragmentsConcatenated() {
+            var f1 = frag("slot-x", "a", 10, "Part A");
+            var f2 = frag("slot-x", "b", 20, "Part B");
+            String result = engine.render("{{ slot: slot-x }}", List.of(f1, f2));
+            assertThat(result).contains("Part A").contains("Part B");
+        }
 
         @Test
         @DisplayName("body without markers passes through unchanged")

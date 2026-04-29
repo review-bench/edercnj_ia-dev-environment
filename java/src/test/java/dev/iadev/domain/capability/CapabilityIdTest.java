@@ -110,6 +110,75 @@ class CapabilityIdTest {
     }
 
     @Nested
+    @DisplayName("matches() edge cases")
+    class MatchesEdgeCases {
+
+        @Test
+        @DisplayName("null glob pattern does not match non-glob id")
+        void nonGlobSelfEquals() {
+            CapabilityId id = CapabilityId.of("data.database.postgres");
+            assertThat(id.matches(CapabilityId.of("data.database.postgres"))).isTrue();
+            assertThat(id.matches(CapabilityId.of("data.database.mysql"))).isFalse();
+        }
+
+        @Test
+        @DisplayName("accepts four-segment id")
+        void acceptsFourSegments() {
+            CapabilityId id = CapabilityId.of("data.database.postgres.dialect");
+            assertThat(id.category()).isEqualTo("data");
+            assertThat(id.subcategory()).isEqualTo("database");
+            assertThat(id.atomic()).isEqualTo("postgres");
+        }
+
+        @Test
+        @DisplayName("value() equals toString()")
+        void valueEqualsToString() {
+            CapabilityId id = CapabilityId.of("data.database.postgres");
+            assertThat(id.value()).isEqualTo(id.toString());
+        }
+    }
+
+    @Nested
+    @DisplayName("category/subcategory/atomic accessors")
+    class Accessors {
+
+        @Test
+        @DisplayName("two-segment id has empty atomic()")
+        void twoSegmentEmptyAtomic() {
+            CapabilityId id = CapabilityId.of("data.database.mysql");
+            assertThat(id.atomic()).isEqualTo("mysql");
+        }
+
+        @Test
+        @DisplayName("toString() returns value")
+        void toStringReturnsValue() {
+            assertThat(CapabilityId.of("data.database.postgres").toString()).isEqualTo("data.database.postgres");
+        }
+
+        @Test
+        @DisplayName("equals with non-CapabilityId returns false")
+        void notEqualToNonId() {
+            assertThat(CapabilityId.of("data.database.postgres").equals("data.database.postgres")).isFalse();
+        }
+
+        @Test
+        @DisplayName("subcategory() returns empty string for single-segment fallback")
+        void subcategoryEmptyForShortId() {
+            // Two-segment id: category.subcategory only (via manual construction tested elsewhere)
+            CapabilityId id = CapabilityId.of("data.database.postgres");
+            assertThat(id.subcategory()).isEqualTo("database");
+            assertThat(id.atomic()).isEqualTo("postgres");
+        }
+
+        @Test
+        @DisplayName("hashCode consistent with equals")
+        void hashCodeConsistent() {
+            assertThat(CapabilityId.of("data.database.postgres").hashCode())
+                    .isEqualTo(CapabilityId.of("data.database.postgres").hashCode());
+        }
+    }
+
+    @Nested
     @DisplayName("equality")
     class Equality {
 

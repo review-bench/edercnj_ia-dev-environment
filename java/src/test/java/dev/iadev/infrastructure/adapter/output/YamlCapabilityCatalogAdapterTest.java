@@ -94,6 +94,123 @@ class YamlCapabilityCatalogAdapterTest {
     }
 
     @Nested
+    @DisplayName("edge cases")
+    class EdgeCases {
+
+        @Test
+        @DisplayName("parses COMPOSITE kind correctly")
+        void parsesCompositeKind(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("composite.yaml");
+            Files.writeString(file, """
+                    id: framework.spring-boot.full
+                    category: framework
+                    kind: composite
+                    requires:
+                      - framework.spring-boot.mvc
+                    """);
+            var def = adapter.load(file).orElseThrow();
+            assertThat(def.kind()).isEqualTo(dev.iadev.domain.capability.CapabilityKind.COMPOSITE);
+        }
+
+        @Test
+        @DisplayName("parses PROFILE kind correctly")
+        void parsesProfileKind(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("profile.yaml");
+            Files.writeString(file, """
+                    id: framework.spring-boot.full
+                    category: framework
+                    kind: profile
+                    expands-to:
+                      - framework.spring-boot.mvc
+                    """);
+            var def = adapter.load(file).orElseThrow();
+            assertThat(def.kind()).isEqualTo(dev.iadev.domain.capability.CapabilityKind.PROFILE);
+        }
+
+        @Test
+        @DisplayName("unknown kind throws UnknownCapability")
+        void unknownKindThrows(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("bad.yaml");
+            Files.writeString(file, """
+                    id: data.database.postgres
+                    category: data
+                    kind: unknown-kind
+                    """);
+            assertThatThrownBy(() -> adapter.load(file))
+                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
+                    .hasMessageContaining("unknown kind");
+        }
+
+        @Test
+        @DisplayName("version field parsed when present")
+        void versionFieldParsed(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("versioned.yaml");
+            Files.writeString(file, """
+                    id: data.database.postgres
+                    category: data
+                    kind: atomic
+                    version: "16"
+                    """);
+            var def = adapter.load(file).orElseThrow();
+            assertThat(def.version()).contains("16");
+        }
+
+        @Test
+        @DisplayName("YAML content that parses to non-Map throws")
+        void nonMapYamlThrows(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("list.yaml");
+            Files.writeString(file, "- item1\n- item2\n");
+            assertThatThrownBy(() -> adapter.load(file))
+                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class);
+        }
+
+        @Test
+        @DisplayName("non-string field value throws with context")
+        void nonStringFieldThrows(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("bad-field.yaml");
+            Files.writeString(file, "id: 123\ncategory: data\nkind: atomic\n");
+            assertThatThrownBy(() -> adapter.load(file))
+                    .isInstanceOf(dev.iadev.domain.capability.CapabilityError.UnknownCapability.class)
+                    .hasMessageContaining("must be a string");
+        }
+
+        @Test
+        @DisplayName("tags and provides as list are parsed")
+        void tagsAndProvidesAsList(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("tagged.yaml");
+            Files.writeString(file, """
+                    id: data.database.postgres
+                    category: data
+                    kind: atomic
+                    tags:
+                      - sql
+                      - rdbms
+                    provides:
+                      - data.transactional-store.any
+                    """);
+            var def = adapter.load(file).orElseThrow();
+            assertThat(def.tags()).containsExactly("sql", "rdbms");
+            assertThat(def.provides()).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("excludes list parsed correctly")
+        void excludesListParsed(@TempDir Path tmp) throws IOException {
+            Path file = tmp.resolve("excludes.yaml");
+            Files.writeString(file, """
+                    id: data.database.postgres
+                    category: data
+                    kind: atomic
+                    excludes:
+                      - data.database.mongo
+                    """);
+            var def = adapter.load(file).orElseThrow();
+            assertThat(def.excludes()).hasSize(1);
+            assertThat(def.excludes().get(0).value()).isEqualTo("data.database.mongo");
+        }
+    }
+
+    @Nested
     @DisplayName("loadAll(catalogRoot) — batch")
     class LoadAll {
 
