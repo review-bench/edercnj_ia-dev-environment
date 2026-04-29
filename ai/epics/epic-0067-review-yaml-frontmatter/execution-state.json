@@ -13,7 +13,9 @@
     "enabled": true,
     "rootTaskId": null,
     "phaseGateResults": [
-      {"phase": "story-0067-0001", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []}
+      {"phase": "story-0067-0001", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0002", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0003", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []}
     ]
   },
   "storyStatuses": {
@@ -26,20 +28,20 @@
       "prNumber": 865
     },
     "story-0067-0002": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0067-0001"],
       "blocks": ["story-0067-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "38d99212a19a5bd33807be0b740ec3fd26b1cd7d",
+      "prNumber": 866
     },
     "story-0067-0003": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0067-0001"],
       "blocks": ["story-0067-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "38d99212a19a5bd33807be0b740ec3fd26b1cd7d",
+      "prNumber": 867
     },
     "story-0067-0004": {
       "status": "Pendente",
