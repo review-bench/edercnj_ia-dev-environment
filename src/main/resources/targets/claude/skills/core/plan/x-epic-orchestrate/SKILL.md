@@ -22,6 +22,18 @@ Orchestrate multi-agent planning for all stories in an epic by invoking `/x-stor
 
 ## When to Use
 
+> **⚠️ Esta skill NÃO cria épico nem stories.** Para criar a feature inteira a partir de uma spec markdown, use `/x-feature-create <SPEC-FILE-PATH> --epic-id <NNNN>`. Esta skill apenas orquestra **planning multi-agente** (Architect + QA + Security + Tech Lead + Product Owner) das stories **já criadas**.
+>
+> Fluxo canônico da Feature Creation Chain (EPIC-0065):
+> 1. `/x-feature-ideate "prosa livre"` → spec.md + PR `docs/feature-<slug>` → develop (manual gate)
+> 2. `/x-feature-create <spec> --epic-id <NNNN>` → epic + stories + map + PR `docs/<id>-<slug>` → epic/XXXX (auto-merge)
+> 3. `/x-epic-orchestrate <NNNN>` → 6 artefatos de Phase 1 por story (planning multi-agente)
+
+- Use **depois** de `x-feature-create` ter gerado epic + stories + IMPLEMENTATION-MAP
+- Use para gerar `plan-story-XXXX-YYYY.md` e demais artefatos de Phase 1 em paralelo across stories
+
+Invocation forms:
+
 - `/x-epic-orchestrate XXXX` -- plan all stories in an epic
 - `/x-epic-orchestrate XXXX --resume` -- resume planning from last checkpoint
 - `/x-epic-orchestrate XXXX --story story-XXXX-YYYY` -- plan only a specific story
