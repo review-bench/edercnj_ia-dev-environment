@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0065 (Feature Creation Chain Refactor)
+
+- **`x-feature-ideate`** (new public skill, model: opus): converts free-form prose or a text file into a structured RA9 v2 spec (5 mandatory sections) and opens a PR on `docs/feature-<slug>` targeting `develop` for human review.
+- **`x-feature-create`** (replaces `x-epic-decompose`): orchestrates full feature creation (epic + stories + map) from a spec file with worktree isolation, consolidated commit on `docs/<epic-id>-<slug>`, and auto-merged PR into `epic/XXXX`.
+- **Rule 09 amendment:** adds `docs/` branch type (2 patterns: `docs/<epic-id>-<slug>` for creation, `docs/feature-<slug>` for ideation).
+- **Rule 14 amendment:** adds 2 new worktree patterns (`feature-XXXX-<slug>`, `feature-ideation-<slug>`).
+- **Rule 19 amendment:** "Hard-cut autorizado" clause — documents 3 conditions under which hard-cut (no deprecation window) is permitted; lists 4 EPIC-0065 cases.
+- **Rule 21 amendment:** `docs/<epic-id>-<slug>` PRs auto-merge into `epic/XXXX` (label `docs`) — authorized exception to anti-pattern.
+- **Rule 22 amendment:** documents 3 new internal skills under `core/internal/plan/` path.
+- **`audit-epic-branches.sh` v1.2.0:** Check D for `docs/` branches + v4 layout PathResolver + flowVersion 2/3/4 support.
+- **`x-git-cleanup-branches`:** preserves `epic/*` (Rule 21) and `docs/*` branches with open PRs (EPIC-0065 D-R6).
+
+### Removed — EPIC-0065 (BREAKING — hard-cut, Rule 19 §Hard-cut autorizado)
+
+> **Migration guide:** Replace usages of removed skills with their successors below.
+> No alias is preserved — hard-cut authorized by Rule 19 because the change is a
+> semantic role change (public → internal, or taxonomic merge).
+
+| Removed (public) | Successor | Role change |
+| :--- | :--- | :--- |
+| `x-epic-decompose` | `x-feature-create` (public) | Renamed + extended with worktree + docs/ PR |
+| `x-epic-create` | `x-internal-epic-create` (internal) | Public → internal; called only by `x-feature-create` |
+| `x-epic-map` | `x-internal-epic-map` (internal) | Public → internal; called only by `x-feature-create` |
+| `x-story-create` | `x-internal-story-create` (internal) | Public → internal; called only by `x-feature-create` |
+
 ## [5.0.0] - 2026-04-29
 
 ### Added
