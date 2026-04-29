@@ -48,7 +48,7 @@ public final class CapabilityResolver {
         CapabilityGraph graph = CapabilityGraph.of(catalog);
         cycleDetector.detect(graph).ifPresent(cycle -> {
             throw new dev.iadev.domain.capability.CapabilityError.CyclicDependency(
-                    "cyclic dependency detected: " + cycle.cyclePath());
+                    "cyclic dependency detected: " + cycle.cyclePath(), cycle.cyclePath());
         });
 
         ResolvedCapabilitySet resolved = profileExpander.expand(profile, catalog, parameterOverrides);

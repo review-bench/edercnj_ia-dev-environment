@@ -25,7 +25,8 @@ public final class PrerequisiteResolver {
         CapabilityDefinition root = catalog.get(capabilityId);
         if (root == null) {
             throw new CapabilityError.MissingPrerequisite(
-                    "capability '" + capabilityId + "' not found in catalog");
+                    "capability '" + capabilityId + "' not found in catalog",
+                    capabilityId, "");
         }
 
         Set<String> visited = new HashSet<>();
@@ -60,7 +61,8 @@ public final class PrerequisiteResolver {
         if (!req.isGlob()) {
             if (!catalog.containsKey(req.value())) {
                 throw new CapabilityError.MissingPrerequisite(
-                        req.value() + " referenced by " + referencedBy + " not found in catalog");
+                        req.value() + " referenced by " + referencedBy + " not found in catalog",
+                        req.value(), referencedBy);
             }
             return List.of(req.value());
         }

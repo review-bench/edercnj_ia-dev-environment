@@ -1,0 +1,4 @@
+id: runtime.jvm.openjdk
+category: runtime
+kind: atomic
+description: OpenJDK runtime

@@ -1,0 +1,6 @@
+id: cli.picocli.framework
+category: cli
+kind: atomic
+requires:
+  - lang.java.21
+description: picocli CLI framework

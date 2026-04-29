@@ -124,6 +124,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Property-based testing (EPIC-0064 story-0064-0110) -->
+        <dependency>
+            <groupId>net.jqwik</groupId>
+            <artifactId>jqwik</artifactId>
+            <version>1.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Architecture testing -->
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
