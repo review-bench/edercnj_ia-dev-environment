@@ -14,9 +14,9 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * E2E smoke test for EPIC-0066 PR Body Templates chain (story-0066-0008).
  *
- * <p>Validates the full chain wires correctly: templates exist, render skill SKILL.md is
- * present, telemetry-consolidate.sh works, audit-pr-template.sh self-checks, fixtures
- * are loadable. Last story of the epic — gate that all 8 prior stories landed coherently.
+ * <p>Validates the full chain wires correctly: templates exist, render skill SKILL.md is present,
+ * telemetry-consolidate.sh works, audit-pr-template.sh self-checks, fixtures are loadable. Last
+ * story of the epic — gate that all 8 prior stories landed coherently.
  *
  * <p>No real `gh pr create` invocations or external network calls; uses static fixtures.
  */
@@ -36,8 +36,7 @@ class Epic0066PrTemplateSmokeTest {
                 REPO_ROOT.resolve(
                         "src/main/resources/shared/templates/_TEMPLATE-PR-IMPLEMENTATION.md");
         Path backlogTpl =
-                REPO_ROOT.resolve(
-                        "src/main/resources/shared/templates/_TEMPLATE-PR-BACKLOG.md");
+                REPO_ROOT.resolve("src/main/resources/shared/templates/_TEMPLATE-PR-BACKLOG.md");
         assertThat(implTpl).as("implementation template must exist").exists();
         assertThat(backlogTpl).as("backlog template must exist").exists();
     }
@@ -101,11 +100,9 @@ class Epic0066PrTemplateSmokeTest {
 
     @Test
     @DisplayName("auditPrTemplate_selfCheck_succeedsOnCleanState")
-    void auditPrTemplate_selfCheck_succeedsOnCleanState()
-            throws IOException, InterruptedException {
+    void auditPrTemplate_selfCheck_succeedsOnCleanState() throws IOException, InterruptedException {
         Path script =
-                REPO_ROOT.resolve(
-                        "src/main/resources/targets/claude/scripts/audit-pr-template.sh");
+                REPO_ROOT.resolve("src/main/resources/targets/claude/scripts/audit-pr-template.sh");
         assertThat(script).as("audit-pr-template.sh must exist").exists();
 
         ProcessBuilder pb = new ProcessBuilder("/bin/bash", script.toString(), "--self-check");
@@ -122,13 +119,17 @@ class Epic0066PrTemplateSmokeTest {
     @DisplayName("fixtures_allEpic0066SmokeArtifactsAreLoadable")
     void fixtures_allEpic0066SmokeArtifactsAreLoadable() throws IOException {
         assertThat(FIXTURES_DIR.resolve("events.ndjson"))
-                .as("events.ndjson fixture must exist").exists();
+                .as("events.ndjson fixture must exist")
+                .exists();
         assertThat(FIXTURES_DIR.resolve("review-story-0066-fixture.md"))
-                .as("review fixture must exist").exists();
+                .as("review fixture must exist")
+                .exists();
         assertThat(FIXTURES_DIR.resolve("techlead-review-story-0066-fixture.md"))
-                .as("techlead fixture must exist").exists();
+                .as("techlead fixture must exist")
+                .exists();
         assertThat(FIXTURES_DIR.resolve("verify-envelope-story-0066-fixture.json"))
-                .as("verify envelope fixture must exist").exists();
+                .as("verify envelope fixture must exist")
+                .exists();
 
         // Validate fixture content basics
         List<String> events = Files.readAllLines(FIXTURES_DIR.resolve("events.ndjson"));
@@ -142,8 +143,7 @@ class Epic0066PrTemplateSmokeTest {
         assertThat(techlead).contains("Decision: GO");
 
         String envelope =
-                Files.readString(
-                        FIXTURES_DIR.resolve("verify-envelope-story-0066-fixture.json"));
+                Files.readString(FIXTURES_DIR.resolve("verify-envelope-story-0066-fixture.json"));
         assertThat(envelope).contains("\"passed\": true");
     }
 }

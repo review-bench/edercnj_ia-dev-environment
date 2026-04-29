@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
  * Validates x-pr-create/SKILL.md Phase 3 integration with x-internal-pr-body-render
  * (story-0066-0005) via static inspection.
  *
- * <p>Checks: MANDATORY TOOL CALL invocation in Phase 3, deduplication logic in Phase 3.5,
- * Recovery section with fallback body, WARN message includes exit code, dedup invariant.
+ * <p>Checks: MANDATORY TOOL CALL invocation in Phase 3, deduplication logic in Phase 3.5, Recovery
+ * section with fallback body, WARN message includes exit code, dedup invariant.
  *
- * <p>TPP order: degenerate (file exists) → constant (Skill invocation present) →
- * collection (4 sections — Phase 3, 3.5, Recovery, dedup) → conditional (fallback warn) →
- * error (legacy body preserved).
+ * <p>TPP order: degenerate (file exists) → constant (Skill invocation present) → collection (4
+ * sections — Phase 3, 3.5, Recovery, dedup) → conditional (fallback warn) → error (legacy body
+ * preserved).
  */
 @DisplayName("XPrCreateRenderIntegrationTest")
 class XPrCreateRenderIntegrationTest {
@@ -130,7 +130,8 @@ class XPrCreateRenderIntegrationTest {
         @Test
         @DisplayName("Recovery preserves legacy inline body sections (in SKILL.md or references/)")
         void recoverySection_preservesLegacyBody() {
-            // ADR-0007: detail may be carved out to references/recovery.md to keep SKILL.md ≤ 500 lines.
+            // ADR-0007: detail may be carved out to references/recovery.md to keep SKILL.md ≤ 500
+            // lines.
             assertThat(combined)
                     .as("Recovery context must contain Summary heading")
                     .contains("## Summary");

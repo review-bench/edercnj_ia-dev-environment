@@ -311,8 +311,7 @@ class PermissionCollectorTest {
         @Test
         @DisplayName("spaces before comma parses both elements")
         void parseJsonStringArray_spacesBeforeComma_parsesBothElements() {
-            List<String> result =
-                    PermissionCollector.parseJsonStringArray("[\"a\"   ,   \"b\"]");
+            List<String> result = PermissionCollector.parseJsonStringArray("[\"a\"   ,   \"b\"]");
 
             assertThat(result).containsExactly("a", "b");
         }

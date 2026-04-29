@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * composition metrics (story-0064-0507, RULE-004 baseline).
  *
  * <p>Metrics emitted on phase.end:
+ *
  * <ul>
  *   <li>{@code tempoComposeMs} — elapsed time for plan() in milliseconds
  *   <li>{@code numArtefatosIncluidos} — count of artifacts included in plan
@@ -78,11 +79,7 @@ public final class TelemetryCapabilityAwareComposer {
     }
 
     private void emitPhaseEnd(
-            String status,
-            long elapsedMs,
-            int included,
-            int pruned,
-            int fragments) {
+            String status, long elapsedMs, int included, int pruned, int fragments) {
         try {
             LOG.fine(
                     "{\"type\":\"phase.end\",\"skill\":\"capability-aware-composer\","

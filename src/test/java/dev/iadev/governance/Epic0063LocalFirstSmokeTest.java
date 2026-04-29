@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
  * E2E smoke test for EPIC-0063 (Local-First Pre-Flight Gates) — story-0063-0011.
  *
  * <p>Terminal story: validates all 20 Wave 1-6 stories working together as an integrated system.
- * Tests that all scripts exist and are executable, key rule files are in place, and key docs
- * exist (ADR-0016, bypass-catalog, branch-protection).
+ * Tests that all scripts exist and are executable, key rule files are in place, and key docs exist
+ * (ADR-0016, bypass-catalog, branch-protection).
  */
 class Epic0063LocalFirstSmokeTest {
 
@@ -19,8 +19,7 @@ class Epic0063LocalFirstSmokeTest {
     //    output and is gitignored, so the test asserts on the versioned
     //    template tree under src/main/resources/targets/claude/) ────────────
 
-    private static final Path CLAUDE_SCRIPTS =
-            Path.of("src/main/resources/targets/claude/scripts");
+    private static final Path CLAUDE_SCRIPTS = Path.of("src/main/resources/targets/claude/scripts");
 
     private static final Path AUDIT_REVIEW_CONTENT =
             CLAUDE_SCRIPTS.resolve("audit-review-content.sh");
@@ -57,8 +56,7 @@ class Epic0063LocalFirstSmokeTest {
 
     // ── claude/hooks paths (source-of-truth) ────────────────────────────────
 
-    private static final Path CLAUDE_HOOKS =
-            Path.of("src/main/resources/targets/claude/hooks");
+    private static final Path CLAUDE_HOOKS = Path.of("src/main/resources/targets/claude/hooks");
 
     private static final Path ENFORCE_PREFLIGHT_V1 =
             CLAUDE_HOOKS.resolve("enforce-preflight-gates.sh");
@@ -146,10 +144,8 @@ class Epic0063LocalFirstSmokeTest {
     void auditBypassCatalogExistsWithExpectedSkillCount() throws Exception {
         assertThat(AUDIT_BYPASS_CATALOG).exists().isRegularFile();
         String content = Files.readString(AUDIT_BYPASS_CATALOG);
-        long skillCount = content
-                .lines()
-                .filter(line -> line.matches("^## \\d+\\. x-[a-z-]+.*"))
-                .count();
+        long skillCount =
+                content.lines().filter(line -> line.matches("^## \\d+\\. x-[a-z-]+.*")).count();
         assertThat(skillCount)
                 .as("docs/audit-bypass-catalog.md must list exactly 11 skills")
                 .isEqualTo(11L);

@@ -15,10 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Validates telemetry-consolidate.sh: 5 scenarios (degenerate, happy, malformed, error, self-check).
+ * Validates telemetry-consolidate.sh: 5 scenarios (degenerate, happy, malformed, error,
+ * self-check).
  *
- * <p>TPP order: degenerate (empty) → constant (self-check) → happy (100 events) →
- * boundary (malformed lines) → error (missing jq).
+ * <p>TPP order: degenerate (empty) → constant (self-check) → happy (100 events) → boundary
+ * (malformed lines) → error (missing jq).
  */
 @DisplayName("Epic0066 — telemetry-consolidate.sh")
 class Epic0066TelemetryConsolidateTest {
@@ -61,7 +62,9 @@ class Epic0066TelemetryConsolidateTest {
     private ProcessResult run(List<String> args) throws IOException, InterruptedException {
         Path plansDir = tempDir.resolve("ai/epics/epic-0066-test/telemetry");
         Files.createDirectories(plansDir);
-        Files.copy(ndjsonPath, plansDir.resolve("events.ndjson"),
+        Files.copy(
+                ndjsonPath,
+                plansDir.resolve("events.ndjson"),
                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         return run(args, tempDir, null);
     }
@@ -120,7 +123,7 @@ class Epic0066TelemetryConsolidateTest {
             for (int i = 0; i < 100; i++) {
                 String tool = i % 3 == 0 ? "Bash" : (i % 3 == 1 ? "Read" : "Write");
                 sb.append(buildEvent("story-0066-0002", tool, 100 + i * 10, base + i * 1000L))
-                  .append('\n');
+                        .append('\n');
             }
             Files.writeString(ndjsonPath, sb.toString(), StandardCharsets.UTF_8);
 
@@ -152,7 +155,7 @@ class Epic0066TelemetryConsolidateTest {
             long base = 1_700_000_000_000L;
             for (int i = 0; i < 50; i++) {
                 sb.append(buildEvent("story-0066-0002", "Bash", 200, base + i * 1000L))
-                  .append('\n');
+                        .append('\n');
                 if (i % 10 == 9) {
                     sb.append("{not valid json at all {{{\n");
                 }
@@ -166,9 +169,10 @@ class Epic0066TelemetryConsolidateTest {
             String json = result.stdout();
             assertThat(json).contains("\"events\"");
             // events count should reflect only valid lines (50)
-            assertThat(json).satisfiesAnyOf(
-                j -> assertThat(j).contains("\"events\":50"),
-                j -> assertThat(j).contains("\"events\": 50"));
+            assertThat(json)
+                    .satisfiesAnyOf(
+                            j -> assertThat(j).contains("\"events\":50"),
+                            j -> assertThat(j).contains("\"events\": 50"));
         }
     }
 

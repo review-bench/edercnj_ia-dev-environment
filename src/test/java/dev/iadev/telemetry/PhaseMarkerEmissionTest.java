@@ -22,20 +22,17 @@ import org.junit.jupiter.api.io.TempDir;
  * <p>Complements TelemetryMarkerLint: the lint detects DUPLICATE/DANGLING/UNCLOSED; this test
  * detects ABSENT markers per numbered phase (the gap the lint misses).
  *
- * <p>TPP order: degenerate (0 phases) → happy x-story-implement → happy x-task-implement →
- * boundary (error phase has failed status doc).
+ * <p>TPP order: degenerate (0 phases) → happy x-story-implement → happy x-task-implement → boundary
+ * (error phase has failed status doc).
  */
 @DisplayName("PhaseMarkerEmissionTest")
 class PhaseMarkerEmissionTest {
 
-    private static final String SKILLS_ROOT =
-            "src/main/resources/targets/claude/skills/core/dev/";
+    private static final String SKILLS_ROOT = "src/main/resources/targets/claude/skills/core/dev/";
 
-    private static final Path X_STORY =
-            Path.of(SKILLS_ROOT + "x-story-implement/SKILL.md");
+    private static final Path X_STORY = Path.of(SKILLS_ROOT + "x-story-implement/SKILL.md");
 
-    private static final Path X_TASK =
-            Path.of(SKILLS_ROOT + "x-task-implement/SKILL.md");
+    private static final Path X_TASK = Path.of(SKILLS_ROOT + "x-task-implement/SKILL.md");
 
     private static final Pattern PHASE_HEADER = Pattern.compile("^## Phase (\\d+)[^\\d]");
     private static final Pattern PHASE_START =
@@ -136,12 +133,15 @@ class PhaseMarkerEmissionTest {
 
             String content = Files.readString(X_STORY, StandardCharsets.UTF_8);
 
-            boolean hasFailedEnd = content.contains("telemetry-phase.sh end")
-                    && (content.contains("failed") || content.contains("status=failed"));
+            boolean hasFailedEnd =
+                    content.contains("telemetry-phase.sh end")
+                            && (content.contains("failed") || content.contains("status=failed"));
 
-            boolean hasErrorDoc = content.contains("status=failed")
-                    || content.contains("phase.end status=failed")
-                    || content.contains("Phase-3-Verify") && content.contains("VERIFY_FAILED");
+            boolean hasErrorDoc =
+                    content.contains("status=failed")
+                            || content.contains("phase.end status=failed")
+                            || content.contains("Phase-3-Verify")
+                                    && content.contains("VERIFY_FAILED");
 
             assertThat(hasFailedEnd || hasErrorDoc)
                     .as(

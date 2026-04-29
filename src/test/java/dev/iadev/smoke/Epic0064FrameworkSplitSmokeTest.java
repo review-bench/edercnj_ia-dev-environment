@@ -236,8 +236,7 @@ class Epic0064FrameworkSplitSmokeTest {
 
     // --- Stories 0410-0411: Audit scripts ---
 
-    private static final Path SCRIPTS_ROOT =
-            Path.of("src/main/resources/targets/claude/scripts");
+    private static final Path SCRIPTS_ROOT = Path.of("src/main/resources/targets/claude/scripts");
 
     @Test
     @DisplayName("audit-fragment-coherence.sh must exist and be executable")

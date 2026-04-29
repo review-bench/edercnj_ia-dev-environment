@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Validates x-internal-pr-body-render/SKILL.md contract via static inspection.
  *
- * <p>Checks: frontmatter (visibility=internal, user-invocable=false, model=haiku), body marker,
- * 5 numbered phases with balanced telemetry markers, exit-code contract, fail-open placeholders,
+ * <p>Checks: frontmatter (visibility=internal, user-invocable=false, model=haiku), body marker, 5
+ * numbered phases with balanced telemetry markers, exit-code contract, fail-open placeholders,
  * Haiku eligibility note in Integration Notes.
  *
- * <p>TPP order: degenerate (file exists) → constant (frontmatter fields) →
- * collection (phases + markers) → conditional (fail-open placeholders) → error (INVALID_KIND doc).
+ * <p>TPP order: degenerate (file exists) → constant (frontmatter fields) → collection (phases +
+ * markers) → conditional (fail-open placeholders) → error (INVALID_KIND doc).
  */
 @DisplayName("XInternalPrBodyRenderImplementationTest")
 class XInternalPrBodyRenderImplementationTest {
@@ -80,9 +80,7 @@ class XInternalPrBodyRenderImplementationTest {
         @Test
         @DisplayName("body marker is present in first 30 lines")
         void bodyMarker_presentInFirst30Lines() {
-            String first30Lines = content.lines()
-                    .limit(30)
-                    .reduce("", (a, b) -> a + "\n" + b);
+            String first30Lines = content.lines().limit(30).reduce("", (a, b) -> a + "\n" + b);
             assertThat(first30Lines).contains("🔒 **INTERNAL SKILL**");
         }
     }
@@ -94,17 +92,18 @@ class XInternalPrBodyRenderImplementationTest {
         @Test
         @DisplayName("has exactly 5 numbered Phase N headings")
         void hasExactly5NumberedPhases() {
-            long count = content.lines()
-                    .filter(line -> line.matches("^## Phase [0-4] —.*"))
-                    .count();
+            long count =
+                    content.lines().filter(line -> line.matches("^## Phase [0-4] —.*")).count();
             assertThat(count).as("Should have 5 numbered phases (0-4)").isEqualTo(5);
         }
 
         @Test
         @DisplayName("phase.start markers match phase.end markers in count")
         void phaseMarkers_areBalanced() {
-            long starts = countOccurrences(content, "telemetry-phase.sh start x-internal-pr-body-render");
-            long ends = countOccurrences(content, "telemetry-phase.sh end x-internal-pr-body-render");
+            long starts =
+                    countOccurrences(content, "telemetry-phase.sh start x-internal-pr-body-render");
+            long ends =
+                    countOccurrences(content, "telemetry-phase.sh end x-internal-pr-body-render");
             assertThat(starts).as("phase.start count").isEqualTo(5);
             assertThat(ends).as("phase.end count").isEqualTo(5);
             assertThat(starts).as("starts must equal ends").isEqualTo(ends);
@@ -114,7 +113,8 @@ class XInternalPrBodyRenderImplementationTest {
         @DisplayName("all phase identifiers use kebab-case (Rule 13 §Forbidden)")
         void phaseIdentifiers_useKebabCase() {
             Pattern identifierPattern =
-                    Pattern.compile("telemetry-phase\\.sh\\s+start\\s+\\S+\\s+(Phase-\\d+-[^\\s`'\"]+)");
+                    Pattern.compile(
+                            "telemetry-phase\\.sh\\s+start\\s+\\S+\\s+(Phase-\\d+-[^\\s`'\"]+)");
             java.util.regex.Matcher m = identifierPattern.matcher(content);
             while (m.find()) {
                 String id = m.group(1);
@@ -122,7 +122,9 @@ class XInternalPrBodyRenderImplementationTest {
                         .as("Phase identifier '%s' must be kebab-case", id)
                         .matches("Phase-\\d+-[a-zA-Z][a-zA-Z0-9-]+");
                 assertThat(id).as("Phase identifier must not contain dots").doesNotContain(".");
-                assertThat(id.length()).as("Phase identifier must be ≤ 64 chars").isLessThanOrEqualTo(64);
+                assertThat(id.length())
+                        .as("Phase identifier must be ≤ 64 chars")
+                        .isLessThanOrEqualTo(64);
             }
         }
     }

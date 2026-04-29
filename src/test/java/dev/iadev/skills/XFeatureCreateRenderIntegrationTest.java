@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
  * Validates x-feature-create/SKILL.md backlog render integration (story-0066-0006) via static
  * inspection.
  *
- * <p>Checks: Phase P5.5 BACKLOG-RENDER MANDATORY TOOL CALL, --kind=backlog argument, Phase P6
- * uses gh pr create --body-file, ## Recovery section, fail-open contract.
+ * <p>Checks: Phase P5.5 BACKLOG-RENDER MANDATORY TOOL CALL, --kind=backlog argument, Phase P6 uses
+ * gh pr create --body-file, ## Recovery section, fail-open contract.
  */
 @DisplayName("XFeatureCreateRenderIntegrationTest")
 class XFeatureCreateRenderIntegrationTest {

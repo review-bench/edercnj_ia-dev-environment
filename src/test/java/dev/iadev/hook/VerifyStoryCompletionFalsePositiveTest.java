@@ -32,8 +32,7 @@ class VerifyStoryCompletionFalsePositiveTest {
     private static final Path SESSION_START_HOOK =
             REPO_ROOT.resolve("src/main/resources/targets/claude/hooks/session-start.sh");
     private static final Path VERIFY_HOOK =
-            REPO_ROOT.resolve(
-                    "src/main/resources/targets/claude/hooks/verify-story-completion.sh");
+            REPO_ROOT.resolve("src/main/resources/targets/claude/hooks/verify-story-completion.sh");
 
     @Test
     @DisplayName("session-start.sh exists and writes epoch to session-start.txt path")

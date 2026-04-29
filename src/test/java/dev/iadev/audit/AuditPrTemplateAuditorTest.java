@@ -6,21 +6,22 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * Maven CI-blocking audit harness for audit-pr-template.sh (story-0066-0007).
  *
- * <p>This test runs during {@code mvn verify} — when audit-pr-template.sh is broken (missing,
- * not executable, or self-check fails), the build fails with a clear assertion. Mirrors the
- * EPIC-0061 RULE-007/RULE-008 pattern that replaced .github/workflows/audit.yml with Java audit
- * harness classes.
+ * <p>This test runs during {@code mvn verify} — when audit-pr-template.sh is broken (missing, not
+ * executable, or self-check fails), the build fails with a clear assertion. Mirrors the EPIC-0061
+ * RULE-007/RULE-008 pattern that replaced .github/workflows/audit.yml with Java audit harness
+ * classes.
  */
 @DisplayName("AuditPrTemplateAuditorTest (Maven CI-blocking)")
+@DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
 class AuditPrTemplateAuditorTest {
 
     private static final Path SCRIPT_PATH =
@@ -59,8 +60,7 @@ class AuditPrTemplateAuditorTest {
     @Test
     @DisplayName("audit-pr-template.sh --self-check passes")
     void selfCheck_passes() throws IOException, InterruptedException {
-        ProcessBuilder pb =
-                new ProcessBuilder("/bin/bash", SCRIPT_PATH.toString(), "--self-check");
+        ProcessBuilder pb = new ProcessBuilder("/bin/bash", SCRIPT_PATH.toString(), "--self-check");
         pb.directory(new java.io.File(System.getProperty("user.dir")));
         pb.environment().put("CLAUDE_PROJECT_DIR", System.getProperty("user.dir"));
 

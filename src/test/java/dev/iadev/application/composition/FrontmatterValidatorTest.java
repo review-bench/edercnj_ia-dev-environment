@@ -157,7 +157,8 @@ class FrontmatterValidatorTest {
         }
 
         @Test
-        @DisplayName("requires-capabilities as scalar (not list) with knownIds — no warning emitted")
+        @DisplayName(
+                "requires-capabilities as scalar (not list) with knownIds — no warning emitted")
         void requiresCapabilitiesNotList_noWarning(@TempDir Path tmp) throws IOException {
             Path file = tmp.resolve("scalar.md");
             Files.writeString(file, "---\nname: x\nrequires-capabilities: just_a_string\n---\n");

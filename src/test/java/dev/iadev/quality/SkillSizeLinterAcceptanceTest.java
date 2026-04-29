@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Acceptance test: runs {@link SkillSizeLinter} against the real source-of-truth tree at {@code
- * src/main/resources/targets/claude/skills/} and fails the build if a NEW offender (not in
- * {@code governance/baselines/skill-size-baseline.txt}) appears.
+ * src/main/resources/targets/claude/skills/} and fails the build if a NEW offender (not in {@code
+ * governance/baselines/skill-size-baseline.txt}) appears.
  *
  * <p>Brownfield policy (story-0047-0003 §4 DoR Local): at the time this story landed, 25 SKILL.md
  * files exceeded 500 lines without a non-empty {@code references/} sibling. These are enumerated in

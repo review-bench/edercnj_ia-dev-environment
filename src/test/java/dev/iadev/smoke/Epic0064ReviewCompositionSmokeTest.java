@@ -12,19 +12,18 @@ import org.junit.jupiter.api.Test;
 /**
  * Smoke test for Phase 5 of EPIC-0064: x-review composite skill composition.
  *
- * <p>Validates that: 1. The x-review parent SKILL.md declares fragment-slots with
- * review-specialist slot 2. The 8 specialist fragment files exist under x-review/fragments/ 3.
- * Each fragment file has required frontmatter fields (fragment-slot + requires-capabilities/any) 4.
- * Universal fragments (qa, perf, security) have requires-capabilities: [] 5. Conditional fragments
- * (devops, db, api, event, compliance) have appropriate capability requirements 6. Fragment order
- * is deterministic (fragment-order values unique and ascending)
+ * <p>Validates that: 1. The x-review parent SKILL.md declares fragment-slots with review-specialist
+ * slot 2. The 8 specialist fragment files exist under x-review/fragments/ 3. Each fragment file has
+ * required frontmatter fields (fragment-slot + requires-capabilities/any) 4. Universal fragments
+ * (qa, perf, security) have requires-capabilities: [] 5. Conditional fragments (devops, db, api,
+ * event, compliance) have appropriate capability requirements 6. Fragment order is deterministic
+ * (fragment-order values unique and ascending)
  */
 @DisplayName("Epic0064ReviewCompositionSmokeTest")
 class Epic0064ReviewCompositionSmokeTest {
 
     private static final Path X_REVIEW_ROOT =
-            Path.of(
-                    "src/main/resources/targets/claude/skills/core/review/x-review");
+            Path.of("src/main/resources/targets/claude/skills/core/review/x-review");
     private static final Path FRAGMENTS_ROOT = X_REVIEW_ROOT.resolve("fragments");
     private static final Path PARENT_SKILL = X_REVIEW_ROOT.resolve("SKILL.md");
 
@@ -47,8 +46,7 @@ class Epic0064ReviewCompositionSmokeTest {
         assertThat(content)
                 .as("x-review SKILL.md body must reference the review-specialist slot")
                 .containsAnyOf(
-                        "{{ #each fragments.review-specialist }}",
-                        "{{ slot: review-specialist }}");
+                        "{{ #each fragments.review-specialist }}", "{{ slot: review-specialist }}");
     }
 
     // --- Fragment file existence ---
@@ -159,14 +157,19 @@ class Epic0064ReviewCompositionSmokeTest {
     void fragments_orderingIsDeterministicAndUnique() throws IOException {
         List<String> fragments =
                 List.of(
-                        "qa.md", "perf.md", "security.md", "devops.md",
-                        "db.md", "api.md", "event.md", "compliance.md");
+                        "qa.md",
+                        "perf.md",
+                        "security.md",
+                        "devops.md",
+                        "db.md",
+                        "api.md",
+                        "event.md",
+                        "compliance.md");
         var orders = new java.util.ArrayList<Integer>();
         for (String frag : fragments) {
             var content = Files.readString(FRAGMENTS_ROOT.resolve(frag));
             var matcher =
-                    java.util.regex.Pattern.compile("fragment-order:\\s*(\\d+)")
-                            .matcher(content);
+                    java.util.regex.Pattern.compile("fragment-order:\\s*(\\d+)").matcher(content);
             assertThat(matcher.find())
                     .withFailMessage(frag + " must declare fragment-order")
                     .isTrue();
@@ -179,6 +182,8 @@ class Epic0064ReviewCompositionSmokeTest {
         // Orders should be ascending (deterministic composition)
         var sorted = new java.util.ArrayList<>(orders);
         java.util.Collections.sort(sorted);
-        assertThat(orders).as("fragments must be ordered ascending by fragment-order").isEqualTo(sorted);
+        assertThat(orders)
+                .as("fragments must be ordered ascending by fragment-order")
+                .isEqualTo(sorted);
     }
 }

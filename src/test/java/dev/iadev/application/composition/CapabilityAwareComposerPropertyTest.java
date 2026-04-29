@@ -20,7 +20,6 @@ import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
 import net.jqwik.api.lifecycle.AfterProperty;
 import net.jqwik.api.lifecycle.BeforeProperty;
-import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Property-based idempotency tests for CapabilityAwareComposer (story-0064-0506,
@@ -76,12 +75,24 @@ class CapabilityAwareComposerPropertyTest {
         CompositionPlan plan1 = composer.plan(capSet, targetsRoot);
         CompositionPlan plan2 = composer.plan(capSet, targetsRoot);
 
-        assertThat(plan1.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList())
+        assertThat(
+                        plan1.included().stream()
+                                .map(CompositionPlan.ArtifactEntry::relativePath)
+                                .toList())
                 .as("plan() must be idempotent — included set must be identical")
-                .isEqualTo(plan2.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList());
-        assertThat(plan1.excluded().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList())
+                .isEqualTo(
+                        plan2.included().stream()
+                                .map(CompositionPlan.ArtifactEntry::relativePath)
+                                .toList());
+        assertThat(
+                        plan1.excluded().stream()
+                                .map(CompositionPlan.ArtifactEntry::relativePath)
+                                .toList())
                 .as("plan() must be idempotent — excluded set must be identical")
-                .isEqualTo(plan2.excluded().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList());
+                .isEqualTo(
+                        plan2.excluded().stream()
+                                .map(CompositionPlan.ArtifactEntry::relativePath)
+                                .toList());
     }
 
     @Property(tries = 100)
@@ -95,9 +106,12 @@ class CapabilityAwareComposerPropertyTest {
         CompositionPlan p2 = composer.plan(capSet, targetsRoot);
         CompositionPlan p3 = composer.plan(capSet, targetsRoot);
 
-        var paths1 = p1.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
-        var paths2 = p2.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
-        var paths3 = p3.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
+        var paths1 =
+                p1.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
+        var paths2 =
+                p2.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
+        var paths3 =
+                p3.included().stream().map(CompositionPlan.ArtifactEntry::relativePath).toList();
 
         assertThat(paths1).isEqualTo(paths2);
         assertThat(paths2).isEqualTo(paths3);
@@ -134,8 +148,7 @@ class CapabilityAwareComposerPropertyTest {
         writeArtifact(root, "spring-specific.md", "web.spring.boot");
     }
 
-    private static void writeArtifact(Path root, String name, String... capIds)
-            throws IOException {
+    private static void writeArtifact(Path root, String name, String... capIds) throws IOException {
         Path file = root.resolve(name);
         Files.createDirectories(file.getParent());
         String capList =

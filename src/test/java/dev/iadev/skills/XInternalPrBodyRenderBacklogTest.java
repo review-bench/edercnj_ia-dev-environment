@@ -72,8 +72,8 @@ class XInternalPrBodyRenderBacklogTest {
             assertThat(content)
                     .as("epic-id format must be documented")
                     .satisfiesAnyOf(
-                        c -> assertThat(c).contains("^epic-[0-9]{4}$"),
-                        c -> assertThat(c).contains("epic-XXXX"));
+                            c -> assertThat(c).contains("^epic-[0-9]{4}$"),
+                            c -> assertThat(c).contains("epic-XXXX"));
         }
 
         @Test
@@ -82,9 +82,9 @@ class XInternalPrBodyRenderBacklogTest {
             assertThat(content)
                     .as("EPIC-XXXX normalization should be documented")
                     .satisfiesAnyOf(
-                        c -> assertThat(c).contains("Normaliz"),
-                        c -> assertThat(c).contains("EPIC-"),
-                        c -> assertThat(c).contains("normaliz"));
+                            c -> assertThat(c).contains("Normaliz"),
+                            c -> assertThat(c).contains("EPIC-"),
+                            c -> assertThat(c).contains("normaliz"));
         }
     }
 
@@ -113,8 +113,8 @@ class XInternalPrBodyRenderBacklogTest {
             assertThat(content)
                     .as("spec search must be security-bounded to REPO_ROOT")
                     .satisfiesAnyOf(
-                        c -> assertThat(c).contains("REPO_ROOT"),
-                        c -> assertThat(c).contains("${REPO_ROOT}"));
+                            c -> assertThat(c).contains("REPO_ROOT"),
+                            c -> assertThat(c).contains("${REPO_ROOT}"));
         }
 
         @Test
@@ -123,9 +123,9 @@ class XInternalPrBodyRenderBacklogTest {
             assertThat(content)
                     .as("coordination with in-progress epics must be documented")
                     .satisfiesAnyOf(
-                        c -> assertThat(c).contains("execution-state.json"),
-                        c -> assertThat(c).contains("Em Andamento"),
-                        c -> assertThat(c).contains("in_progress"));
+                            c -> assertThat(c).contains("execution-state.json"),
+                            c -> assertThat(c).contains("Em Andamento"),
+                            c -> assertThat(c).contains("in_progress"));
         }
     }
 
@@ -168,9 +168,9 @@ class XInternalPrBodyRenderBacklogTest {
             assertThat(content)
                     .as("RULE-007 or backlog Orchestrator Evidence must reference reduced form")
                     .satisfiesAnyOf(
-                        c -> assertThat(c).contains("RULE-007"),
-                        c -> assertThat(c).contains("without Story IDs"),
-                        c -> assertThat(c).contains("Backlog-only PR"));
+                            c -> assertThat(c).contains("RULE-007"),
+                            c -> assertThat(c).contains("without Story IDs"),
+                            c -> assertThat(c).contains("Backlog-only PR"));
         }
     }
 }

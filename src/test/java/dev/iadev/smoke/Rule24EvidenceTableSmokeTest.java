@@ -15,12 +15,12 @@ import org.junit.jupiter.api.condition.OS;
  * Repo-level smoke test for the EPIC-0057 evidence-table expansion.
  *
  * <p>Reads the canonical reference golden at {@code
- * src/test/resources/golden/java-spring/.claude/rules/24-execution-integrity.md} — the
- * committed reference for the most exercised profile — and checks the Mandatory Evidence Artifacts
- * table carries the EPIC-0057 expansion. Complements {@link Rule24EvidenceTableExpansionTest},
- * which exercises the pipeline end-to-end. This smoke version is independent of {@code @TempDir}
- * and runs as a fast guard against drift between the source-of-truth rule and the committed
- * reference golden.
+ * src/test/resources/golden/java-spring/.claude/rules/24-execution-integrity.md} — the committed
+ * reference for the most exercised profile — and checks the Mandatory Evidence Artifacts table
+ * carries the EPIC-0057 expansion. Complements {@link Rule24EvidenceTableExpansionTest}, which
+ * exercises the pipeline end-to-end. This smoke version is independent of {@code @TempDir} and runs
+ * as a fast guard against drift between the source-of-truth rule and the committed reference
+ * golden.
  *
  * <p>Note: the runtime {@code .claude/} at the repo root is gitignored (regenerated locally), so a
  * smoke test must read from the committed golden tree to remain CI-stable.
@@ -32,8 +32,7 @@ import org.junit.jupiter.api.condition.OS;
 class Rule24EvidenceTableSmokeTest {
 
     private static final String REFERENCE_GOLDEN_PATH =
-            "src/test/resources/golden/java-spring/"
-                    + ".claude/rules/24-execution-integrity.md";
+            "src/test/resources/golden/java-spring/" + ".claude/rules/24-execution-integrity.md";
 
     @Test
     @DisplayName("reference golden Rule 24 has ≥11 evidence-table rows")

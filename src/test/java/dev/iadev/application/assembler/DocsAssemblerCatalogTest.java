@@ -137,14 +137,14 @@ class DocsAssemblerCatalogTest {
         @Test
         void templateWithoutLoopMarkers_returnsRenderedPlainTemplate(@TempDir Path tempDir)
                 throws IOException {
-            Path templatesDir =
-                    Files.createDirectories(tempDir.resolve("shared/templates"));
+            Path templatesDir = Files.createDirectories(tempDir.resolve("shared/templates"));
             Files.writeString(
                     templatesDir.resolve("_TEMPLATE-AUDIT-GATES-CATALOG.md"),
                     "Stack: {{STACK}}\nTotal Audits: {{TOTAL_AUDITS}}\n");
             DocsAssembler plainAssembler = new DocsAssembler(tempDir);
 
-            String output = plainAssembler.renderCatalog("spring-boot", List.of(modelSelectionAudit()));
+            String output =
+                    plainAssembler.renderCatalog("spring-boot", List.of(modelSelectionAudit()));
 
             assertThat(output).contains("Stack: spring-boot");
             assertThat(output).contains("Total Audits: 1");
