@@ -22,7 +22,7 @@ tool/session activity as NDJSON telemetry events. The scripts are the
 Events are appended to:
 
 ```
-${CLAUDE_PROJECT_DIR}/plans/epic-XXXX/telemetry/events.ndjson   # per-epic, committed
+${CLAUDE_PROJECT_DIR}/ai/epics/epic-XXXX/telemetry/events.ndjson   # per-epic, committed
 ${CLAUDE_PROJECT_DIR}/plans/unknown/telemetry/events.ndjson     # fallback
 ```
 
@@ -52,7 +52,7 @@ variables in this order:
 1. `CLAUDE_TELEMETRY_CONTEXT` JSON env var with `epicId`/`storyId`/`taskId`.
 2. Current Git branch: `feat/story-NNNN-MMMM-*` or
    `feat/task-NNNN-MMMM-NNN-*` or `feature/epic-NNNN-*` (regex match).
-3. Any `plans/epic-*/execution-state.json` with `currentPhase != null`
+3. Any `ai/epics/epic-*/execution-state.json` with `currentPhase != null`
    (newest matching file wins).
 4. Fallback: `epicId = "unknown"`, story/task empty.
 
