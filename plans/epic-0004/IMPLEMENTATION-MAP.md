@@ -8,23 +8,23 @@
 
 | Story | Título | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0004-0001 | ADR Template & Estrutura `docs/adr/` | — | story-0004-0006, story-0004-0015 | Pendente |
-| story-0004-0002 | Template de Documentação de Arquitetura de Serviço | — | story-0004-0006, story-0004-0014 | Pendente |
-| story-0004-0003 | Template de Runbook de Deploy | — | story-0004-0011 | Pendente |
-| story-0004-0004 | `x-story-create` — Diagramas Mermaid Obrigatórios | — | — | Pendente |
-| story-0004-0005 | Fase de Documentação no `x-dev-lifecycle` | — | story-0004-0007, story-0004-0008, story-0004-0009, story-0004-0010, story-0004-0011, story-0004-0012, story-0004-0013 | Pendente |
-| story-0004-0006 | Nova Skill `x-dev-architecture-plan` | story-0004-0001, story-0004-0002 | story-0004-0013, story-0004-0014, story-0004-0015, story-0004-0016 | Pendente |
-| story-0004-0007 | Gerador de Documentação OpenAPI/Swagger (REST) | story-0004-0005 | — | Pendente |
-| story-0004-0008 | Gerador de Documentação gRPC/Proto | story-0004-0005 | — | Pendente |
-| story-0004-0009 | Gerador de Documentação CLI | story-0004-0005 | — | Pendente |
-| story-0004-0010 | Gerador de Documentação Event-Driven/WebSocket | story-0004-0005 | — | Pendente |
-| story-0004-0011 | Geração de Artefatos CI/CD no Lifecycle | story-0004-0003, story-0004-0005 | — | Pendente |
-| story-0004-0012 | Performance Baseline Tracking | story-0004-0005 | — | Pendente |
-| story-0004-0013 | Integração do Architecture Plan no Lifecycle Completo | story-0004-0005, story-0004-0006 | story-0004-0017 | Pendente |
-| story-0004-0014 | Atualização Incremental do Service Architecture Doc | story-0004-0002, story-0004-0006 | — | Pendente |
-| story-0004-0015 | ADR Automation — Geração e Indexação Automática | story-0004-0001, story-0004-0006 | — | Pendente |
-| story-0004-0016 | Documentação de Security Threat Model | story-0004-0006 | — | Pendente |
-| story-0004-0017 | Post-Deploy Verification Step | story-0004-0013 | — | Pendente |
+| story-0004-0001 | ADR Template & Estrutura `docs/adr/` | — | story-0004-0006, story-0004-0015 | Concluída |
+| story-0004-0002 | Template de Documentação de Arquitetura de Serviço | — | story-0004-0006, story-0004-0014 | Concluída |
+| story-0004-0003 | Template de Runbook de Deploy | — | story-0004-0011 | Concluída |
+| story-0004-0004 | `x-story-create` — Diagramas Mermaid Obrigatórios | — | — | Concluída |
+| story-0004-0005 | Fase de Documentação no `x-dev-lifecycle` | — | story-0004-0007, story-0004-0008, story-0004-0009, story-0004-0010, story-0004-0011, story-0004-0012, story-0004-0013 | Concluída |
+| story-0004-0006 | Nova Skill `x-dev-architecture-plan` | story-0004-0001, story-0004-0002 | story-0004-0013, story-0004-0014, story-0004-0015, story-0004-0016 | Concluída |
+| story-0004-0007 | Gerador de Documentação OpenAPI/Swagger (REST) | story-0004-0005 | — | Concluída |
+| story-0004-0008 | Gerador de Documentação gRPC/Proto | story-0004-0005 | — | Concluída |
+| story-0004-0009 | Gerador de Documentação CLI | story-0004-0005 | — | Concluída |
+| story-0004-0010 | Gerador de Documentação Event-Driven/WebSocket | story-0004-0005 | — | Concluída |
+| story-0004-0011 | Geração de Artefatos CI/CD no Lifecycle | story-0004-0003, story-0004-0005 | — | Concluída |
+| story-0004-0012 | Performance Baseline Tracking | story-0004-0005 | — | Concluída |
+| story-0004-0013 | Integração do Architecture Plan no Lifecycle Completo | story-0004-0005, story-0004-0006 | story-0004-0017 | Concluída |
+| story-0004-0014 | Atualização Incremental do Service Architecture Doc | story-0004-0002, story-0004-0006 | — | Concluída |
+| story-0004-0015 | ADR Automation — Geração e Indexação Automática | story-0004-0001, story-0004-0006 | — | Concluída |
+| story-0004-0016 | Documentação de Security Threat Model | story-0004-0006 | — | Concluída |
+| story-0004-0017 | Post-Deploy Verification Step | story-0004-0013 | — | Concluída |
 
 > **Nota:** story-0004-0004 (Mermaid Enhancement) e story-0004-0012 (Performance Baseline) são histórias folha — não bloqueiam nenhuma outra. story-0004-0005 (Documentation Phase) é o maior fan-out node, bloqueando 7 histórias. story-0004-0006 (Architecture Plan) é o segundo maior, bloqueando 4 histórias.
 

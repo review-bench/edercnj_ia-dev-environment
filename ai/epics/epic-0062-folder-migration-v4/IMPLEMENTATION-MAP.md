@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0062-0001 | Parametrizar `BASELINE_DIR` nos audit scripts | — | — | story-0062-0002 | Pendente |
-| story-0062-0002 | Mover `audits/*.txt` → `governance/baselines/` | — | story-0062-0001 | story-0062-0005, story-0062-0008 | Pendente |
-| story-0062-0003 | Mover `adr/*.md` → `docs/adr/` + refs raiz | — | — | story-0062-0004, story-0062-0005, story-0062-0007 | Pendente |
-| story-0062-0004 | Mover `specs/*.md` → `docs/specs/` + refs | — | story-0062-0003 | story-0062-0005, story-0062-0007 | Pendente |
-| story-0062-0005 | Java assemblers + `FileCategorizer` para v4 | — | story-0062-0002, story-0062-0003, story-0062-0004 | story-0062-0006 | Pendente |
-| story-0062-0006 | 14 SKILLs → `PathResolver` | — | story-0062-0005 | story-0062-0007 | Pendente |
-| story-0062-0007 | Rules 05/13/24/25/26/27/45 + regen 11 fixtures | — | story-0062-0006 | story-0062-0008 | Pendente |
-| story-0062-0008 | Cleanup: remover symlink + dirs v3 vazios | — | story-0062-0007 | — | Pendente |
+| story-0062-0001 | Parametrizar `BASELINE_DIR` nos audit scripts | — | — | story-0062-0002 | Concluída |
+| story-0062-0002 | Mover `audits/*.txt` → `governance/baselines/` | — | story-0062-0001 | story-0062-0005, story-0062-0008 | Concluída |
+| story-0062-0003 | Mover `adr/*.md` → `docs/adr/` + refs raiz | — | — | story-0062-0004, story-0062-0005, story-0062-0007 | Concluída |
+| story-0062-0004 | Mover `specs/*.md` → `docs/specs/` + refs | — | story-0062-0003 | story-0062-0005, story-0062-0007 | Concluída |
+| story-0062-0005 | Java assemblers + `FileCategorizer` para v4 | — | story-0062-0002, story-0062-0003, story-0062-0004 | story-0062-0006 | Concluída |
+| story-0062-0006 | 14 SKILLs → `PathResolver` | — | story-0062-0005 | story-0062-0007 | Concluída |
+| story-0062-0007 | Rules 05/13/24/25/26/27/45 + regen 11 fixtures | — | story-0062-0006 | story-0062-0008 | Concluída |
+| story-0062-0008 | Cleanup: remover symlink + dirs v3 vazios | — | story-0062-0007 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

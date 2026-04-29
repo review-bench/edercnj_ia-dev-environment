@@ -8,15 +8,15 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0052-0001 | Publicar Rule 21 e atualizar CLAUDE.md | — | — | story-0052-0002, story-0052-0003, story-0052-0004 | Pendente |
-| story-0052-0002 | Reescrever skills de análise (telemetry-analyze, telemetry-trend, parallel-eval) | — | story-0052-0001 | story-0052-0005, story-0052-0007 | Pendente |
-| story-0052-0003 | Reescrever skill `x-release` em LLM+bash/git/gh | — | story-0052-0001 | story-0052-0005, story-0052-0006 | Pendente |
-| story-0052-0004 | Reescrever skills de implementação (epic/story/task-implement) | — | story-0052-0001 | story-0052-0006 | Pendente |
-| story-0052-0005 | Remover entry points `main()` extras do JAR | — | story-0052-0002, story-0052-0003 | story-0052-0006, story-0052-0007 | Pendente |
-| story-0052-0006 | Deletar pacotes `release`, `checkpoint`, `parallelism` | — | story-0052-0003, story-0052-0004, story-0052-0005 | story-0052-0008 | Pendente |
-| story-0052-0007 | Deletar pacotes `progress`, `telemetry` (Java), `smoke`, `ci` | — | story-0052-0002, story-0052-0005 | story-0052-0008 | Pendente |
-| story-0052-0008 | Simplificar `CicdAssembler` e auditar Assemblers categoria B | — | story-0052-0006, story-0052-0007 | story-0052-0009 | Pendente |
-| story-0052-0009 | Validação end-to-end: smoke 18 stacks + coverage | — | story-0052-0008 | — | Pendente |
+| story-0052-0001 | Publicar Rule 21 e atualizar CLAUDE.md | — | — | story-0052-0002, story-0052-0003, story-0052-0004 | Concluída |
+| story-0052-0002 | Reescrever skills de análise (telemetry-analyze, telemetry-trend, parallel-eval) | — | story-0052-0001 | story-0052-0005, story-0052-0007 | Concluída |
+| story-0052-0003 | Reescrever skill `x-release` em LLM+bash/git/gh | — | story-0052-0001 | story-0052-0005, story-0052-0006 | Concluída |
+| story-0052-0004 | Reescrever skills de implementação (epic/story/task-implement) | — | story-0052-0001 | story-0052-0006 | Concluída |
+| story-0052-0005 | Remover entry points `main()` extras do JAR | — | story-0052-0002, story-0052-0003 | story-0052-0006, story-0052-0007 | Concluída |
+| story-0052-0006 | Deletar pacotes `release`, `checkpoint`, `parallelism` | — | story-0052-0003, story-0052-0004, story-0052-0005 | story-0052-0008 | Concluída |
+| story-0052-0007 | Deletar pacotes `progress`, `telemetry` (Java), `smoke`, `ci` | — | story-0052-0002, story-0052-0005 | story-0052-0008 | Concluída |
+| story-0052-0008 | Simplificar `CicdAssembler` e auditar Assemblers categoria B | — | story-0052-0006, story-0052-0007 | story-0052-0009 | Concluída |
+| story-0052-0009 | Validação end-to-end: smoke 18 stacks + coverage | — | story-0052-0008 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

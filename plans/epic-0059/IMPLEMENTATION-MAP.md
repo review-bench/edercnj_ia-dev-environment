@@ -8,18 +8,18 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0059-0001 | Estender `audit-execution-integrity.sh` para 6 artefatos Fase 1 | — | — | story-0059-0002, story-0059-0011 | Pendente |
-| story-0059-0002 | Markers de origem em artefatos + audit anti-backfill | — | story-0059-0001 | story-0059-0008, story-0059-0011 | Pendente |
-| story-0059-0003 | PreToolUse hook bloqueia `--skip-*` fora de Recovery | — | — | story-0059-0004 | Pendente |
-| story-0059-0004 | Pre-commit hook protege `execution-state.json` | — | story-0059-0003 | story-0059-0005 | Pendente |
-| story-0059-0005 | Pre-commit hook exige assinatura do orquestrador em branches `feat/task-*` | — | story-0059-0004 | story-0059-0006 | Pendente |
-| story-0059-0006 | CI re-roda pre-commit chain no merge commit | — | story-0059-0005 | — | Pendente |
-| story-0059-0007 | PR template + CI valida "Orchestrator Evidence" preenchida | — | — | story-0059-0008, story-0059-0009 | Pendente |
-| story-0059-0008 | Telemetria como prova-de-vida do orquestrador | — | story-0059-0002, story-0059-0007 | story-0059-0009, story-0059-0011 | Pendente |
-| story-0059-0009 | GitHub branch protection + CODEOWNERS | — | story-0059-0008 | — | Pendente |
-| story-0059-0010 | Rule 26 + bloco "ZERO-BYPASS" em CLAUDE.md | — | — | story-0059-0012 | Pendente |
-| story-0059-0011 | Anistia formal de EPIC-0054–0057 + immutability check | — | story-0059-0001, story-0059-0008 | — | Pendente |
-| story-0059-0012 | `taskTracking.enabled=true` mandatório para `flowVersion=2` | — | story-0059-0010 | — | Pendente |
+| story-0059-0001 | Estender `audit-execution-integrity.sh` para 6 artefatos Fase 1 | — | — | story-0059-0002, story-0059-0011 | Concluída |
+| story-0059-0002 | Markers de origem em artefatos + audit anti-backfill | — | story-0059-0001 | story-0059-0008, story-0059-0011 | Concluída |
+| story-0059-0003 | PreToolUse hook bloqueia `--skip-*` fora de Recovery | — | — | story-0059-0004 | Concluída |
+| story-0059-0004 | Pre-commit hook protege `execution-state.json` | — | story-0059-0003 | story-0059-0005 | Concluída |
+| story-0059-0005 | Pre-commit hook exige assinatura do orquestrador em branches `feat/task-*` | — | story-0059-0004 | story-0059-0006 | Concluída |
+| story-0059-0006 | CI re-roda pre-commit chain no merge commit | — | story-0059-0005 | — | Concluída |
+| story-0059-0007 | PR template + CI valida "Orchestrator Evidence" preenchida | — | — | story-0059-0008, story-0059-0009 | Concluída |
+| story-0059-0008 | Telemetria como prova-de-vida do orquestrador | — | story-0059-0002, story-0059-0007 | story-0059-0009, story-0059-0011 | Concluída |
+| story-0059-0009 | GitHub branch protection + CODEOWNERS | — | story-0059-0008 | — | Concluída |
+| story-0059-0010 | Rule 26 + bloco "ZERO-BYPASS" em CLAUDE.md | — | — | story-0059-0012 | Concluída |
+| story-0059-0011 | Anistia formal de EPIC-0054–0057 + immutability check | — | story-0059-0001, story-0059-0008 | — | Concluída |
+| story-0059-0012 | `taskTracking.enabled=true` mandatório para `flowVersion=2` | — | story-0059-0010 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

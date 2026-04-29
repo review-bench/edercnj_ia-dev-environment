@@ -8,16 +8,16 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0050-0001 | Rule nova — Model Selection Strategy (foundation) | — | — | story-0050-0002, story-0050-0003, story-0050-0004, story-0050-0005, story-0050-0006, story-0050-0007, story-0050-0008 | Pendente |
-| story-0050-0002 | Frontmatter `model: sonnet` em 4 orquestradores pesados | — | story-0050-0001 | story-0050-0009 | Pendente |
-| story-0050-0003 | Frontmatter `model: sonnet` em 4 orquestradores secundários | — | story-0050-0001 | story-0050-0009 | Pendente |
-| story-0050-0004 | Frontmatter `model: haiku` em 10 skills utilitárias e KPs | — | story-0050-0001 | story-0050-0009 | Pendente |
-| story-0050-0005 | `Agent(...)` com `model:` em x-story-plan (5 subagents) | — | story-0050-0001 | story-0050-0006, story-0050-0009 | Pendente |
-| story-0050-0006 | `Agent(...)` com `model:` em x-arch-plan + x-test-plan | — | story-0050-0005 | story-0050-0009 | Pendente |
-| story-0050-0007 | `Skill(...)` com `model:` param em orquestradores | — | story-0050-0001 | story-0050-0009 | Pendente |
-| story-0050-0008 | Agent metadata determinístico (substituir Adaptive) | — | story-0050-0001 | story-0050-0009 | Pendente |
-| story-0050-0009 | CI audit script de model selection | — | story-0050-0002, story-0050-0003, story-0050-0004, story-0050-0005, story-0050-0006, story-0050-0007, story-0050-0008 | story-0050-0010 | Pendente |
-| story-0050-0010 | Medição pós-deploy via telemetria (EPIC-0040) | — | story-0050-0009 | — | Pendente |
+| story-0050-0001 | Rule nova — Model Selection Strategy (foundation) | — | — | story-0050-0002, story-0050-0003, story-0050-0004, story-0050-0005, story-0050-0006, story-0050-0007, story-0050-0008 | Concluída |
+| story-0050-0002 | Frontmatter `model: sonnet` em 4 orquestradores pesados | — | story-0050-0001 | story-0050-0009 | Concluída |
+| story-0050-0003 | Frontmatter `model: sonnet` em 4 orquestradores secundários | — | story-0050-0001 | story-0050-0009 | Concluída |
+| story-0050-0004 | Frontmatter `model: haiku` em 10 skills utilitárias e KPs | — | story-0050-0001 | story-0050-0009 | Concluída |
+| story-0050-0005 | `Agent(...)` com `model:` em x-story-plan (5 subagents) | — | story-0050-0001 | story-0050-0006, story-0050-0009 | Concluída |
+| story-0050-0006 | `Agent(...)` com `model:` em x-arch-plan + x-test-plan | — | story-0050-0005 | story-0050-0009 | Concluída |
+| story-0050-0007 | `Skill(...)` com `model:` param em orquestradores | — | story-0050-0001 | story-0050-0009 | Concluída |
+| story-0050-0008 | Agent metadata determinístico (substituir Adaptive) | — | story-0050-0001 | story-0050-0009 | Concluída |
+| story-0050-0009 | CI audit script de model selection | — | story-0050-0002, story-0050-0003, story-0050-0004, story-0050-0005, story-0050-0006, story-0050-0007, story-0050-0008 | story-0050-0010 | Concluída |
+| story-0050-0010 | Medição pós-deploy via telemetria (EPIC-0040) | — | story-0050-0009 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

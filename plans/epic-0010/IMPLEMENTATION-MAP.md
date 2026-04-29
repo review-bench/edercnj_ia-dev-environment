@@ -8,15 +8,15 @@
 
 | Story | Titulo | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0010-0001 | Corrigir race condition Phase 1C/1B | — | story-0010-0005 | Pendente |
-| story-0010-0002 | Tornar execucao paralela o default | — | story-0010-0004, story-0010-0007, story-0010-0009 | Pendente |
-| story-0010-0003 | Pre-flight conflict analysis | — | story-0010-0004, story-0010-0009 | Pendente |
-| story-0010-0004 | Rebase-before-merge strategy | story-0010-0002, story-0010-0003 | story-0010-0009 | Pendente |
-| story-0010-0005 | Paralelizar Phase 1A com test planning | story-0010-0001 | story-0010-0006, story-0010-0008 | Pendente |
-| story-0010-0006 | Paralelizar Phase 3 documentation generators | story-0010-0005 | story-0010-0008 | Pendente |
-| story-0010-0007 | Paralelizar epic consolidation 2.1 + 2.2 | story-0010-0002 | story-0010-0009 | Pendente |
-| story-0010-0008 | Split Phase 2 em sub-fases por layer | story-0010-0005, story-0010-0006 | story-0010-0009 | Pendente |
-| story-0010-0009 | Documentacao estrategia de worktree | story-0010-0002, story-0010-0003, story-0010-0004, story-0010-0008 | — | Pendente |
+| story-0010-0001 | Corrigir race condition Phase 1C/1B | — | story-0010-0005 | Concluída |
+| story-0010-0002 | Tornar execucao paralela o default | — | story-0010-0004, story-0010-0007, story-0010-0009 | Concluída |
+| story-0010-0003 | Pre-flight conflict analysis | — | story-0010-0004, story-0010-0009 | Concluída |
+| story-0010-0004 | Rebase-before-merge strategy | story-0010-0002, story-0010-0003 | story-0010-0009 | Concluída |
+| story-0010-0005 | Paralelizar Phase 1A com test planning | story-0010-0001 | story-0010-0006, story-0010-0008 | Concluída |
+| story-0010-0006 | Paralelizar Phase 3 documentation generators | story-0010-0005 | story-0010-0008 | Concluída |
+| story-0010-0007 | Paralelizar epic consolidation 2.1 + 2.2 | story-0010-0002 | story-0010-0009 | Concluída |
+| story-0010-0008 | Split Phase 2 em sub-fases por layer | story-0010-0005, story-0010-0006 | story-0010-0009 | Concluída |
+| story-0010-0009 | Documentacao estrategia de worktree | story-0010-0002, story-0010-0003, story-0010-0004, story-0010-0008 | — | Concluída |
 
 > **Nota:** story-0010-0001 e story-0010-0002/0003 operam em skills diferentes (`x-dev-lifecycle` vs `x-dev-epic-implement`), permitindo paralelismo real na Fase 0 sem conflitos de arquivo. story-0010-0009 e uma historia folha (sem dependentes) e serve como consolidacao documental do epico inteiro.
 

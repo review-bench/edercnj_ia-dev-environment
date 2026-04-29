@@ -1,6 +1,6 @@
 # EPIC-0059: Zero-Bypass Lifecycle Enforcement — Completion Report
 
-**Status:** Concluído
+**Status:** Concluída
 **Branch:** epic/0059
 **Date:** 2026-04-27
 **Stories:** 12/12 complete

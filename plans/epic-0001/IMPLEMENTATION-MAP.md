@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0001-0001 | Eliminar branch épica e adotar branching por story | — | — | story-0001-0003, story-0001-0005, story-0001-0006 | Pendente |
-| story-0001-0002 | Delegar criação de PR e review ao x-dev-lifecycle | — | — | story-0001-0003, story-0001-0004 | Pendente |
-| story-0001-0003 | Enforcement de dependências via PR merge status | — | story-0001-0001, story-0001-0002 | story-0001-0006, story-0001-0007 | Pendente |
-| story-0001-0004 | Substituir Phase 2 consolidada por tracking incremental | — | story-0001-0002 | story-0001-0008 | Pendente |
-| story-0001-0005 | Pre-flight analysis em modo advisory | — | story-0001-0001 | story-0001-0008 | Pendente |
-| story-0001-0006 | Integrity e consistency gates na main | — | story-0001-0001, story-0001-0003 | story-0001-0008 | Pendente |
-| story-0001-0007 | Resume workflow para modelo per-story PR | — | story-0001-0003 | story-0001-0008 | Pendente |
-| story-0001-0008 | Verificação final e documentação de integração | — | story-0001-0004, story-0001-0005, story-0001-0006, story-0001-0007 | — | Pendente |
+| story-0001-0001 | Eliminar branch épica e adotar branching por story | — | — | story-0001-0003, story-0001-0005, story-0001-0006 | Concluída |
+| story-0001-0002 | Delegar criação de PR e review ao x-dev-lifecycle | — | — | story-0001-0003, story-0001-0004 | Concluída |
+| story-0001-0003 | Enforcement de dependências via PR merge status | — | story-0001-0001, story-0001-0002 | story-0001-0006, story-0001-0007 | Concluída |
+| story-0001-0004 | Substituir Phase 2 consolidada por tracking incremental | — | story-0001-0002 | story-0001-0008 | Concluída |
+| story-0001-0005 | Pre-flight analysis em modo advisory | — | story-0001-0001 | story-0001-0008 | Concluída |
+| story-0001-0006 | Integrity e consistency gates na main | — | story-0001-0001, story-0001-0003 | story-0001-0008 | Concluída |
+| story-0001-0007 | Resume workflow para modelo per-story PR | — | story-0001-0003 | story-0001-0008 | Concluída |
+| story-0001-0008 | Verificação final e documentação de integração | — | story-0001-0004, story-0001-0005, story-0001-0006, story-0001-0007 | — | Concluída |
 
 > **Nota:** story-0001-0004 depende apenas de story-0001-0002 (não de story-0001-0001), pois a substituição da Phase 2 requer apenas o SubagentResult com campos de PR, não a eliminação da branch épica. A Phase 2 atualizada coexiste com o modelo per-story sem conflito.
 

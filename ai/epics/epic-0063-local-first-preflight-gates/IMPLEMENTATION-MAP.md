@@ -8,27 +8,27 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0063-0001 | Pre-Flight Runner Script (gates 1-12, integração incremental) | — | 0002, 0003, 0007 (para v1, gates 1-6) | 0004, 0005, 0011 | Pendente |
-| story-0063-0002 | Content-Quality Audits (review + envelope) | — | — | 0001, 0015 | Pendente |
-| story-0063-0003 | Telemetry-as-Evidence Audit + Stage Hook | — | — | 0001, 0012, 0014, 0015, 0017, 0018, 0019 | Pendente |
-| story-0063-0004 | PreToolUse Blocking Hook (v1) | — | 0001 | 0005, 0006, 0011, 0013, 0016, 0018 | Pendente |
-| story-0063-0005 | x-story-implement Phase Shift | — | 0001, 0004 | 0011 | Pendente |
-| story-0063-0006 | x-epic-implement Phase 4.5 | — | 0004 | 0011, 0020 | Pendente |
-| story-0063-0007 | Local Coverage Gate | — | — | 0001 | Pendente |
-| story-0063-0008 | Branch Protection Automation | — | — | — | Pendente |
-| story-0063-0009 | Bypass-Skill Catalog | — | — | — | Pendente |
-| story-0063-0010 | Rule 24 §Camada 0 + CLAUDE.md | — | — | 0011, 0012 | Pendente |
-| story-0063-0011 | E2E Smoke Test (15 cenários) | — | 0001, 0004, 0005, 0006, 0010, 0012, 0013, 0014, 0015, 0016, 0017, 0018, 0019, 0020, 0021 | — | Pendente |
-| story-0063-0012 | SKILL.md Tool-Call Grammar (Rule 28) | — | 0003, 0010 | 0001 (integração gate 7), 0011, 0014 | Pendente |
-| story-0063-0013 | PreToolUse Hook v2 (15 vetores) | — | 0004 | 0011, 0016, 0017 | Pendente |
-| story-0063-0014 | Sub-Skill Wave Dispatch Audit | — | 0003, 0012 | 0001 (integração gate 8), 0011 | Pendente |
-| story-0063-0015 | Planning-Content Audits | — | 0002, 0003 | 0001 (integração gate 9), 0011 | Pendente |
-| story-0063-0016 | Rollout WARN→FAIL Execution | — | 0004, 0013, 0017 | (terminal) | Pendente |
-| story-0063-0017 | Recovery-Mode Periodic Audit + Dashboard | — | 0003, 0013 | 0011, 0016 | Pendente |
-| story-0063-0018 | Hooks `--self-check` Contract | — | 0003, 0004 | 0001 (integração gate 10), 0011 | Pendente |
-| story-0063-0019 | NDJSON Integrity Hash Chain | — | 0003 | 0001 (integração gate 11), 0011 | Pendente |
-| story-0063-0020 | Epic-Review Reconciliation | — | 0002, 0006 | 0011 | Pendente |
-| story-0063-0021 | x-pr-fix Real-Diff Gate | — | — | 0011 | Pendente |
+| story-0063-0001 | Pre-Flight Runner Script (gates 1-12, integração incremental) | — | 0002, 0003, 0007 (para v1, gates 1-6) | 0004, 0005, 0011 | Concluída |
+| story-0063-0002 | Content-Quality Audits (review + envelope) | — | — | 0001, 0015 | Concluída |
+| story-0063-0003 | Telemetry-as-Evidence Audit + Stage Hook | — | — | 0001, 0012, 0014, 0015, 0017, 0018, 0019 | Concluída |
+| story-0063-0004 | PreToolUse Blocking Hook (v1) | — | 0001 | 0005, 0006, 0011, 0013, 0016, 0018 | Concluída |
+| story-0063-0005 | x-story-implement Phase Shift | — | 0001, 0004 | 0011 | Concluída |
+| story-0063-0006 | x-epic-implement Phase 4.5 | — | 0004 | 0011, 0020 | Concluída |
+| story-0063-0007 | Local Coverage Gate | — | — | 0001 | Concluída |
+| story-0063-0008 | Branch Protection Automation | — | — | — | Concluída |
+| story-0063-0009 | Bypass-Skill Catalog | — | — | — | Concluída |
+| story-0063-0010 | Rule 24 §Camada 0 + CLAUDE.md | — | — | 0011, 0012 | Concluída |
+| story-0063-0011 | E2E Smoke Test (15 cenários) | — | 0001, 0004, 0005, 0006, 0010, 0012, 0013, 0014, 0015, 0016, 0017, 0018, 0019, 0020, 0021 | — | Concluída |
+| story-0063-0012 | SKILL.md Tool-Call Grammar (Rule 28) | — | 0003, 0010 | 0001 (integração gate 7), 0011, 0014 | Concluída |
+| story-0063-0013 | PreToolUse Hook v2 (15 vetores) | — | 0004 | 0011, 0016, 0017 | Concluída |
+| story-0063-0014 | Sub-Skill Wave Dispatch Audit | — | 0003, 0012 | 0001 (integração gate 8), 0011 | Concluída |
+| story-0063-0015 | Planning-Content Audits | — | 0002, 0003 | 0001 (integração gate 9), 0011 | Concluída |
+| story-0063-0016 | Rollout WARN→FAIL Execution | — | 0004, 0013, 0017 | (terminal) | Concluída |
+| story-0063-0017 | Recovery-Mode Periodic Audit + Dashboard | — | 0003, 0013 | 0011, 0016 | Concluída |
+| story-0063-0018 | Hooks `--self-check` Contract | — | 0003, 0004 | 0001 (integração gate 10), 0011 | Concluída |
+| story-0063-0019 | NDJSON Integrity Hash Chain | — | 0003 | 0001 (integração gate 11), 0011 | Concluída |
+| story-0063-0020 | Epic-Review Reconciliation | — | 0002, 0006 | 0011 | Concluída |
+| story-0063-0021 | x-pr-fix Real-Diff Gate | — | — | 0011 | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

@@ -8,17 +8,17 @@
 
 | Story | Título | Blocked By | Blocks | Status | Chave Jira |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0012-0001 | Infraestrutura de Smoke Tests | — | story-0012-0003, story-0012-0004, story-0012-0005 | Pendente | — |
-| story-0012-0002 | Manifesto de Artefatos Esperados por Perfil | — | story-0012-0003 | Pendente | — |
-| story-0012-0003 | Smoke Test de Pipeline Completo por Perfil | story-0012-0001, story-0012-0002 | story-0012-0006, story-0012-0007, story-0012-0008, story-0012-0009, story-0012-0011 | Pendente | — |
-| story-0012-0004 | Smoke Test de Integridade de Conteúdo | story-0012-0001 | story-0012-0009, story-0012-0011 | Pendente | — |
-| story-0012-0005 | Smoke Test de Frontmatter e Estrutura de Skills | story-0012-0001 | story-0012-0009, story-0012-0011 | Pendente | — |
-| story-0012-0006 | Smoke Test de Modos CLI | story-0012-0003 | story-0012-0011 | Pendente | — |
-| story-0012-0007 | Smoke Test de Consistência Cross-Profile | story-0012-0003 | story-0012-0011 | Pendente | — |
-| story-0012-0008 | Smoke Test de Regressão de Assemblers | story-0012-0003 | story-0012-0011 | Pendente | — |
-| story-0012-0009 | Integrar Smoke Tests no Skill x-dev-lifecycle | story-0012-0003, story-0012-0004, story-0012-0005 | story-0012-0010 | Pendente | — |
-| story-0012-0010 | Integrar Smoke Tests no Skill x-dev-epic-implement | story-0012-0009 | — | Pendente | — |
-| story-0012-0011 | Criar Skill /run-smoke para Execução On-Demand | story-0012-0003, story-0012-0004, story-0012-0005, story-0012-0006, story-0012-0007, story-0012-0008 | — | Pendente | — |
+| story-0012-0001 | Infraestrutura de Smoke Tests | — | story-0012-0003, story-0012-0004, story-0012-0005 | Concluída | — |
+| story-0012-0002 | Manifesto de Artefatos Esperados por Perfil | — | story-0012-0003 | Concluída | — |
+| story-0012-0003 | Smoke Test de Pipeline Completo por Perfil | story-0012-0001, story-0012-0002 | story-0012-0006, story-0012-0007, story-0012-0008, story-0012-0009, story-0012-0011 | Concluída | — |
+| story-0012-0004 | Smoke Test de Integridade de Conteúdo | story-0012-0001 | story-0012-0009, story-0012-0011 | Concluída | — |
+| story-0012-0005 | Smoke Test de Frontmatter e Estrutura de Skills | story-0012-0001 | story-0012-0009, story-0012-0011 | Concluída | — |
+| story-0012-0006 | Smoke Test de Modos CLI | story-0012-0003 | story-0012-0011 | Concluída | — |
+| story-0012-0007 | Smoke Test de Consistência Cross-Profile | story-0012-0003 | story-0012-0011 | Concluída | — |
+| story-0012-0008 | Smoke Test de Regressão de Assemblers | story-0012-0003 | story-0012-0011 | Concluída | — |
+| story-0012-0009 | Integrar Smoke Tests no Skill x-dev-lifecycle | story-0012-0003, story-0012-0004, story-0012-0005 | story-0012-0010 | Concluída | — |
+| story-0012-0010 | Integrar Smoke Tests no Skill x-dev-epic-implement | story-0012-0009 | — | Concluída | — |
+| story-0012-0011 | Criar Skill /run-smoke para Execução On-Demand | story-0012-0003, story-0012-0004, story-0012-0005, story-0012-0006, story-0012-0007, story-0012-0008 | — | Concluída | — |
 
 ---
 

@@ -8,12 +8,12 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0030-0001 | Context Budget Tracking | — | — | story-0030-0006 | Pendente |
-| story-0030-0002 | Skill Instruction Compression via References | — | — | story-0030-0006 | Pendente |
-| story-0030-0003 | Lazy Knowledge Pack Loading | — | — | — | Pendente |
-| story-0030-0004 | Output Compaction | — | — | — | Pendente |
-| story-0030-0005 | Subagent Context Isolation Enforcement | — | — | — | Pendente |
-| story-0030-0006 | Progressive Skill Loading (Slim Mode) | — | story-0030-0002 | — | Pendente |
+| story-0030-0001 | Context Budget Tracking | — | — | story-0030-0006 | Concluída |
+| story-0030-0002 | Skill Instruction Compression via References | — | — | story-0030-0006 | Concluída |
+| story-0030-0003 | Lazy Knowledge Pack Loading | — | — | — | Concluída |
+| story-0030-0004 | Output Compaction | — | — | — | Concluída |
+| story-0030-0005 | Subagent Context Isolation Enforcement | — | — | — | Concluída |
+| story-0030-0006 | Progressive Skill Loading (Slim Mode) | — | story-0030-0002 | — | Concluída |
 
 > **Nota:** Stories 0001-0005 são independentes entre si e podem ser executadas em paralelo. Story 0006 depende de 0002 porque o pattern de references deve estar estabelecido antes de implementar slim mode.
 

@@ -8,34 +8,34 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0022-0001 | Security Config Model Extension | — | — | story-0022-0003, story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0014 | Pendente |
-| story-0022-0002 | Security Report Infrastructure (SARIF + Scoring) | — | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011, story-0022-0012, story-0022-0013, story-0022-0014, story-0022-0015, story-0022-0020 | Pendente |
-| story-0022-0003 | Security Skill Template + CI Integration | — | story-0022-0001 | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010 | Pendente |
-| story-0022-0004 | OWASP ASVS Reference Knowledge Pack | — | — | story-0022-0010, story-0022-0012, story-0022-0013, story-0022-0021, story-0022-0024 | Pendente |
-| story-0022-0005 | SAST Scanner (x-sast-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0011, story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0023 | Pendente |
-| story-0022-0006 | Secret Scanner (x-secret-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0023 | Pendente |
-| story-0022-0007 | Container Security Scanner (x-container-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Pendente |
-| story-0022-0008 | Infrastructure Security Scanner (x-infra-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Pendente |
-| story-0022-0009 | DAST Scanner (x-dast-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Pendente |
-| story-0022-0010 | OWASP Top 10 Verification (x-owasp-scan) | — | story-0022-0002, story-0022-0003, story-0022-0004 | story-0022-0019, story-0022-0020 | Pendente |
-| story-0022-0011 | SonarQube Quality Gate (x-sonar-gate) | — | story-0022-0002, story-0022-0005 | story-0022-0019, story-0022-0020 | Pendente |
-| story-0022-0012 | Application Hardening Eval (x-hardening-eval) | — | story-0022-0002, story-0022-0004 | story-0022-0018, story-0022-0019 | Pendente |
-| story-0022-0013 | Runtime Protection Eval (x-runtime-protection) | — | story-0022-0002, story-0022-0004 | story-0022-0018, story-0022-0019 | Pendente |
-| story-0022-0014 | Enhanced Supply Chain (x-supply-chain-audit) | — | story-0022-0001, story-0022-0002 | story-0022-0019 | Pendente |
-| story-0022-0015 | Pentest Engineer Agent | — | story-0022-0002 | story-0022-0018, story-0022-0026 | Pendente |
-| story-0022-0016 | AppSec Engineer Agent | — | — | story-0022-0018, story-0022-0019, story-0022-0021 | Pendente |
-| story-0022-0017 | DevSecOps Engineer Agent | — | — | story-0022-0019 | Pendente |
-| story-0022-0018 | Pentest Orchestrator (x-pentest) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0012, story-0022-0013, story-0022-0015, story-0022-0016 | story-0022-0022 | Pendente |
-| story-0022-0019 | Security Posture Dashboard (x-security-dashboard) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011, story-0022-0012, story-0022-0013, story-0022-0014, story-0022-0016, story-0022-0017 | story-0022-0022 | Pendente |
-| story-0022-0020 | Security CI Pipeline Generator (x-security-pipeline) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011 | story-0022-0022 | Pendente |
-| story-0022-0021 | Compliance Auditor Agent | — | story-0022-0004, story-0022-0016 | story-0022-0022 | Pendente |
-| story-0022-0022 | Security Review Integration Enhancement | — | story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0021 | story-0022-0028 | Pendente |
-| story-0022-0023 | Security Baseline Rule Enhancement | — | story-0022-0005, story-0022-0006 | story-0022-0028 | Pendente |
-| story-0022-0024 | Security KP — Application Security Reference | — | story-0022-0004 | story-0022-0028 | Pendente |
-| story-0022-0025 | Security KP — Cryptography Reference | — | — | story-0022-0028 | Pendente |
-| story-0022-0026 | Security KP — Pentest Readiness Reference | — | story-0022-0015 | story-0022-0028 | Pendente |
-| story-0022-0027 | Security Anti-Patterns Rule (per language) | — | — | story-0022-0028 | Pendente |
-| story-0022-0028 | Integration Verification + Smoke Test | — | story-0022-0022, story-0022-0023, story-0022-0024, story-0022-0025, story-0022-0026, story-0022-0027 | — | Pendente |
+| story-0022-0001 | Security Config Model Extension | — | — | story-0022-0003, story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0014 | Concluída |
+| story-0022-0002 | Security Report Infrastructure (SARIF + Scoring) | — | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011, story-0022-0012, story-0022-0013, story-0022-0014, story-0022-0015, story-0022-0020 | Concluída |
+| story-0022-0003 | Security Skill Template + CI Integration | — | story-0022-0001 | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010 | Concluída |
+| story-0022-0004 | OWASP ASVS Reference Knowledge Pack | — | — | story-0022-0010, story-0022-0012, story-0022-0013, story-0022-0021, story-0022-0024 | Concluída |
+| story-0022-0005 | SAST Scanner (x-sast-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0011, story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0023 | Concluída |
+| story-0022-0006 | Secret Scanner (x-secret-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0023 | Concluída |
+| story-0022-0007 | Container Security Scanner (x-container-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Concluída |
+| story-0022-0008 | Infrastructure Security Scanner (x-infra-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Concluída |
+| story-0022-0009 | DAST Scanner (x-dast-scan) | — | story-0022-0001, story-0022-0002, story-0022-0003 | story-0022-0018, story-0022-0019, story-0022-0020 | Concluída |
+| story-0022-0010 | OWASP Top 10 Verification (x-owasp-scan) | — | story-0022-0002, story-0022-0003, story-0022-0004 | story-0022-0019, story-0022-0020 | Concluída |
+| story-0022-0011 | SonarQube Quality Gate (x-sonar-gate) | — | story-0022-0002, story-0022-0005 | story-0022-0019, story-0022-0020 | Concluída |
+| story-0022-0012 | Application Hardening Eval (x-hardening-eval) | — | story-0022-0002, story-0022-0004 | story-0022-0018, story-0022-0019 | Concluída |
+| story-0022-0013 | Runtime Protection Eval (x-runtime-protection) | — | story-0022-0002, story-0022-0004 | story-0022-0018, story-0022-0019 | Concluída |
+| story-0022-0014 | Enhanced Supply Chain (x-supply-chain-audit) | — | story-0022-0001, story-0022-0002 | story-0022-0019 | Concluída |
+| story-0022-0015 | Pentest Engineer Agent | — | story-0022-0002 | story-0022-0018, story-0022-0026 | Concluída |
+| story-0022-0016 | AppSec Engineer Agent | — | — | story-0022-0018, story-0022-0019, story-0022-0021 | Concluída |
+| story-0022-0017 | DevSecOps Engineer Agent | — | — | story-0022-0019 | Concluída |
+| story-0022-0018 | Pentest Orchestrator (x-pentest) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0012, story-0022-0013, story-0022-0015, story-0022-0016 | story-0022-0022 | Concluída |
+| story-0022-0019 | Security Posture Dashboard (x-security-dashboard) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011, story-0022-0012, story-0022-0013, story-0022-0014, story-0022-0016, story-0022-0017 | story-0022-0022 | Concluída |
+| story-0022-0020 | Security CI Pipeline Generator (x-security-pipeline) | — | story-0022-0005, story-0022-0006, story-0022-0007, story-0022-0008, story-0022-0009, story-0022-0010, story-0022-0011 | story-0022-0022 | Concluída |
+| story-0022-0021 | Compliance Auditor Agent | — | story-0022-0004, story-0022-0016 | story-0022-0022 | Concluída |
+| story-0022-0022 | Security Review Integration Enhancement | — | story-0022-0018, story-0022-0019, story-0022-0020, story-0022-0021 | story-0022-0028 | Concluída |
+| story-0022-0023 | Security Baseline Rule Enhancement | — | story-0022-0005, story-0022-0006 | story-0022-0028 | Concluída |
+| story-0022-0024 | Security KP — Application Security Reference | — | story-0022-0004 | story-0022-0028 | Concluída |
+| story-0022-0025 | Security KP — Cryptography Reference | — | — | story-0022-0028 | Concluída |
+| story-0022-0026 | Security KP — Pentest Readiness Reference | — | story-0022-0015 | story-0022-0028 | Concluída |
+| story-0022-0027 | Security Anti-Patterns Rule (per language) | — | — | story-0022-0028 | Concluída |
+| story-0022-0028 | Integration Verification + Smoke Test | — | story-0022-0022, story-0022-0023, story-0022-0024, story-0022-0025, story-0022-0026, story-0022-0027 | — | Concluída |
 
 > **Nota:** story-0022-0012 e story-0022-0013 (hardening e runtime protection) dependem do ASVS KP (story-0022-0004) mas NÃO dependem do config model (story-0022-0001) pois são skills core, não condicionais. story-0022-0010 (OWASP scan) depende do ASVS KP mas não do config model pois também é core.
 

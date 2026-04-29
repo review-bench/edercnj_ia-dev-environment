@@ -8,14 +8,14 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0056-0001 | KP `planning-standards-kp` | — | — | 0002, 0003, 0004, 0005 | Pendente |
-| story-0056-0002 | `_TEMPLATE-EPIC.md` v2 | — | 0001 | 0006, 0007 | Pendente |
-| story-0056-0003 | `_TEMPLATE-STORY.md` v2 | — | 0001 | 0006, 0007 | Pendente |
-| story-0056-0004 | `_TEMPLATE-TASK.md` v2 | — | 0001 | 0006, 0007 | Pendente |
-| story-0056-0005 | `_TEMPLATE-IMPLEMENTATION-PLAN.md` ganha Package Structure | — | 0001 | 0006 | Pendente |
-| story-0056-0006 | Atualizar skills de plan | — | 0002, 0003, 0004, 0005 | 0008 | Pendente |
-| story-0056-0007 | Estender LifecycleIntegrityAuditTest | — | 0002, 0003, 0004 | 0008 | Pendente |
-| story-0056-0008 | Regenerar golden files + CHANGELOG | — | 0006, 0007 | — | Pendente |
+| story-0056-0001 | KP `planning-standards-kp` | — | — | 0002, 0003, 0004, 0005 | Concluída |
+| story-0056-0002 | `_TEMPLATE-EPIC.md` v2 | — | 0001 | 0006, 0007 | Concluída |
+| story-0056-0003 | `_TEMPLATE-STORY.md` v2 | — | 0001 | 0006, 0007 | Concluída |
+| story-0056-0004 | `_TEMPLATE-TASK.md` v2 | — | 0001 | 0006, 0007 | Concluída |
+| story-0056-0005 | `_TEMPLATE-IMPLEMENTATION-PLAN.md` ganha Package Structure | — | 0001 | 0006 | Concluída |
+| story-0056-0006 | Atualizar skills de plan | — | 0002, 0003, 0004, 0005 | 0008 | Concluída |
+| story-0056-0007 | Estender LifecycleIntegrityAuditTest | — | 0002, 0003, 0004 | 0008 | Concluída |
+| story-0056-0008 | Regenerar golden files + CHANGELOG | — | 0006, 0007 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Planejada` · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada`
 

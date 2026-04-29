@@ -8,16 +8,16 @@
 
 | Story | Titulo | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| story-0009-0001 | Codex Skills Dual Output | — | story-0009-0006 | Pendente |
-| story-0009-0002 | Subagent Definitions [agents.*] | — | story-0009-0006 | Pendente |
-| story-0009-0003 | CodexRequirementsAssembler | — | story-0009-0006 | Pendente |
-| story-0009-0004 | CodexOverrideAssembler | — | story-0009-0006 | Pendente |
-| story-0009-0005 | Enhanced AGENTS.md Security Baseline | — | story-0009-0006 | Pendente |
-| story-0009-0006 | Pipeline Integration, Testes e Golden Files | story-0009-0001 a 0005 | — | Pendente |
-| story-0009-0007 | Codex Skills Single Output (.codex/skills only) | — | story-0009-0008, story-0009-0009 | Pendente |
-| story-0009-0008 | Remocao de `.agents/` no Core do Gerador | story-0009-0007 | story-0009-0009, story-0009-0010 | Pendente |
-| story-0009-0009 | Refatoracao de Documentacao e UX para Codex-only | story-0009-0007, story-0009-0008 | story-0009-0010 | Pendente |
-| story-0009-0010 | Regressao Completa e Golden Files sem `.agents/` | story-0009-0008, story-0009-0009 | — | Pendente |
+| story-0009-0001 | Codex Skills Dual Output | — | story-0009-0006 | Concluída |
+| story-0009-0002 | Subagent Definitions [agents.*] | — | story-0009-0006 | Concluída |
+| story-0009-0003 | CodexRequirementsAssembler | — | story-0009-0006 | Concluída |
+| story-0009-0004 | CodexOverrideAssembler | — | story-0009-0006 | Concluída |
+| story-0009-0005 | Enhanced AGENTS.md Security Baseline | — | story-0009-0006 | Concluída |
+| story-0009-0006 | Pipeline Integration, Testes e Golden Files | story-0009-0001 a 0005 | — | Concluída |
+| story-0009-0007 | Codex Skills Single Output (.codex/skills only) | — | story-0009-0008, story-0009-0009 | Concluída |
+| story-0009-0008 | Remocao de `.agents/` no Core do Gerador | story-0009-0007 | story-0009-0009, story-0009-0010 | Concluída |
+| story-0009-0009 | Refatoracao de Documentacao e UX para Codex-only | story-0009-0007, story-0009-0008 | story-0009-0010 | Concluída |
+| story-0009-0010 | Regressao Completa e Golden Files sem `.agents/` | story-0009-0008, story-0009-0009 | — | Concluída |
 
 > **Nota:** As stories 0001-0005 sao independentes entre si e podem ser executadas em paralelo maximo. Apenas story-0009-0006 depende da conclusao de todas as anteriores.
 

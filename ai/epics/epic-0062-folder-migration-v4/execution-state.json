@@ -10,26 +10,82 @@
     "enabled": true,
     "rootTaskId": 1,
     "phaseGateResults": [
-      {"phase": "Phase 0", "mode": "post", "passed": true},
-      {"phase": "Phase 1", "mode": "post", "passed": true},
-      {"phase": "Phase 2", "mode": "post", "passed": true},
-      {"phase": "Phase 3", "mode": "post", "passed": true},
-      {"phase": "Phase 4", "mode": "post", "passed": true},
-      {"phase": "Phase 5", "mode": "post", "passed": true}
+      {
+        "phase": "Phase 0",
+        "mode": "post",
+        "passed": true
+      },
+      {
+        "phase": "Phase 1",
+        "mode": "post",
+        "passed": true
+      },
+      {
+        "phase": "Phase 2",
+        "mode": "post",
+        "passed": true
+      },
+      {
+        "phase": "Phase 3",
+        "mode": "post",
+        "passed": true
+      },
+      {
+        "phase": "Phase 4",
+        "mode": "post",
+        "passed": true
+      },
+      {
+        "phase": "Phase 5",
+        "mode": "post",
+        "passed": true
+      }
     ]
   },
   "finalPrNumber": 751,
   "finalPrUrl": "https://github.com/edercnj/ia-dev-environment/pull/751",
   "integrityGatePassed": true,
   "storyStatuses": {
-    "story-0062-0001": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 743},
-    "story-0062-0002": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 745},
-    "story-0062-0003": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 744},
-    "story-0062-0004": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 746},
-    "story-0062-0005": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 747},
-    "story-0062-0006": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 748},
-    "story-0062-0007": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 749},
-    "story-0062-0008": {"status": "COMPLETE", "flowVersion": "4", "prNumber": 750}
+    "story-0062-0001": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 743
+    },
+    "story-0062-0002": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 745
+    },
+    "story-0062-0003": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 744
+    },
+    "story-0062-0004": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 746
+    },
+    "story-0062-0005": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 747
+    },
+    "story-0062-0006": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 748
+    },
+    "story-0062-0007": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 749
+    },
+    "story-0062-0008": {
+      "status": "Concluída",
+      "flowVersion": "4",
+      "prNumber": 750
+    }
   },
   "executionOrder": [
     "story-0062-0001",
@@ -40,5 +96,6 @@
     "story-0062-0006",
     "story-0062-0007",
     "story-0062-0008"
-  ]
+  ],
+  "status": "Concluída"
 }

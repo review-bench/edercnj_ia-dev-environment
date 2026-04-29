@@ -8,13 +8,13 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0028-0001 | Templates de Planejamento Multi-Agente | — | — | story-0028-0002, story-0028-0003, story-0028-0004, story-0028-0005, story-0028-0006, story-0028-0007 | Pendente |
-| story-0028-0002 | Skill x-story-plan | — | story-0028-0001 | story-0028-0003, story-0028-0006, story-0028-0007 | Pendente |
-| story-0028-0003 | Skill x-epic-plan | — | story-0028-0002 | story-0028-0006, story-0028-0007 | Pendente |
-| story-0028-0004 | x-dev-lifecycle PRE_PLANNED | — | story-0028-0001 | story-0028-0006, story-0028-0007 | Pendente |
-| story-0028-0005 | x-dev-implement Task-Aware | — | story-0028-0001 | story-0028-0006, story-0028-0007 | Pendente |
-| story-0028-0006 | x-dev-epic-implement DoR + Per-Task | — | story-0028-0003, story-0028-0004, story-0028-0005 | story-0028-0007 | Pendente |
-| story-0028-0007 | Gerador + Golden Files | — | story-0028-0001, story-0028-0002, story-0028-0003 | — | Pendente |
+| story-0028-0001 | Templates de Planejamento Multi-Agente | — | — | story-0028-0002, story-0028-0003, story-0028-0004, story-0028-0005, story-0028-0006, story-0028-0007 | Concluída |
+| story-0028-0002 | Skill x-story-plan | — | story-0028-0001 | story-0028-0003, story-0028-0006, story-0028-0007 | Concluída |
+| story-0028-0003 | Skill x-epic-plan | — | story-0028-0002 | story-0028-0006, story-0028-0007 | Concluída |
+| story-0028-0004 | x-dev-lifecycle PRE_PLANNED | — | story-0028-0001 | story-0028-0006, story-0028-0007 | Concluída |
+| story-0028-0005 | x-dev-implement Task-Aware | — | story-0028-0001 | story-0028-0006, story-0028-0007 | Concluída |
+| story-0028-0006 | x-dev-epic-implement DoR + Per-Task | — | story-0028-0003, story-0028-0004, story-0028-0005 | story-0028-0007 | Concluída |
+| story-0028-0007 | Gerador + Golden Files | — | story-0028-0001, story-0028-0002, story-0028-0003 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

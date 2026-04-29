@@ -8,12 +8,12 @@
 
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| story-0060-0001 | PathResolver helper + schema v4 | — | — | story-0060-0002, story-0060-0004, story-0060-0005 | Pendente |
-| story-0060-0002 | Script `migrate-layout.sh` idempotente | — | story-0060-0001 | story-0060-0003 | Pendente |
-| story-0060-0003 | Mover ADRs, specs, templates, baselines, steering, contracts e results | — | story-0060-0002 | story-0060-0005 | Pendente |
-| story-0060-0004 | Atualizar 42 SKILLs para usar PathResolver | — | story-0060-0001 | story-0060-0005 | Pendente |
-| story-0060-0005 | Atualizar Rules, Hooks e Java Assemblers para layout v4 | — | story-0060-0003, story-0060-0004 | story-0060-0006 | Pendente |
-| story-0060-0006 | Compat layer cleanup + congelamento de `plans/` | — | story-0060-0005 | — | Pendente |
+| story-0060-0001 | PathResolver helper + schema v4 | — | — | story-0060-0002, story-0060-0004, story-0060-0005 | Concluída |
+| story-0060-0002 | Script `migrate-layout.sh` idempotente | — | story-0060-0001 | story-0060-0003 | Concluída |
+| story-0060-0003 | Mover ADRs, specs, templates, baselines, steering, contracts e results | — | story-0060-0002 | story-0060-0005 | Concluída |
+| story-0060-0004 | Atualizar 42 SKILLs para usar PathResolver | — | story-0060-0001 | story-0060-0005 | Concluída |
+| story-0060-0005 | Atualizar Rules, Hooks e Java Assemblers para layout v4 | — | story-0060-0003, story-0060-0004 | story-0060-0006 | Concluída |
+| story-0060-0006 | Compat layer cleanup + congelamento de `plans/` | — | story-0060-0005 | — | Concluída |
 
 > **Valores de Status:** `Pendente` (padrão) · `Em Andamento` · `Concluída` · `Falha` · `Bloqueada` · `Parcial`
 

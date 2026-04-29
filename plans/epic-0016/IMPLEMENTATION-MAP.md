@@ -21,10 +21,10 @@
 | story-0016-0003 | Preservacao de CONSTITUTION.md na regeneracao | story-0016-0002 | -- | 2 | Pending | Concluída |
 | story-0016-0010 | Profile java-spring-fintech-pci base | story-0016-0002 | story-0016-0011, story-0016-0012, story-0016-0015 | 2 | Pending | Concluída |
 | story-0016-0013 | Motor de classificacao do Scope Assessment | story-0016-0005, story-0016-0007 | story-0016-0014 | 2 | Pending | Concluída |
-| story-0016-0011 | Knowledge pack PCI-DSS com 12 requisitos | story-0016-0010 | story-0016-0015 | 3 | Pending | Pendente |
-| story-0016-0012 | Skill x-review-compliance e regras PCI | story-0016-0010 | story-0016-0015 | 3 | Pending | Pendente |
-| story-0016-0014 | Integracao do Scope Assessment no x-dev-lifecycle | story-0016-0013 | -- | 3 | Pending | Pendente |
-| story-0016-0015 | Golden files e testes de integracao do profile fintech-pci | story-0016-0011, story-0016-0012 | -- | 4 | Pending | Pendente |
+| story-0016-0011 | Knowledge pack PCI-DSS com 12 requisitos | story-0016-0010 | story-0016-0015 | 3 | Pending | Concluída |
+| story-0016-0012 | Skill x-review-compliance e regras PCI | story-0016-0010 | story-0016-0015 | 3 | Pending | Concluída |
+| story-0016-0014 | Integracao do Scope Assessment no x-dev-lifecycle | story-0016-0013 | -- | 3 | Pending | Concluída |
+| story-0016-0015 | Golden files e testes de integracao do profile fintech-pci | story-0016-0011, story-0016-0012 | -- | 4 | Pending | Concluída |
 
 > **Nota:** story-0016-0009 e story-0016-0003 sao folhas (sem dependentes). Atrasos nessas stories nao impactam o caminho critico.
 > story-0016-0014 tambem e folha mas esta no caminho critico alternativo do Scope Assessment.
