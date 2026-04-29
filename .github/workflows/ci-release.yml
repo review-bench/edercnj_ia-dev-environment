@@ -20,7 +20,6 @@ on:
 
 defaults:
   run:
-    working-directory: java
     shell: bash
 
 jobs:
@@ -48,13 +47,12 @@ jobs:
 
       # EPIC-0040: shellcheck the telemetry hook scripts.
       # Ubuntu runners already ship shellcheck; -S warning mirrors the
-      # project convention in java/src/main/resources/targets/claude/hooks/.
+      # project convention in src/main/resources/targets/claude/hooks/.
       - name: Shellcheck telemetry hooks
-        working-directory: ${{ github.workspace }}
         run: |
           set -euo pipefail
           shopt -s nullglob
-          SCRIPTS=(java/src/main/resources/targets/claude/hooks/telemetry-*.sh)
+          SCRIPTS=(src/main/resources/targets/claude/hooks/telemetry-*.sh)
           if (( ${#SCRIPTS[@]} == 0 )); then
             echo "No telemetry-*.sh scripts found — skipping shellcheck"
             exit 0
@@ -75,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: jacoco-report-${{ github.run_id }}
-          path: java/target/site/jacoco/
+          path: target/site/jacoco/
           retention-days: 7
 
       - name: Upload coverage to Codecov
@@ -83,7 +81,7 @@ jobs:
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: java/target/site/jacoco/jacoco.xml
+          files: target/site/jacoco/jacoco.xml
           flags: unit
           fail_ci_if_error: false
 
@@ -101,7 +99,6 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: java
         shell: bash
     steps:
       - name: Checkout (full depth for diff)
@@ -128,7 +125,7 @@ jobs:
           # Fetch base branch so git diff has both sides
           git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
           if git diff --name-only "origin/${BASE_REF}...${HEAD_SHA}" \
-              | grep -qE '^(java/src/main/java/|java/pom\.xml$|java/checkstyle-suppressions\.xml$)'; then
+              | grep -qE '^(src/main/java/|pom\.xml$|checkstyle-suppressions\.xml$)'; then
             echo "java_changed=true" >> "${GITHUB_OUTPUT}"
           else
             echo "java_changed=false" >> "${GITHUB_OUTPUT}"
@@ -170,6 +167,11 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
+          # GHSA-p75g-cxfj-7wrx: Pebble Templates LFI via include macro.
+          # Pre-existing on develop (pebble 3.2.2 unchanged); no upstream
+          # patch available (advisory: affected <=3.2.3, patched=None).
+          # Mitigation tracked separately; replacing Pebble is out of scope.
+          allow-ghsas: GHSA-p75g-cxfj-7wrx
 
   publish:
     name: Publish to GitHub Packages (tag only)
@@ -205,8 +207,8 @@ jobs:
         with:
           name: release-artifacts-${{ github.ref_name }}
           path: |
-            java/target/ia-dev-env-*.jar
-            java/target/bom.json
+            target/ia-dev-env-*.jar
+            target/bom.json
           retention-days: 1
           if-no-files-found: error
 
