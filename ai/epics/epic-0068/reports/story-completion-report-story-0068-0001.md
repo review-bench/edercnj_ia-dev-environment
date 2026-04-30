@@ -60,7 +60,7 @@
 
 ## Dependency Audit
 
-**PASS** — No new Maven dependencies introduced. See `reports/dependency-audit-story-0068-0001.md`.
+**PASS** — No new Maven dependencies introduced. See `dependency-audit-story-0068-0001.md`.
 
 ---
 

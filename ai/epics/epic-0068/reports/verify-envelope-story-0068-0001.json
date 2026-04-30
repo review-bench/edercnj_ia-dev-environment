@@ -38,6 +38,7 @@
   "acCheckCount": 6,
   "acPassCount": 6,
   "acFailCount": 0,
+  "failures": [],
   "criticalIssueCount": 0,
   "highIssueCount": 0,
   "mediumIssueCount": 0,

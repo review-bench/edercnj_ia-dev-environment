@@ -6,8 +6,8 @@ story-id: story-0068-0001
 epic-id: EPIC-0068
 date: 2026-04-30T10:24:32Z
 decision: GO-WITH-RESERVATIONS
-score: 80
-score-max: 82
+score: 54
+score-max: 55
 severity-counts:
   critical: 0
   high: 0
@@ -16,9 +16,9 @@ severity-counts:
   info: 0
 blocking-findings: []
 reviewers:
-  - QA
-  - Performance
-  - DevOps
+  - qa
+  - performance
+  - devops
 ---
 
 # Specialist Review — story-0068-0001
