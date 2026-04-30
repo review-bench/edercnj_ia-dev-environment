@@ -141,8 +141,7 @@ class ExecutionStateRefinementTest {
         @Test
         void nonNullVerdict_effectiveReturnsSameInstance() {
             RefinementVerdict verdict = RefinementVerdict.absent();
-            ExecutionState state =
-                    new ExecutionState("4", "EPIC-TEST", null, null, true, verdict);
+            ExecutionState state = new ExecutionState("4", "EPIC-TEST", null, null, true, verdict);
 
             assertThat(state.effectiveRefinementVerdict()).isSameAs(verdict);
         }

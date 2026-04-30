@@ -19,7 +19,12 @@ class RefinementVerdictTest {
         void approvedStatus_isApprovedTrue() {
             RefinementVerdict v =
                     new RefinementVerdict(
-                            "approved", "story", "2026-04-30T00:00:00Z", Map.of(), List.of(), "abc");
+                            "approved",
+                            "story",
+                            "2026-04-30T00:00:00Z",
+                            Map.of(),
+                            List.of(),
+                            "abc");
 
             assertThat(v.isApproved()).isTrue();
             assertThat(v.isRejected()).isFalse();
@@ -30,8 +35,12 @@ class RefinementVerdictTest {
         void rejectedStatus_isRejectedTrue() {
             RefinementVerdict v =
                     new RefinementVerdict(
-                            "rejected", "story", "2026-04-30T00:00:00Z", Map.of(),
-                            List.of("ac: missing Gherkin"), "abc");
+                            "rejected",
+                            "story",
+                            "2026-04-30T00:00:00Z",
+                            Map.of(),
+                            List.of("ac: missing Gherkin"),
+                            "abc");
 
             assertThat(v.isRejected()).isTrue();
             assertThat(v.isApproved()).isFalse();
@@ -40,8 +49,7 @@ class RefinementVerdictTest {
 
         @Test
         void tbdStatus_isTbdTrue() {
-            RefinementVerdict v =
-                    new RefinementVerdict("tbd", null, null, null, List.of(), null);
+            RefinementVerdict v = new RefinementVerdict("tbd", null, null, null, List.of(), null);
 
             assertThat(v.isTbd()).isTrue();
             assertThat(v.isApproved()).isFalse();
@@ -50,8 +58,7 @@ class RefinementVerdictTest {
 
         @Test
         void nullStatus_isTbdTrue() {
-            RefinementVerdict v =
-                    new RefinementVerdict(null, null, null, null, List.of(), null);
+            RefinementVerdict v = new RefinementVerdict(null, null, null, null, List.of(), null);
 
             assertThat(v.isTbd()).isTrue();
         }
@@ -90,7 +97,8 @@ class RefinementVerdictTest {
 
         @Test
         void checkedDimension_hasNullBlocker() {
-            RefinementVerdict.DimensionResult dim = new RefinementVerdict.DimensionResult(true, null);
+            RefinementVerdict.DimensionResult dim =
+                    new RefinementVerdict.DimensionResult(true, null);
 
             assertThat(dim.checked()).isTrue();
             assertThat(dim.blocker()).isNull();
@@ -99,7 +107,8 @@ class RefinementVerdictTest {
         @Test
         void blockedDimension_hasBlockerReason() {
             RefinementVerdict.DimensionResult dim =
-                    new RefinementVerdict.DimensionResult(false, "hypothesis: missing measurable indicator");
+                    new RefinementVerdict.DimensionResult(
+                            false, "hypothesis: missing measurable indicator");
 
             assertThat(dim.checked()).isFalse();
             assertThat(dim.blocker()).isEqualTo("hypothesis: missing measurable indicator");
@@ -113,8 +122,13 @@ class RefinementVerdictTest {
         @Test
         void epicScope_isStoredAsEpic() {
             RefinementVerdict v =
-                    new RefinementVerdict("approved", "epic", "2026-04-30T00:00:00Z",
-                            Map.of(), List.of(), "hash");
+                    new RefinementVerdict(
+                            "approved",
+                            "epic",
+                            "2026-04-30T00:00:00Z",
+                            Map.of(),
+                            List.of(),
+                            "hash");
 
             assertThat(v.scope()).isEqualTo("epic");
         }
@@ -122,8 +136,13 @@ class RefinementVerdictTest {
         @Test
         void storyScope_isStoredAsStory() {
             RefinementVerdict v =
-                    new RefinementVerdict("approved", "story", "2026-04-30T00:00:00Z",
-                            Map.of(), List.of(), "hash");
+                    new RefinementVerdict(
+                            "approved",
+                            "story",
+                            "2026-04-30T00:00:00Z",
+                            Map.of(),
+                            List.of(),
+                            "hash");
 
             assertThat(v.scope()).isEqualTo("story");
         }

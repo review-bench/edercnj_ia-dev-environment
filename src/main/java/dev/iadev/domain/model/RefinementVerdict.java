@@ -16,8 +16,8 @@ import java.util.Map;
  * @param checkedAt ISO-8601 UTC timestamp of the last refinement run (nullable when status=tbd)
  * @param dimensions per-dimension results keyed by persona name; nullable when not yet run
  * @param blockers aggregated blocker descriptions across all personas; empty list when approved
- * @param verdictHash SHA-256 hex of the {@code ## Refinement Verdict} markdown block; null when
- *     not yet written
+ * @param verdictHash SHA-256 hex of the {@code ## Refinement Verdict} markdown block; null when not
+ *     yet written
  */
 public record RefinementVerdict(
         String status,

@@ -49,8 +49,7 @@ public record ExecutionState(
             Pattern.compile(
                     "\"refinementVerdict\"\\s*:\\s*\\{[^}]*\"status\"\\s*:\\s*\"([^\"]+)\"");
     private static final Pattern REFINEMENT_SCOPE_PATTERN =
-            Pattern.compile(
-                    "\"refinementVerdict\"\\s*:\\s*\\{[^}]*\"scope\"\\s*:\\s*\"([^\"]+)\"");
+            Pattern.compile("\"refinementVerdict\"\\s*:\\s*\\{[^}]*\"scope\"\\s*:\\s*\"([^\"]+)\"");
 
     /**
      * Parses a minimal subset of an {@code execution-state.json} string.

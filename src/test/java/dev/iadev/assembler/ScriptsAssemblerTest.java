@@ -6,17 +6,15 @@ import dev.iadev.application.assembler.ScriptsAssembler;
 import dev.iadev.config.ConfigProfiles;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.template.TemplateEngine;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Unit tests for {@link ScriptsAssembler}.
