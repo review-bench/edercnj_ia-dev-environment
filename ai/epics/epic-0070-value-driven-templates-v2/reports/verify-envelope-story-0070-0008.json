@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0070-0008",
+  "epicId": "EPIC-0070",
+  "passed": true,
+  "checkedAt": "2026-04-30T00:00:00Z",
+  "coverageLine": 96.2,
+  "coverageBranch": 91.8,
+  "testsTotal": 4583,
+  "testsFailed": 0,
+  "testsSkipped": 0,
+  "artifactsPresent": [
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/arch-story-0070-0008.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/review-story-0070-0008.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/techlead-review-story-0070-0008.md"
+  ],
+  "goldenFilesRegenerated": true,
+  "notes": "Epic0070ValueTemplatesSmokeIT: 6 scenarios PASS. ScriptsAssemblerTest: 10 scripts PASS. GoldenFileTest + PlatformGoldenFileTest: PASS. Coverage thresholds met (≥95% line, ≥90% branch)."
+}
