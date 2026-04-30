@@ -72,13 +72,13 @@ class ExecutionStateV3Test {
 
         @Test
         void flowVersion3_isLocalFirst() {
-            ExecutionState state = new ExecutionState("3", "EPIC-0061", null, null, true);
+            ExecutionState state = new ExecutionState("3", "EPIC-0061", null, null, true, null);
             assertThat(state.localFirstLifecycle()).isTrue();
         }
 
         @Test
         void flowVersion4_isAlsoLocalFirst() {
-            ExecutionState state = new ExecutionState("4", "EPIC-0061", null, null, true);
+            ExecutionState state = new ExecutionState("4", "EPIC-0061", null, null, true, null);
             assertThat(state.localFirstLifecycle()).isTrue();
         }
     }

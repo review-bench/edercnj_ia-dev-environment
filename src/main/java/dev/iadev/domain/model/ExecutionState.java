@@ -20,18 +20,24 @@ import java.util.regex.Pattern;
  * "4". It is serialized explicitly for grep/jq discoverability (EPIC-0061 story-0061-0007 decision
  * rationale).
  *
+ * <p>{@code refinementVerdict} carries the output of {@code /x-story-refine} or {@code
+ * /x-epic-refine} (EPIC-0069 / Rule 29). Absent in pre-EPIC-0069 state files — callers treat
+ * absence as {@link RefinementVerdict#absent()} per the Rule 19 fallback matrix.
+ *
  * @param flowVersion the flow version discriminator
  * @param epicId the epic identifier
  * @param storyStatuses per-story status map (may be null when not loaded)
  * @param taskTracking task tracking configuration (may be null)
  * @param localFirstLifecycle true when flowVersion is "3" or "4"
+ * @param refinementVerdict the refinement gate verdict; null means field absent (legacy state)
  */
 public record ExecutionState(
         String flowVersion,
         String epicId,
         Map<String, Object> storyStatuses,
         Map<String, Object> taskTracking,
-        boolean localFirstLifecycle) {
+        boolean localFirstLifecycle,
+        RefinementVerdict refinementVerdict) {
 
     private static final Pattern FLOW_VERSION_PATTERN =
             Pattern.compile("\"flowVersion\"\\s*:\\s*\"([^\"]+)\"");
@@ -39,6 +45,12 @@ public record ExecutionState(
             Pattern.compile("\"epicId\"\\s*:\\s*\"([^\"]+)\"");
     private static final Pattern LOCAL_FIRST_PATTERN =
             Pattern.compile("\"localFirstLifecycle\"\\s*:\\s*(true|false)");
+    private static final Pattern REFINEMENT_STATUS_PATTERN =
+            Pattern.compile(
+                    "\"refinementVerdict\"\\s*:\\s*\\{[^}]*\"status\"\\s*:\\s*\"([^\"]+)\"");
+    private static final Pattern REFINEMENT_SCOPE_PATTERN =
+            Pattern.compile(
+                    "\"refinementVerdict\"\\s*:\\s*\\{[^}]*\"scope\"\\s*:\\s*\"([^\"]+)\"");
 
     /**
      * Parses a minimal subset of an {@code execution-state.json} string.
@@ -61,7 +73,28 @@ public record ExecutionState(
                             + "' — localFirstLifecycle requires flowVersion 3 or 4");
         }
 
-        return new ExecutionState(version, epicId, null, null, derivedLocalFirst);
+        RefinementVerdict verdict = parseRefinementVerdict(json);
+        return new ExecutionState(version, epicId, null, null, derivedLocalFirst, verdict);
+    }
+
+    /**
+     * Returns the effective refinement verdict — never null.
+     *
+     * <p>When the field is absent in the state file (pre-EPIC-0069 legacy), returns {@link
+     * RefinementVerdict#absent()} per the Rule 19 fallback matrix.
+     */
+    public RefinementVerdict effectiveRefinementVerdict() {
+        return refinementVerdict != null ? refinementVerdict : RefinementVerdict.absent();
+    }
+
+    private static RefinementVerdict parseRefinementVerdict(String json) {
+        if (!json.contains("\"refinementVerdict\"")) {
+            return null;
+        }
+        String status =
+                extractString(json, REFINEMENT_STATUS_PATTERN, RefinementVerdict.STATUS_TBD);
+        String scope = extractString(json, REFINEMENT_SCOPE_PATTERN, null);
+        return new RefinementVerdict(status, scope, null, null, java.util.List.of(), null);
     }
 
     private static String extractString(String json, Pattern pattern, String defaultVal) {
