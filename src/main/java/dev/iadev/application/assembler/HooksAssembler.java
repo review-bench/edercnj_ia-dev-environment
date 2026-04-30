@@ -86,6 +86,15 @@ public final class HooksAssembler implements Assembler {
      */
     public static final List<String> RULE_68_SCRIPTS = List.of("enforce-continuous-flow.sh");
 
+    /**
+     * EPIC-0069 refinement gate PreToolUse hook — always copied, independent of telemetry. {@code
+     * enforce-refinement-gate.sh} is the PreToolUse Camada 0 hook that blocks orchestrators
+     * ({@code x-story-implement}, {@code x-epic-implement}, {@code x-task-implement}, {@code
+     * x-epic-orchestrate}) when {@code refinementVerdict.status != "approved"} (Rule 29 — exit 33
+     * {@code REFINEMENT_REQUIRED}).
+     */
+    public static final List<String> RULE_69_SCRIPTS = List.of("enforce-refinement-gate.sh");
+
     private final Path resourcesDir;
 
     /** Creates a HooksAssembler using classpath resources. */
@@ -125,6 +134,9 @@ public final class HooksAssembler implements Assembler {
         // EPIC-0068 continuous-flow hook — always copied; runtime enforcement
         // for non-interactive orchestrator stall detection (Camada 0).
         written.addAll(copyScriptList(outputDir, RULE_68_SCRIPTS, "rule-68"));
+        // EPIC-0069 refinement gate — always copied; blocks orchestrators
+        // when refinementVerdict.status != "approved" (Rule 29, Camada 0).
+        written.addAll(copyScriptList(outputDir, RULE_69_SCRIPTS, "rule-69"));
         return List.copyOf(written);
     }
 

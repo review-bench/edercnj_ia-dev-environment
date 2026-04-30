@@ -4,14 +4,15 @@
 **Chave Jira:** <CHAVE-JIRA>
 **Status:** Pendente
 
-> **Status Transitions (Rule 22 — lifecycle-integrity):**
-> valores permitidos `Pendente | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
-> Transições válidas: `Pendente → Planejada | Em Andamento | Falha | Bloqueada`;
+> **Status Transitions (Rule 29 — refinement-gate):**
+> valores permitidos `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
+> Transições válidas: `Pendente → Refinada` (via `/x-story-refine`);
+> `Refinada → Planejada | Em Andamento | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
 > reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
-> Ver [`.claude/rules/22-lifecycle-integrity.md`](../.claude/rules/22-lifecycle-integrity.md).
+> Ver [`.claude/rules/29-refinement-gate.md`](../.claude/rules/29-refinement-gate.md).
 
 ---
 
@@ -310,3 +311,11 @@ read:
 regen:
   - <path/to/golden/file.md>
 ```
+
+---
+
+## Refinement Verdict
+
+> _Slot reservado para `/x-story-refine`. Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via verdictHash (Rule 29 §verdictHash)._
+>
+> **Status:** TBD — execute `/x-story-refine <story-id>` para preencher.

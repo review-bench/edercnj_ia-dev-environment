@@ -60,18 +60,20 @@ class HooksAssemblerTest {
 
             List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // 1 post-compile-check + Rule-25 + Rule-59 + Rule-68 enforcement scripts
+            // 1 post-compile-check + Rule-25 + Rule-59 + Rule-68 + Rule-69 enforcement scripts
             // (all always copied, independent of telemetry).
             assertThat(files)
                     .hasSize(
                             1
                                     + HooksAssembler.RULE_25_SCRIPTS.size()
                                     + HooksAssembler.RULE_59_SCRIPTS.size()
-                                    + HooksAssembler.RULE_68_SCRIPTS.size());
+                                    + HooksAssembler.RULE_68_SCRIPTS.size()
+                                    + HooksAssembler.RULE_69_SCRIPTS.size());
             assertThat(outputDir.resolve("hooks/post-compile-check.sh")).exists();
             assertThat(outputDir.resolve("hooks/verify-phase-gates.sh")).exists();
             assertThat(outputDir.resolve("hooks/enforce-phase-sequence.sh")).exists();
             assertThat(outputDir.resolve("hooks/enforce-no-bypass-flags.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-refinement-gate.sh")).exists();
         }
 
         // Non-Java hook generation tests removed in EPIC-0048 full
@@ -178,7 +180,7 @@ class HooksAssemblerTest {
             Path resourceDir = tempDir.resolve("res");
             Path hooksResourceDir = resourceDir.resolve("targets/claude/hooks");
             Files.createDirectories(hooksResourceDir.resolve("exotic"));
-            // Seed Rule 25 + Rule 59 + Rule 68 script sources (always required).
+            // Seed Rule 25 + Rule 59 + Rule 68 + Rule 69 script sources (always required).
             for (String name : HooksAssembler.RULE_25_SCRIPTS) {
                 Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
             }
@@ -186,6 +188,9 @@ class HooksAssemblerTest {
                 Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
             }
             for (String name : HooksAssembler.RULE_68_SCRIPTS) {
+                Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
+            }
+            for (String name : HooksAssembler.RULE_69_SCRIPTS) {
                 Files.writeString(hooksResourceDir.resolve(name), "#!/usr/bin/env bash\nexit 0\n");
             }
             Path outputDir = tempDir.resolve("output");
@@ -203,12 +208,13 @@ class HooksAssemblerTest {
             List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             // No post-compile hook (kotlin has no template),
-            // but Rule 25 + Rule 59 + Rule 68 scripts are always copied.
+            // but Rule 25 + Rule 59 + Rule 68 + Rule 69 scripts are always copied.
             assertThat(files)
                     .hasSize(
                             HooksAssembler.RULE_25_SCRIPTS.size()
                                     + HooksAssembler.RULE_59_SCRIPTS.size()
-                                    + HooksAssembler.RULE_68_SCRIPTS.size());
+                                    + HooksAssembler.RULE_68_SCRIPTS.size()
+                                    + HooksAssembler.RULE_69_SCRIPTS.size());
         }
 
         @Test
@@ -229,15 +235,17 @@ class HooksAssemblerTest {
             List<String> files = assembler.assemble(config, new TemplateEngine(), outputDir);
 
             // No post-compile hook for unknown language, but
-            // Rule 25 + Rule 59 + Rule 68 scripts are always copied regardless.
+            // Rule 25 + Rule 59 + Rule 68 + Rule 69 scripts are always copied regardless.
             assertThat(files)
                     .hasSize(
                             HooksAssembler.RULE_25_SCRIPTS.size()
                                     + HooksAssembler.RULE_59_SCRIPTS.size()
-                                    + HooksAssembler.RULE_68_SCRIPTS.size());
+                                    + HooksAssembler.RULE_68_SCRIPTS.size()
+                                    + HooksAssembler.RULE_69_SCRIPTS.size());
             assertThat(outputDir.resolve("hooks/verify-phase-gates.sh")).exists();
             assertThat(outputDir.resolve("hooks/enforce-phase-sequence.sh")).exists();
             assertThat(outputDir.resolve("hooks/enforce-no-bypass-flags.sh")).exists();
+            assertThat(outputDir.resolve("hooks/enforce-refinement-gate.sh")).exists();
         }
     }
 

@@ -164,6 +164,8 @@ public final class HookConfigBuilder {
      *   <li>Rule 25 Layer 3 enforcement ({@code enforce-phase-sequence.sh}) — always emitted
      *   <li>Rule 59 enforcement ({@code enforce-no-bypass-flags.sh}) — always emitted; blocks
      *       {@code --skip-*} flags outside recovery mode (story-0059-0003)
+     *   <li>Rule 69 refinement gate ({@code enforce-refinement-gate.sh}) — always emitted; blocks
+     *       orchestrators when {@code refinementVerdict.status != "approved"} (EPIC-0069, Rule 29)
      *   <li>Optional telemetry pretool hook ({@code telemetry-pretool.sh}) — only when {@code
      *       telemetryEnabled} is {@code true}
      * </ul>
@@ -171,7 +173,7 @@ public final class HookConfigBuilder {
      * <p>All entries run under the same wildcard matcher. Both enforcement scripts short-circuit on
      * {@code tool_name != "Skill"}.
      *
-     * <p>Decoupling from telemetry: both Rule 25 and Rule 59 define enforcement as runtime (not
+     * <p>Decoupling from telemetry: Rule 25, Rule 59, and Rule 69 define enforcement as runtime (not
      * observability), so disabling telemetry does NOT disable these hooks.
      */
     private static void appendPreToolUseWithPhaseSequence(
@@ -184,8 +186,9 @@ public final class HookConfigBuilder {
             appendStopHookEntry(sb, "telemetry-pretool.sh", true);
         }
         appendStopHookEntry(sb, "enforce-phase-sequence.sh", true);
-        // Rule 59: always the last entry (no sibling after).
-        appendStopHookEntry(sb, "enforce-no-bypass-flags.sh", false);
+        appendStopHookEntry(sb, "enforce-no-bypass-flags.sh", true);
+        // Rule 69: always the last PreToolUse entry (no sibling after).
+        appendStopHookEntry(sb, "enforce-refinement-gate.sh", false);
         sb.append(JsonHelpers.indent(4)).append("]\n");
         sb.append(JsonHelpers.indent(3)).append("}\n");
         sb.append(JsonHelpers.indent(2)).append("],\n");

@@ -5,17 +5,18 @@
 **Versão:** <Versão do documento>
 **Status:** <Em Refinamento | Pronto | Em Andamento | Concluído>
 
-> **Status Transitions (Rule 22 — lifecycle-integrity):**
+> **Status Transitions (Rule 29 — refinement-gate):**
 > artifacts lifecycle-controlados (Story/Task) usam o enum canônico
-> `Pendente | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
+> `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
 > O campo Status do Épico aqui é documental e reflete o estado
 > agregado das histórias filhas. Transições permitidas do enum:
-> `Pendente → Planejada | Em Andamento | Falha | Bloqueada`;
+> `Pendente → Refinada` (via `/x-epic-refine`);
+> `Refinada → Planejada | Em Andamento | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
 > reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
-> Ver [`.claude/rules/22-lifecycle-integrity.md`](../.claude/rules/22-lifecycle-integrity.md).
+> Ver [`.claude/rules/29-refinement-gate.md`](../.claude/rules/29-refinement-gate.md).
 
 ---
 
@@ -202,3 +203,11 @@ read:
 regen:
   - <path/to/golden/file.md>
 ```
+
+---
+
+## Refinement Verdict
+
+> _Slot reservado para `/x-epic-refine`. Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via verdictHash (Rule 29 §verdictHash)._
+>
+> **Status:** TBD — execute `/x-epic-refine <epic-id>` para preencher.
