@@ -25,14 +25,142 @@
     "blockers": []
   },
   "storyStatuses": {
-    "story-0071-0001": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0002": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0003": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0004": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0005": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0006": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0007": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0071-0008": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } }
+    "story-0071-0001": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2865a19506d805c7bd24eae17219bf439020bba398607db6521b069e10d29dd9",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0002": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "c30013bc7648e9bc33be892eab1a9e30330dc472714b39bfbcdfa25a3b7a1079",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0003": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "da927041fab2fa9af74be91658b1c32f8b0f3807e98715df4caed04d445cf715",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0004": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "1d82907359152cf595425bbfa45977ba038dff0a048124fe87938e9e1d3687c1",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0005": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "7865fb14e6f2ec4783d08a4222e50ffd2bcb60ff53bc706f35c097fda073a5d9",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0006": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2780835bbfb9ae7d0258672cb8042a142c1fb2b2831a44a92c20ca50f6d71590",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0007": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "935ef9739dcd640754cdbe5f0df1fc9ffb5ee29e277c987d0d06eac51d68e605",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0008": {
+      "status": "Refinada", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "e836bdc4f39de223b6c18cf54133a5ab6d8bcfa83c0ce78519892e121cf321a9",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    }
   },
   "phases": [
     { "id": 0, "name": "Governance + Domain", "stories": ["story-0071-0001"], "mode": "sequential" },

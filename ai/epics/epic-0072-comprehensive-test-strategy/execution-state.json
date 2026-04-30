@@ -22,7 +22,7 @@
   },
   "storyStatuses": {
     "story-0072-0001": {
-      "status": "Refinada",
+      "status": "Pendente",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -40,9 +40,63 @@
         "blockers": []
       }
     },
-    "story-0072-0002": { "status": "Pendente" },
-    "story-0072-0003": { "status": "Pendente" },
-    "story-0072-0004": { "status": "Pendente" },
+    "story-0072-0002": {
+      "status": "Pendente",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:50:00Z",
+        "verdictHash": "b804dd595ecf5664750dada3bf2a3e5b1203ce4f5044b2be1d6c62b57cb9127c",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0003": {
+      "status": "Pendente",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:55:00Z",
+        "verdictHash": "4d819e742518b93f3ccba0b20dce93f9c8128c227b1ddcb033c642ec63bc02ec",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0004": {
+      "status": "Pendente",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:00:00Z",
+        "verdictHash": "0f925f168d5a35a6239ea3338d6be30dcf74252280d6ff2f47d015bbee399690",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
     "story-0072-0005": { "status": "Pendente" },
     "story-0072-0006": { "status": "Pendente" },
     "story-0072-0007": { "status": "Pendente" },
