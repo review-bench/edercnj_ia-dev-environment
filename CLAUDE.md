@@ -49,6 +49,18 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > antes do remote op; Camadas 1-4 (Rule 24) são **detectivas** — pegam após o fato.
 > Ver [Rule 24 §Camada 0](.claude/rules/24-execution-integrity.md).
 
+> **REFINEMENT GATE — INEGOCIÁVEL (NEW — EPIC-0069):** Toda story/epic DEVE
+> ser refinada via `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes
+> de invocar `x-story-implement`, `x-epic-implement`, `x-task-implement`, ou
+> `x-epic-orchestrate`. PreToolUse hook `enforce-refinement-gate.sh` (Camada 0)
+> bloqueia com exit `33 REFINEMENT_REQUIRED` quando o `refinementVerdict.status`
+> do alvo não é `"approved"`. CI script `audit-refinement-gate.sh` (Camada 2,
+> Rule 26) confirma post-merge — também detecta divergência state↔markdown via
+> `verdictHash`. Bypasses aceitos: `CLAUDE_RECOVERY_MODE=1` (Rule 27), branches
+> `hotfix/*` (Rule 27 Exception 2), `flowVersion=1` (Rule 19 fallback). Sem
+> outro escape hatch.
+> Ver [Rule 29](.claude/rules/29-refinement-gate.md) e [EPIC-0069](ai/epics/epic-0069-refinement-and-dor-gate/).
+
 > **In progress — EPIC-0046 (Lifecycle Integrity Phase 2 — CI enforcement).**
 > Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `ai/epics/epic-*/reports/` with no `x-git-commit` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
 > - Story: [`ai/epics/epic-0046/story-0046-0007.md`](ai/epics/epic-0046/story-0046-0007.md)

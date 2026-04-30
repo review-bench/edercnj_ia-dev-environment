@@ -19,8 +19,8 @@
     "story-0069-0003": { "status": "done", "flowVersion": "4" },
     "story-0069-0004": { "status": "done", "flowVersion": "4" },
     "story-0069-0005": { "status": "done", "flowVersion": "4" },
-    "story-0069-0006": { "status": "in_progress", "flowVersion": "4" },
-    "story-0069-0007": { "status": "pending", "flowVersion": "4" }
+    "story-0069-0006": { "status": "done", "flowVersion": "4" },
+    "story-0069-0007": { "status": "done", "flowVersion": "4" }
   },
   "phases": [
     { "id": 0, "name": "Governance Foundation", "stories": ["story-0069-0001"], "mode": "sequential" },
