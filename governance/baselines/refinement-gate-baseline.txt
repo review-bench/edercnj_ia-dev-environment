@@ -1,0 +1,8 @@
+# refinement-gate-baseline.txt
+# Grandfathers story/epic IDs merged before EPIC-0069 introduced Rule 29.
+# File is append-only and immutable after EPIC-0069 merges to develop.
+# New entries are FORBIDDEN — use the hotfix exception path (Rule 27 Exception 2) instead.
+# Format: STORY-ID or EPIC-ID  # reason
+#
+# Initial baseline: all stories merged before EPIC-0069 are pre-gate.
+# The audit-refinement-gate.sh --self-check verifies this file is present.

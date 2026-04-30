@@ -1,0 +1,28 @@
+{
+  "storyId": "story-0069-0002",
+  "epicId": "EPIC-0069",
+  "passed": true,
+  "verifiedAt": "2026-04-30T10:45:00Z",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "artifactsVerified": [
+    "src/main/resources/targets/claude/skills/core/plan/x-story-refine/SKILL.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/plan-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/arch-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/tests-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/tasks-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/security-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/compliance-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/review-story-0069-0002.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/techlead-review-story-0069-0002.md"
+  ],
+  "specialistReview": { "verdict": "GO", "score": "8/8", "path": "ai/epics/epic-0069-refinement-and-dor-gate/plans/review-story-0069-0002.md" },
+  "techLeadReview": { "verdict": "GO", "score": "41/45", "path": "ai/epics/epic-0069-refinement-and-dor-gate/plans/techlead-review-story-0069-0002.md" },
+  "fixes": [
+    "F1: x-internal-phase-gate PRE/POST added to Phases A, C, D",
+    "F2: Subagent markers added for all 5 core + 2 conditional personas in Phases A and C",
+    "F3: Phase C expanded with explicit Agent() calls for TechLead, Architect, Security, QA",
+    "F4: verdictHash computation hardened with printf instead of echo -n"
+  ],
+  "notes": "Content-layer story (SKILL.md only). Coverage N/A. All normative artifacts present. 4 fixes applied post-tech-lead-review (F1-F4)."
+}

@@ -25,6 +25,7 @@
 | ADR-0019 | [Preflight Gates WARN→FAIL Rollout Strategy](ADR-0019-preflight-warn-to-fail-rollout.md) | Accepted | 2026-04-28 |
 | ADR-0020 | [Hexagonal Architecture Migration (EPIC-0015)](ADR-0020-hexagonal-architecture-migration.md) | Accepted | 2026-04-04 |
 | ADR-0021 | [`CLAUDE.md` Contract (Root File via Dedicated Assembler) (EPIC-0048)](ADR-0021-claude-md-contract.md) | Accepted | 2026-04-22 |
+| ADR-0022 | [Refinement Gate Convention (EPIC-0069)](ADR-0022-refinement-gate.md) | Accepted | 2026-04-30 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.

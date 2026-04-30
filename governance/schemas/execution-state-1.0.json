@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "execution-state-1.0.json",
+  "title": "ExecutionState",
+  "description": "Schema for execution-state.json produced by the ia-dev-env orchestration workflow. Field additions are backward-compatible per Rule 19 — all new fields are optional.",
+  "type": "object",
+  "properties": {
+    "flowVersion": {
+      "type": "string",
+      "enum": ["1", "2", "3", "4"],
+      "description": "Lifecycle variant: 1=legacy, 2=epic-branch, 3=local-first, 4=v4-layout"
+    },
+    "epicId": {
+      "type": "string",
+      "pattern": "^EPIC-[0-9]{4}$",
+      "description": "Epic identifier in canonical uppercase form"
+    },
+    "epicSlug": {
+      "type": "string",
+      "description": "Human-readable slug appended to epic directory (v4 layout)"
+    },
+    "interactiveMode": {
+      "type": "string",
+      "enum": ["interactive", "non-interactive"],
+      "description": "Consumed by enforce-continuous-flow.sh (EPIC-0068)"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 creation timestamp"
+    },
+    "localFirstLifecycle": {
+      "type": "boolean",
+      "description": "Derived from flowVersion 3 or 4 — serialized for jq discoverability"
+    },
+    "taskTracking": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "rootTaskId": { "type": "integer" },
+        "phaseGateResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phase": { "type": "string" },
+              "mode": { "type": "string", "enum": ["pre", "post", "wave", "final"] },
+              "passed": { "type": "boolean" },
+              "missingArtifacts": { "type": "array", "items": { "type": "string" } },
+              "missingTasks": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["phase", "mode", "passed"]
+          }
+        }
+      }
+    },
+    "storyStatuses": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "done", "failed", "blocked", "refinada"]
+          },
+          "flowVersion": { "type": "string" }
+        }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "stories": { "type": "array", "items": { "type": "string" } },
+          "mode": { "type": "string", "enum": ["sequential", "parallel"] }
+        },
+        "required": ["id", "name", "stories"]
+      }
+    },
+    "refinementVerdict": {
+      "type": "object",
+      "description": "Output of /x-story-refine or /x-epic-refine (EPIC-0069 / Rule 29). Absent in pre-EPIC-0069 state files — callers treat absence as status=tbd per Rule 19 fallback matrix.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["approved", "rejected", "tbd"],
+          "description": "Gate status: approved=all dimensions clear; rejected=at least one NO-GO; tbd=not yet run"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["story", "epic"],
+          "description": "Discriminator: story=from /x-story-refine; epic=from /x-epic-refine"
+        },
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 UTC timestamp of the last refinement run"
+        },
+        "verdictHash": {
+          "type": "string",
+          "description": "SHA-256 hex of the ## Refinement Verdict block in the markdown — used by audit-refinement-gate.sh to detect manual divergence"
+        },
+        "dimensions": {
+          "type": "object",
+          "description": "Per-dimension results keyed by persona name (po, techLead, architect, security, qa, sre)",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "checked": { "type": "boolean" },
+              "blocker": { "type": ["string", "null"] }
+            },
+            "required": ["checked"]
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Aggregated blocker descriptions across all personas"
+        }
+      },
+      "required": ["status"]
+    }
+  },
+  "required": ["flowVersion", "epicId"]
+}

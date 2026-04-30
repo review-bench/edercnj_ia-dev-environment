@@ -167,6 +167,34 @@ WARN [interactiveMode-fallback] execution-state.json has interactiveMode=<value>
 
 **Consumers:** `enforce-continuous-flow.sh` (Stop hook, EPIC-0068). No CI audit script reads this field; it is a runtime-only discriminator.
 
+### `refinementVerdict` Field (EPIC-0069)
+
+Added by EPIC-0069 (Story Refinement & DoR Gate — Rule 29). Carries the output of `/x-story-refine` or `/x-epic-refine` — a multi-persona verdict indicating whether the story/epic has been approved for implementation.
+
+#### Fallback Matrix
+
+| Condition on `refinementVerdict` | `flowVersion` | Resolved value | Behavior | Warning? |
+| :--- | :--- | :--- | :--- | :--- |
+| Field absent (legacy state file pre-EPIC-0069) | `"1"` or absent | `{ status: "tbd" }` | Hook is no-op — preserves legacy behavior | No |
+| Field absent | `"2"` or `"4"` | `{ status: "tbd" }` | Hook active — blocks with `REFINEMENT_REQUIRED` (exit 33) | **Yes** — visible warning `[refinementVerdict-absent]` |
+| Field present, `status = "tbd"` | `"1"` or absent | `"tbd"` | Hook is no-op (legacy) | No |
+| Field present, `status = "tbd"` | `"2"` or `"4"` | `"tbd"` | Hook active — blocks with `REFINEMENT_REQUIRED` | **Yes** — visible warning `[refinementVerdict-tbd]` |
+| Field present, `status = "rejected"` | any | `"rejected"` | Hook active — blocks with `REFINEMENT_REQUIRED` | No (rejection is explicit) |
+| Field present, `status = "approved"` | any | `"approved"` | Hook is no-op — gate passed | No |
+| Field present, `status = any other value` (typo) | any | `"tbd"` | Hook active — blocks | **Yes** — visible warning `[refinementVerdict-invalid]` |
+
+**Exception — `hotfix/*` branches:** `enforce-refinement-gate.sh` exits 0 (no-op) regardless of `refinementVerdict.status` when the current branch matches `hotfix/*` (Rule 27 Exception 2).
+
+**Warning format (absent on flowVersion ≥ 2):**
+
+```
+WARN [refinementVerdict-absent] execution-state.json has no refinementVerdict;
+     defaulting to status=tbd. Run /x-story-refine <STORY-ID> to refine before implementing.
+     Gate: enforce-refinement-gate.sh (exit 33 REFINEMENT_REQUIRED).
+```
+
+**Consumers:** `enforce-refinement-gate.sh` (PreToolUse hook, EPIC-0069, Camada 0); `audit-refinement-gate.sh` (CI script, EPIC-0069, Camada 2). The `verdictHash` sub-field is also consumed by the CI audit to detect manual divergence between the state file and the markdown `## Refinement Verdict` block.
+
 ## Forbidden
 
 - Removing `flowVersion` resolution logic from orchestrators during the deprecation window.

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0069 (Story Refinement & DoR Gate)
+
+- **Capability `governance.refinement-gate`** declared in `capabilities/governance/refinement-gate.yaml` (universal — no stack-specific `requires-capabilities`). All EPIC-0069 artefacts (skills, hooks, scripts, KP) declare `requires-capabilities: [governance.refinement-gate]` in their frontmatter (Rule 28).
+- **Rule 29 — Refinement Gate** + **ADR-0022**: define the blocking refinement gate that bars `x-story-implement`, `x-epic-implement`, `x-task-implement`, and `x-epic-orchestrate` until the target's `refinementVerdict.status == "approved"`. Exception paths: `CLAUDE_RECOVERY_MODE=1` (Rule 27), `hotfix/*` branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19 legacy fallback).
+- **Skill `/x-story-refine`** (multi-persona 4-phase dispatcher): Phase A parallel persona analysis (Product Owner, Tech Lead, Architect, Security, QA, conditional Performance/SRE), Phase B single consolidated batch of questions, Phase C parallel refinement with answers, Phase D consolidation by Architect. Produces `## Refinement Verdict` block on the story markdown + `refinementVerdict` entry in `execution-state.json`.
+- **Skill `/x-epic-refine`** — analogous dispatcher for epics (problem, persona, value hypothesis, OKRs, alternatives, risks, scope/out-of-scope), with conditional SRE/DevOps persona gated on `infra.*` / `runtime.*` capabilities.
+- **`RefinementVerdict` domain model** + **`governance/schemas/execution-state-1.0.json`**: typed record (`status`, `scope`, `checkedAt`, `dimensions`, `blockers`, `verdictHash`) with absent() sentinel for Rule 19 fallback (status=tbd). Extended `ExecutionState` with `refinementVerdict` field + `effectiveRefinementVerdict()`.
+- **`_TEMPLATE-REFINEMENT-VERDICT.md`** + status `Refinada` added to `_TEMPLATE-STORY.md` / `_TEMPLATE-EPIC.md` (Rule 29 transitions: `Pendente → Refinada → Planejada`).
+- **PreToolUse hook `enforce-refinement-gate.sh`** (Camada 0): blocks orchestrator invocations with exit `33` `REFINEMENT_REQUIRED` when target verdict is not approved. PT-BR error message. Fail-open contract on jq absent / malformed input. Resolves `execution-state.json` via v3 + v4 layout probing. Registered in `settings.json` PreToolUse via `HooksAssembler.RULE_69_SCRIPTS`.
+- **CI script `audit-refinement-gate.sh`** (Camada 2 — Rule 26): post-merge audit verifying every implemented story/epic has `refinementVerdict.status="approved"` or is covered by a valid exception (hotfix, baseline, audit-exempt marker, flowVersion=1). Detects state↔markdown divergence via `verdictHash` (sha256 of the `## Refinement Verdict` block). Modes: `--self-check`, `--since <ref>`, `--story <id>`, default. Exit codes 0/1/2/3/4 per Rule 26 §Standardized.
+- **`governance/baselines/refinement-gate-baseline.txt`**: empty + immutable post-EPIC-0069 (new entries forbidden — use the hotfix exception path instead).
+- **`docs/audit-gates-catalog.md`**: entries added for both `enforce-refinement-gate.sh` (Camada 0) and `audit-refinement-gate.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **Tests**: `Epic0069RefinementGateSmokeIT` (8 E2E scenarios — Java), `enforce_refinement_gate_test.sh` (8 scenarios — bash), `audit_refinement_gate_test.sh` (7 scenarios — bash), `RefinementVerdictTest` (12 unit tests), `ExecutionStateRefinementTest` (18 unit tests).
+
+### Highlights — EPIC-0069
+
+> **Histórias e épicos deixam de chegar mal-definidos a `x-story-implement` e `x-epic-implement`.** O gate de refinamento (Rule 29) é bloqueante em quatro camadas — normativa (a própria Rule 29 + bloco "REFINEMENT GATE — INEGOCIÁVEL" em CLAUDE.md), preventiva local (PreToolUse hook `enforce-refinement-gate.sh`, exit `33`), CI (`audit-refinement-gate.sh`, exit `1`), e detecção pós-merge via `verdictHash`. Operadores rodam `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes de implementar; persona-agents paralelos (PO, Tech Lead, Architect, Security, QA, condicionais Perf/SRE) aplicam silenciosamente seus NO-GOs e consolidam um único batch de perguntas para o operador. O resultado: AC com 4 categorias obrigatórias (happy/erro/perf/sec), contratos tipados, métricas mensuráveis, alternativas consideradas e riscos identificados — antes do TDD começar.
+
 ## [5.1.0] - 2026-04-30
 
 ### Added — EPIC-0068 (Continuous-Flow Heartbeat Hook)

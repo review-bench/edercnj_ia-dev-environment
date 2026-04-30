@@ -212,6 +212,30 @@
 
 ---
 
+### audit-refinement-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 29 §Audit (Camada 2), Rule 27 (zero-bypass for refinement) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Every merged story/epic on PRs to `develop` or `epic/*` has `refinementVerdict.status="approved"` in `execution-state.json`; detects state↔markdown divergence via `verdictHash`; honors hotfix exception (Rule 27 Exception 2), `audit-exempt` markers, and `governance/baselines/refinement-gate-baseline.txt` |
+| **Introduced** | story-0069-0006 (EPIC-0069) |
+| **Exit Codes** | `0` = OK · `1` = `REFINEMENT_GATE_VIOLATION` (sub-codes: `missing-verdict`, `rejected-verdict`, `verdict-mismatch`) · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT`/`INVALID_EXEMPTION` · `4` = `RULE_29_ENFORCEMENT_BROKEN` |
+
+---
+
+### enforce-refinement-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 29 §Camada 0, Rule 26 §Camada 0 |
+| **Layer** | 0 — Local PreToolUse Hook (preventive) |
+| **Validates** | Blocks invocations of `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate` when target's `refinementVerdict.status != "approved"`. Bypasses: `CLAUDE_RECOVERY_MODE=1` (Rule 27), hotfix branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19) |
+| **Introduced** | story-0069-0005 (EPIC-0069) |
+| **Exit Codes** | `0` = OK (allow) · `33` = `REFINEMENT_REQUIRED` (block) · `2` = `OPERATIONAL_ERROR` (self-check) |
+
+---
+
 ### audit-review-content.sh
 
 | Field | Value |

@@ -91,9 +91,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
 | 28 | `28-tool-call-grammar.md` | tool call grammar |
+| 29 | `29-refinement-gate.md` | refinement gate |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 25 rules**
+**Total: 26 rules**
 
 ### Numbering
 
@@ -124,6 +125,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-doc-generate** | `/x-doc-generate` | Documentation automation: detects documentation type needed (API, README, ADR, changelog) from code changes, delegates to specialized skills or generates inline. Single entry point for all documentation updates. |
 | **x-epic-implement** | `/x-epic-implement` | Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-args-normalize), Phase 1 (load+plan via x-internal-epic-build-plan), Phase 2 (epic branch via x-internal-epic-branch-ensure), Phase 3 (sequential-by-default story loop via x-story-implement), Phase 4 (integrity gate + report via x-internal-epic-integrity-gate + x-internal-report-write), Phase 5 (final PR epic/XXXX → develop via x-git-merge + x-pr-create). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill. |
 | **x-epic-orchestrate** | `/x-epic-orchestrate` | Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support. |
+| **x-epic-refine** | `/x-epic-refine` | Multi-persona 4-phase strategic epic refinement dispatcher. Phase A: 5-6 parallel specialist agents analyse the epic for strategic gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-6 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict with scope=epic and dual-writes to execution-state.json + epic markdown. |
 | **x-feature-create** | `/x-feature-create` | Create a complete feature (Epic + N Stories + Implementation Map) from a spec file, with a worktree-isolated docs/ branch, consolidated commit, and auto-merged PR into epic/XXXX. |
 | **x-feature-ideate** | `/x-feature-ideate` | Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-feature-create. |
 | **x-git-branch** | `/x-git-branch` | Creates a bare git branch (no worktree) from a configurable base with naming validation and idempotency. Single source of truth for branch creation logic consumed by orchestrators (x-internal-epic-branch-ensure, x-story-implement) and users. |
@@ -164,6 +166,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-status-reconcile** | `/x-status-reconcile` | Reconciles execution-state.json (telemetry) against the **Status:** field of Epic / Story markdown artifacts. Default mode (diagnose) is read-only and prints a divergence table. Opt-in --apply rewrites the markdowns atomically via StatusFieldParser and commits via x-git-commit. Respects Rule 19 (legacy v1 epics skip silently) and Rule 22 (markdown is SoT; state.json is telemetry). Use for manual recovery of legacy epics whose markdown status drifted from execution checkpoints. |
 | **x-story-implement** | `/x-story-implement` | Thin orchestrator (~320 lines — story-0049-0019 refactor) that drives a story end-to-end via 4 delegated phases: Phase 0 (args via x-internal-args-normalize + context via x-internal-story-load-context + resume via x-internal-story-resume), Phase 1 (parallel planning via x-internal-story-build-plan), Phase 2 (task execution loop via x-task-implement per task, then final story PR via x-pr-create), Phase 3 (verify via x-internal-story-verify + report via x-internal-story-report + optional worktree cleanup via x-git-worktree). New EPIC-0049 flags --target-branch / --auto-merge / --epic-id propagate OO-style to x-task-implement and x-pr-create. Backward compatible: absent flags preserve legacy EPIC-0048 behavior (target=develop, auto-merge=none). |
 | **x-story-plan** | `/x-story-plan` | Multi-agent story planning: launches 5 specialized agents (Architect, QA, Security, Tech Lead, Product Owner) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-task-plan in parallel. |
+| **x-story-refine** | `/x-story-refine` | Multi-persona 4-phase story refinement dispatcher. Phase A: 5-7 parallel specialist agents analyse the story for gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-7 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict and dual-writes to execution-state.json + story markdown. |
 | **x-supply-chain-audit** | `/x-supply-chain-audit` | Enhanced supply chain security audit beyond x-dependency-audit. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring. |
 | **x-task-implement** | `/x-task-implement` | Implements a feature/story/task using TDD (Red-Green-Refactor) workflow. Schema-aware: v1 (legacy) runs the original Double-Loop TDD flow with story-section task extraction; v2 (task-first, EPIC-0038) reads task-TASK-XXXX-YYYY-NNN.md + plan-task-TASK-XXXX-YYYY-NNN.md, honours declared I/O contracts, respects task-implementation-map dependencies, verifies post-conditions via grep/assert, and produces a single atomic commit per task via x-git-commit. |
 | **x-task-plan** | `/x-task-plan` | Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-story-plan (future). |
@@ -177,7 +180,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-test-tdd** | `/x-test-tdd` | Executes systematic Red-Green-Refactor TDD cycles for a task. Reads the task plan generated by x-task-plan, runs each cycle in TPP order, validates RED/GREEN/REFACTOR phases, delegates atomic commits to x-git-commit with TDD tags, and supports resume and dry-run. |
 | **x-threat-model** | `/x-threat-model` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 
-**Total: 88 skills**
+**Total: 90 skills**
 
 ### Usage Examples
 
@@ -336,11 +339,11 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 25 |
-| Skills (.claude) | 69 |
+| Rules (.claude) | 26 |
+| Skills (.claude) | 71 |
 | Knowledge Packs (.claude) | 19 |
 | Agents (.claude) | 11 |
-| Hooks (.claude) | 16 |
+| Hooks (.claude) | 17 |
 | Settings (.claude) | 2 |
 | Plan Templates (.claude) | 24 |
 

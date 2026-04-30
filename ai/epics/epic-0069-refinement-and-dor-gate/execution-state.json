@@ -1,0 +1,31 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0069",
+  "epicSlug": "refinement-and-dor-gate",
+  "interactiveMode": "non-interactive",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-28T00:00:00Z"
+  },
+  "storyStatuses": {
+    "story-0069-0001": { "status": "done", "flowVersion": "4" },
+    "story-0069-0002": { "status": "done", "flowVersion": "4" },
+    "story-0069-0003": { "status": "done", "flowVersion": "4" },
+    "story-0069-0004": { "status": "done", "flowVersion": "4" },
+    "story-0069-0005": { "status": "done", "flowVersion": "4" },
+    "story-0069-0006": { "status": "done", "flowVersion": "4" },
+    "story-0069-0007": { "status": "done", "flowVersion": "4" }
+  },
+  "phases": [
+    { "id": 0, "name": "Governance Foundation", "stories": ["story-0069-0001"], "mode": "sequential" },
+    { "id": 1, "name": "Skills + Domain Model", "stories": ["story-0069-0002", "story-0069-0003", "story-0069-0004"], "mode": "sequential" },
+    { "id": 2, "name": "Infrastructure", "stories": ["story-0069-0005", "story-0069-0006"], "mode": "sequential" },
+    { "id": 3, "name": "Verification & Release", "stories": ["story-0069-0007"], "mode": "sequential" }
+  ]
+}
