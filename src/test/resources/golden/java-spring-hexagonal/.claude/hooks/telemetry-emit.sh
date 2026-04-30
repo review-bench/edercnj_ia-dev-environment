@@ -99,6 +99,12 @@ fi
 
 EPIC_ID="$(printf '%s' "${EVENT_JSON}" | jq -r '.epicId // "unknown"')"
 
+# Validate epicId before composing paths (CWE-22: prevent path traversal via malformed ids).
+if ! printf '%s' "${EPIC_ID}" | grep -qE '^(EPIC-[0-9]{4}|unknown)$'; then
+    echo "telemetry-emit: invalid epicId '${EPIC_ID}' — forcing unknown" >&2
+    EPIC_ID="unknown"
+fi
+
 # Canonical directory name: EPIC-0040 → ai/epics/epic-0040[-slug]/telemetry/.
 # "unknown" fallback stays as plans/unknown/telemetry/.
 # Supports v4 slugged layout (epic-NNNN-slug) via glob probe.
@@ -112,10 +118,8 @@ else
     for _d in "${PROJECT_DIR}/ai/epics/epic-${EPIC_NUM}"-*/; do
         [[ -d "${_d}" ]] && { EPIC_DIR_MATCH="${_d}"; break; }
     done
-    if [[ -z "${EPIC_DIR_MATCH}" ]]; then
-        for _d in "${PROJECT_DIR}/ai/epics/epic-${EPIC_NUM}"/; do
-            [[ -d "${_d}" ]] && { EPIC_DIR_MATCH="${_d}"; break; }
-        done
+    if [[ -z "${EPIC_DIR_MATCH}" ]] && [[ -d "${PROJECT_DIR}/ai/epics/epic-${EPIC_NUM}" ]]; then
+        EPIC_DIR_MATCH="${PROJECT_DIR}/ai/epics/epic-${EPIC_NUM}/"
     fi
     TARGET_DIR="${EPIC_DIR_MATCH:-${PROJECT_DIR}/ai/epics/epic-${EPIC_NUM}/}telemetry"
 fi

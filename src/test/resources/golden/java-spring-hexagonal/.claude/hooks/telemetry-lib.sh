@@ -171,7 +171,7 @@ resolve_context() {
             local dir name
             dir="$(dirname "${newest_file}")"
             name="$(basename "${dir}")"
-            if [[ "${name}" =~ ^epic-([0-9]{4}) ]]; then
+            if [[ "${name}" =~ ^epic-([0-9]{4})(-|$) ]]; then
                 TELEMETRY_EPIC_ID="EPIC-${BASH_REMATCH[1]}"
                 return 0
             fi
