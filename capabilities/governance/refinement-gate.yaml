@@ -1,0 +1,21 @@
+id: governance.refinement-gate
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Story and epic refinement gate — enforces that stories/epics are reviewed
+  and approved by multi-persona agents (PO, Tech Lead, Architect, Security, QA)
+  before entering the implementation orchestrator. Installs skill x-story-refine,
+  skill x-epic-refine, PreToolUse hook enforce-refinement-gate.sh, and CI audit
+  audit-refinement-gate.sh. Universal — stack-agnostic.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: true
+tags:
+  - governance
+  - refinement
+  - dor
+  - quality-gate
+  - planning

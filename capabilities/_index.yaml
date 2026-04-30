@@ -38,3 +38,8 @@ categories:
     description: Runtime environments
     capabilities:
       - runtime.jvm.openjdk
+
+  - name: governance
+    description: Governance gates, refinement, and lifecycle enforcement
+    capabilities:
+      - governance.refinement-gate
