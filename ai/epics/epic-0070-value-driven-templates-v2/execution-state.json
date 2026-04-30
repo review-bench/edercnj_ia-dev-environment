@@ -1,0 +1,40 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0070",
+  "epicSlug": "value-driven-templates-v2",
+  "epicBranch": "epic/0070",
+  "targetBranch": "develop",
+  "mode": "sequential",
+  "interactive": false,
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "db60d8a8023a774f236c13e466e68de35fbcffce0c23e9e07b1d712bbc782840",
+    "dimensions": {
+      "problem":      { "checked": true, "blocker": null },
+      "persona":      { "checked": true, "blocker": null },
+      "value":        { "checked": true, "blocker": null },
+      "okrs":         { "checked": true, "blocker": null },
+      "alternatives": { "checked": true, "blocker": null },
+      "risks":        { "checked": true, "blocker": null },
+      "scope":        { "checked": true, "blocker": null }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0070-0001": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0002": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0003": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0004": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0005": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0006": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0007": { "status": "PENDING", "flowVersion": "4" },
+    "story-0070-0008": { "status": "PENDING", "flowVersion": "4" }
+  }
+}
