@@ -121,13 +121,16 @@ public final class HookConfigBuilder {
     }
 
     /**
-     * Emits the {@code Stop} event with TWO hook entries: the telemetry session-end emitter AND the
-     * EIE (Execution Integrity Enforcement) Camada 2 hook {@code verify-story-completion.sh} (Rule
-     * 24).
+     * Emits the {@code Stop} event hooks sequentially. When telemetry is enabled the sequence is:
+     * {@code telemetry-stop.sh} → {@code verify-story-completion.sh} (Rule 24 Camada 2 EIE) →
+     * {@code verify-phase-gates.sh} (Rule 25 Layer 2) → {@code enforce-continuous-flow.sh}
+     * (EPIC-0068 Camada 0) → {@code stage-telemetry.sh}. When telemetry is disabled the sequence
+     * is: {@code verify-phase-gates.sh} → {@code enforce-continuous-flow.sh}.
      *
-     * <p>The two commands run sequentially; {@code verify-story-completion.sh} exits 2 when a story
-     * commit is detected but mandatory evidence artifacts are missing, which Claude Code surfaces
-     * to the LLM as a blocking notification.
+     * <p>{@code verify-story-completion.sh} exits 2 when a story commit is detected but mandatory
+     * evidence artifacts are missing, which Claude Code surfaces to the LLM as a blocking
+     * notification. {@code enforce-continuous-flow.sh} exits 2 when a non-interactive orchestrator
+     * stalls mid-phase, emitting a {@code CONTINUOUS_FLOW_INTERRUPT} nudge.
      */
     private static void appendStopEventWithEie(StringBuilder sb, boolean telemetryEnabled) {
         sb.append(JsonHelpers.indent(2)).append("\"Stop\": [\n");

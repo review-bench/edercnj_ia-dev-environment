@@ -64,7 +64,7 @@ derive_next_mandatory_call() {
   emitted="$(jq -r 'select(.type=="tool.call") | .skill // .metadata.skill // ""' \
              "$ndjson" 2>/dev/null)" || return 2
   for skill in "${required_skills[@]}"; do
-    grep -qF "$skill" <<< "$emitted" || { echo "$skill"; return 0; }
+    grep -qxF "$skill" <<< "$emitted" || { echo "$skill"; return 0; }
   done
   echo "PHASE_COMPLETE"
   return 0
@@ -83,11 +83,13 @@ resolve_interactive_mode() {
 find_state_file() {
   local project_dir="$1" result="" candidate
   while IFS= read -r candidate; do
-    [[ -n "$candidate" && -f "$candidate" ]] && result="$candidate" && break
+    [[ -n "$candidate" && -f "$candidate" ]] || continue
+    if [[ -z "$result" || "$candidate" -nt "$result" ]]; then
+      result="$candidate"
+    fi
   done < <(
-    { find "$project_dir/ai/epics" -maxdepth 3 -name "execution-state.json" 2>/dev/null
-      find "$project_dir/plans"    -maxdepth 3 -name "execution-state.json" 2>/dev/null; } \
-      | head -1
+    find "$project_dir/ai/epics" -maxdepth 3 -name "execution-state.json" 2>/dev/null
+    find "$project_dir/plans"    -maxdepth 3 -name "execution-state.json" 2>/dev/null
   )
   echo "$result"
 }
@@ -118,16 +120,18 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   NDJSON="$(find "$EPIC_DIR/telemetry" -maxdepth 1 -name "events.ndjson" 2>/dev/null | head -1 || true)"
   [[ -z "$NDJSON" ]] && exit 0
 
-  # get last NDJSON event type
-  LAST_EVENT_TYPE="$(tail -1 "$NDJSON" 2>/dev/null | jq -r '.type // ""' 2>/dev/null || echo "")"
+  # get last NDJSON event fields (read once to avoid repeated I/O)
+  LAST_EVENT_JSON="$(tail -1 "$NDJSON" 2>/dev/null || echo "")"
+  LAST_EVENT_TYPE="$(jq -r '.type // ""' <<< "$LAST_EVENT_JSON" 2>/dev/null || echo "")"
+  LAST_EVENT_HAS_DURATION="$(jq -r 'has("durationMs")' <<< "$LAST_EVENT_JSON" 2>/dev/null || echo "false")"
   [[ -z "$LAST_EVENT_TYPE" ]] && exit 0
 
   # (e) legitimate pause
   [[ "$LAST_EVENT_TYPE" == "finding.critical" || "$LAST_EVENT_TYPE" == "finding.high" ]] && exit 0
   # (f) error events handled by other hooks
   [[ "$LAST_EVENT_TYPE" == "error" || "$LAST_EVENT_TYPE" == "tool.error" ]] && exit 0
-  # (g) tool.call still in-flight
-  [[ "$LAST_EVENT_TYPE" == "tool.call" ]] && exit 0
+  # (g) tool.call in-flight only when no durationMs; completed tool.call (has durationMs) may be a stall
+  [[ "$LAST_EVENT_TYPE" == "tool.call" && "$LAST_EVENT_HAS_DURATION" != "true" ]] && exit 0
 
   # (h) stall detected — gather nudge info
   ORCHESTRATOR="$(jq -r '.epicId // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")"

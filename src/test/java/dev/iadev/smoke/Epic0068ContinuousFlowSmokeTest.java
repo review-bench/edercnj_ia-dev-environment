@@ -119,7 +119,12 @@ class Epic0068ContinuousFlowSmokeTest {
         pb.redirectErrorStream(false);
         Process p = pb.start();
         p.getInputStream().readAllBytes();
-        p.waitFor(10, TimeUnit.SECONDS);
+        boolean finished = p.waitFor(10, TimeUnit.SECONDS);
+        if (!finished) {
+            p.destroyForcibly();
+            p.waitFor(5, TimeUnit.SECONDS);
+            throw new AssertionError("--self-check exceeded 10s timeout");
+        }
         assertThat(p.exitValue()).as("--self-check exits 0").isEqualTo(0);
     }
 
@@ -201,7 +206,12 @@ class Epic0068ContinuousFlowSmokeTest {
         Process p = pb.start();
         byte[] stderr = p.getErrorStream().readAllBytes();
         p.getInputStream().readAllBytes();
-        p.waitFor(10, TimeUnit.SECONDS);
+        boolean finished = p.waitFor(10, TimeUnit.SECONDS);
+        if (!finished) {
+            p.destroyForcibly();
+            p.waitFor(5, TimeUnit.SECONDS);
+            throw new AssertionError("hook exceeded 10s timeout");
+        }
         return new HookResult(p.exitValue(), new String(stderr, StandardCharsets.UTF_8));
     }
 
@@ -209,7 +219,12 @@ class Epic0068ContinuousFlowSmokeTest {
         Process p = pb.start();
         byte[] stderr = p.getErrorStream().readAllBytes();
         p.getInputStream().readAllBytes();
-        p.waitFor(10, TimeUnit.SECONDS);
+        boolean finished = p.waitFor(10, TimeUnit.SECONDS);
+        if (!finished) {
+            p.destroyForcibly();
+            p.waitFor(5, TimeUnit.SECONDS);
+            throw new AssertionError("process exceeded 10s timeout");
+        }
         return stderr;
     }
 
