@@ -43,3 +43,4 @@ categories:
     description: Governance gates, refinement, and lifecycle enforcement
     capabilities:
       - governance.refinement-gate
+      - governance.value-driven-templates
