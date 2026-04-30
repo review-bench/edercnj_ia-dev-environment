@@ -3,6 +3,7 @@
   "epicId": "EPIC-0078",
   "epicSlug": "context-budget-optimization",
   "createdAt": "2026-04-30T00:00:00Z",
+  "interactiveMode": "non-interactive",
   "taskTracking": {
     "enabled": true,
     "phaseGateResults": []
@@ -45,7 +46,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. Value measurable (>=4500 tokens reduction). AC covers happy-path, error/boundary, performance (<30s golden regen), security (path traversal). Contracts typed. 3 risks."
+        "verdictRationale": "Todas as dimensões aprovadas. Valor mensurável (≥4500 tokens de redução). AC cobre happy-path, error/boundary, performance (<30s regen golden), security (path traversal). Contratos tipados. 3 riscos."
       }
     },
     "story-0078-0003": {
@@ -85,7 +86,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. AC covers all 4 mandatory categories. Contracts typed (rename matrix), metrics (<=5 rules), alternatives (rename vs hard-cut), risks identified."
+        "verdictRationale": "Todas as dimensões aprovadas. AC cobre todas as 4 categorias obrigatórias. Contratos tipados (rename matrix), métricas (≤5 rules), alternativas (rename vs hard-cut), riscos identificados."
       }
     },
     "story-0078-0004": {
@@ -125,7 +126,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. AC: happy-path, error, performance (<5s), security (realpath). Contracts, metrics (<=200 lines, >=3000 tokens). Alternatives documented."
+        "verdictRationale": "Todas as dimensões aprovadas. AC: happy-path, error, performance (<5s), security (realpath). Contratos, métricas (≤200 linhas, ≥3000 tokens). Alternativas documentadas."
       }
     },
     "story-0078-0005": {
@@ -165,7 +166,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. AC: degenerate, happy, error, boundary, performance (<500ms), security (path traversal). Contracts (8 KP paths), metrics (>=6000 tokens). Alternatives documented."
+        "verdictRationale": "Todas as dimensões aprovadas. AC: degenerate, happy, error, boundary, performance (<500ms), security (path traversal). Contratos (8 KP paths), métricas (≥6000 tokens). Alternativas documentadas."
       }
     },
     "story-0078-0006": {
@@ -205,7 +206,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. AC: happy-path, error, performance (KP assembly <500ms), security (path traversal). Contracts typed. Metrics with unit+target."
+        "verdictRationale": "Todas as dimensões aprovadas. AC: happy-path, error, performance (KP assembly <500ms), security (path traversal). Contratos tipados. Métricas com unidade+target."
       }
     },
     "story-0078-0007": {
@@ -245,7 +246,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. Full AC coverage. Contracts, metrics, alternatives, risks all present."
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura completa de AC. Contratos, métricas, alternativas e riscos presentes."
       }
     },
     "story-0078-0008": {
@@ -285,7 +286,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. AC coverage including security and performance scenarios. Contracts, metrics, alternatives, risks present."
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura de AC incluindo cenários security e performance. Contratos, métricas, alternativas e riscos presentes."
       }
     },
     "story-0078-0009": {
@@ -325,7 +326,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All dimensions passed. Full AC coverage. All required dimensions clean."
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura completa de AC. Todas as dimensões obrigatórias limpas."
       }
     },
     "story-0078-0010": {
@@ -365,7 +366,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (audit <3s), security scenario added (path traversal rejection), metrics SLO updated from N/A to concrete target."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (audit <3s), cenário de security adicionado (path traversal rejeitado), SLO de métricas atualizado de N/A para target concreto."
       }
     },
     "story-0078-0011": {
@@ -405,7 +406,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (measure-context-budget >=10% reduction in <1s), security scenario added (invalid KP cross-reference rejected)."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (measure-context-budget ≥10% redução em <1s), cenário de security adicionado (referência inválida de KP rejeitada)."
       }
     },
     "story-0078-0012": {
@@ -445,7 +446,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (assembly <500ms for 11 profiles), security scenario added (path traversal in KP rejected), risks section added (3 risks)."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (assembly <500ms para 11 perfis), cenário de security adicionado (path traversal em KP rejeitado), seção de riscos adicionada (3 riscos)."
       }
     },
     "story-0078-0013": {
@@ -485,7 +486,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (measure <=baseline-14000 tokens, <1s), security scenario added (stub no-credential leak), risks section added."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (measure ≤baseline-14000 tokens, <1s), cenário de security adicionado (stub sem vazamento de credencial), seção de riscos adicionada."
       }
     },
     "story-0078-0014": {
@@ -525,7 +526,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All mandatory dimensions passed. Advisory risks gap (question-level only). EPIC-0064 Phase 2 dependency documented in DoR."
+        "verdictRationale": "Todas as dimensões obrigatórias aprovadas. Gap de riscos em nível advisory (question). Dependência de EPIC-0064 Phase 2 documentada no DoR."
       }
     },
     "story-0078-0015": {
@@ -565,7 +566,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GO resolved: performance/SLA scenario added (audit <3s P99 with 15 KPs + 40 SKILL.md). Security scenario was already present."
+        "verdictRationale": "NO-GO resolvido: cenário de performance/SLA adicionado (audit <3s P99 com 15 KPs + 40 SKILL.md). Cenário de security já estava presente."
       }
     },
     "story-0078-0016": {
@@ -605,7 +606,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (hard-fail audit <2s P99), security scenario added (adversarial baseline JSON -> BASELINE_CORRUPT)."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (hard-fail audit <2s P99), cenário de security adicionado (baseline JSON adversarial → BASELINE_CORRUPT)."
       }
     },
     "story-0078-0017": {
@@ -645,7 +646,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "NO-GOs resolved: performance/SLA scenario added (regen 11 profiles <30s), security scenario added (deletion integrity check)."
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (regen 11 perfis <30s), cenário de security adicionado (verificação de integridade de deleção)."
       }
     },
     "story-0078-0001": {
@@ -685,7 +686,7 @@
           }
         },
         "blockers": [],
-        "verdictRationale": "All 5 mandatory dimensions passed with zero gaps. AC covers all 4 mandatory categories: happy-path, error/boundary (corrupt baseline), performance/SLA (<2s audit), security/auth (path traversal rejection). Contracts fully typed with explicit exit codes. Alternatives documented. 3 risks with mitigations."
+        "verdictRationale": "Todas as 5 dimensões obrigatórias aprovadas sem gaps. AC cobre todas as 4 categorias: happy-path, error/boundary (baseline corrompido), performance/SLA (<2s audit), security/auth (path traversal rejeitado). Contratos totalmente tipados com exit codes explícitos. Alternativas documentadas. 3 riscos com mitigações."
       }
     }
   },
@@ -725,6 +726,6 @@
       }
     },
     "blockers": [],
-    "verdictRationale": "Refinement approved after 4-phase strategic analysis. 3 NO-GOs resolved via direct epic edits (\u00a71.4, \u00a71.5, \u00a71.6, \u00a71.7, \u00a72.1). 9 operator questions addressed. EPIC-0064 v5.0.0 already released unblocks story-0078-0014. New tests + RULE-011/RULE-012 codify Security KP enforcement and release-elapsed gate."
+    "verdictRationale": "Refinamento aprovado após análise estratégica 4-fases. 3 NO-GOs resolvidos via edições diretas do épico (§1.4, §1.5, §1.6, §1.7, §2.1). 9 questões do operador respondidas. EPIC-0064 v5.0.0 já lançado desbloqueia story-0078-0014. Novas regras RULE-011/RULE-012 codificam enforcement de Security KP e gate release-elapsed."
   }
 }
