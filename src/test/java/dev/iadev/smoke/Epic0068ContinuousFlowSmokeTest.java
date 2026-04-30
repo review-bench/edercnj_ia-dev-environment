@@ -38,11 +38,15 @@ class Epic0068ContinuousFlowSmokeTest {
     // ─── Scenario (h): NUDGE emitted ───────────────────────────────────────
 
     @Test
-    @DisplayName("hook emits CONTINUOUS_FLOW_INTERRUPT when phase open, non-interactive, last event=tool.result")
-    void hook_emitsNudgeWhen_phaseOpenAndNonInteractive_andLastEventIsToolResult(
-            @TempDir Path tmp) throws Exception {
-        HookResult result = executeHook(tmp, "state-non-interactive-open-phase.json",
-                "events-tool-result-last.ndjson");
+    @DisplayName(
+            "hook emits CONTINUOUS_FLOW_INTERRUPT when phase open, non-interactive, last event=tool.result")
+    void hook_emitsNudgeWhen_phaseOpenAndNonInteractive_andLastEventIsToolResult(@TempDir Path tmp)
+            throws Exception {
+        HookResult result =
+                executeHook(
+                        tmp,
+                        "state-non-interactive-open-phase.json",
+                        "events-tool-result-last.ndjson");
         assertThat(result.exitCode).as("exit 2 for stall").isEqualTo(2);
         assertThat(result.stderr).contains("CONTINUOUS_FLOW_INTERRUPT");
     }
@@ -52,8 +56,8 @@ class Epic0068ContinuousFlowSmokeTest {
     @Test
     @DisplayName("hook exits 0 when interactiveMode=interactive (Rule 19 guard)")
     void hook_skipsWhen_modeIsInteractive(@TempDir Path tmp) throws Exception {
-        HookResult result = executeHook(tmp, "state-interactive.json",
-                "events-tool-result-last.ndjson");
+        HookResult result =
+                executeHook(tmp, "state-interactive.json", "events-tool-result-last.ndjson");
         assertThat(result.exitCode).as("exit 0 for interactive mode").isEqualTo(0);
     }
 
@@ -62,8 +66,9 @@ class Epic0068ContinuousFlowSmokeTest {
     @Test
     @DisplayName("hook exits 0 when last NDJSON event is finding.high (legitimate pause)")
     void hook_skipsWhen_findingHighInLastNdjsonEvent(@TempDir Path tmp) throws Exception {
-        HookResult result = executeHook(tmp, "state-non-interactive-open-phase.json",
-                "events-finding-high.ndjson");
+        HookResult result =
+                executeHook(
+                        tmp, "state-non-interactive-open-phase.json", "events-finding-high.ndjson");
         assertThat(result.exitCode).as("exit 0 for finding.high").isEqualTo(0);
     }
 
@@ -84,8 +89,7 @@ class Epic0068ContinuousFlowSmokeTest {
                   }
                 }
                 """;
-        HookResult result = executeHookInline(tmp, emptyTasksState,
-                "events-empty-tasks.ndjson");
+        HookResult result = executeHookInline(tmp, emptyTasksState, "events-empty-tasks.ndjson");
         assertThat(result.exitCode).as("exit 0 for empty openTasks").isEqualTo(0);
     }
 
@@ -94,8 +98,12 @@ class Epic0068ContinuousFlowSmokeTest {
     @Test
     @DisplayName("hook exits 0 on hotfix/* branch (Rule 27 Exception 2)")
     void hook_skipsWhen_currentBranchIsHotfix(@TempDir Path tmp) throws Exception {
-        HookResult result = executeHookOnBranch(tmp, "state-non-interactive-open-phase.json",
-                "events-tool-result-last.ndjson", "hotfix/critical-fix");
+        HookResult result =
+                executeHookOnBranch(
+                        tmp,
+                        "state-non-interactive-open-phase.json",
+                        "events-tool-result-last.ndjson",
+                        "hotfix/critical-fix");
         assertThat(result.exitCode).as("exit 0 for hotfix branch").isEqualTo(0);
     }
 
@@ -146,8 +154,8 @@ class Epic0068ContinuousFlowSmokeTest {
         return runHook(tmp);
     }
 
-    private HookResult executeHookOnBranch(Path tmp, String stateFixture, String ndjsonFixture,
-            String branch) throws Exception {
+    private HookResult executeHookOnBranch(
+            Path tmp, String stateFixture, String ndjsonFixture, String branch) throws Exception {
         Path epicDir = setupEpicDir(tmp);
         copyFixture(stateFixture, epicDir.resolve("execution-state.json"));
         copyFixture(ndjsonFixture, epicDir.resolve("telemetry/events.ndjson"));
@@ -162,8 +170,7 @@ class Epic0068ContinuousFlowSmokeTest {
     }
 
     private void copyFixture(String fixtureName, Path dest) throws IOException {
-        URL url = getClass().getClassLoader()
-                .getResource("fixtures/epic-0068/" + fixtureName);
+        URL url = getClass().getClassLoader().getResource("fixtures/epic-0068/" + fixtureName);
         assertThat(url).as("fixture %s must exist", fixtureName).isNotNull();
         try (InputStream in = url.openStream()) {
             Files.copy(in, dest);
@@ -172,8 +179,18 @@ class Epic0068ContinuousFlowSmokeTest {
 
     private void initGitWithBranch(Path dir, String branch) throws Exception {
         runCommand(dir, "git", "init", "-q");
-        runCommand(dir, "git", "-c", "user.email=t@t", "-c", "user.name=T",
-                "commit", "--allow-empty", "-m", "init", "-q");
+        runCommand(
+                dir,
+                "git",
+                "-c",
+                "user.email=t@t",
+                "-c",
+                "user.name=T",
+                "commit",
+                "--allow-empty",
+                "-m",
+                "init",
+                "-q");
         runCommand(dir, "git", "checkout", "-q", "-b", branch);
     }
 

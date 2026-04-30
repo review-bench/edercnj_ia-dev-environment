@@ -117,9 +117,7 @@ class EnforceContinuousFlowHookTest {
                 .isGreaterThan(0);
         String fromStart = content.substring(startIdx);
         int endIdx = fromStart.indexOf("\n}\n");
-        assertThat(endIdx)
-                .as("function must have closing brace")
-                .isGreaterThan(0);
+        assertThat(endIdx).as("function must have closing brace").isGreaterThan(0);
         String funcBody = fromStart.substring(0, endIdx + 3);
         long lineCount = funcBody.lines().count();
         assertThat(lineCount)

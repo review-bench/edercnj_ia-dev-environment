@@ -80,9 +80,9 @@ public final class HooksAssembler implements Assembler {
 
     /**
      * EPIC-0068 continuous-flow Stop hook — always copied, independent of telemetry. {@code
-     * enforce-continuous-flow.sh} is the Stop-event Camada 0 hook that detects mid-phase stalls
-     * in non-interactive orchestrators and emits a {@code CONTINUOUS_FLOW_INTERRUPT} nudge
-     * (exit 2). Registered after {@code verify-phase-gates.sh} to run sequentially.
+     * enforce-continuous-flow.sh} is the Stop-event Camada 0 hook that detects mid-phase stalls in
+     * non-interactive orchestrators and emits a {@code CONTINUOUS_FLOW_INTERRUPT} nudge (exit 2).
+     * Registered after {@code verify-phase-gates.sh} to run sequentially.
      */
     public static final List<String> RULE_68_SCRIPTS = List.of("enforce-continuous-flow.sh");
 
