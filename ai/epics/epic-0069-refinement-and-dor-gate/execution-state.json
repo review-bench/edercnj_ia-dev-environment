@@ -8,12 +8,17 @@
     "enabled": true,
     "phaseGateResults": []
   },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-28T00:00:00Z"
+  },
   "storyStatuses": {
-    "story-0069-0001": { "status": "pending", "flowVersion": "4" },
-    "story-0069-0002": { "status": "pending", "flowVersion": "4" },
-    "story-0069-0003": { "status": "pending", "flowVersion": "4" },
-    "story-0069-0004": { "status": "pending", "flowVersion": "4" },
-    "story-0069-0005": { "status": "pending", "flowVersion": "4" },
+    "story-0069-0001": { "status": "done", "flowVersion": "4" },
+    "story-0069-0002": { "status": "done", "flowVersion": "4" },
+    "story-0069-0003": { "status": "done", "flowVersion": "4" },
+    "story-0069-0004": { "status": "done", "flowVersion": "4" },
+    "story-0069-0005": { "status": "in_progress", "flowVersion": "4" },
     "story-0069-0006": { "status": "pending", "flowVersion": "4" },
     "story-0069-0007": { "status": "pending", "flowVersion": "4" }
   },

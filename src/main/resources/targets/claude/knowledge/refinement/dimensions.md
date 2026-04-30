@@ -1,8 +1,6 @@
 ---
 name: refinement-dimensions
 description: Shared heuristics for story and epic refinement dimensions — acceptance and rejection rules used by x-story-refine and x-epic-refine persona-agents
-visibility: internal
-user-invocable: false
 requires-capabilities: [governance.refinement-gate]
 ---
 
