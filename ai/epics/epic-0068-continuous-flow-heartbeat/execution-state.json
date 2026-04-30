@@ -29,19 +29,19 @@
       "phase": 1,
       "blockedBy": ["story-0068-0001"],
       "blocks": ["story-0068-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "b1bdf2926",
+      "prNumber": 872
     },
     "story-0068-0003": {
       "status": "EmAndamento",
       "phase": 1,
       "blockedBy": ["story-0068-0001"],
       "blocks": ["story-0068-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "b1bdf2926",
+      "prNumber": 872
     },
     "story-0068-0004": {
-      "status": "Pendente",
+      "status": "EmAndamento",
       "phase": 2,
       "blockedBy": ["story-0068-0001", "story-0068-0002", "story-0068-0003"],
       "blocks": [],
