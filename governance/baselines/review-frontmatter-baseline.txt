@@ -1,0 +1,11 @@
+# review-frontmatter-baseline.txt
+#
+# Stories grandfathered from audit-review-frontmatter.sh (EPIC-0067).
+# Reviews merged before EPIC-0067 that lack frontmatter YAML v1.0.
+#
+# Format: <story-id>  # <reason>
+#
+# This file is append-only and immutable after EPIC-0067 merges to develop.
+# No new entries may be added post-merge; use audit-exempt marker instead.
+#
+# EMPTY — all reviews from EPIC-0067 onwards must have valid frontmatter.

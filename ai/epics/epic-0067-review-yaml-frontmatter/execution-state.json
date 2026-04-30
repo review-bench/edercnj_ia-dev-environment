@@ -8,14 +8,15 @@
   "epicMarkdownPath": "ai/epics/epic-0067-review-yaml-frontmatter/epic-0067.md",
   "implementationMapPath": "ai/epics/epic-0067-review-yaml-frontmatter/IMPLEMENTATION-MAP.md",
   "createdAt": "2026-04-28T00:00:00Z",
-  "status": "Em Execução",
+  "status": "Pronto para Revisão",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
     "phaseGateResults": [
       {"phase": "story-0067-0001", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
       {"phase": "story-0067-0002", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
-      {"phase": "story-0067-0003", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []}
+      {"phase": "story-0067-0003", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0004", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []}
     ]
   },
   "storyStatuses": {
@@ -44,12 +45,12 @@
       "prNumber": 867
     },
     "story-0067-0004": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 2,
       "blockedBy": ["story-0067-0001", "story-0067-0002", "story-0067-0003"],
       "blocks": [],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "515a392d6",
+      "prNumber": 868
     }
   },
   "externalDependencies": {
