@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iadev.dev/schemas/review-frontmatter-1.0.json",
+  "type": "object",
+  "required": ["schema-version", "generated-by", "story-id", "epic-id", "date", "decision", "score", "score-max", "severity-counts", "blocking-findings"],
+  "properties": {
+    "schema-version": { "const": "1.0" },
+    "generated-by": { "type": "string", "pattern": "^(x-review|x-review-pr)@[0-9a-f]{40}$" },
+    "story-id": { "type": "string", "pattern": "^story-[0-9]{4}-[0-9]{4}$" },
+    "epic-id": { "type": "string", "pattern": "^EPIC-[0-9]{4}$" },
+    "date": { "type": "string", "format": "date-time" },
+    "decision": { "enum": ["GO", "NO-GO", "GO-WITH-RESERVATIONS"] },
+    "score": { "type": "integer", "minimum": 0, "maximum": 55 },
+    "score-max": { "type": "integer", "minimum": 1, "maximum": 55 },
+    "severity-counts": {
+      "type": "object",
+      "required": ["critical", "high", "medium", "low", "info"],
+      "properties": {
+        "critical": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "medium": { "type": "integer", "minimum": 0 },
+        "low": { "type": "integer", "minimum": 0 },
+        "info": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "blocking-findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "title", "file"],
+        "properties": {
+          "severity": { "enum": ["critical", "high"] },
+          "title": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "recommendation": { "type": "string" }
+        }
+      }
+    },
+    "reviewers": {
+      "type": "array",
+      "items": { "enum": ["qa", "security", "performance", "devops", "database", "api", "event", "observability"] }
+    },
+    "checklist": {
+      "type": "object",
+      "required": ["passed", "total"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 1 },
+        "failed-sections": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Unit tests for {@link ScriptsAssembler}.
  *
- * <p>Validates that the assembler copies all 7 audit and utility scripts to the output scripts/
+ * <p>Validates that the assembler copies all 8 audit and utility scripts to the output scripts/
  * directory, sets executable permissions, and returns the correct list of generated paths.
  */
 @DisplayName("ScriptsAssemblerTest")
@@ -34,12 +34,12 @@ class ScriptsAssemblerTest {
     private final TemplateEngine engine = new TemplateEngine();
 
     @Test
-    @DisplayName("assemble returns paths for all 7 audit and utility scripts")
+    @DisplayName("assemble returns paths for all 8 audit and utility scripts")
     void assemble_returnsPathsForAllAuditScripts() {
         List<String> generated = assembler.assemble(config, engine, tempDir);
 
         assertThat(generated)
-                .as("Should generate 7 script paths")
+                .as("Should generate 8 script paths")
                 .hasSize(ScriptsAssembler.AUDIT_SCRIPTS.size());
     }
 
@@ -86,10 +86,10 @@ class ScriptsAssemblerTest {
     }
 
     @Test
-    @DisplayName("AUDIT_SCRIPTS list contains exactly 7 scripts")
+    @DisplayName("AUDIT_SCRIPTS list contains exactly 8 scripts")
     void auditScripts_constantHasExpectedSize() {
         assertThat(ScriptsAssembler.AUDIT_SCRIPTS)
-                .hasSize(7)
+                .hasSize(8)
                 .contains(
                         "audit-flow-version.sh",
                         "audit-epic-branches.sh",
@@ -97,6 +97,7 @@ class ScriptsAssemblerTest {
                         "audit-model-selection.sh",
                         "audit-execution-integrity.sh",
                         "audit-pr-template.sh",
+                        "audit-review-frontmatter.sh",
                         "telemetry-consolidate.sh");
     }
 

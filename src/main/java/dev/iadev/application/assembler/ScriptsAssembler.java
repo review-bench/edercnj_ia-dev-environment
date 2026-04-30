@@ -55,6 +55,7 @@ public final class ScriptsAssembler implements Assembler {
                     "audit-flow-version.sh",
                     "audit-model-selection.sh",
                     "audit-pr-template.sh",
+                    "audit-review-frontmatter.sh",
                     "audit-skill-visibility.sh",
                     "telemetry-consolidate.sh");
 

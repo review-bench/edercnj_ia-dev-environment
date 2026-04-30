@@ -409,51 +409,56 @@ No 4th option is offered. The gate terminates immediately. The menu was presente
 
 ## State File (opt-in)
 
-Written only when the operator selects **FIX-PR** (slot 2) in Step 8.4. Enables resume via `--resume-review <pr>`.
+Written only when the operator selects **FIX-PR** (slot 2) in Step 8.4. Enables resume via `--resume-review <pr>`. Path: `plans/review/<pr-number>/state.json`. Schema version `"1.0"` with fields `phase`, `lastPhaseCompletedAt`, `lastGateDecision`, `fixAttempts[]`, `schemaVersion`.
 
-**Path:** `plans/review/<pr-number>/state.json`
+See [`references/full-protocol.md`](references/full-protocol.md) for the full JSON schema, field definitions, and `--resume-review` resume semantics.
 
-**Schema (Rule 20 §State File Schema — version 1.0):**
+## Phase 5 — Emit Frontmatter (MANDATORY — Rule 24 §Camada-1)
 
-```json
-{
-  "phase": "GATE_FIX_PR",
-  "lastPhaseCompletedAt": "<ISO-8601 UTC>",
-  "lastGateDecision": "<PROCEED|FIX_PR|ABORT|null>",
-  "fixAttempts": [
-    {
-      "at": "<ISO-8601 UTC>",
-      "delegateSkill": "x-pr-fix",
-      "prNumber": 123,
-      "outcome": "applied"
-    }
-  ],
-  "schemaVersion": "1.0"
-}
-```
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-review-pr Phase-5-Frontmatter`
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `phase` | String | Yes | Always `"GATE_FIX_PR"` for this skill |
-| `lastPhaseCompletedAt` | String (ISO-8601 UTC) | Yes | Updated on each write |
-| `lastGateDecision` | String \| null | Yes | One of `PROCEED`, `FIX_PR`, `ABORT`, or `null` before first interaction |
-| `fixAttempts` | Array | Yes | Always present; `[]` before first fix; max 3 items |
-| `schemaVersion` | String | Yes | Literal `"1.0"` |
+> **MANDATORY TOOL CALL (Rule 24 §Camada-1):** This phase MUST NOT be inlined, simulated,
+> or omitted. The LLM MUST prepend the populated YAML frontmatter to the tech-lead review
+> artifact. Absent frontmatter is detected by `audit-review-frontmatter.sh` (Layer 3 CI)
+> and the Stop hook (Layer 2 runtime). There is no fallback when frontmatter emission fails.
 
-**`fixAttempts` entry fields:** `at` (ISO-8601 UTC), `delegateSkill` (always `"x-pr-fix"`), `prNumber` (PR number), `outcome` (`applied` \| `no_comments` \| `compile_regression` \| `aborted`).
+TaskCreate(
+  subject: "<STORY_ID> › Phase 5 › Emit tech-lead review frontmatter",
+  activeForm: "Emitting tech-lead review frontmatter",
+  metadata: {
+    "phase": "Phase 5",
+    "parentSkill": "x-review-pr",
+    "storyId": "<STORY_ID>",
+    "epicId": "<EPIC_ID>",
+    "expectedArtifacts": ["<path to techlead-review-story-XXXX-YYYY.md>"]
+  }
+)
 
-**Lifecycle:**
-- Written atomically (write to `<path>.tmp`, rename) when slot 2 (FIX-PR) is selected
-- Not written for PROCEED or ABORT selections
-- Not written on `--non-interactive` path
+Invoke pre-gate (Rule 25 §Invariants 4):
 
-**`--resume-review <pr>` flag:**
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-pr")
 
-When present, reads the state file at `plans/review/<pr>/state.json` and restores `gateAttempts` from `fixAttempts.size()`. If the state file satisfies the schema (Rule 20), the gate loop resumes from the last decision point. If the state file is absent or invalid, the gate starts fresh (gateAttempts = 0) with a warning:
-```
-WARNING: State file not found at plans/review/<pr>/state.json. Starting gate from scratch.
-```
-If the state file fails schema validation, emit `GATE_SCHEMA_INVALID` with the path and the missing/malformed field name.
+After Phase 4 has produced the prose body of `techlead-review-story-<STORY_ID>.md`,
+prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`.
+The full YAML template and field notes are in [`references/full-protocol.md §Phase 5`](references/full-protocol.md).
+
+Key fields: `schema-version: "1.0"`, `generated-by: x-review-pr@<40-hex SHA>` (matches schema pattern `^(x-review|x-review-pr)@[0-9a-f]{40}$`), `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
+
+After writing the artifact, validate:
+
+    Bash command: `$CLAUDE_PROJECT_DIR/.claude/scripts/audit-review-frontmatter.sh --story <STORY_ID>`
+
+If the script returns exit ≠ 0, abort with `REVIEW_FRONTMATTER_INVALID`. No fallback.
+
+Invoke post-gate (Rule 25 §Invariants 4):
+
+    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-pr --expected-artifacts <path to techlead-review-story-XXXX-YYYY.md>")
+
+TaskUpdate(taskId: <id from TaskCreate above>, status: "completed")
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review-pr Phase-5-Frontmatter ok`
 
 ## Error Codes
 

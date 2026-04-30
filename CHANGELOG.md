@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0067 (Review YAML Frontmatter)
+
+- **`governance/schemas/review-frontmatter-1.0.json`** (JSON Schema Draft 2020-12): validates review YAML frontmatter blocks in `review-story-*.md` and `techlead-review-story-*.md`. 10 required fields: `schema-version`, `generated-by`, `story-id`, `epic-id`, `date`, `decision`, `score`, `score-max`, `severity-counts`, `blocking-findings`. `decision` enum: `GO | NO-GO | GO-WITH-RESERVATIONS`.
+- **`<!-- template-version: 1.0 -->` comment + YAML frontmatter block** added to `_TEMPLATE-SPECIALIST-REVIEW.md` and `_TEMPLATE-TECH-LEAD-REVIEW.md`. `x-review` and `x-review-pr` skills updated to emit frontmatter on every review artifact.
+- **`audit-review-frontmatter.sh`** (CI audit — Rule 26 §CI script): validates all `review-story-*.md` / `techlead-review-story-*.md` in `--all` / `--epic <ID>` / `--story <ID>` modes. Requires `yq` + `jq`. Baseline: `governance/baselines/review-frontmatter-baseline.txt` (empty — no pre-EPIC-0067 grandfather entries). Exit codes: `0` = OK · `1` = `REVIEW_FRONTMATTER_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `INVALID_EXEMPTION`.
+- **`ScriptsAssembler.AUDIT_SCRIPTS`** updated: `audit-review-frontmatter.sh` added to the canonical 8-script list; all 10 golden profiles regenerated.
+- **`docs/audit-gates-catalog.md`** created: canonical index of all governance CI scripts across all 5 layers (Camada 0–4); entry for `audit-review-frontmatter.sh` added per Rule 26 §Catalog-before-Add (RULE-004).
+- **`AuditReviewFrontmatterTest`** (8 behavioural scenarios) and **`Epic0067ReviewFrontmatterSmokeTest`** (5 E2E scenarios) validate schema well-formedness, specialist + tech-lead fixture passes, violation detection for missing/invalid fields, baseline grandfathering, self-check, and v3/v4 path resolution.
+
 ### Added — EPIC-0066 (PR Body Templates & Telemetry-Aware Review Visibility)
 
 - **Two new PR body templates** under `shared/templates/`:

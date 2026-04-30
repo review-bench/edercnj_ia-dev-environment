@@ -1,0 +1,20 @@
+{
+  "storyId": "story-0067-0001",
+  "epicId": "EPIC-0067",
+  "passed": true,
+  "timestamp": "2026-04-29T23:37:00Z",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "reviewDecision": "GO",
+  "techLeadDecision": "GO",
+  "checks": [
+    {"name": "tests-pass", "passed": true, "detail": "15/15 tests green (ReviewFrontmatterSchemaTest + GoldenFileTest + PlatformGoldenFileTest)"},
+    {"name": "schema-exists", "passed": true, "detail": "governance/schemas/review-frontmatter-1.0.json created"},
+    {"name": "specialist-template-updated", "passed": true, "detail": "_TEMPLATE-SPECIALIST-REVIEW.md has frontmatter block (PR #862)"},
+    {"name": "techlead-template-updated", "passed": true, "detail": "_TEMPLATE-TECH-LEAD-REVIEW.md has frontmatter block (PR #863)"},
+    {"name": "golden-files-regenerated", "passed": true, "detail": "20 golden files updated across 10 profiles (PR #865)"},
+    {"name": "specialist-review", "passed": true, "detail": "GO 47/50 — no blocking findings"},
+    {"name": "techlead-review", "passed": true, "detail": "GO 52/55 — no blocking findings"}
+  ],
+  "mergedPRs": [861, 862, 863, 864, 865]
+}

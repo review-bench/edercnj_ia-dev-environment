@@ -8,44 +8,49 @@
   "epicMarkdownPath": "ai/epics/epic-0067-review-yaml-frontmatter/epic-0067.md",
   "implementationMapPath": "ai/epics/epic-0067-review-yaml-frontmatter/IMPLEMENTATION-MAP.md",
   "createdAt": "2026-04-28T00:00:00Z",
-  "status": "Backlog",
+  "status": "Pronto para Revisão",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
-    "phaseGateResults": []
+    "phaseGateResults": [
+      {"phase": "story-0067-0001", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0002", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0003", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []},
+      {"phase": "story-0067-0004", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": []}
+    ]
   },
   "storyStatuses": {
     "story-0067-0001": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0067-0002", "story-0067-0003", "story-0067-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "482e59bb4a18095ba6055d134c35473fa16826b9",
+      "prNumber": 865
     },
     "story-0067-0002": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0067-0001"],
       "blocks": ["story-0067-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "38d99212a19a5bd33807be0b740ec3fd26b1cd7d",
+      "prNumber": 866
     },
     "story-0067-0003": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 1,
       "blockedBy": ["story-0067-0001"],
       "blocks": ["story-0067-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "38d99212a19a5bd33807be0b740ec3fd26b1cd7d",
+      "prNumber": 867
     },
     "story-0067-0004": {
-      "status": "Pendente",
+      "status": "COMPLETE",
       "phase": 2,
       "blockedBy": ["story-0067-0001", "story-0067-0002", "story-0067-0003"],
       "blocks": [],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "515a392d6",
+      "prNumber": 868
     }
   },
   "externalDependencies": {
