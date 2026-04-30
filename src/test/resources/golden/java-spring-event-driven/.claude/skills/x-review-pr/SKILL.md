@@ -112,6 +112,14 @@ test -f .claude/templates/_TEMPLATE-TECH-LEAD-REVIEW.md && echo "TL_TEMPLATE_AVA
 
 > **Fallback (RULE-012 — Graceful template fallback):** When template is not available (pre-EPIC-0024 projects), the current inline format is used as fallback. Skip dashboard and remediation updates since they depend on template-based artifacts.
 
+Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+
+Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
+    TaskUpdate(id: phase0TaskId, status: "completed")
+
 ## Phase 1 — Execute 45-point review
 
 Open a phase tracker; PRE gate ensures Phase 0 completed:

@@ -87,6 +87,12 @@ Open a phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "complete
 
 Check for existing `state.json` (`--state-file` override or default `ai/releases/release-state-X.Y.Z.json`). If `--continue-after-merge`: load state, verify `phase == APPROVAL_PENDING`. Handle `--status` (read-only, exit 0) and `--abort`. See `references/full-protocol.md §Phase 0`.
 
+Persist interactiveMode to release state (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+    Skill(skill: "x-internal-status-update", args: "--file ai/releases/release-state-{version}.json --type release --id <VERSION> --field interactiveMode --value <interactive|non-interactive>")
+
+Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
     TaskUpdate(id: phase0TaskId, status: "completed")
 
 ## Phase 1 - Determine
