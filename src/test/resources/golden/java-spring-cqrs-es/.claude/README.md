@@ -92,9 +92,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
 | 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 29 | `29-refinement-gate.md` | refinement gate |
+| 30 | `30-value-driven-templates.md` | value driven templates |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 26 rules**
+**Total: 27 rules**
 
 ### Numbering
 
@@ -342,7 +343,7 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 26 |
+| Rules (.claude) | 27 |
 | Skills (.claude) | 73 |
 | Knowledge Packs (.claude) | 19 |
 | Agents (.claude) | 12 |

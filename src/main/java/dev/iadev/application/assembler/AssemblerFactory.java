@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Factory that instantiates the 25 assemblers in the fixed order defined by RULE-005.
+ * Factory that instantiates the 26 assemblers in the fixed order defined by RULE-005.
  *
  * <p>Extracted from {@link AssemblerPipeline} to keep both classes under 250 lines per RULE-004.
  *
@@ -30,7 +30,7 @@ public final class AssemblerFactory {
     }
 
     /**
-     * Builds the ordered list of 25 assemblers per RULE-005.
+     * Builds the ordered list of 26 assemblers per RULE-005.
      *
      * <p>Delegates to group builders by category: constitution, core, docs, cicd, and readme. The
      * options parameter controls constitution preservation behavior.
@@ -44,13 +44,13 @@ public final class AssemblerFactory {
     }
 
     /**
-     * Builds ALL 25 assemblers without platform filtering.
+     * Builds ALL 26 assemblers without platform filtering.
      *
      * <p>Use this when you need the complete list for verbose/dry-run comparison against filtered
      * list.
      *
      * @param options pipeline options controlling assembler behavior (platforms field is ignored)
-     * @return immutable ordered list of all 23 assembler descriptors
+     * @return immutable ordered list of all 26 assembler descriptors
      */
     public static List<AssemblerDescriptor> buildAllAssemblers(PipelineOptions options) {
         List<AssemblerDescriptor> all = new ArrayList<>();
@@ -139,7 +139,12 @@ public final class AssemblerFactory {
                         "DataMigrationPlanAssembler",
                         AssemblerTarget.ROOT,
                         shared,
-                        new DataMigrationPlanAssembler()));
+                        new DataMigrationPlanAssembler()),
+                desc(
+                        "SystemArchAssembler",
+                        AssemblerTarget.ROOT,
+                        shared,
+                        new SystemArchAssembler()));
     }
 
     private static List<AssemblerDescriptor> buildCicdAssemblers() {

@@ -687,15 +687,15 @@ class PlanTemplatesAssemblerTest {
                 buildContent(
                         "Epic",
                         List.of(
-                                "1. Contexto & Escopo",
-                                "2. Packages (Hexagonal)",
-                                "3. Contratos & Endpoints",
-                                "4. Materialização SOLID",
-                                "5. Quality Gates",
-                                "6. Segurança",
-                                "7. Observabilidade",
-                                "8. Decision Rationale",
-                                "9. Dependências" + " & File Footprint"),
+                                "1. Visão & Problema",
+                                "2. Persona & Stakeholders",
+                                "3. Hipótese & OKRs",
+                                "4. Alternativas Consideradas",
+                                "5. Escopo",
+                                "6. Riscos",
+                                "7. Índice de Histórias",
+                                "8. Quality Gates",
+                                "Refinement Verdict"),
                         false));
 
         writeTemplate(
@@ -704,15 +704,15 @@ class PlanTemplatesAssemblerTest {
                 buildContent(
                         "Story",
                         List.of(
-                                "1. Contexto & Escopo",
-                                "2. Packages (Hexagonal)",
-                                "3. Contratos & Endpoints",
-                                "4. Materialização SOLID",
-                                "5. Quality Gates",
-                                "6. Segurança",
-                                "7. Observabilidade",
+                                "1. Visão",
+                                "2. Persona & Cenário",
+                                "3. Entrega de Valor",
+                                "4. AC (Gherkin — 4 categorias mandatórias)",
+                                "5. Contratos",
+                                "6. Tasks",
+                                "7. Dependências",
                                 "8. Decision Rationale",
-                                "9. Dependências" + " & File Footprint"),
+                                "9. Refinement Verdict"),
                         false));
 
         writeTemplate(

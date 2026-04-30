@@ -24,7 +24,7 @@ class PlatformFilterTest {
 
             List<AssemblerDescriptor> result = PlatformFilter.filter(all, Set.of());
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
             assertThat(result).isEqualTo(all);
         }
 
@@ -36,7 +36,7 @@ class PlatformFilterTest {
             List<AssemblerDescriptor> result =
                     PlatformFilter.filter(all, Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
             assertThat(result).isEqualTo(all);
         }
     }
@@ -46,14 +46,14 @@ class PlatformFilterTest {
     class SinglePlatform {
 
         @Test
-        @DisplayName("CLAUDE_CODE returns 24 assemblers " + "(11 claude + 14 shared)")
-        void filter_claudeCode_returns25() {
+        @DisplayName("CLAUDE_CODE returns 26 assemblers " + "(11 claude + 15 shared)")
+        void filter_claudeCode_returns26() {
             List<AssemblerDescriptor> all = AssemblerFactory.buildAssemblers();
 
             List<AssemblerDescriptor> result =
                     PlatformFilter.filter(all, Set.of(Platform.CLAUDE_CODE));
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
             assertThat(result)
                     .allSatisfy(
                             d ->
@@ -70,8 +70,8 @@ class PlatformFilterTest {
     class SharedAlwaysIncluded {
 
         @Test
-        @DisplayName("CLAUDE_CODE includes all 14 " + "SHARED assemblers")
-        void filter_claudeCode_includes14Shared() {
+        @DisplayName("CLAUDE_CODE includes all 15 " + "SHARED assemblers")
+        void filter_claudeCode_includes15Shared() {
             List<AssemblerDescriptor> all = AssemblerFactory.buildAssemblers();
 
             List<AssemblerDescriptor> result =
@@ -79,7 +79,7 @@ class PlatformFilterTest {
 
             long sharedCount =
                     result.stream().filter(d -> d.platforms().contains(Platform.SHARED)).count();
-            assertThat(sharedCount).isEqualTo(14);
+            assertThat(sharedCount).isEqualTo(15);
         }
 
         @Test
@@ -152,24 +152,24 @@ class PlatformFilterTest {
 
             List<AssemblerDescriptor> result = AssemblerFactory.buildAssemblers(options);
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
         }
 
         @Test
-        @DisplayName("buildAssemblers with default " + "options returns all 24")
+        @DisplayName("buildAssemblers with default " + "options returns all 26")
         void buildAssemblers_defaults_returnsAll() {
             List<AssemblerDescriptor> result =
                     AssemblerFactory.buildAssemblers(PipelineOptions.defaults());
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
         }
 
         @Test
-        @DisplayName("buildAssemblers no-arg returns " + "all 24")
+        @DisplayName("buildAssemblers no-arg returns " + "all 26")
         void buildAssemblers_noArg_returnsAll() {
             List<AssemblerDescriptor> result = AssemblerFactory.buildAssemblers();
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
         }
     }
 
@@ -197,7 +197,7 @@ class PlatformFilterTest {
             // match
             List<AssemblerDescriptor> result = PlatformFilter.filter(all, Set.of(Platform.SHARED));
 
-            assertThat(result).hasSize(14);
+            assertThat(result).hasSize(15);
             assertThat(result)
                     .allSatisfy(d -> assertThat(d.platforms().contains(Platform.SHARED)).isTrue());
         }
