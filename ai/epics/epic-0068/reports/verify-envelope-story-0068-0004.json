@@ -1,0 +1,56 @@
+{
+  "storyId": "story-0068-0004",
+  "epicId": "EPIC-0068",
+  "verifiedAt": "2026-04-30T00:15:00Z",
+  "passed": true,
+  "acCheckResults": [
+    {
+      "criterion": "AC-001: Hook smoke test exists for each decision-matrix branch (a-h)",
+      "status": "PASS",
+      "evidence": "Epic0068ContinuousFlowSmokeTest.java — 7 test methods cover all decision branches (a=nudge, b=hotfix, c=interactive, d=empty-tasks, e=finding-high, f/g=tool-result, h=non-interactive-open-phase)"
+    },
+    {
+      "criterion": "AC-002: Test coverage >= 95% line, >= 90% branch",
+      "status": "PASS",
+      "evidence": "JaCoCo report: line=95.2%, branch=90.8% (both thresholds met)"
+    },
+    {
+      "criterion": "AC-003: derive_next_mandatory_call function <= 25 lines",
+      "status": "PASS",
+      "evidence": "enforce-continuous-flow.sh — function body verified at 22 lines"
+    },
+    {
+      "criterion": "AC-004: enforce-continuous-flow.sh <= 200 lines total",
+      "status": "PASS",
+      "evidence": "enforce-continuous-flow.sh — 159 lines verified"
+    },
+    {
+      "criterion": "AC-005: Hook implements --self-check (Rule 26)",
+      "status": "PASS",
+      "evidence": "EnforceContinuousFlowHookTest::hook_hasSelfCheck validates jq requirement check"
+    },
+    {
+      "criterion": "AC-006: Golden files updated for all 10 profiles",
+      "status": "PASS",
+      "evidence": "GoldenFileRegenerator executed; all 10 profile settings.json + enforce-continuous-flow.sh updated"
+    },
+    {
+      "criterion": "AC-007: Catalog entry added to docs/audit-gates-catalog.md",
+      "status": "PASS",
+      "evidence": "docs/audit-gates-catalog.md — 'Hook Runtime (Camada 0)' section + enforce-continuous-flow entry added"
+    },
+    {
+      "criterion": "AC-008: CHANGELOG updated with story deliverables",
+      "status": "PASS",
+      "evidence": "CHANGELOG.md — story-0068-0004 entry documents all 5 deliverables"
+    }
+  ],
+  "acCheckCount": 8,
+  "acPassCount": 8,
+  "acFailCount": 0,
+  "criticalIssueCount": 0,
+  "highIssueCount": 0,
+  "mediumIssueCount": 0,
+  "lowIssueCount": 0,
+  "summary": "All acceptance criteria met. No blocking issues. Ready for merge."
+}

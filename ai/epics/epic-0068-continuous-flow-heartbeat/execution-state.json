@@ -41,12 +41,12 @@
       "prNumber": 872
     },
     "story-0068-0004": {
-      "status": "EmAndamento",
+      "status": "Concluido",
       "phase": 2,
       "blockedBy": ["story-0068-0001", "story-0068-0002", "story-0068-0003"],
       "blocks": [],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "c4f8e9a2d",
+      "prNumber": 874
     }
   }
 }
