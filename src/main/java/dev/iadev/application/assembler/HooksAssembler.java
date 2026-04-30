@@ -3,6 +3,7 @@ package dev.iadev.application.assembler;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.stack.StackMapping;
 import dev.iadev.template.TemplateEngine;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -88,8 +89,8 @@ public final class HooksAssembler implements Assembler {
 
     /**
      * EPIC-0069 refinement gate PreToolUse hook — always copied, independent of telemetry. {@code
-     * enforce-refinement-gate.sh} is the PreToolUse Camada 0 hook that blocks orchestrators
-     * ({@code x-story-implement}, {@code x-epic-implement}, {@code x-task-implement}, {@code
+     * enforce-refinement-gate.sh} is the PreToolUse Camada 0 hook that blocks orchestrators ({@code
+     * x-story-implement}, {@code x-epic-implement}, {@code x-task-implement}, {@code
      * x-epic-orchestrate}) when {@code refinementVerdict.status != "approved"} (Rule 29 — exit 33
      * {@code REFINEMENT_REQUIRED}).
      */

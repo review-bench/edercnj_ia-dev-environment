@@ -2,25 +2,25 @@ package dev.iadev.smoke;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+
 /**
  * E2E smoke tests for EPIC-0069 (Story Refinement & DoR Gate / Rule 29).
  *
- * <p>Validates the 6 canonical scenarios cooperatively across Camada 0
- * (PreToolUse hook {@code enforce-refinement-gate.sh}) and Camada 2
- * (CI script {@code audit-refinement-gate.sh}). Complements the bash
- * unit suites {@code enforce_refinement_gate_test.sh} and
- * {@code audit_refinement_gate_test.sh}.
+ * <p>Validates the 6 canonical scenarios cooperatively across Camada 0 (PreToolUse hook {@code
+ * enforce-refinement-gate.sh}) and Camada 2 (CI script {@code audit-refinement-gate.sh}).
+ * Complements the bash unit suites {@code enforce_refinement_gate_test.sh} and {@code
+ * audit_refinement_gate_test.sh}.
  */
 @DisplayName("Epic0069RefinementGateSmokeIT — Refinement Gate E2E")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "POSIX bash hook + CI script")
@@ -195,8 +195,7 @@ class Epic0069RefinementGateSmokeIT {
         Files.createDirectories(tmp.resolve(".claude/hooks"));
         Files.createDirectories(tmp.resolve("governance/baselines"));
         Files.createDirectories(tmp.resolve("capabilities/governance"));
-        Files.writeString(
-                tmp.resolve(".claude/rules/29-refinement-gate.md"), "# Rule 29 stub\n");
+        Files.writeString(tmp.resolve(".claude/rules/29-refinement-gate.md"), "# Rule 29 stub\n");
         Files.writeString(
                 tmp.resolve(".claude/hooks/enforce-refinement-gate.sh"), "#!/usr/bin/env bash\n");
         Files.writeString(
@@ -214,7 +213,11 @@ class Epic0069RefinementGateSmokeIT {
         try {
             ProcessBuilder pb =
                     new ProcessBuilder(
-                            "bash", "-c", "cat \"$1\" | bash \"$2\"", "--", payloadFile.toString(),
+                            "bash",
+                            "-c",
+                            "cat \"$1\" | bash \"$2\"",
+                            "--",
+                            payloadFile.toString(),
                             HOOK.toString());
             pb.environment().put("CLAUDE_PROJECT_DIR", projectDir.toString());
             return waitProcess(pb);

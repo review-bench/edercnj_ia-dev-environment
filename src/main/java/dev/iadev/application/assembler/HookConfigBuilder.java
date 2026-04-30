@@ -173,8 +173,8 @@ public final class HookConfigBuilder {
      * <p>All entries run under the same wildcard matcher. Both enforcement scripts short-circuit on
      * {@code tool_name != "Skill"}.
      *
-     * <p>Decoupling from telemetry: Rule 25, Rule 59, and Rule 69 define enforcement as runtime (not
-     * observability), so disabling telemetry does NOT disable these hooks.
+     * <p>Decoupling from telemetry: Rule 25, Rule 59, and Rule 69 define enforcement as runtime
+     * (not observability), so disabling telemetry does NOT disable these hooks.
      */
     private static void appendPreToolUseWithPhaseSequence(
             StringBuilder sb, boolean telemetryEnabled) {
