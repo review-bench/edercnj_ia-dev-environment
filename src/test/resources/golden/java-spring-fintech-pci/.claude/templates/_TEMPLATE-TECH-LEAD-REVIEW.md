@@ -14,13 +14,11 @@ severity-counts:
   medium: {{MEDIUM_COUNT}}
   low: {{LOW_COUNT}}
   info: {{INFO_COUNT}}
-blocking-findings:
-{{BLOCKING_FINDINGS_YAML}}
+blocking-findings: {{BLOCKING_FINDINGS_YAML}}
 checklist:
   passed: {{CHECKLIST_PASSED}}
   total: 45
-  failed-sections:
-{{FAILED_SECTIONS_YAML}}
+  failed-sections: {{FAILED_SECTIONS_YAML}}
 ---
 # Tech Lead Review — {{STORY_ID}}
 

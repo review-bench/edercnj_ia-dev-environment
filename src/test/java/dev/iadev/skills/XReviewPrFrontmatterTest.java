@@ -61,6 +61,14 @@ class XReviewPrFrontmatterTest {
         assertThat(content)
                 .as("Phase 5 must emit score-max: 55 (tech-lead constant)")
                 .contains("score-max: 55");
+        assertThat(content)
+                .as(
+                        "Phase 5 MUST NOT document a YAML field 'reviewers:' — Tech Lead is sole"
+                                + " reviewer; checklist replaces it")
+                .doesNotContain("reviewers:");
+        assertThat(content)
+                .as("Phase 5 must document generated-by prefix 'x-review-pr@' (schema pattern)")
+                .contains("x-review-pr@");
     }
 
     @Test

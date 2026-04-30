@@ -439,7 +439,7 @@ After Phase 4 has produced the prose body of `techlead-review-story-<STORY_ID>.m
 prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`.
 The full YAML template and field notes are in [`references/full-protocol.md §Phase 5`](references/full-protocol.md).
 
-Key fields: `schema-version: "1.0"`, `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
+Key fields: `schema-version: "1.0"`, `generated-by: x-review-pr@<40-hex SHA>` (matches schema pattern `^(x-review|x-review-pr)@[0-9a-f]{40}$`), `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
 
 After writing the artifact, validate:
 

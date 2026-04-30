@@ -1,13 +1,13 @@
 <!-- template-version: 1.0 -->
 ---
 schema-version: "1.0"
-generated-by: x-review@claude-opus-4-7
+generated-by: x-review@3f48abe31033f5d86194ac476112db42ca911d7f
 story-id: story-0067-0004
 epic-id: EPIC-0067
 date: 2026-04-29T12:00:00Z
 decision: GO-WITH-RESERVATIONS
-score: 100
-score-max: 112
+score: 49
+score-max: 55
 severity-counts:
   critical: 0
   high: 0
@@ -16,10 +16,10 @@ severity-counts:
   info: 0
 blocking-findings: []
 reviewers:
-  - QA
-  - Performance
-  - Security
-  - DevOps
+  - qa
+  - performance
+  - security
+  - devops
 ---
 
 # Specialist Review — story-0067-0004
@@ -54,8 +54,8 @@ None.
 
 **[QA-16] INVALID_EXEMPTION exit-3 path not tested**
 - File: `src/test/java/dev/iadev/skills/AuditReviewFrontmatterTest.java`
-- Description: The audit script exits with code 3 when `<!-- audit-exempt: -->` marker has no reason text. Neither `AuditReviewFrontmatterTest` nor `Epic0067ReviewFrontmatterSmokeTest` exercises this branch. Exit-3 is a documented contract in Rule 26 §Standardized and in the script header.
-- Fix: Add `@Test void auditScript_auditExemptMissingReason_exitsThree()` that writes a review file with `<!-- audit-exempt: -->` (no reason) and asserts `exitCode == 3` + `stderr.contains("INVALID_EXEMPTION")`.
+- Description: The audit script exits with code 3 when an `audit-exempt` HTML comment marker has no reason text after the colon. Neither `AuditReviewFrontmatterTest` nor `Epic0067ReviewFrontmatterSmokeTest` exercises this branch. Exit-3 is a documented contract in Rule 26 §Standardized and in the script header.
+- Fix: Add `@Test void auditScript_auditExemptMissingReason_exitsThree()` that writes a review file with an empty-reason `audit-exempt` marker and asserts `exitCode == 3` + `stderr.contains("INVALID_EXEMPTION")`.
 
 **[SEC-16] Path traversal prevention code has no test coverage**
 - File: `src/test/java/dev/iadev/skills/AuditReviewFrontmatterTest.java`
@@ -64,7 +64,7 @@ None.
 
 ### LOW
 
-**[QA-17] audit-exempt happy path not tested** — File path skipped when valid `<!-- audit-exempt: reason -->` present is untested. Add test asserting exit 0 when marker has reason.
+**[QA-17] audit-exempt happy path not tested** — File path skipped when a valid `audit-exempt` marker (with non-empty reason text) is present is untested. Add test asserting exit 0 when marker has a reason.
 
 **[QA-18] Unknown flag OPERATIONAL_ERROR not tested** — `run(List.of("--bad-flag"))` should exit 2; not exercised.
 

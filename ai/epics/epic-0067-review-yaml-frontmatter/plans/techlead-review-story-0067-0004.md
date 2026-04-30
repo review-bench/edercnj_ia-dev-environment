@@ -1,7 +1,7 @@
 <!-- template-version: 1.0 -->
 ---
 schema-version: "1.0"
-generated-by: x-review-pr@claude-opus-4-7
+generated-by: x-review-pr@3f48abe31033f5d86194ac476112db42ca911d7f
 story-id: story-0067-0004
 epic-id: EPIC-0067
 date: 2026-04-29T12:00:00Z
@@ -80,7 +80,7 @@ None.
 
 | # | File | Line | Description | Suggestion |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | `AuditReviewFrontmatterTest.java` | — | audit-exempt happy path (marker with reason → skip) not tested | Add test: file with `<!-- audit-exempt: legacy review -->` → exit 0 |
+| 1 | `AuditReviewFrontmatterTest.java` | — | audit-exempt happy path (marker with reason → skip) not tested | Add test: file with a non-empty-reason `audit-exempt` HTML comment marker → exit 0 |
 | 2 | `AuditReviewFrontmatterTest.java` | — | Unknown-flag OPERATIONAL_ERROR not tested | Add: `run(List.of("--bad-flag"))` → assertThat exitCode == 2 |
 | 3 | `audit-review-frontmatter.sh` | 91 | `grep -q "^${story_id}$"` without `-F` — story_id is regex-constrained (safe) but `grep -qF` is more defensive idiom | Change to `grep -qxF "${story_id}"` for fixed-string + whole-line match |
 | 4 | `ScriptsAssembler.java` | — | No direct assertion in `ScriptsAssemblerTest` that `audit-review-frontmatter.sh` is in `AUDIT_SCRIPTS` | Add `assertThat(ScriptsAssembler.AUDIT_SCRIPTS).contains("audit-review-frontmatter.sh")` |
