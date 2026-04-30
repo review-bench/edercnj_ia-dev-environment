@@ -4,6 +4,8 @@
 
 > ℹ️ **Refinamento cross-cutting aplicado em 2026-04-28** — paths e referências atualizados conforme epic-0069.md §10 (D-R1..D-R11). Principais correções: D-R3 (Rule 29 publica máquina de estados, não Rule 22); D-R4 (skills em `plan/`, não `refine/`); D-R6 (Rule/ADR numbers são working-titles).
 
+> ℹ️ **Reescopo multi-persona aplicado em 2026-04-29** — stories 0069-0002 e 0069-0003 deixam de ser inquéritos lineares e passam a ser **dispatchers multi-persona** (D-R12..D-R15). Arquitetura interna: Phases A/B/C/D (análise paralela → batch único de perguntas → refinamento paralelo → consolidação por Architect). Complexidade das stories sobe de SIMPLE/STANDARD para STANDARD/COMPLEX. Phasing inter-stories (sequencial vs paralelo) **não muda** — file-footprints continuam distintos.
+
 ---
 
 ## 1. Matriz de Dependências
@@ -11,8 +13,8 @@
 | Story | Título | Chave Jira | Blocked By | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | story-0069-0001 | Capability `governance.refinement-gate` + Rule 29 + ADR-0018 | — | — | 0002, 0003, 0004 | Pendente |
-| story-0069-0002 | Skill `/x-story-refine` (interativa, 6 dimensões) | — | 0001 | 0005, 0007 | Pendente |
-| story-0069-0003 | Skill `/x-epic-refine` (interativa, 7 dimensões) | — | 0001 | 0005, 0007 | Pendente |
+| story-0069-0002 | Skill `/x-story-refine` (dispatcher multi-persona) | — | 0001 | 0005, 0007 | Pendente |
+| story-0069-0003 | Skill `/x-epic-refine` (dispatcher multi-persona estratégico) | — | 0001 | 0005, 0007 | Pendente |
 | story-0069-0004 | Field `refinementVerdict` em `execution-state.json` + status `Refinada` na Rule 22 | — | 0001 | 0005, 0006 | Pendente |
 | story-0069-0005 | PreToolUse hook `enforce-refinement-gate.sh` + exit code `33` | — | 0002, 0003, 0004 | 0007 | Pendente |
 | story-0069-0006 | CI audit `audit-refinement-gate.sh` + entry no audit-gates-catalog | — | 0004 | 0007 | Pendente |
@@ -89,8 +91,8 @@ Atrasos em qualquer ponto da cadeia atrasam o épico inteiro. Stories 0002, 0003
 ```mermaid
 graph TD
     S0001["story-0069-0001<br/>Governance Foundation<br/>(Capability + Rule 29 + ADR)"]
-    S0002["story-0069-0002<br/>x-story-refine"]
-    S0003["story-0069-0003<br/>x-epic-refine"]
+    S0002["story-0069-0002<br/>x-story-refine<br/>(dispatcher multi-persona)"]
+    S0003["story-0069-0003<br/>x-epic-refine<br/>(dispatcher multi-persona)"]
     S0004["story-0069-0004<br/>state field + Rule 22"]
     S0005["story-0069-0005<br/>PreToolUse hook"]
     S0006["story-0069-0006<br/>CI audit script"]
@@ -150,8 +152,8 @@ graph TD
 
 | Story | Escopo Principal | Artefatos Chave |
 | :--- | :--- | :--- |
-| 0069-0002 | Skill interativa de refinamento de história (6 dimensões: persona/valor, AC Gherkin, contratos, métricas, alternativas, riscos) com `model: sonnet` (D-R8) e 6 TaskCreate (D-R10) | `java/src/main/resources/targets/claude/skills/plan/x-story-refine/SKILL.md` (D-R4), KP shared `targets/claude/knowledge/refinement/dimensions.md` |
-| 0069-0003 | Skill interativa de refinamento de épico (7 dimensões: problema, persona ampla, hipótese, OKRs, alternativas estratégicas, riscos de produto, escopo) com `model: sonnet` e 7 TaskCreate | `java/src/main/resources/targets/claude/skills/plan/x-epic-refine/SKILL.md` (D-R4) |
+| 0069-0002 | **Dispatcher multi-persona** de refinamento de história (D-R12) — Phases A/B/C/D (análise paralela → batch único → refinamento paralelo → consolidação Architect). Personas fixas: PO, Tech Lead, Architect, Security, QA. Condicionais: Performance, SRE/DevOps. `model: sonnet` no dispatcher e personas; **`model: opus` no Architect Phase D** (D-R13). N TaskCreate (5–7) por persona ativa (D-R10 atualizado). | `java/src/main/resources/targets/claude/skills/plan/x-story-refine/SKILL.md` (D-R4); reusa `agents/core/{architect,product-owner,tech-lead,security-engineer,qa-engineer,performance-engineer,sre-engineer}.md`; KP shared `targets/claude/knowledge/refinement/dimensions.md` |
+| 0069-0003 | **Dispatcher multi-persona estratégico** de refinamento de épico (D-R12) — mesmo contrato Phases A/B/C/D da story-0002. Personas fixas: PO, Tech Lead, Architect, Security, QA. Condicional: SRE/DevOps. Heurística "fora-de-escopo ≥ 3 itens" preservada como NO-GO silencioso do Architect (D-R15 + decisão D4 original). | `java/src/main/resources/targets/claude/skills/plan/x-epic-refine/SKILL.md` (D-R4); reusa as mesmas personas + Rules estratégicas. |
 | 0069-0004 | Field `refinementVerdict` (com `verdictHash` sha256) em ExecutionState; status `Refinada` na **§State Machine Extension da Rule 29** (NÃO Rule 22 — D-R3 (b)); `_TEMPLATE-REFINEMENT-VERDICT.md` | `domain/model/ExecutionState.java`, `domain/model/RefinementVerdict.java` (record imutável domain-pure), `java/src/main/resources/targets/claude/rules/29-refinement-gate.md` (extended pela story-0001), `java/src/main/resources/shared/templates/_TEMPLATE-REFINEMENT-VERDICT.md` |
 
 **Entregas da Fase 1:**

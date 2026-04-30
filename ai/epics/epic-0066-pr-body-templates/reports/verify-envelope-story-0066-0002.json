@@ -1,0 +1,28 @@
+{
+  "storyId": "story-0066-0002",
+  "epicId": "EPIC-0066",
+  "timestamp": "2026-04-29T21:00:00Z",
+  "passed": true,
+  "coverageLine": 100.0,
+  "coverageBranch": 100.0,
+  "failures": [],
+  "acCheckResults": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "scenarios": [
+      "degenerate — empty events.ndjson returns exit 1",
+      "happy path — 100 events produce complete JSON",
+      "boundary — malformed lines ignored with WARN",
+      "error — jq missing returns exit 2",
+      "self-check — exit 0 when jq present"
+    ]
+  },
+  "filesChanged": [
+    "scripts/telemetry-consolidate.sh",
+    "src/main/resources/targets/claude/scripts/telemetry-consolidate.sh",
+    "src/main/java/dev/iadev/application/assembler/ScriptsAssembler.java",
+    "src/test/java/dev/iadev/skills/Epic0066TelemetryConsolidateTest.java"
+  ],
+  "goldenFilesRegenerated": 10
+}

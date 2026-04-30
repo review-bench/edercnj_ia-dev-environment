@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
  * Validates the structure of docs/audit-bypass-catalog.md (story-0063-0009).
  *
  * <p>The catalog must list exactly 11 skills, each with the required 4 sub-sections (evidência,
- * padrão de bypass, plano de blindagem). Schema validation only — content remains free-form per
- * D3 refinement.
+ * padrão de bypass, plano de blindagem). Schema validation only — content remains free-form per D3
+ * refinement.
  */
 class AuditBypassCatalogTest {
 

@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-04-30
+
+### Added — EPIC-0068 (Continuous-Flow Heartbeat Hook)
+
+- **`enforce-continuous-flow.sh`** (Layer-0 Stop hook, Rule 26 Camada 0): detects orchestrators stalled mid-phase in `non-interactive` mode (last NDJSON event is `tool.result` with open tasks remaining) and emits a `CONTINUOUS_FLOW_INTERRUPT` nudge (exit 2) to the LLM. Closes the residual gap where LLM emits prose between sub-phases instead of the next tool call. Decision matrix (a)–(h): no state file / hotfix branch / interactive mode / empty openTasks / finding.high / error event / tool.call in-flight → exit 0; otherwise exit 2 + nudge.
+- **`derive_next_mandatory_call()`** bash function (≤25 lines) inside the hook: reads `[required]` Tool-Call Grammar markers (Rule 28) from the active SKILL.md, cross-references against NDJSON `tool.call` events, and surfaces the next missing required invocation in the nudge message. Returns `PHASE_COMPLETE` when all required skills have been emitted.
+- **`interactiveMode` field** added to `execution-state.json` (Rule 19 fallback: absent field defaults to `"interactive"` = no-op). All 8 Anexo B orchestrators (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`) emit `--field interactiveMode` in Phase 0 via `x-internal-status-update`.
+- **`HooksAssembler.RULE_68_SCRIPTS`** constant: `enforce-continuous-flow.sh` always copied to generated `.claude/hooks/`. Hook registered in `settings.json` Stop event across all 10 golden profiles.
+- **`EnforceContinuousFlowHookTest`** (9 structural contract tests), **`Epic0068ContinuousFlowSmokeTest`** (7 E2E scenarios — decision matrix (a)–(h)), **`enforce_continuous_flow_test.sh`** (9 bash scenarios), **`derive_next_mandatory_call_test.sh`** (6 bash unit tests).
+- **`docs/audit-gates-catalog.md`**: Hook runtime (Camada 0) section added with entry for `enforce-continuous-flow.sh` per Rule 26 §Catalog-before-Add (RULE-004).
+
+### Added — EPIC-0067 (Review YAML Frontmatter)
+
+- **`governance/schemas/review-frontmatter-1.0.json`** (JSON Schema Draft 2020-12): validates review YAML frontmatter blocks in `review-story-*.md` and `techlead-review-story-*.md`. 10 required fields: `schema-version`, `generated-by`, `story-id`, `epic-id`, `date`, `decision`, `score`, `score-max`, `severity-counts`, `blocking-findings`. `decision` enum: `GO | NO-GO | GO-WITH-RESERVATIONS`.
+- **`<!-- template-version: 1.0 -->` comment + YAML frontmatter block** added to `_TEMPLATE-SPECIALIST-REVIEW.md` and `_TEMPLATE-TECH-LEAD-REVIEW.md`. `x-review` and `x-review-pr` skills updated to emit frontmatter on every review artifact.
+- **`audit-review-frontmatter.sh`** (CI audit — Rule 26 §CI script): validates all `review-story-*.md` / `techlead-review-story-*.md` in `--all` / `--epic <ID>` / `--story <ID>` modes. Requires `yq` + `jq`. Baseline: `governance/baselines/review-frontmatter-baseline.txt` (empty — no pre-EPIC-0067 grandfather entries). Exit codes: `0` = OK · `1` = `REVIEW_FRONTMATTER_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `INVALID_EXEMPTION`.
+- **`ScriptsAssembler.AUDIT_SCRIPTS`** updated: `audit-review-frontmatter.sh` added to the canonical 8-script list; all 10 golden profiles regenerated.
+- **`docs/audit-gates-catalog.md`** created: canonical index of all governance CI scripts across all 5 layers (Camada 0–4); entry for `audit-review-frontmatter.sh` added per Rule 26 §Catalog-before-Add (RULE-004).
+- **`AuditReviewFrontmatterTest`** (8 behavioural scenarios) and **`Epic0067ReviewFrontmatterSmokeTest`** (5 E2E scenarios) validate schema well-formedness, specialist + tech-lead fixture passes, violation detection for missing/invalid fields, baseline grandfathering, self-check, and v3/v4 path resolution.
+
+### Added — EPIC-0066 (PR Body Templates & Telemetry-Aware Review Visibility)
+
+- **Two new PR body templates** under `shared/templates/`:
+  - `_TEMPLATE-PR-IMPLEMENTATION.md` — for implementation/story/task PRs (9 sections).
+  - `_TEMPLATE-PR-BACKLOG.md` — for scaffolding PRs (12 sections).
+- **`x-internal-pr-body-render`** (new internal skill, `model: haiku`): renders PR body Markdown from disk artifacts using one of the two templates. 5 numbered phases + Phase 1.5 BACKLOG-GATHER for `--kind=backlog`. Fail-open per RULE-004.
+- **`scripts/telemetry-consolidate.sh`**: aggregates `events.ndjson` by scope; emits JSON/MD/table. Rule 26 exit codes.
+- **`audit-pr-template.sh`** (CI audit — Rule 26 §CI script): hard gate validating PR body has `<!-- template-version: -->` marker and mandatory sections. `AuditPrTemplateAuditorTest` invokes it during `mvn verify` (EPIC-0061 pattern).
+- **`x-pr-create` Phase 3** refactored to delegate body generation to render skill (MANDATORY TOOL CALL — Rule 24); Phase 3.5 dedup; ## Recovery fallback (carved out per ADR-0007).
+- **`x-feature-create` Phase P5.5 BACKLOG-RENDER**: invokes render with `--kind=backlog`, uses `gh pr create --body-file`.
+- **`PhaseMarkerEmissionTest`**: catches ABSENT markers (gap `TelemetryMarkerLint` doesn't detect).
+- **`Epic0066PrTemplateSmokeTest`**: E2E smoke wiring all chain pieces under `mvn verify`.
+- **`pr-template-baseline.txt`**: empty grandfather file for `audit-pr-template.sh` (immutable post-merge).
+
+### Added — EPIC-0065 (Feature Creation Chain Refactor)
+
+- **`x-feature-ideate`** (new public skill, model: opus): converts free-form prose or a text file into a structured RA9 v2 spec (5 mandatory sections) and opens a PR on `docs/feature-<slug>` targeting `develop` for human review.
+- **`x-feature-create`** (replaces `x-epic-decompose`): orchestrates full feature creation (epic + stories + map) from a spec file with worktree isolation, consolidated commit on `docs/<epic-id>-<slug>`, and auto-merged PR into `epic/XXXX`.
+- **Rule 09 amendment:** adds `docs/` branch type (2 patterns: `docs/<epic-id>-<slug>` for creation, `docs/feature-<slug>` for ideation).
+- **Rule 14 amendment:** adds 2 new worktree patterns (`feature-XXXX-<slug>`, `feature-ideation-<slug>`).
+- **Rule 19 amendment:** "Hard-cut autorizado" clause — documents 3 conditions under which hard-cut (no deprecation window) is permitted; lists 4 EPIC-0065 cases.
+- **Rule 21 amendment:** `docs/<epic-id>-<slug>` PRs auto-merge into `epic/XXXX` (label `docs`) — authorized exception to anti-pattern.
+- **Rule 22 amendment:** documents 3 new internal skills under `core/internal/plan/` path.
+- **`audit-epic-branches.sh` v1.2.0:** Check D for `docs/` branches + v4 layout PathResolver + flowVersion 2/3/4 support.
+- **`x-git-cleanup-branches`:** preserves `epic/*` (Rule 21) and `docs/*` branches with open PRs (EPIC-0065 D-R6).
+
+### Removed — EPIC-0065 (BREAKING — hard-cut, Rule 19 §Hard-cut autorizado)
+
+> **Migration guide:** Replace usages of removed skills with their successors below.
+> No alias is preserved — hard-cut authorized by Rule 19 because the change is a
+> semantic role change (public → internal, or taxonomic merge).
+
+| Removed (public) | Successor | Role change |
+| :--- | :--- | :--- |
+| `x-epic-decompose` | `x-feature-create` (public) | Renamed + extended with worktree + docs/ PR |
+| `x-epic-create` | `x-internal-epic-create` (internal) | Public → internal; called only by `x-feature-create` |
+| `x-epic-map` | `x-internal-epic-map` (internal) | Public → internal; called only by `x-feature-create` |
+| `x-story-create` | `x-internal-story-create` (internal) | Public → internal; called only by `x-feature-create` |
+
 ## [5.0.0] - 2026-04-29
 
 ### Added

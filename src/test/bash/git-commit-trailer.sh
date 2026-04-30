@@ -68,7 +68,7 @@ at02
 
 # AT-03: source-of-truth SKILL.md also documents the trailer
 at03() {
-    local src_skill="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core/git/x-git-commit/SKILL.md"
+    local src_skill="${REPO_ROOT}/src/main/resources/targets/claude/skills/core/git/x-git-commit/SKILL.md"
     if [[ ! -f "${src_skill}" ]]; then
         fail "AT-03: source SKILL.md exists" "file not found: ${src_skill}"
         return
@@ -83,7 +83,7 @@ at03
 
 # AT-04: source-of-truth full-protocol.md documents --trailer flag
 at04() {
-    local src_protocol="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core/git/x-git-commit/references/full-protocol.md"
+    local src_protocol="${REPO_ROOT}/src/main/resources/targets/claude/skills/core/git/x-git-commit/references/full-protocol.md"
     if [[ ! -f "${src_protocol}" ]]; then
         fail "AT-04: source full-protocol.md exists" "file not found: ${src_protocol}"
         return
@@ -148,7 +148,7 @@ at07
 # AT-08: Both SKILL.md files (generated + source-of-truth) are consistent
 at08() {
     local gen="${REPO_ROOT}/.claude/skills/x-git-commit/SKILL.md"
-    local src="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core/git/x-git-commit/SKILL.md"
+    local src="${REPO_ROOT}/src/main/resources/targets/claude/skills/core/git/x-git-commit/SKILL.md"
     local gen_line src_line
     gen_line=$(grep "Co-Authored-By: x-git-commit@" "${gen}" | head -1)
     src_line=$(grep "Co-Authored-By: x-git-commit@" "${src}" | head -1)

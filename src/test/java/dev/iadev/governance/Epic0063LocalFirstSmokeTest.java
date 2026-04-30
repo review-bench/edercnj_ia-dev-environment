@@ -10,14 +10,16 @@ import org.junit.jupiter.api.Test;
  * E2E smoke test for EPIC-0063 (Local-First Pre-Flight Gates) — story-0063-0011.
  *
  * <p>Terminal story: validates all 20 Wave 1-6 stories working together as an integrated system.
- * Tests that all scripts exist and are executable, key rule files are in place, and key docs
- * exist (ADR-0016, bypass-catalog, branch-protection).
+ * Tests that all scripts exist and are executable, key rule files are in place, and key docs exist
+ * (ADR-0016, bypass-catalog, branch-protection).
  */
 class Epic0063LocalFirstSmokeTest {
 
-    // ── .claude/scripts paths ─────────────────────────────────────────────────
+    // ── claude/scripts paths (source-of-truth — `.claude/` is a generated
+    //    output and is gitignored, so the test asserts on the versioned
+    //    template tree under src/main/resources/targets/claude/) ────────────
 
-    private static final Path CLAUDE_SCRIPTS = Path.of(".claude/scripts");
+    private static final Path CLAUDE_SCRIPTS = Path.of("src/main/resources/targets/claude/scripts");
 
     private static final Path AUDIT_REVIEW_CONTENT =
             CLAUDE_SCRIPTS.resolve("audit-review-content.sh");
@@ -50,11 +52,11 @@ class Epic0063LocalFirstSmokeTest {
 
     private static final Path PREFLIGHT = SCRIPTS.resolve("preflight.sh");
     private static final Path AUDIT_TOOL_CALL_GRAMMAR_SCRIPTS =
-            SCRIPTS.resolve("audit-tool-call-grammar.sh");
+            CLAUDE_SCRIPTS.resolve("audit-tool-call-grammar.sh");
 
-    // ── .claude/hooks paths ───────────────────────────────────────────────────
+    // ── claude/hooks paths (source-of-truth) ────────────────────────────────
 
-    private static final Path CLAUDE_HOOKS = Path.of(".claude/hooks");
+    private static final Path CLAUDE_HOOKS = Path.of("src/main/resources/targets/claude/hooks");
 
     private static final Path ENFORCE_PREFLIGHT_V1 =
             CLAUDE_HOOKS.resolve("enforce-preflight-gates.sh");
@@ -64,14 +66,14 @@ class Epic0063LocalFirstSmokeTest {
     // ── Rule files ────────────────────────────────────────────────────────────
 
     private static final Path RULE_28_TOOL_CALL_GRAMMAR =
-            Path.of(".claude/rules/28-tool-call-grammar.md");
+            Path.of("src/main/resources/targets/claude/rules/28-tool-call-grammar.md");
 
     // ── Documentation paths ───────────────────────────────────────────────────
 
     private static final Path AUDIT_BYPASS_CATALOG = Path.of("docs/audit-bypass-catalog.md");
     private static final Path BRANCH_PROTECTION = Path.of("docs/branch-protection.md");
     private static final Path ADR_0016_PREFLIGHT =
-            Path.of("docs/adr/ADR-0016-preflight-warn-to-fail-rollout.md");
+            Path.of("docs/adr/ADR-0019-preflight-warn-to-fail-rollout.md");
 
     // ─────────────────────────────────────────────────────────────────────────
     // Wave 1: Core Infrastructure (stories 0001-0003)
@@ -142,10 +144,8 @@ class Epic0063LocalFirstSmokeTest {
     void auditBypassCatalogExistsWithExpectedSkillCount() throws Exception {
         assertThat(AUDIT_BYPASS_CATALOG).exists().isRegularFile();
         String content = Files.readString(AUDIT_BYPASS_CATALOG);
-        long skillCount = content
-                .lines()
-                .filter(line -> line.matches("^## \\d+\\. x-[a-z-]+.*"))
-                .count();
+        long skillCount =
+                content.lines().filter(line -> line.matches("^## \\d+\\. x-[a-z-]+.*")).count();
         assertThat(skillCount)
                 .as("docs/audit-bypass-catalog.md must list exactly 11 skills")
                 .isEqualTo(11L);

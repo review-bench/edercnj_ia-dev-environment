@@ -1,0 +1,12 @@
+# governance/baselines/pr-template-baseline.txt
+#
+# Grandfather list for audit-pr-template.sh (EPIC-0066, story-0066-0007).
+# Format: <PR_NUMBER>  # <reason>
+#
+# This file is APPEND-ONLY at story-0066-0007 merge time and IMMUTABLE thereafter.
+# After EPIC-0066 merges to develop, no new entries may be added without a new
+# audit-immutability gate amendment (mirrors the convention from RULE-027 + Rule 24
+# baselines).
+#
+# Empty body below = clean state. Any PR ID listed must include a # comment with
+# rationale (typically "merged before audit-pr-template.sh was active").

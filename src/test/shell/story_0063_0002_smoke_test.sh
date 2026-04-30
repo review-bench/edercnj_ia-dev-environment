@@ -44,7 +44,7 @@ The new audit gates are properly isolated from business logic and correctly inte
 ### File Analysis
 - src/main/java/dev/iadev/adapter/inbound/cli/GenerateCommand.java: proper command dispatch
 - src/main/java/dev/iadev/adapter/inbound/cli/ValidateCommand.java: correct validation pattern
-- java/src/main/resources/targets/claude/scripts/audit-review-content.sh: heuristic implementation sound
+- src/main/resources/targets/claude/scripts/audit-review-content.sh: heuristic implementation sound
 - src/test/shell/audit_review_content_test.sh: comprehensive test coverage
 
 ### Design Patterns

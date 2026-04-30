@@ -237,7 +237,7 @@ run_at06
 # AT-07: x-arch-plan SKILL.md source-of-truth contains frontmatter instruction
 # ---------------------------------------------------------------------------
 run_at07() {
-    local skill_file="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core/plan/x-arch-plan/SKILL.md"
+    local skill_file="${REPO_ROOT}/src/main/resources/targets/claude/skills/core/plan/x-arch-plan/SKILL.md"
     if grep -q "generated-by" "${skill_file}" 2>/dev/null; then
         pass "AT-07: x-arch-plan SKILL.md contains 'generated-by' instruction"
     else
@@ -250,7 +250,7 @@ run_at07
 # AT-08: x-test-plan SKILL.md source-of-truth contains frontmatter instruction
 # ---------------------------------------------------------------------------
 run_at08() {
-    local skill_file="${REPO_ROOT}/java/src/main/resources/targets/claude/skills/core/test/x-test-plan/SKILL.md"
+    local skill_file="${REPO_ROOT}/src/main/resources/targets/claude/skills/core/test/x-test-plan/SKILL.md"
     if grep -q "generated-by" "${skill_file}" 2>/dev/null; then
         pass "AT-08: x-test-plan SKILL.md contains 'generated-by' instruction"
     else

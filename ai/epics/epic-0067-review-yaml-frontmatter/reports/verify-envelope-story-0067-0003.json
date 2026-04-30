@@ -1,0 +1,16 @@
+{
+  "storyId": "story-0067-0003",
+  "epicId": "EPIC-0067",
+  "passed": true,
+  "timestamp": "2026-04-29T23:46:00Z",
+  "reviewDecision": "GO",
+  "techLeadDecision": "GO",
+  "checks": [
+    {"name": "tests-pass", "passed": true, "detail": "XReviewPrFrontmatterTest 5/5 + GoldenFileTest 9/9 + PlatformGoldenFileTest 1/1"},
+    {"name": "phase5-present", "passed": true, "detail": "x-review-pr SKILL.md Phase 5 header added"},
+    {"name": "telemetry-balanced", "passed": true, "detail": "Phase-5-Frontmatter start/end markers balanced for x-review-pr"},
+    {"name": "specialist-review", "passed": true, "detail": "GO 48/50 — no blocking findings"},
+    {"name": "techlead-review", "passed": true, "detail": "GO 53/55 — no blocking findings"}
+  ],
+  "mergedPRs": [867]
+}

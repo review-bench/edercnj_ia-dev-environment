@@ -1,0 +1,25 @@
+{
+  "storyId": "story-0067-0004",
+  "epicId": "EPIC-0067",
+  "verifiedAt": "2026-04-29T12:00:00Z",
+  "passed": true,
+  "coverageLine": 96.2,
+  "coverageBranch": 91.5,
+  "testsRun": 15,
+  "testsFailed": 0,
+  "testsSkipped": 0,
+  "planArtifacts": {
+    "arch": "ai/epics/epic-0067-review-yaml-frontmatter/plans/arch-story-0067-0001.md",
+    "review": "ai/epics/epic-0067-review-yaml-frontmatter/plans/review-story-0067-0004.md",
+    "techLeadReview": "ai/epics/epic-0067-review-yaml-frontmatter/plans/techlead-review-story-0067-0004.md"
+  },
+  "reviewDecision": "GO-WITH-RESERVATIONS",
+  "reviewScore": "100/112",
+  "techLeadDecision": "GO-WITH-RESERVATIONS",
+  "techLeadScore": "48/55",
+  "remediationApplied": true,
+  "remediationCommit": "515a392d6",
+  "prNumber": 868,
+  "prBranch": "feat/story-0067-0004-audit-gate",
+  "targetBranch": "epic/0067"
+}
