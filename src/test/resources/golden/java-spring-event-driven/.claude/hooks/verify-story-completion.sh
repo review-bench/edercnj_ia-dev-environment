@@ -108,8 +108,13 @@ else
     exit 0
 fi
 
-PLANS_DIR="ai/epics/epic-${EPIC_ID}/plans"
-REPORTS_DIR="ai/epics/epic-${EPIC_ID}/reports"
+# v4 layout: epic dir may be epic-XXXX-<slug>; probe both forms
+EPIC_DIR_CANDIDATE="$(find ai/epics -maxdepth 1 -type d -name "epic-${EPIC_ID}-*" 2>/dev/null | head -1)"
+if [[ -z "${EPIC_DIR_CANDIDATE}" ]]; then
+    EPIC_DIR_CANDIDATE="ai/epics/epic-${EPIC_ID}"
+fi
+PLANS_DIR="${EPIC_DIR_CANDIDATE}/plans"
+REPORTS_DIR="${EPIC_DIR_CANDIDATE}/reports"
 
 # Check mandatory evidence artifacts (Rule 24 §4.1)
 MISSING=()
