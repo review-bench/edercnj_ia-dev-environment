@@ -1,0 +1,52 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0072",
+  "taskTracking": {
+    "enabled": true
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T17:27:16Z",
+    "verdictHash": "2b6a1ad595515e45df596b1d7ba6874444c1534c18bf3b9f02afde5e0189f32d",
+    "dimensions": {
+      "problem":       { "checked": true, "blocker": null },
+      "persona":       { "checked": true, "blocker": null },
+      "value":         { "checked": true, "blocker": null },
+      "okrs":          { "checked": true, "blocker": null },
+      "alternatives":  { "checked": true, "blocker": null },
+      "risks":         { "checked": true, "blocker": null },
+      "scope":         { "checked": true, "blocker": null }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0072-0001": {
+      "status": "Pendente",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:45:33Z",
+        "verdictHash": "daf1899b45fe754d4c1dae522854e3949914db7005e0766f68a0eace10316267",
+        "dimensions": {
+          "persona":      { "checked": true, "blocker": null },
+          "value":        { "checked": true, "blocker": null },
+          "ac":           { "checked": true, "blocker": null },
+          "contracts":    { "checked": true, "blocker": null },
+          "metrics":      { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks":        { "checked": true, "blocker": null }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0002": { "status": "Pendente" },
+    "story-0072-0003": { "status": "Pendente" },
+    "story-0072-0004": { "status": "Pendente" },
+    "story-0072-0005": { "status": "Pendente" },
+    "story-0072-0006": { "status": "Pendente" },
+    "story-0072-0007": { "status": "Pendente" },
+    "story-0072-0008": { "status": "Pendente" },
+    "story-0072-0009": { "status": "Pendente" }
+  }
+}

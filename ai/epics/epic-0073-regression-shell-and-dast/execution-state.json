@@ -1,0 +1,34 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0073",
+  "layout": "v4",
+  "epicSlug": "regression-shell-and-dast",
+  "taskTracking": {
+    "enabled": true
+  },
+  "storyStatuses": {
+    "story-0073-0001": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0002": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0003": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0004": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0005": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0006": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
+    "story-0073-0007": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } }
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "db60d8a8023a774f236c13e466e68de35fbcffce0c23e9e07b1d712bbc782840",
+    "dimensions": {
+      "problem":      { "checked": true, "blocker": null },
+      "persona":      { "checked": true, "blocker": null },
+      "value":        { "checked": true, "blocker": null },
+      "okrs":         { "checked": true, "blocker": null },
+      "alternatives": { "checked": true, "blocker": null },
+      "risks":        { "checked": true, "blocker": null },
+      "scope":        { "checked": true, "blocker": null }
+    },
+    "blockers": []
+  }
+}

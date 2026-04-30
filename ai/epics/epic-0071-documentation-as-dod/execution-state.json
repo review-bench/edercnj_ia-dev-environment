@@ -1,0 +1,163 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0071",
+  "epicSlug": "documentation-as-dod",
+  "interactiveMode": "interactive",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "4c8438f8ce94cbd7552cc0b28c462438bdd9f77077b70e3596ca4c4091b0c7da",
+    "dimensions": {
+      "problem":      { "checked": true, "blocker": null },
+      "persona":      { "checked": true, "blocker": null },
+      "value":        { "checked": true, "blocker": null },
+      "okrs":         { "checked": true, "blocker": null },
+      "alternatives": { "checked": true, "blocker": null },
+      "risks":        { "checked": true, "blocker": null },
+      "scope":        { "checked": true, "blocker": null }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0071-0001": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": false, "blocker": "All metrics are binary existence checks with no quantitative unit+target" },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario", "metrics: binary only, no unit+target"]
+      }
+    },
+    "story-0071-0002": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0003": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0004": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing security/auth scenario" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0005": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0006": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0007": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    },
+    "story-0071-0008": {
+      "status": "Pendente", "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "rejected", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
+        "dimensions": {
+          "persona": { "checked": true, "blocker": null },
+          "value": { "checked": true, "blocker": null },
+          "ac": { "checked": false, "blocker": "AC missing performance/SLA and security/auth scenarios" },
+          "contracts": { "checked": true, "blocker": null },
+          "metrics": { "checked": true, "blocker": null },
+          "alternatives": { "checked": true, "blocker": null },
+          "risks": { "checked": true, "blocker": null }
+        },
+        "blockers": ["ac: missing performance/SLA scenario", "ac: missing security/auth scenario"]
+      }
+    }
+  },
+  "phases": [
+    { "id": 0, "name": "Governance + Domain", "stories": ["story-0071-0001"], "mode": "sequential" },
+    { "id": 1, "name": "Skills + Templates", "stories": ["story-0071-0002", "story-0071-0003", "story-0071-0004"], "mode": "parallel" },
+    { "id": 2, "name": "Infrastructure + Integration", "stories": ["story-0071-0005", "story-0071-0006", "story-0071-0007"], "mode": "sequential" },
+    { "id": 3, "name": "Smoke Test + Release", "stories": ["story-0071-0008"], "mode": "sequential" }
+  ]
+}
