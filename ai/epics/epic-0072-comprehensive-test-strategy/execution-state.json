@@ -1,0 +1,406 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0072",
+  "taskTracking": {
+    "enabled": true
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T17:27:16Z",
+    "verdictHash": "2b6a1ad595515e45df596b1d7ba6874444c1534c18bf3b9f02afde5e0189f32d",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0072-0001": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:45:33Z",
+        "verdictHash": "c92f008d9eedb230324763663edc47788249334d78ea5c20ef7293418bd45b7c",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0002": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:50:00Z",
+        "verdictHash": "311693735324f55b526e973e3dfd8050a7fd7110d945d8f4603c41041ade7850",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0003": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T17:55:00Z",
+        "verdictHash": "d038fe2c33c4e899e7ba6a2653e0ca0742c39ae7b68d423dcbdd42ca2230ed37",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0004": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:00:00Z",
+        "verdictHash": "ef12f46daa885036e3506f75cca0fa05aba85efaa85cabaac31b0cf2fe05af2c",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0005": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:05:00Z",
+        "verdictHash": "5266d2b3257bd7251777712ab0676552138367151dc253439327796cd3046676",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0006": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:10:00Z",
+        "verdictHash": "3ded85a590e0cf45a53b01fe4df1408c740f12ac354c20c334832faf12d7104f",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0007": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:15:00Z",
+        "verdictHash": "cb647d31e83b2341bd3594253a2d6bf9afc93d043fe3b574d33106ca232c2276",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0008": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:20:00Z",
+        "verdictHash": "083a24bad010e5827237d1752a1d05da9765911917bfa608196baa990dbab2dd",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0072-0009": {
+      "status": "refinada",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T18:25:00Z",
+        "verdictHash": "f34657f384862ab2a5e4a08c73a6a5fa42ad0688385b5ab91613f727dc11f1dc",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    }
+  }
+}
