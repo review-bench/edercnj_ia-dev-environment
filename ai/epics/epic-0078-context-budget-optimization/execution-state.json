@@ -1,0 +1,28 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0078",
+  "epicSlug": "context-budget-optimization",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {},
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "db60d8a8023a774f236c13e466e68de35fbcffce0c23e9e07b1d712bbc782840",
+    "dimensions": {
+      "problem": {"checked": true, "blocker": null},
+      "persona": {"checked": true, "blocker": null},
+      "value": {"checked": true, "blocker": null},
+      "okrs": {"checked": true, "blocker": null},
+      "alternatives": {"checked": true, "blocker": null},
+      "risks": {"checked": true, "blocker": null},
+      "scope": {"checked": true, "blocker": null}
+    },
+    "blockers": [],
+    "verdictRationale": "Refinement approved after 4-phase strategic analysis. 3 NO-GOs resolved via direct epic edits (§1.4, §1.5, §1.6, §1.7, §2.1). 9 operator questions addressed. EPIC-0064 v5.0.0 already released unblocks story-0078-0014. New tests + RULE-011/RULE-012 codify Security KP enforcement and release-elapsed gate."
+  }
+}
