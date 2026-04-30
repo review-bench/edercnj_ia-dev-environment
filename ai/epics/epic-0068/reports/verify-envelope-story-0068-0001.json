@@ -1,0 +1,47 @@
+{
+  "storyId": "story-0068-0001",
+  "epicId": "EPIC-0068",
+  "verifiedAt": "2026-04-30T10:24:32Z",
+  "passed": true,
+  "acCheckResults": [
+    {
+      "criterion": "AC-001: All 8 Anexo B orchestrators' SKILL.md contain --field interactiveMode --value in Phase 0",
+      "status": "PASS",
+      "evidence": "InteractiveModePersistenceTest.java — parameterized test with 8 @ValueSource entries each asserting SKILL.md contains '--field interactiveMode --value'. 8/8 tests pass."
+    },
+    {
+      "criterion": "AC-002: Rule 19 source-of-truth contains interactiveMode fallback matrix section",
+      "status": "PASS",
+      "evidence": "rule19_containsInteractiveModeFallbackMatrix() test passes — verifies '`interactiveMode` Field (EPIC-0068)' heading, 'Field absent' entry, and '\"interactive\"' fallback value all present in 19-backward-compatibility.md"
+    },
+    {
+      "criterion": "AC-003: InteractiveModePersistenceTest exists and all 10 test cases pass",
+      "status": "PASS",
+      "evidence": "mvn test -Dtest=InteractiveModePersistenceTest: Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS"
+    },
+    {
+      "criterion": "AC-004: Fallback matrix covers all 4 conditions (absent, interactive, non-interactive, invalid)",
+      "status": "PASS",
+      "evidence": "Rule 19 §interactiveMode Fallback Matrix has 4 rows: absent→interactive (no-op), explicit interactive (no-op), explicit non-interactive (hook active), invalid value (warn + interactive fallback)"
+    },
+    {
+      "criterion": "AC-005: interactiveMode value logic matches Rule 20 default (non-interactive is default)",
+      "status": "PASS",
+      "evidence": "All 8 SKILL.md additions document: value is 'interactive' when --interactive passed or CLAUDE_LEGACY_INTERACTIVE=1; otherwise 'non-interactive' (Rule 20 default, EPIC-0061)"
+    },
+    {
+      "criterion": "AC-006: No regression in existing tests",
+      "status": "PASS",
+      "evidence": "BUILD SUCCESS on develop — PR #874 CI gate passed; no test regression detected"
+    }
+  ],
+  "acCheckCount": 6,
+  "acPassCount": 6,
+  "acFailCount": 0,
+  "failures": [],
+  "criticalIssueCount": 0,
+  "highIssueCount": 0,
+  "mediumIssueCount": 0,
+  "lowIssueCount": 2,
+  "summary": "All acceptance criteria met. Two LOW-severity issues in InteractiveModePersistenceTest (unused ORCHESTRATOR_SKILLS constant, weak hasSize assertion) — non-blocking. Ready for merge."
+}
