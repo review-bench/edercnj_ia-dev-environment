@@ -310,6 +310,20 @@
 
 ---
 
+---
+
+### audit-template-version.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 30 §Audit (EPIC-0070) |
+| **Layer** | 2 — CI Script |
+| **Validates** | New epic/story markdown files under `ai/epics/` use v2 template structure OR carry `--legacy-template-v1` annotation |
+| **Introduced** | story-0070-0008 (EPIC-0070) — **RESERVED; script not yet delivered** |
+| **Exit Codes** | `0` = OK · `1` = `TEMPLATE_VERSION_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.
