@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-04-30
+
 ### Added — EPIC-0068 (Continuous-Flow Heartbeat Hook)
 
 - **`enforce-continuous-flow.sh`** (Layer-0 Stop hook, Rule 26 Camada 0): detects orchestrators stalled mid-phase in `non-interactive` mode (last NDJSON event is `tool.result` with open tasks remaining) and emits a `CONTINUOUS_FLOW_INTERRUPT` nudge (exit 2) to the LLM. Closes the residual gap where LLM emits prose between sub-phases instead of the next tool call. Decision matrix (a)–(h): no state file / hotfix branch / interactive mode / empty openTasks / finding.high / error event / tool.call in-flight → exit 0; otherwise exit 2 + nudge.
