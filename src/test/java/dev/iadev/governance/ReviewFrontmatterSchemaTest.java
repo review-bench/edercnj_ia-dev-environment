@@ -17,17 +17,18 @@ class ReviewFrontmatterSchemaTest {
     private static final Path SCHEMA_PATH =
             Path.of("governance/schemas/review-frontmatter-1.0.json");
 
-    private static final List<String> REQUIRED_FIELDS = List.of(
-            "schema-version",
-            "generated-by",
-            "story-id",
-            "epic-id",
-            "date",
-            "decision",
-            "score",
-            "score-max",
-            "severity-counts",
-            "blocking-findings");
+    private static final List<String> REQUIRED_FIELDS =
+            List.of(
+                    "schema-version",
+                    "generated-by",
+                    "story-id",
+                    "epic-id",
+                    "date",
+                    "decision",
+                    "score",
+                    "score-max",
+                    "severity-counts",
+                    "blocking-findings");
 
     @Test
     void schemaFile_exists_atExpectedPath() {
@@ -57,10 +58,12 @@ class ReviewFrontmatterSchemaTest {
         assertThat(requiredNode).isNotNull();
         assertThat(requiredNode.isArray()).isTrue();
 
-        List<String> actualRequired = StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(requiredNode.elements(), 0), false)
-                .map(JsonNode::asText)
-                .toList();
+        List<String> actualRequired =
+                StreamSupport.stream(
+                                Spliterators.spliteratorUnknownSize(requiredNode.elements(), 0),
+                                false)
+                        .map(JsonNode::asText)
+                        .toList();
 
         assertThat(actualRequired).containsExactlyInAnyOrderElementsOf(REQUIRED_FIELDS);
     }
@@ -68,9 +71,7 @@ class ReviewFrontmatterSchemaTest {
     @Test
     void schemaFile_generatedByProperty_hasCorrectPattern() throws IOException {
         JsonNode root = parseSchema();
-        JsonNode pattern = root.path("properties")
-                .path("generated-by")
-                .path("pattern");
+        JsonNode pattern = root.path("properties").path("generated-by").path("pattern");
         assertThat(pattern.isMissingNode()).isFalse();
         assertThat(pattern.asText()).isEqualTo("^(x-review|x-review-pr)@[0-9a-f]{40}$");
     }

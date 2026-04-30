@@ -34,8 +34,7 @@ class Epic0067ReviewFrontmatterSmokeTest {
     private static final Path SCHEMA_PATH =
             REPO_ROOT.resolve("governance/schemas/review-frontmatter-1.0.json");
     private static final String SCRIPT_PATH =
-            REPO_ROOT
-                    + "/src/main/resources/targets/claude/scripts/audit-review-frontmatter.sh";
+            REPO_ROOT + "/src/main/resources/targets/claude/scripts/audit-review-frontmatter.sh";
 
     @TempDir Path tempDir;
 

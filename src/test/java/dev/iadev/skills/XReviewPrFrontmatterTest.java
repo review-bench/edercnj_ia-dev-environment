@@ -11,15 +11,14 @@ import org.junit.jupiter.api.Test;
 /**
  * TDD tests for Phase 5 (Emit Frontmatter) of x-review-pr/SKILL.md (story-0067-0003).
  *
- * <p>Mirrors XReviewFrontmatterTest but validates the tech-lead review variant:
- * score-max 55, checklist field (not reviewers), generated-by prefix x-review-pr.
+ * <p>Mirrors XReviewFrontmatterTest but validates the tech-lead review variant: score-max 55,
+ * checklist field (not reviewers), generated-by prefix x-review-pr.
  */
 @DisplayName("XReviewPrFrontmatterTest — Phase 5 Emit Frontmatter contract")
 class XReviewPrFrontmatterTest {
 
     private static final Path SKILL_PATH =
-            Path.of(
-                    "src/main/resources/targets/claude/skills/core/review/x-review-pr/SKILL.md");
+            Path.of("src/main/resources/targets/claude/skills/core/review/x-review-pr/SKILL.md");
 
     @Test
     @DisplayName("phase5_section_present_in_skillmd")

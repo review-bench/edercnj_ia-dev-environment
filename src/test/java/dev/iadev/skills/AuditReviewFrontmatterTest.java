@@ -21,8 +21,8 @@ import org.junit.jupiter.api.io.TempDir;
  * Behavioural tests for audit-review-frontmatter.sh (story-0067-0004).
  *
  * <p>Eight scenarios validate: valid specialist review, valid tech-lead review, missing
- * frontmatter, invalid decision enum, missing required field, baseline grandfather, self-check,
- * and v3+v4 path resolution.
+ * frontmatter, invalid decision enum, missing required field, baseline grandfather, self-check, and
+ * v3+v4 path resolution.
  */
 @DisplayName("AuditReviewFrontmatterTest")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
@@ -115,7 +115,8 @@ class AuditReviewFrontmatterTest {
                 ## Summary
 
                 Story implements frontmatter YAML correctly.
-                """.formatted(storyId);
+                """
+                .formatted(storyId);
     }
 
     private static String validTechLeadFrontmatter(String storyId) {
@@ -151,7 +152,8 @@ class AuditReviewFrontmatterTest {
                 ## Summary
 
                 Tech-lead review passes all checks.
-                """.formatted(storyId);
+                """
+                .formatted(storyId);
     }
 
     @Nested
@@ -160,7 +162,8 @@ class AuditReviewFrontmatterTest {
 
         @Test
         @DisplayName("valid review-story-*.md with frontmatter exits 0")
-        void auditScript_validSpecialistReview_exitsZero() throws IOException, InterruptedException {
+        void auditScript_validSpecialistReview_exitsZero()
+                throws IOException, InterruptedException {
             createReviewFile(
                     "ai/epics/epic-0067/plans/review-story-0067-0002.md",
                     validSpecialistFrontmatter("story-0067-0002"));
@@ -257,8 +260,7 @@ class AuditReviewFrontmatterTest {
         @DisplayName("story ID in review-frontmatter-baseline.txt exits 0 even without frontmatter")
         void auditScript_grandfatheredStoryId_exitsZero() throws IOException, InterruptedException {
             // write story ID to baseline
-            Path baseline =
-                    tempDir.resolve("governance/baselines/review-frontmatter-baseline.txt");
+            Path baseline = tempDir.resolve("governance/baselines/review-frontmatter-baseline.txt");
             Files.writeString(
                     baseline,
                     "story-0063-0001  # legacy review, pre-EPIC-0067\n",
@@ -282,7 +284,8 @@ class AuditReviewFrontmatterTest {
 
         @Test
         @DisplayName("--self-check with all deps present exits 0")
-        void auditScript_selfCheck_withAllDeps_exitsZero() throws IOException, InterruptedException {
+        void auditScript_selfCheck_withAllDeps_exitsZero()
+                throws IOException, InterruptedException {
             ProcessResult r = run(List.of("--self-check"));
             // yq + jq must be on PATH in CI; if not, we accept exit 2 with OPERATIONAL_ERROR
             if (r.exitCode() == 0) {
@@ -314,8 +317,9 @@ class AuditReviewFrontmatterTest {
 
             ProcessResult r = run(List.of("--all"));
             assertThat(r.exitCode())
-                    .as("Both v3 and v4 valid reviews must produce exit 0, stderr=%s"
-                            .formatted(r.stderr()))
+                    .as(
+                            "Both v3 and v4 valid reviews must produce exit 0, stderr=%s"
+                                    .formatted(r.stderr()))
                     .isEqualTo(0);
         }
     }
@@ -350,9 +354,7 @@ class AuditReviewFrontmatterTest {
             java.io.File outsideFile = java.io.File.createTempFile("outside-review", ".md");
             outsideFile.deleteOnExit();
             java.nio.file.Files.writeString(
-                    outsideFile.toPath(),
-                    "# Review outside repo root\n",
-                    StandardCharsets.UTF_8);
+                    outsideFile.toPath(), "# Review outside repo root\n", StandardCharsets.UTF_8);
 
             // Create a symlink inside the repo pointing to the outside file
             Path linkDir = tempDir.resolve("ai/epics/epic-0067/plans");

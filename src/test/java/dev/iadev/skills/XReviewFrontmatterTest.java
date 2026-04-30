@@ -11,16 +11,15 @@ import org.junit.jupiter.api.Test;
 /**
  * TDD tests for Phase 5 (Emit Frontmatter) of x-review/SKILL.md (story-0067-0002).
  *
- * <p>Validates that the Phase 5 section is present with the required structural markers:
- * telemetry phase.start/end pair, MANDATORY TOOL CALL block, TaskCreate, pre- and post-gate
- * invocations, and TaskUpdate.
+ * <p>Validates that the Phase 5 section is present with the required structural markers: telemetry
+ * phase.start/end pair, MANDATORY TOOL CALL block, TaskCreate, pre- and post-gate invocations, and
+ * TaskUpdate.
  */
 @DisplayName("XReviewFrontmatterTest — Phase 5 Emit Frontmatter contract")
 class XReviewFrontmatterTest {
 
     private static final Path SKILL_PATH =
-            Path.of(
-                    "src/main/resources/targets/claude/skills/core/review/x-review/SKILL.md");
+            Path.of("src/main/resources/targets/claude/skills/core/review/x-review/SKILL.md");
 
     @Test
     @DisplayName("phase5_section_present_in_skillmd")
@@ -70,9 +69,7 @@ class XReviewFrontmatterTest {
     @DisplayName("phase5_task_create_and_update_present")
     void phase5_task_create_and_update_present() throws IOException {
         String content = Files.readString(SKILL_PATH);
-        assertThat(content)
-                .as("Phase 5 must emit TaskCreate")
-                .contains("TaskCreate(");
+        assertThat(content).as("Phase 5 must emit TaskCreate").contains("TaskCreate(");
         assertThat(content)
                 .as("Phase 5 must emit TaskUpdate with status: \"completed\"")
                 .contains("TaskUpdate(");
