@@ -1,7 +1,7 @@
 # Audit Gates Catalog
 
 > **Maintained by:** Rule 26 §Catalog-before-Add (RULE-004).
-> **Last updated:** story-0067-0004 (EPIC-0067 — Review YAML Frontmatter).
+> **Last updated:** story-0068-0004 (EPIC-0068 — Continuous-Flow Heartbeat Hook).
 > **Purpose:** Single source of truth for every governance gate across all 5 layers (Camada 0–4).
 >
 > No gate of any layer may be introduced in any Rule, ADR, SKILL.md, or code comment
@@ -18,6 +18,27 @@
 | **2** | CI Script (`audit-*.sh`) | PR open / push | **Detectivo** |
 | **3** | Java Test (`*AuditTest.java`) | `mvn verify` | **Detectivo** |
 | **4** | CI Workflow (`.github/workflows/*.yml`) | GitHub Actions | **Detectivo** |
+
+---
+
+## Hook Runtime (Camada 0)
+
+### enforce-continuous-flow.sh (EPIC-0068)
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 19 §interactiveMode Field, Rule 24 §Camada 0, Rule 26 §Camada 0, Rule 27 §Exception 2 |
+| **Layer** | 0 — Hook runtime (preventive, Stop event) |
+| **Trigger** | `Stop` event (every LLM turn end) |
+| **Reads** | `execution-state.json` (`interactiveMode`, `taskTracking.openTasks`), `telemetry/events.ndjson`, current branch via `git rev-parse` |
+| **Writes** | None (read-only, idempotent) |
+| **Self-check** | `--self-check` validates `jq` on PATH + `ai/epics/` or `plans/` exists |
+| **Exit codes** | `0` = no nudge needed · `2` = `CONTINUOUS_FLOW_INTERRUPT` nudge emitted to LLM |
+| **Bypass** | None — Rule 27 hotfix exception honored automatically via branch detection (`hotfix/*` → exit 0) |
+| **Related rules** | Rule 19, Rule 24, Rule 25, Rule 26, Rule 27, Rule 28 (Tool-Call Grammar) |
+| **Introduced** | story-0068-0002 + story-0068-0003 (EPIC-0068) |
+| **Source** | `src/main/resources/targets/claude/hooks/enforce-continuous-flow.sh` |
+| **Java smoke test** | `Epic0068ContinuousFlowSmokeTest` (7 tests — decision matrix (a)–(h)) |
 
 ---
 
