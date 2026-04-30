@@ -12,7 +12,7 @@
     "status": "approved",
     "scope": "epic",
     "checkedAt": "2026-04-30T00:00:00Z",
-    "verdictHash": "4c8438f8ce94cbd7552cc0b28c462438bdd9f77077b70e3596ca4c4091b0c7da",
+    "verdictHash": "30bff2943c83778dd485cb6f593333e3c33eaa536dab1497cbb156a1a2f8d25b",
     "dimensions": {
       "problem":      { "checked": true, "blocker": null },
       "persona":      { "checked": true, "blocker": null },
@@ -29,7 +29,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "2865a19506d805c7bd24eae17219bf439020bba398607db6521b069e10d29dd9",
+        "verdictHash": "e872dbec9f03474747532b3b53204060519f8ba46427bda6280d1a4a0a2ac191",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -46,7 +46,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "c30013bc7648e9bc33be892eab1a9e30330dc472714b39bfbcdfa25a3b7a1079",
+        "verdictHash": "352c76d3e24174a167aa7c14550dddd760973b143538007f576af093130cfbb0",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -63,7 +63,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "da927041fab2fa9af74be91658b1c32f8b0f3807e98715df4caed04d445cf715",
+        "verdictHash": "ba6b02d8da2067f502a77dc5eaf46d77c38c41397bbe18bb22521b58cb273444",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -80,7 +80,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "1d82907359152cf595425bbfa45977ba038dff0a048124fe87938e9e1d3687c1",
+        "verdictHash": "418d39e3bbde21e7382731184b88ad98bbaf2119ecba449c6b8a1a92a8508a26",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -97,7 +97,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "7865fb14e6f2ec4783d08a4222e50ffd2bcb60ff53bc706f35c097fda073a5d9",
+        "verdictHash": "c296f288e3c724ca02f1b3cb53d95331d11335c03e5656fa3d980266c4a5b514",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -114,7 +114,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "2780835bbfb9ae7d0258672cb8042a142c1fb2b2831a44a92c20ca50f6d71590",
+        "verdictHash": "ad596b751cc1fcf6092521ae378f438c97dd9a91e63e765236085c81c508b7d1",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -131,7 +131,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "935ef9739dcd640754cdbe5f0df1fc9ffb5ee29e277c987d0d06eac51d68e605",
+        "verdictHash": "a374bca1952cef919cd1f5a8c3ae365865e2d024580f68748a29a75351193f78",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },
@@ -148,7 +148,7 @@
       "status": "Refinada", "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "e836bdc4f39de223b6c18cf54133a5ab6d8bcfa83c0ce78519892e121cf321a9",
+        "verdictHash": "05c300971c22f8a88c563ac2eecfc626f7cbf4d1af12063553b3bb18791f5a54",
         "dimensions": {
           "persona":      { "checked": true, "blocker": null },
           "value":        { "checked": true, "blocker": null },

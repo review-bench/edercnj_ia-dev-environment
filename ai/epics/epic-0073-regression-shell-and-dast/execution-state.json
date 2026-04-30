@@ -7,13 +7,293 @@
     "enabled": true
   },
   "storyStatuses": {
-    "story-0073-0001": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0002": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0003": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0004": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0005": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0006": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } },
-    "story-0073-0007": { "status": "Refinada", "flowVersion": "4", "refinementVerdict": { "status": "approved", "scope": "story", "checkedAt": "2026-04-30T00:00:00Z", "verdictHash": "a1d3c9617d4d075b3d1a9ad10f3bd743746230b34d420ec18f63aa9d59be79f5" } }
+    "story-0073-0001": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "1fa2dfc5c890377e3d60852627b0c32c9b4b6a99afedb1f7237b768c11b9f372",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0002": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ce2fb60c10124aee0a38adb431ed72fb137fc9fbfca2f3d3c014e79b64626bb4",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0003": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "54bfb73920fd2e4a782f0973802271beb8244745ecc062013fb675497959a48a",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0004": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "0f020889d9e955ccc86b1430f311e48a91c2a8d7f939bbd090876639fba09d50",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0005": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "bb039862395bd1f2e12f2d25c32129db84cfdf0b6cb3c88ada52f643fdc2a2e7",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0006": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ac186b3b8614a843d1922838f4a04b3fa791c19dc656f96ffdf8118614d27c09",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0073-0007": {
+      "status": "Refinada",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "c0e184d4d322398b244e2cd82c7decfe40e8b4f2a16e899adf5338485d17c39a",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    }
   },
   "refinementVerdict": {
     "status": "approved",
@@ -21,13 +301,34 @@
     "checkedAt": "2026-04-30T00:00:00Z",
     "verdictHash": "db60d8a8023a774f236c13e466e68de35fbcffce0c23e9e07b1d712bbc782840",
     "dimensions": {
-      "problem":      { "checked": true, "blocker": null },
-      "persona":      { "checked": true, "blocker": null },
-      "value":        { "checked": true, "blocker": null },
-      "okrs":         { "checked": true, "blocker": null },
-      "alternatives": { "checked": true, "blocker": null },
-      "risks":        { "checked": true, "blocker": null },
-      "scope":        { "checked": true, "blocker": null }
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
     },
     "blockers": []
   }
