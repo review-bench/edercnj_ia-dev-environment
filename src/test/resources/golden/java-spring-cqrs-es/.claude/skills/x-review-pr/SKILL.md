@@ -407,51 +407,9 @@ No 4th option is offered. The gate terminates immediately. The menu was presente
 
 ## State File (opt-in)
 
-Written only when the operator selects **FIX-PR** (slot 2) in Step 8.4. Enables resume via `--resume-review <pr>`.
+Written only when the operator selects **FIX-PR** (slot 2) in Step 8.4. Enables resume via `--resume-review <pr>`. Path: `plans/review/<pr-number>/state.json`. Schema version `"1.0"` with fields `phase`, `lastPhaseCompletedAt`, `lastGateDecision`, `fixAttempts[]`, `schemaVersion`.
 
-**Path:** `plans/review/<pr-number>/state.json`
-
-**Schema (Rule 20 §State File Schema — version 1.0):**
-
-```json
-{
-  "phase": "GATE_FIX_PR",
-  "lastPhaseCompletedAt": "<ISO-8601 UTC>",
-  "lastGateDecision": "<PROCEED|FIX_PR|ABORT|null>",
-  "fixAttempts": [
-    {
-      "at": "<ISO-8601 UTC>",
-      "delegateSkill": "x-pr-fix",
-      "prNumber": 123,
-      "outcome": "applied"
-    }
-  ],
-  "schemaVersion": "1.0"
-}
-```
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `phase` | String | Yes | Always `"GATE_FIX_PR"` for this skill |
-| `lastPhaseCompletedAt` | String (ISO-8601 UTC) | Yes | Updated on each write |
-| `lastGateDecision` | String \| null | Yes | One of `PROCEED`, `FIX_PR`, `ABORT`, or `null` before first interaction |
-| `fixAttempts` | Array | Yes | Always present; `[]` before first fix; max 3 items |
-| `schemaVersion` | String | Yes | Literal `"1.0"` |
-
-**`fixAttempts` entry fields:** `at` (ISO-8601 UTC), `delegateSkill` (always `"x-pr-fix"`), `prNumber` (PR number), `outcome` (`applied` \| `no_comments` \| `compile_regression` \| `aborted`).
-
-**Lifecycle:**
-- Written atomically (write to `<path>.tmp`, rename) when slot 2 (FIX-PR) is selected
-- Not written for PROCEED or ABORT selections
-- Not written on `--non-interactive` path
-
-**`--resume-review <pr>` flag:**
-
-When present, reads the state file at `plans/review/<pr>/state.json` and restores `gateAttempts` from `fixAttempts.size()`. If the state file satisfies the schema (Rule 20), the gate loop resumes from the last decision point. If the state file is absent or invalid, the gate starts fresh (gateAttempts = 0) with a warning:
-```
-WARNING: State file not found at plans/review/<pr>/state.json. Starting gate from scratch.
-```
-If the state file fails schema validation, emit `GATE_SCHEMA_INVALID` with the path and the missing/malformed field name.
+See [`references/full-protocol.md`](references/full-protocol.md) for the full JSON schema, field definitions, and `--resume-review` resume semantics.
 
 ## Phase 5 — Emit Frontmatter (MANDATORY — Rule 24 §Camada-1)
 
@@ -480,39 +438,10 @@ Invoke pre-gate (Rule 25 §Invariants 4):
     Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-pr")
 
 After Phase 4 has produced the prose body of `techlead-review-story-<STORY_ID>.md`,
-prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`:
+prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`.
+The full YAML template and field notes are in [`references/full-protocol.md §Phase 5`](references/full-protocol.md).
 
-```
-<!-- template-version: 1.0 -->
----
-schema-version: "1.0"
-generated-by: x-review-pr@<git rev-parse HEAD>
-story-id: <STORY_ID>
-epic-id: <EPIC_ID>
-date: <date -u +%Y-%m-%dT%H:%M:%SZ>
-decision: <GO|NO-GO|GO-WITH-RESERVATIONS>
-score: <integer 0-55>
-score-max: 55
-severity-counts:
-  critical: <count>
-  high: <count>
-  medium: <count>
-  low: <count>
-  info: <count>
-blocking-findings:
-<YAML list of critical/high findings, empty list [] if none>
-checklist:
-  passed: <integer 0-45>
-  total: 45
-  failed-sections:
-<YAML list of failed section IDs, empty list [] if none>
----
-# Tech Lead Review — <STORY_ID>
-...existing prose body...
-```
-
-**Note:** `x-review-pr` does NOT emit the `reviewers` field — the Tech Lead is the sole
-reviewer; `checklist` replaces `reviewers` as the optional field per schema spec.
+Key fields: `schema-version: "1.0"`, `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
 
 After writing the artifact, validate:
 
