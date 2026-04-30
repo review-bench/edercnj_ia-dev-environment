@@ -1,0 +1,731 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0078",
+  "epicSlug": "context-budget-optimization",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0078-0002": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "8aadec009a01c45e93339bd456dbc129bf62cd5cfa2171e710e1dc97223f276b",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. Valor mensurável (≥4500 tokens de redução). AC cobre happy-path, error/boundary, performance (<30s regen golden), security (path traversal). Contratos tipados. 3 riscos."
+      }
+    },
+    "story-0078-0003": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ae7bfa53c462e6a08e2749c8955d02e9fe27817ddab90e57a91474ea3c6092b9",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. AC cobre todas as 4 categorias obrigatórias. Contratos tipados (rename matrix), métricas (≤5 rules), alternativas (rename vs hard-cut), riscos identificados."
+      }
+    },
+    "story-0078-0004": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "1087c2a01f1a4f9ba9db6ac62b5cb20b8408305ed6e9d9a9e0c75de2f9667896",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. AC: happy-path, error, performance (<5s), security (realpath). Contratos, métricas (≤200 linhas, ≥3000 tokens). Alternativas documentadas."
+      }
+    },
+    "story-0078-0005": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "41e8e7fbe2738ab599ec2e4c62909c039864c2ffa8300ec4ab888b1f8014b189",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. AC: degenerate, happy, error, boundary, performance (<500ms), security (path traversal). Contratos (8 KP paths), métricas (≥6000 tokens). Alternativas documentadas."
+      }
+    },
+    "story-0078-0006": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ec35c3b9c71b5984dd43b7a16e8b8c7e0e8d55960c2adf167ed204af26cc0856",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. AC: happy-path, error, performance (KP assembly <500ms), security (path traversal). Contratos tipados. Métricas com unidade+target."
+      }
+    },
+    "story-0078-0007": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "0fe70b6c13f90420065b02d3c82aaed22461b66f8d89fd41edf7062a6393217e",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura completa de AC. Contratos, métricas, alternativas e riscos presentes."
+      }
+    },
+    "story-0078-0008": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "720c05e0d86243dcbf27d6eb3d696c160a5a9cc573433d336f592df95ff9825d",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura de AC incluindo cenários security e performance. Contratos, métricas, alternativas e riscos presentes."
+      }
+    },
+    "story-0078-0009": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2810b43b36b2e7af40ce9ee286dadbcbe2e11e513560e8042732167985f5ec20",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões aprovadas. Cobertura completa de AC. Todas as dimensões obrigatórias limpas."
+      }
+    },
+    "story-0078-0010": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "841e973c1ce399f4e85c38f49bf74593fe45b1f3e7d3915713738ee2d418ceb6",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (audit <3s), cenário de security adicionado (path traversal rejeitado), SLO de métricas atualizado de N/A para target concreto."
+      }
+    },
+    "story-0078-0011": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "f5f004810d53f06713352bc0bd9afed5e4edb23b6ce9b54abc4a59a9b2e9ea80",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (measure-context-budget ≥10% redução em <1s), cenário de security adicionado (referência inválida de KP rejeitada)."
+      }
+    },
+    "story-0078-0012": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "a8077ffb3047452406a1d477190c6dd66d273ecb98097d27ff43eea24a70900e",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (assembly <500ms para 11 perfis), cenário de security adicionado (path traversal em KP rejeitado), seção de riscos adicionada (3 riscos)."
+      }
+    },
+    "story-0078-0013": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "95afcf1d1f6e2e389eecfd7893ab0abd6fb5b073d2549736e40da385e86ccbab",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (measure ≤baseline-14000 tokens, <1s), cenário de security adicionado (stub sem vazamento de credencial), seção de riscos adicionada."
+      }
+    },
+    "story-0078-0014": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "0cc7798a979f3823c0388d3672596b715bc84457fc57ccdb75230e9ba3d85f3b",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as dimensões obrigatórias aprovadas. Gap de riscos em nível advisory (question). Dependência de EPIC-0064 Phase 2 documentada no DoR."
+      }
+    },
+    "story-0078-0015": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "77661b39f8fbe7ecc7c526b8d921c9496088b33c7f5cbe6d18a9390a28d31a1b",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GO resolvido: cenário de performance/SLA adicionado (audit <3s P99 com 15 KPs + 40 SKILL.md). Cenário de security já estava presente."
+      }
+    },
+    "story-0078-0016": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "df654e6c88da96444c07b018172799471b8e03ae045c606b187a716fe04ec05a",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (hard-fail audit <2s P99), cenário de security adicionado (baseline JSON adversarial → BASELINE_CORRUPT)."
+      }
+    },
+    "story-0078-0017": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "07614e1c57d337408bbb9733bc7a9ba414a630c07770b18daeb595913f3a0f5d",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "NO-GOs resolvidos: cenário de performance/SLA adicionado (regen 11 perfis <30s), cenário de security adicionado (verificação de integridade de deleção)."
+      }
+    },
+    "story-0078-0001": {
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "939dd69e2045ea6138059e936530fce7db8889404cf3b0af5b143194f8f70105",
+        "dimensions": {
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "verdictRationale": "Todas as 5 dimensões obrigatórias aprovadas sem gaps. AC cobre todas as 4 categorias: happy-path, error/boundary (baseline corrompido), performance/SLA (<2s audit), security/auth (path traversal rejeitado). Contratos totalmente tipados com exit codes explícitos. Alternativas documentadas. 3 riscos com mitigações."
+      }
+    }
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "db60d8a8023a774f236c13e466e68de35fbcffce0c23e9e07b1d712bbc782840",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": [],
+    "verdictRationale": "Refinamento aprovado após análise estratégica 4-fases. 3 NO-GOs resolvidos via edições diretas do épico (§1.4, §1.5, §1.6, §1.7, §2.1). 9 questões do operador respondidas. EPIC-0064 v5.0.0 já lançado desbloqueia story-0078-0014. Novas regras RULE-011/RULE-012 codificam enforcement de Security KP e gate release-elapsed."
+  }
+}
