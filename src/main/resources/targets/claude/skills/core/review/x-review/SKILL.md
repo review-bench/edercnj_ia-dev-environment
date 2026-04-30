@@ -62,6 +62,14 @@ Before executing a review, check if reports already exist and are still valid.
    - If code changed after reports: proceed with full review
 5. If no reports exist, proceed normally
 
+Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+
+Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
+    TaskUpdate(id: phase0TaskId, status: "completed")
+
 <!-- phase-no-gate: read-only context detection; no artifact produced -->
 ## Phase 1 -- Detect Context (Orchestrator -- Inline)
 
