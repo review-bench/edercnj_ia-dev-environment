@@ -88,7 +88,7 @@ is_grandfathered() {
     grep -v '^[[:space:]]*#' "${BASELINE_FILE}" 2>/dev/null \
         | sed 's/#.*//' \
         | tr -d '[:space:]' \
-        | grep -q "^${story_id}$"
+        | grep -qxF "${story_id}"
 }
 
 # ── File collector ─────────────────────────────────────────────────────────────

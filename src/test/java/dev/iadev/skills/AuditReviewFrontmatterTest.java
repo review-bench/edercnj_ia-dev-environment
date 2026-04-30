@@ -320,5 +320,53 @@ class AuditReviewFrontmatterTest {
         }
     }
 
+    @Nested
+    @DisplayName("violation — audit-exempt marker missing reason")
+    class InvalidExemption {
+
+        @Test
+        @DisplayName("audit-exempt marker without reason exits 3 with INVALID_EXEMPTION")
+        void auditScript_auditExemptMissingReason_exitsThree()
+                throws IOException, InterruptedException {
+            createReviewFile(
+                    "ai/epics/epic-0067/plans/review-story-0067-0002.md",
+                    "<!-- audit-exempt: -->\n# Review without reason\n");
+
+            ProcessResult r = run(List.of("--story", "story-0067-0002"));
+            assertThat(r.exitCode()).isEqualTo(3);
+            assertThat(r.stderr()).contains("INVALID_EXEMPTION");
+        }
+    }
+
+    @Nested
+    @DisplayName("security — path traversal prevention")
+    class PathTraversal {
+
+        @Test
+        @DisplayName("symlink resolving outside REPO_ROOT exits 2 with OPERATIONAL_ERROR")
+        void auditScript_symlinkOutsideRepoRoot_exitsTwo()
+                throws IOException, InterruptedException {
+            // Create a file outside the temp git repo
+            java.io.File outsideFile = java.io.File.createTempFile("outside-review", ".md");
+            outsideFile.deleteOnExit();
+            java.nio.file.Files.writeString(
+                    outsideFile.toPath(),
+                    "# Review outside repo root\n",
+                    StandardCharsets.UTF_8);
+
+            // Create a symlink inside the repo pointing to the outside file
+            Path linkDir = tempDir.resolve("ai/epics/epic-0067/plans");
+            Files.createDirectories(linkDir);
+            Path symlink = linkDir.resolve("review-story-0067-0099.md");
+            Files.createSymbolicLink(symlink, outsideFile.toPath());
+
+            ProcessResult r = run(List.of("--story", "story-0067-0099"));
+            assertThat(r.exitCode())
+                    .as("Path outside REPO_ROOT must exit 2, stderr=%s".formatted(r.stderr()))
+                    .isEqualTo(2);
+            assertThat(r.stderr()).contains("OPERATIONAL_ERROR");
+        }
+    }
+
     private record ProcessResult(int exitCode, String stdout, String stderr) {}
 }
