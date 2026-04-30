@@ -91,6 +91,12 @@ Invoke args normalizer and resolve epicId, flowVersion, flags:
 
     Skill(skill: "x-internal-args-normalize", args: "--schema @references/args-schema.json --argv \"{raw argv}\"")
 
+Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field interactiveMode --value <interactive|non-interactive>")
+
+Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
 Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-0-Args")
 
 TaskUpdate(id: phase0TaskId, status: "completed")

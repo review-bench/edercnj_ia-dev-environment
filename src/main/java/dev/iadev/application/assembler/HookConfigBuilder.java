@@ -139,10 +139,15 @@ public final class HookConfigBuilder {
         }
         // Rule 25 Layer 2 — always emitted, independent of telemetry.
         appendStopHookEntry(sb, "verify-phase-gates.sh", true);
-        // EPIC-0063 story-0063-0003 — stage-telemetry.sh: auto git add NDJSON turn-by-turn.
-        // Requires telemetry enabled (NDJSON only exists when telemetry runs).
+        // EPIC-0068 Camada 0 — always emitted; detects mid-phase stalls in
+        // non-interactive orchestrators and emits CONTINUOUS_FLOW_INTERRUPT nudge.
+        // Runs after verify-phase-gates.sh to avoid duplicate warnings.
         if (telemetryEnabled) {
+            appendStopHookEntry(sb, "enforce-continuous-flow.sh", true);
+            // EPIC-0063 story-0063-0003 — stage-telemetry.sh: auto git add NDJSON turn-by-turn.
             appendStopHookEntry(sb, "stage-telemetry.sh", false);
+        } else {
+            appendStopHookEntry(sb, "enforce-continuous-flow.sh", false);
         }
         sb.append(JsonHelpers.indent(4)).append("]\n");
         sb.append(JsonHelpers.indent(3)).append("}\n");
