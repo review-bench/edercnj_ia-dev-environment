@@ -145,6 +145,28 @@ WARN [taskTracking-flowVersion2] execution-state.json has flowVersion=2 but task
 
 **Migration:** Run `scripts/migrate-task-tracking-v2.sh` to migrate all active `flowVersion=2` epics to `taskTracking.enabled=true` before activating the CI audit. The script is idempotent — re-execution is safe.
 
+### `interactiveMode` Field (EPIC-0068)
+
+Added by EPIC-0068 (Continuous-Flow Heartbeat Hook). Signals whether the orchestrator is running in interactive or non-interactive mode, consumed by the Stop hook `enforce-continuous-flow.sh` to determine whether to emit flow-stall nudges.
+
+#### Fallback Matrix
+
+| Condition on `interactiveMode` | Resolved value | Behavior | Warning? |
+| :--- | :--- | :--- | :--- |
+| Field absent (legacy state file pre-EPIC-0068) | `"interactive"` | Hook is no-op — preserves legacy behavior | No |
+| Field = `"interactive"` (explicit) | `"interactive"` | Hook is no-op | No |
+| Field = `"non-interactive"` (explicit) | `"non-interactive"` | Hook active — nudge emitted when phase stalls | No |
+| Field = any other value (typo, future variant) | `"interactive"` | Fallback safe — hook is no-op | **Yes** — visible warning `[interactiveMode-fallback]` |
+
+**Warning format (invalid value):**
+
+```
+WARN [interactiveMode-fallback] execution-state.json has interactiveMode=<value>;
+     defaulting to "interactive" (hook no-op). Valid values: "interactive" | "non-interactive".
+```
+
+**Consumers:** `enforce-continuous-flow.sh` (Stop hook, EPIC-0068). No CI audit script reads this field; it is a runtime-only discriminator.
+
 ## Forbidden
 
 - Removing `flowVersion` resolution logic from orchestrators during the deprecation window.

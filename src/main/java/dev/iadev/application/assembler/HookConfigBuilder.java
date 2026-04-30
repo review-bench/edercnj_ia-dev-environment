@@ -121,13 +121,16 @@ public final class HookConfigBuilder {
     }
 
     /**
-     * Emits the {@code Stop} event with TWO hook entries: the telemetry session-end emitter AND the
-     * EIE (Execution Integrity Enforcement) Camada 2 hook {@code verify-story-completion.sh} (Rule
-     * 24).
+     * Emits the {@code Stop} event hooks sequentially. When telemetry is enabled the sequence is:
+     * {@code telemetry-stop.sh} → {@code verify-story-completion.sh} (Rule 24 Camada 2 EIE) →
+     * {@code verify-phase-gates.sh} (Rule 25 Layer 2) → {@code enforce-continuous-flow.sh}
+     * (EPIC-0068 Camada 0) → {@code stage-telemetry.sh}. When telemetry is disabled the sequence
+     * is: {@code verify-phase-gates.sh} → {@code enforce-continuous-flow.sh}.
      *
-     * <p>The two commands run sequentially; {@code verify-story-completion.sh} exits 2 when a story
-     * commit is detected but mandatory evidence artifacts are missing, which Claude Code surfaces
-     * to the LLM as a blocking notification.
+     * <p>{@code verify-story-completion.sh} exits 2 when a story commit is detected but mandatory
+     * evidence artifacts are missing, which Claude Code surfaces to the LLM as a blocking
+     * notification. {@code enforce-continuous-flow.sh} exits 2 when a non-interactive orchestrator
+     * stalls mid-phase, emitting a {@code CONTINUOUS_FLOW_INTERRUPT} nudge.
      */
     private static void appendStopEventWithEie(StringBuilder sb, boolean telemetryEnabled) {
         sb.append(JsonHelpers.indent(2)).append("\"Stop\": [\n");
@@ -139,10 +142,15 @@ public final class HookConfigBuilder {
         }
         // Rule 25 Layer 2 — always emitted, independent of telemetry.
         appendStopHookEntry(sb, "verify-phase-gates.sh", true);
-        // EPIC-0063 story-0063-0003 — stage-telemetry.sh: auto git add NDJSON turn-by-turn.
-        // Requires telemetry enabled (NDJSON only exists when telemetry runs).
+        // EPIC-0068 Camada 0 — always emitted; detects mid-phase stalls in
+        // non-interactive orchestrators and emits CONTINUOUS_FLOW_INTERRUPT nudge.
+        // Runs after verify-phase-gates.sh to avoid duplicate warnings.
         if (telemetryEnabled) {
+            appendStopHookEntry(sb, "enforce-continuous-flow.sh", true);
+            // EPIC-0063 story-0063-0003 — stage-telemetry.sh: auto git add NDJSON turn-by-turn.
             appendStopHookEntry(sb, "stage-telemetry.sh", false);
+        } else {
+            appendStopHookEntry(sb, "enforce-continuous-flow.sh", false);
         }
         sb.append(JsonHelpers.indent(4)).append("]\n");
         sb.append(JsonHelpers.indent(3)).append("}\n");

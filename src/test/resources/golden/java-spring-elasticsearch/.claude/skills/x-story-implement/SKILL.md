@@ -105,6 +105,14 @@ Open phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "completed"
 
 Consume `{parsed, warnings, errors}`: exit `ARGS_INVALID` on errors; print warnings once; extract `storyId`, `epicId` (auto-derived from storyId prefix), `targetBranch`, `autoMerge`, and all flags (skipReview/skipVerification/skipSmoke/autoApprovePr/nonInteractive/worktree/task/resume/noAutoRemediation/noCiWatch/fullLifecycle) for phase propagation.
 
+### 0.1a Persist interactiveMode (EPIC-0068)
+
+Write the resolved interactive mode to `execution-state.json` so the Stop hook `enforce-continuous-flow.sh` can determine whether to emit nudges:
+
+    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+
+Value is `"interactive"` when `--interactive` flag was passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
 ### 0.2 Load story context
 
     Skill(skill: "x-internal-story-load-context", args: "--story-id <STORY-ID> --epic-id <EPIC-ID>")

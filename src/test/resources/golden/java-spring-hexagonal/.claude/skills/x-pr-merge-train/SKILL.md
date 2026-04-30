@@ -96,6 +96,12 @@ Resolve `--resume` (load existing `state.json`) vs fresh run. Validate exactly o
 
 See `references/full-protocol.md §Phase 0` for full implementation.
 
+Persist interactiveMode to state file (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+    Skill(skill: "x-internal-status-update", args: "--file plans/merge-train/{trainId}/state.json --type merge-train --id {trainId} --field interactiveMode --value <interactive|non-interactive>")
+
+Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+
     TaskUpdate(id: phase0TaskId, status: "completed")
 
 ## Phase 1 - Discovery

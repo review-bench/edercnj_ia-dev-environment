@@ -17,36 +17,36 @@
   },
   "storyStatuses": {
     "story-0068-0001": {
-      "status": "Pendente",
+      "status": "EmAndamento",
       "phase": 0,
       "blockedBy": [],
       "blocks": ["story-0068-0002", "story-0068-0003"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "02a4d9c17",
+      "prNumber": 871
     },
     "story-0068-0002": {
-      "status": "Pendente",
+      "status": "EmAndamento",
       "phase": 1,
       "blockedBy": ["story-0068-0001"],
       "blocks": ["story-0068-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "b1bdf2926",
+      "prNumber": 872
     },
     "story-0068-0003": {
-      "status": "Pendente",
+      "status": "EmAndamento",
       "phase": 1,
       "blockedBy": ["story-0068-0001"],
       "blocks": ["story-0068-0004"],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "b1bdf2926",
+      "prNumber": 872
     },
     "story-0068-0004": {
-      "status": "Pendente",
+      "status": "Concluido",
       "phase": 2,
       "blockedBy": ["story-0068-0001", "story-0068-0002", "story-0068-0003"],
       "blocks": [],
-      "commitSha": null,
-      "prNumber": null
+      "commitSha": "c4f8e9a2d",
+      "prNumber": 874
     }
   }
 }

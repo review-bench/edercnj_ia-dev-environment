@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0068 (Continuous-Flow Heartbeat Hook)
+
+- **`enforce-continuous-flow.sh`** (Layer-0 Stop hook, Rule 26 Camada 0): detects orchestrators stalled mid-phase in `non-interactive` mode (last NDJSON event is `tool.result` with open tasks remaining) and emits a `CONTINUOUS_FLOW_INTERRUPT` nudge (exit 2) to the LLM. Closes the residual gap where LLM emits prose between sub-phases instead of the next tool call. Decision matrix (a)–(h): no state file / hotfix branch / interactive mode / empty openTasks / finding.high / error event / tool.call in-flight → exit 0; otherwise exit 2 + nudge.
+- **`derive_next_mandatory_call()`** bash function (≤25 lines) inside the hook: reads `[required]` Tool-Call Grammar markers (Rule 28) from the active SKILL.md, cross-references against NDJSON `tool.call` events, and surfaces the next missing required invocation in the nudge message. Returns `PHASE_COMPLETE` when all required skills have been emitted.
+- **`interactiveMode` field** added to `execution-state.json` (Rule 19 fallback: absent field defaults to `"interactive"` = no-op). All 8 Anexo B orchestrators (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`) emit `--field interactiveMode` in Phase 0 via `x-internal-status-update`.
+- **`HooksAssembler.RULE_68_SCRIPTS`** constant: `enforce-continuous-flow.sh` always copied to generated `.claude/hooks/`. Hook registered in `settings.json` Stop event across all 10 golden profiles.
+- **`EnforceContinuousFlowHookTest`** (9 structural contract tests), **`Epic0068ContinuousFlowSmokeTest`** (7 E2E scenarios — decision matrix (a)–(h)), **`enforce_continuous_flow_test.sh`** (9 bash scenarios), **`derive_next_mandatory_call_test.sh`** (6 bash unit tests).
+- **`docs/audit-gates-catalog.md`**: Hook runtime (Camada 0) section added with entry for `enforce-continuous-flow.sh` per Rule 26 §Catalog-before-Add (RULE-004).
+
 ### Added — EPIC-0067 (Review YAML Frontmatter)
 
 - **`governance/schemas/review-frontmatter-1.0.json`** (JSON Schema Draft 2020-12): validates review YAML frontmatter blocks in `review-story-*.md` and `techlead-review-story-*.md`. 10 required fields: `schema-version`, `generated-by`, `story-id`, `epic-id`, `date`, `decision`, `score`, `score-max`, `severity-counts`, `blocking-findings`. `decision` enum: `GO | NO-GO | GO-WITH-RESERVATIONS`.
