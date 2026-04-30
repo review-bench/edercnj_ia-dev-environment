@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0070 (Value-Driven Templates v2)
+
+- **Capability `governance.value-driven-templates`** — all EPIC-0070 artefacts (skills, scripts, templates) declare `requires-capabilities: [governance.value-driven-templates]` (Rule 28).
+- **v2 template sections** added to `_TEMPLATE-STORY.md` and `_TEMPLATE-EPIC.md`: `## 3. Hipótese & OKRs`, `## Refinement Verdict`. Skills `x-internal-epic-create` and `x-internal-story-create` emit v2 by default; `--legacy-template-v1` flag available with `DEPRECATED` warning (2-release deprecation window, Rule 19).
+- **`_TEMPLATE-ARCHITECTURE-SYSTEM.md`**: new template for `docs/architecture/system.md` with §11 Decision Log section for cross-epic architectural change tracking.
+- **`_TEMPLATE-ADR.md`**: standardised ADR template with v2 problem/hypothesis/value/alternatives structure.
+- **`_TEMPLATE-CAPABILITY.md`**: new template for capability YAML files under `capabilities/`.
+- **Skill `/x-arch-system-update`** (public, `model: sonnet`): incrementally updates `docs/architecture/system.md` after an epic completes — appends to §11 Decision Log (idempotent via `## ID: epic-<ID>` marker) and surgically updates sections 1-10 via SHA-256 hash guard. Errors: `SYSTEM_MD_MISSING`, `EPIC_DIR_MISSING`. Supports `--dry-run`.
+- **Skill `/x-template-migrate`** (public, `model: sonnet`): assists v1→v2 epic document migration with 7-category block classification heuristics, optional `--interactive` per-block confirmation (Rule 20 non-interactive default), atomic Write via `.tmp` swap, `PARSER_ERROR` abort guarantee, `--dry-run` preview mode, recovery state-file at `.claude/state/template-migrate-<epic-id>.json`.
+- **`audit-template-version.sh`** (Camada 2 CI Script, Rule 26): detects epics created after rollout date 2026-04-30 that are still in v1 format without a valid exemption. Exemption paths: `governance/baselines/template-version-baseline.txt`, `audit-exempt` marker, `legacyTemplateV1: true` in execution-state.json. Exit codes: `0`=OK, `1`=`TEMPLATE_VERSION_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check` and `--epic <ID>` per Rule 26.
+- **`governance/baselines/template-version-baseline.txt`**: empty baseline (pre-EPIC-0070 epics are discriminated by rollout date in script logic; explicit entries for post-rollout exceptions only — append-only, immutable after EPIC-0070 merges).
+- **`ScriptsAssembler.AUDIT_SCRIPTS`**: `audit-template-version.sh` added (alphabetically between `audit-skill-visibility.sh` and `telemetry-consolidate.sh`).
+- **`docs/audit-gates-catalog.md`**: entry added for `audit-template-version.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **EPIC-0056 `## ⛔ SUPERSEDED`**: `epic-0056.md` marked superseded by EPIC-0070 (history preserved, file not deleted).
+- **Tests**: `Epic0070ValueTemplatesSmokeIT` (6 E2E scenarios), `PlanSkillsV2TemplateDefaultTest` (8 tests), `ArchSystemUpdateSkillTest` (8 tests), `TemplateMigrateSkillTest` (9 tests).
+
+### [Breaking] — EPIC-0070
+
+> **Template format changed for new epics/stories.** `x-internal-epic-create` and `x-internal-story-create` now emit v2 by default. Use `--legacy-template-v1` (with `DEPRECATED` warning) to produce v1 format; this flag will be removed in 2 releases. The `audit-template-version.sh` CI script will fail PRs introducing v1-format epics after 2026-04-30 without an exemption.
+
 ### Added — EPIC-0069 (Story Refinement & DoR Gate)
 
 - **Capability `governance.refinement-gate`** declared in `capabilities/governance/refinement-gate.yaml` (universal — no stack-specific `requires-capabilities`). All EPIC-0069 artefacts (skills, hooks, scripts, KP) declare `requires-capabilities: [governance.refinement-gate]` in their frontmatter (Rule 28).

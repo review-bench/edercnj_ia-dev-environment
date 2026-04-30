@@ -13,13 +13,16 @@ import java.util.Map;
 /**
  * Assembles documentation artifacts for generated projects.
  *
- * <p>Provides two capabilities:
+ * <p>Provides three capabilities:
  *
  * <ol>
  *   <li>{@link #assemble} — renders {@code steering/service-architecture.md} from the service
  *       architecture template (EPIC-0014 original).
  *   <li>{@link #renderCatalog} — produces a markdown catalog of audit gates for a given stack from
  *       {@code _TEMPLATE-AUDIT-GATES-CATALOG.md} (EPIC-0061 story-0061-0003).
+ *   <li>{@link #assembleSystemArchitecture} — renders {@code docs/architecture/system.md} from the
+ *       system architecture template (EPIC-0070 story-0070-0004). Idempotent: skips if the output
+ *       file already exists.
  * </ol>
  *
  * <p>Graceful no-op: if the source template does not exist in the resources directory, returns an
@@ -33,8 +36,12 @@ public final class DocsAssembler implements Assembler {
     private static final String TEMPLATE_PATH =
             "shared/templates/_TEMPLATE-SERVICE-ARCHITECTURE.md";
     static final String CATALOG_TEMPLATE_PATH = "shared/templates/_TEMPLATE-AUDIT-GATES-CATALOG.md";
+    static final String SYSTEM_ARCH_TEMPLATE_PATH =
+            "shared/templates/_TEMPLATE-ARCHITECTURE-SYSTEM.md";
     private static final String OUTPUT_SUBDIR = "steering";
     private static final String OUTPUT_FILENAME = "service-architecture.md";
+    private static final String SYSTEM_ARCH_OUTPUT = "docs/architecture/system.md";
+    private static final String FRONTMATTER_DELIMITER = "---";
     private static final String DEFAULT_STACK = "_default";
 
     private final Path resourcesDir;
@@ -67,6 +74,58 @@ public final class DocsAssembler implements Assembler {
         Path destFile = destDir.resolve(OUTPUT_FILENAME);
         CopyHelpers.writeFile(destFile, rendered);
         return List.of(destFile.toString());
+    }
+
+    /**
+     * Renders and writes {@code docs/architecture/system.md} for the generated project.
+     *
+     * <p>Idempotent: if the output file already exists it is left unchanged and an empty list is
+     * returned. Frontmatter in the template (capability declaration) is stripped before rendering
+     * so the output file contains only the document body.
+     *
+     * @param config the project configuration
+     * @param engine the template rendering engine
+     * @param outputDir the root output directory for the generated project
+     * @return a list containing the path of the written file, or an empty list when skipped
+     */
+    public List<String> assembleSystemArchitecture(
+            ProjectConfig config, TemplateEngine engine, Path outputDir) {
+        Path templateFile = resourcesDir.resolve(SYSTEM_ARCH_TEMPLATE_PATH);
+        if (!Files.exists(templateFile)) {
+            return List.of();
+        }
+        Path destFile = outputDir.resolve(SYSTEM_ARCH_OUTPUT);
+        if (Files.exists(destFile)) {
+            return List.of();
+        }
+        Map<String, Object> context = ContextBuilder.buildContext(config);
+        String rendered = engine.render(SYSTEM_ARCH_TEMPLATE_PATH, context);
+        rendered = stripFrontmatter(rendered);
+        CopyHelpers.ensureDirectory(destFile.getParent());
+        CopyHelpers.writeFile(destFile, rendered);
+        return List.of(destFile.toString());
+    }
+
+    /**
+     * Strips YAML frontmatter ({@code ---...---}) from a rendered template output.
+     *
+     * <p>Frontmatter is present in the template source for capability-driven composition (Rule 28)
+     * but must not appear in the generated output file.
+     *
+     * @param content the rendered template content, possibly starting with frontmatter
+     * @return content with the leading frontmatter block removed, or the original content unchanged
+     */
+    static String stripFrontmatter(String content) {
+        if (!content.startsWith(FRONTMATTER_DELIMITER)) {
+            return content;
+        }
+        int secondDelimiter = content.indexOf(FRONTMATTER_DELIMITER, FRONTMATTER_DELIMITER.length());
+        if (secondDelimiter < 0) {
+            return content;
+        }
+        String afterFrontmatter =
+                content.substring(secondDelimiter + FRONTMATTER_DELIMITER.length());
+        return afterFrontmatter.replaceFirst("^\r?\n", "");
     }
 
     /**

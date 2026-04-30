@@ -1,0 +1,33 @@
+{
+  "storyId": "story-0070-0005",
+  "epicId": "epic-0070",
+  "passed": true,
+  "checkedAt": "2026-04-30T21:00:00-03:00",
+  "coverageLine": 96.2,
+  "coverageBranch": 91.8,
+  "thresholds": {
+    "line": 95,
+    "branch": 90
+  },
+  "artifacts": {
+    "archPlan": "ai/epics/epic-0070-value-driven-templates-v2/plans/arch-story-0070-0005.md",
+    "implPlan": "ai/epics/epic-0070-value-driven-templates-v2/plans/plan-story-0070-0005.md",
+    "testPlan": "ai/epics/epic-0070-value-driven-templates-v2/plans/tests-story-0070-0005.md",
+    "taskBreakdown": "ai/epics/epic-0070-value-driven-templates-v2/plans/tasks-story-0070-0005.md",
+    "securityAssessment": "ai/epics/epic-0070-value-driven-templates-v2/plans/security-story-0070-0005.md",
+    "complianceAssessment": "ai/epics/epic-0070-value-driven-templates-v2/plans/compliance-story-0070-0005.md",
+    "specialistReview": "ai/epics/epic-0070-value-driven-templates-v2/plans/review-story-0070-0005.md",
+    "techLeadReview": "ai/epics/epic-0070-value-driven-templates-v2/plans/techlead-review-story-0070-0005.md"
+  },
+  "goldenFiles": {
+    "expected": 476,
+    "generated": 476,
+    "diff": 0
+  },
+  "testResults": {
+    "total": 4540,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 14
+  }
+}

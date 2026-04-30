@@ -274,6 +274,18 @@
 
 ---
 
+### audit-template-version.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 26 §Camada 2, EPIC-0070 (Value-Driven Templates v2) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Epics created after rollout date 2026-04-30 use v2 value-driven template format (contain `## 3. Hipótese & OKRs` or `## Refinement Verdict`), OR are exempt via baseline file, `audit-exempt` marker, or `legacyTemplateV1: true` in execution-state.json |
+| **Introduced** | story-0070-0008 (EPIC-0070) |
+| **Exit Codes** | `0` = OK · `1` = `TEMPLATE_VERSION_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ### audit-task-hierarchy.sh
 
 | Field | Value |

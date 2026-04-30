@@ -92,9 +92,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
 | 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 29 | `29-refinement-gate.md` | refinement gate |
+| 30 | `30-value-driven-templates.md` | value driven templates |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 26 rules**
+**Total: 27 rules**
 
 ### Numbering
 
@@ -116,6 +117,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **spring-controller** | `/spring-controller` | Generate a Spring Boot @RestController with matching DTOs, mappers, @ControllerAdvice handler, and unit tests following hexagonal architecture. |
 | **x-adr-generate** | `/x-adr-generate` | Automates ADR generation from architecture plan mini-ADRs: extracts inline decisions, expands to full ADR format, assigns sequential numbering, updates the ADR index, and adds cross-references. |
 | **x-arch-plan** | `/x-arch-plan` | Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions. |
+| **x-arch-system-update** | `/x-arch-system-update` | Incrementally updates docs/architecture/system.md after an epic completes. Appends new entries to the Decision Log (§11) using x-internal-report-write --append (dedup by ## ID: marker) and surgically inserts component/integration changes into sections 1-10 via Edit. Idempotent: re-running with the same epic produces a byte-identical system.md. |
 | **x-arch-update** | `/x-arch-update` | Incrementally updates the service architecture document with changes from architecture plans. Adds new components, integrations, flows, and ADR references without rewriting existing content. Use after implementation to keep architecture documentation current. |
 | **x-ci-generate** | `/x-ci-generate` | Generate or update CI/CD pipelines based on project stack: detect language, analyze existing workflows, generate CI/CD/release/security pipelines, validate with actionlint, support monorepo triggers. |
 | **x-code-audit** | `/x-code-audit` | Full codebase review against all project standards. Launches parallel subagents per audit dimension (Clean Code, SOLID, Architecture, Tests, Security, Cross-file), consolidates findings into a severity-categorized report with score. Use for periodic quality validation. |
@@ -172,6 +174,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-task-plan** | `/x-task-plan` | Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-story-plan (future). |
 | **x-telemetry-analyze** | `/x-telemetry-analyze` | Analyze telemetry NDJSON for one or more epics and produce a Markdown report with skill/phase/tool aggregates, Mermaid Gantt timeline, and optional JSON/CSV exports. Use to answer 'which phase is the bottleneck?' and 'is skill X getting slower?' questions for operator visibility. |
 | **x-telemetry-trend** | `/x-telemetry-trend` | Detect cross-epic P95 regressions (>= threshold %) and rank top-10 slowest skills from the global telemetry index. Single-responsibility partner of /x-telemetry-analyze focused on trend detection, not point-in-time reporting. Use to answer 'is skill X getting slower over the last N epics?' with evidence. |
+| **x-template-migrate** | `/x-template-migrate` | Assists migration of a v1 epic document to the v2 value-driven template (EPIC-0070). Parses v1 technical blocks (Packages, Contratos, SOLID, Observabilidade), classifies each block with a safe default heuristic, and optionally asks the operator for confirmation per block (--interactive). Side-effects: writes epic.md in v2 format atomically, creates ADRs for 'virar ADR' decisions, updates system.md via x-arch-system-update. Supports --dry-run and recovery from interrupted sessions. |
 | **x-test-contract-lint** | `/x-test-contract-lint` | Validates API contracts (OpenAPI 3.1, AsyncAPI 2.6, Protobuf 3) against their specifications. Reports structural errors, missing fields, and spec violations. |
 | **x-test-e2e** | `/x-test-e2e` | Runs integration tests that validate the complete flow from request through all application layers to response, using a real database. |
 | **x-test-plan** | `/x-test-plan` | Generates a Double-Loop TDD test plan with TPP-ordered scenarios before implementation. Delegates KP reading to a context-gathering subagent, then produces structured Acceptance Tests (outer loop) and Unit Tests in Transformation Priority Premise order (inner loop). |
@@ -180,7 +183,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-test-tdd** | `/x-test-tdd` | Executes systematic Red-Green-Refactor TDD cycles for a task. Reads the task plan generated by x-task-plan, runs each cycle in TPP order, validates RED/GREEN/REFACTOR phases, delegates atomic commits to x-git-commit with TDD tags, and supports resume and dry-run. |
 | **x-threat-model** | `/x-threat-model` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 
-**Total: 90 skills**
+**Total: 92 skills**
 
 ### Usage Examples
 
@@ -339,8 +342,8 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 26 |
-| Skills (.claude) | 71 |
+| Rules (.claude) | 27 |
+| Skills (.claude) | 73 |
 | Knowledge Packs (.claude) | 19 |
 | Agents (.claude) | 11 |
 | Hooks (.claude) | 17 |

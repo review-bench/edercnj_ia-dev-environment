@@ -18,7 +18,7 @@ class AssemblerFactoryBuildAllTest {
     class UnfilteredList {
 
         @Test
-        @DisplayName("returns all 24 assemblers regardless " + "of platform option")
+        @DisplayName("returns all 26 assemblers regardless " + "of platform option")
         void buildAllAssemblers_withClaudeFilter_returns23() {
             PipelineOptions options =
                     new PipelineOptions(
@@ -26,17 +26,17 @@ class AssemblerFactoryBuildAllTest {
 
             List<AssemblerDescriptor> result = AssemblerFactory.buildAllAssemblers(options);
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
         }
 
         @Test
-        @DisplayName("returns all 24 with empty platforms")
+        @DisplayName("returns all 26 with empty platforms")
         void buildAllAssemblers_emptyPlatforms_returns23() {
             PipelineOptions options = PipelineOptions.defaults();
 
             List<AssemblerDescriptor> result = AssemblerFactory.buildAllAssemblers(options);
 
-            assertThat(result).hasSize(25);
+            assertThat(result).hasSize(26);
         }
 
         @Test

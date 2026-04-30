@@ -1,0 +1,9 @@
+# template-version-baseline.txt
+# Grandfathers epic IDs created before EPIC-0070 introduced v2 value-driven templates (2026-04-30).
+# File is append-only and immutable after EPIC-0070 merges to develop.
+# New entries are FORBIDDEN — set legacyTemplateV1: true in execution-state.json instead.
+# Format: epic-NNNN  # reason
+#
+# NOTE: All epics prior to EPIC-0070 (epic-0001 through epic-0069) are pre-rollout legacy.
+# This baseline covers them implicitly; the audit script uses the rollout date (2026-04-30)
+# as a discriminator. Explicit entries are for post-rollout exceptions documented by an ADR only.
