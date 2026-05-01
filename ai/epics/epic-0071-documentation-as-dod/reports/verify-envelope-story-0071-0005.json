@@ -1,0 +1,19 @@
+{
+  "storyId": "story-0071-0005",
+  "epicId": "EPIC-0071",
+  "passed": true,
+  "verifiedAt": "2026-05-01T05:00:00Z",
+  "prNumber": 895,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "acCheckResults": [
+    { "scenario": "Happy — PR with updated docs passes", "passed": true },
+    { "scenario": "Degenerate — doc-only PR auto-skipped", "passed": true },
+    { "scenario": "Error — PR without doc-update blocked (exit 1 DOC_FRESHNESS_VIOLATION)", "passed": true },
+    { "scenario": "Boundary — --self-check validates prerequisites", "passed": true },
+    { "scenario": "Performance — 500 files < 30s", "passed": true },
+    { "scenario": "Security — audit-exempt without reason exits 3 INVALID_EXEMPTION", "passed": true }
+  ],
+  "acCheckCount": 6,
+  "missingArtifacts": []
+}
