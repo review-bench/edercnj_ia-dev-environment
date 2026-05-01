@@ -734,6 +734,41 @@ produces:
 
 **Decisão de migração:** no NDP, cada ativo precisa declarar `kind` (`command`, `worker`, `policy`, `knowledge-pack`, `template`, `adapter`) e dependências explícitas. Skills deixam de carregar política e conhecimento embutidos; elas passam a consumir policies e KPs versionados. Isso reduz tokens, remove duplicação e torna possível testar governance como código.
 
+### 5.5. Grupos canônicos — Rules, KPs e skills reclassificadas
+
+Para o registry NDP, os ativos devem ser agrupados por domínio de responsabilidade, não pelo formato atual do arquivo (`SKILL.md`, rule markdown, KP ou shell script). O agrupamento abaixo define o vocabulário inicial para `policy_id`, `kp_id`, capability bundles e navegação futura no marketplace.
+
+| Grupo canônico | O que governa | Rules/policies | KPs | Skills/artefatos relacionados |
+| --- | --- | --- | --- | --- |
+| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, SOLID/Clean Code, limites de método/classe. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-code-format`, `x-code-lint`, `x-code-audit`, review specialists consomem este grupo. |
+| `architecture-standards` | Estrutura, camadas, dependency direction e decisões de design. | Architecture summary, dependency rules, capability/frontmatter constraints quando afetam arquitetura. | `architecture`, `api-design`, `protocols`, `resilience`, `layer-templates`. | `x-arch-plan`, `x-arch-update`, `x-arch-system-update`; scaffolds viram templates stack-specific. |
+| `security-compliance` | Segurança mínima, compliance e postura regulatória. | Security baseline, conditional security rules, compliance gates, evidence requirements. | `security`, `compliance` e overlays `pci`, `hipaa`, `lgpd`, `soc2`. | `x-owasp-scan`, `x-hardening-eval`, `x-runtime-eval`, `x-dependency-audit`, `x-supply-chain-audit`, `x-doc-validate` como command/policy hybrid. |
+| `testing-quality` | Como provar comportamento, cobertura e aceitação. | Coverage thresholds, TDD requirements, acceptance criteria coverage, smoke/contract requirements. | `testing`, `story-planning`. | `x-test-plan`, `x-test-run`, `x-test-tdd`, `x-test-e2e`, `x-test-contract`, `x-test-perf`, `x-test-smoke-*`. |
+| `planning-product` | Como transformar intenção em backlog, planos e artefatos RA9. | Refinement gate, value-driven templates, flow version rules, DoR. | `story-planning`, `planning-standards-kp`. | `planning-standards-kp` vira KP; `x-story-plan`, `x-task-plan`, `x-template-migrate`, `x-feature-create`, `x-feature-ideate` consomem policies/KPs. |
+| `execution-governance` | Integridade de execução, anti-bypass, phase gates e lifecycle. | Execution Integrity, Zero-bypass Lifecycle, Task Hierarchy, Phase Gates, Audit Lifecycle, Refinement Gate. | Guidance curta de lifecycle para humanos; critérios executáveis vivem em policy. | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate`, `verify-*`, `enforce-*`, `audit-execution-integrity.sh`, `audit-phase-gates.sh`, `audit-task-hierarchy.sh`. |
+| `git-release-pr` | Branching, commits, PRs, merge train e releases. | Branching model, release process, commit conventions, PR evidence requirements, CI-watch integrity. | Git/release workflow guidance. | `x-git-branch`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-pr-create`, `x-pr-merge`, `x-pr-watch-ci`, `x-pr-merge-train`, `x-release`. |
+| `documentation` | Documentação como DoD e rastreabilidade técnica. | Documentation freshness, ADR requirements, changelog rules, system architecture update rules. | Architecture docs guidance, API docs guidance, ADR/changelog knowledge. | `x-doc-generate`, `x-doc-validate`, `x-adr-generate`, `x-release-changelog`, `x-arch-system-update`. |
+| `observability-ops` | Telemetria, operação, incidentes e troubleshooting. | Telemetry privacy, operations baseline, CI-watch observability signals. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | `telemetry-*` hooks viram telemetry service; `x-telemetry-analyze`, `x-telemetry-trend`, `x-ops-troubleshoot`, `x-ops-incident`, `x-perf-profile`. |
+| `review-governance` | Critérios e vereditos de review técnico. | Mandatory review surfaces, GO/NO-GO schema, review evidence requirements. | `security`, `testing`, `architecture`, `api-design`, `observability`, `resilience`. | `x-review`, `x-review-pr`, `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, `x-review-db`, `x-review-events`, `x-review-graphql`, `x-review-grpc`. |
+| `capability-registry` | Como capabilities, skills, rules, KPs e policies são descritos e distribuídos. | Capability frontmatter, skill visibility, audit gate lifecycle, model selection. | Governance authoring guidance, capability composition knowledge. | `x-lib-audit-rules`, `x-frontmatter-migrate`, `audit-capability-graph.sh`, `audit-skill-visibility.sh`, `audit-model-selection.sh`. |
+| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, MCP/Jira/GitHub boundaries, provider usage policy. | MCP catalog, Jira workflow knowledge, provider docs. | `x-mcp-recommend` vira KP + advisor command; `x-jira-create-epic`, `x-jira-create-stories` viram plugins/commands. |
+
+#### 5.5.1. Regras de reclassificação por grupo
+
+| Caso | Classificação NDP |
+| --- | --- |
+| Standard obrigatório e testável | `policy` dentro do grupo correspondente. |
+| Explicação, heurística, checklist ou vocabulário | `knowledge-pack`. |
+| Scaffold ou estrutura repetível | `template` + render command. |
+| Execução de ferramenta, geração de artefato, PR, commit, scan ou review | `command` ou `worker`. |
+| Gate interno, audit script ou hook de bloqueio | `policy executable` + runtime/CI service. |
+
+#### 5.5.2. Decisão de produto
+
+Esses grupos viram a taxonomia oficial do NDP para empacotar e descobrir capacidades. Um pacote pode conter múltiplos tipos (`policy`, `knowledge-pack`, `template`, `command`), mas todos devem declarar o mesmo domínio canônico. Exemplo: `security-compliance` pode conter o KP `security`, a policy `owasp-baseline`, templates de SARIF e commands de scan; o registry mostra tudo como uma capacidade coerente em vez de uma lista plana de skills.
+
+**Regra de ouro:** standards viram policies, explicações viram KPs, estruturas repetíveis viram templates, ações continuam commands/workers.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
