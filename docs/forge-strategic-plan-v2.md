@@ -1,10 +1,10 @@
-# Plano Estratégico v2 — Evolução do `ia-dev-environment` para NDP
+# Plano Estratégico v2 — Evolução do `ia-dev-environment` para Forge
 
 > **Status:** Rascunho estratégico reorganizado (pré-refinement).
-> **Origem:** Consolidação do `docs/ndp-strategic-plan.md` após inventários de skills, hooks, rules, KPs, templates e artefatos.
+> **Origem:** Consolidação do `docs/forge-strategic-plan.md` após inventários de skills, hooks, rules, KPs, templates e artefatos.
 > **Objetivo:** Servir como fonte de entrada para planejar o futuro produto, suas capacidades, features e épicos.
 > **Hierarquia-alvo:** `Project → Product → Capacity → Feature`. Épicos, Stories e Tasks ficam para a próxima etapa de refinement.
-> **Codinome:** `NDP` — NextGen Dev Platform.
+> **Nome do produto:** `Forge`.
 
 ---
 
@@ -14,7 +14,7 @@ A versão anterior acumulou informação de forma incremental: primeiro princíp
 
 Esta v2 reorganiza a história em uma sequência mais natural para tomada de decisão:
 
-1. **Tese do produto:** o que o NDP é e quais decisões são inegociáveis.
+1. **Tese do produto:** o que o Forge é e quais decisões são inegociáveis.
 2. **Diagnóstico:** como o `ia-dev-environment` funciona hoje e por que precisa evoluir.
 3. **Modelo futuro:** como a inversão de controle muda runtime, LLM, policies, telemetria e artefatos.
 4. **Inventário canônico:** o que existe hoje, classificado uma única vez por papel: commands/workers, policies, KPs, templates, artefatos e integrações.
@@ -22,7 +22,7 @@ Esta v2 reorganiza a história em uma sequência mais natural para tomada de dec
 6. **Roadmap:** Products, Capacities e Features.
 7. **Riscos e próximos passos:** o que precisa ser provado antes de transformar isso em épicos.
 
-Regra editorial desta versão: inventários detalhados continuam presentes porque são contexto estratégico, mas cada lista tem uma função clara. A lista de skills diz **qual papel cada skill terá no NDP**. A taxonomia diz **em qual domínio do produto esse papel vive**. Templates dizem **como artefatos são renderizados**. Artefatos dizem **o que aparece no disco e quem consome**.
+Regra editorial desta versão: inventários detalhados continuam presentes porque são contexto estratégico, mas cada lista tem uma função clara. A lista de skills diz **qual papel cada skill terá no Forge**. A taxonomia diz **em qual domínio do produto esse papel vive**. Templates dizem **como artefatos são renderizados**. Artefatos dizem **o que aparece no disco e quem consome**.
 
 ---
 
@@ -30,12 +30,12 @@ Regra editorial desta versão: inventários detalhados continuam presentes porqu
 
 ### 1.1. Princípio fundador — local-first, CLI-first
 
-O NDP é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A V0 é uma CLI, como o `ia-dev-env` é hoje. Toda interface gráfica (TUI, web console, dashboards, IDE extensions, SaaS) é pós-V0 e não bloqueia nenhuma capacidade do core.
+O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A V0 é uma CLI, como o `ia-dev-env` é hoje. Toda interface gráfica (TUI, web console, dashboards, IDE extensions, SaaS) é pós-V0 e não bloqueia nenhuma capacidade do core.
 
 | Decisão | Consequência |
 | --- | --- |
 | Local-first por padrão | Código-fonte, telemetria, audit log e estado de execução vivem no disco do desenvolvedor. Nada é enviado para nuvem sem opt-in explícito. |
-| V0 = CLI | A primeira release entregável é `ndp ...`, sem servidor, sem login e sem dependência de rede no caminho feliz. |
+| V0 = CLI | A primeira release entregável é `forge ...`, sem servidor, sem login e sem dependência de rede no caminho feliz. |
 | UI é v1+ | TUI, IDE panels e web console consomem o mesmo core da CLI. Nenhuma regra de negócio vive apenas na UI. |
 | Headless friendly | Todo comando core precisa ser scriptável, com `--output json`, `--output text` e, quando fizer sentido, `--output ndjson`. |
 | Network como opt-in | Marketplace, telemetria remota, analytics cross-project e multi-tenancy são desligados por padrão. |
@@ -44,15 +44,15 @@ O NDP é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do d
 Roadmap de interfaces:
 
 ```text
-V0  -> CLI (ndp <command>)                      -> single source of truth
-V1  -> TUI (ndp tui) e IDE panel mínimo         -> melhora UX, mesmo core
-V2  -> Web console local (ndp ui, localhost)    -> dashboard offline opcional
+V0  -> CLI (forge <command>)                      -> single source of truth
+V1  -> TUI (forge tui) e IDE panel mínimo         -> melhora UX, mesmo core
+V2  -> Web console local (forge ui, localhost)    -> dashboard offline opcional
 V3+ -> SaaS multi-tenant e marketplace remoto   -> opt-in, separado do core
 ```
 
 A CLI permanece canônica em todas as versões. Nenhuma feature do core pode existir apenas na UI.
 
-### 1.2. Princípio de inversão de controle — o NDP é o orquestrador
+### 1.2. Princípio de inversão de controle — o Forge é o orquestrador
 
 A mudança mais importante não é trocar templates, renomear skills ou criar outro gerador. A mudança é inverter quem controla a execução.
 
@@ -65,36 +65,36 @@ Usuário -> Claude Code -> lê SKILL.md -> LLM tenta executar passo a passo
 
 O LLM é o orquestrador. Ele decide quais skills chamar, em qual ordem e com quais argumentos. As camadas de gates existem porque o LLM pode pular etapas, simular resultados e declarar sucesso sem gerar evidência.
 
-Modelo NDP:
+Modelo Forge:
 
 ```text
-Usuário -> ndp story implement STORY-0072-0001
+Usuário -> forge story implement STORY-0072-0001
              |
              v
-          NDP controla state machine, fases, gates, evidências, git, PR e telemetria
+          Forge controla state machine, fases, gates, evidências, git, PR e telemetria
              |
              v
           LLM é chamado apenas como worker criativo quando necessário
 ```
 
-O NDP é o orquestrador determinístico. O LLM é um worker invocado para tarefas pontuais que exigem julgamento ou geração: refinar story, gerar plano, escrever código, revisar, redigir ADR. Tudo que é determinístico — ordem de fases, criação de branch, commit, PR, validação de artefatos, telemetria, retry, resume e gates — vira código do NDP.
+O Forge é o orquestrador determinístico. O LLM é um worker invocado para tarefas pontuais que exigem julgamento ou geração: refinar story, gerar plano, escrever código, revisar, redigir ADR. Tudo que é determinístico — ordem de fases, criação de branch, commit, PR, validação de artefatos, telemetria, retry, resume e gates — vira código do Forge.
 
 ### 1.3. Consequências práticas
 
 | Efeito | Decisão de produto |
 | --- | --- |
-| Skills orquestradoras viram comandos CLI | `x-story-implement` vira `ndp story implement`; `x-epic-implement` vira `ndp epic implement`; `x-release` vira `ndp release`. |
-| Hooks e scripts shell deixam de ser mecanismo primário | Invariantes passam para funções do runtime e `ndp ci verify`. |
-| Camadas 0-4 colapsam em duas | **Camada A:** NDP runtime bloqueia em processo. **Camada B:** CI valida o que o NDP produziu. |
-| Zero-bypass vira propriedade arquitetural | O fluxo oficial começa no comando NDP; o comando não oferece caminho feliz sem evidência. |
-| Refinement gate vira pré-condição do comando | `ndp story implement` falha com código tipado se o refinement não estiver aprovado. |
+| Skills orquestradoras viram comandos CLI | `x-story-implement` vira `forge story implement`; `x-epic-implement` vira `forge epic implement`; `x-release` vira `forge release`. |
+| Hooks e scripts shell deixam de ser mecanismo primário | Invariantes passam para funções do runtime e `forge ci verify`. |
+| Camadas 0-4 colapsam em duas | **Camada A:** Forge runtime bloqueia em processo. **Camada B:** CI valida o que o Forge produziu. |
+| Zero-bypass vira propriedade arquitetural | O fluxo oficial começa no comando Forge; o comando não oferece caminho feliz sem evidência. |
+| Refinement gate vira pré-condição do comando | `forge story implement` falha com código tipado se o refinement não estiver aprovado. |
 | Tool-call grammar vira tipo | O que hoje é regex contra markdown vira schema, enum e contrato de comando. |
 | Telemetria é in-process | NDJSON/OTel nasce no runtime que controla a execução, não em hooks externos. |
 | Rules críticas viram policies | Rules deixam de ser apenas prosa para LLM e passam a ter `policy_id`, versão, testes e ponto de execução. |
 
 ### 1.4. Posicionamento
 
-O NDP não compete em "a IA faz tudo sozinha". O diferencial é: **a IA faz certo, com governança, evidência e execução auditável, localmente, em qualquer IDE e com múltiplos LLMs**.
+O Forge não compete em "a IA faz tudo sozinha". O diferencial é: **a IA faz certo, com governança, evidência e execução auditável, localmente, em qualquer IDE e com múltiplos LLMs**.
 
 ---
 
@@ -128,7 +128,7 @@ O `ia-dev-environment` é um gerador CLI Java que materializa um ambiente `.clau
 
 ### 2.3. A leitura estratégica
 
-O sistema atual já provou valor: ele tem uma gramática de governança, um catálogo grande de skills, um lifecycle de evidências, telemetry local e uma cultura de zero-bypass. O NDP não deve jogar isso fora. O que deve mudar é **onde a responsabilidade vive**.
+O sistema atual já provou valor: ele tem uma gramática de governança, um catálogo grande de skills, um lifecycle de evidências, telemetry local e uma cultura de zero-bypass. O Forge não deve jogar isso fora. O que deve mudar é **onde a responsabilidade vive**.
 
 O que hoje é espalhado como texto e shell deve virar:
 
@@ -143,7 +143,7 @@ O que hoje é espalhado como texto e shell deve virar:
 
 ---
 
-## 3. Modelo Futuro do NDP
+## 3. Modelo Futuro do Forge
 
 ### 3.1. Arquitetura conceitual
 
@@ -151,7 +151,7 @@ O que hoje é espalhado como texto e shell deve virar:
 Profile / repo / command args
         |
         v
-NDP CLI
+Forge CLI
         |
         v
 Runtime determinístico
@@ -169,9 +169,9 @@ Runtime determinístico
 
 ### 3.2. Tipos canônicos de ativo
 
-| Tipo | Responsabilidade | Exemplo atual | Forma no NDP |
+| Tipo | Responsabilidade | Exemplo atual | Forma no Forge |
 | --- | --- | --- | --- |
-| `command` | Entrada pública de produto. | `x-story-implement`, `x-release`, `x-pr-watch-ci`. | `ndp story implement`, `ndp release`, `ndp pr watch`. |
+| `command` | Entrada pública de produto. | `x-story-implement`, `x-release`, `x-pr-watch-ci`. | `forge story implement`, `forge release`, `forge pr watch`. |
 | `internal-service` | Componente chamado por commands; não precisa ser exposto. | `x-internal-status-update`, `x-internal-phase-gate`. | Classe/serviço testável. |
 | `worker-prompt` | Produz conteúdo criativo com LLM. | `x-arch-plan`, `x-test-plan`, review specialists. | Prompt versionado + schema de saída. |
 | `adapter` | Executa tooling determinístico. | `x-test-run`, `x-code-lint`, `x-git-commit`. | Adapter local para git/build/test/PR. |
@@ -186,22 +186,22 @@ Runtime determinístico
 Todo ativo precisa declarar identidade, tipo, domínio, versão, dependências e outputs. Exemplo:
 
 ```yaml
-id: ndp.story.implement
+id: forge.story.implement
 kind: command
 domain: execution-governance
 version: 1.0.0
 requires-policies:
-  - ndp.policy.refinement-gate@1
-  - ndp.policy.execution-integrity@1
-  - ndp.policy.task-hierarchy@1
+  - forge.policy.refinement-gate@1
+  - forge.policy.execution-integrity@1
+  - forge.policy.task-hierarchy@1
 requires-context:
-  - ndp.kp.story-planning@1
-  - ndp.kp.testing.tdd@1
-  - ndp.kp.security.baseline@1
+  - forge.kp.story-planning@1
+  - forge.kp.testing.tdd@1
+  - forge.kp.security.baseline@1
 produces:
-  - ndp.artifact.story-completion-report@1
-  - ndp.artifact.verify-envelope@1
-  - ndp.artifact.telemetry-run@1
+  - forge.artifact.story-completion-report@1
+  - forge.artifact.verify-envelope@1
+  - forge.artifact.telemetry-run@1
 ```
 
 ### 3.4. Regra de ouro de classificação
@@ -218,19 +218,19 @@ produces:
 
 ### 3.5. Blueprint de sequência dos comandos
 
-Os comandos são o ponto de entrada do produto. Por isso, a forma mais clara de entender o NDP é partir do comando mais amplo e expandir as delegações. O fluxo raiz é `ndp epic implement`: ele coordena épico, histórias, tasks, PRs, reviews, gates, evidências e telemetria. Sempre que uma chamada delega para outro orquestrador e o diagrama ficaria ilegível, o detalhe aparece no diagrama seguinte.
+Os comandos são o ponto de entrada do produto. Por isso, a forma mais clara de entender o Forge é partir do comando mais amplo e expandir as delegações. O fluxo raiz é `forge epic implement`: ele coordena épico, histórias, tasks, PRs, reviews, gates, evidências e telemetria. Sempre que uma chamada delega para outro orquestrador e o diagrama ficaria ilegível, o detalhe aparece no diagrama seguinte.
 
 Regra de leitura:
 
-- `NDP Runtime` substitui a skill markdown atual como dono da state machine.
+- `Forge Runtime` substitui a skill markdown atual como dono da state machine.
 - `Policy/Gate Engine` substitui phase gates, hooks preventivos e audit checks locais.
 - `Artifact Store` representa `ai/epics/*`, `ai/releases/*`, `ai/runs/*`, PR body e state local.
 - `LLM Worker` só aparece quando há geração criativa ou julgamento.
 - `Adapters` representam git, build, test, docs, security, GitHub/PR e CI.
 
-Convenção de numeração: a linha em que o usuário ou comando pai invoca o command é o **gatilho**. A etapa `1` começa na primeira ação interna do NDP depois desse gatilho. Quando uma etapa chama outro comando orquestrador, o detalhe aparece no diagrama próprio desse comando.
+Convenção de numeração: a linha em que o usuário ou comando pai invoca o command é o **gatilho**. A etapa `1` começa na primeira ação interna do Forge depois desse gatilho. Quando uma etapa chama outro comando orquestrador, o detalhe aparece no diagrama próprio desse comando.
 
-#### 3.5.1. `ndp epic implement <EPIC-ID>` — sequência raiz
+#### 3.5.1. `forge epic implement <EPIC-ID>` — sequência raiz
 
 Este é o fluxo equivalente ao `x-epic-implement`. Ele preserva as seis fases atuais: args, plano, branch, loop de stories, gate de integridade e PR final.
 
@@ -238,17 +238,17 @@ Este é o fluxo equivalente ao `x-epic-implement`. Ele preserva as seis fases at
 sequenceDiagram
   autonumber
   actor User as Developer
-  participant CLI as NDP CLI
-  participant RT as NDP Runtime
+  participant CLI as Forge CLI
+  participant RT as Forge Runtime
   participant Gate as Policy/Gate Engine
   participant State as Execution State
   participant Art as Artifact Store
   participant Git as Git Adapter
-  participant Story as ndp story implement
+  participant Story as forge story implement
   participant PR as PR Adapter
   participant Tele as Telemetry/Audit
 
-  User->>CLI: ndp epic implement EPIC-XXXX [flags]
+  User->>CLI: forge epic implement EPIC-XXXX [flags]
   CLI->>RT: 1. parse command envelope
   RT->>Tele: 2. run.start(epic implement)
   RT->>Gate: 3. assertPre(Phase 0 - Args)
@@ -278,7 +278,7 @@ sequenceDiagram
     loop 19. each implementation phase
       loop each story in topological order
         RT->>State: 20. mark story IN_PROGRESS
-        RT->>Story: 21. ndp story implement STORY-ID --target-branch epic/XXXX --auto-merge strategy
+        RT->>Story: 21. forge story implement STORY-ID --target-branch epic/XXXX --auto-merge strategy
         Story-->>RT: 22. story envelope {status, pr, coverage, report}
         RT->>State: 23. persist story status, PR status, evidence paths
         alt story failed
@@ -294,7 +294,7 @@ sequenceDiagram
     RT->>Art: 28. read story reports, verify envelopes, PR evidence, telemetry
     RT->>Gate: 29. run epic integrity gate
     alt gate failed
-      RT->>PR: 30a. optional ndp pr fix-epic or revert policy
+      RT->>PR: 30a. optional forge pr fix-epic or revert policy
       PR-->>RT: 30b. remediation result
       RT->>Gate: 30c. retry integrity gate once
     end
@@ -316,7 +316,7 @@ sequenceDiagram
 
 Etapas:
 
-1. **Parse do command envelope.** A CLI transforma `ndp epic implement EPIC-XXXX [flags]` em um envelope tipado com epic ID, flags, modo de execução e destino esperado.
+1. **Parse do command envelope.** A CLI transforma `forge epic implement EPIC-XXXX [flags]` em um envelope tipado com epic ID, flags, modo de execução e destino esperado.
 2. **Início de telemetria.** O runtime registra `run.start` para que toda a execução tenha correlação, duração e status final.
 3. **Gate pré-args.** O runtime verifica se pode iniciar a fase de argumentos: ambiente válido, estado legível e nenhuma fase anterior pendente.
 4. **Normalização de argumentos.** Flags legadas, `--resume`, `--parallel`, `--dry-run`, `flowVersion`, estratégia de merge e modo interativo são resolvidos em um contrato único.
@@ -336,7 +336,7 @@ Etapas:
 18. **Gate pré-loop de stories.** Abre a fase principal de execução e garante que o plano e a branch estão válidos.
 19. **Iteração por fase de implementação.** O runtime percorre fases do DAG; dentro de cada fase, respeita ordem topológica ou paralelismo permitido.
 20. **Marcação da story como em progresso.** Atualiza estado antes de chamar a story, criando checkpoint recuperável.
-21. **Delegação para `ndp story implement`.** Chama o command de story com target branch, estratégia de auto-merge e flags propagadas. O detalhe está no diagrama 3.5.2.
+21. **Delegação para `forge story implement`.** Chama o command de story com target branch, estratégia de auto-merge e flags propagadas. O detalhe está no diagrama 3.5.2.
 22. **Recebimento do envelope da story.** Recebe status, PR, coverage, report e paths de evidência.
 23. **Persistência do resultado da story.** Atualiza `execution-state.json` com status, PR, merge status e artefatos produzidos.
 24. **Tratamento de falha da story.** Se falhou, marca dependentes como `BLOCKED` e decide entre abortar, recovery ou política de revert.
@@ -345,7 +345,7 @@ Etapas:
 27. **Gate pré-integridade do épico.** Garante que todas as evidências por story existem antes do gate agregado.
 28. **Leitura de evidências.** Carrega reports, verify envelopes, PR evidence e telemetria.
 29. **Execução do gate de integridade.** Avalia se o épico está consistente para integração final.
-30. **Remediação de gate falho.** Se necessário, chama `ndp pr fix-epic` ou aplica política de revert, depois tenta o gate uma vez.
+30. **Remediação de gate falho.** Se necessário, chama `forge pr fix-epic` ou aplica política de revert, depois tenta o gate uma vez.
 31. **Persistência do relatório do épico.** Escreve relatório final e envelope de verificação do épico.
 32. **Gate pós-integridade.** Confirma que o épico tem evidência agregada suficiente.
 33. **Sincronização com `develop`.** Em fluxo não legado, mescla `develop` na branch `epic/XXXX` para reduzir conflito no PR final.
@@ -353,21 +353,21 @@ Etapas:
 35. **Fim de telemetria.** Registra `run.end` com status final e métricas.
 36. **Saída estruturada.** Retorna para CLI e usuário um resumo com status, paths de evidência e PR final.
 
-#### 3.5.2. `ndp story implement <STORY-ID>` — ciclo de story
+#### 3.5.2. `forge story implement <STORY-ID>` — ciclo de story
 
 Este diagrama expande a chamada feita no loop do épico. Ele corresponde ao `x-story-implement`: prepara contexto, cria/valida contratos, planeja, executa tasks, cria PRs, valida, roda docs/reviews e escreve relatório final.
 
 ```mermaid
 sequenceDiagram
   autonumber
-  participant Epic as ndp epic implement
-  participant Story as ndp story implement
+  participant Epic as forge epic implement
+  participant Story as forge story implement
   participant Gate as Policy/Gate Engine
   participant State as Execution State
   participant Art as Artifact Store
   participant Contract as Contract Adapter
   participant Plan as Story Planning Service
-  participant Task as ndp task implement
+  participant Task as forge task implement
   participant PR as PR/CI Adapter
   participant Docs as Docs Adapter
   participant Review as Review Commands
@@ -405,7 +405,7 @@ sequenceDiagram
     alt dependency unresolved
       Story->>State: 20. mark task BLOCKED
     else executable task
-      Story->>Task: 21. ndp task implement TASK-ID --orchestrated
+      Story->>Task: 21. forge task implement TASK-ID --orchestrated
       Task-->>Story: 22. task envelope {status, branch, commit, coverage}
       alt task failed
         Story->>State: 23a. mark task FAILED and dependants BLOCKED
@@ -431,12 +431,12 @@ sequenceDiagram
   Docs-->>Story: 33. doc-validate-report
   Story->>Gate: 34. verify story evidence, coverage, ACs
   Gate-->>Story: 35. verify-envelope
-  Story->>Review: 36. ndp review STORY-ID
+  Story->>Review: 36. forge review STORY-ID
   Review-->>Story: 37. specialist dashboard
-  Story->>Review: 38. ndp review pr STORY-ID
+  Story->>Review: 38. forge review pr STORY-ID
   Review-->>Story: 39. GO or NO-GO verdict
   alt NO-GO and remediation enabled
-    Story->>PR: 40. ndp pr fix
+    Story->>PR: 40. forge pr fix
     PR-->>Story: 41. remediation result
     Story->>Review: 42. rerun required review gate
   end
@@ -469,7 +469,7 @@ Etapas:
 18. **Leitura das tasks.** Carrega `tasks-story-*` e planos por task.
 19. **Checagem de dependências por task.** Antes de executar, valida se a task está desbloqueada.
 20. **Bloqueio de task dependente.** Se faltar dependência, marca `BLOCKED` e segue política de propagação.
-21. **Delegação para `ndp task implement`.** Executa a task via loop TDD detalhado no diagrama 3.5.4.
+21. **Delegação para `forge task implement`.** Executa a task via loop TDD detalhado no diagrama 3.5.4.
 22. **Recebimento do envelope da task.** Recebe status, branch, commit e coverage.
 23. **Tratamento de task falha.** Marca falha, bloqueia dependentes e retorna `TASK_FAILED` ao épico quando necessário.
 24. **Criação/watch/merge do PR da task.** Se a task passou, chama o subdomínio PR/CI detalhado no diagrama 3.5.5.
@@ -484,11 +484,11 @@ Etapas:
 33. **Relatório de documentação.** Produz `doc-validate-report`.
 34. **Verify gate da story.** Valida evidência, coverage e critérios de aceite.
 35. **Verify envelope.** Persiste resultado estruturado do gate.
-36. **Review especialista.** Chama `ndp review`, detalhado no diagrama 3.5.6.
+36. **Review especialista.** Chama `forge review`, detalhado no diagrama 3.5.6.
 37. **Dashboard especialista.** Recebe achados e scores consolidados.
-38. **Review Tech Lead.** Chama `ndp review pr`, também detalhado no diagrama 3.5.6.
+38. **Review Tech Lead.** Chama `forge review pr`, também detalhado no diagrama 3.5.6.
 39. **Veredito GO/NO-GO.** Recebe decisão final de qualidade.
-40. **Remediação automática.** Em NO-GO remediável, chama `ndp pr fix`.
+40. **Remediação automática.** Em NO-GO remediável, chama `forge pr fix`.
 41. **Resultado da remediação.** Recebe patch/commit/status da correção.
 42. **Revisão focada pós-remediação.** Roda novamente o gate necessário.
 43. **Relatório de conclusão da story.** Escreve `story-completion-report`.
@@ -504,7 +504,7 @@ Este diagrama detalha o subfluxo de planejamento (`x-internal-story-build-plan`)
 ```mermaid
 sequenceDiagram
   autonumber
-  participant Story as ndp story implement
+  participant Story as forge story implement
   participant Plan as Story Planning Service
   participant Gate as Policy/Gate Engine
   participant LLM as LLM Worker Pool
@@ -554,17 +554,17 @@ Etapas:
 12. **Degradação por colisão.** Se houver conflito hard/regen, registra que a wave deve rodar serialmente.
 13. **Confirmação de paralelismo.** Se não houver colisão, preserva execução paralela permitida.
 14. **Gate de artefatos esperados.** Valida que todos os outputs obrigatórios existem.
-15. **Envelope para story.** Retorna paths e status para `ndp story implement`.
+15. **Envelope para story.** Retorna paths e status para `forge story implement`.
 
-#### 3.5.4. `ndp task implement <TASK-ID>` — TDD inner loop
+#### 3.5.4. `forge task implement <TASK-ID>` — TDD inner loop
 
 Este diagrama expande o menor orquestrador de implementação. Ele mantém o Double-Loop TDD em código: o runtime decide ciclo, valida RED/GREEN/REFACTOR e chama LLM apenas para gerar teste/código quando necessário.
 
 ```mermaid
 sequenceDiagram
   autonumber
-  participant Story as ndp story implement
-  participant Task as ndp task implement
+  participant Story as forge story implement
+  participant Task as forge task implement
   participant Gate as Policy/Gate Engine
   participant State as Execution State
   participant Art as Artifact Store
@@ -735,7 +735,7 @@ Etapas:
 7. **Criação do PR.** GitHub Adapter abre PR com labels, título e body.
 8. **Envelope básico do PR.** Retorna número e URL.
 9. **CI-watch.** Acompanha checks, salvo quando recovery policy permite pular.
-10. **Persistência do watch.** Escreve `.claude/state/pr-watch-{PR}.json` ou equivalente NDP.
+10. **Persistência do watch.** Escreve `.claude/state/pr-watch-{PR}.json` ou equivalente Forge.
 11. **Resultado do CI.** Retorna status dos checks.
 12. **Decisão de auto-merge.** Se auto-merge está habilitado e CI está verde, segue para merge.
 13. **Merge com estratégia selecionada.** Aplica merge/squash/rebase conforme política.
@@ -747,19 +747,19 @@ Etapas:
 
 #### 3.5.6. Review gates — especialistas e Tech Lead
 
-Este diagrama detalha as chamadas `ndp review` e `ndp review pr`, acionadas dentro de `story implement` e também úteis como comandos públicos.
+Este diagrama detalha as chamadas `forge review` e `forge review pr`, acionadas dentro de `story implement` e também úteis como comandos públicos.
 
 ```mermaid
 sequenceDiagram
   autonumber
-  participant Story as ndp story implement
-  participant Review as ndp review
-  participant TL as ndp review pr
+  participant Story as forge story implement
+  participant Review as forge review
+  participant TL as forge review pr
   participant Gate as Policy/Gate Engine
   participant LLM as Specialist Worker Pool
   participant Build as Build/Test Adapter
   participant Art as Artifact Store
-  participant Fix as ndp pr fix
+  participant Fix as forge pr fix
 
   Story->>Review: 1. run specialist review for STORY-ID
   Review->>Art: 2. idempotency check for existing reports
@@ -815,7 +815,7 @@ Etapas:
 16. **Review holístico.** LLM aplica rubrica Tech Lead.
 17. **Report GO/NO-GO.** Retorna decisão e achados.
 18. **Persistência do Tech Lead report.** Atualiza dashboard com score final.
-19. **Remediação condicional.** Em NO-GO remediável, chama `ndp pr fix`.
+19. **Remediação condicional.** Em NO-GO remediável, chama `forge pr fix`.
 20. **Resultado da correção.** Recebe patch/status.
 21. **Revalidação determinística.** Roda compile/test novamente após correção.
 22. **Review focado pós-fix.** Reavalia achados afetados.
@@ -826,16 +826,16 @@ Etapas:
 
 Esses diagramas revelam a estrutura real do produto:
 
-- `ndp epic implement` é um **composite command** que não deve conter lógica de story/task/review inline; ele coordena envelopes e policies.
-- `ndp story implement` é o principal command de delivery: ele integra planejamento, task loop, docs, verify, review e report.
-- `ndp task implement` é o inner loop TDD, onde a maior parte da criação de código acontece.
+- `forge epic implement` é um **composite command** que não deve conter lógica de story/task/review inline; ele coordena envelopes e policies.
+- `forge story implement` é o principal command de delivery: ele integra planejamento, task loop, docs, verify, review e report.
+- `forge task implement` é o inner loop TDD, onde a maior parte da criação de código acontece.
 - PR/CI/review são subdomínios reutilizáveis, não detalhes acidentais de story.
 - Cada seta que escreve em disco deve produzir um `artifact_kind` tipado.
 - Cada `alt` de erro/recovery deve virar exceção tipada, política de retry ou estado persistido.
 
 ---
 
-## 4. Inventário Canônico de Ativos Atuais e Destino NDP
+## 4. Inventário Canônico de Ativos Atuais e Destino Forge
 
 Esta é a seção de preservação de contexto. Ela evita duplicação separando a pergunta em camadas:
 
@@ -848,26 +848,26 @@ Esta é a seção de preservação de contexto. Ela evita duplicação separando
 
 ### 4.1. Skills e comandos atuais, classificados uma única vez
 
-#### 4.1.1. Orquestradoras públicas — viram comandos NDP
+#### 4.1.1. Orquestradoras públicas — viram comandos Forge
 
-Estas skills controlam fluxo amplo. No NDP elas devem sair de markdown interpretado e virar comandos CLI com state machine, persistência, gates, telemetria, retries e saída estruturada.
+Estas skills controlam fluxo amplo. No Forge elas devem sair de markdown interpretado e virar comandos CLI com state machine, persistência, gates, telemetria, retries e saída estruturada.
 
-| Skill atual | Destino NDP V0 | Motivo |
+| Skill atual | Destino Forge V0 | Motivo |
 | --- | --- | --- |
-| `x-epic-implement` | `ndp epic implement <ID>` | Implementação de épico em fases, waves, gates e PRs. |
-| `x-story-implement` | `ndp story implement <ID>` | Lifecycle end-to-end de story: planning, task execution, PR, review, verify, report. |
-| `x-task-implement` | `ndp task implement <ID>` | TDD double-loop, validações, commits e PR/task. |
-| `x-release` | `ndp release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, tag e back-merge. |
-| `x-epic-orchestrate` | `ndp epic orchestrate <ID>` | Planejamento multi-story com checkpoints e resume. |
-| `x-pr-merge-train` | `ndp merge-train` | Ordenação topológica de PRs, waves, CI e merge. |
-| `x-review` | `ndp review <STORY>` | Fan-out/fan-in de especialistas e consolidação. |
-| `x-review-pr` | `ndp review pr <PR>` | Veredito Tech Lead GO/NO-GO. |
-| `x-story-refine` | `ndp story refine <ID>` | Refinement multi-persona com verdict persistido. |
-| `x-epic-refine` | `ndp epic refine <ID>` | Refinement estratégico de épico. |
-| `x-story-plan` | `ndp story plan <ID>` | Planning wave, task breakdown, task plans e DoR. |
-| `x-feature-create` | `ndp feature create <SPEC>` | Spec → epic → stories → implementation map → PR. |
-| `x-feature-ideate` | `ndp feature ideate` | Ideia livre → spec/backlog estruturado. |
-| `x-test-tdd` | `ndp test tdd <TASK>` | Orquestra ciclos Red/Green/Refactor; LLM atua pontualmente. |
+| `x-epic-implement` | `forge epic implement <ID>` | Implementação de épico em fases, waves, gates e PRs. |
+| `x-story-implement` | `forge story implement <ID>` | Lifecycle end-to-end de story: planning, task execution, PR, review, verify, report. |
+| `x-task-implement` | `forge task implement <ID>` | TDD double-loop, validações, commits e PR/task. |
+| `x-release` | `forge release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, tag e back-merge. |
+| `x-epic-orchestrate` | `forge epic orchestrate <ID>` | Planejamento multi-story com checkpoints e resume. |
+| `x-pr-merge-train` | `forge merge-train` | Ordenação topológica de PRs, waves, CI e merge. |
+| `x-review` | `forge review <STORY>` | Fan-out/fan-in de especialistas e consolidação. |
+| `x-review-pr` | `forge review pr <PR>` | Veredito Tech Lead GO/NO-GO. |
+| `x-story-refine` | `forge story refine <ID>` | Refinement multi-persona com verdict persistido. |
+| `x-epic-refine` | `forge epic refine <ID>` | Refinement estratégico de épico. |
+| `x-story-plan` | `forge story plan <ID>` | Planning wave, task breakdown, task plans e DoR. |
+| `x-feature-create` | `forge feature create <SPEC>` | Spec → epic → stories → implementation map → PR. |
+| `x-feature-ideate` | `forge feature ideate` | Ideia livre → spec/backlog estruturado. |
+| `x-test-tdd` | `forge test tdd <TASK>` | Orquestra ciclos Red/Green/Refactor; LLM atua pontualmente. |
 
 #### 4.1.2. Orquestradoras auxiliares — comando público, subcomando avançado ou serviço
 
@@ -875,31 +875,31 @@ Estas coordenam fluxo suficiente para não serem leaf prompts. A visibilidade p�
 
 | Skill auxiliar | Destino provável |
 | --- | --- |
-| `x-code-audit` | `ndp code audit` ou parte de `ndp ci verify`. |
-| `x-lib-audit-rules` | Serviço interno / `ndp lint policy`. |
-| `x-doc-generate` | `ndp doc generate` e fase interna de story/release. |
-| `x-template-migrate` | `ndp template migrate`. |
-| `x-pr-create` | `ndp pr create` e serviço interno de PR. |
-| `x-pr-fix` | `ndp pr fix <PR>`. |
-| `x-pr-fix-epic` | `ndp pr fix --epic <EPIC>`. |
-| `x-pr-watch-ci` | `ndp pr watch <PR>` com exit codes tipados. |
-| `x-pr-merge` | `ndp pr merge` ou serviço interno usado por merge-train/release. |
-| `x-git-push`, `x-git-commit`, `x-git-worktree`, `x-git-cleanup-branches` | Subcomandos `ndp git ...` e serviços transacionais internos. |
-| `x-status-reconcile` | `ndp status reconcile` para recovery/admin. |
-| `x-ci-generate` | `ndp ci generate`. |
-| `x-setup-env` | `ndp setup env` ou `ndp doctor`. |
-| `x-perf-profile` | `ndp perf profile`. |
-| `x-ops-troubleshoot` | `ndp troubleshoot` ou worker acionado por falhas. |
+| `x-code-audit` | `forge code audit` ou parte de `forge ci verify`. |
+| `x-lib-audit-rules` | Serviço interno / `forge lint policy`. |
+| `x-doc-generate` | `forge doc generate` e fase interna de story/release. |
+| `x-template-migrate` | `forge template migrate`. |
+| `x-pr-create` | `forge pr create` e serviço interno de PR. |
+| `x-pr-fix` | `forge pr fix <PR>`. |
+| `x-pr-fix-epic` | `forge pr fix --epic <EPIC>`. |
+| `x-pr-watch-ci` | `forge pr watch <PR>` com exit codes tipados. |
+| `x-pr-merge` | `forge pr merge` ou serviço interno usado por merge-train/release. |
+| `x-git-push`, `x-git-commit`, `x-git-worktree`, `x-git-cleanup-branches` | Subcomandos `forge git ...` e serviços transacionais internos. |
+| `x-status-reconcile` | `forge status reconcile` para recovery/admin. |
+| `x-ci-generate` | `forge ci generate`. |
+| `x-setup-env` | `forge setup env` ou `forge doctor`. |
+| `x-perf-profile` | `forge perf profile`. |
+| `x-ops-troubleshoot` | `forge troubleshoot` ou worker acionado por falhas. |
 | `x-ops-incident` | Comando opcional; provável V1+ ou plugin ops. |
-| `x-jira-create-epic`, `x-jira-create-stories` | Plugins `ndp jira ...`, fora do core offline. |
-| `x-adr-generate` | `ndp adr generate` e fase interna de arquitetura. |
-| `x-owasp-scan`, `x-security-dashboard`, `x-security-pentest` | `ndp security ...`, alguns condicionais por capability/permissão. |
+| `x-jira-create-epic`, `x-jira-create-stories` | Plugins `forge jira ...`, fora do core offline. |
+| `x-adr-generate` | `forge adr generate` e fase interna de arquitetura. |
+| `x-owasp-scan`, `x-security-dashboard`, `x-security-pentest` | `forge security ...`, alguns condicionais por capability/permissão. |
 
 #### 4.1.3. Serviços internos — viram código testável
 
-Estas skills existem hoje porque o LLM precisava chamar componentes internos por nome. No NDP, elas viram classes, serviços ou funções.
+Estas skills existem hoje porque o LLM precisava chamar componentes internos por nome. No Forge, elas viram classes, serviços ou funções.
 
-| Grupo interno | Skills atuais | Forma em NDP |
+| Grupo interno | Skills atuais | Forma em Forge |
 | --- | --- | --- |
 | Gates | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | `PhaseGateService`, `StoryVerifyService`, `EpicIntegrityGate`. |
 | Estado e contexto | `x-internal-status-update`, `x-internal-story-resume`, `x-internal-story-load-context`, `x-internal-args-normalize` | Repositório de estado, loader de contexto, parser tipado de args. |
@@ -910,9 +910,9 @@ Estas skills existem hoje porque o LLM precisava chamar componentes internos por
 
 #### 4.1.4. Skills puras — permanecem isoladas como workers, adapters ou comandos utilitários
 
-Estas já têm uma responsabilidade dominante. O NDP deve portá-las sem inflar escopo. Elas não devem ganhar state machine própria nem coordenar lifecycle amplo.
+Estas já têm uma responsabilidade dominante. O Forge deve portá-las sem inflar escopo. Elas não devem ganhar state machine própria nem coordenar lifecycle amplo.
 
-| Grupo | Skills puras | Destino NDP |
+| Grupo | Skills puras | Destino Forge |
 | --- | --- | --- |
 | `conditional/dev` | `x-setup-stack` | Adapter/comando de setup stack-specific. |
 | `conditional/ops` | `x-obs-instrument` | Worker/adapter de instrumentação. |
@@ -947,7 +947,7 @@ Estas já têm uma responsabilidade dominante. O NDP deve portá-las sem inflar 
 
 ### 4.2. Rules e policies
 
-| Domínio de rule atual | Exemplos atuais | Destino NDP |
+| Domínio de rule atual | Exemplos atuais | Destino Forge |
 | --- | --- | --- |
 | Identidade, domínio e contexto | Rules 01, 02 | Doctrine humana + defaults de profile. |
 | Coding standards, arquitetura, quality gates | Rules 03, 04, 05 | Thresholds/limites viram policy; explicações viram KP. |
@@ -965,16 +965,16 @@ Decisão: rules críticas ganham `policy_id`, versão, testes e ponto de execuç
 
 ### 4.3. Knowledge Packs
 
-| KP/domínio | Destino NDP | Consumo típico |
+| KP/domínio | Destino Forge | Consumo típico |
 | --- | --- | --- |
-| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `ndp arch plan`, scaffolds, code workers. |
-| `coding-standards` | KP de engenharia + ponte para policies executáveis. | `ndp task implement`, `ndp review`, `ndp code audit`. |
-| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `ndp story plan`, `ndp task plan`, `ndp test tdd`. |
-| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `ndp review security`, `ndp threat model`, `ndp ci verify`. |
-| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability runtime/infra. | `ndp ops`, `ndp review devops`, `ndp perf profile`. |
-| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `ndp review api`, `ndp arch plan`, contract tests. |
+| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `forge arch plan`, scaffolds, code workers. |
+| `coding-standards` | KP de engenharia + ponte para policies executáveis. | `forge task implement`, `forge review`, `forge code audit`. |
+| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `forge story plan`, `forge task plan`, `forge test tdd`. |
+| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `forge review security`, `forge threat model`, `forge ci verify`. |
+| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability runtime/infra. | `forge ops`, `forge review devops`, `forge perf profile`. |
+| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `forge review api`, `forge arch plan`, contract tests. |
 
-KP não deve ter side effect nem ser invocado como comando principal. Se houver UX de consulta, ela deve ser algo como `ndp explain <topic>`, não um lifecycle step.
+KP não deve ter side effect nem ser invocado como comando principal. Se houver UX de consulta, ela deve ser algo como `forge explain <topic>`, não um lifecycle step.
 
 ### 4.4. Hooks e scripts de validação
 
@@ -994,9 +994,9 @@ Os hooks e scripts atuais são importantes porque explicitam invariantes. Eles n
 
 #### 4.4.2. Migração dos invariantes
 
-| Script/hook/família | Invariante | Destino NDP |
+| Script/hook/família | Invariante | Destino Forge |
 | --- | --- | --- |
-| `enforce-phase-sequence.sh`, `verify-phase-gates.sh`, `audit-phase-gates.sh` | Não avançar fase sem filhos/evidências/gates passados. | `PhaseGateService` + testes + `ndp ci verify`. |
+| `enforce-phase-sequence.sh`, `verify-phase-gates.sh`, `audit-phase-gates.sh` | Não avançar fase sem filhos/evidências/gates passados. | `PhaseGateService` + testes + `forge ci verify`. |
 | `enforce-no-bypass-flags.sh`, `audit-bypass-flags.sh` | Bypass flags só em recovery. | Parser tipado de flags + policy de recovery. |
 | `enforce-refinement-gate.sh`, `audit-refinement-gate.sh` | Implementação exige refinement aprovado. | Pré-condição dos commands. |
 | `enforce-preflight-gates.sh`, `scripts/preflight.sh` | Operação remota exige estado local íntegro. | Preflight in-process antes de push/PR. |
@@ -1004,18 +1004,18 @@ Os hooks e scripts atuais são importantes porque explicitam invariantes. Eles n
 | `verify-story-completion.sh`, `audit-execution-integrity.sh` | PR/story exige evidência completa. | Completion gate + CI Camada B. |
 | `enforce-continuous-flow.sh` | Orquestração não deve ficar parada em fase aberta. | Scheduler/state machine do runtime. |
 | `telemetry-*`, `telemetry-phase.sh`, `stage-telemetry.sh` | Eventos de sessão/tool/fase/subagente precisam ser emitidos. | Telemetria in-process + audit log local. |
-| `audit-doc-freshness.sh` | Doc-as-DoD. | Documentation policy + `ndp doc validate`. |
+| `audit-doc-freshness.sh` | Doc-as-DoD. | Documentation policy + `forge doc validate`. |
 | `audit-template-version.sh`, `audit-flow-version.sh` | Templates e flowVersion precisam ser compatíveis. | Schema validators + migration assistant. |
 | `audit-epic-branches.sh` | Branching de epic precisa ser consistente. | Branch policy service. |
 | `audit-skill-visibility.sh`, `audit-model-selection.sh`, `audit-capability-graph.sh` | Registry, modelo e capability graph precisam ser íntegros. | Registry linter + resolver tipado. |
 
-Decisão: nenhum hook shell deve ser mecanismo primário da V0. Para cada hook/script removido, criar teste no NDP cobrindo o mesmo invariante e rodar dual-mode por 1 release.
+Decisão: nenhum hook shell deve ser mecanismo primário da V0. Para cada hook/script removido, criar teste no Forge cobrindo o mesmo invariante e rodar dual-mode por 1 release.
 
 ### 4.5. Templates
 
 Templates são estruturas reutilizáveis. Eles não são artefatos finais; eles definem a forma dos artefatos.
 
-| Família | Exemplos | Consumidores atuais | Destino NDP |
+| Família | Exemplos | Consumidores atuais | Destino Forge |
 | --- | --- | --- | --- |
 | Planning product | `_TEMPLATE-EPIC.md`, `_TEMPLATE-STORY.md`, `_TEMPLATE-TASK.md`, `_TEMPLATE-IMPLEMENTATION-MAP.md`, `_TEMPLATE-DOR-CHECKLIST.md` | Epic/story/feature creation, planning/refinement. | Template registry + schemas de backlog. |
 | Execution governance | `_TEMPLATE-IMPLEMENTATION-PLAN.md`, `_TEMPLATE-TASK-BREAKDOWN.md`, `_TEMPLATE-EPIC-EXECUTION-PLAN.md`, `_TEMPLATE-STORY-COMPLETION-REPORT.md`, `_TEMPLATE-EXECUTION-STATE.json`, `_TEMPLATE-REFINEMENT-VERDICT.md` | Story/epic implement, reports, status update. | Renderer determinístico + schemas para estado/evidência. |
@@ -1044,7 +1044,7 @@ Artefatos são instâncias persistidas no disco. A fonte de layout v4 é `ai/REA
 | `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico. | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, builders internos. | Operadores, story creation, refinement, orchestrators, audits. |
 | `story-XXXX-YYYY.md` | Contrato implementável da story. | `x-story-create`, `x-epic-decompose`, builders internos. | `x-story-implement`, `x-task-implement`, reviews, CI. |
 | `IMPLEMENTATION-MAP.md` | DAG e fases entre stories. | `x-epic-map`, `x-feature-create`, `x-epic-decompose`. | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`. |
-| `execution-state.json` | Checkpoint de orquestração. | Orchestrators e status services. | Resume, phase gates, refinement gate, continuous flow, runtime NDP. |
+| `execution-state.json` | Checkpoint de orquestração. | Orchestrators e status services. | Resume, phase gates, refinement gate, continuous flow, runtime Forge. |
 | `epic-execution-plan.md` | Plano materializado do épico. | Epic build plan / implement. | `x-epic-implement`, relatórios, auditoria humana. |
 | `epic-execution-report.md` | Encerramento agregado do épico. | `x-epic-implement`, report writer. | Release train, stakeholders, CI. |
 | `spec-*.md` | Entrada de decomposição. | Humano ou feature pipeline. | Epic/story creation, refinement. |
@@ -1085,7 +1085,7 @@ O pacote de Fase 1 em fluxos zero-bypass é tipicamente: arch plan, implementati
 
 | Artefato | Objetivo | Quem gera | Consumidores |
 | --- | --- | --- | --- |
-| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; NDP runtime no futuro. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
+| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; Forge runtime no futuro. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
 | `ai/releases/release-state-X.Y.Z.json` | Estado monotônico de release. | `x-release`. | Próximo release, CI, operadores. |
 | `ai/runs/*` | Evidência por sessão/execução. | Ferramentas, hooks ou ops skills. | Troubleshooting/forensics. |
 | `tasks/task-TASK-*.md` | Contrato task-first. | `x-story-plan`, `x-task-plan`. | `x-task-implement`. |
@@ -1094,7 +1094,7 @@ O pacote de Fase 1 em fluxos zero-bypass é tipicamente: arch plan, implementati
 | PR body `## Orchestrator Evidence` | Ponte entre GitHub e evidências locais. | `x-pr-create`, PR body renderer. | Revisores, CI audit, Surface 11. |
 | `governance/baselines/*.txt` | Exceções explícitas. | Humanos/scripts de baseline. | CI auditors, hotfix exceptions. |
 
-Implicação NDP: cada artefato vira `artifact_kind` com schema, gerador autorizado e consumidores declarados. O runtime deixa de inferir por path e passa a validar contratos.
+Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autorizado e consumidores declarados. O runtime deixa de inferir por path e passa a validar contratos.
 
 ---
 
@@ -1117,7 +1117,7 @@ A taxonomia abaixo evita que o registry seja uma lista plana de skills. Um pacot
 | `capability-registry` | Como ativos são descritos e distribuídos. | Capability schema, visibility, model selection. | Governance authoring guidance. | registry linter, capability graph, frontmatter migration. |
 | `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, provider boundaries. | MCP/Jira/GitHub/provider docs. | `x-mcp-recommend`, Jira commands, marketplace plugins. |
 
-Decisão de produto: essa taxonomia vira a navegação oficial do NDP para capability packaging, marketplace, documentação e `ndp explain`.
+Decisão de produto: essa taxonomia vira a navegação oficial do Forge para capability packaging, marketplace, documentação e `forge explain`.
 
 ---
 
@@ -1125,7 +1125,7 @@ Decisão de produto: essa taxonomia vira a navegação oficial do NDP para capab
 
 ### 6.1. Project
 
-**Project:** `NextGen-Dev-Platform` (`NDP`)
+**Project:** `Forge`
 
 Hierarquia: `Project → Product → Capacity → Feature`. A marcação indica release alvo:
 
@@ -1140,7 +1140,7 @@ Evolução direta do gerador Java. Continua sendo fonte da verdade de compositio
 #### P1.C1 — Configuração & Profile Management
 
 - P1.C1.F1 `[V0]`: Schema unificado de profile com JSON-Schema versionado.
-- P1.C1.F2 `[V0]`: Migração assistida v5 (`ia-dev-env`) → v6 (`NDP`) com `ndp migrate --from-iadev`.
+- P1.C1.F2 `[V0]`: Migração assistida v5 (`ia-dev-env`) → v6 (`Forge`) com `forge migrate --from-iadev`.
 - P1.C1.F3 `[V0]`: Profile inheritance & overlays.
 - P1.C1.F4 `[V1+]`: Detecção automática de stack.
 
@@ -1172,17 +1172,17 @@ Produto-âncora da V0. Substitui markdown interpretado por state machines em có
 
 #### P2.C0 — Comandos orquestradores nativos
 
-- P2.C0.F1 `[V0]`: `ndp epic implement <ID>`.
-- P2.C0.F2 `[V0]`: `ndp story implement <ID>`.
-- P2.C0.F3 `[V0]`: `ndp task implement <ID>`.
-- P2.C0.F4 `[V0]`: `ndp story refine <ID>` / `ndp epic refine <ID>`.
-- P2.C0.F5 `[V0]`: `ndp review <STORY>` / `ndp review pr <PR>`.
-- P2.C0.F6 `[V0]`: `ndp release`.
-- P2.C0.F7 `[V0]`: `ndp epic orchestrate <ID>`.
-- P2.C0.F8 `[V0]`: `ndp merge-train`.
-- P2.C0.F9 `[V0]`: `ndp pr watch <PR>`.
-- P2.C0.F10 `[V0]`: `ndp pr fix <PR>` / `ndp pr fix-epic <EPIC>`.
-- P2.C0.F11 `[V0]`: `ndp pipeline run <COMMAND>`.
+- P2.C0.F1 `[V0]`: `forge epic implement <ID>`.
+- P2.C0.F2 `[V0]`: `forge story implement <ID>`.
+- P2.C0.F3 `[V0]`: `forge task implement <ID>`.
+- P2.C0.F4 `[V0]`: `forge story refine <ID>` / `forge epic refine <ID>`.
+- P2.C0.F5 `[V0]`: `forge review <STORY>` / `forge review pr <PR>`.
+- P2.C0.F6 `[V0]`: `forge release`.
+- P2.C0.F7 `[V0]`: `forge epic orchestrate <ID>`.
+- P2.C0.F8 `[V0]`: `forge merge-train`.
+- P2.C0.F9 `[V0]`: `forge pr watch <PR>`.
+- P2.C0.F10 `[V0]`: `forge pr fix <PR>` / `forge pr fix-epic <EPIC>`.
+- P2.C0.F11 `[V0]`: `forge pipeline run <COMMAND>`.
 - P2.C0.F12 `[V0]`: Headless mode em todos os comandos.
 
 #### P2.C1 — Agent Lifecycle Service
@@ -1220,17 +1220,17 @@ CLI primária; TUI, IDE e web UI são camadas posteriores.
 
 #### P3.C1 — CLI v2
 
-- P3.C1.F1 `[V0]`: `ndp` CLI unificado.
+- P3.C1.F1 `[V0]`: `forge` CLI unificado.
 - P3.C1.F2 `[V0]`: Saída estruturada.
-- P3.C1.F3 `[V0]`: `ndp repl`.
-- P3.C1.F4 `[V0]`: `ndp migrate`.
-- P3.C1.F5 `[V0]`: `ndp init`.
+- P3.C1.F3 `[V0]`: `forge repl`.
+- P3.C1.F4 `[V0]`: `forge migrate`.
+- P3.C1.F5 `[V0]`: `forge init`.
 
 #### P3.C2 — TUI & Local UI
 
-- P3.C2.F1 `[V1+]`: `ndp tui`.
-- P3.C2.F2 `[V1+]`: `ndp watch`.
-- P3.C2.F3 `[V2+]`: `ndp ui` local.
+- P3.C2.F1 `[V1+]`: `forge tui`.
+- P3.C2.F2 `[V1+]`: `forge watch`.
+- P3.C2.F3 `[V2+]`: `forge ui` local.
 - P3.C2.F4 `[V2+]`: Editor visual de rules/skills.
 
 #### P3.C3 — IDE Extensions
@@ -1242,10 +1242,10 @@ CLI primária; TUI, IDE e web UI são camadas posteriores.
 
 #### P3.C4 — Onboarding & Time-to-Value
 
-- P3.C4.F1 `[V0]`: `ndp init` com 5-7 perguntas.
+- P3.C4.F1 `[V0]`: `forge init` com 5-7 perguntas.
 - P3.C4.F2 `[V0]`: Templates por persona.
 - P3.C4.F3 `[V1+]`: Tutorial guiado in-IDE.
-- P3.C4.F4 `[V0]`: `ndp doctor`.
+- P3.C4.F4 `[V0]`: `forge doctor`.
 
 ### 6.5. Product P4 — Knowledge & Marketplace
 
@@ -1270,7 +1270,7 @@ Ecossistema compartilhado, opt-in e network-required; core funciona offline com 
 
 - P4.C3.F1 `[V1+]`: Catálogo de profiles oficial/community.
 - P4.C3.F2 `[V2+]`: Rating e usage stats.
-- P4.C3.F3 `[V1+]`: `ndp profile fork`.
+- P4.C3.F3 `[V1+]`: `forge profile fork`.
 - P4.C3.F4 `[V1+]`: Profile lineage.
 
 #### P4.C4 — Cross-Project Intelligence
@@ -1323,7 +1323,7 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 - P6.C1.F2 `[V0]`: Evidence vault local.
 - P6.C1.F3 `[V1+]`: Reports SOC2 / ISO 27001 / LGPD.
 - P6.C1.F4 `[V1+]`: Forensics.
-- P6.C1.F5 `[V0]`: CI Camada B com `ndp ci verify`.
+- P6.C1.F5 `[V0]`: CI Camada B com `forge ci verify`.
 
 #### P6.C2 — Refinement & Quality Gates v2
 
@@ -1352,18 +1352,18 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 | # | Mudança | De | Para | Risco / mitigação |
 | --- | --- | --- | --- | --- |
-| 0 | Inversão de controle | LLM orquestra; hooks tentam bloquear bypass. | NDP orquestra; LLM é worker. | Portar 1 orquestrador por vez e validar dual-mode. |
+| 0 | Inversão de controle | LLM orquestra; hooks tentam bloquear bypass. | Forge orquestra; LLM é worker. | Portar 1 orquestrador por vez e validar dual-mode. |
 | 1 | Harness abstraction | Claude Code only. | Claude Code, Cursor, Windsurf, Aider, generic MCP. | Começar com Claude Code + Cursor. |
 | 2 | LLM abstraction | Anthropic-only. | Claude/GPT/Gemini/local. | Prompt matrix por provider. |
 | 3 | Governança como código | Rules markdown. | Policies executáveis. | Começar com YAML+JSONLogic para rules críticas. |
-| 4 | Output do generator | Regen-only. | Overlay system. | 3-way merge declarativo + `ndp doctor`. |
+| 4 | Output do generator | Regen-only. | Overlay system. | 3-way merge declarativo + `forge doctor`. |
 | 5 | Telemetria | NDJSON via hooks. | Runtime telemetry + OTel-compatible. | Importer para histórico. |
 | 6 | Distribuição de skills | Copy in-repo. | Marketplace/cache local versionado. | Assinatura, sandbox e core offline. |
 | 7 | Multi-projeto | Repos isolados. | Opt-in cross-project intelligence. | Differential privacy e local-only default. |
 | 8 | Multi-tenancy | N/A. | RBAC/cloud opcional V2+. | Manter V0/V1 single-user local. |
 | 9 | Backward compat | Flow versions legados. | Migration assistant. | Testar contra profiles e epics canônicos. |
 | 10 | OSS vs commercial | 100% OSS hoje. | Core OSS + cloud paid. | Linha clara desde o dia 1. |
-| 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `ndp ci verify`. | Um teste por invariante migrado. |
+| 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
 | 12 | Rules engine | Prosa interpretada. | Policy engine + CI check. | Migrar só o que é realmente enforceable primeiro. |
 
 ---
@@ -1380,7 +1380,7 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 ### 8.2. Produto
 
-- **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `ndp init` e `ndp doctor` são centrais.
+- **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `forge init` e `forge doctor` são centrais.
 - **Adoption friction.** Usuários com histórico de epics 0001-0071 precisam migrar sem perder evidência.
 - **Marketplace cold-start.** Portar todos os ativos oficiais atuais como cache local embarcado.
 - **Modelo de pricing.** Core local-first deve permanecer gratuito; cloud/marketplace/observability podem ser pagos.
@@ -1402,7 +1402,7 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 ## 9. V0 Sugerida
 
-O núcleo mínimo da V0 precisa provar o diferencial completo: NDP controla execução localmente, chama LLM como worker e produz evidências verificáveis.
+O núcleo mínimo da V0 precisa provar o diferencial completo: Forge controla execução localmente, chama LLM como worker e produz evidências verificáveis.
 
 Escopo mínimo sugerido:
 
@@ -1417,7 +1417,7 @@ Escopo mínimo sugerido:
 | Audit/evidence | P6.C1.F1-F2/F5. |
 | Refinement/security | P6.C2.F1/F3/F4, P6.C3.F1-F3. |
 
-Primeiro spike recomendado: reimplementar **um único orquestrador** como código, preferencialmente `ndp story refine` ou `ndp story implement` em escopo reduzido. Comparar contra a skill atual:
+Primeiro spike recomendado: reimplementar **um único orquestrador** como código, preferencialmente `forge story refine` ou `forge story implement` em escopo reduzido. Comparar contra a skill atual:
 
 - tempo total;
 - taxa de bypass;
@@ -1440,7 +1440,7 @@ Se esse spike falhar, o plano inteiro precisa ser revisto antes de criar épicos
 6. Criar ADRs para as 12 mudanças estruturais antes de código de produção.
 7. Aplicar refinement gate neste próprio plano, com personas PO, Tech Lead, Architect, Security, QA e SRE/DevOps.
 8. Transformar V0 sugerida em épicos, depois stories e tasks.
-9. Planejar transição dual-mode: hooks/scripts atuais e NDP rodando em paralelo por 1 release.
+9. Planejar transição dual-mode: hooks/scripts atuais e Forge rodando em paralelo por 1 release.
 
 ---
 
@@ -1450,4 +1450,4 @@ Este plano para em `Feature`. Quando aprovado, cada Feature deve passar por refi
 
 O princípio local-first é vinculante para toda Feature `[V0]`: se uma Feature não puder rodar como CLI local, não é V0.
 
-O princípio de inversão de controle também é vinculante para toda Feature `[V0]`: se uma Feature depende do LLM para orquestrar ordem, gates, commits ou validações, ela está no produto errado. O LLM pode gerar conteúdo; o NDP deve controlar o fluxo.
+O princípio de inversão de controle também é vinculante para toda Feature `[V0]`: se uma Feature depende do LLM para orquestrar ordem, gates, commits ou validações, ela está no produto errado. O LLM pode gerar conteúdo; o Forge deve controlar o fluxo.
