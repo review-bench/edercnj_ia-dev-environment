@@ -883,6 +883,133 @@ No NDP, templates não devem ser arquivos soltos copiados para cada projeto sem 
 
 **Risco principal:** template drift. Hoje o mesmo conceito pode existir no SoT, em `.claude/templates/`, em goldens e em texto dentro de skills. O NDP deve ter uma fonte única e gerar as views para cada target, com golden tests apenas como verificação.
 
+### 5.7. Inventário — Artefatos padrão gerados (`ai/` e adjacentes)
+
+Esta seção lista **instâncias** de trabalho (não os templates da seção 5.6): arquivos que skills, hooks ou o gerador criam durante o ciclo de vida. O ponto de partida normativo para layout v4 é `ai/README.md`: `ai/epics/epic-XXXX-<slug>/` concentra épico, stories, planos, relatórios, telemetria e estado; `ai/releases/` guarda estado de release; `ai/runs/` guarda artefatos por sessão/execução. Épicos legados (`flowVersion` ≤ 2) podem ainda usar `plans/epic-XXXX/` — o `PathResolver` escolhe o diretório; a **semântica** dos artefatos abaixo é a mesma.
+
+Para cada família: **objetivo**, **geradores típicos** (skill ou componente), **o que o arquivo representa na prática**, e **consumidores** (humanos, hooks, CI, outros skills).
+
+#### 5.7.1. Raiz do diretório do épico (`{epicDir}/`)
+
+| Artefato | Objetivo | Quem gera | O que faz / conteúdo | Consumidores |
+| --- | --- | --- | --- | --- |
+| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico (índice de stories, regras, status). | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, `x-internal-epic-create`; atualizações em fases de planejamento (`x-epic-orchestrate`, `x-epic-map`, orquestradores). | Markdown vivo: escopo, DoR/DoD, story index, colunas de status; pode incluir `refinementVerdict`, `flowVersion`. | Operadores; `x-story-create` / `x-story-implement` (contexto); hooks de refinement; auditorias de epic branch / flow version. |
+| `story-XXXX-YYYY.md` | Contrato implementável da story (critérios, dependências, tarefas). | `x-story-create`, `x-epic-decompose`, `x-internal-story-create`; updates de `x-story-plan` / `x-epic-orchestrate` (ex.: Seção 8 / status). | História + Gherkin + dados de planejamento; ancora todos os paths `plans/*` e `reports/*` da story. | `x-internal-story-load-context`, `x-story-implement`, `x-task-implement`, reviews, CI de integridade. |
+| `IMPLEMENTATION-MAP.md` | DAG e fases de execução entre stories. | `x-epic-map`, `x-internal-epic-map`, `x-feature-create`, `x-epic-decompose`. | Ordem, paralelismo, critical path; pode incluir “file footprint” / restrições de paralelismo (EPIC-0041). | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`, planejamento humano. |
+| `execution-state.json` | Checkpoint único de orquestração (épico e/ou stories). | `x-epic-implement`, `x-epic-orchestrate`, `x-story-implement` (via `x-internal-status-update`), `x-internal-story-resume`, fases de gate. | JSON: status por story, fase atual, `refinementVerdict`, flags (`flowVersion`, `interactiveMode`, downgrades de paralelismo, etc.). | Resume/`--resume`; hooks (`enforce-phase-sequence`, `enforce-refinement-gate`, `enforce-continuous-flow`); operadores; futuro runtime NDP. |
+| `epic-execution-plan.md` | Plano de execução materializado do épico (fases, ondas, critérios). | `x-internal-epic-build-plan`, `x-epic-implement` (fases iniciais). | Markdown derivado do mapa + políticas; guia para waves. | `x-epic-implement`; relatórios finais; auditoria humana. |
+| `epic-execution-report.md` / relatórios de épico em `reports/` | Encerramento e evidências agregadas do épico. | `x-epic-implement`, `x-internal-report-write`. | Resumo de stories, gates, métricas, bloqueios. | Release train, stakeholders, CI de epic integrity quando aplicável. |
+| `spec-*.md` ou especificação anexa | Entrada de decomposição (feature/spec-driven). | Autor humano ou `x-feature-create` / pipeline de spec. | Requisitos fonte para épico/stories. | `x-epic-create`, `x-epic-decompose`, refinamento. |
+| `reviews/review-*.md` (alguns épicos) | Reviews agregados ao nível do épico (legado ou relatórios consolidados). | Varia: `x-review`, `x-epic-implement`, relatórios manuais. | Opinião especializada consolidada. | Tech lead, arquivo de épico; tende a convergir para `plans/` por story em fluxos novos. |
+
+#### 5.7.2. `plans/` — planejamento e evidência de design
+
+| Artefato (padrão de nome) | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `arch-story-XXXX-YYYY.md` | Plano arquitetural da story. | `x-arch-plan` (via `x-internal-story-build-plan` / Phase 1). | Componentes, diagramas, mini-ADRs, NFRs. | Implementação, `x-arch-update`, revisores; **Surface 07** (Rule 27). |
+| `plan-story-XXXX-YYYY.md` | Plano de implementação (fases, riscos, footprint). | `x-internal-story-build-plan` → template implementation plan. | Blueprint da codificação; alinha tasks e PRs. | `x-task-implement`, `x-internal-story-load-context` (staleness), verify gate. |
+| `tests-story-XXXX-YYYY.md` | Plano de testes Double-Loop / TPP. | `x-test-plan` ou wave interna de plano. | Ordem de testes, cenários AT/UT. | `x-task-implement`, QA, coverage gate. |
+| `tasks-story-XXXX-YYYY.md` | Decomposição em tasks. | `x-lib-task-decomposer` / build-plan. | Lista de tasks com IDs estáveis. | `x-task-implement`, execution-state, wave commits. |
+| `plan-task-*.md` / `task-plan-TASK-*-story-*.md` | Plano fino por task (TDD, footprint). | `x-task-plan`, `x-story-plan` (orquestração multi-task). | Passos atômicos por task. | `x-task-implement`, auditorias de paralelismo. |
+| `task-implementation-map-*.md` | DAG de tasks e paralelismo. | `x-story-plan`. | Ordem entre tasks da story. | `x-task-implement`, operadores. |
+| `security-story-XXXX-YYYY.md` | Avaliação de segurança. | Fase 1E do build-plan. | Threats, controles, evidências. | Security review, compliance gate. |
+| `compliance-story-XXXX-YYYY.md` | Avaliação compliance. | Fase 1F do build-plan. | Mapeamento normativo. | Compliance, auditores. |
+| `story-planning-report-*.md` / `planning-report-story-*.md` | Relatório do wave de planejamento. | `x-story-plan`, `x-epic-orchestrate` (per story). | Síntese do plano + DoR inputs. | `x-epic-orchestrate` (veredito DoR), operadores. |
+| `dor-story-XXXX-YYYY.md` | Definition of Ready por story. | `x-story-plan` subagent. | Checklist e **veredito READY/NOT_READY**. | `x-epic-orchestrate` (checkpoint), replanejamento. |
+| `remediation-story-XXXX-YYYY.md` | Plano de correção pós-review. | `x-story-implement` (fase de remediação). | Itens acionáveis pós-`x-review` / `x-review-pr`. | Implementação iterativa, PR fixes. |
+| `review-*-story-*.md` (especialistas) | Review por dimensão (security, qa, perf, …). | `x-review` (+ sub-skills especializadas). | Achados e scores por especialista. | Dashboard consolidado, remediação; **Surface 04** (Rule 27). |
+| `review-dashboard-story-*.md` | Consolidação multi-especialista. | `x-review`. | Visão única para decisão. | Tech lead, story owner. |
+| `techlead-review-story-*.md` | Veredito GO/NO-GO. | `x-review-pr`. | Checklist TL; **Surface 05**. | Merge gate humano, evidência em PR. |
+| `threat-model-story-*.md` | Threat model dedicado. | `x-threat-model`. | Cenários STRIDE/LINDDUN (conforme skill). | Security, auditorias. |
+
+**Pacote “6 artefatos de Fase 1”** (Rule 27 **Surface 09**): em fluxos zero-bypass, `x-internal-story-build-plan` materializa o conjunto esperado sob `{epicDir}/plans/` — tipicamente **arch, implementation plan, test plan, task breakdown, security, compliance** (com variação SIMPLE que pode omitir security/compliance). O hook `x-internal-phase-gate` e o loader de contexto tratam esse conjunto como evidência.
+
+#### 5.7.3. `reports/` — evidência de conclusão, verificação e auditoria
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-story-report` ao final de `x-story-implement`. | Resumo de PRs, coverage, tasks, achados; **Surface 01**. | Operadores, merge checklist, `audit-execution-integrity.sh`. |
+| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-story-verify`. | Assinatura de que fases obrigatórias rodaram; **Surface 03**. | CI (integridade), auditorias JSON. |
+| `verify-envelope-epic-XXXX.json` | Verificação ao nível do épico. | `x-internal-epic-integrity-gate`. | Agregado de gates de épico; **Surface 10**. | CI, release. |
+| `dependency-audit-STORY-ID.md` | Evidência de auditoria de dependências. | `x-dependency-audit`; **Surface 08**. | Vulnerabilidades, licenças, drift. | Segurança, supply chain, PR evidence. |
+| `doc-validate-report-STORY-ID.md` | Evidência do documentation gate (EPIC-0071). | `x-doc-validate`. | Arquivos verificados, deltas, falhas. | `verify-story-completion.sh`, CI doc freshness. |
+| `phase-report-epic-XXXX.md` | Relatório de fase do épico. | `x-epic-implement`. | Checkpoint entre fases grandes. | Epic orchestration, stakeholders. |
+| `epic-planning-report-XXXX.md` | Saída consolidada do planejamento multi-story. | `x-epic-orchestrate` Phase 3. | Status DoR por story, próximos passos. | Equipe, re-run com `--resume`. |
+| `epic-execution-plan-*.md` / `epic-orchestrator-state.json` (variações) | Estado ou plano exportado em alguns fluxos legados ou extensões. | Skills de épico / relatório interno. | Snapshots para ferramentas externas. | Integrações, debug (normalizar no NDP). |
+
+**Pacote “4 artefatos de Fase 3”** (narrativa Rule 27): na prática são as **evidências pós-implementação** exigidas para merge (relatório de story, verify envelope, auditorias correlatas, doc validate quando no escopo). A lista exata é validada por `scripts/audit-execution-integrity.sh` e pelo Stop hook `verify-story-completion.sh`.
+
+#### 5.7.4. `telemetry/events.ndjson`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `telemetry/events.ndjson` | Trilha auditável tempo-fase-skill. | Hooks (`telemetry-session`, `telemetry-pretool`/`posttool`, `telemetry-phase.sh`) + marcações nas skills. | NDJSON append-only: fases, subagentes, durações, scrubbed privacy. | `x-telemetry-analyze`, `x-telemetry-trend`; **Surface 12** / Camada 4 (Rule 27); operadores. |
+
+#### 5.7.5. `tasks/` (task-first) e contratos fora de `ai/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `tasks/task-TASK-*.md` | Contrato de task isolável. | `x-story-plan`, planejadores task-first. | Escopo mínimo por task. | `x-task-implement`, estado por task. |
+| `contracts/{STORY_ID}-*.yaml` / `.proto` / AsyncAPI | Contratos API-first. | `x-story-implement` Phase 0.5 (condicional) + linters. | Schemas aprovados antes do código. | `x-test-contract-lint`, implementação, revisores de API. |
+
+#### 5.7.6. `ai/releases/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `release-state-X.Y.Z.json` (padrão v4) | Estado monotônico de um release. | `x-release`, automações de versão. | Versão, branches, checklist, timestamps. | Próximo `x-release`, CI, operadores. |
+
+#### 5.7.7. `ai/runs/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| Arquivos por sessão/execução (transcripts, logs de ferramenta) | Diagnóstico forense fora do épico. | Ferramentas / skills de ops ou hooks (conforme projeto). | Evidência bruta de uma execução. | Troubleshooting, auditoria pontual; **não** substitui `events.ndjson` para métricas agregadas. |
+
+#### 5.7.8. Adjacentes críticos (não sob `ai/epics/`, mas cadeia de evidência)
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `.claude/state/pr-watch-{PR}.json` | Estado do CI-watch / Copilot para um PR. | `x-pr-watch-ci`; **Surface 06**. | Stop hook `verify-story-completion`, operadores. |
+| Corpo de PR (`## Orchestrator Evidence`) | Ligação entre git e artefatos em disco. | `x-internal-pr-body-render`, `x-pr-create`; **Surface 11**. | Revisores, `audit-execution-integrity.sh`. |
+| `governance/baselines/*.txt` | Exceções explícitas a políticas (hotfix, capabilities, etc.). | Humanos + scripts de baseline. | CI auditors (`audit-*`), bypass documentado (Rule 27 Exception 2). |
+
+#### 5.7.9. Síntese — grafo de consumo
+
+```mermaid
+flowchart LR
+  subgraph gen [Geração]
+    A[Skills de criação / mapa]
+    B[Wave de plano Phase 1]
+    C[x-story-implement / x-task-implement]
+    D[Verify e relatórios]
+    E[Hooks de telemetria]
+  end
+  subgraph disk [Disco]
+    P[plans/]
+    R[reports/]
+    T[telemetry/]
+    S[execution-state.json]
+  end
+  subgraph use [Consumo]
+    H[Hooks Camada 0/2]
+    I[CI audit-execution-integrity]
+    J[x-internal-story-load-context]
+    K[x-telemetry-analyze]
+  end
+  A --> S
+  B --> P
+  C --> P
+  C --> R
+  D --> R
+  E --> T
+  P --> J
+  R --> H
+  R --> I
+  T --> K
+  S --> H
+```
+
+**Implicação para o NDP:** cada linha desta seção vira um **tipo de artefato versionado** no registry (`artifact_kind`, schema, gerador autorizado, consumidores declarados). O runtime substitui inferência “por convenção de path” por **contratos explícitos**, mantendo paridade com as Surfaces 01–12 enquanto migramos de shell hooks para gates em processo.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
