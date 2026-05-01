@@ -47,7 +47,7 @@ categories:
       - governance.doc-as-dod
 
   - name: quality
-    description: Quality gates — performance, mutation, and contract testing
+    description: Quality gates — performance, mutation, contract, regression, and DAST testing
     capabilities:
       - quality.performance.rest
       - quality.performance.grpc
@@ -62,3 +62,8 @@ categories:
       - quality.contract.pact
       - quality.contract.buf
       - quality.contract.scc
+      - quality.regression.self
+      - quality.regression.service
+      - quality.dast.zap-passive
+      - quality.dast.zap-active
+      - quality.dast.nuclei

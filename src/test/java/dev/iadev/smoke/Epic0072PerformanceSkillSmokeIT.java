@@ -115,7 +115,9 @@ class Epic0072PerformanceSkillSmokeIT {
                     new QualityConfig(
                             new QualityConfig.PerformanceConfig(true, null, 10, java.util.Map.of()),
                             QualityConfig.MutationConfig.DEFAULT,
-                            QualityConfig.ContractConfig.DEFAULT);
+                            QualityConfig.ContractConfig.DEFAULT,
+                            QualityConfig.RegressionConfig.DEFAULT,
+                            QualityConfig.DastConfig.DEFAULT);
             var configWithQuality =
                     new dev.iadev.domain.model.ProjectConfig(
                             baseConfig.core(),

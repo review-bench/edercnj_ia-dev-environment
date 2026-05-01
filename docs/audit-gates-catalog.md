@@ -384,6 +384,30 @@
 
 ---
 
+### audit-regression-shell.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rules 05, 24 (EPIC-0073 — Regression Shell + DAST) |
+| **Layer** | 2 — CI Script |
+| **Validates** | When `quality.regression.enabled=true`: scenario file exists, scenario execution results meet pass-rate threshold, no regression vs baseline. Mode `self` validates generator's own output; mode `service` validates client project services. |
+| **Introduced** | story-0073-0005 (EPIC-0073) |
+| **Exit Codes** | `0` = OK · `1` = `REGRESSION_SHELL_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-dast-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rules 05, 06, 24 (EPIC-0073 — Regression Shell + DAST) |
+| **Layer** | 2 — CI Script |
+| **Validates** | When `quality.dast.enabled=true`: SARIF 2.1.0 report exists for the PR; no HIGH/CRITICAL findings above threshold; target is not `production`; Nuclei templates-version is pinned (not `latest`/`master`/`HEAD`). |
+| **Introduced** | story-0073-0006 (EPIC-0073) |
+| **Exit Codes** | `0` = OK · `1` = `DAST_GATE_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.
