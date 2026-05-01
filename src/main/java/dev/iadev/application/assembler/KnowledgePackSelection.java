@@ -43,6 +43,7 @@ public final class KnowledgePackSelection {
         packs.addAll(selectOwaspAsvsReferencePack(config));
         packs.addAll(selectQualityPerformancePacks(config));
         packs.addAll(selectQualityMutationPacks(config));
+        packs.addAll(selectQualityContractPacks(config));
         return packs;
     }
 
@@ -125,5 +126,12 @@ public final class KnowledgePackSelection {
             return List.of();
         }
         return List.of("mutation-testing");
+    }
+
+    private static List<String> selectQualityContractPacks(ProjectConfig config) {
+        if (!config.quality().contract().enabled()) {
+            return List.of();
+        }
+        return List.of("contract-testing");
     }
 }

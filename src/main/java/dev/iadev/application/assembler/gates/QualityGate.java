@@ -9,7 +9,7 @@ import java.util.List;
  *
  * <p>Adds {@code x-test-performance} when {@code quality.performance.enabled=true},
  * {@code x-test-mutation} when {@code quality.mutation.enabled=true}, and
- * {@code x-test-contract-quality} when {@code quality.contract.enabled=true}.
+ * {@code x-test-contract} when {@code quality.contract.enabled=true} (EPIC-0072).
  */
 public final class QualityGate implements SkillGateEvaluator {
 
@@ -23,7 +23,7 @@ public final class QualityGate implements SkillGateEvaluator {
             skills.add("x-test-mutation");
         }
         if (config.quality().contract().enabled()) {
-            skills.add("x-test-contract-quality");
+            skills.add("x-test-contract");
         }
         return skills;
     }
