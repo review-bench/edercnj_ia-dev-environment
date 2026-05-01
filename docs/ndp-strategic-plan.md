@@ -632,6 +632,108 @@ No NDP, esses riscos mudam de lugar:
 
 **Decisão de migração:** nenhum hook shell deve sobreviver como mecanismo primário da V0. Para cada hook/script atual, o trabalho de migração é extrair o invariante, escrever teste de unidade/integração no NDP e manter no máximo um `ndp ci verify` detectivo para PRs. A existência de muitos hooks hoje é um sintoma da arquitetura atual; no NDP, o runtime deve tornar esses bypasses impossíveis por construção.
 
+### 5.4. Fronteira — Rules, Knowledge Packs e Skills
+
+O NDP precisa corrigir uma ambiguidade do modelo atual: parte do que hoje aparece como `SKILL.md` não é exatamente uma ação de produto; parte é política, parte é material de referência, parte é template/heurística. A migração deve separar esses papéis para evitar drift textual entre rule, KP e skill.
+
+#### 5.4.1. Critério de classificação
+
+| Tipo-alvo | Pergunta discriminante | Forma no NDP |
+| --- | --- | --- |
+| **Rule / policy** | Deve valer sempre? Pode bloquear, validar ou impor uma invariável independente do julgamento do LLM? | Policy pack versionado, função tipada, schema, gate runtime ou `ndp ci verify`. |
+| **Knowledge Pack (KP)** | Serve para ensinar contexto, padrões, heurísticas, checklists ou vocabulário, sem ser dono de side effects? | Pacote de conhecimento versionado, carregado sob demanda por comandos/workers. |
+| **Skill / comando / worker** | Executa uma ação com entrada/saída clara: gera artefato, roda ferramenta, abre PR, aplica mudança, cria relatório ou faz review? | Comando público, serviço interno ou prompt worker versionado. |
+| **Template / snippet** | É principalmente estrutura reutilizável de código/documento? | Template renderizado por engine determinística, referenciado por capability/stack. |
+
+**Regra prática:** checklist dentro de uma skill não torna a skill um KP. O que decide é a responsabilidade principal. Se a entrega é um artefato ou uma execução, permanece skill/worker. Se a entrega é apenas critério, política ou contexto, deve migrar para rule ou KP.
+
+#### 5.4.2. Rules atuais — destino no NDP
+
+| Domínio de rule | Exemplos atuais | Destino NDP |
+| --- | --- | --- |
+| Identidade, domínio e contexto | Rules 01, 02 | Doctrine humana + defaults de profile. Pouca execução, exceto validação de metadados. |
+| Coding standards, arquitetura e quality gates | Rules 03, 04, 05 | Híbrido: thresholds e limites viram policy executável; explicações e exemplos viram KP de engenharia. |
+| Segurança, operações e compliance | Rules 06, 07, conditional rules | Policy pack por domínio regulado + KP de referência. Gates SARIF/CI ficam executáveis. |
+| Branching, release e Git Flow | Rules 08, 09, Rule 21 | Serviços de branch/release em código (`ndp release`, `ndp epic branch`) + CI de consistência. |
+| Skill invocation, visibility e capability grammar | Rules 13, 22, 28 | Registry/linter tipado. A gramática de tool-call vira schema/AST, não regex em markdown. |
+| Model selection e custo | Rule 23 | Policy executável no model router: tier, fallback, custo e provider permitidos. |
+| Execution integrity e zero-bypass | Rules 24, 27 | Propriedade arquitetural do runtime NDP. CI só valida evidência pós-fato. |
+| Task hierarchy e phase gates | Rule 25 | State machine tipada + phase gate service + testes de unidade. |
+| Audit lifecycle | Rule 26 | Taxonomia vira documentação curta; exit codes, baselines e self-check viram biblioteca de auditoria. |
+| Refinement e DoR | Rule 29 | Pré-condição nativa de `ndp story/epic/task implement`. |
+| Documentation as DoD | Rule 31 | Policy executável de doc freshness + KP stack-aware explicando o que conta como documentação. |
+
+**Decisão:** rules críticas deixam de ser prosa interpretada pelo LLM. Elas ganham `policy_id`, versão, testes e ponto de execução claro: runtime, CI Camada B, ou apenas doctrine humana quando não houver predicado determinístico.
+
+#### 5.4.3. Knowledge Packs atuais — destino no NDP
+
+Os KPs devem virar pacotes oficiais versionados, com binding explícito por stack/profile e consumo declarado pelos comandos. O NDP deve saber **qual KP carregar, quando carregar e para qual worker**, em vez de deixar cada skill repetir blocos grandes de contexto.
+
+| KP/domínio | Destino NDP | Consumo típico |
+| --- | --- | --- |
+| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `ndp arch plan`, scaffolds, code workers. |
+| `coding-standards` | KP de engenharia + ponte para policies executáveis de limites. | `ndp task implement`, `ndp review`, `ndp code audit`. |
+| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `ndp story plan`, `ndp task plan`, `ndp test tdd`. |
+| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `ndp review security`, `ndp threat model`, `ndp ci verify`. |
+| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability de runtime/infra. | `ndp ops`, `ndp review devops`, `ndp perf profile`. |
+| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `ndp review api`, `ndp arch plan`, contract tests. |
+
+**Decisão:** KP não deve ter side effect nem ser "invocado" como comando principal. Quando o usuário quiser consultar conhecimento, o produto pode ter `ndp explain <topic>`, mas isso é UX de leitura, não lifecycle.
+
+#### 5.4.4. Skills candidatas a virar KP, rule ou template
+
+| Skill atual | Tipo-alvo provável | Justificativa |
+| --- | --- | --- |
+| `planning-standards-kp` | Knowledge Pack | Já é explicitamente uma fonte RA9; deve sair da lista de comandos e virar contexto versionado de planejamento. |
+| `x-mcp-recommend` | KP + advisor command | O catálogo de MCPs é conhecimento versionado; o comando só aplica matching contra o profile. |
+| `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Template/snippet + render command | A maior parte do valor é template stack-specific. O comando NDP deve renderizar templates e aplicar variações, não conter conhecimento espalhado. |
+| `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, demais especialistas | Worker skill + KP externo | Devem permanecer workers se produzem review estruturado, mas seus critérios precisam vir de KPs/policies, não de prosa duplicada em cada skill. |
+| `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | Rule/policy service | São gates normativos. No NDP viram funções do runtime e contratos de CI, não skills markdown. |
+| `x-doc-validate` | Policy + command | A regra de documentação é policy; a execução continua comando/gate. Separar critério de enforcement. |
+| `x-lib-audit-rules` | Policy/registry validator | Seu papel é validar rules/KPs/skills; no NDP vira `ndp lint policy` ou validação do registry. |
+| `audit-*.sh` e `verify/enforce-*.sh` | Policy executable | Não são skills; seus invariantes migram para runtime e `ndp ci verify`. |
+
+#### 5.4.5. Skills que permanecem skills, consumindo rules/KPs explicitamente
+
+| Grupo | Permanecem como | Como consomem rule/KP |
+| --- | --- | --- |
+| Orquestradoras públicas | Comandos NDP (`ndp story implement`, `ndp epic implement`, `ndp release`, etc.) | Declaram `requires-policies` para gates e `requires-context` para KPs por fase. |
+| Planejamento e arquitetura | Worker prompts/comandos (`x-arch-plan`, `x-task-plan`, `x-threat-model`, `x-adr-generate`) | Geram artefatos, mas carregam KPs RA9, arquitetura, segurança e testing por contrato. |
+| Testes, lint, format e scans | Comandos determinísticos/adapters | Executam tooling; thresholds vêm de policies. |
+| Git/PR/Jira/ops | Comandos ou plugins | Executam integração; branching/release/CI rules vêm de policies. |
+| Reviews especialistas | Workers de julgamento estruturado | Critérios vêm de KPs; veredito e schema de saída vêm da policy do review. |
+
+Contrato sugerido para o registry NDP:
+
+```yaml
+id: ndp.story.implement
+kind: command
+requires-policies:
+  - ndp.policy.refinement-gate@1
+  - ndp.policy.execution-integrity@1
+  - ndp.policy.task-hierarchy@1
+requires-context:
+  - ndp.kp.story-planning@1
+  - ndp.kp.testing.tdd@1
+  - ndp.kp.security.baseline@1
+produces:
+  - story-completion-report
+  - verify-envelope
+  - telemetry-run
+```
+
+#### 5.4.6. Riscos e próximos movimentos
+
+| Risco | Mitigação NDP |
+| --- | --- |
+| Drift triplo: a mesma regra em Rule markdown, KP e SKILL.md. | Uma fonte canônica por `policy_id`/`kp_id`; views markdown geradas. |
+| KP gigante carregado em todo prompt. | Roteamento por capability, stack, fase e worker. Compliance pesado só entra quando o profile pede. |
+| Skills virando pseudo-KP só para "ler contexto". | Separar UX de consulta (`ndp explain`) de commands com side effects. |
+| Reclassificar ação como rule e perder extensibilidade. | Manter comando quando há artefato/execução; extrair apenas critérios e thresholds para policy/KP. |
+| Templates de scaffold duplicados em várias skills. | Template registry por stack, com golden tests e render engine determinística. |
+
+**Decisão de migração:** no NDP, cada ativo precisa declarar `kind` (`command`, `worker`, `policy`, `knowledge-pack`, `template`, `adapter`) e dependências explícitas. Skills deixam de carregar política e conhecimento embutidos; elas passam a consumir policies e KPs versionados. Isso reduz tokens, remove duplicação e torna possível testar governance como código.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
