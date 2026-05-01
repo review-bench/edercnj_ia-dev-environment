@@ -1,0 +1,24 @@
+id: quality.mutation.java-pit
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Java mutation gate using PIT (Pitest) — runs pitest:mutationCoverage, fails when
+  mutation score < QualityConfig.mutation.threshold. Runtime capped by runtimeCapMin.
+  Invoked by /x-test-mutation when language = java.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [pitest]
+    default: pitest
+  threshold:
+    type: integer
+    default: 80
+  runtime_cap_min:
+    type: integer
+    default: 10

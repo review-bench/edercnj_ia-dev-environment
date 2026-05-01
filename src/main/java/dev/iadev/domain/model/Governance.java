@@ -22,22 +22,26 @@ import java.util.Set;
  *     maps to YAML {@code telemetry.enabled} (story-0040-0004)
  * @param documentation the documentation governance config (optional, default auto-detect); maps to
  *     YAML {@code documentation} block (EPIC-0071, story-0071-0001)
+ * @param quality the quality-gate configuration (optional, default all-disabled); maps to YAML
+ *     {@code quality} block (EPIC-0072, story-0072-0001)
  */
 public record Governance(
         String compliance,
         Set<Platform> platforms,
         BranchingModel branchingModel,
         boolean telemetryEnabled,
-        DocumentationConfig documentation) {
+        DocumentationConfig documentation,
+        QualityConfig quality) {
 
     /**
      * Compact constructor enforcing immutability of the {@code platforms} set and applying defaults
-     * for the {@code branchingModel} and {@code documentation}.
+     * for the {@code branchingModel}, {@code documentation}, and {@code quality}.
      */
     public Governance {
         platforms = platforms == null ? Set.of() : Set.copyOf(platforms);
         branchingModel = branchingModel == null ? BranchingModel.GITFLOW : branchingModel;
         documentation = documentation == null ? DocumentationConfig.DEFAULT : documentation;
+        quality = quality == null ? QualityConfig.DEFAULT : quality;
     }
 
     /**
@@ -56,6 +60,7 @@ public record Governance(
                 ProjectConfig.parsePlatforms(root),
                 ProjectConfig.parseBranchingModel(root),
                 ProjectConfig.parseTelemetryEnabled(root),
-                ProjectConfig.parseDocumentation(root));
+                ProjectConfig.parseDocumentation(root),
+                ProjectConfig.parseQuality(root));
     }
 }

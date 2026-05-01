@@ -63,7 +63,8 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
                         platforms,
                         branchingModel,
                         telemetryEnabled,
-                        DocumentationConfig.DEFAULT));
+                        DocumentationConfig.DEFAULT,
+                        QualityConfig.DEFAULT));
     }
 
     /**
@@ -161,6 +162,10 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
 
     public DocumentationConfig documentation() {
         return governance.documentation();
+    }
+
+    public QualityConfig quality() {
+        return governance.quality();
     }
 
     // --- Convenience accessors (Law of Demeter) ---
@@ -326,5 +331,9 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
      */
     static DocumentationConfig parseDocumentation(Map<String, Object> map) {
         return DocumentationConfig.fromMap(MapHelper.optionalMap(map, "documentation"));
+    }
+
+    static QualityConfig parseQuality(Map<String, Object> map) {
+        return QualityConfig.fromMap(MapHelper.optionalMap(map, "quality"));
     }
 }

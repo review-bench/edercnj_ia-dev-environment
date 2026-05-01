@@ -18,10 +18,10 @@ import java.util.Map;
  *
  * @see PlanTemplatesAssembler
  */
-final class PlanTemplateDefinitions {
+public final class PlanTemplateDefinitions {
 
     /** Number of templates currently managed. */
-    static final int TEMPLATE_COUNT = 23;
+    public static final int TEMPLATE_COUNT = 26;
 
     private static final List<Map.Entry<String, List<String>>> STORY_PLANNING_TEMPLATES =
             List.of(
@@ -262,6 +262,41 @@ final class PlanTemplateDefinitions {
                                     "6. Detalhamento por Fase",
                                     "7. Observações Estratégicas")));
 
+    private static final List<Map.Entry<String, List<String>>> QUALITY_TEMPLATES =
+            List.of(
+                    Map.entry(
+                            "_TEMPLATE-PERFORMANCE-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Load Scenarios",
+                                    "Results per Endpoint",
+                                    "Baseline Comparison",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-MUTATION-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Scope",
+                                    "Surviving Mutants",
+                                    "Configuration",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-CONTRACT-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Changes Detected",
+                                    "CHANGELOG Integration",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")));
+
     private static final List<Map.Entry<String, List<String>>> PR_BODY_TEMPLATES =
             List.of(
                     Map.entry(
@@ -292,7 +327,7 @@ final class PlanTemplateDefinitions {
      * Template definitions: filename to mandatory sections mapping. {@link LinkedHashMap} preserves
      * insertion order for deterministic processing.
      */
-    static final Map<String, List<String>> TEMPLATE_SECTIONS = buildTemplateSections();
+    public static final Map<String, List<String>> TEMPLATE_SECTIONS = buildTemplateSections();
 
     private PlanTemplateDefinitions() {
         // utility class
@@ -308,6 +343,7 @@ final class PlanTemplateDefinitions {
                         EPIC_EXECUTION_TEMPLATES,
                         TASK_FIRST_TEMPLATES,
                         EPIC_STORY_TEMPLATES,
+                        QUALITY_TEMPLATES,
                         PR_BODY_TEMPLATES);
         for (List<Map.Entry<String, List<String>>> group : groups) {
             for (Map.Entry<String, List<String>> e : group) {

@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0072 (Comprehensive Test Strategy)
+
+Antes desta release, projetos gerados por `ia-dev-env` tinham dois gaps críticos na estratégia de teste: **performance regressions** passavam silenciosamente para produção (nenhum gate de p95/p99 antes do merge), **mutation score** era medido manualmente (sem bloqueio de merge quando mutantes sobreviviam acima de threshold), e **contract breaking changes** podiam entrar em `develop` sem evidência de migration plan no CHANGELOG.
+
+**A partir desta release, os três gates estão codificados como MANDATORY TOOL CALLS no Phase 3 de `x-story-implement`.** A sequência `x-test-performance → x-test-mutation → x-test-contract` segue o padrão D-R11 (fast-fail): a primeira falha cancela as etapas subsequentes, evitando ciclos de CI desnecessários. Cada gate é **condicional** — ativado apenas quando `quality.{performance,mutation,contract}.enabled=true` no YAML do projeto. Projetos existentes sem essa config continuam operando sem mudança (backward compatibility total, Rule 19).
+
+Os três skills são **stack-aware**: `x-test-performance` despacha para Newman (REST), ghz (gRPC), hyperfine (CLI), ou Artillery (GraphQL); `x-test-mutation` despacha para PIT/pitest (Java/Maven), gradle-pitest (Java/Gradle), Stryker (JS/TS), mutmut (Python), ou go-mutesting (Go); `x-test-contract` despacha para openapi-diff (REST/OpenAPI), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), ou schema registry compat (eventos). A configuração de stack no YAML do projeto determina automaticamente qual tooling é invocado — zero configuração extra de CI necessária.
+
+A integração com Rule 24 é completa: os três reports (`perf-report-STORY-ID.md`, `mutation-report-STORY-ID.md`, `contract-report-STORY-ID.md`) são artefatos de evidência mandatórios quando o gate correspondente está ativo. A Camada 3 (`audit-execution-integrity.sh`) verifica sua presença via variáveis de ambiente `QUALITY_*_ENABLED`, mantendo retrocompatibilidade com projetos sem quality config. A Camada 2 é servida por três novos audit scripts: `audit-perf-baseline.sh`, `audit-mutation-score.sh`, `audit-contract-breaking.sh`.
+
+### Added — EPIC-0072 (Comprehensive Test Strategy)
+
+- **Skill `x-test-performance`** (conditional, `model: sonnet`, capabilities `quality.performance.*`): stack-aware performance gate. Reads `QualityConfig.performance` SLOs, dispatches to Newman (REST), ghz (gRPC), hyperfine (CLI), or Artillery (GraphQL). Compares p50/p95/p99 against `governance/baselines/performance-baseline.json`. Exit codes: `0`=SUCCESS, `1`=PERF_REGRESSION_DETECTED, `2`=TOOL_NOT_FOUND, `3`=NO_SLO_DECLARED, `4`=BASELINE_NOT_FOUND, `50`=PERF_DISABLED. `--update-baseline` flag for explicit baseline writes.
+- **Skill `x-test-mutation`** (conditional, `model: sonnet`, capabilities `quality.mutation.*`): stack-aware mutation coverage gate. Dispatches to PIT/pitest (Java/Maven), gradle-pitest (Java/Gradle), Stryker (JS/TS), mutmut (Python), or go-mutesting (Go). Enforces `quality.mutation.threshold` (default 80%) and `runtime-cap-min` cap. Exit codes: `0`=SUCCESS, `1`=MUTATION_SCORE_BELOW_THRESHOLD, `2`=MUTATION_RUNTIME_CAP_EXCEEDED, `3`=TOOL_NOT_FOUND, `4`=MUTATION_CONFIG_INVALID, `50`=MUTATION_DISABLED.
+- **Skill `x-test-contract`** (conditional, `model: sonnet`, capabilities `quality.contract.*`): stack-aware contract breaking-change gate. Dispatches to openapi-diff (REST), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), or schema registry compat (events). CHANGELOG integration: exit 0 when breaking change documented under `## Breaking` or `## BREAKING CHANGE` in CHANGELOG. Exit codes: `0`=SUCCESS, `1`=CONTRACT_BREAKING_CHANGE, `2`=OPERATIONAL_ERROR, `3`=CONTRACT_ARTIFACT_INVALID.
+- **Knowledge Pack `performance-engineering`**: `index.md` + 7 stack-specific docs (performance-rest, performance-grpc, performance-cli, performance-graphql, performance-socket, performance-metrics-guide, load-testing-patterns, profiling-tools-matrix). Provides tooling reference consumed by `x-test-performance`.
+- **`_TEMPLATE-PERFORMANCE-PLAN.md`**: plan template for `quality.performance` SLO declarations (endpoint, stack, p50/p95/p99 targets, baseline tolerance).
+- **`_TEMPLATE-PERFORMANCE-BASELINE.md`**: report template for `governance/baselines/performance-baseline.json` schema documentation.
+- **`_TEMPLATE-MUTATION-PLAN.md`**: plan template for `quality.mutation` configuration (threshold, runtime cap, exclude packages, tool selection).
+- **`_TEMPLATE-CONTRACT-PLAN.md`**: plan template for `quality.contract` configuration (pact opt-in, openapi_breaking, proto_breaking, schema registry).
+- **`audit-perf-baseline.sh`** (Camada 2 CI Script, Rule 26): validates `governance/baselines/performance-baseline.json` schema and detects stale baselines (> N days old). Exit codes: `0`=OK, `1`=`PERF_BASELINE_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`audit-mutation-score.sh`** (Camada 2 CI Script, Rule 26): verifies `mutation-report-STORY-ID.md` artifacts are present and score meets threshold for merged stories with `quality.mutation.enabled=true`. Exit codes: `0`=OK, `1`=`MUTATION_SCORE_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`audit-contract-breaking.sh`** (Camada 2 CI Script, Rule 26): detects contract-report artifacts missing from merged story PRs with `quality.contract.enabled=true`; checks for path-traversal and command-injection in artifact paths. Exit codes: `0`=OK, `1`=`CONTRACT_BREAKING_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`QualityConfig` record** (domain model): `PerformanceConfig`, `MutationConfig`, `ContractConfig` each with `enabled` boolean and stack-specific parameters. Parsed from project YAML `quality:` block.
+- **`QualityConfigParser`** + **`QualityConfigParserTest`** (11 unit tests): YAML → QualityConfig, including default values, stack-specific SLO parsing, and all 3 gates.
+- **`audit-execution-integrity.sh`** extended: conditional checks via `QUALITY_PERFORMANCE_ENABLED`, `QUALITY_MUTATION_ENABLED`, `QUALITY_CONTRACT_ENABLED` env vars (all default `false` for backward compatibility, Rule 19).
+- **`governance/baselines/performance-baseline.json`**: empty baseline (append-only, immutable schema after merge).
+- **`governance/baselines/mutation-score-baseline.txt`**: empty baseline for stories grandfathered before EPIC-0072.
+- **`governance/baselines/contract-breaking-baseline.txt`**: empty baseline for stories grandfathered before EPIC-0072.
+- **`docs/adr/ADR-0025-comprehensive-test-strategy.md`**: decision record for the 3-gate quality framework, D-R11 fast-fail sequence, backward-compatibility approach, and conditional evidence artifact design.
+- **Rule 05 §Quality Gates extended**: `x-test-performance`, `x-test-mutation`, `x-test-contract` added as conditional gates (EPIC-0072); D-R11 fast-fail sequence documented.
+- **`x-story-implement` Phase 3 §3.Q extended**: 3 new MANDATORY conditional invocations (`x-test-performance`, `x-test-mutation`, `x-test-contract`) with D-R11 fast-fail; 3 telemetry sub-phases (Phase-3-Quality-Perf, Phase-3-Quality-Mutation, Phase-3-Quality-Contract); `--skip-quality` flag added to Recovery block.
+- **`Epic0072TestStrategySmokeIT`** (8 E2E scenarios): stack dispatch, regression blocking, opt-out, CHANGELOG integration, structural invariants across all 3 skills and audit scripts.
+- **`setup-config.java-spring.yaml`** extended: `quality:` YAML block with all 3 gates defaulting to `enabled: false` and documented SLO/threshold parameters.
+
+### [Breaking] — EPIC-0072
+
+> **`x-story-implement` Phase 3 now includes conditional quality gates.** When `quality.{performance,mutation,contract}.enabled=true` in the project YAML, the corresponding skill (`x-test-performance`, `x-test-mutation`, `x-test-contract`) is invoked as a MANDATORY TOOL CALL and its report artifact is required by Rule 24. Projects with `quality.*.enabled=false` (the default) are unaffected. Exit codes `14` (PERF_REGRESSION_DETECTED), `17` (MUTATION_SCORE_BELOW_THRESHOLD), and `18` (CONTRACT_BREAKING_CHANGE) are new in `x-story-implement` Error Envelope — callers must handle them. The `--skip-quality` flag is accepted exclusively inside `## Recovery` blocks.
+
 ### Highlights — EPIC-0071 (Documentation as DoD)
 
 Antes desta release, documentação era um artefato opcional no `x-story-implement`: o step existia, sabia gerar README, OpenAPI e ADRs, mas era invocado "se sobrasse tempo". PRs merged sem atualizar doc passavam CI sem fricção. O resultado era um débito documental silencioso — endpoints novos entravam na API sem entrada na OpenAPI spec; ADRs eram referenciados em PRs sem estarem publicados em `docs/adr/`; o CHANGELOG acumulava linhas técnicas como `- expand X interface` sem dizer **o que mudou para o usuário**.

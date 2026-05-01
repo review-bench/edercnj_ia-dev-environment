@@ -1,0 +1,4 @@
+# Contract Breaking Gate — Grandfather List
+# Stories merged before audit-contract-breaking.sh was introduced (story-0072-0007).
+# Format: story-XXXX-YYYY  # reason
+# Append-only and IMMUTABLE after epic-0072 merges to develop.
