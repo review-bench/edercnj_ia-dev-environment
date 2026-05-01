@@ -228,6 +228,8 @@ Regra de leitura:
 - `LLM Worker` só aparece quando há geração criativa ou julgamento.
 - `Adapters` representam git, build, test, docs, security, GitHub/PR e CI.
 
+Convenção de numeração: a linha em que o usuário ou comando pai invoca o command é o **gatilho**. A etapa `1` começa na primeira ação interna do NDP depois desse gatilho. Quando uma etapa chama outro comando orquestrador, o detalhe aparece no diagrama próprio desse comando.
+
 #### 3.5.1. `ndp epic implement <EPIC-ID>` — sequência raiz
 
 Este é o fluxo equivalente ao `x-epic-implement`. Ele preserva as seis fases atuais: args, plano, branch, loop de stories, gate de integridade e PR final.
@@ -247,70 +249,109 @@ sequenceDiagram
   participant Tele as Telemetry/Audit
 
   User->>CLI: ndp epic implement EPIC-XXXX [flags]
-  CLI->>RT: parse command envelope
-  RT->>Tele: run.start(epic implement)
-  RT->>Gate: assertPre(Phase 0 - Args)
-  RT->>RT: normalize args, resolve flowVersion, flags, mode
-  RT->>State: persist interactiveMode and command context
-  RT->>Gate: assertPost(Phase 0 - Args)
+  CLI->>RT: 1. parse command envelope
+  RT->>Tele: 2. run.start(epic implement)
+  RT->>Gate: 3. assertPre(Phase 0 - Args)
+  RT->>RT: 4. normalize args, resolve flowVersion, flags, mode
+  RT->>State: 5. persist interactiveMode and command context
+  RT->>Gate: 6. assertPost(Phase 0 - Args)
 
-  RT->>Gate: assertPre(Phase 1 - Plan)
-  RT->>Art: read epic, stories, IMPLEMENTATION-MAP
-  RT->>RT: build DAG, phases, critical path, resume projection
-  RT->>Art: write epic-execution-plan
-  RT->>Gate: assertPost(Phase 1 - Plan, expected plan)
+  RT->>Gate: 7. assertPre(Phase 1 - Plan)
+  RT->>Art: 8. read epic, stories, IMPLEMENTATION-MAP
+  RT->>RT: 9. build DAG, phases, critical path, resume projection
+  RT->>Art: 10. write epic-execution-plan
+  RT->>Gate: 11. assertPost(Phase 1 - Plan, expected plan)
 
   alt dry-run
-    RT-->>CLI: return plan path and stop
+    RT-->>CLI: 12. return plan path and stop
   else executable run
     alt flowVersion is legacy
-      RT->>Tele: skip Phase 2 branch setup
+      RT->>Tele: 13. skip Phase 2 branch setup
     else v2/v4 flow
-      RT->>Gate: assertPre(Phase 2 - Branch)
-      RT->>Git: ensure epic/XXXX from develop and push
-      Git-->>RT: branch ready or conflict
-      RT->>Gate: assertPost(Phase 2 - Branch)
+      RT->>Gate: 14. assertPre(Phase 2 - Branch)
+      RT->>Git: 15. ensure epic/XXXX from develop and push
+      Git-->>RT: 16. branch ready or conflict
+      RT->>Gate: 17. assertPost(Phase 2 - Branch)
     end
 
-    RT->>Gate: assertPre(Phase 3 - Stories)
-    loop each implementation phase
+    RT->>Gate: 18. assertPre(Phase 3 - Stories)
+    loop 19. each implementation phase
       loop each story in topological order
-        RT->>State: mark story IN_PROGRESS
-        RT->>Story: ndp story implement STORY-ID --target-branch epic/XXXX --auto-merge strategy
-        Story-->>RT: story envelope {status, pr, coverage, report}
-        RT->>State: persist story status, PR status, evidence paths
+        RT->>State: 20. mark story IN_PROGRESS
+        RT->>Story: 21. ndp story implement STORY-ID --target-branch epic/XXXX --auto-merge strategy
+        Story-->>RT: 22. story envelope {status, pr, coverage, report}
+        RT->>State: 23. persist story status, PR status, evidence paths
         alt story failed
-          RT->>State: mark dependants BLOCKED
-          RT->>Gate: raise STORY_FAILED or trigger recovery policy
+          RT->>State: 24a. mark dependants BLOCKED
+          RT->>Gate: 24b. raise STORY_FAILED or trigger recovery policy
         end
       end
-      RT->>Gate: assertWave(phase stories completed and merged)
+      RT->>Gate: 25. assertWave(phase stories completed and merged)
     end
-    RT->>Gate: assertPost(Phase 3 - Stories)
+    RT->>Gate: 26. assertPost(Phase 3 - Stories)
 
-    RT->>Gate: assertPre(Phase 4 - Integrity)
-    RT->>Art: read story reports, verify envelopes, PR evidence, telemetry
-    RT->>Gate: run epic integrity gate
+    RT->>Gate: 27. assertPre(Phase 4 - Integrity)
+    RT->>Art: 28. read story reports, verify envelopes, PR evidence, telemetry
+    RT->>Gate: 29. run epic integrity gate
     alt gate failed
-      RT->>PR: optional ndp pr fix-epic or revert policy
-      PR-->>RT: remediation result
-      RT->>Gate: retry integrity gate once
+      RT->>PR: 30a. optional ndp pr fix-epic or revert policy
+      PR-->>RT: 30b. remediation result
+      RT->>Gate: 30c. retry integrity gate once
     end
-    RT->>Art: write epic execution report and verify envelope
-    RT->>Gate: assertPost(Phase 4 - Integrity)
+    RT->>Art: 31. write epic execution report and verify envelope
+    RT->>Gate: 32. assertPost(Phase 4 - Integrity)
 
     alt non-legacy final PR
-      RT->>Git: merge develop into epic/XXXX
-      Git-->>RT: synced or conflict
-      RT->>PR: create final PR epic/XXXX -> develop
-      PR-->>RT: PR url/number
+      RT->>Git: 33. merge develop into epic/XXXX
+      Git-->>RT: 33b. synced or conflict
+      RT->>PR: 34. create final PR epic/XXXX -> develop
+      PR-->>RT: 34b. PR url/number
     end
   end
 
-  RT->>Tele: run.end(epic implement, status)
-  RT-->>CLI: structured output
-  CLI-->>User: summary, evidence paths, final PR
+  RT->>Tele: 35. run.end(epic implement, status)
+  RT-->>CLI: 36a. structured output
+  CLI-->>User: 36b. summary, evidence paths, final PR
 ```
+
+Etapas:
+
+1. **Parse do command envelope.** A CLI transforma `ndp epic implement EPIC-XXXX [flags]` em um envelope tipado com epic ID, flags, modo de execução e destino esperado.
+2. **Início de telemetria.** O runtime registra `run.start` para que toda a execução tenha correlação, duração e status final.
+3. **Gate pré-args.** O runtime verifica se pode iniciar a fase de argumentos: ambiente válido, estado legível e nenhuma fase anterior pendente.
+4. **Normalização de argumentos.** Flags legadas, `--resume`, `--parallel`, `--dry-run`, `flowVersion`, estratégia de merge e modo interativo são resolvidos em um contrato único.
+5. **Persistência de contexto.** O runtime salva `interactiveMode` e metadados do comando em `execution-state.json`, permitindo resume e diagnósticos posteriores.
+6. **Gate pós-args.** Confirma que a fase de argumentos produziu estado suficiente para continuar.
+7. **Gate pré-planejamento.** Antes de ler backlog e mapas, valida que a fase de args passou e que o épico é elegível.
+8. **Leitura de backlog.** Carrega épico, stories e `IMPLEMENTATION-MAP.md`; aqui aparecem gaps de arquivo ausente, story órfã ou mapa divergente.
+9. **Construção do plano de execução.** Calcula DAG, fases, critical path, projeção de resume e quais stories devem rodar.
+10. **Persistência do plano.** Escreve `epic-execution-plan` para virar evidência humana e input de replay.
+11. **Gate pós-planejamento.** Confirma que o plano existe, é consistente e não contém ciclos ou dependências quebradas.
+12. **Saída antecipada em dry-run.** Se `--dry-run` foi usado, o comando termina aqui com o caminho do plano, sem criar branch nem executar stories.
+13. **Decisão de branch por flowVersion.** Fluxos legados pulam branch de épico; fluxos novos seguem para `epic/XXXX`.
+14. **Gate pré-branch.** Valida que é permitido criar/sincronizar branch antes de tocar Git remoto.
+15. **Garantia da branch de épico.** Cria ou atualiza `epic/XXXX` a partir de `develop` e faz push quando aplicável.
+16. **Resultado do Git.** O Git Adapter retorna branch pronta ou conflito operacional.
+17. **Gate pós-branch.** Confirma que a branch de épico está pronta antes de executar stories.
+18. **Gate pré-loop de stories.** Abre a fase principal de execução e garante que o plano e a branch estão válidos.
+19. **Iteração por fase de implementação.** O runtime percorre fases do DAG; dentro de cada fase, respeita ordem topológica ou paralelismo permitido.
+20. **Marcação da story como em progresso.** Atualiza estado antes de chamar a story, criando checkpoint recuperável.
+21. **Delegação para `ndp story implement`.** Chama o command de story com target branch, estratégia de auto-merge e flags propagadas. O detalhe está no diagrama 3.5.2.
+22. **Recebimento do envelope da story.** Recebe status, PR, coverage, report e paths de evidência.
+23. **Persistência do resultado da story.** Atualiza `execution-state.json` com status, PR, merge status e artefatos produzidos.
+24. **Tratamento de falha da story.** Se falhou, marca dependentes como `BLOCKED` e decide entre abortar, recovery ou política de revert.
+25. **Gate de wave/fase.** Ao fim de cada fase do DAG, valida que todas as stories esperadas concluíram e foram integradas.
+26. **Gate pós-loop de stories.** Fecha a fase de execução de stories quando todas as waves elegíveis terminam.
+27. **Gate pré-integridade do épico.** Garante que todas as evidências por story existem antes do gate agregado.
+28. **Leitura de evidências.** Carrega reports, verify envelopes, PR evidence e telemetria.
+29. **Execução do gate de integridade.** Avalia se o épico está consistente para integração final.
+30. **Remediação de gate falho.** Se necessário, chama `ndp pr fix-epic` ou aplica política de revert, depois tenta o gate uma vez.
+31. **Persistência do relatório do épico.** Escreve relatório final e envelope de verificação do épico.
+32. **Gate pós-integridade.** Confirma que o épico tem evidência agregada suficiente.
+33. **Sincronização com `develop`.** Em fluxo não legado, mescla `develop` na branch `epic/XXXX` para reduzir conflito no PR final.
+34. **Criação do PR final.** Abre PR `epic/XXXX -> develop` com evidências do épico.
+35. **Fim de telemetria.** Registra `run.end` com status final e métricas.
+36. **Saída estruturada.** Retorna para CLI e usuário um resumo com status, paths de evidência e PR final.
 
 #### 3.5.2. `ndp story implement <STORY-ID>` — ciclo de story
 
@@ -333,78 +374,128 @@ sequenceDiagram
   participant Tele as Telemetry/Audit
 
   Epic->>Story: implement STORY-ID with target branch and flags
-  Story->>Tele: phase.start(Prepare)
-  Story->>Gate: assertPre(Phase 0 - Context)
-  Story->>State: persist interactiveMode
-  Story->>Art: load story, predecessor status, existing artifacts
-  Story->>State: resume projection if --resume
-  Story->>Gate: assertPost(Phase 0 - Context)
+  Story->>Tele: 1. phase.start(Prepare)
+  Story->>Gate: 2. assertPre(Phase 0 - Context)
+  Story->>State: 3. persist interactiveMode
+  Story->>Art: 4. load story, predecessor status, existing artifacts
+  Story->>State: 5. resume projection if --resume
+  Story->>Gate: 6. assertPost(Phase 0 - Context)
 
   opt story declares API contracts
-    Story->>Contract: generate OpenAPI/Proto/AsyncAPI draft
-    Contract->>Contract: lint contract
-    Contract-->>Story: contract envelope
-    Story->>Art: persist contracts
+    Story->>Contract: 7. generate OpenAPI/Proto/AsyncAPI draft
+    Contract->>Contract: 8. lint contract
+    Contract-->>Story: 9. contract envelope
+    Story->>Art: 10. persist contracts
   end
 
   alt planning artifacts are fresh
-    Story->>Tele: skip Phase 1 as PRE_PLANNED
+    Story->>Tele: 11. skip Phase 1 as PRE_PLANNED
   else planning required
-    Story->>Gate: assertPre(Phase 1 - Plan)
-    Story->>Plan: build story plan wave
-    Plan-->>Story: artifacts envelope
-    Story->>Gate: assertWave(arch, impl, tests, tasks, security, compliance)
-    Story->>Gate: assertPost(Phase 1 - Plan)
+    Story->>Gate: 12. assertPre(Phase 1 - Plan)
+    Story->>Plan: 13. build story plan wave
+    Plan-->>Story: 14. artifacts envelope
+    Story->>Gate: 15. assertWave(arch, impl, tests, tasks, security, compliance)
+    Story->>Gate: 16. assertPost(Phase 1 - Plan)
   end
 
-  Story->>Gate: assertPre(Phase 2 - Execute)
-  Story->>Art: read tasks-story and task plans
+  Story->>Gate: 17. assertPre(Phase 2 - Execute)
+  Story->>Art: 18. read tasks-story and task plans
   loop each pending task
-    Story->>State: check dependencies
+    Story->>State: 19. check dependencies
     alt dependency unresolved
-      Story->>State: mark task BLOCKED
+      Story->>State: 20. mark task BLOCKED
     else executable task
-      Story->>Task: ndp task implement TASK-ID --orchestrated
-      Task-->>Story: task envelope {status, branch, commit, coverage}
+      Story->>Task: 21. ndp task implement TASK-ID --orchestrated
+      Task-->>Story: 22. task envelope {status, branch, commit, coverage}
       alt task failed
-        Story->>State: mark task FAILED and dependants BLOCKED
-        Story-->>Epic: TASK_FAILED envelope
+        Story->>State: 23a. mark task FAILED and dependants BLOCKED
+        Story-->>Epic: 23b. TASK_FAILED envelope
       else task done
-        Story->>PR: create/watch/merge task PR
-        PR-->>Story: prNumber, mergeStatus, ciStatus
-        Story->>State: update task status and PR evidence
+        Story->>PR: 24. create/watch/merge task PR
+        PR-->>Story: 24b. prNumber, mergeStatus, ciStatus
+        Story->>State: 25. update task status and PR evidence
       end
     end
   end
 
   opt parent story PR mode
-    Story->>PR: create story-level PR
-    PR-->>Story: story PR envelope
+    Story->>PR: 26. create story-level PR
+    PR-->>Story: 27. story PR envelope
   end
-  Story->>Gate: assertPost(Phase 2 - Execute)
+  Story->>Gate: 28. assertPost(Phase 2 - Execute)
 
-  Story->>Gate: assertPre(Phase 3 - Verify)
-  Story->>Docs: generate docs
-  Docs-->>Story: docs changed
-  Story->>Docs: validate documentation freshness
-  Docs-->>Story: doc-validate-report
-  Story->>Gate: verify story evidence, coverage, ACs
-  Gate-->>Story: verify-envelope
-  Story->>Review: ndp review STORY-ID
-  Review-->>Story: specialist dashboard
-  Story->>Review: ndp review pr STORY-ID
-  Review-->>Story: GO or NO-GO verdict
+  Story->>Gate: 29. assertPre(Phase 3 - Verify)
+  Story->>Docs: 30. generate docs
+  Docs-->>Story: 31. docs changed
+  Story->>Docs: 32. validate documentation freshness
+  Docs-->>Story: 33. doc-validate-report
+  Story->>Gate: 34. verify story evidence, coverage, ACs
+  Gate-->>Story: 35. verify-envelope
+  Story->>Review: 36. ndp review STORY-ID
+  Review-->>Story: 37. specialist dashboard
+  Story->>Review: 38. ndp review pr STORY-ID
+  Review-->>Story: 39. GO or NO-GO verdict
   alt NO-GO and remediation enabled
-    Story->>PR: ndp pr fix
-    PR-->>Story: remediation result
-    Story->>Review: rerun required review gate
+    Story->>PR: 40. ndp pr fix
+    PR-->>Story: 41. remediation result
+    Story->>Review: 42. rerun required review gate
   end
-  Story->>Art: write story-completion-report
-  Story->>State: mark story COMPLETE
-  Story->>Gate: assertFinal(verify, reviews, report, docs)
-  Story->>Tele: phase.end(story lifecycle)
-  Story-->>Epic: story envelope
+  Story->>Art: 43. write story-completion-report
+  Story->>State: 44. mark story COMPLETE
+  Story->>Gate: 45. assertFinal(verify, reviews, report, docs)
+  Story->>Tele: 46. phase.end(story lifecycle)
+  Story-->>Epic: 47. story envelope
 ```
+
+Etapas:
+
+1. **Início da fase de preparo.** A story recebe o envelope do épico ou da CLI e abre telemetria própria.
+2. **Gate pré-contexto.** Valida que a story pode iniciar: refinement, predecessores, worktree e estado básico.
+3. **Persistência do modo interativo.** Salva a forma de interação para recovery, prompts e auditoria.
+4. **Carga da story e evidências existentes.** Lê story, status de predecessores e artefatos já gerados.
+5. **Projeção de resume.** Se `--resume`, calcula tasks concluídas, pendentes e warnings de staleness.
+6. **Gate pós-contexto.** Confirma que há contexto suficiente para planejar ou executar.
+7. **Geração condicional de contratos.** Se a story declara REST, gRPC, events ou websocket, gera contrato API-first.
+8. **Lint de contrato.** Valida que o contrato gerado é sintaticamente e semanticamente aceitável.
+9. **Envelope de contrato.** Retorna status, arquivos e eventuais warnings.
+10. **Persistência de contratos.** Grava OpenAPI/Proto/AsyncAPI para implementação e review.
+11. **Decisão de reuso de planejamento.** Se os artefatos estão frescos, a Phase 1 é pulada como `PRE_PLANNED`.
+12. **Gate pré-plano.** Se planejamento é necessário, abre a fase de plano.
+13. **Build do story planning wave.** Chama o serviço detalhado no diagrama 3.5.3.
+14. **Recebimento de artefatos de planejamento.** Recebe paths e status de arch, impl, tests, tasks, security e compliance.
+15. **Gate de wave de planejamento.** Confirma que todos os artefatos obrigatórios existem.
+16. **Gate pós-plano.** Fecha planejamento e libera execução.
+17. **Gate pré-execução.** Garante que tasks e dependências estão prontas para execução.
+18. **Leitura das tasks.** Carrega `tasks-story-*` e planos por task.
+19. **Checagem de dependências por task.** Antes de executar, valida se a task está desbloqueada.
+20. **Bloqueio de task dependente.** Se faltar dependência, marca `BLOCKED` e segue política de propagação.
+21. **Delegação para `ndp task implement`.** Executa a task via loop TDD detalhado no diagrama 3.5.4.
+22. **Recebimento do envelope da task.** Recebe status, branch, commit e coverage.
+23. **Tratamento de task falha.** Marca falha, bloqueia dependentes e retorna `TASK_FAILED` ao épico quando necessário.
+24. **Criação/watch/merge do PR da task.** Se a task passou, chama o subdomínio PR/CI detalhado no diagrama 3.5.5.
+25. **Persistência do status da task.** Salva PR, CI, merge status e evidências.
+26. **PR de story opcional.** Em modo parent-story branch, cria PR agregado da story.
+27. **Envelope do PR de story.** Recebe número, URL e status do PR agregado.
+28. **Gate pós-execução.** Confirma que as tasks esperadas estão concluídas, bloqueadas ou falharam de forma explícita.
+29. **Gate pré-verificação.** Abre a fase final de verify/report.
+30. **Geração de documentação.** Atualiza docs exigidos pela story.
+31. **Resultado da geração de docs.** Retorna arquivos alterados ou no-op.
+32. **Validação de documentation freshness.** Confere se README/API/ADR/system docs estão coerentes com o diff.
+33. **Relatório de documentação.** Produz `doc-validate-report`.
+34. **Verify gate da story.** Valida evidência, coverage e critérios de aceite.
+35. **Verify envelope.** Persiste resultado estruturado do gate.
+36. **Review especialista.** Chama `ndp review`, detalhado no diagrama 3.5.6.
+37. **Dashboard especialista.** Recebe achados e scores consolidados.
+38. **Review Tech Lead.** Chama `ndp review pr`, também detalhado no diagrama 3.5.6.
+39. **Veredito GO/NO-GO.** Recebe decisão final de qualidade.
+40. **Remediação automática.** Em NO-GO remediável, chama `ndp pr fix`.
+41. **Resultado da remediação.** Recebe patch/commit/status da correção.
+42. **Revisão focada pós-remediação.** Roda novamente o gate necessário.
+43. **Relatório de conclusão da story.** Escreve `story-completion-report`.
+44. **Finalização de estado.** Marca story como `COMPLETE`.
+45. **Gate final da story.** Confirma verify, reviews, report e docs.
+46. **Fim de telemetria.** Fecha o ciclo da story.
+47. **Envelope para o épico.** Retorna status e evidências para o command pai.
 
 #### 3.5.3. Story planning wave — workers paralelos
 
@@ -420,32 +511,50 @@ sequenceDiagram
   participant Art as Artifact Store
   participant Parallel as Parallelism Evaluator
 
-  Story->>Plan: build plan for STORY-ID with scope
-  Plan->>Gate: assertPre(planning wave)
-  Plan->>LLM: x-arch-plan worker
+  Story->>Plan: 1. build plan for STORY-ID with scope
+  Plan->>Gate: 2. assertPre(planning wave)
+  Plan->>LLM: 3. x-arch-plan worker
   par implementation plan
-    Plan->>LLM: implementation-plan worker
+    Plan->>LLM: 4. implementation-plan worker
   and test plan
-    Plan->>LLM: test-plan worker
+    Plan->>LLM: 5. test-plan worker
   and task breakdown
-    Plan->>LLM: task-breakdown worker
+    Plan->>LLM: 6. task-breakdown worker
   and security assessment when scope requires
-    Plan->>LLM: security-assessment worker
+    Plan->>LLM: 7. security-assessment worker
   and compliance assessment when scope requires
-    Plan->>LLM: compliance-assessment worker
+    Plan->>LLM: 8. compliance-assessment worker
   end
-  LLM-->>Plan: structured artifact drafts
-  Plan->>Art: write arch, plan, tests, tasks, security, compliance
-  Plan->>Parallel: evaluate file footprint and hotspots
+  LLM-->>Plan: 9. structured artifact drafts
+  Plan->>Art: 10. write arch, plan, tests, tasks, security, compliance
+  Plan->>Parallel: 11. evaluate file footprint and hotspots
   alt hard or regen collision
-    Parallel-->>Plan: degrade affected wave to serial
-    Plan->>Art: record parallelismDowngrades
+    Parallel-->>Plan: 12. degrade affected wave to serial
+    Plan->>Art: 12b. record parallelismDowngrades
   else no collision
-    Parallel-->>Plan: parallel execution allowed
+    Parallel-->>Plan: 13. parallel execution allowed
   end
-  Plan->>Gate: assertWave(expected artifacts)
-  Plan-->>Story: artifacts envelope
+  Plan->>Gate: 14. assertWave(expected artifacts)
+  Plan-->>Story: 15. artifacts envelope
 ```
+
+Etapas:
+
+1. **Entrada do planejamento.** A story solicita o plano com story ID, escopo e contexto.
+2. **Gate pré-wave.** Confirma que o planejamento pode iniciar e que não há artefatos obrigatórios corrompidos.
+3. **Worker de arquitetura.** Chama LLM para gerar plano arquitetural.
+4. **Worker de implementação.** Em paralelo, gera plano técnico de implementação.
+5. **Worker de testes.** Em paralelo, gera plano TDD/TPP e cenários.
+6. **Worker de decomposição.** Em paralelo, quebra a story em tasks.
+7. **Worker de segurança.** Quando o escopo exige, gera avaliação de segurança.
+8. **Worker de compliance.** Quando o perfil exige, gera avaliação regulatória.
+9. **Coleta dos drafts.** O serviço recebe todos os outputs estruturados.
+10. **Persistência dos artefatos.** Escreve planos, tasks, security e compliance em `plans/`.
+11. **Avaliação de footprint.** Analisa arquivos que cada task pretende tocar para prever colisões.
+12. **Degradação por colisão.** Se houver conflito hard/regen, registra que a wave deve rodar serialmente.
+13. **Confirmação de paralelismo.** Se não houver colisão, preserva execução paralela permitida.
+14. **Gate de artefatos esperados.** Valida que todos os outputs obrigatórios existem.
+15. **Envelope para story.** Retorna paths e status para `ndp story implement`.
 
 #### 3.5.4. `ndp task implement <TASK-ID>` — TDD inner loop
 
@@ -465,69 +574,117 @@ sequenceDiagram
   participant CI as CI Watch
   participant Tele as Telemetry/Audit
 
-  Story->>Task: implement TASK-ID
-  Task->>Tele: run.start(task implement)
-  Task->>Gate: assertPre(Phase 0 - Setup)
-  Task->>Art: resolve task file, task plan, implementation map
-  Task->>Git: detect worktree context
-  Task->>State: persist interactiveMode
-  Task->>Gate: assertPost(Phase 0 - Setup)
+  Story->>Task: 1. implement TASK-ID
+  Task->>Tele: 2. run.start(task implement)
+  Task->>Gate: 3. assertPre(Phase 0 - Setup)
+  Task->>Art: 4. resolve task file, task plan, implementation map
+  Task->>Git: 5. detect worktree context
+  Task->>State: 6. persist interactiveMode
+  Task->>Gate: 7. assertPost(Phase 0 - Setup)
 
-  Task->>Gate: assertPre(Phase 1 - Prepare)
-  Task->>Art: load KPs, plan, contracts, acceptance criteria
-  Task->>LLM: prepare TDD implementation plan
-  LLM-->>Task: ordered TDD cycles
-  Task->>Gate: assertPost(Phase 1 - Prepare)
+  Task->>Gate: 8. assertPre(Phase 1 - Prepare)
+  Task->>Art: 9. load KPs, plan, contracts, acceptance criteria
+  Task->>LLM: 10. prepare TDD implementation plan
+  LLM-->>Task: 11. ordered TDD cycles
+  Task->>Gate: 12. assertPost(Phase 1 - Prepare)
 
-  Task->>Gate: assertPre(Phase 2 - TDD)
+  Task->>Gate: 13. assertPre(Phase 2 - TDD)
   loop each TDD cycle
-    Task->>LLM: write failing test for next behavior
-    LLM-->>Task: test patch
-    Task->>Build: run targeted tests expecting RED
+    Task->>LLM: 14. write failing test for next behavior
+    LLM-->>Task: 15. test patch
+    Task->>Build: 16. run targeted tests expecting RED
     alt test does not fail
-      Task->>Gate: raise RED_NOT_OBSERVED
+      Task->>Gate: 17. raise RED_NOT_OBSERVED
     else RED observed
-      Task->>Git: commit RED test
+      Task->>Git: 18. commit RED test
     end
-    Task->>LLM: write minimal implementation
-    LLM-->>Task: implementation patch
-    Task->>Build: run tests expecting GREEN
+    Task->>LLM: 19. write minimal implementation
+    LLM-->>Task: 20. implementation patch
+    Task->>Build: 21. run tests expecting GREEN
     alt tests fail
-      Task->>LLM: repair minimal implementation
-      Task->>Build: rerun tests
+      Task->>LLM: 22. repair minimal implementation
+      Task->>Build: 23. rerun tests
     end
-    Task->>Git: commit GREEN implementation
-    Task->>LLM: propose refactor if useful
-    LLM-->>Task: refactor patch or no-op
-    Task->>Build: rerun tests
+    Task->>Git: 24. commit GREEN implementation
+    Task->>LLM: 25. propose refactor if useful
+    LLM-->>Task: 26. refactor patch or no-op
+    Task->>Build: 27. rerun tests
     alt refactor broke tests
-      Task->>Gate: raise REFACTOR_BROKE_TESTS
+      Task->>Gate: 28. raise REFACTOR_BROKE_TESTS
     else tests stay green
-      Task->>Git: commit REFACTOR when changed
+      Task->>Git: 29. commit REFACTOR when changed
     end
   end
-  Task->>Gate: assertWave(all TDD cycle tasks complete)
+  Task->>Gate: 30. assertWave(all TDD cycle tasks complete)
 
-  Task->>Gate: assertPre(Phase 3 - Validate)
-  Task->>Build: run acceptance tests and coverage
-  Build-->>Task: coverage and test envelope
-  Task->>Art: update task status and task map row
-  Task->>Gate: assertPost(Phase 3 - Validate)
+  Task->>Gate: 31. assertPre(Phase 3 - Validate)
+  Task->>Build: 32. run acceptance tests and coverage
+  Build-->>Task: 33. coverage and test envelope
+  Task->>Art: 34. update task status and task map row
+  Task->>Gate: 35. assertPost(Phase 3 - Validate)
 
-  Task->>Gate: assertPre(Phase 4 - Commit)
-  Task->>Git: create final atomic task commit if needed
+  Task->>Gate: 36. assertPre(Phase 4 - Commit)
+  Task->>Git: 37. create final atomic task commit if needed
   opt standalone worktree PR
-    Task->>CI: watch PR checks
-    CI-->>Task: ci status file
+    Task->>CI: 38. watch PR checks
+    CI-->>Task: 39. ci status file
   end
-  Task->>Gate: assertPost(Phase 4 - Commit)
+  Task->>Gate: 40. assertPost(Phase 4 - Commit)
 
-  Task->>Gate: assertPre(Phase 5 - Cleanup)
-  Task->>Git: cleanup worktree according to mode
-  Task->>Gate: assertFinal(Phase 5 - Cleanup)
-  Task->>Tele: run.end(task implement)
-  Task-->>Story: task envelope
+  Task->>Gate: 41. assertPre(Phase 5 - Cleanup)
+  Task->>Git: 42. cleanup worktree according to mode
+  Task->>Gate: 43. assertFinal(Phase 5 - Cleanup)
+  Task->>Tele: 44. run.end(task implement)
+  Task-->>Story: 45. task envelope
 ```
+
+Etapas:
+
+1. **Entrada da task.** A story chama a task com ID, target branch e flags orquestradas.
+2. **Início de telemetria da task.** Abre run/span específico para medir o ciclo TDD.
+3. **Gate pré-setup.** Valida se a task pode ser carregada.
+4. **Resolução de artefatos.** Lê task file, task plan e task implementation map.
+5. **Detecção de worktree.** Decide entre reutilizar, criar ou operar em modo legado.
+6. **Persistência do modo interativo.** Salva estado para recovery e auditoria.
+7. **Gate pós-setup.** Confirma que setup está consistente.
+8. **Gate pré-prepare.** Abre fase de entendimento.
+9. **Carga de contexto.** Lê KPs, plano, contratos e acceptance criteria.
+10. **Preparação do plano TDD.** Chama LLM para ordenar ciclos e estratégia mínima.
+11. **Retorno dos ciclos.** Recebe lista ordenada de comportamentos/testes.
+12. **Gate pós-prepare.** Fecha preparação.
+13. **Gate pré-TDD.** Abre o loop principal.
+14. **Geração do teste falho.** LLM escreve o próximo teste esperado.
+15. **Patch do teste.** Retorna alteração de teste.
+16. **Execução esperando RED.** Build/Test Adapter roda teste alvo e espera falha.
+17. **Erro se não houve RED.** Se o teste passa ou não executa, levanta `RED_NOT_OBSERVED`.
+18. **Commit RED.** Se falhou corretamente, grava commit do teste.
+19. **Geração da implementação mínima.** LLM escreve o menor código para passar.
+20. **Patch da implementação.** Retorna alteração de produção.
+21. **Execução esperando GREEN.** Testes rodam esperando sucesso.
+22. **Reparo de implementação.** Se falhar, LLM tenta correção mínima.
+23. **Rerun dos testes.** Confirma se o reparo ficou verde.
+24. **Commit GREEN.** Grava implementação mínima.
+25. **Proposta de refactor.** LLM sugere refactor ou no-op.
+26. **Patch de refactor.** Retorna alteração ou nada.
+27. **Rerun pós-refactor.** Testes rodam para garantir comportamento preservado.
+28. **Erro se refactor quebrou.** Levanta `REFACTOR_BROKE_TESTS`.
+29. **Commit REFACTOR.** Grava refactor quando houve mudança segura.
+30. **Gate da wave TDD.** Confirma que todos os ciclos planejados foram concluídos.
+31. **Gate pré-validação.** Abre validação final.
+32. **Acceptance e coverage.** Roda testes de aceite e cobertura.
+33. **Envelope de testes.** Recebe resultados e percentuais.
+34. **Atualização de status da task.** Marca arquivo/mapa como concluído.
+35. **Gate pós-validação.** Confirma que critérios foram provados.
+36. **Gate pré-commit final.** Abre fase de commit/CI.
+37. **Commit atômico final.** Cria commit consolidado se necessário.
+38. **CI-watch condicional.** Em modo PR/worktree, acompanha checks remotos.
+39. **Arquivo de status CI.** Persiste resultado do watch.
+40. **Gate pós-commit.** Fecha fase de commit.
+41. **Gate pré-cleanup.** Abre cleanup.
+42. **Limpeza de worktree.** Remove ou preserva worktree conforme modo e status.
+43. **Gate final da task.** Confirma fechamento completo.
+44. **Fim de telemetria.** Registra duração e status.
+45. **Envelope para story.** Retorna status, commit, coverage e branch.
 
 #### 3.5.5. PR, CI-watch e auto-merge
 
@@ -545,27 +702,48 @@ sequenceDiagram
   participant CI as CI Watch Service
   participant Merge as Merge Service
 
-  Caller->>PR: create PR envelope {head, target, kind, autoMerge}
-  PR->>Gate: validate branch, task/story/epic ids, target policy
-  PR->>Gate: preflight tests and evidence availability
-  PR->>Render: render PR body
-  Render->>Art: read story report, verify envelope, review paths, telemetry pointers
-  Render-->>PR: body with Orchestrator Evidence
-  PR->>GitHub: create PR with labels and body
-  GitHub-->>PR: prNumber, prUrl
-  PR->>CI: watch checks unless disabled by recovery policy
-  CI-->>Art: write .claude/state/pr-watch-{PR}.json
-  CI-->>PR: ci status
-  alt autoMerge != none and CI green
-    PR->>Merge: merge PR with selected strategy
-    Merge->>GitHub: merge
-    GitHub-->>Merge: merge result
-    Merge-->>PR: prMergeStatus
+  Caller->>PR: 1. create PR envelope {head, target, kind, autoMerge}
+  PR->>Gate: 2. validate branch, task/story/epic ids, target policy
+  PR->>Gate: 3. preflight tests and evidence availability
+  PR->>Render: 4. render PR body
+  Render->>Art: 5. read story report, verify envelope, review paths, telemetry pointers
+  Render-->>PR: 6. body with Orchestrator Evidence
+  PR->>GitHub: 7. create PR with labels and body
+  GitHub-->>PR: 8. prNumber, prUrl
+  PR->>CI: 9. watch checks unless disabled by recovery policy
+  CI-->>Art: 10. write .claude/state/pr-watch-{PR}.json
+  CI-->>PR: 11. ci status
+  alt 12. autoMerge != none and CI green
+    PR->>Merge: 13. merge PR with selected strategy
+    Merge->>GitHub: 14. merge
+    GitHub-->>Merge: 15. merge result
+    Merge-->>PR: 16. prMergeStatus
   else manual or blocked
-    PR-->>Caller: PR left open with evidence
+    PR-->>Caller: 17. PR left open with evidence
   end
-  PR-->>Caller: PR envelope
+  PR-->>Caller: 18. PR envelope
 ```
+
+Etapas:
+
+1. **Entrada do PR envelope.** O caller informa head, target, tipo de PR, auto-merge e contexto de task/story/epic.
+2. **Validação de identidade e branch.** Confere padrões de branch, IDs, target branch e labels esperados.
+3. **Preflight de testes/evidência.** Garante que o PR não será criado sem estado local consistente.
+4. **Renderização do PR body.** Chama renderer para montar corpo padronizado.
+5. **Leitura de evidências.** Renderer coleta report, verify envelope, review paths e telemetry pointers.
+6. **Body com Orchestrator Evidence.** Retorna markdown com evidência rastreável.
+7. **Criação do PR.** GitHub Adapter abre PR com labels, título e body.
+8. **Envelope básico do PR.** Retorna número e URL.
+9. **CI-watch.** Acompanha checks, salvo quando recovery policy permite pular.
+10. **Persistência do watch.** Escreve `.claude/state/pr-watch-{PR}.json` ou equivalente NDP.
+11. **Resultado do CI.** Retorna status dos checks.
+12. **Decisão de auto-merge.** Se auto-merge está habilitado e CI está verde, segue para merge.
+13. **Merge com estratégia selecionada.** Aplica merge/squash/rebase conforme política.
+14. **Chamada ao GitHub para merge.** Executa operação remota.
+15. **Resultado do merge.** Recebe sucesso ou falha.
+16. **Status de merge no envelope.** Retorna `prMergeStatus`.
+17. **PR manual/bloqueado.** Se não pode auto-merge, retorna PR aberto com evidências.
+18. **Envelope final para caller.** Devolve URL, número, CI e merge status.
 
 #### 3.5.6. Review gates — especialistas e Tech Lead
 
@@ -583,39 +761,66 @@ sequenceDiagram
   participant Art as Artifact Store
   participant Fix as ndp pr fix
 
-  Story->>Review: run specialist review for STORY-ID
-  Review->>Art: idempotency check for existing reports
-  Review->>Review: detect diff and active specialists
-  Review->>Gate: assertPre(SpecialistReviews)
+  Story->>Review: 1. run specialist review for STORY-ID
+  Review->>Art: 2. idempotency check for existing reports
+  Review->>Review: 3. detect diff and active specialists
+  Review->>Gate: 4. assertPre(SpecialistReviews)
   par QA
-    Review->>LLM: qa review worker
+    Review->>LLM: 5. qa review worker
   and Performance
-    Review->>LLM: perf review worker
+    Review->>LLM: 6. perf review worker
   and Security when active
-    Review->>LLM: security review worker
+    Review->>LLM: 7. security review worker
   and Database/API/Event/DevOps when active
-    Review->>LLM: conditional specialist workers
+    Review->>LLM: 8. conditional specialist workers
   end
-  LLM-->>Review: review reports and scores
-  Review->>Art: write review reports and dashboard
-  Review->>Gate: assertWave(review reports exist)
-  Review-->>Story: specialist dashboard
+  LLM-->>Review: 9. review reports and scores
+  Review->>Art: 10. write review reports and dashboard
+  Review->>Gate: 11. assertWave(review reports exist)
+  Review-->>Story: 12. specialist dashboard
 
-  Story->>TL: run Tech Lead review
-  TL->>Art: load specialist dashboard, plans, tests, PR diff
-  TL->>Build: compile, test, coverage, smoke when configured
-  TL->>LLM: holistic 57-point review
-  LLM-->>TL: GO or NO-GO report
-  TL->>Art: write techlead review and update dashboard
+  Story->>TL: 13. run Tech Lead review
+  TL->>Art: 14. load specialist dashboard, plans, tests, PR diff
+  TL->>Build: 15. compile, test, coverage, smoke when configured
+  TL->>LLM: 16. holistic 57-point review
+  LLM-->>TL: 17. GO or NO-GO report
+  TL->>Art: 18. write techlead review and update dashboard
   alt NO-GO and auto remediation enabled
-    TL->>Fix: apply actionable fixes
-    Fix-->>TL: fix result
-    TL->>Build: rerun compile/tests
-    TL->>LLM: rerun focused review
+    TL->>Fix: 19. apply actionable fixes
+    Fix-->>TL: 20. fix result
+    TL->>Build: 21. rerun compile/tests
+    TL->>LLM: 22. rerun focused review
   end
-  TL->>Gate: assertFinal(techlead report and dashboard)
-  TL-->>Story: final review verdict
+  TL->>Gate: 23. assertFinal(techlead report and dashboard)
+  TL-->>Story: 24. final review verdict
 ```
+
+Etapas:
+
+1. **Entrada do review especialista.** Story solicita review para a story/branch.
+2. **Idempotency check.** Verifica se reports existentes ainda são válidos.
+3. **Detecção de diff e especialistas ativos.** Decide quais reviewers são necessários com base no perfil e arquivos alterados.
+4. **Gate pré-review.** Valida que há diff e contexto suficiente.
+5. **Worker QA.** Roda review de qualidade/testes.
+6. **Worker Performance.** Roda review de performance.
+7. **Worker Security condicional.** Roda review de segurança quando aplicável.
+8. **Workers condicionais adicionais.** Roda database, API, events, DevOps e outros quando o stack exige.
+9. **Coleta de reports.** Recebe achados e scores dos especialistas.
+10. **Persistência de reports e dashboard.** Grava relatórios individuais e consolidação.
+11. **Gate de wave dos reviews.** Confirma que todos os reports ativos existem.
+12. **Dashboard para story.** Retorna síntese de especialistas.
+13. **Entrada do Tech Lead review.** Story solicita veredito holístico.
+14. **Carga de contexto TL.** Lê dashboard, planos, testes e diff/PR.
+15. **Build/test/coverage/smoke.** Executa validações determinísticas antes do julgamento.
+16. **Review holístico.** LLM aplica rubrica Tech Lead.
+17. **Report GO/NO-GO.** Retorna decisão e achados.
+18. **Persistência do Tech Lead report.** Atualiza dashboard com score final.
+19. **Remediação condicional.** Em NO-GO remediável, chama `ndp pr fix`.
+20. **Resultado da correção.** Recebe patch/status.
+21. **Revalidação determinística.** Roda compile/test novamente após correção.
+22. **Review focado pós-fix.** Reavalia achados afetados.
+23. **Gate final de review.** Confirma report TL e dashboard.
+24. **Veredito final para story.** Retorna GO/NO-GO para o lifecycle.
 
 #### 3.5.7. Implicação para o design do runtime
 
