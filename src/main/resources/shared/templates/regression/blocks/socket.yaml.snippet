@@ -1,0 +1,9 @@
+  - id: "websocket-connect"
+    type: websocket
+    description: "WebSocket handshake returns 101 Switching Protocols"
+    command: "wscat -c ws://localhost:8080/ws --execute '' --timeout 5"
+    expected:
+      exit_code: 0
+      stdout_contains: "Connected"
+    timeout_seconds: 10
+

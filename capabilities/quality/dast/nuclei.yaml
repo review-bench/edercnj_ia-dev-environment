@@ -1,0 +1,24 @@
+id: quality.dast.nuclei
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Nuclei community templates — curated CVE templates for known vulnerability patterns.
+  Smoke tier uses top-50 lightweight templates (2-3 min); full tier uses the complete
+  template set (10+ min). Templates version must be pinned to a stable series (vN.x or vN.M.P).
+  Values 'latest', 'master', 'HEAD' are rejected by ConfigValidationException NUCLEI_VERSION_UNPINNED.
+  Default: v9.x. Major-version upgrades require an explicit PR + smoke test rerun (D-R8).
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  templates-version:
+    type: string
+    description: "Pinned version series. Format: vN.x or vN.M.P. Rejects: latest/master/HEAD."
+    default: "v9.x"
+  lightweight-count:
+    type: integer
+    description: Number of templates in smoke mode
+    default: 50

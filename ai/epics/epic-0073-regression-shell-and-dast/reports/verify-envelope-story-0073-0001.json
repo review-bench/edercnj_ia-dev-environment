@@ -1,0 +1,32 @@
+{
+  "storyId": "story-0073-0001",
+  "epicId": "EPIC-0073",
+  "verifiedAt": "2026-05-01T18:35:00Z",
+  "passed": true,
+  "gates": {
+    "coverage": {
+      "passed": true,
+      "lineCoverage": 97.2,
+      "branchCoverage": 93.1,
+      "thresholds": { "line": 95, "branch": 90 }
+    },
+    "tests": {
+      "passed": true,
+      "total": 4612,
+      "failures": 0,
+      "skipped": 14
+    },
+    "compilation": { "passed": true },
+    "artifacts": {
+      "passed": true,
+      "present": [
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/arch-story-0073-0001.md",
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/plan-story-0073-0001.md",
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/tests-story-0073-0001.md",
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/tasks-story-0073-0001.md",
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/security-story-0073-0001.md",
+        "ai/epics/epic-0073-regression-shell-and-dast/plans/compliance-story-0073-0001.md"
+      ]
+    }
+  }
+}
