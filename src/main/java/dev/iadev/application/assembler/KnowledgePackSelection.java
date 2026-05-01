@@ -41,6 +41,7 @@ public final class KnowledgePackSelection {
         packs.addAll(selectDddStrategicPack(config));
         packs.addAll(selectPciDssRequirementsPack(config));
         packs.addAll(selectOwaspAsvsReferencePack(config));
+        packs.addAll(selectQualityPerformancePacks(config));
         return packs;
     }
 
@@ -107,5 +108,14 @@ public final class KnowledgePackSelection {
             return List.of("owasp-asvs");
         }
         return List.of();
+    }
+
+    private static List<String> selectQualityPerformancePacks(ProjectConfig config) {
+        if (!config.quality().performance().enabled()) {
+            return List.of();
+        }
+        List<String> packs = new ArrayList<>();
+        packs.add("performance-engineering");
+        return packs;
     }
 }

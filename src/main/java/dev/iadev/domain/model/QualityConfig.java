@@ -75,7 +75,7 @@ public record QualityConfig(
             int baselineTolerancePct,
             Map<String, Object> toolVersions) {
 
-        static final PerformanceConfig DEFAULT =
+        public static final PerformanceConfig DEFAULT =
                 new PerformanceConfig(false, SloConfig.DEFAULT, 10, Map.of());
 
         public PerformanceConfig {
@@ -166,7 +166,7 @@ public record QualityConfig(
     public record MutationConfig(
             boolean enabled, int threshold, int runtimeCapMin, Map<String, Object> toolVersions) {
 
-        static final MutationConfig DEFAULT = new MutationConfig(false, 80, 10, Map.of());
+        public static final MutationConfig DEFAULT = new MutationConfig(false, 80, 10, Map.of());
 
         public MutationConfig {
             toolVersions = toolVersions == null ? Map.of() : Map.copyOf(toolVersions);
@@ -192,7 +192,7 @@ public record QualityConfig(
     public record ContractConfig(
             boolean enabled, boolean pact, boolean openapiBreaking, boolean protoBreaking) {
 
-        static final ContractConfig DEFAULT = new ContractConfig(false, false, true, true);
+        public static final ContractConfig DEFAULT = new ContractConfig(false, false, true, true);
 
         static ContractConfig fromMap(Map<String, Object> m) {
             return new ContractConfig(
