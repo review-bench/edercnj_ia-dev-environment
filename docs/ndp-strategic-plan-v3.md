@@ -12,7 +12,7 @@
 
 A versão anterior acumulou informação de forma incremental: primeiro princípios, depois produtos, depois migração, depois inventários. Isso foi útil para descobrir fatos, mas deixou duplicações: skills aparecem por tipo, por papel, por grupo canônico e por destino; hooks aparecem tanto como problema de governança quanto como artefatos; templates e artefatos aparecem próximos, mas representam camadas diferentes.
 
-Esta v2 reorganiza a história em uma sequência mais natural para tomada de decisão:
+Esta v3 reorganiza a história em uma sequência mais natural para tomada de decisão:
 
 1. **Tese do produto:** o que o NDP é e quais decisões são inegociáveis.
 2. **Diagnóstico:** como o `ia-dev-environment` funciona hoje e por que precisa evoluir.
@@ -1315,7 +1315,7 @@ Estas skills controlam fluxo amplo. No NDP elas devem sair de markdown interpret
 | `x-story-refine` | `ndp story refine <ID>` | Refinement multi-persona com verdict persistido. |
 | `x-epic-refine` | `ndp epic refine <ID>` | Refinement estratégico de épico. |
 | `x-story-plan` | `ndp story plan <ID>` | Planning wave, task breakdown, task plans e DoR. |
-| `x-feature-create` | `ndp feature create <SPEC>` | Spec → epic → stories → implementation map → PR. |
+| `x-feature-create` | `ndp feature create <CAPACITY-CODE>` | Capacity/ideation → feature estruturada; epic/stories/map nascem depois de arquitetura aprovada. |
 | `x-feature-ideate` | `ndp feature ideate` | Ideia livre → spec/backlog estruturado. |
 | `x-test-tdd` | `ndp test tdd <TASK>` | Orquestra ciclos Red/Green/Refactor; LLM atua pontualmente. |
 
@@ -1916,7 +1916,419 @@ Se esse spike falhar, o plano inteiro precisa ser revisto antes de criar épicos
 
 ---
 
-## 10. Próximos Passos
+## 10. Contratos Implementáveis da V0
+
+Esta seção transforma a estratégia em contratos próximos de implementação. Ela não substitui o refinement futuro, mas reduz ambiguidade: cada épico derivado da V0 deve apontar para um contrato abaixo, declarar o recorte que entrega e preservar os estados, erros, evidências e invariantes definidos aqui.
+
+### 10.1. Contrato fechado da V0
+
+A V0 não deve tentar entregar o NDP inteiro. Ela precisa provar uma fatia vertical completa: o NDP controla um fluxo local, chama LLM como worker, persiste estado, aplica gates em código, produz evidência verificável e consegue retomar execução.
+
+| Dimensão | Contrato V0 |
+| --- | --- |
+| Interface | CLI `ndp`, sem UI obrigatória, com `--output text`, `--output json` e logs locais. |
+| Execução | Local-first, single-user, file-based state store, locking local e Git como checkpoint remoto. |
+| LLM | Um provider oficial inicial, com abstração para múltiplos providers e validação de saída por schema. |
+| Orquestração | Pelo menos um fluxo end-to-end controlado pelo runtime, não por skill markdown. |
+| Planejamento | Cadeia mínima `Project -> Product -> Capacity -> Feature -> Architecture Plan -> Epic`. |
+| Evidência | Artifact registry tipado, audit log local, verify envelopes e PR body com evidências quando houver PR. |
+| Migração | Leitura/importação do layout atual `ia-dev-env` sem exigir reescrita manual dos artefatos existentes. |
+| CI | `ndp ci verify` como Camada B para validar o que o runtime produziu. |
+
+Não-goals da V0:
+
+- SaaS, multi-tenancy, RBAC organizacional e marketplace remoto.
+- Dashboard web, IDE extension completa ou TUI rica.
+- Execução cross-machine ou colaboração em tempo real.
+- Compatibilidade com todos os LLM providers; a arquitetura deve permitir, mas a entrega pode começar com um provider.
+- Reimplementação de todas as skills atuais; V0 deve portar o caminho crítico e manter o restante em dual-mode.
+
+Métricas de sucesso:
+
+| Métrica | Alvo V0 |
+| --- | --- |
+| Time-to-first-value | Um usuário novo roda `ndp init` e chega a um artefato aprovado em até 5 minutos. |
+| Taxa de bypass no caminho oficial | Zero bypass possível sem entrar em modo recovery explícito. |
+| Retomada | Um run interrompido é retomado sem corromper estado nem duplicar artefatos. |
+| Evidência | Todo comando mutável produz artifact envelope e audit event. |
+| Debuggability | Qualquer falha retorna error code tipado, fase, artifact path e próxima ação sugerida. |
+| Migração | Um repo `ia-dev-env` atual passa em `ndp doctor --from-iadev` com plano de migração claro. |
+
+### 10.2. Vertical slice recomendado
+
+O primeiro slice deve ser pequeno o suficiente para ser implementável, mas completo o suficiente para provar a tese de inversão de controle.
+
+```text
+ndp init
+  -> ndp product create|approve
+  -> ndp capacity create|approve
+  -> ndp feature create|approve
+  -> ndp architecture plan feature
+  -> ndp epic create
+  -> ndp story refine ou ndp story implement reduzido
+  -> ndp ci verify
+```
+
+Recorte sugerido:
+
+| Slice | Inclui | Exclui |
+| --- | --- | --- |
+| S0 — bootstrap | `ndp init`, profile mínimo, control repo detection, `ndp doctor`. | Marketplace, target adapters múltiplos. |
+| S1 — strategic chain | Product, Capacity, Feature, approvals e remote checkpoint. | Ideation multi-round e personas avançadas. |
+| S2 — architecture intake | `architecture-feature-*` com NFR gate e mini-ADRs. | Arquitetura product/capacity profunda quando o repo ainda é simples. |
+| S3 — backlog generation | `ndp epic create` gera epic, stories e implementation map com links. | Replanejamento incremental automático. |
+| S4 — runtime proof | `ndp story refine` ou `ndp story implement` reduzido com state machine real. | Todo o lifecycle de PR/review/release. |
+| S5 — CI evidence | `ndp ci verify` valida registry, estados, links e evidências. | Compliance reports formais. |
+
+Critério de corte: se uma feature V0 não ajuda a provar esse slice, ela deve ir para V1+ ou virar plugin experimental.
+
+### 10.3. State machines canônicas
+
+Estados devem ser enums de domínio, não strings livres em markdown. Cada transição precisa declarar comando autorizado, pré-condições e evidências geradas.
+
+| Entidade | Estados V0 | Transições principais |
+| --- | --- | --- |
+| `Project` | `DRAFT`, `APPROVED`, `REMOTE_CHECKPOINTED`, `SUPERSEDED` | `create`, `approve`, `checkpoint`, `supersede`. |
+| `Product` | `DRAFT`, `REVIEW_READY`, `APPROVED`, `REMOTE_CHECKPOINTED`, `SUPERSEDED` | `create`, `submit-review`, `approve`, `checkpoint`, `supersede`. |
+| `Capacity` | `DRAFT`, `REVIEW_READY`, `APPROVED`, `REMOTE_CHECKPOINTED`, `SUPERSEDED` | Igual a Product, sempre com parent Product aprovado. |
+| `Feature` | `DRAFT`, `REVIEW_READY`, `APPROVED`, `ARCHITECTURE_REQUIRED`, `ARCHITECTURE_APPROVED`, `READY_FOR_EPIC`, `SUPERSEDED` | `create`, `approve`, `plan-architecture`, `approve-architecture`, `create-epic`. |
+| `ArchitecturePlan` | `DRAFT`, `NEEDS_INPUT`, `REVIEW_READY`, `APPROVED`, `REMOTE_CHECKPOINTED`, `STALE`, `SUPERSEDED` | `plan`, `request-input`, `approve`, `checkpoint`, `mark-stale`. |
+| `Epic` | `DRAFT`, `BACKLOG_READY`, `APPROVED`, `IMPLEMENTING`, `COMPLETE`, `BLOCKED`, `SUPERSEDED` | `create`, `approve`, `implement`, `complete`, `block`. |
+| `Story` | `DRAFT`, `REFINEMENT_REQUIRED`, `REFINED`, `PLANNED`, `IMPLEMENTING`, `VERIFYING`, `COMPLETE`, `FAILED`, `BLOCKED` | `refine`, `plan`, `implement`, `verify`, `complete`, `fail`, `block`. |
+| `Task` | `DRAFT`, `READY`, `IN_PROGRESS`, `RED`, `GREEN`, `REFACTORED`, `VALIDATED`, `COMPLETE`, `FAILED`, `BLOCKED` | `prepare`, `red`, `green`, `refactor`, `validate`, `complete`. |
+| `PR` | `NOT_CREATED`, `OPEN`, `CI_PENDING`, `CI_GREEN`, `CI_FAILED`, `MERGED`, `BLOCKED`, `ABANDONED` | `create`, `watch`, `merge`, `block`, `abandon`. |
+| `Run` | `CREATED`, `RUNNING`, `PAUSED`, `RECOVERING`, `SUCCEEDED`, `FAILED`, `CANCELLED` | `start`, `pause`, `resume`, `recover`, `finish`, `cancel`. |
+
+Regras gerais:
+
+- `SUPERSEDED` nunca é deletado; mantém link para substituto.
+- `STALE` deve explicar qual ancestor SHA invalidou o artefato.
+- `FAILED` precisa carregar error code tipado e fase.
+- `BLOCKED` precisa declarar dependency ou policy que bloqueou.
+- `REMOTE_CHECKPOINTED` exige SHA remoto verificável.
+
+### 10.4. Schemas mínimos de artefatos estratégicos
+
+Os exemplos abaixo são contratos de intenção. O formato final pode ser Markdown com frontmatter YAML ou JSON sidecar, mas os campos são obrigatórios para o runtime.
+
+`product-*.md`:
+
+```yaml
+artifact_kind: ndp.product
+schema_version: 1
+id: PRODUCT-NDP-0001
+project_id: PROJECT-NDP
+status: APPROVED
+title: NextGen Dev Platform
+value_proposition: "Local-first orchestration for governed AI-assisted delivery."
+target_users:
+  - platform engineers
+  - tech leads
+success_metrics:
+  - id: ttfv
+    target: "first useful artifact in <= 5 minutes"
+constraints:
+  local_first: true
+  network_required: false
+remote_checkpoint:
+  branch: product/PRODUCT-NDP-0001
+  sha: "<remote-sha>"
+```
+
+`capacity-*.md`:
+
+```yaml
+artifact_kind: ndp.capacity
+schema_version: 1
+id: CAP-NDP-RUNTIME
+product_id: PRODUCT-NDP-0001
+status: APPROVED
+domain: orchestration-runtime
+outcomes:
+  - deterministic state machine controls implementation flow
+dependencies:
+  - CAP-NDP-REGISTRY
+events:
+  - ndp.run.started
+  - ndp.run.completed
+```
+
+`feature-*.md`:
+
+```yaml
+artifact_kind: ndp.feature
+schema_version: 1
+id: FEAT-NDP-STORY-RUNTIME
+capacity_id: CAP-NDP-RUNTIME
+status: READY_FOR_EPIC
+hypothesis: "If NDP owns story execution, bypass and evidence gaps drop to zero."
+scope:
+  includes:
+    - story runtime state machine
+    - artifact evidence validation
+  excludes:
+    - full release orchestration
+nfrs:
+  max_resume_time_seconds: 10
+  local_only: true
+architecture_plan_id: ARCH-FEAT-NDP-STORY-RUNTIME
+```
+
+`architecture-feature-*.md`:
+
+```yaml
+artifact_kind: ndp.architecture_plan
+schema_version: 1
+id: ARCH-FEAT-NDP-STORY-RUNTIME
+scope: feature
+feature_id: FEAT-NDP-STORY-RUNTIME
+status: APPROVED
+parent_architecture:
+  product: ARCH-PRODUCT-NDP
+  capacity: ARCH-CAP-NDP-RUNTIME
+decisions:
+  - id: ADR-MINI-001
+    decision: "Use file-based state store for V0."
+    consequence: "Cross-machine resume is V2+."
+runtime_components:
+  - StoryRuntime
+  - PolicyEngine
+  - ArtifactRegistry
+  - LlmWorkerRouter
+readiness_checklist:
+  - state machine states declared
+  - policy failures mapped to error codes
+  - artifact kinds declared
+```
+
+### 10.5. Command contracts
+
+Todo comando mutável da V0 deve ter o mesmo contrato externo: parse tipado, preflight, lock, state transition, artifact write, audit event, remote checkpoint quando aplicável e output estruturado.
+
+Contrato comum:
+
+| Campo | Regra |
+| --- | --- |
+| `--output` | `text` para humano, `json` para automação, `ndjson` para streaming quando houver progresso longo. |
+| `--dry-run` | Nunca escreve artefato final nem faz operação remota; pode produzir plano temporário em `ai/runs/`. |
+| `--resume` | Só permitido quando existe run anterior compatível e não stale. |
+| `--recovery` | Exige motivo explícito e registra audit event; não é caminho feliz. |
+| `--yes` | Remove prompts, mas não remove gates. |
+| Exit code | Deve ser estável, documentado e testado. |
+
+Exemplos de contratos V0:
+
+| Command | Entrada | Saída JSON mínima | Erros principais |
+| --- | --- | --- | --- |
+| `ndp init` | repo path, profile opcional | `{ "projectId", "profile", "createdArtifacts" }` | `PROFILE_INVALID`, `REPO_NOT_SUPPORTED`. |
+| `ndp product create <PROJECT-CODE>` | project aprovado ou bootstrap | `{ "productId", "path", "status" }` | `PARENT_NOT_APPROVED`, `SCHEMA_INVALID`. |
+| `ndp capacity create <PRODUCT-CODE>` | product aprovado | `{ "capacityId", "path", "parentSha" }` | `REMOTE_CHECKPOINT_REQUIRED`. |
+| `ndp feature create <CAPACITY-CODE>` | capacity aprovada | `{ "featureId", "path", "openQuestions" }` | `PARENT_NOT_APPROVED`, `MISSING_VALUE_HYPOTHESIS`. |
+| `ndp architecture plan feature <FEATURE-CODE>` | feature aprovada + NFRs | `{ "architecturePlanId", "status", "decisions" }` | `NFR_REQUIRED`, `ARCHITECTURE_NOT_READY`. |
+| `ndp epic create <FEATURE-CODE>` | architecture feature aprovada | `{ "epicId", "stories", "implementationMap" }` | `ARCHITECTURE_NOT_APPROVED`, `BACKLOG_INCONSISTENT`. |
+| `ndp story refine <STORY-ID>` | story draft/refinement required | `{ "storyId", "verdict", "blockingFindings" }` | `REFINEMENT_NO_GO`, `SCHEMA_INVALID`. |
+| `ndp story implement <STORY-ID>` | story refined + map aprovado | `{ "storyId", "status", "evidence", "pr" }` | `REFINEMENT_REQUIRED`, `TASK_FAILED`, `VERIFY_FAILED`. |
+| `ndp ci verify` | repo path | `{ "status", "checkedPolicies", "violations" }` | `POLICY_VIOLATION`, `ARTIFACT_MISSING`. |
+
+### 10.6. Error taxonomy
+
+Erros precisam ser parte da API do produto. O usuário deve conseguir automatizar decisões sem parsear texto.
+
+| Categoria | Prefixo | Exemplos |
+| --- | --- | --- |
+| Entrada e schema | `INPUT_*` | `INPUT_MISSING_REQUIRED_FIELD`, `INPUT_SCHEMA_INVALID`. |
+| Estado e lifecycle | `STATE_*` | `STATE_TRANSITION_FORBIDDEN`, `STATE_STALE_RUN`, `STATE_LOCKED`. |
+| Rastreabilidade | `TRACE_*` | `TRACE_PARENT_NOT_APPROVED`, `TRACE_REMOTE_CHECKPOINT_REQUIRED`. |
+| Policy/gate | `POLICY_*` | `POLICY_REFINEMENT_REQUIRED`, `POLICY_DOC_FRESHNESS_FAILED`. |
+| Artefatos | `ARTIFACT_*` | `ARTIFACT_MISSING`, `ARTIFACT_STALE`, `ARTIFACT_GENERATOR_FORBIDDEN`. |
+| Git/PR/CI | `VCS_*` | `VCS_BRANCH_DIRTY`, `VCS_PUSH_FAILED`, `VCS_CI_FAILED`. |
+| LLM/provider | `LLM_*` | `LLM_TIMEOUT`, `LLM_SCHEMA_INVALID`, `LLM_BUDGET_EXCEEDED`. |
+| Recovery | `RECOVERY_*` | `RECOVERY_NOT_ALLOWED`, `RECOVERY_REQUIRES_REASON`. |
+
+Saída de erro mínima:
+
+```json
+{
+  "status": "failed",
+  "errorCode": "POLICY_REFINEMENT_REQUIRED",
+  "phase": "story.preflight",
+  "message": "Story must have an approved refinement verdict before implementation.",
+  "artifactPath": "ai/projects/project-0001/.../story-0072-0001.md",
+  "nextAction": "Run ndp story refine STORY-0072-0001"
+}
+```
+
+### 10.7. Policy matrix
+
+Policies críticas da V0 devem declarar ponto de execução e evidência. Se uma regra não tem enforcement possível, ela permanece doctrine/KP, não policy runtime.
+
+| Policy | Enforcement point | Evidence | Error code |
+| --- | --- | --- | --- |
+| Remote predecessor gate | Antes de criar descendente estratégico. | Parent status + remote SHA. | `TRACE_REMOTE_CHECKPOINT_REQUIRED`. |
+| Refinement gate | Antes de `story implement` e `epic implement`. | `refinementVerdict.status=approved`. | `POLICY_REFINEMENT_REQUIRED`. |
+| Architecture readiness | Antes de `epic create`. | `architecture-feature-*` aprovado. | `POLICY_ARCHITECTURE_REQUIRED`. |
+| Worktree clean | Antes de writes remotos e comandos mutáveis. | Git status envelope. | `VCS_BRANCH_DIRTY`. |
+| Artifact schema | Após cada write de artefato tipado. | Schema validation result. | `ARTIFACT_SCHEMA_INVALID`. |
+| Phase gate | Entre fases do runtime. | Expected child statuses + artifacts. | `STATE_TRANSITION_FORBIDDEN`. |
+| Evidence completeness | Antes de PR e `ci verify`. | Verify envelope + reports. | `ARTIFACT_MISSING`. |
+| Documentation freshness | Antes de completion de story. | `doc-validate-report`. | `POLICY_DOC_FRESHNESS_FAILED`. |
+| Budget guardrail | Antes e depois de chamada LLM. | Cost event + budget config. | `LLM_BUDGET_EXCEEDED`. |
+| Recovery guard | Sempre que `--recovery` for usado. | Recovery reason + audit event. | `RECOVERY_REQUIRES_REASON`. |
+
+### 10.8. Artifact kind matrix
+
+O runtime não deve inferir semântica apenas pelo path. Cada artefato persistido precisa declarar `artifact_kind`, schema, gerador autorizado e regra de freshness.
+
+| Artifact kind | Gerador autorizado | Consumidores | Freshness rule |
+| --- | --- | --- | --- |
+| `ndp.product` | `ndp product create\|approve` | capacity planning, roadmap, `doctor`. | Stale se Project SHA muda com breaking constraint. |
+| `ndp.capacity` | `ndp capacity create\|approve` | feature planning, architecture capacity. | Stale se Product aprovado muda domínio/restrição. |
+| `ndp.feature` | `ndp feature create\|approve` | architecture feature, epic create. | Stale se Capacity ou Product ancestor muda. |
+| `ndp.architecture_plan` | `ndp architecture plan *` | epic create, review, ADR generation. | Stale se target ou parent architecture muda. |
+| `ndp.epic` | `ndp epic create` | epic implement, story implement. | Stale se Feature/ArchitecturePlan SHA muda. |
+| `ndp.story` | `ndp epic create`, `ndp story refine` | story implement, reviews. | Stale se Epic story index muda. |
+| `ndp.implementation_map` | `ndp epic create`, `ndp epic map` | epic implement, parallel eval. | Stale se stories/dependencies mudam. |
+| `ndp.execution_state` | runtime commands | resume, phase gates, CI verify. | Stale se command version incompatível. |
+| `ndp.verify_envelope` | gate services | PR body, CI verify, reports. | Immutable for run ID. |
+| `ndp.audit_event` | runtime telemetry | audit log, forensics, analytics. | Append-only. |
+
+### 10.9. Runtime module boundaries
+
+Uma implementação saudável deve manter o core independente de CLI, GitHub e provider específico.
+
+| Módulo | Responsabilidade | Não deve fazer |
+| --- | --- | --- |
+| `ndp-cli` | Parse de argumentos, renderização de output e UX de prompts. | Decidir policy ou mutar estado diretamente. |
+| `runtime-core` | State machines, command orchestration, locks, resume. | Chamar provider ou GitHub diretamente. |
+| `artifact-registry` | Schemas, artifact kinds, path resolver, freshness. | Gerar conteúdo criativo. |
+| `policy-engine` | Executar gates e produzir violações tipadas. | Renderizar markdown ou PR body. |
+| `state-store` | Persistência local, snapshots, run metadata. | Aplicar regra de negócio. |
+| `llm-router` | Provider abstraction, model routing, budget, schema validation. | Orquestrar lifecycle. |
+| `template-renderer` | Renderizar documentos a partir de dados tipados. | Buscar contexto sozinho. |
+| `git-adapter` | Branch, commit, push, worktree, status. | Interpretar backlog. |
+| `ci-pr-adapter` | GitHub/PR/CI watch e merge. | Decidir se evidência é suficiente. |
+| `telemetry-audit` | Eventos, spans, cost events e audit log local. | Bloquear fluxo fora de policy. |
+| `migration` | Importar layout `ia-dev-env`, detectar drift, gerar plano. | Alterar artefatos sem checkpoint. |
+
+### 10.10. Fluxos adicionais obrigatórios
+
+#### Golden path completo
+
+```text
+idea
+  -> ndp ideate --kind product
+  -> ndp product create|approve
+  -> ndp product propose-capacities
+  -> ndp capacity create|approve
+  -> ndp feature create|approve
+  -> ndp architecture plan feature
+  -> ndp epic create
+  -> ndp story refine
+  -> ndp story implement
+  -> ndp ci verify
+  -> PR with Orchestrator Evidence
+```
+
+#### Mudança em feature ou arquitetura
+
+```text
+feature or architecture changes
+  -> mark descendants STALE
+  -> compute impacted epics/stories/tasks
+  -> require re-approval or controlled regeneration
+  -> preserve old artifacts as SUPERSEDED
+  -> create migration/replan report
+```
+
+Regra: nenhum descendente stale pode ser implementado sem `--replan` ou aprovação explícita de compatibilidade.
+
+#### Recovery e resume
+
+```text
+run interrupted
+  -> ndp status
+  -> load execution_state + audit events
+  -> validate locks and artifact freshness
+  -> classify safe resume, recovery needed or manual intervention
+  -> ndp <command> --resume
+```
+
+O resume nunca deve repetir side effects remotos sem idempotency key.
+
+#### Policy failure
+
+```text
+gate fails
+  -> stop before side effect
+  -> write violation envelope
+  -> return typed error
+  -> suggest exact command to fix
+```
+
+Falhas de policy são resultado esperado do produto, não exceptions genéricas.
+
+#### LLM/provider failure
+
+```text
+LLM call fails or returns invalid schema
+  -> retry according to provider policy
+  -> fallback when configured and budget allows
+  -> persist failed worker envelope
+  -> never mark artifact approved from invalid output
+```
+
+O LLM pode falhar; o runtime não pode perder rastreabilidade.
+
+#### Marketplace/plugin opt-in
+
+```text
+ndp plugin install <PACKAGE>
+  -> verify signature
+  -> show permissions
+  -> cache locally
+  -> register capabilities
+  -> allow rollback
+```
+
+Na V0, esse fluxo pode existir apenas como design contract; execução real fica V1+.
+
+### 10.11. Migration contract
+
+Migração deve ser assistida, reversível e auditável.
+
+| Fase | Comando | Resultado |
+| --- | --- | --- |
+| Diagnóstico | `ndp doctor --from-iadev` | Inventário de rules, skills, hooks, templates, epics e riscos. |
+| Plano | `ndp migrate --from-iadev --dry-run` | Plano de renome, importação e dual-mode sem writes finais. |
+| Importação | `ndp migrate --from-iadev` | Registry local inicial e artifacts importados com source metadata. |
+| Dual-mode | `ndp ci verify --dual-mode` | Compara invariantes atuais e NDP por uma release. |
+| Corte | `ndp migrate finalize` | Marca NDP como runtime primário. |
+
+Todo artefato importado deve carregar:
+
+```yaml
+source_system: ia-dev-env
+source_path: ai/epics/epic-0071/story-0071-0001.md
+source_sha: "<sha>"
+imported_at: "<iso-8601>"
+compatibility: imported|converted|manual-review-required
+```
+
+### 10.12. Critérios de aceite para transformar este plano em épicos
+
+Antes de decompor a V0 em épicos, o refinement deve confirmar:
+
+- Cada feature `[V0]` aponta para um contrato desta seção ou declara por que é exceção.
+- Cada command V0 tem entrada, saída, error codes e artifact kinds.
+- Cada policy V0 tem enforcement point, evidence e teste planejado.
+- Cada state machine tem transições autorizadas e recovery behavior.
+- Cada artefato estratégico tem schema mínimo e freshness rule.
+- O vertical slice está separado do backlog V0 expandido.
+- Não há dependência obrigatória de cloud, UI ou marketplace para o caminho feliz.
+
+---
+
+## 11. Próximos Passos
 
 1. Decidir o nome real do produto e registrar domínio/organização.
 2. Definir licença do core e fronteira comercial.
@@ -1930,7 +2342,7 @@ Se esse spike falhar, o plano inteiro precisa ser revisto antes de criar épicos
 
 ---
 
-## 11. Notas de Processo
+## 12. Notas de Processo
 
 Este plano para em `Feature`. Quando aprovado, cada Feature deve passar por refinement antes de virar Epic. Cada Epic resultante deve produzir os artefatos de planejamento e evidência exigidos pelo próprio modelo que queremos vender.
 
