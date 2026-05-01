@@ -47,7 +47,7 @@
   },
   "storyStatuses": {
     "story-0071-0001": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved",
@@ -85,7 +85,10 @@
           }
         },
         "blockers": []
-      }
+      },
+      "prNumber": 891,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/891",
+      "mergedAt": "2026-05-01T02:36:17Z"
     },
     "story-0071-0002": {
       "status": "refinada",

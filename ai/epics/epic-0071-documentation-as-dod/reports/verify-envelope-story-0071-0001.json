@@ -1,0 +1,28 @@
+{
+  "storyId": "story-0071-0001",
+  "epicId": "EPIC-0071",
+  "verifiedAt": "2026-05-01T02:36:17Z",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "buildStatus": "SUCCESS",
+  "testsRun": 4567,
+  "failures": 0,
+  "errors": 0,
+  "artifacts": {
+    "capability": "capabilities/governance/doc-as-dod.yaml",
+    "rule": "src/main/resources/targets/claude/rules/31-documentation-freshness-gate.md",
+    "adr": "docs/adr/ADR-0024-documentation-freshness-gate.md",
+    "documentationConfig": "src/main/java/dev/iadev/domain/model/DocumentationConfig.java",
+    "documentationConfigTest": "src/test/java/dev/iadev/domain/model/DocumentationConfigTest.java"
+  },
+  "acVerification": {
+    "happyPath": "PASS — capability + rule + ADR + DocumentationConfig all present and parseable",
+    "errorBoundary": "PASS — GovernanceTest covers null/defaults; ConfigValidationException coverage maintained",
+    "performance": "PASS — DocumentationConfigTest.performance.fromMap_largeTargetsList_completesWithinTimeout (55 targets < 500ms)",
+    "security": "PASS — doc-as-dod.yaml schema validates against governance/schemas/capabilities-1.0.json; targets are logical names (not paths)"
+  },
+  "prNumber": 891,
+  "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/891",
+  "mergedAt": "2026-05-01T02:36:17Z"
+}
