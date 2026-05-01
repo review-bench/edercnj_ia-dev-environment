@@ -47,6 +47,9 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 | `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
 | `x-threat-model` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
 | `x-doc-validate` | `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` | Camada 3 (EPIC-0071) |
+| `x-test-performance` | `ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.performance.enabled=true`, EPIC-0072) |
+| `x-test-mutation` | `ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.mutation.enabled=true`, EPIC-0072) |
+| `x-test-contract` | `ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.contract.enabled=true`, EPIC-0072) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
