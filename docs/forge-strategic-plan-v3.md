@@ -10,19 +10,18 @@
 
 ## 0. Como ler esta versão
 
-A versão anterior acumulou informação de forma incremental: primeiro princípios, depois produtos, depois migração, depois inventários. Isso foi útil para descobrir fatos, mas deixou duplicações: skills aparecem por tipo, por papel, por grupo canônico e por destino; hooks aparecem tanto como problema de governança quanto como artefatos; templates e artefatos aparecem próximos, mas representam camadas diferentes.
+Este documento agora deve ser lido como uma ponte entre estratégia de produto e backlog implementável. A ordem é intencional:
 
-Esta v3 reorganiza a história em uma sequência mais natural para tomada de decisão:
+1. **Tese do produto:** por que o Forge existe e quais decisões são inegociáveis.
+2. **Diagnóstico:** o que o `ia-dev-environment` provou e quais limites precisam virar produto.
+3. **Modelo operacional:** como Forge controla runtime, ativos, storage, cadeia estratégica e execução.
+4. **Escopo da V0:** tudo que pertence à primeira release e como a entrega pode ser fatiada sem reduzir escopo.
+5. **Contratos canônicos:** state machines, schemas, prompts, policies, commands, erros, artifact kinds e arquitetura do runtime.
+6. **Taxonomia e roadmap:** como os domínios viram products, capacities e features.
+7. **Inventário e migração:** como skills, rules, KPs, templates, hooks e artefatos atuais entram no modelo Forge.
+8. **Riscos e próximos passos:** o que precisa ser refinado antes de decompor em épicos e histórias.
 
-1. **Tese do produto:** o que o Forge é e quais decisões são inegociáveis.
-2. **Diagnóstico:** como o `ia-dev-environment` funciona hoje e por que precisa evoluir.
-3. **Modelo futuro:** como a inversão de controle muda runtime, LLM, policies, telemetria e artefatos.
-4. **Inventário canônico:** o que existe hoje, classificado uma única vez por papel: commands/workers, policies, KPs, templates, artefatos e integrações.
-5. **Taxonomia de domínio:** como esses ativos entram em grupos coerentes de produto.
-6. **Roadmap:** Products, Capacities e Features.
-7. **Riscos e próximos passos:** o que precisa ser provado antes de transformar isso em épicos.
-
-Regra editorial desta versão: inventários detalhados continuam presentes porque são contexto estratégico, mas cada lista tem uma função clara. A lista de skills diz **qual papel cada skill terá no Forge**. A taxonomia diz **em qual domínio do produto esse papel vive**. Templates dizem **como artefatos são renderizados**. Artefatos dizem **o que aparece no disco e quem consome**.
+Regra editorial desta versão: a parte estratégica explica o **porquê**; os contratos explicam o **como**; o roadmap explica o **que será decomposto**; o inventário explica o **que será migrado**. Nenhuma seção deve depender de conhecimento implícito do leitor.
 
 ---
 
@@ -30,7 +29,7 @@ Regra editorial desta versão: inventários detalhados continuam presentes porqu
 
 ### 1.1. Princípio fundador — local-first, CLI-first
 
-O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A V0 é uma CLI, como o `ia-dev-env` é hoje. Toda interface gráfica (TUI, web console, dashboards, IDE extensions, SaaS) é parte da V0 e não bloqueia nenhuma capacidade do core.
+O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A CLI é a interface canônica, como o `ia-dev-env` é hoje, mas a V0 completa também inclui TUI, web console, dashboards, IDE extensions e SaaS opt-in. Essas interfaces consomem o mesmo core e não bloqueiam nenhuma capacidade local.
 
 | Decisão | Consequência |
 | --- | --- |
@@ -143,7 +142,7 @@ O que hoje é espalhado como texto e shell deve virar:
 
 ---
 
-## 3. Modelo Futuro do Forge
+## 3. Modelo Operacional do Forge
 
 ### 3.1. Arquitetura conceitual
 
@@ -1324,605 +1323,7 @@ Esses diagramas revelam a estrutura real do produto:
 
 ---
 
-## 4. Inventário Canônico de Ativos Atuais e Destino Forge
-
-Esta é a seção de preservação de contexto. Ela evita duplicação separando a pergunta em camadas:
-
-- **Skills/comandos/workers:** quem executa ou gera algo?
-- **Rules/policies:** quais invariantes precisam sobreviver?
-- **KPs:** qual conhecimento alimenta workers?
-- **Hooks/scripts:** quais invariantes shell precisam virar runtime?
-- **Templates:** quais estruturas renderizam artefatos?
-- **Artefatos:** o que aparece em disco e quem consome?
-
-### 4.1. Skills e comandos atuais, classificados uma única vez
-
-#### 4.1.1. Orquestradoras públicas — viram comandos Forge
-
-Estas skills controlam fluxo amplo. No Forge elas devem sair de markdown interpretado e virar comandos CLI com state machine, persistência, gates, telemetria, retries e saída estruturada.
-
-| Skill atual | Destino Forge V0 | Motivo |
-| --- | --- | --- |
-| `x-epic-implement` | `forge epic implement <ID>` | Implementação de épico em fases, waves, gates e PRs. |
-| `x-story-implement` | `forge story implement <ID>` | Lifecycle end-to-end de story: planning, task execution, PR, review, verify, report. |
-| `x-task-implement` | `forge task implement <ID>` | TDD double-loop, validações, commits e PR/task. |
-| `x-release` | `forge release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, tag e back-merge. |
-| `x-epic-orchestrate` | `forge epic orchestrate <ID>` | Planejamento multi-story com checkpoints e resume. |
-| `x-pr-merge-train` | `forge merge-train` | Ordenação topológica de PRs, waves, CI e merge. |
-| `x-review` | `forge review <STORY>` | Fan-out/fan-in de especialistas e consolidação. |
-| `x-review-pr` | `forge review pr <PR>` | Veredito Tech Lead GO/NO-GO. |
-| `x-story-refine` | `forge story refine <ID>` | Refinement multi-persona com verdict persistido. |
-| `x-epic-refine` | `forge epic refine <ID>` | Refinement estratégico de épico. |
-| `x-story-plan` | `forge story plan <ID>` | Planning wave, task breakdown, task plans e DoR. |
-| `x-feature-create` | `forge feature create <CAPACITY-CODE>` | Capacity/ideation → feature estruturada; epic/stories/map nascem depois de arquitetura aprovada. |
-| `x-feature-ideate` | `forge feature ideate` | Ideia livre → spec/backlog estruturado. |
-| `x-test-tdd` | `forge test tdd <TASK>` | Orquestra ciclos Red/Green/Refactor; LLM atua pontualmente. |
-
-#### 4.1.2. Orquestradoras auxiliares — comando público, subcomando avançado ou serviço
-
-Estas coordenam fluxo suficiente para não serem leaf prompts. A visibilidade pública deve ser decidida por UX, não por necessidade do LLM.
-
-| Skill auxiliar | Destino provável |
-| --- | --- |
-| `x-code-audit` | `forge code audit` ou parte de `forge ci verify`. |
-| `x-lib-audit-rules` | Serviço interno / `forge lint policy`. |
-| `x-doc-generate` | `forge doc generate` e fase interna de story/release. |
-| `x-template-migrate` | `forge template migrate`. |
-| `x-pr-create` | `forge pr create` e serviço interno de PR. |
-| `x-pr-fix` | `forge pr fix <PR>`. |
-| `x-pr-fix-epic` | `forge pr fix --epic <EPIC>`. |
-| `x-pr-watch-ci` | `forge pr watch <PR>` com exit codes tipados. |
-| `x-pr-merge` | `forge pr merge` ou serviço interno usado por merge-train/release. |
-| `x-git-push`, `x-git-commit`, `x-git-worktree`, `x-git-cleanup-branches` | Subcomandos `forge git ...` e serviços transacionais internos. |
-| `x-status-reconcile` | `forge status reconcile` para recovery/admin. |
-| `x-ci-generate` | `forge ci generate`. |
-| `x-setup-env` | `forge setup env` ou `forge doctor`. |
-| `x-perf-profile` | `forge perf profile`. |
-| `x-ops-troubleshoot` | `forge troubleshoot` ou worker acionado por falhas. |
-| `x-ops-incident` | Comando V0 de operação/incidente, também instalável como plugin ops quando o time quiser empacotar extensões. |
-| `x-jira-create-epic`, `x-jira-create-stories` | Plugins V0 `forge jira ...`; fora do core offline obrigatório, mas dentro do escopo V0 via marketplace/plugin opt-in. |
-| `x-adr-generate` | `forge adr generate` e fase interna de arquitetura. |
-| `x-owasp-scan`, `x-security-dashboard`, `x-security-pentest` | `forge security ...`, alguns condicionais por capability/permissão. |
-
-#### 4.1.3. Serviços internos — viram código testável
-
-Estas skills existem hoje porque o LLM precisava chamar componentes internos por nome. No Forge, elas viram classes, serviços ou funções.
-
-| Grupo interno | Skills atuais | Forma em Forge |
-| --- | --- | --- |
-| Gates | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | `PhaseGateService`, `StoryVerifyService`, `EpicIntegrityGate`. |
-| Estado e contexto | `x-internal-status-update`, `x-internal-story-resume`, `x-internal-story-load-context`, `x-internal-args-normalize` | Repositório de estado, loader de contexto, parser tipado de args. |
-| Planejamento | `x-internal-story-build-plan`, `x-internal-epic-build-plan`, `x-lib-task-decomposer` | Builders e dispatchers internos de workers. |
-| Renderização | `x-internal-report-write`, `x-internal-pr-body-render`, `x-internal-story-report` | Renderers tipados com templates versionados. |
-| Git/precheck | `x-internal-epic-branch-ensure`, `x-internal-worktree-precheck`, `x-lib-group-verifier` | Serviços de branch, worktree, locks e wave verification. |
-| Criação interna | `x-internal-epic-create`, `x-internal-story-create`, `x-internal-epic-map` | Factories/renderers de backlog e mapa. |
-
-#### 4.1.4. Skills puras — permanecem isoladas como workers, adapters ou comandos utilitários
-
-Estas já têm uma responsabilidade dominante. O Forge deve portá-las sem inflar escopo. Elas não devem ganhar state machine própria nem coordenar lifecycle amplo.
-
-| Grupo | Skills puras | Destino Forge |
-| --- | --- | --- |
-| `conditional/dev` | `x-setup-stack` | Adapter/comando de setup stack-specific. |
-| `conditional/ops` | `x-obs-instrument` | Worker/adapter de instrumentação. |
-| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-obs`, `x-review-security` | Workers especialistas que consomem KPs/policies. |
-| `conditional/security` | `x-security-container`, `x-security-dast`, `x-security-infra`, `x-security-sast`, `x-security-secrets`, `x-security-sonar` | Security adapters/workers por superfície. |
-| `conditional/test` | `x-test-contract-lint`, `x-test-contract`, `x-test-e2e`, `x-test-perf`, `x-test-smoke-api`, `x-test-smoke-socket` | Test adapters por categoria. |
-| `core/code` | `x-code-format`, `x-code-lint` | Adapters determinísticos de format/lint. |
-| `core/dev` | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Templates stack-specific + render command. |
-| `core/dev` | `x-ci-generate`, `x-mcp-recommend`, `x-setup-env`, `x-spec-drift` | CI renderer, advisor command, setup/doctor, drift report. |
-| `core/git` | `x-git-branch`, `x-git-cleanup-branches`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-planning-commit` | Git adapters transacionais. |
-| `core/jira` | `x-jira-create-epic`, `x-jira-create-stories` | Plugins Jira. |
-| `core/lib` | `x-lib-group-verifier`, `x-lib-task-decomposer` | Serviços internos reutilizáveis. |
-| `core/ops` | `x-doc-generate`, `x-doc-validate`, `x-ops-incident`, `x-ops-troubleshoot`, `x-perf-profile`, `x-release-changelog`, `x-status-reconcile`, `x-telemetry-analyze`, `x-telemetry-trend` | Docs, ops, profiling, changelog, telemetry commands. |
-| `core/plan` | `planning-standards-kp`, `x-adr-generate`, `x-arch-plan`, `x-arch-system-update`, `x-arch-update`, `x-parallel-eval`, `x-task-plan`, `x-template-migrate`, `x-threat-model` | KP, worker prompts, docs updates, validators e planners. |
-| `core/pr` | `x-pr-create`, `x-pr-fix`, `x-pr-merge`, `x-pr-watch-ci` | PR commands/services. |
-| `core/review` | `x-review-perf`, `x-review-pr`, `x-review-qa` | Review workers/commands. |
-| `core/security` | `x-dependency-audit`, `x-hardening-eval`, `x-owasp-scan`, `x-runtime-eval`, `x-security-dashboard`, `x-security-pipeline`, `x-supply-chain-audit` | Security commands/adapters. |
-| `core/test` | `x-test-plan`, `x-test-run` | Test plan worker + test runner adapter. |
-
-#### 4.1.5. Skills candidatas a virar KP, policy ou template
-
-| Ativo atual | Tipo-alvo provável | Justificativa |
-| --- | --- | --- |
-| `planning-standards-kp` | `knowledge-pack` | Já é uma fonte RA9; deve sair do catálogo de comandos. |
-| `x-mcp-recommend` | KP + advisor command | O catálogo de MCPs é conhecimento; o comando só aplica matching. |
-| Scaffolds (`spring-controller`, `quarkus-resource`, etc.) | `template` + render command | O valor principal é estrutura stack-specific. |
-| Review specialists | `worker-prompt` + KP/policy externo | O review permanece ação, mas critérios devem sair do prompt e virar KP/policy. |
-| `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | `policy` / gate service | São invariantes de lifecycle. |
-| `x-doc-validate` | Policy + command | O critério é policy; a execução é command/gate. |
-| `x-lib-audit-rules` | Registry/policy validator | Deve validar registry, rules e policies tipadas. |
-| `audit-*.sh`, `verify-*.sh`, `enforce-*.sh` | Policy executable | Não são skills; são invariantes que migram para runtime/CI. |
-
-### 4.2. Rules e policies
-
-| Domínio de rule atual | Exemplos atuais | Destino Forge |
-| --- | --- | --- |
-| Identidade, domínio e contexto | Rules 01, 02 | Doctrine humana + defaults de profile. |
-| Coding standards, arquitetura, quality gates | Rules 03, 04, 05 | Thresholds/limites viram policy; explicações viram KP. |
-| Segurança, operações, compliance | Rules 06, 07, conditional rules | Policy packs por domínio regulado + KP de referência. |
-| Branching, release, Git Flow | Rules 08, 09, 21 | Serviços de branch/release e CI de consistência. |
-| Skill invocation, visibility, capability grammar | Rules 13, 22, 28 | Registry/linter tipado; tool-call grammar vira schema/AST. |
-| Model selection e custo | Rule 23 | Policy no model router. |
-| Execution integrity e zero-bypass | Rules 24, 27 | Propriedade arquitetural do runtime; CI valida evidência. |
-| Task hierarchy e phase gates | Rule 25 | State machine + phase gate service. |
-| Audit lifecycle | Rule 26 | Biblioteca de auditoria; taxonomy curta em docs. |
-| Refinement e DoR | Rule 29 | Pré-condição nativa dos comandos de implementação. |
-| Documentation as DoD | Rule 31 | Policy de doc freshness + KP stack-aware. |
-
-Decisão: rules críticas ganham `policy_id`, versão, testes e ponto de execução claro: runtime, CI Camada B ou doctrine humana.
-
-### 4.3. Knowledge Packs
-
-| KP/domínio | Destino Forge | Consumo típico |
-| --- | --- | --- |
-| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `forge arch plan`, scaffolds, code workers. |
-| `coding-standards` | KP de engenharia + ponte para policies executáveis. | `forge task implement`, `forge review`, `forge code audit`. |
-| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `forge story plan`, `forge task plan`, `forge test tdd`. |
-| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `forge review security`, `forge threat model`, `forge ci verify`. |
-| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability runtime/infra. | `forge ops`, `forge review devops`, `forge perf profile`. |
-| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `forge review api`, `forge arch plan`, contract tests. |
-
-KP não deve ter side effect nem ser invocado como comando principal. Se houver UX de consulta, ela deve ser algo como `forge explain <topic>`, não um lifecycle step.
-
-### 4.4. Hooks e scripts de validação
-
-Os hooks e scripts atuais são importantes porque explicitam invariantes. Eles não devem sobreviver como mecanismo primário, mas seus contratos devem sobreviver como código.
-
-#### 4.4.1. Gatilhos atuais
-
-| Gatilho | Hooks/scripts envolvidos | Responsabilidade |
-| --- | --- | --- |
-| `SessionStart` | `telemetry-session.sh` | Abre trilha de telemetria da sessão. |
-| `PreToolUse` | `telemetry-pretool.sh`, `enforce-phase-sequence.sh`, `enforce-no-bypass-flags.sh`, `enforce-refinement-gate.sh`, `enforce-preflight-gates.sh` | Mede tool call e bloqueia fase inválida, bypass, ausência de refinement ou operação remota sem preflight. |
-| `PostToolUse` (`Write`/`Edit`) | `post-compile-check.sh` | Compila após edição Java. |
-| `PostToolUse` (`*`) | `telemetry-posttool.sh` | Fecha medição de tool call. |
-| `SubagentStop` | `telemetry-subagent.sh` | Registra encerramento de subagente. |
-| `Stop` | `telemetry-stop.sh`, `verify-story-completion.sh`, `verify-phase-gates.sh`, `enforce-continuous-flow.sh`, `stage-telemetry.sh` | Fecha sessão, verifica evidências, alerta gates e prepara telemetria. |
-| PR/CI/`mvn verify` | `scripts/audit-*.sh`, `*AuditTest.java` | Validação detectiva no repositório. |
-
-#### 4.4.2. Migração dos invariantes
-
-| Script/hook/família | Invariante | Destino Forge |
-| --- | --- | --- |
-| `enforce-phase-sequence.sh`, `verify-phase-gates.sh`, `audit-phase-gates.sh` | Não avançar fase sem filhos/evidências/gates passados. | `PhaseGateService` + testes + `forge ci verify`. |
-| `enforce-no-bypass-flags.sh`, `audit-bypass-flags.sh` | Bypass flags só em recovery. | Parser tipado de flags + policy de recovery. |
-| `enforce-refinement-gate.sh`, `audit-refinement-gate.sh` | Implementação exige refinement aprovado. | Pré-condição dos commands. |
-| `enforce-preflight-gates.sh`, `scripts/preflight.sh` | Operação remota exige estado local íntegro. | Preflight in-process antes de push/PR. |
-| `post-compile-check.sh` | Edição Java não deve quebrar compile. | Build adapter por stack. |
-| `verify-story-completion.sh`, `audit-execution-integrity.sh` | PR/story exige evidência completa. | Completion gate + CI Camada B. |
-| `enforce-continuous-flow.sh` | Orquestração não deve ficar parada em fase aberta. | Scheduler/state machine do runtime. |
-| `telemetry-*`, `telemetry-phase.sh`, `stage-telemetry.sh` | Eventos de sessão/tool/fase/subagente precisam ser emitidos. | Telemetria in-process + audit log local. |
-| `audit-doc-freshness.sh` | Doc-as-DoD. | Documentation policy + `forge doc validate`. |
-| `audit-template-version.sh`, `audit-flow-version.sh` | Templates e flowVersion precisam ser compatíveis. | Schema validators + migration assistant. |
-| `audit-epic-branches.sh` | Branching de epic precisa ser consistente. | Branch policy service. |
-| `audit-skill-visibility.sh`, `audit-model-selection.sh`, `audit-capability-graph.sh` | Registry, modelo e capability graph precisam ser íntegros. | Registry linter + resolver tipado. |
-
-Decisão: nenhum hook shell deve ser mecanismo primário da V0. Para cada hook/script removido, criar teste no Forge cobrindo o mesmo invariante e rodar dual-mode por 1 release.
-
-### 4.5. Templates
-
-Templates são estruturas reutilizáveis. Eles não são artefatos finais; eles definem a forma dos artefatos.
-
-| Família | Exemplos | Consumidores atuais | Destino Forge |
-| --- | --- | --- | --- |
-| Planning product | `_TEMPLATE-EPIC.md`, `_TEMPLATE-STORY.md`, `_TEMPLATE-TASK.md`, `_TEMPLATE-IMPLEMENTATION-MAP.md`, `_TEMPLATE-DOR-CHECKLIST.md` | Epic/story/feature creation, planning/refinement. | Template registry + schemas de backlog. |
-| Execution governance | `_TEMPLATE-IMPLEMENTATION-PLAN.md`, `_TEMPLATE-TASK-BREAKDOWN.md`, `_TEMPLATE-EPIC-EXECUTION-PLAN.md`, `_TEMPLATE-STORY-COMPLETION-REPORT.md`, `_TEMPLATE-EXECUTION-STATE.json`, `_TEMPLATE-REFINEMENT-VERDICT.md` | Story/epic implement, reports, status update. | Renderer determinístico + schemas para estado/evidência. |
-| Review governance | `_TEMPLATE-ARCHITECTURE-PLAN.md`, `_TEMPLATE-SPECIALIST-REVIEW.md`, `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`, `_TEMPLATE-TECH-LEAD-REVIEW.md`, `_TEMPLATE-REVIEW-REMEDIATION.md` | Review, review-pr, remediation. | Worker review templates + structured verdicts. |
-| Security, compliance, quality | `_TEMPLATE-SECURITY-ASSESSMENT.md`, `_TEMPLATE-COMPLIANCE-ASSESSMENT.md`, `_TEMPLATE-THREAT-MODEL.md`, `_TEMPLATE-SLO-SLI-DEFINITION.md`, `_TEMPLATE-TEST-PLAN.md` | Planning, threat model, test plan. | Security/testing templates tied to policies. |
-| Documentation | `_TEMPLATE-ADR.md`, `_TEMPLATE-ARCHITECTURE-SYSTEM.md`, `_TEMPLATE-DOC-VALIDATE-REPORT.md`, `_TEMPLATE-CONTRIBUTING.md`, `CLAUDE.md`, `SYSTEM_SPECS.md` | Docs generation, ADR, target adapters. | Generated documentation views. |
-| Observability/ops | `_TEMPLATE-TELEMETRY-EVENT.json`, `_TEMPLATE-TELEMETRY-REPORT.md`, runbooks | Telemetry hooks, telemetry analyze, ops skills. | Event schemas + report renderers. |
-| Git/PR/release | `_TEMPLATE-CHANGELOG-ENTRY.md`, `_TEMPLATE-RELEASE-CHECKLIST.md`, `_TEMPLATE-PR-IMPLEMENTATION.md`, `_TEMPLATE-PR-BACKLOG.md` | Release/changelog/PR body rendering. | Strict renderers with evidence schema. |
-| Meta-generator/infra | `_TEMPLATE-SKILL.md`, `constitution/*`, `domains/**`, `fragments/*`, `config-templates/*`, `cicd-templates/**/*.njk` | Generator, authoring, CI/CD assembler. | Template/profile/fragment registry. |
-
-Decisões:
-
-- Todo template ganha `template_id`, versão, categoria, input schema e consumidores.
-- JSON templates como `_TEMPLATE-EXECUTION-STATE.json` viram schemas, não texto copiado.
-- Templates `.njk`/YAML pertencem à composition engine, não ao lifecycle de skills.
-- Goldens continuam testes de regressão, não fonte de verdade.
-
-### 4.6. Artefatos padrão gerados
-
-Artefatos são instâncias persistidas no disco. A fonte de layout v4 é `ai/README.md`: `ai/epics/epic-XXXX-<slug>/` concentra épico, stories, planos, relatórios, telemetria e estado; `ai/releases/` guarda release state; `ai/runs/` guarda artefatos por sessão/execução. Fluxos legados podem usar `plans/epic-XXXX/`, mas a semântica é a mesma.
-
-#### 4.6.1. Raiz do épico
-
-| Artefato | Objetivo | Quem gera | Consumidores |
-| --- | --- | --- | --- |
-| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico. | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, builders internos. | Operadores, story creation, refinement, orchestrators, audits. |
-| `story-XXXX-YYYY.md` | Contrato implementável da story. | `x-story-create`, `x-epic-decompose`, builders internos. | `x-story-implement`, `x-task-implement`, reviews, CI. |
-| `IMPLEMENTATION-MAP.md` | DAG e fases entre stories. | `x-epic-map`, `x-feature-create`, `x-epic-decompose`. | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`. |
-| `execution-state.json` | Checkpoint de orquestração. | Orchestrators e status services. | Resume, phase gates, refinement gate, continuous flow, runtime Forge. |
-| `epic-execution-plan.md` | Plano materializado do épico. | Epic build plan / implement. | `x-epic-implement`, relatórios, auditoria humana. |
-| `epic-execution-report.md` | Encerramento agregado do épico. | `x-epic-implement`, report writer. | Release train, stakeholders, CI. |
-| `spec-*.md` | Entrada de decomposição. | Humano ou feature pipeline. | Epic/story creation, refinement. |
-
-#### 4.6.2. `plans/`
-
-| Artefato | Objetivo | Quem gera | Consumidores |
-| --- | --- | --- | --- |
-| `arch-story-*.md` | Plano arquitetural. | `x-arch-plan` / build-plan. | Implementação, `x-arch-update`, reviews, Surface 07. |
-| `plan-story-*.md` | Plano de implementação. | `x-internal-story-build-plan`. | Task implement, context loader, verify. |
-| `tests-story-*.md` | Plano TDD/TPP. | `x-test-plan` / build-plan. | Task implement, QA, coverage. |
-| `tasks-story-*.md` | Decomposição de tasks. | `x-lib-task-decomposer`. | Task implement, execution state. |
-| `plan-task-*.md` / `task-plan-TASK-*.md` | Plano por task. | `x-task-plan`, `x-story-plan`. | Task implement, parallel eval. |
-| `security-story-*.md` | Avaliação de segurança. | Build-plan Phase 1E. | Security review, compliance. |
-| `compliance-story-*.md` | Avaliação compliance. | Build-plan Phase 1F. | Compliance gates. |
-| `planning-report-story-*.md` / `story-planning-report-*.md` | Relatório de planejamento. | `x-story-plan`, `x-epic-orchestrate`. | DoR, resume, operadores. |
-| `dor-story-*.md` | Definition of Ready. | `x-story-plan`. | `x-epic-orchestrate`, planning gate. |
-| `review-*-story-*.md` | Review especialista. | `x-review`. | Dashboard, remediation, Surface 04. |
-| `review-dashboard-story-*.md` | Consolidação de reviews. | `x-review`. | Tech lead, story owner. |
-| `techlead-review-story-*.md` | Veredito GO/NO-GO. | `x-review-pr`. | Merge gate, Surface 05. |
-| `remediation-story-*.md` | Plano de correções pós-review. | Story implement remediation phase. | PR fixes, implementation. |
-
-O pacote de Fase 1 em fluxos zero-bypass é tipicamente: arch plan, implementation plan, test plan, task breakdown, security assessment e compliance assessment.
-
-#### 4.6.3. `reports/`
-
-| Artefato | Objetivo | Quem gera | Consumidores |
-| --- | --- | --- | --- |
-| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-story-report`. | Operadores, merge checklist, execution integrity audit. |
-| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-story-verify`. | CI, audits, Surface 03. |
-| `verify-envelope-epic-XXXX.json` | Verificação de épico. | `x-internal-epic-integrity-gate`. | CI, release. |
-| `dependency-audit-STORY-ID.md` | Evidência supply chain. | `x-dependency-audit`. | Security, PR evidence, Surface 08. |
-| `doc-validate-report-STORY-ID.md` | Evidência doc-as-DoD. | `x-doc-validate`. | Stop hook, CI doc freshness. |
-| `phase-report-epic-XXXX.md` | Relatório de fase. | `x-epic-implement`. | Epic orchestration, stakeholders. |
-| `epic-planning-report-XXXX.md` | Planejamento consolidado. | `x-epic-orchestrate`. | Equipe, resume/replanning. |
-
-#### 4.6.4. Telemetria, releases e adjacentes
-
-| Artefato | Objetivo | Quem gera | Consumidores |
-| --- | --- | --- | --- |
-| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; Forge runtime na V0. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
-| `ai/releases/release-state-X.Y.Z.json` | Estado monotônico de release. | `x-release`. | Próximo release, CI, operadores. |
-| `ai/runs/*` | Evidência por sessão/execução. | Ferramentas, hooks ou ops skills. | Troubleshooting/forensics. |
-| `tasks/task-TASK-*.md` | Contrato task-first. | `x-story-plan`, `x-task-plan`. | `x-task-implement`. |
-| `contracts/{STORY_ID}-*.yaml\|proto` | Contratos API-first. | Story implement Phase 0.5. | Contract lint, implementação, API review. |
-| `.claude/state/pr-watch-{PR}.json` | Estado de CI-watch. | `x-pr-watch-ci`. | Stop hook, operadores, Surface 06. |
-| PR body `## Orchestrator Evidence` | Ponte entre GitHub e evidências locais. | `x-pr-create`, PR body renderer. | Revisores, CI audit, Surface 11. |
-| `governance/baselines/*.txt` | Exceções explícitas. | Humanos/scripts de baseline. | CI auditors, hotfix exceptions. |
-
-Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autorizado e consumidores declarados. O runtime deixa de inferir por path e passa a validar contratos.
-
----
-
-## 5. Taxonomia Canônica de Domínios
-
-A taxonomia abaixo evita que o registry seja uma lista plana de skills. Um pacote pode conter policies, KPs, templates, commands e artifact kinds, desde que todos pertençam a um domínio coerente.
-
-| Domínio | O que governa | Policies | KPs | Commands/workers/artifacts |
-| --- | --- | --- | --- | --- |
-| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, limites. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-code-format`, `x-code-lint`, `x-code-audit`, review specialists. |
-| `architecture-standards` | Estrutura, camadas, APIs e decisões. | Dependency rules, architecture constraints. | `architecture`, `api-design`, `protocols`, `resilience`. | `x-arch-plan`, `x-arch-update`, scaffolds/templates. |
-| `security-compliance` | Segurança mínima e regulação. | Security baseline, compliance gates, SARIF, evidence. | `security`, `compliance`, overlays. | `x-owasp-scan`, `x-dependency-audit`, `x-supply-chain-audit`. |
-| `testing-quality` | Como provar comportamento. | Coverage, TDD, acceptance, smoke/contract rules. | `testing`, `story-planning`. | `x-test-plan`, `x-test-run`, `x-test-tdd`, contract/e2e/perf/smoke. |
-| `planning-product` | Como transformar intenção em backlog. | Refinement gate, DoR, value-driven templates, flow version. | `story-planning`, `planning-standards-kp`. | `x-story-plan`, `x-task-plan`, `x-feature-create`, templates backlog. |
-| `execution-governance` | Integridade, anti-bypass, phase gates, lifecycle. | Execution Integrity, Zero-bypass, Task Hierarchy, Audit Lifecycle. | Lifecycle guidance curta. | Orchestrators, internal gates, verify envelopes, reports. |
-| `git-release-pr` | Branches, commits, PRs, release. | Branching, release process, CI-watch, PR evidence. | Git/release workflow guidance. | `x-git-*`, `x-pr-*`, `x-release`, merge train. |
-| `documentation` | Documentação como DoD. | Doc freshness, ADR, changelog, system architecture. | Architecture docs, API docs, ADR/changelog knowledge. | `x-doc-generate`, `x-doc-validate`, `x-adr-generate`, reports. |
-| `observability-ops` | Telemetria, operação, incidentes. | Telemetry privacy, ops baseline. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | telemetry runtime, `x-telemetry-*`, `x-ops-*`, runbooks. |
-| `review-governance` | Critérios e vereditos de review. | Review evidence, GO/NO-GO schema. | Security, testing, architecture, API, observability. | `x-review`, `x-review-pr`, specialist reviews, dashboards. |
-| `capability-registry` | Como ativos são descritos e distribuídos. | Capability schema, visibility, model selection. | Governance authoring guidance. | registry linter, capability graph, frontmatter migration. |
-| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, provider boundaries. | MCP/Jira/GitHub/provider docs. | `x-mcp-recommend`, Jira commands, marketplace plugins. |
-
-Decisão de produto: essa taxonomia vira a navegação oficial do Forge para capability packaging, marketplace, documentação e `forge explain`.
-
----
-
-## 6. Roadmap de Produto
-
-### 6.1. Project
-
-**Project:** `Forge`
-
-Hierarquia: `Project → Product → Capacity → Feature`. A marcação indica release alvo:
-
-- `[V0]`: escopo completo deste plano. A ordem de implementação pode ser incremental, mas todas as features listadas abaixo pertencem à primeira release.
-
-### 6.2. Product P0 — Product Design & Architecture Design
-
-Camada inicial antes do épico. Garante que produto, capacidade, feature e arquitetura sistêmica existam como artefatos aprovados, versionados e sincronizados no GitHub antes de qualquer backlog técnico ser criado.
-
-#### P0.C1 — Ideation & Strategic Templates
-
-- P0.C1.F1 `[V0]`: `forge ideate --kind product|capacity|feature` para transformar ideia livre em template estruturado.
-- P0.C1.F2 `[V0]`: Templates versionados de Project, Product, Capacity e Feature com schema.
-- P0.C1.F3 `[V0]`: Approval workflow para Product, Capacity e Feature (`draft -> approved -> remote checkpoint`).
-- P0.C1.F4 `[V0]`: Multi-round ideation com personas e comparação de alternativas.
-
-#### P0.C2 — Product/Capacity/Feature Lifecycle
-
-- P0.C2.F1 `[V0]`: `forge product create|approve`.
-- P0.C2.F2 `[V0]`: `forge product propose-capacities`.
-- P0.C2.F3 `[V0]`: `forge capacity create|approve`.
-- P0.C2.F4 `[V0]`: `forge feature create|approve`.
-- P0.C2.F5 `[V0]`: Gate de predecessor remoto e worktree limpa antes de criar descendentes.
-
-#### P0.C3 — System Architecture Planning
-
-- P0.C3.F1 `[V0]`: `forge architecture plan product <PRODUCT-CODE>`.
-- P0.C3.F2 `[V0]`: Coleta obrigatória de NFRs mínimos (usuários, concorrência, latência, disponibilidade, volume, segurança).
-- P0.C3.F3 `[V0]`: `forge architecture plan capacity <CAPACITY-CODE>`.
-- P0.C3.F4 `[V0]`: `forge architecture plan feature <FEATURE-CODE>`.
-- P0.C3.F5 `[V0]`: Architecture Plans em três níveis (`architecture-product-*`, `architecture-capacity-*`, `architecture-feature-*`).
-- P0.C3.F6 `[V0]`: Gate `architecture-feature approved + remote-clean` antes de `forge epic create`.
-
-#### P0.C4 — Feature to Epic Generation
-
-- P0.C4.F1 `[V0]`: `forge epic create <FEATURE-CODE>` gera epic, stories e implementation map a partir da feature e do Architecture Plan.
-- P0.C4.F2 `[V0]`: Link bidirecional `Feature -> Architecture Plan -> Epic -> Stories`.
-- P0.C4.F3 `[V0]`: Versionamento Git/PR para backlog gerado.
-- P0.C4.F4 `[V0]`: Replanejamento incremental quando arquitetura ou feature mudam.
-
-### 6.3. Product P1 — Core Engine
-
-Evolução direta do gerador Java. Continua sendo fonte da verdade de composition/governance, mas passa a ser multi-target e multi-LLM.
-
-#### P1.C1 — Configuração & Profile Management
-
-- P1.C1.F1 `[V0]`: Schema unificado de profile com JSON-Schema versionado.
-- P1.C1.F2 `[V0]`: Migração assistida v5 (`ia-dev-env`) → v6 (`Forge`) com `forge migrate --from-iadev`.
-- P1.C1.F3 `[V0]`: Profile inheritance & overlays.
-- P1.C1.F4 `[V0]`: Detecção automática de stack.
-
-#### P1.C2 — Capability Composition v2
-
-- P1.C2.F1 `[V0]`: Capability resolver com cache local.
-- P1.C2.F2 `[V0]`: Frontmatter v4 com `provides:`.
-- P1.C2.F3 `[V0]`: Plug-in capabilities externas.
-- P1.C2.F4 `[V0]`: Composition diff & dry-run.
-
-#### P1.C3 — Artifact Generation Multi-Target
-
-- P1.C3.F1 `[V0]`: Target adapter `claude-code`.
-- P1.C3.F2 `[V0]`: Target adapter `cursor`.
-- P1.C3.F3 `[V0]`: Targets `windsurf`, `aider`, `gemini-cli`, `codex-cli`.
-- P1.C3.F4 `[V0]`: Target adapter `generic-mcp`.
-- P1.C3.F5 `[V0]`: Overlay system para customizações sem perder regen.
-
-#### P1.C4 — Multi-Stack & Multi-Language
-
-- P1.C4.F1 `[V0]`: Catálogo de stacks oficial.
-- P1.C4.F2 `[V0]`: Stack templates community-contributed.
-- P1.C4.F3 `[V0]`: Polyglot monorepos.
-- P1.C4.F4 `[V0]`: Reutilização de KPs via taxonomia comum.
-
-### 6.4. Product P2 — Orchestration Runtime
-
-Produto-âncora da V0. Substitui markdown interpretado por state machines em código.
-
-#### P2.C0 — Comandos orquestradores nativos
-
-- P2.C0.F1 `[V0]`: `forge epic implement <ID>`.
-- P2.C0.F2 `[V0]`: `forge story implement <ID>`.
-- P2.C0.F3 `[V0]`: `forge task implement <ID>`.
-- P2.C0.F4 `[V0]`: `forge story refine <ID>` / `forge epic refine <ID>`.
-- P2.C0.F5 `[V0]`: `forge review <STORY>` / `forge review pr <PR>`.
-- P2.C0.F6 `[V0]`: `forge release`.
-- P2.C0.F7 `[V0]`: `forge epic orchestrate <ID>`.
-- P2.C0.F8 `[V0]`: `forge merge-train`.
-- P2.C0.F9 `[V0]`: `forge pr watch <PR>`.
-- P2.C0.F10 `[V0]`: `forge pr fix <PR>` / `forge pr fix-epic <EPIC>`.
-- P2.C0.F11 `[V0]`: `forge pipeline run <COMMAND>`.
-- P2.C0.F12 `[V0]`: Headless mode em todos os comandos.
-
-#### P2.C1 — Agent Lifecycle Service
-
-- P2.C1.F1 `[V0]`: State machine local.
-- P2.C1.F2 `[V0]`: Pause/resume de orquestração.
-- P2.C1.F3 `[V0]`: Resume cross-machine.
-- P2.C1.F4 `[V0]`: Fan-out/fan-in declarativo.
-
-#### P2.C2 — Task Hierarchy & Phase Gates v2
-
-- P2.C2.F1 `[V0]`: Task tree como entidade de primeira classe.
-- P2.C2.F2 `[V0]`: Phase gates tipados em código.
-- P2.C2.F3 `[V0]`: Pré-condições in-process antes de efeitos colaterais.
-- P2.C2.F4 `[V0]`: Gates customizáveis por org.
-- P2.C2.F5 `[V0]`: Replay determinístico de execução.
-
-#### P2.C3 — LLM Abstraction Layer
-
-- P2.C3.F1 `[V0]`: Provider abstraction.
-- P2.C3.F2 `[V0]`: Model routing dinâmico.
-- P2.C3.F3 `[V0]`: Fallback automático.
-- P2.C3.F4 `[V0]`: Custo por execução em tempo real.
-
-#### P2.C4 — Reliability & Replay
-
-- P2.C4.F1 `[V0]`: Determinismo controlado.
-- P2.C4.F2 `[V0]`: Snapshot de contexto local.
-- P2.C4.F3 `[V0]`: Idempotência por comando/skill.
-- P2.C4.F4 `[V0]`: File locking local.
-
-### 6.5. Product P3 — Developer Experience
-
-CLI primária; TUI, IDE e web UI são camadas incluídas na V0.
-
-#### P3.C1 — CLI v2
-
-- P3.C1.F1 `[V0]`: `forge` CLI unificado.
-- P3.C1.F2 `[V0]`: Saída estruturada.
-- P3.C1.F3 `[V0]`: `forge repl`.
-- P3.C1.F4 `[V0]`: `forge migrate`.
-- P3.C1.F5 `[V0]`: `forge init`.
-
-#### P3.C2 — TUI & Local UI
-
-- P3.C2.F1 `[V0]`: `forge tui`.
-- P3.C2.F2 `[V0]`: `forge watch`.
-- P3.C2.F3 `[V0]`: `forge ui` local.
-- P3.C2.F4 `[V0]`: Editor visual de rules/skills.
-
-#### P3.C3 — IDE Extensions
-
-- P3.C3.F1 `[V0]`: Extensão VS Code.
-- P3.C3.F2 `[V0]`: Extensão JetBrains.
-- P3.C3.F3 `[V0]`: Painel inline de evidências.
-- P3.C3.F4 `[V0]`: Auto-complete de profile/capabilities.
-
-#### P3.C4 — Onboarding & Time-to-Value
-
-- P3.C4.F1 `[V0]`: `forge init` com 5-7 perguntas.
-- P3.C4.F2 `[V0]`: Templates por persona.
-- P3.C4.F3 `[V0]`: Tutorial guiado in-IDE.
-- P3.C4.F4 `[V0]`: `forge doctor`.
-
-### 6.6. Product P4 — Knowledge & Marketplace
-
-Ecossistema compartilhado, opt-in e network-required; core funciona offline com cache embarcado.
-
-#### P4.C1 — Skill Marketplace
-
-- P4.C1.F1 `[V0]`: Registry central ou self-hosted.
-- P4.C1.F2 `[V0]`: SemVer obrigatório.
-- P4.C1.F3 `[V0]`: Dependency resolution.
-- P4.C1.F4 `[V0]`: Trust model com assinatura e sandbox.
-- P4.C1.F5 `[V0]`: Compatibility matrix por modelo/provider.
-
-#### P4.C2 — Rule & Governance Library
-
-- P4.C2.F1 `[V0]`: Rule packs por domínio.
-- P4.C2.F2 `[V0]`: Rule simulator.
-- P4.C2.F3 `[V0]`: Rule conflict detector.
-- P4.C2.F4 `[V0]`: Custom rule authoring.
-
-#### P4.C3 — Template & Profile Catalog
-
-- P4.C3.F1 `[V0]`: Catálogo de profiles oficial/community.
-- P4.C3.F2 `[V0]`: Rating e usage stats.
-- P4.C3.F3 `[V0]`: `forge profile fork`.
-- P4.C3.F4 `[V0]`: Profile lineage.
-
-#### P4.C4 — Cross-Project Intelligence
-
-- P4.C4.F1 `[V0]`: Padrões agregados anonimizados.
-- P4.C4.F2 `[V0]`: Recommendation engine.
-- P4.C4.F3 `[V0]`: Drift detection cross-repo.
-- P4.C4.F4 `[V0]`: Knowledge graph navegável.
-
-### 6.7. Product P5 — Observability, Analytics & FinOps
-
-V0 entrega observabilidade local, streaming remoto opt-in, dashboards, alerting, analytics e FinOps. O caminho feliz continua local-first, mas as integrações remotas já fazem parte da release.
-
-#### P5.C1 — Local & Real-Time Telemetry
-
-- P5.C1.F1 `[V0]`: Captura local NDJSON + queries CLI.
-- P5.C1.F2 `[V0]`: Streaming opt-in para OTLP/Datadog/custom HTTP.
-- P5.C1.F3 `[V0]`: Dashboard live de execução.
-- P5.C1.F4 `[V0]`: Alerting.
-- P5.C1.F5 `[V0]`: Trace OTel-compatible.
-
-#### P5.C2 — Quality & Compliance Metrics
-
-- P5.C2.F1 `[V0]`: Coverage longitudinal.
-- P5.C2.F2 `[V0]`: Refinement quality score.
-- P5.C2.F3 `[V0]`: Doc freshness heatmap.
-- P5.C2.F4 `[V0]`: Compliance posture report.
-
-#### P5.C3 — FinOps & Cost Insights
-
-- P5.C3.F1 `[V0]`: Custo de LLM por skill/story/epic/org.
-- P5.C3.F2 `[V0]`: Sugestão de model downgrade.
-- P5.C3.F3 `[V0]`: Budget guardrails locais.
-- P5.C3.F4 `[V0]`: Comparativo por provider.
-
-#### P5.C4 — Research & Benchmarking
-
-- P5.C4.F1 `[V0]`: A/B testing de skills.
-- P5.C4.F2 `[V0]`: Benchmark suite.
-- P5.C4.F3 `[V0]`: Regression detection.
-- P5.C4.F4 `[V0]`: Public leaderboard opt-in.
-
-### 6.8. Product P6 — Governance, Security & Trust
-
-P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, compliance, threat modeling, supply chain e cloud trust.
-
-#### P6.C1 — Audit & Compliance Engine
-
-- P6.C1.F1 `[V0]`: Audit log local imutável.
-- P6.C1.F2 `[V0]`: Evidence vault local.
-- P6.C1.F3 `[V0]`: Reports SOC2 / ISO 27001 / LGPD.
-- P6.C1.F4 `[V0]`: Forensics.
-- P6.C1.F5 `[V0]`: CI Camada B com `forge ci verify`.
-
-#### P6.C2 — Refinement & Quality Gates v2
-
-- P6.C2.F1 `[V0]`: AI-assisted refinement.
-- P6.C2.F2 `[V0]`: Refinement memory.
-- P6.C2.F3 `[V0]`: Refinement templates por domínio.
-- P6.C2.F4 `[V0]`: NO-GO library.
-
-#### P6.C3 — Security Posture & Threat Modeling
-
-- P6.C3.F1 `[V0]`: Continuous threat modeling.
-- P6.C3.F2 `[V0]`: SBOM gerado e validado.
-- P6.C3.F3 `[V0]`: Secret scanning integrado.
-- P6.C3.F4 `[V0]`: Supply chain trust score.
-
-#### P6.C4 — Privacy, Multi-Tenancy & RBAC
-
-- P6.C4.F1 `[V0]`: Multi-tenant.
-- P6.C4.F2 `[V0]`: RBAC.
-- P6.C4.F3 `[V0]`: Data residency.
-- P6.C4.F4 `[V0]`: PII scrubbing para telemetria remota.
-
----
-
-## 7. Alterações Estruturais Necessárias
-
-| # | Mudança | De | Para | Risco / mitigação |
-| --- | --- | --- | --- | --- |
-| 0 | Inversão de controle | LLM orquestra; hooks tentam bloquear bypass. | Forge orquestra; LLM é worker. | Portar 1 orquestrador por vez e validar dual-mode. |
-| 1 | Harness abstraction | Claude Code only. | Claude Code, Cursor, Windsurf, Aider, generic MCP. | Começar com Claude Code + Cursor. |
-| 2 | LLM abstraction | Anthropic-only. | Claude/GPT/Gemini/local. | Prompt matrix por provider. |
-| 3 | Governança como código | Rules markdown. | Policies executáveis. | Começar com YAML+JSONLogic para rules críticas. |
-| 4 | Output do generator | Regen-only. | Overlay system. | 3-way merge declarativo + `forge doctor`. |
-| 5 | Telemetria | NDJSON via hooks. | Runtime telemetry + OTel-compatible. | Importer para histórico. |
-| 6 | Distribuição de skills | Copy in-repo. | Marketplace/cache local versionado. | Assinatura, sandbox e core offline. |
-| 7 | Multi-projeto | Repos isolados. | Opt-in cross-project intelligence. | Differential privacy e local-only default. |
-| 8 | Multi-tenancy | N/A. | RBAC/cloud opt-in na V0. | Caminho feliz local single-user; cloud multi-tenant não pode virar pré-requisito. |
-| 9 | Backward compat | Flow versions legados. | Migration assistant. | Testar contra profiles e epics canônicos. |
-| 10 | OSS vs commercial | 100% OSS hoje. | Core OSS + cloud paid. | Linha clara desde o dia 1. |
-| 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
-| 12 | Rules engine | Prosa interpretada. | Policy engine + CI check. | Migrar só o que é realmente enforceable primeiro. |
-
----
-
-## 8. Riscos Transversais
-
-### 8.1. Técnicos
-
-- **Performance da composition em escala.** Com plugins externos, pode crescer de centenas para milhares de artefatos. Cache local é V0.
-- **Determinismo cross-LLM.** Separar composição determinística de conteúdo criativo gerado por LLM.
-- **Estado distribuído.** A V0 precisa suportar local single-user, resume cross-machine e colaboração, preservando Git/Markdown como fonte canônica e SQLite/blob store como projeções locais.
-- **Trace OTel.** Migrar `events.ndjson` sem quebrar análises atuais.
-- **Migração de hooks.** Perda de invariante é o maior risco. Dual-mode e testes por script mitigam.
-
-### 8.2. Produto
-
-- **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `forge init` e `forge doctor` são centrais.
-- **Adoption friction.** Usuários com histórico de epics 0001-0071 precisam migrar sem perder evidência.
-- **Marketplace cold-start.** Portar todos os ativos oficiais atuais como cache local embarcado.
-- **Modelo de pricing.** Core local-first deve permanecer gratuito; cloud/marketplace/observability podem ser pagos.
-
-### 8.3. Compliance e segurança
-
-- **LGPD/GDPR para telemetria remota.** Scrubbing client-side e opt-in granular.
-- **Supply chain do marketplace.** SBOM, signing, sandbox, trust score.
-- **Auditabilidade legal.** Audit log local imutável começa na V0.
-- **Cost-attack vector.** Budget guardrails por skill/provider.
-
-### 8.4. Estratégia
-
-- **Posicionamento.** Diferenciar por governance-first, evidence-first, local-first e multi-LLM.
-- **OSS strategy.** Core Apache 2.0 é bom candidato; cloud/commercial separado.
-- **Contribuição.** Extension points limpos: target adapter, capability, policy pack, template pack, plugin.
-
----
-
-## 9. V0 Completa
+## 4. Escopo da V0 Completa
 
 A V0 completa precisa entregar todo o diferencial do Forge: controle local-first, runtime determinístico, LLM como worker, evidências verificáveis, marketplace, UI local, IDEs, analytics, compliance, multi-tenancy opt-in e operação cloud sem comprometer o caminho feliz offline.
 
@@ -1952,11 +1353,11 @@ Se esse spike falhar, o plano inteiro precisa ser revisto antes de criar épicos
 
 ---
 
-## 10. Contratos Implementáveis da V0
+## 5. Contratos Canônicos da V0
 
-Esta seção transforma a estratégia em contratos próximos de implementação. Ela não substitui o refinement futuro, mas reduz ambiguidade: cada épico derivado da V0 deve apontar para um contrato abaixo, declarar o recorte que entrega e preservar os estados, erros, evidências e invariantes definidos aqui.
+Esta seção transforma a tese, o modelo operacional e o escopo da V0 em contratos próximos de implementação. Ela não substitui o refinement futuro, mas reduz ambiguidade: cada épico derivado da V0 deve apontar para um contrato abaixo, declarar o recorte que entrega e preservar os estados, erros, evidências e invariantes definidos aqui.
 
-### 10.1. Contrato fechado da V0
+### 5.1. Contrato fechado da V0
 
 A V0 deve entregar o Forge inteiro conforme este plano. Ela precisa provar a fatia vertical completa e também incluir as capacidades avançadas de produto, runtime, marketplace, UI, analytics, segurança e operação: o Forge controla um fluxo local, chama LLM como worker, persiste estado, aplica gates em código, produz evidência verificável e consegue retomar execução.
 
@@ -1971,7 +1372,7 @@ A V0 deve entregar o Forge inteiro conforme este plano. Ela precisa provar a fat
 | Migração | Leitura/importação do layout atual `ia-dev-env`, dual-mode controlado, migração assistida e validação de compatibilidade sem reescrita manual dos artefatos existentes. |
 | CI/Cloud | `forge ci verify` como Camada B, marketplace assinado, SaaS opt-in, multi-tenancy, RBAC, data residency e telemetria remota com PII scrubbing. |
 
-Escopo obrigatório da V0:
+Escopo obrigatório da V0 inclui explicitamente:
 
 - SaaS, multi-tenancy, RBAC organizacional e marketplace remoto.
 - Dashboard web, IDE extension completa ou TUI rica.
@@ -1990,7 +1391,7 @@ Métricas de sucesso:
 | Debuggability | Qualquer falha retorna error code tipado, fase, artifact path e próxima ação sugerida. |
 | Migração | Um repo `ia-dev-env` atual passa em `forge doctor --from-iadev` com plano de migração claro. |
 
-### 10.2. Vertical slice recomendado
+### 5.2. Vertical slice recomendado
 
 O primeiro slice continua sendo a ordem recomendada de implementação, mas não limita escopo. A V0 completa inclui todos os produtos, capacities e features do roadmap.
 
@@ -2025,7 +1426,7 @@ Recorte sugerido:
 
 Critério de corte: todas as features deste plano pertencem à V0. A ordem pode ser incremental, mas o escopo de release permanece completo.
 
-### 10.3. State machines canônicas
+### 5.3. State machines canônicas
 
 Estados devem ser enums de domínio, não strings livres em markdown. Cada transição precisa declarar comando autorizado, pré-condições e evidências geradas.
 
@@ -2050,34 +1451,11 @@ Regras gerais:
 - `BLOCKED` precisa declarar dependency ou policy que bloqueou.
 - `REMOTE_CHECKPOINTED` exige SHA remoto verificável.
 
-### 10.4. Schemas canônicos de artefatos e prompts
+### 5.4. Schemas canônicos de artefatos e prompts
 
-Todo artefato estratégico do Forge deve ser um arquivo Markdown com frontmatter YAML. O frontmatter é o contrato tipado consumido pelo runtime, pelo índice SQLite, pelo blob store, pelas policies e pelo CI. O corpo Markdown é o contrato semântico consumido por humanos e usado pelo Forge para montar contexto de LLM.
+Todo artefato estratégico do Forge deve seguir o mesmo padrão: **arquivo Markdown com frontmatter YAML**. O YAML é o contrato tipado para runtime, SQLite, blob store, policies, CI e migração. O corpo Markdown é o contrato semântico para humanos e LLMs.
 
-Regra central: YAML decide identidade, estado, relações, NFRs, lineage e validação; Markdown explica intenção, problema, decisões, comportamento esperado e trade-offs.
-
-Formato canônico:
-
-```md
----
-artifact_kind: forge.feature
-schema_version: 1
-id: FEAT-Forge-STORY-RUNTIME
-slug: story-runtime
-title: Story Runtime Orchestration
-status: READY_FOR_EPIC
-# demais campos tipados do artifact_kind
----
-# Story Runtime Orchestration
-
-## Problem
-
-Texto descritivo para humanos e LLMs.
-
-## Desired Behavior
-
-Texto com comportamento esperado, decisões e exemplos.
-```
+Regra central: YAML decide identidade, estado, relações, NFRs, lineage e validação; Markdown explica intenção, problema, decisões, comportamento esperado, exemplos e trade-offs. O Forge nunca deve depender apenas de prose para aplicar gates, e a LLM nunca deve depender apenas de IDs para entender contexto.
 
 Campos comuns a todos os artefatos:
 
@@ -2092,12 +1470,12 @@ Campos comuns a todos os artefatos:
 | `parent` | Relação ascendente direta. | Lineage, freshness, criação de descendentes. |
 | `lineage` | Origem, gerador, artefatos fonte, filhos e checkpoints. | Evidence Ledger, rebuild, auditoria. |
 | `body_contract` | Seções Markdown obrigatórias para o tipo. | LLM context builder, doc validator. |
-| `llm_context` | Como o Forge deve transformar o artefato em contexto de prompt. | AI Workers, prompt renderer. |
+| `llm_context` | Como o Forge transforma o artefato em contexto de prompt. | AI Workers, prompt renderer. |
 | `remote_checkpoint` | Branch, SHA, PR e estado remoto aprovado. | Git adapter, CI, recovery. |
 
-#### 10.4.1. Product
+#### 5.4.1. Product
 
-`product-*.md` descreve o produto como unidade de valor. Ele precisa carregar contexto suficiente para orientar capacities, features, arquitetura, métricas e trade-offs comerciais.
+`product-*.md` descreve o produto como unidade de valor. Ele orienta capacities, features, arquitetura, métricas e trade-offs comerciais.
 
 ```yaml
 artifact_kind: forge.product
@@ -2136,7 +1514,7 @@ body_contract:
     - Success Metrics
     - Constraints
 llm_context:
-  summary: "Forge is the product that owns governed AI-assisted delivery."
+  summary: "Forge owns governed AI-assisted delivery."
   include_sections:
     - Problem
     - Value Proposition
@@ -2147,7 +1525,7 @@ remote_checkpoint:
   pr: "<pr-url>"
 ```
 
-#### 10.4.2. Capacity
+#### 5.4.2. Capacity
 
 `capacity-*.md` descreve uma capacidade de produto/plataforma. Ela é maior que uma feature e menor que o produto inteiro.
 
@@ -2192,7 +1570,7 @@ body_contract:
     - Events
 ```
 
-#### 10.4.3. Feature
+#### 5.4.3. Feature
 
 `feature-*.md` precisa conter contexto completo de produto, comportamento, fronteiras, NFRs e critérios de aceite. Ele não deve ser apenas um envelope técnico.
 
@@ -2276,9 +1654,9 @@ remote_checkpoint:
   pr: "<pr-url>"
 ```
 
-#### 10.4.4. Architecture Plan
+#### 5.4.4. Architecture Plan
 
-`architecture-*.md` registra decisões sistêmicas para product, capacity ou feature. Ele precisa ser linkável e reusável por epic/story/task.
+`architecture-*.md` registra decisões sistêmicas para product, capacity ou feature. Ele precisa ser linkável e reusável por epic, story e task.
 
 ```yaml
 artifact_kind: forge.architecture_plan
@@ -2323,61 +1701,33 @@ body_contract:
     - Readiness Checklist
 ```
 
-#### 10.4.5. Epic
+#### 5.4.5. Epic, Story e Task
 
-`epic-*.md` é o pacote implementável derivado de uma feature aprovada e de um architecture plan aprovado.
+`epic-*.md`, `story-*.md` e `task-*.md` formam a cadeia implementável. Epic agrupa o pacote de entrega, Story descreve comportamento verificável, Task é a unidade atômica de TDD/commit.
 
 ```yaml
 artifact_kind: forge.epic
 schema_version: 1
 id: EPIC-Forge-0001
-slug: story-runtime-implementation
-title: Implement Story Runtime Orchestration
 status: BACKLOG_READY
 parent:
   feature_id: FEAT-Forge-STORY-RUNTIME
   architecture_plan_id: ARCH-FEAT-Forge-STORY-RUNTIME
-lineage:
-  created_by: forge epic create
-  source_artifacts:
-    - FEAT-Forge-STORY-RUNTIME
-    - ARCH-FEAT-Forge-STORY-RUNTIME
 story_index:
   - id: STORY-Forge-0001
     title: Define story runtime state machine
     depends_on: []
-  - id: STORY-Forge-0002
-    title: Persist evidence envelopes
-    depends_on:
-      - STORY-Forge-0001
 dod:
   required_artifacts:
     - forge.artifact.implementation-map
     - forge.artifact.epic-execution-report
     - forge.artifact.verify-envelope
-policies:
-  required:
-    - POLICY-Forge-REFINEMENT-GATE
-    - POLICY-Forge-EXECUTION-INTEGRITY
-body_contract:
-  required_sections:
-    - Goal
-    - Scope
-    - Story Index
-    - Cross-Cutting Rules
-    - Definition of Done
 ```
-
-#### 10.4.6. Story
-
-`story-*.md` é a menor fatia de comportamento implementável e verificável. Ele deve ter contexto suficiente para gerar tasks e testes.
 
 ```yaml
 artifact_kind: forge.story
 schema_version: 1
 id: STORY-Forge-0001
-slug: story-runtime-state-machine
-title: Define Story Runtime State Machine
 status: REFINEMENT_REQUIRED
 parent:
   epic_id: EPIC-Forge-0001
@@ -2391,40 +1741,14 @@ acceptance_criteria:
     given: "a refined story and approved implementation map"
     when: "forge story implement starts"
     then: "Forge records phase state before invoking any LLM worker"
-contracts:
-  inputs:
-    - STORY-ID
-    - implementation-map
-    - architecture-plan
-  outputs:
-    - story-completion-report
-    - verify-envelope
-dependencies:
-  stories: []
-  policies:
-    - POLICY-Forge-REFINEMENT-GATE
 task_ids:
   - TASK-Forge-0001-001
-  - TASK-Forge-0001-002
-body_contract:
-  required_sections:
-    - User Value
-    - Acceptance Criteria
-    - Contracts
-    - Dependencies
-    - Task Breakdown
 ```
-
-#### 10.4.7. Task
-
-`task-*.md` é a unidade atômica do loop TDD e do commit semântico.
 
 ```yaml
 artifact_kind: forge.task
 schema_version: 1
 id: TASK-Forge-0001-001
-slug: story-runtime-domain-model
-title: Create Story Runtime Domain Model
 status: READY
 parent:
   story_id: STORY-Forge-0001
@@ -2434,8 +1758,6 @@ execution:
   expected_files:
     write:
       - java/src/main/java/dev/forge/deliveryorchestration/domain/StoryRuntime.java
-    read:
-      - docs/forge-strategic-plan-v3.md
 io_contract:
   inputs:
     - refined story schema
@@ -2444,121 +1766,14 @@ io_contract:
     - domain model
     - unit tests
 completion:
-  tests:
-    - StoryRuntimeTest
   evidence:
     - forge.artifact.task-commit
     - forge.artifact.verify-envelope
-body_contract:
-  required_sections:
-    - Objective
-    - Inputs
-    - Outputs
-    - TDD Plan
-    - Completion Criteria
 ```
 
-#### 10.4.8. Policy e guideline
+#### 5.4.6. Rules, KPs e skills no modelo canônico
 
-Rules atuais se dividem em `forge.policy` quando são executáveis e `forge.guideline` quando são doutrina para humanos/LLMs.
-
-```yaml
-artifact_kind: forge.policy
-schema_version: 1
-id: POLICY-Forge-REFINEMENT-GATE
-slug: refinement-gate
-title: Refinement Gate
-status: ACTIVE
-enforcement:
-  points:
-    - command: forge story implement
-      phase: preflight
-    - command: forge epic implement
-      phase: preflight
-  failure_code: REFINEMENT_REQUIRED
-inputs:
-  required_fields:
-    - story.status
-    - story.refinement_verdict.status
-rule:
-  expression_language: jsonlogic
-  expression:
-    and:
-      - { "==": [{ "var": "story.status" }, "REFINED"] }
-      - { "==": [{ "var": "story.refinement_verdict.status" }, "approved"] }
-evidence:
-  emits:
-    - forge.artifact.policy-decision
-body_contract:
-  required_sections:
-    - Intent
-    - Enforcement Points
-    - Failure Modes
-    - Recovery
-```
-
-```yaml
-artifact_kind: forge.guideline
-schema_version: 1
-id: GUIDE-Forge-CODING-STANDARDS
-slug: coding-standards
-title: Coding Standards Guidance
-status: ACTIVE
-applies_to:
-  domains:
-    - engineering-standards
-used_by:
-  prompts:
-    - PROMPT-Forge-CODE-GENERATE
-    - PROMPT-Forge-CODE-REVIEW
-body_contract:
-  required_sections:
-    - Principles
-    - Examples
-    - Anti-Patterns
-```
-
-#### 10.4.9. Knowledge Pack
-
-KPs viram artefatos de conhecimento versionados, indexáveis e citáveis pelo prompt builder.
-
-```yaml
-artifact_kind: forge.knowledge_pack
-schema_version: 1
-id: KP-Forge-STORY-PLANNING
-slug: story-planning
-title: Story Planning Knowledge Pack
-status: ACTIVE
-domain: planning-product
-applies_to:
-  artifact_kinds:
-    - forge.story
-    - forge.task
-used_by:
-  prompts:
-    - PROMPT-Forge-STORY-REFINE
-    - PROMPT-Forge-TASK-PLAN
-sections:
-  - id: decomposition
-    title: Story Decomposition
-  - id: acceptance-criteria
-    title: Acceptance Criteria
-  - id: dependency-mapping
-    title: Dependency Mapping
-retrieval:
-  default_mode: section-aware
-  max_tokens_per_prompt: 4000
-body_contract:
-  required_sections:
-    - Principles
-    - Procedures
-    - Examples
-    - Checklists
-```
-
-#### 10.4.10. Skills viram prompts, commands, adapters ou policies
-
-No Forge, `skill` deixa de ser um contrato externo para a LLM. Para a LLM, existe apenas prompt renderizado, contexto e schema de saída. `Skill` pode continuar como termo de migração interna, mas o registry canônico usa tipos mais precisos:
+Rules atuais se dividem em `forge.policy` quando são executáveis e `forge.guideline` quando são doutrina para humanos/LLMs. KPs viram `forge.knowledge_pack`. Skills deixam de ser contrato externo para LLM: para a LLM existe apenas prompt renderizado, contexto e schema de saída.
 
 | Skill atual | Forma canônica no Forge | Exemplo |
 | --- | --- | --- |
@@ -2569,16 +1784,10 @@ No Forge, `skill` deixa de ser um contrato externo para a LLM. Para a LLM, exist
 | Ensina contexto, sem side effects | `forge.knowledge_pack` ou `forge.guideline` | `testing`, `security`, `architecture`. |
 | Define forma de output | `forge.template` | `_TEMPLATE-STORY.md`. |
 
-#### 10.4.11. Prompt
-
-`forge.prompt` é o artefato que substitui as skills LLM-facing. Ele declara entrada, contexto, modelo, saída esperada e critérios de aceitação. O Forge renderiza o prompt final e valida a resposta.
-
 ```yaml
 artifact_kind: forge.prompt
 schema_version: 1
 id: PROMPT-Forge-STORY-REFINE
-slug: story-refine
-title: Story Refinement Prompt
 status: ACTIVE
 worker_kind: refinement
 model_requirements:
@@ -2595,58 +1804,57 @@ context_requirements:
     - KP-Forge-TESTING
   policies:
     - POLICY-Forge-REFINEMENT-GATE
-  include_markdown_sections:
-    - User Value
-    - Acceptance Criteria
-    - Contracts
 output_schema: SCHEMA-Forge-REFINEMENT-VERDICT-v1
-validation:
-  reject_if:
-    - output_missing_required_fields
-    - ungrounded_scope_change
-body_contract:
-  required_sections:
-    - System Role
-    - Task
-    - Context Assembly Rules
-    - Output Contract
-    - Rejection Criteria
 ```
 
-#### 10.4.12. Template
+```yaml
+artifact_kind: forge.policy
+schema_version: 1
+id: POLICY-Forge-REFINEMENT-GATE
+status: ACTIVE
+enforcement:
+  points:
+    - command: forge story implement
+      phase: preflight
+  failure_code: REFINEMENT_REQUIRED
+inputs:
+  required_fields:
+    - story.status
+    - story.refinement_verdict.status
+```
 
-Templates são renderizadores tipados, não apenas arquivos copiáveis.
+```yaml
+artifact_kind: forge.knowledge_pack
+schema_version: 1
+id: KP-Forge-STORY-PLANNING
+status: ACTIVE
+domain: planning-product
+used_by:
+  prompts:
+    - PROMPT-Forge-STORY-REFINE
+retrieval:
+  default_mode: section-aware
+  max_tokens_per_prompt: 4000
+```
+
+#### 5.4.7. Template, command, adapter, plugin e artifact schema
+
+Templates são renderizadores tipados. Commands são entrada pública. Adapters encapsulam ferramentas externas. Plugins distribuem extensões assinadas. Schemas também são artefatos versionados.
 
 ```yaml
 artifact_kind: forge.template
 schema_version: 1
 id: TEMPLATE-Forge-STORY
-slug: story-template
-title: Story Markdown Template
 status: ACTIVE
 renders_artifact_kind: forge.story
 input_schema: SCHEMA-Forge-STORY-INPUT-v1
 output_schema: SCHEMA-Forge-STORY-v1
-renderer:
-  engine: markdown-frontmatter
-  deterministic: true
-body_contract:
-  required_sections:
-    - Frontmatter Mapping
-    - Markdown Sections
-    - Rendering Rules
 ```
-
-#### 10.4.13. Command, adapter e plugin
-
-Commands são entrada pública, adapters encapsulam ferramentas externas e plugins distribuem extensões assinadas.
 
 ```yaml
 artifact_kind: forge.command
 schema_version: 1
 id: COMMAND-Forge-STORY-IMPLEMENT
-slug: story-implement
-title: forge story implement
 status: ACTIVE
 cli:
   name: forge story implement
@@ -2656,38 +1864,12 @@ lifecycle:
   policies:
     - POLICY-Forge-REFINEMENT-GATE
     - POLICY-Forge-EXECUTION-INTEGRITY
-emits:
-  artifacts:
-    - forge.artifact.story-completion-report
-    - forge.artifact.verify-envelope
-    - forge.artifact.telemetry-run
-```
-
-```yaml
-artifact_kind: forge.adapter
-schema_version: 1
-id: ADAPTER-Forge-GIT
-slug: git-adapter
-title: Git Adapter
-status: ACTIVE
-capabilities:
-  - ensure_branch
-  - commit_changes
-  - push_branch
-  - create_pull_request
-ports:
-  implements:
-    - GitClientPort
-security:
-  requires_user_workspace: true
-  masks_secrets: true
 ```
 
 ```yaml
 artifact_kind: forge.plugin
 schema_version: 1
 id: PLUGIN-Forge-JIRA
-slug: jira
 status: ACTIVE
 distribution:
   semver: 1.0.0
@@ -2696,32 +1878,20 @@ distribution:
 permissions:
   network:
     - atlassian
-  writes:
-    - forge.jira.issue-link
 provides:
   commands:
     - COMMAND-Forge-JIRA-CREATE-EPIC
-  prompts: []
   adapters:
     - ADAPTER-Forge-JIRA
 ```
-
-#### 10.4.14. Artifact schema
-
-Todo schema também é artefato versionado. Isso permite migration, validation, compatibility matrix e CI audit.
 
 ```yaml
 artifact_kind: forge.artifact_schema
 schema_version: 1
 id: SCHEMA-Forge-FEATURE-v1
-slug: feature-schema-v1
-title: Feature Schema v1
 status: ACTIVE
 validates_artifact_kind: forge.feature
 format: json-schema
-compatibility:
-  backward_compatible_with: []
-  migration_to_next: null
 required_fields:
   - artifact_kind
   - schema_version
@@ -2734,7 +1904,7 @@ required_fields:
   - body_contract
 ```
 
-### 10.5. Command contracts
+### 5.5. Command contracts
 
 Todo comando mutável da V0 deve ter o mesmo contrato externo: parse tipado, preflight, lock, state transition, artifact write, audit event, remote checkpoint quando aplicável e output estruturado.
 
@@ -2763,9 +1933,9 @@ Exemplos de contratos V0:
 | `forge story implement <STORY-ID>` | story refined + map aprovado | `{ "storyId", "status", "evidence", "pr" }` | `REFINEMENT_REQUIRED`, `TASK_FAILED`, `VERIFY_FAILED`. |
 | `forge ci verify` | repo path | `{ "status", "checkedPolicies", "violations" }` | `POLICY_VIOLATION`, `ARTIFACT_MISSING`. |
 
-### 10.6. Error taxonomy
+### 5.6. Error taxonomy
 
-Erros precisam ser parte da API do produto. O usuário deve conseguir automatizar decisões sem parsear texto.
+Erros são API de produto. Usuários, CI e automações precisam decidir sem parsear texto humano.
 
 | Categoria | Prefixo | Exemplos |
 | --- | --- | --- |
@@ -2786,14 +1956,14 @@ Saída de erro mínima:
   "errorCode": "POLICY_REFINEMENT_REQUIRED",
   "phase": "story.preflight",
   "message": "Story must have an approved refinement verdict before implementation.",
-  "artifactPath": "ai/projects/project-0001/.../story-0072-0001.md",
-  "nextAction": "Run forge story refine STORY-0072-0001"
+  "artifactPath": "projects/project-0001/.../story-0001.md",
+  "nextAction": "Run forge story refine STORY-0001"
 }
 ```
 
-### 10.7. Policy matrix
+### 5.7. Policy matrix e artifact kind matrix
 
-Policies críticas da V0 devem declarar ponto de execução e evidência. Se uma regra não tem enforcement possível, ela permanece doctrine/KP, não policy runtime.
+Policies críticas da V0 devem declarar ponto de execução e evidência. Se uma regra não tem enforcement possível, ela permanece guideline/KP, não policy runtime.
 
 | Policy | Enforcement point | Evidence | Error code |
 | --- | --- | --- | --- |
@@ -2804,11 +1974,8 @@ Policies críticas da V0 devem declarar ponto de execução e evidência. Se uma
 | Artifact schema | Após cada write de artefato tipado. | Schema validation result. | `ARTIFACT_SCHEMA_INVALID`. |
 | Phase gate | Entre fases do runtime. | Expected child statuses + artifacts. | `STATE_TRANSITION_FORBIDDEN`. |
 | Evidence completeness | Antes de PR e `ci verify`. | Verify envelope + reports. | `ARTIFACT_MISSING`. |
-| Documentation freshness | Antes de completion de story. | `doc-validate-report`. | `POLICY_DOC_FRESHNESS_FAILED`. |
 | Budget guardrail | Antes e depois de chamada LLM. | Cost event + budget config. | `LLM_BUDGET_EXCEEDED`. |
 | Recovery guard | Sempre que `--recovery` for usado. | Recovery reason + audit event. | `RECOVERY_REQUIRES_REASON`. |
-
-### 10.8. Artifact kind matrix
 
 O runtime não deve inferir semântica apenas pelo path. Cada artefato persistido precisa declarar `artifact_kind`, schema, gerador autorizado e regra de freshness.
 
@@ -2820,12 +1987,8 @@ O runtime não deve inferir semântica apenas pelo path. Cada artefato persistid
 | `forge.architecture_plan` | `forge architecture plan *` | epic create, review, ADR generation. | Stale se target ou parent architecture muda. |
 | `forge.epic` | `forge epic create` | epic implement, story implement. | Stale se Feature/ArchitecturePlan SHA muda. |
 | `forge.story` | `forge epic create`, `forge story refine` | story implement, reviews. | Stale se Epic story index muda. |
-| `forge.implementation_map` | `forge epic create`, `forge epic map` | epic implement, parallel eval. | Stale se stories/dependencies mudam. |
-| `forge.execution_state` | runtime commands | resume, phase gates, CI verify. | Stale se command version incompatível. |
-| `forge.verify_envelope` | gate services | PR body, CI verify, reports. | Immutable for run ID. |
-| `forge.audit_event` | runtime telemetry | audit log, forensics, analytics. | Append-only. |
+| `forge.task` | `forge story plan`, `forge task plan` | task implement, TDD loop. | Stale se Story contract muda. |
 | `forge.policy` | governance authoring / migration | runtime gates, CI, command preflight. | Stale se input schema, command contract ou enforcement point muda. |
-| `forge.guideline` | governance authoring / migration | prompt builder, docs, reviews. | Stale se domain taxonomy ou linked policy muda. |
 | `forge.knowledge_pack` | KP authoring / migration | prompt builder, retrieval, reviews. | Stale se referenced schema, policy ou domain changes. |
 | `forge.prompt` | prompt authoring / migration | AI Workers, model router, output validator. | Stale se input/output schema ou required KP muda. |
 | `forge.template` | template authoring / renderer | artifact generation, PR body, reports. | Stale se rendered artifact schema muda. |
@@ -2834,568 +1997,52 @@ O runtime não deve inferir semântica apenas pelo path. Cada artefato persistid
 | `forge.plugin` | marketplace / plugin installer | capability resolver, command registry. | Stale se signature, SBOM, semver ou permissions mudam. |
 | `forge.artifact_schema` | schema authoring / migration | validators, CI, migration assistant. | Immutable by version; superseded by newer schema. |
 
-### 10.9. Arquitetura hexagonal e bounded contexts do runtime
+### 5.8. Arquitetura hexagonal e bounded contexts do runtime
 
-O Forge deve ser implementado como um conjunto de bounded contexts em arquitetura hexagonal. O objetivo é impedir que a CLI, GitHub, filesystem, provider de LLM ou templates virem o centro do produto. O centro do produto é o domínio: estados, políticas, artefatos, rastreabilidade, comandos de lifecycle e invariantes.
+Forge deve ser um modular monolith com arquitetura hexagonal. A regra obrigatória é direção de dependência, não nome exato de pacote: adapters entram pelas portas, application orquestra casos de uso, domain guarda invariantes.
 
-Regra arquitetural:
+Camadas:
 
-```text
-Inbound adapters -> Application services -> Domain model <- Domain services
-                                |
-                                v
-                        Outbound ports
-                                |
-                                v
-                        Outbound adapters
-```
-
-Dependências sempre apontam para dentro:
-
-- `domain` não importa CLI, Picocli, GitHub SDK, filesystem, HTTP, provider LLM, JSON parser específico ou template engine.
-- `application` orquestra casos de uso, transações, ports e policies, mas não contém regra de negócio profunda.
-- `adapters.inbound` traduz entrada externa para comandos de aplicação.
-- `adapters.outbound` implementa ports para Git, filesystem, LLM, CI, PR, templates, telemetry e migration.
-- `infrastructure` configura wiring, profile, clock, IDs, serialization e runtime local.
-
-#### 10.9.1. Camadas hexagonais
-
-| Camada | Responsabilidade | Contém | Não deve conter |
-| --- | --- | --- | --- |
-| `domain` | Modelar conceitos centrais e invariantes que continuam verdadeiros independentemente da interface. | Aggregates, entities, value objects, domain services, domain events, policy decisions, error codes. | IO, CLI, GitHub, filesystem, LLM calls, templates, JSON/YAML concreto. |
-| `application` | Executar casos de uso e coordenar transições entre aggregates usando ports. | Use cases, command handlers, transaction scripts finos, orchestration services, DTOs de entrada/saída. | Decisão de policy hardcoded, parsing de CLI, chamadas diretas a SDKs externos. |
-| `ports.inbound` | Contratos de entrada para qualquer interface. | Interfaces como `CreateFeatureUseCase`, `ImplementStoryUseCase`, `VerifyCiUseCase`. | Detalhe de Picocli, REST, TUI ou IDE. |
-| `ports.outbound` | Contratos que o core precisa do mundo externo. | `ArtifactRepository`, `GitPort`, `LlmPort`, `PolicyCatalogPort`, `TelemetryPort`, `ClockPort`. | Implementação concreta, retry de SDK, path hardcoded. |
-| `adapters.inbound.cli` | CLI local-first da V0. | Picocli commands, parsing de flags, output text/json/ndjson, prompts humanos. | Regra de negócio, state transition direta, bypass de use case. |
-| `adapters.inbound.ci` | Entrada para `forge ci verify` e automação headless. | Comandos CI, exit code mapping, machine-readable reports. | Regras duplicadas do policy engine. |
-| `adapters.outbound.fs` | Persistência local e leitura de artefatos. | Implementações de repositories, path resolver, locks, snapshots. | Interpretação semântica fora do artifact registry. |
-| `adapters.outbound.git` | Operações de versionamento. | Branch, commit, push, worktree, status, remote SHA. | Decidir se uma story está pronta. |
-| `adapters.outbound.llm` | Chamada a modelos e validação de resposta bruta. | Claude/GPT/local providers, schema validation, cost envelope. | Orquestrar lifecycle ou aprovar artefato por conta própria. |
-| `adapters.outbound.pr_ci` | Integração com GitHub/PR/CI. | PR create/watch/merge, labels, checks, CI status. | Decidir evidência mínima; isso pertence a policies. |
-| `adapters.outbound.rendering` | Renderização de documentos. | Markdown renderer, template engine, PR body renderer. | Buscar contexto ou calcular estado. |
-| `infrastructure` | Wiring técnico e runtime local. | Dependency injection, config, profile loading, logging, serialization, filesystem root. | Regra de domínio. |
-
-#### 10.9.2. Bounded contexts com linguagem ubíqua
-
-Bounded context não é sinônimo de feature de backlog. Um bounded context é uma fronteira de linguagem, modelo e invariantes. Para closed scope com IA, cada feature implementável deve declarar **em qual bounded context vive** e quais arquivos/ports pode tocar. Assim a IA trabalha em uma fatia pequena sem quebrar a coerência do domínio.
-
-Decisão de linguagem: evitar nomes técnicos demais como `strategicplanning`, `artifactevidence` ou `vcsprci`. O código precisa falar a mesma língua que PO, QA, engenharia e arquitetura usarão para discutir o produto.
-
-| Bounded context | Nome de pacote | Linguagem ubíqua | Responsabilidade principal |
-| --- | --- | --- | --- |
-| Product Design | `productdesign` | Project, Product, Product Capability, Feature, Hypothesis, Success Metric, Approval. | Transformar intenção de produto em features aprovadas e rastreáveis. |
-| Architecture Design | `architecturedesign` | Architecture Plan, NFR, Decision, Risk, Integration, Readiness. | Desenhar a arquitetura necessária para uma feature virar backlog implementável. |
-| Delivery Backlog | `deliverybacklog` | Epic, Story, Task, Implementation Map, Dependency Graph, Backlog Consistency. | Converter feature aprovada em unidades de entrega planejáveis e testáveis. |
-| Delivery Orchestration | `deliveryorchestration` | Run, Phase, Wave, Resume, Lock, Command Execution, Task Execution. | Controlar execução determinística de epic/story/task. |
-| Delivery Governance | `deliverygovernance` | Policy, Gate, Violation, Verdict, Recovery, Phase Gate, Refinement Gate. | Garantir que a entrega siga os invariantes do Forge. |
-| Evidence Ledger | `evidenceledger` | Artifact Kind, Evidence Envelope, Lineage, Freshness, Checkpoint, Superseded Artifact. | Manter o livro-razão local de evidências e rastreabilidade. |
-| AI Workers | `aiworkers` | Worker, Prompt, Model Route, Structured Output, Budget, Provider Failure. | Invocar LLMs como workers criativos, sob contrato e sem controle de lifecycle. |
-| Source Control | `sourcecontrol` | Branch, Commit, Pull Request, Check, Merge, Remote Checkpoint. | Encapsular Git, PR e CI como operações externas rastreáveis. |
-| Telemetry & Costs | `telemetrycosts` | Audit Event, Trace, Span, Cost Event, Metric. | Registrar telemetria local, trilha auditável e custo de execução. |
-| Platform Composition | `platformcomposition` | Profile, Target, Template, Plugin, Technical Capability, Package, Compatibility. | Resolver o que o Forge gera, instala, renderiza e compõe para outros ambientes. |
-| Migration | `migration` | Migration Plan, Imported Artifact, Legacy Source, Dual Mode, Compatibility Report. | Migrar do `ia-dev-env` para Forge sem perder evidência histórica. |
-
-Notas de modelagem:
-
-- `Product Capability` substitui o uso isolado de `Capacity` dentro do código. Isso evita confusão com capacidade técnica, throughput ou capability de composição.
-- `Epic` nasce a partir de Product Design e Architecture Design, mas pertence ao `Delivery Backlog`, porque já é uma embalagem de entrega.
-- `Task` é planejada no `Delivery Backlog`, mas executada pelo `Delivery Orchestration`.
-- `Policy` pertence ao `Delivery Governance`; o runtime apenas pede decisões e aplica o resultado.
-- `Evidence Ledger` não é storage genérico. Ele é o registro confiável do que foi produzido, validado, invalidado ou substituído.
-- `AI Workers` não é "o cérebro" do produto. É um contexto auxiliar que entrega output estruturado para outros contextos.
-
-#### 10.9.3. Agrupamento por mapa de processo
-
-O fluxo de produto vira um pipeline de contextos. Essa leitura ajuda a fechar escopo para IA e a orientar testes por persona.
-
-```text
-Product Design
-  -> Product
-  -> Product Capability
-  -> Feature
-
-Architecture Design
-  -> Architecture Plan
-  -> Decisions
-  -> Readiness
-
-Delivery Backlog
-  -> Epic
-  -> Story
-  -> Task
-  -> Implementation Map
-
-Delivery Orchestration
-  -> Run
-  -> Phase
-  -> Task Execution
-  -> Resume
-
-Delivery Governance
-  -> Gates
-  -> Policies
-  -> Verdicts
-
-Evidence Ledger
-  -> Evidence
-  -> Lineage
-  -> Freshness
-```
-
-Regra para features implementáveis:
-
-| Tipo de mudança | Contexto primário | Contextos que podem ser consultados | Contextos que não devem ser alterados |
-| --- | --- | --- | --- |
-| Criar/aprovar produto | `productdesign` | `evidenceledger`, `sourcecontrol`, `aiworkers`. | `deliveryorchestration`, `deliverybacklog`. |
-| Planejar arquitetura | `architecturedesign` | `productdesign`, `aiworkers`, `evidenceledger`. | `sourcecontrol` direto, exceto via port. |
-| Criar epic/stories/tasks | `deliverybacklog` | `productdesign`, `architecturedesign`, `aiworkers`, `evidenceledger`. | `deliveryorchestration`. |
-| Implementar story/task | `deliveryorchestration` | `deliverybacklog`, `deliverygovernance`, `evidenceledger`, `sourcecontrol`, `aiworkers`. | `productdesign`, exceto leitura de lineage. |
-| Avaliar gate/policy | `deliverygovernance` | `evidenceledger`, `deliverybacklog`, `productdesign`. | `sourcecontrol` direto. |
-| Registrar evidência | `evidenceledger` | schemas e lineage publicados. | Regras de aprovação de produto ou execução. |
-
-#### 10.9.4. Context map inicial
-
-O mapa abaixo define como os contextos se relacionam. Ele é mais importante que a estrutura de pastas, porque evita dependências acidentais.
-
-| Relação | Tipo | Contrato |
+| Camada | Responsabilidade | Não pode fazer |
 | --- | --- | --- |
-| `Product Design` -> `Architecture Design` | Customer/Supplier | Feature aprovada fornece hipótese, escopo, Product Capability e NFRs para Architecture Plan. |
-| `Architecture Design` -> `Delivery Backlog` | Conformist | Epic só nasce de `architecture-feature-*` aprovado e remoto. |
-| `Delivery Backlog` -> `Delivery Orchestration` | Customer/Supplier | Implementation Map fornece DAG, fases, stories e tasks executáveis. |
-| `Delivery Orchestration` -> `Delivery Governance` | Open Host Service | Orchestration pede decisões de gate; Governance retorna pass/fail/violations. |
-| `Delivery Orchestration` -> `Evidence Ledger` | Open Host Service | Orchestration grava e consulta evidence envelopes por interface tipada. |
-| `Delivery Orchestration` -> `AI Workers` | Anti-Corruption Layer | Orchestration envia worker request estruturado; nunca recebe decisão de lifecycle do LLM. |
-| `Delivery Orchestration` -> `Source Control` | Anti-Corruption Layer | GitHub/Git/CI são detalhes externos atrás de ports. |
-| `Evidence Ledger` -> `Telemetry & Costs` | Published Language | Writes, validations e freshness checks emitem eventos auditáveis. |
-| `Platform Composition` -> todos | Shared Kernel controlado | Schemas, ids, templates e capability metadata são compartilhados com versionamento rígido. |
-| `Migration` -> todos | Anti-Corruption Layer | Layout legado é traduzido para linguagem Forge antes de entrar no domínio. |
+| Domain | Estados, invariantes, policies puras, value objects. | Chamar Git, LLM, filesystem ou rede. |
+| Application | Use cases, transações, sequência de portas. | Conter detalhes de CLI, GitHub, Maven ou provider LLM. |
+| Inbound adapters | CLI, TUI, web, IDE, CI. | Pular use case ou mutar estado direto. |
+| Outbound adapters | Git, PR, CI, LLM, filesystem, SQLite, blob store, marketplace. | Decidir regra de negócio. |
 
-#### 10.9.5. Detalhamento por bounded context
+Bounded contexts iniciais:
 
-`Product Design`
+| Contexto | Responsabilidade |
+| --- | --- |
+| `Product Design` | Project, Product, Capacity, Feature, approval e ideation. |
+| `Architecture Design` | Architecture Plans, NFRs, mini-ADRs e readiness. |
+| `Delivery Backlog` | Epic, Story, Task, implementation maps e decomposition. |
+| `Delivery Orchestration` | State machines, phase gates, replay, recovery e lifecycle. |
+| `Delivery Governance` | Policies, guidelines, gates, recovery approval e violations. |
+| `Evidence Ledger` | Artifact kinds, schemas, freshness, lineage, SQLite index e blob snapshots. |
+| `AI Workers` | Prompts, model routing, structured output, retry/fallback e budgets. |
+| `Source Control` | Git, branches, commits, PR, CI status e remote checkpoints. |
+| `Telemetry & Costs` | Audit events, traces, spans, metrics e cost events. |
+| `Platform Composition` | Profiles, capabilities, targets, templates, plugins e compatibility. |
+| `Migration` | Importação do `ia-dev-env`, dual-mode, drift e compatibility report. |
 
-- Domínio: decide se `Project`, `Product`, `ProductCapability` e `Feature` estão prontos para avançar.
-- Possui: visão de produto, hipótese, proposta de valor, Product Capability, Feature, métricas de sucesso, aprovação e remote checkpoint estratégico.
-- Não possui: epic, story, task, implementation map ou execução.
-- Use cases: `CreateProduct`, `ApproveProduct`, `ProposeProductCapabilities`, `CreateProductCapability`, `ApproveProductCapability`, `CreateFeature`, `ApproveFeature`.
-- Ports de entrada: `CreateProductUseCase`, `ApproveProductUseCase`, `CreateFeatureUseCase`, `ApproveFeatureUseCase`.
-- Ports de saída: `ProductDesignRepository`, `ApprovalPolicyPort`, `RemoteCheckpointPort`, `IdeationWorkerPort`.
-- Eventos: `ProductApproved`, `ProductCapabilityApproved`, `FeatureApproved`, `ProductDesignArtifactSuperseded`.
-- Invariante central: nenhum descendente de produto nasce se o pai não está aprovado e checkpointed.
+### 5.9. Fluxos adicionais obrigatórios
 
-`Architecture Design`
+Além do golden path principal, a V0 precisa especificar fluxos de mudança, recovery, falha de policy, falha de LLM e instalação de plugin.
 
-- Domínio: transforma feature aprovada em decisões sistêmicas mínimas para backlog.
-- Possui: Architecture Plan, NFR Profile, riscos, integrações, decisões, readiness checklist e mini-ADRs.
-- Não possui: story breakdown, execução de task ou merge de PR.
-- Use cases: `PlanProductArchitecture`, `PlanProductCapabilityArchitecture`, `PlanFeatureArchitecture`, `ApproveArchitecturePlan`, `MarkArchitectureStale`.
-- Ports de entrada: `PlanFeatureArchitectureUseCase`, `ApproveArchitecturePlanUseCase`, `MarkArchitectureStaleUseCase`.
-- Ports de saída: `ArchitectureWorkerPort`, `NfrQuestionnairePort`, `ArchitecturePlanRepository`, `DecisionLogPort`.
-- Eventos: `ArchitecturePlanApproved`, `ArchitecturePlanMarkedStale`, `ArchitectureDecisionRecorded`.
-- Invariante central: `Epic` não pode ser criado sem `ArchitecturePlan` de feature aprovado.
+| Fluxo | Comando principal | Resultado esperado |
+| --- | --- | --- |
+| Golden path | `forge init -> product -> capacity -> feature -> architecture -> epic -> story -> task -> PR/release` | Cadeia completa com evidência e checkpoint remoto. |
+| Mudança em feature/arquitetura | `forge feature update` ou `forge architecture plan --revise` | Descendentes marcados `STALE`, replanejamento incremental e lineage preservado. |
+| Recovery/resume | `forge <command> --resume` ou `--recovery` | Continuação tipada sem duplicar artefatos, com audit event. |
+| Policy failure | qualquer comando mutável | Erro tipado, evidence de falha e próxima ação. |
+| LLM/provider failure | qualquer prompt worker | Retry/fallback conforme budget, output rejeitado sem mudar lifecycle state. |
+| Marketplace/plugin | `forge plugin install <PACKAGE>` | Assinatura, SBOM, permissões, cache local, rollback e registry update. |
+| Story/task manual | `forge story create` / `forge task create` | Ajuste humano rastreável sem quebrar implementation map. |
 
-`Delivery Backlog`
+### 5.10. Migration contract e critérios para decompor em épicos
 
-- Domínio: cria backlog implementável a partir de feature e arquitetura aprovadas.
-- Possui: Epic, Story, Task, story index, task breakdown, Implementation Map, DAG, critical path e regras de consistência.
-- Não possui: execução de testes, commits, PRs ou chamadas diretas ao LLM provider.
-- Use cases: `CreateEpicFromFeature`, `CreateStories`, `CreateTasks`, `BuildImplementationMap`, `ValidateBacklogConsistency`.
-- Ports de entrada: `CreateEpicUseCase`, `CreateStoryUseCase`, `CreateTaskUseCase`, `BuildImplementationMapUseCase`.
-- Ports de saída: `BacklogWorkerPort`, `DeliveryBacklogRepository`, `DependencyGraphPort`, `ParallelismEvaluatorPort`.
-- Eventos: `EpicCreated`, `StoryCreated`, `TaskCreated`, `ImplementationMapCreated`, `BacklogRejected`.
-- Invariante central: toda story/task implementável aparece no índice e no mapa correspondente.
-
-`Delivery Orchestration`
-
-- Domínio: controla runs, fases, waves, locks, resume e transições de execução.
-- Possui: Run, Phase, Wave, Execution State, Lock, Resume Projection, task execution state e idempotency keys.
-- Não possui: regras de produto, critérios de approval ou implementação concreta de Git/CI/LLM.
-- Use cases: `ImplementEpic`, `ImplementStory`, `ImplementTask`, `ResumeRun`, `CancelRun`, `RecoverRun`.
-- Ports de entrada: `ImplementEpicUseCase`, `ImplementStoryUseCase`, `ImplementTaskUseCase`, `ResumeRunUseCase`.
-- Ports de saída: `ExecutionStateRepository`, `PolicyDecisionPort`, `EvidenceLedgerPort`, `SourceControlPort`, `TaskWorkerPort`, `BuildTestPort`.
-- Eventos: `RunStarted`, `PhaseStarted`, `WaveCompleted`, `TaskCompleted`, `RunFailed`, `RunSucceeded`.
-- Invariante central: nenhum side effect ocorre antes do gate correspondente passar.
-
-`Delivery Governance`
-
-- Domínio: avalia regras executáveis como refinement, phase gate, doc freshness, remote predecessor e recovery.
-- Possui: Policy, Gate, Violation, Verdict, Recovery Request, NO-GO reason e policy decision.
-- Não possui: execução de correção, escrita de artefato final ou operação Git direta.
-- Use cases: `EvaluatePolicy`, `AssertPrecondition`, `AssertPhaseGate`, `EvaluateRecoveryRequest`, `GenerateViolationReport`.
-- Ports de entrada: `EvaluatePolicyUseCase`, `AssertGateUseCase`, `EvaluateRecoveryUseCase`.
-- Ports de saída: `PolicyCatalogRepository`, `EvidenceReaderPort`, `ClockPort`.
-- Eventos: `PolicyPassed`, `PolicyViolated`, `RecoveryApproved`, `RecoveryRejected`.
-- Invariante central: policy produz decisão tipada; quem aplica a decisão é o contexto chamador.
-
-`Evidence Ledger`
-
-- Domínio: controla schemas, artifact kinds, lineage, freshness, evidence envelopes, índice operacional de artefatos e blobs locais deduplicados.
-- Possui: Artifact Kind, Evidence Envelope, Lineage, Freshness Rule, Checkpoint, Superseded Artifact, Asset Index, Blob Snapshot e generator authorization.
-- Não possui: regra de aprovação de produto, decisão de gate ou renderização criativa.
-- Use cases: `RegisterArtifactKind`, `WriteEvidenceEnvelope`, `ValidateArtifact`, `EvaluateFreshness`, `ResolveLineage`, `SyncAssetIndex`, `RebuildAssetIndex`, `WriteBlobSnapshot`, `CompactBlobStore`.
-- Ports de entrada: `WriteEvidenceUseCase`, `ValidateArtifactUseCase`, `ResolveLineageUseCase`, `SyncAssetIndexUseCase`.
-- Ports de saída: `ArtifactStoragePort`, `ArtifactIndexPort`, `BlobStorePort`, `SchemaRegistryPort`, `ChecksumPort`, `CompressionPort`, `GitMetadataPort`.
-- Eventos: `EvidenceWritten`, `ArtifactValidated`, `ArtifactMarkedStale`, `ArtifactSuperseded`, `AssetIndexed`, `AssetIndexRebuilt`, `BlobSnapshotWritten`, `BlobStoreCompacted`.
-- Invariante central: artefato sem schema ou gerador autorizado não entra como evidência válida; o índice SQLite e o blob store são sempre reconstruíveis a partir do control repository.
-
-`AI Workers`
-
-- Domínio: trata LLM como worker com contrato, custo e saída estruturada.
-- Possui: Worker, Prompt, Model Route, Structured Output, Budget, Retry Policy, Fallback Policy e provider failure.
-- Não possui: lifecycle, aprovação de artifact, merge de PR ou decisão de gate.
-- Use cases: `InvokeWorker`, `RouteModel`, `ValidateStructuredOutput`, `TrackCost`, `RetryOrFallback`.
-- Ports de entrada: `InvokeWorkerUseCase`, `RouteModelUseCase`.
-- Ports de saída: `ModelProviderPort`, `PromptCatalogPort`, `BudgetRepository`, `OutputSchemaPort`.
-- Eventos: `WorkerStarted`, `WorkerOutputAccepted`, `WorkerOutputRejected`, `BudgetExceeded`.
-- Invariante central: LLM nunca muda estado do lifecycle diretamente; ele apenas propõe output validável.
-
-`Source Control`
-
-- Domínio: encapsula Git, PR e CI como transações externas rastreáveis.
-- Possui: Branch, Commit, Pull Request, Check, Merge, Remote Checkpoint, CI Status e PR Evidence Pointer.
-- Não possui: regra de qualidade, aprovação de feature ou decisão de policy.
-- Use cases: `EnsureBranch`, `CommitChanges`, `PushBranch`, `CreatePullRequest`, `WatchCi`, `MergePullRequest`.
-- Ports de entrada: `CreatePullRequestUseCase`, `WatchCiUseCase`, `MergePullRequestUseCase`, `RemoteCheckpointUseCase`.
-- Ports de saída: `GitClientPort`, `PullRequestProviderPort`, `CiProviderPort`.
-- Eventos: `BranchReady`, `CommitCreated`, `PullRequestOpened`, `CiPassed`, `CiFailed`, `PullRequestMerged`.
-- Invariante central: PR/merge não decide qualidade; apenas executa operação quando policies autorizam.
-
-`Telemetry & Costs`
-
-- Domínio: captura eventos, spans, custos e audit log local.
-- Possui: Audit Event, Trace, Span, Cost Event, Metric, Run Correlation e local audit stream.
-- Não possui: bloqueio de fluxo fora de policy ou interpretação de backlog.
-- Use cases: `RecordAuditEvent`, `StartSpan`, `EndSpan`, `RecordCost`, `QueryTelemetry`.
-- Ports de entrada: `RecordAuditEventUseCase`, `QueryTelemetryUseCase`, `RecordCostUseCase`.
-- Ports de saída: `TelemetryStorePort`, `AuditLogPort`, `CostExporterPort`.
-- Eventos: `AuditEventRecorded`, `CostRecorded`, `TraceCompleted`.
-- Invariante central: audit log é append-only; telemetry remota é opt-in.
-
-`Platform Composition`
-
-- Domínio: resolve profiles, capabilities técnicas, targets, templates, plugins e compatibilidade.
-- Possui: Profile, Target Adapter, Template, Plugin, Technical Capability, Package, Compatibility Matrix e Signature.
-- Não possui: Product Capability de negócio; esse termo pertence ao `Product Design`.
-- Use cases: `ResolveCapabilities`, `RenderTarget`, `ValidateTemplateInput`, `InstallPlugin`, `CheckCompatibility`.
-- Ports de entrada: `ResolveCapabilitiesUseCase`, `RenderTargetUseCase`, `InstallPluginUseCase`.
-- Ports de saída: `PackageRepositoryPort`, `TemplateStorePort`, `SignatureVerifierPort`, `TargetRendererPort`.
-- Eventos: `CapabilityResolved`, `TemplateRendered`, `PluginInstalled`, `CompatibilityViolationFound`.
-- Invariante central: pacote externo só entra no runtime depois de validação de versão, assinatura e permissões.
-
-`Migration`
-
-- Domínio: traduz o mundo legado `ia-dev-env` para a linguagem Forge.
-- Possui: Migration Plan, Imported Artifact, Legacy Source, Drift, Dual Mode, Compatibility Report e source metadata.
-- Não possui: nova regra de produto ou reinterpretação silenciosa de evidência.
-- Use cases: `DiagnoseLegacyRepo`, `PlanMigration`, `ImportLegacyArtifacts`, `RunDualModeVerification`, `FinalizeMigration`.
-- Ports de entrada: `DiagnoseLegacyRepoUseCase`, `PlanMigrationUseCase`, `ImportLegacyArtifactsUseCase`.
-- Ports de saída: `LegacyLayoutReaderPort`, `MigrationWriterPort`, `DiffPort`, `CompatibilityPolicyPort`.
-- Eventos: `LegacyRepoDiagnosed`, `MigrationPlanCreated`, `ArtifactImported`, `DualModeVerified`.
-- Invariante central: migração não apaga nem reinterpreta evidência histórica sem lineage explícito.
-
-#### 10.9.6. Organização sugerida de pacotes
-
-A estrutura abaixo é sugestiva para um modular monolith. A regra obrigatória é a direção das dependências, não o nome exato dos diretórios.
-
-```text
-dev.forge
-  productdesign
-    domain
-    application
-    port.inbound
-    port.outbound
-    adapter.inbound.cli
-    adapter.outbound.fs
-  architecturedesign
-    domain
-    application
-    port.inbound
-    port.outbound
-    adapter.outbound.llm
-  deliverybacklog
-    domain
-    application
-    port.inbound
-    port.outbound
-  deliveryorchestration
-    domain
-    application
-    port.inbound
-    port.outbound
-  deliverygovernance
-    domain
-    application
-    port.inbound
-    port.outbound
-  evidenceledger
-    domain
-    application
-    port.inbound
-    port.outbound
-  aiworkers
-    domain
-    application
-    port.inbound
-    port.outbound
-    adapter.outbound.anthropic
-    adapter.outbound.openai
-  sourcecontrol
-    domain
-    application
-    port.inbound
-    port.outbound
-    adapter.outbound.git
-    adapter.outbound.github
-  telemetrycosts
-    domain
-    application
-    port.inbound
-    port.outbound
-  platformcomposition
-    domain
-    application
-    port.inbound
-    port.outbound
-  migration
-    domain
-    application
-    port.inbound
-    port.outbound
-  bootstrap
-    infrastructure
-    cli
-```
-
-#### 10.9.7. Closed scope para desenvolvimento com IA
-
-Cada story de implementação deve declarar um `AI Scope Envelope`. Esse envelope impede pesquisa ampla e deixa explícito o contrato que a IA pode alterar.
-
-```yaml
-ai_scope:
-  primary_context: productdesign
-  feature_slice: approve-product
-  allowed_packages:
-    - dev.forge.productdesign.domain
-    - dev.forge.productdesign.application
-    - dev.forge.productdesign.port.inbound
-    - dev.forge.productdesign.port.outbound
-    - dev.forge.productdesign.adapter.inbound.cli
-  readonly_contexts:
-    - evidenceledger
-    - sourcecontrol
-  forbidden_contexts:
-    - deliveryorchestration
-    - deliverybacklog
-  inbound_ports:
-    - ApproveProductUseCase
-  outbound_ports:
-    - ProductDesignRepository
-    - RemoteCheckpointPort
-  acceptance_tests:
-    - ApproveProductUseCaseTest
-    - ProductApproveCliIT
-```
-
-Regras para IA:
-
-- Uma feature slice tem um contexto primário.
-- Contextos de leitura são permitidos apenas por ports ou published language.
-- Nenhum adapter concreto de outro contexto pode ser chamado diretamente.
-- Se a feature exigir dois contextos primários, provavelmente ela deve ser quebrada.
-- O plano de implementação deve listar os packages permitidos antes de código.
-
-#### 10.9.8. Regras de implementação
-
-- Um bounded context não acessa repository concreto de outro contexto; chama use case, port ou consome domain event.
-- Value objects compartilhados só entram em `Shared Kernel` se forem estáveis: `ArtifactId`, `RunId`, `RemoteSha`, `PolicyId`, `ErrorCode`.
-- `Shared Kernel` deve ser pequeno; se começar a conter regra de negócio, o contexto ainda não foi bem delimitado.
-- Adapters podem depender de SDKs externos; domain e application não.
-- Tests de domain não usam filesystem, Git, rede, LLM ou templates reais.
-- Tests de application usam ports fake/in-memory para provar orquestração.
-- Tests de adapters provam integração com filesystem, Git, provider ou template engine.
-- `forge-cli` deve ser substituível por TUI, IDE ou API sem reimplementar regra de negócio.
-- `AI Workers` deve ser substituível por provider local/offline sem alterar `Delivery Orchestration`.
-- `Source Control` deve permitir GitHub primeiro, mas não deve impedir GitLab, Bitbucket ou provider local no futuro.
-
-### 10.10. Fluxos adicionais obrigatórios
-
-#### Golden path completo
-
-```text
-idea
-  -> forge ideate --kind product
-       -> internal: render product ideation draft
-       -> internal: validate draft schema
-  -> forge product create
-       -> internal: create product artifact
-       -> internal: validate product DoR
-       -> internal: commit/push/open review checkpoint
-  -> forge product approve
-       -> internal: assert approval policy
-       -> internal: mark product APPROVED
-       -> internal: persist remote checkpoint
-  -> forge product propose-capacities
-       -> internal: derive capacity candidates
-       -> internal: write proposal report
-  -> forge capacity create
-       -> internal: create capacity artifact from proposal or ideation
-       -> internal: validate parent product checkpoint
-  -> forge capacity approve
-       -> internal: mark capacity APPROVED
-       -> internal: persist remote checkpoint
-  -> forge feature create
-       -> internal: create feature artifact from capacity context
-       -> internal: capture hypothesis, scope, NFR placeholders and success metrics
-  -> forge feature approve
-       -> internal: mark feature APPROVED
-       -> internal: persist remote checkpoint
-  -> forge architecture plan feature
-       -> internal: collect required NFRs
-       -> internal: generate architecture-feature-* draft
-       -> internal: validate architecture readiness
-       -> internal: mark architecture plan APPROVED
-  -> forge epic create
-       -> internal: forge story create for each story in the generated story index
-       -> internal: forge epic map to build IMPLEMENTATION-MAP.md
-       -> internal: validate backlog consistency
-       -> internal: commit/push/open backlog PR
-  -> forge story refine
-       -> internal: run multi-persona refinement
-       -> internal: persist refinement verdict
-       -> internal: block if verdict is NO-GO
-  -> forge story plan
-       -> internal: generate architecture/implementation/test/security/compliance plans
-       -> internal: forge task create through task breakdown
-       -> internal: generate task plans and file footprints
-       -> internal: evaluate parallelism and hotspots
-  -> forge story implement
-       -> internal: load approved story plan and task breakdown
-       -> internal: forge task implement for each executable task
-       -> internal: create/watch/merge task PRs when configured
-       -> internal: generate docs, verify envelope and story completion report
-  -> forge ci verify
-       -> internal: validate artifact schemas, policies, evidence and lineage
-  -> PR with Orchestrator Evidence
-```
-
-Decisão: `story create` é serviço interno de `forge epic create` no caminho feliz. `task create` é serviço interno de `forge story plan`. Ambos podem existir como comandos públicos avançados para recovery ou edição manual controlada, mas não devem aparecer como passos obrigatórios para o usuário no golden path.
-
-#### Mudança em feature ou arquitetura
-
-```text
-feature or architecture changes
-  -> forge feature amend <FEATURE-CODE> or forge architecture amend <ARCH-ID>
-       -> internal: load descendants linked by lineage
-       -> internal: compare old ancestor SHA vs new ancestor SHA
-       -> internal: classify impact as compatible, replan-required or breaking
-       -> internal: mark impacted architecture/epics/stories/tasks as STALE
-       -> internal: preserve replaced artifacts as SUPERSEDED
-       -> internal: write impact report
-  -> forge replan <FEATURE-CODE|EPIC-CODE>
-       -> internal: regenerate affected epic/story/task artifacts only
-       -> internal: preserve manual decisions when compatible
-       -> internal: validate implementation map and dependencies
-       -> internal: require approval before implementation resumes
-```
-
-Regra: nenhum descendente stale pode ser implementado sem `--replan` ou aprovação explícita de compatibilidade.
-
-#### Recovery e resume
-
-```text
-run interrupted
-  -> forge status
-       -> internal: load execution_state + audit events
-       -> internal: inspect current phase, locks and last side effect
-       -> internal: validate artifact freshness and idempotency keys
-       -> internal: classify as safe resume, recovery needed or manual intervention
-  -> forge <command> --resume
-       -> internal: rebuild resume projection
-       -> internal: skip completed idempotent steps
-       -> internal: rerun only safe deterministic checks
-       -> internal: continue from first incomplete transition
-```
-
-O resume nunca deve repetir side effects remotos sem idempotency key.
-
-#### Policy failure
-
-```text
-gate fails
-  -> runtime stops before side effect
-  -> internal: write violation envelope
-  -> internal: record audit event
-  -> internal: mark run FAILED or BLOCKED according to policy
-  -> return typed error with phase, artifact path and nextAction
-  -> user runs suggested command
-       -> examples:
-          -> forge story refine STORY-ID
-          -> forge architecture plan feature FEATURE-CODE
-          -> forge doc validate STORY-ID
-          -> forge replan EPIC-CODE
-```
-
-Falhas de policy são resultado esperado do produto, não exceptions genéricas.
-
-#### LLM/provider failure
-
-```text
-LLM call fails or returns invalid schema
-  -> internal: classify failure as timeout, provider-error, schema-invalid or budget-exceeded
-  -> internal: retry according to provider policy
-  -> internal: fallback when configured and budget allows
-  -> internal: persist failed worker envelope
-  -> internal: record cost and audit events
-  -> internal: mark draft as NEEDS_INPUT or run as FAILED
-  -> never mark artifact approved from invalid output
-```
-
-O LLM pode falhar; o runtime não pode perder rastreabilidade.
-
-#### Marketplace/plugin opt-in
-
-```text
-forge plugin install <PACKAGE>
-  -> internal: resolve package metadata
-  -> internal: verify signature and SBOM
-  -> internal: show permissions and required capabilities
-  -> internal: require explicit approval
-  -> internal: cache package locally
-  -> internal: register capabilities, templates, policies or adapters
-  -> internal: write plugin install checkpoint
-  -> internal: allow rollback to previous registry state
-```
-
-Na V0, esse fluxo deve existir como execução real, com assinatura, SBOM, permissões, cache local e rollback.
-
-#### Manual story ou task creation controlado
-
-Este fluxo não é caminho feliz, mas precisa existir para casos em que o backlog gerado precisa de ajuste humano sem quebrar rastreabilidade.
-
-```text
-forge story create --epic EPIC-CODE
-  -> internal: assert epic approved or in controlled replan
-  -> internal: load feature, architecture plan and existing implementation map
-  -> internal: create story artifact with parent epic link
-  -> internal: update epic story index
-  -> internal: regenerate or patch IMPLEMENTATION-MAP.md
-  -> internal: validate no orphan story exists
-  -> internal: commit/push/open review checkpoint
-
-forge task create --story STORY-ID
-  -> internal: assert story refined or in story planning
-  -> internal: load story plan, tests plan and file footprint
-  -> internal: create task artifact with parent story link
-  -> internal: update task breakdown and task implementation map
-  -> internal: validate dependencies and parallelism
-  -> internal: commit/push/open review checkpoint when outside active planning run
-```
-
-Regra: criação manual de story/task sempre atualiza índice/mapa no mesmo run. Uma story ou task órfã é violação de policy.
-
-### 10.11. Migration contract
-
-Migração deve ser assistida, reversível e auditável.
+Migração do `ia-dev-env` para Forge deve ser explícita, auditável e reversível por pelo menos uma release.
 
 | Fase | Comando | Resultado |
 | --- | --- | --- |
@@ -3405,17 +2052,7 @@ Migração deve ser assistida, reversível e auditável.
 | Dual-mode | `forge ci verify --dual-mode` | Compara invariantes atuais e Forge por uma release. |
 | Corte | `forge migrate finalize` | Marca Forge como runtime primário. |
 
-Todo artefato importado deve carregar:
-
-```yaml
-source_system: ia-dev-env
-source_path: ai/epics/epic-0071/story-0071-0001.md
-source_sha: "<sha>"
-imported_at: "<iso-8601>"
-compatibility: imported|converted|manual-review-required
-```
-
-### 10.12. Critérios de aceite para transformar este plano em épicos
+Todo artefato importado deve carregar `source_system`, `source_path`, `source_sha`, `imported_at` e `compatibility`.
 
 Antes de decompor a V0 em épicos, o refinement deve confirmar:
 
@@ -3423,30 +2060,628 @@ Antes de decompor a V0 em épicos, o refinement deve confirmar:
 - Cada command V0 tem entrada, saída, error codes e artifact kinds.
 - Cada policy V0 tem enforcement point, evidence e teste planejado.
 - Cada state machine tem transições autorizadas e recovery behavior.
-- Cada artefato estratégico tem schema mínimo e freshness rule.
+- Cada artefato estratégico tem schema e freshness rule.
 - O vertical slice define ordem de implementação, mas não reduz o escopo completo da V0.
 - Não há dependência obrigatória de cloud, UI ou marketplace para o caminho feliz.
+
+## 6. Taxonomia Canônica de Domínios
+
+A taxonomia abaixo evita que o registry seja uma lista plana de skills. Um pacote pode conter policies, KPs, templates, commands e artifact kinds, desde que todos pertençam a um domínio coerente.
+
+| Domínio | O que governa | Policies | KPs | Commands/workers/artifacts |
+| --- | --- | --- | --- | --- |
+| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, limites. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-code-format`, `x-code-lint`, `x-code-audit`, review specialists. |
+| `architecture-standards` | Estrutura, camadas, APIs e decisões. | Dependency rules, architecture constraints. | `architecture`, `api-design`, `protocols`, `resilience`. | `x-arch-plan`, `x-arch-update`, scaffolds/templates. |
+| `security-compliance` | Segurança mínima e regulação. | Security baseline, compliance gates, SARIF, evidence. | `security`, `compliance`, overlays. | `x-owasp-scan`, `x-dependency-audit`, `x-supply-chain-audit`. |
+| `testing-quality` | Como provar comportamento. | Coverage, TDD, acceptance, smoke/contract rules. | `testing`, `story-planning`. | `x-test-plan`, `x-test-run`, `x-test-tdd`, contract/e2e/perf/smoke. |
+| `planning-product` | Como transformar intenção em backlog. | Refinement gate, DoR, value-driven templates, flow version. | `story-planning`, `planning-standards-kp`. | `x-story-plan`, `x-task-plan`, `x-feature-create`, templates backlog. |
+| `execution-governance` | Integridade, anti-bypass, phase gates, lifecycle. | Execution Integrity, Zero-bypass, Task Hierarchy, Audit Lifecycle. | Lifecycle guidance curta. | Orchestrators, internal gates, verify envelopes, reports. |
+| `git-release-pr` | Branches, commits, PRs, release. | Branching, release process, CI-watch, PR evidence. | Git/release workflow guidance. | `x-git-*`, `x-pr-*`, `x-release`, merge train. |
+| `documentation` | Documentação como DoD. | Doc freshness, ADR, changelog, system architecture. | Architecture docs, API docs, ADR/changelog knowledge. | `x-doc-generate`, `x-doc-validate`, `x-adr-generate`, reports. |
+| `observability-ops` | Telemetria, operação, incidentes. | Telemetry privacy, ops baseline. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | telemetry runtime, `x-telemetry-*`, `x-ops-*`, runbooks. |
+| `review-governance` | Critérios e vereditos de review. | Review evidence, GO/NO-GO schema. | Security, testing, architecture, API, observability. | `x-review`, `x-review-pr`, specialist reviews, dashboards. |
+| `capability-registry` | Como ativos são descritos e distribuídos. | Capability schema, visibility, model selection. | Governance authoring guidance. | registry linter, capability graph, frontmatter migration. |
+| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, provider boundaries. | MCP/Jira/GitHub/provider docs. | `x-mcp-recommend`, Jira commands, marketplace plugins. |
+
+Decisão de produto: essa taxonomia vira a navegação oficial do Forge para capability packaging, marketplace, documentação e `forge explain`.
+
+---
+
+## 7. Roadmap de Produto
+
+### 7.1. Project
+
+**Project:** `Forge`
+
+Hierarquia: `Project → Product → Capacity → Feature`. A marcação indica release alvo:
+
+- `[V0]`: escopo completo deste plano. A ordem de implementação pode ser incremental, mas todas as features listadas abaixo pertencem à primeira release.
+
+### 7.2. Product P0 — Product Design & Architecture Design
+
+Camada inicial antes do épico. Garante que produto, capacidade, feature e arquitetura sistêmica existam como artefatos aprovados, versionados e sincronizados no GitHub antes de qualquer backlog técnico ser criado.
+
+#### P0.C1 — Ideation & Strategic Templates
+
+- P0.C1.F1 `[V0]`: `forge ideate --kind product|capacity|feature` para transformar ideia livre em template estruturado.
+- P0.C1.F2 `[V0]`: Templates versionados de Project, Product, Capacity e Feature com schema.
+- P0.C1.F3 `[V0]`: Approval workflow para Product, Capacity e Feature (`draft -> approved -> remote checkpoint`).
+- P0.C1.F4 `[V0]`: Multi-round ideation com personas e comparação de alternativas.
+
+#### P0.C2 — Product/Capacity/Feature Lifecycle
+
+- P0.C2.F1 `[V0]`: `forge product create|approve`.
+- P0.C2.F2 `[V0]`: `forge product propose-capacities`.
+- P0.C2.F3 `[V0]`: `forge capacity create|approve`.
+- P0.C2.F4 `[V0]`: `forge feature create|approve`.
+- P0.C2.F5 `[V0]`: Gate de predecessor remoto e worktree limpa antes de criar descendentes.
+
+#### P0.C3 — System Architecture Planning
+
+- P0.C3.F1 `[V0]`: `forge architecture plan product <PRODUCT-CODE>`.
+- P0.C3.F2 `[V0]`: Coleta obrigatória de NFRs mínimos (usuários, concorrência, latência, disponibilidade, volume, segurança).
+- P0.C3.F3 `[V0]`: `forge architecture plan capacity <CAPACITY-CODE>`.
+- P0.C3.F4 `[V0]`: `forge architecture plan feature <FEATURE-CODE>`.
+- P0.C3.F5 `[V0]`: Architecture Plans em três níveis (`architecture-product-*`, `architecture-capacity-*`, `architecture-feature-*`).
+- P0.C3.F6 `[V0]`: Gate `architecture-feature approved + remote-clean` antes de `forge epic create`.
+
+#### P0.C4 — Feature to Epic Generation
+
+- P0.C4.F1 `[V0]`: `forge epic create <FEATURE-CODE>` gera epic, stories e implementation map a partir da feature e do Architecture Plan.
+- P0.C4.F2 `[V0]`: Link bidirecional `Feature -> Architecture Plan -> Epic -> Stories`.
+- P0.C4.F3 `[V0]`: Versionamento Git/PR para backlog gerado.
+- P0.C4.F4 `[V0]`: Replanejamento incremental quando arquitetura ou feature mudam.
+
+### 7.3. Product P1 — Core Engine
+
+Evolução direta do gerador Java. Continua sendo fonte da verdade de composition/governance, mas passa a ser multi-target e multi-LLM.
+
+#### P1.C1 — Configuração & Profile Management
+
+- P1.C1.F1 `[V0]`: Schema unificado de profile com JSON-Schema versionado.
+- P1.C1.F2 `[V0]`: Migração assistida v5 (`ia-dev-env`) → v6 (`Forge`) com `forge migrate --from-iadev`.
+- P1.C1.F3 `[V0]`: Profile inheritance & overlays.
+- P1.C1.F4 `[V0]`: Detecção automática de stack.
+
+#### P1.C2 — Capability Composition v2
+
+- P1.C2.F1 `[V0]`: Capability resolver com cache local.
+- P1.C2.F2 `[V0]`: Frontmatter v4 com `provides:`.
+- P1.C2.F3 `[V0]`: Plug-in capabilities externas.
+- P1.C2.F4 `[V0]`: Composition diff & dry-run.
+
+#### P1.C3 — Artifact Generation Multi-Target
+
+- P1.C3.F1 `[V0]`: Target adapter `claude-code`.
+- P1.C3.F2 `[V0]`: Target adapter `cursor`.
+- P1.C3.F3 `[V0]`: Targets `windsurf`, `aider`, `gemini-cli`, `codex-cli`.
+- P1.C3.F4 `[V0]`: Target adapter `generic-mcp`.
+- P1.C3.F5 `[V0]`: Overlay system para customizações sem perder regen.
+
+#### P1.C4 — Multi-Stack & Multi-Language
+
+- P1.C4.F1 `[V0]`: Catálogo de stacks oficial.
+- P1.C4.F2 `[V0]`: Stack templates community-contributed.
+- P1.C4.F3 `[V0]`: Polyglot monorepos.
+- P1.C4.F4 `[V0]`: Reutilização de KPs via taxonomia comum.
+
+### 7.4. Product P2 — Orchestration Runtime
+
+Produto-âncora da V0. Substitui markdown interpretado por state machines em código.
+
+#### P2.C0 — Comandos orquestradores nativos
+
+- P2.C0.F1 `[V0]`: `forge epic implement <ID>`.
+- P2.C0.F2 `[V0]`: `forge story implement <ID>`.
+- P2.C0.F3 `[V0]`: `forge task implement <ID>`.
+- P2.C0.F4 `[V0]`: `forge story refine <ID>` / `forge epic refine <ID>`.
+- P2.C0.F5 `[V0]`: `forge review <STORY>` / `forge review pr <PR>`.
+- P2.C0.F6 `[V0]`: `forge release`.
+- P2.C0.F7 `[V0]`: `forge epic orchestrate <ID>`.
+- P2.C0.F8 `[V0]`: `forge merge-train`.
+- P2.C0.F9 `[V0]`: `forge pr watch <PR>`.
+- P2.C0.F10 `[V0]`: `forge pr fix <PR>` / `forge pr fix-epic <EPIC>`.
+- P2.C0.F11 `[V0]`: `forge pipeline run <COMMAND>`.
+- P2.C0.F12 `[V0]`: Headless mode em todos os comandos.
+
+#### P2.C1 — Agent Lifecycle Service
+
+- P2.C1.F1 `[V0]`: State machine local.
+- P2.C1.F2 `[V0]`: Pause/resume de orquestração.
+- P2.C1.F3 `[V0]`: Resume cross-machine.
+- P2.C1.F4 `[V0]`: Fan-out/fan-in declarativo.
+
+#### P2.C2 — Task Hierarchy & Phase Gates v2
+
+- P2.C2.F1 `[V0]`: Task tree como entidade de primeira classe.
+- P2.C2.F2 `[V0]`: Phase gates tipados em código.
+- P2.C2.F3 `[V0]`: Pré-condições in-process antes de efeitos colaterais.
+- P2.C2.F4 `[V0]`: Gates customizáveis por org.
+- P2.C2.F5 `[V0]`: Replay determinístico de execução.
+
+#### P2.C3 — LLM Abstraction Layer
+
+- P2.C3.F1 `[V0]`: Provider abstraction.
+- P2.C3.F2 `[V0]`: Model routing dinâmico.
+- P2.C3.F3 `[V0]`: Fallback automático.
+- P2.C3.F4 `[V0]`: Custo por execução em tempo real.
+
+#### P2.C4 — Reliability & Replay
+
+- P2.C4.F1 `[V0]`: Determinismo controlado.
+- P2.C4.F2 `[V0]`: Snapshot de contexto local.
+- P2.C4.F3 `[V0]`: Idempotência por comando/skill.
+- P2.C4.F4 `[V0]`: File locking local.
+
+### 7.5. Product P3 — Developer Experience
+
+CLI primária; TUI, IDE e web UI são camadas incluídas na V0.
+
+#### P3.C1 — CLI v2
+
+- P3.C1.F1 `[V0]`: `forge` CLI unificado.
+- P3.C1.F2 `[V0]`: Saída estruturada.
+- P3.C1.F3 `[V0]`: `forge repl`.
+- P3.C1.F4 `[V0]`: `forge migrate`.
+- P3.C1.F5 `[V0]`: `forge init`.
+
+#### P3.C2 — TUI & Local UI
+
+- P3.C2.F1 `[V0]`: `forge tui`.
+- P3.C2.F2 `[V0]`: `forge watch`.
+- P3.C2.F3 `[V0]`: `forge ui` local.
+- P3.C2.F4 `[V0]`: Editor visual de rules/skills.
+
+#### P3.C3 — IDE Extensions
+
+- P3.C3.F1 `[V0]`: Extensão VS Code.
+- P3.C3.F2 `[V0]`: Extensão JetBrains.
+- P3.C3.F3 `[V0]`: Painel inline de evidências.
+- P3.C3.F4 `[V0]`: Auto-complete de profile/capabilities.
+
+#### P3.C4 — Onboarding & Time-to-Value
+
+- P3.C4.F1 `[V0]`: `forge init` com 5-7 perguntas.
+- P3.C4.F2 `[V0]`: Templates por persona.
+- P3.C4.F3 `[V0]`: Tutorial guiado in-IDE.
+- P3.C4.F4 `[V0]`: `forge doctor`.
+
+### 7.6. Product P4 — Knowledge & Marketplace
+
+Ecossistema compartilhado, opt-in e network-required; core funciona offline com cache embarcado.
+
+#### P4.C1 — Skill Marketplace
+
+- P4.C1.F1 `[V0]`: Registry central ou self-hosted.
+- P4.C1.F2 `[V0]`: SemVer obrigatório.
+- P4.C1.F3 `[V0]`: Dependency resolution.
+- P4.C1.F4 `[V0]`: Trust model com assinatura e sandbox.
+- P4.C1.F5 `[V0]`: Compatibility matrix por modelo/provider.
+
+#### P4.C2 — Rule & Governance Library
+
+- P4.C2.F1 `[V0]`: Rule packs por domínio.
+- P4.C2.F2 `[V0]`: Rule simulator.
+- P4.C2.F3 `[V0]`: Rule conflict detector.
+- P4.C2.F4 `[V0]`: Custom rule authoring.
+
+#### P4.C3 — Template & Profile Catalog
+
+- P4.C3.F1 `[V0]`: Catálogo de profiles oficial/community.
+- P4.C3.F2 `[V0]`: Rating e usage stats.
+- P4.C3.F3 `[V0]`: `forge profile fork`.
+- P4.C3.F4 `[V0]`: Profile lineage.
+
+#### P4.C4 — Cross-Project Intelligence
+
+- P4.C4.F1 `[V0]`: Padrões agregados anonimizados.
+- P4.C4.F2 `[V0]`: Recommendation engine.
+- P4.C4.F3 `[V0]`: Drift detection cross-repo.
+- P4.C4.F4 `[V0]`: Knowledge graph navegável.
+
+### 7.7. Product P5 — Observability, Analytics & FinOps
+
+V0 entrega observabilidade local, streaming remoto opt-in, dashboards, alerting, analytics e FinOps. O caminho feliz continua local-first, mas as integrações remotas já fazem parte da release.
+
+#### P5.C1 — Local & Real-Time Telemetry
+
+- P5.C1.F1 `[V0]`: Captura local NDJSON + queries CLI.
+- P5.C1.F2 `[V0]`: Streaming opt-in para OTLP/Datadog/custom HTTP.
+- P5.C1.F3 `[V0]`: Dashboard live de execução.
+- P5.C1.F4 `[V0]`: Alerting.
+- P5.C1.F5 `[V0]`: Trace OTel-compatible.
+
+#### P5.C2 — Quality & Compliance Metrics
+
+- P5.C2.F1 `[V0]`: Coverage longitudinal.
+- P5.C2.F2 `[V0]`: Refinement quality score.
+- P5.C2.F3 `[V0]`: Doc freshness heatmap.
+- P5.C2.F4 `[V0]`: Compliance posture report.
+
+#### P5.C3 — FinOps & Cost Insights
+
+- P5.C3.F1 `[V0]`: Custo de LLM por skill/story/epic/org.
+- P5.C3.F2 `[V0]`: Sugestão de model downgrade.
+- P5.C3.F3 `[V0]`: Budget guardrails locais.
+- P5.C3.F4 `[V0]`: Comparativo por provider.
+
+#### P5.C4 — Research & Benchmarking
+
+- P5.C4.F1 `[V0]`: A/B testing de skills.
+- P5.C4.F2 `[V0]`: Benchmark suite.
+- P5.C4.F3 `[V0]`: Regression detection.
+- P5.C4.F4 `[V0]`: Public leaderboard opt-in.
+
+### 7.8. Product P6 — Governance, Security & Trust
+
+P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, compliance, threat modeling, supply chain e cloud trust.
+
+#### P6.C1 — Audit & Compliance Engine
+
+- P6.C1.F1 `[V0]`: Audit log local imutável.
+- P6.C1.F2 `[V0]`: Evidence vault local.
+- P6.C1.F3 `[V0]`: Reports SOC2 / ISO 27001 / LGPD.
+- P6.C1.F4 `[V0]`: Forensics.
+- P6.C1.F5 `[V0]`: CI Camada B com `forge ci verify`.
+
+#### P6.C2 — Refinement & Quality Gates v2
+
+- P6.C2.F1 `[V0]`: AI-assisted refinement.
+- P6.C2.F2 `[V0]`: Refinement memory.
+- P6.C2.F3 `[V0]`: Refinement templates por domínio.
+- P6.C2.F4 `[V0]`: NO-GO library.
+
+#### P6.C3 — Security Posture & Threat Modeling
+
+- P6.C3.F1 `[V0]`: Continuous threat modeling.
+- P6.C3.F2 `[V0]`: SBOM gerado e validado.
+- P6.C3.F3 `[V0]`: Secret scanning integrado.
+- P6.C3.F4 `[V0]`: Supply chain trust score.
+
+#### P6.C4 — Privacy, Multi-Tenancy & RBAC
+
+- P6.C4.F1 `[V0]`: Multi-tenant.
+- P6.C4.F2 `[V0]`: RBAC.
+- P6.C4.F3 `[V0]`: Data residency.
+- P6.C4.F4 `[V0]`: PII scrubbing para telemetria remota.
+
+---
+
+## 8. Inventário e Migração dos Ativos Atuais
+
+Esta seção existe para responder uma pergunta prática: o que acontece com cada skill, rule, KP, template, hook e artefato já existente quando o Forge virar o runtime principal?
+
+Esta é a seção de preservação de contexto. Ela evita duplicação separando a pergunta em camadas:
+
+- **Skills/comandos/workers:** quem executa ou gera algo?
+- **Rules/policies:** quais invariantes precisam sobreviver?
+- **KPs:** qual conhecimento alimenta workers?
+- **Hooks/scripts:** quais invariantes shell precisam virar runtime?
+- **Templates:** quais estruturas renderizam artefatos?
+- **Artefatos:** o que aparece em disco e quem consome?
+
+### 8.1. Skills e comandos atuais, classificados uma única vez
+
+#### 8.1.1. Orquestradoras públicas — viram comandos Forge
+
+Estas skills controlam fluxo amplo. No Forge elas devem sair de markdown interpretado e virar comandos CLI com state machine, persistência, gates, telemetria, retries e saída estruturada.
+
+| Skill atual | Destino Forge V0 | Motivo |
+| --- | --- | --- |
+| `x-epic-implement` | `forge epic implement <ID>` | Implementação de épico em fases, waves, gates e PRs. |
+| `x-story-implement` | `forge story implement <ID>` | Lifecycle end-to-end de story: planning, task execution, PR, review, verify, report. |
+| `x-task-implement` | `forge task implement <ID>` | TDD double-loop, validações, commits e PR/task. |
+| `x-release` | `forge release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, tag e back-merge. |
+| `x-epic-orchestrate` | `forge epic orchestrate <ID>` | Planejamento multi-story com checkpoints e resume. |
+| `x-pr-merge-train` | `forge merge-train` | Ordenação topológica de PRs, waves, CI e merge. |
+| `x-review` | `forge review <STORY>` | Fan-out/fan-in de especialistas e consolidação. |
+| `x-review-pr` | `forge review pr <PR>` | Veredito Tech Lead GO/NO-GO. |
+| `x-story-refine` | `forge story refine <ID>` | Refinement multi-persona com verdict persistido. |
+| `x-epic-refine` | `forge epic refine <ID>` | Refinement estratégico de épico. |
+| `x-story-plan` | `forge story plan <ID>` | Planning wave, task breakdown, task plans e DoR. |
+| `x-feature-create` | `forge feature create <CAPACITY-CODE>` | Capacity/ideation → feature estruturada; epic/stories/map nascem depois de arquitetura aprovada. |
+| `x-feature-ideate` | `forge feature ideate` | Ideia livre → spec/backlog estruturado. |
+| `x-test-tdd` | `forge test tdd <TASK>` | Orquestra ciclos Red/Green/Refactor; LLM atua pontualmente. |
+
+#### 8.1.2. Orquestradoras auxiliares — comando público, subcomando avançado ou serviço
+
+Estas coordenam fluxo suficiente para não serem leaf prompts. A visibilidade pública deve ser decidida por UX, não por necessidade do LLM.
+
+| Skill auxiliar | Destino provável |
+| --- | --- |
+| `x-code-audit` | `forge code audit` ou parte de `forge ci verify`. |
+| `x-lib-audit-rules` | Serviço interno / `forge lint policy`. |
+| `x-doc-generate` | `forge doc generate` e fase interna de story/release. |
+| `x-template-migrate` | `forge template migrate`. |
+| `x-pr-create` | `forge pr create` e serviço interno de PR. |
+| `x-pr-fix` | `forge pr fix <PR>`. |
+| `x-pr-fix-epic` | `forge pr fix --epic <EPIC>`. |
+| `x-pr-watch-ci` | `forge pr watch <PR>` com exit codes tipados. |
+| `x-pr-merge` | `forge pr merge` ou serviço interno usado por merge-train/release. |
+| `x-git-push`, `x-git-commit`, `x-git-worktree`, `x-git-cleanup-branches` | Subcomandos `forge git ...` e serviços transacionais internos. |
+| `x-status-reconcile` | `forge status reconcile` para recovery/admin. |
+| `x-ci-generate` | `forge ci generate`. |
+| `x-setup-env` | `forge setup env` ou `forge doctor`. |
+| `x-perf-profile` | `forge perf profile`. |
+| `x-ops-troubleshoot` | `forge troubleshoot` ou worker acionado por falhas. |
+| `x-ops-incident` | Comando V0 de operação/incidente, também instalável como plugin ops quando o time quiser empacotar extensões. |
+| `x-jira-create-epic`, `x-jira-create-stories` | Plugins V0 `forge jira ...`; fora do core offline obrigatório, mas dentro do escopo V0 via marketplace/plugin opt-in. |
+| `x-adr-generate` | `forge adr generate` e fase interna de arquitetura. |
+| `x-owasp-scan`, `x-security-dashboard`, `x-security-pentest` | `forge security ...`, alguns condicionais por capability/permissão. |
+
+#### 8.1.3. Serviços internos — viram código testável
+
+Estas skills existem hoje porque o LLM precisava chamar componentes internos por nome. No Forge, elas viram classes, serviços ou funções.
+
+| Grupo interno | Skills atuais | Forma em Forge |
+| --- | --- | --- |
+| Gates | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | `PhaseGateService`, `StoryVerifyService`, `EpicIntegrityGate`. |
+| Estado e contexto | `x-internal-status-update`, `x-internal-story-resume`, `x-internal-story-load-context`, `x-internal-args-normalize` | Repositório de estado, loader de contexto, parser tipado de args. |
+| Planejamento | `x-internal-story-build-plan`, `x-internal-epic-build-plan`, `x-lib-task-decomposer` | Builders e dispatchers internos de workers. |
+| Renderização | `x-internal-report-write`, `x-internal-pr-body-render`, `x-internal-story-report` | Renderers tipados com templates versionados. |
+| Git/precheck | `x-internal-epic-branch-ensure`, `x-internal-worktree-precheck`, `x-lib-group-verifier` | Serviços de branch, worktree, locks e wave verification. |
+| Criação interna | `x-internal-epic-create`, `x-internal-story-create`, `x-internal-epic-map` | Factories/renderers de backlog e mapa. |
+
+#### 8.1.4. Skills puras — permanecem isoladas como workers, adapters ou comandos utilitários
+
+Estas já têm uma responsabilidade dominante. O Forge deve portá-las sem inflar escopo. Elas não devem ganhar state machine própria nem coordenar lifecycle amplo.
+
+| Grupo | Skills puras | Destino Forge |
+| --- | --- | --- |
+| `conditional/dev` | `x-setup-stack` | Adapter/comando de setup stack-specific. |
+| `conditional/ops` | `x-obs-instrument` | Worker/adapter de instrumentação. |
+| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-obs`, `x-review-security` | Workers especialistas que consomem KPs/policies. |
+| `conditional/security` | `x-security-container`, `x-security-dast`, `x-security-infra`, `x-security-sast`, `x-security-secrets`, `x-security-sonar` | Security adapters/workers por superfície. |
+| `conditional/test` | `x-test-contract-lint`, `x-test-contract`, `x-test-e2e`, `x-test-perf`, `x-test-smoke-api`, `x-test-smoke-socket` | Test adapters por categoria. |
+| `core/code` | `x-code-format`, `x-code-lint` | Adapters determinísticos de format/lint. |
+| `core/dev` | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Templates stack-specific + render command. |
+| `core/dev` | `x-ci-generate`, `x-mcp-recommend`, `x-setup-env`, `x-spec-drift` | CI renderer, advisor command, setup/doctor, drift report. |
+| `core/git` | `x-git-branch`, `x-git-cleanup-branches`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-planning-commit` | Git adapters transacionais. |
+| `core/jira` | `x-jira-create-epic`, `x-jira-create-stories` | Plugins Jira. |
+| `core/lib` | `x-lib-group-verifier`, `x-lib-task-decomposer` | Serviços internos reutilizáveis. |
+| `core/ops` | `x-doc-generate`, `x-doc-validate`, `x-ops-incident`, `x-ops-troubleshoot`, `x-perf-profile`, `x-release-changelog`, `x-status-reconcile`, `x-telemetry-analyze`, `x-telemetry-trend` | Docs, ops, profiling, changelog, telemetry commands. |
+| `core/plan` | `planning-standards-kp`, `x-adr-generate`, `x-arch-plan`, `x-arch-system-update`, `x-arch-update`, `x-parallel-eval`, `x-task-plan`, `x-template-migrate`, `x-threat-model` | KP, worker prompts, docs updates, validators e planners. |
+| `core/pr` | `x-pr-create`, `x-pr-fix`, `x-pr-merge`, `x-pr-watch-ci` | PR commands/services. |
+| `core/review` | `x-review-perf`, `x-review-pr`, `x-review-qa` | Review workers/commands. |
+| `core/security` | `x-dependency-audit`, `x-hardening-eval`, `x-owasp-scan`, `x-runtime-eval`, `x-security-dashboard`, `x-security-pipeline`, `x-supply-chain-audit` | Security commands/adapters. |
+| `core/test` | `x-test-plan`, `x-test-run` | Test plan worker + test runner adapter. |
+
+#### 8.1.5. Skills candidatas a virar KP, policy ou template
+
+| Ativo atual | Tipo-alvo provável | Justificativa |
+| --- | --- | --- |
+| `planning-standards-kp` | `knowledge-pack` | Já é uma fonte RA9; deve sair do catálogo de comandos. |
+| `x-mcp-recommend` | KP + advisor command | O catálogo de MCPs é conhecimento; o comando só aplica matching. |
+| Scaffolds (`spring-controller`, `quarkus-resource`, etc.) | `template` + render command | O valor principal é estrutura stack-specific. |
+| Review specialists | `worker-prompt` + KP/policy externo | O review permanece ação, mas critérios devem sair do prompt e virar KP/policy. |
+| `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | `policy` / gate service | São invariantes de lifecycle. |
+| `x-doc-validate` | Policy + command | O critério é policy; a execução é command/gate. |
+| `x-lib-audit-rules` | Registry/policy validator | Deve validar registry, rules e policies tipadas. |
+| `audit-*.sh`, `verify-*.sh`, `enforce-*.sh` | Policy executable | Não são skills; são invariantes que migram para runtime/CI. |
+
+### 8.2. Rules e policies
+
+| Domínio de rule atual | Exemplos atuais | Destino Forge |
+| --- | --- | --- |
+| Identidade, domínio e contexto | Rules 01, 02 | Doctrine humana + defaults de profile. |
+| Coding standards, arquitetura, quality gates | Rules 03, 04, 05 | Thresholds/limites viram policy; explicações viram KP. |
+| Segurança, operações, compliance | Rules 06, 07, conditional rules | Policy packs por domínio regulado + KP de referência. |
+| Branching, release, Git Flow | Rules 08, 09, 21 | Serviços de branch/release e CI de consistência. |
+| Skill invocation, visibility, capability grammar | Rules 13, 22, 28 | Registry/linter tipado; tool-call grammar vira schema/AST. |
+| Model selection e custo | Rule 23 | Policy no model router. |
+| Execution integrity e zero-bypass | Rules 24, 27 | Propriedade arquitetural do runtime; CI valida evidência. |
+| Task hierarchy e phase gates | Rule 25 | State machine + phase gate service. |
+| Audit lifecycle | Rule 26 | Biblioteca de auditoria; taxonomy curta em docs. |
+| Refinement e DoR | Rule 29 | Pré-condição nativa dos comandos de implementação. |
+| Documentation as DoD | Rule 31 | Policy de doc freshness + KP stack-aware. |
+
+Decisão: rules críticas ganham `policy_id`, versão, testes e ponto de execução claro: runtime, CI Camada B ou doctrine humana.
+
+### 8.3. Knowledge Packs
+
+| KP/domínio | Destino Forge | Consumo típico |
+| --- | --- | --- |
+| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `forge arch plan`, scaffolds, code workers. |
+| `coding-standards` | KP de engenharia + ponte para policies executáveis. | `forge task implement`, `forge review`, `forge code audit`. |
+| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `forge story plan`, `forge task plan`, `forge test tdd`. |
+| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `forge review security`, `forge threat model`, `forge ci verify`. |
+| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability runtime/infra. | `forge ops`, `forge review devops`, `forge perf profile`. |
+| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `forge review api`, `forge arch plan`, contract tests. |
+
+KP não deve ter side effect nem ser invocado como comando principal. Se houver UX de consulta, ela deve ser algo como `forge explain <topic>`, não um lifecycle step.
+
+### 8.4. Hooks e scripts de validação
+
+Os hooks e scripts atuais são importantes porque explicitam invariantes. Eles não devem sobreviver como mecanismo primário, mas seus contratos devem sobreviver como código.
+
+#### 8.4.1. Gatilhos atuais
+
+| Gatilho | Hooks/scripts envolvidos | Responsabilidade |
+| --- | --- | --- |
+| `SessionStart` | `telemetry-session.sh` | Abre trilha de telemetria da sessão. |
+| `PreToolUse` | `telemetry-pretool.sh`, `enforce-phase-sequence.sh`, `enforce-no-bypass-flags.sh`, `enforce-refinement-gate.sh`, `enforce-preflight-gates.sh` | Mede tool call e bloqueia fase inválida, bypass, ausência de refinement ou operação remota sem preflight. |
+| `PostToolUse` (`Write`/`Edit`) | `post-compile-check.sh` | Compila após edição Java. |
+| `PostToolUse` (`*`) | `telemetry-posttool.sh` | Fecha medição de tool call. |
+| `SubagentStop` | `telemetry-subagent.sh` | Registra encerramento de subagente. |
+| `Stop` | `telemetry-stop.sh`, `verify-story-completion.sh`, `verify-phase-gates.sh`, `enforce-continuous-flow.sh`, `stage-telemetry.sh` | Fecha sessão, verifica evidências, alerta gates e prepara telemetria. |
+| PR/CI/`mvn verify` | `scripts/audit-*.sh`, `*AuditTest.java` | Validação detectiva no repositório. |
+
+#### 8.4.2. Migração dos invariantes
+
+| Script/hook/família | Invariante | Destino Forge |
+| --- | --- | --- |
+| `enforce-phase-sequence.sh`, `verify-phase-gates.sh`, `audit-phase-gates.sh` | Não avançar fase sem filhos/evidências/gates passados. | `PhaseGateService` + testes + `forge ci verify`. |
+| `enforce-no-bypass-flags.sh`, `audit-bypass-flags.sh` | Bypass flags só em recovery. | Parser tipado de flags + policy de recovery. |
+| `enforce-refinement-gate.sh`, `audit-refinement-gate.sh` | Implementação exige refinement aprovado. | Pré-condição dos commands. |
+| `enforce-preflight-gates.sh`, `scripts/preflight.sh` | Operação remota exige estado local íntegro. | Preflight in-process antes de push/PR. |
+| `post-compile-check.sh` | Edição Java não deve quebrar compile. | Build adapter por stack. |
+| `verify-story-completion.sh`, `audit-execution-integrity.sh` | PR/story exige evidência completa. | Completion gate + CI Camada B. |
+| `enforce-continuous-flow.sh` | Orquestração não deve ficar parada em fase aberta. | Scheduler/state machine do runtime. |
+| `telemetry-*`, `telemetry-phase.sh`, `stage-telemetry.sh` | Eventos de sessão/tool/fase/subagente precisam ser emitidos. | Telemetria in-process + audit log local. |
+| `audit-doc-freshness.sh` | Doc-as-DoD. | Documentation policy + `forge doc validate`. |
+| `audit-template-version.sh`, `audit-flow-version.sh` | Templates e flowVersion precisam ser compatíveis. | Schema validators + migration assistant. |
+| `audit-epic-branches.sh` | Branching de epic precisa ser consistente. | Branch policy service. |
+| `audit-skill-visibility.sh`, `audit-model-selection.sh`, `audit-capability-graph.sh` | Registry, modelo e capability graph precisam ser íntegros. | Registry linter + resolver tipado. |
+
+Decisão: nenhum hook shell deve ser mecanismo primário da V0. Para cada hook/script removido, criar teste no Forge cobrindo o mesmo invariante e rodar dual-mode por 1 release.
+
+### 8.5. Templates
+
+Templates são estruturas reutilizáveis. Eles não são artefatos finais; eles definem a forma dos artefatos.
+
+| Família | Exemplos | Consumidores atuais | Destino Forge |
+| --- | --- | --- | --- |
+| Planning product | `_TEMPLATE-EPIC.md`, `_TEMPLATE-STORY.md`, `_TEMPLATE-TASK.md`, `_TEMPLATE-IMPLEMENTATION-MAP.md`, `_TEMPLATE-DOR-CHECKLIST.md` | Epic/story/feature creation, planning/refinement. | Template registry + schemas de backlog. |
+| Execution governance | `_TEMPLATE-IMPLEMENTATION-PLAN.md`, `_TEMPLATE-TASK-BREAKDOWN.md`, `_TEMPLATE-EPIC-EXECUTION-PLAN.md`, `_TEMPLATE-STORY-COMPLETION-REPORT.md`, `_TEMPLATE-EXECUTION-STATE.json`, `_TEMPLATE-REFINEMENT-VERDICT.md` | Story/epic implement, reports, status update. | Renderer determinístico + schemas para estado/evidência. |
+| Review governance | `_TEMPLATE-ARCHITECTURE-PLAN.md`, `_TEMPLATE-SPECIALIST-REVIEW.md`, `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`, `_TEMPLATE-TECH-LEAD-REVIEW.md`, `_TEMPLATE-REVIEW-REMEDIATION.md` | Review, review-pr, remediation. | Worker review templates + structured verdicts. |
+| Security, compliance, quality | `_TEMPLATE-SECURITY-ASSESSMENT.md`, `_TEMPLATE-COMPLIANCE-ASSESSMENT.md`, `_TEMPLATE-THREAT-MODEL.md`, `_TEMPLATE-SLO-SLI-DEFINITION.md`, `_TEMPLATE-TEST-PLAN.md` | Planning, threat model, test plan. | Security/testing templates tied to policies. |
+| Documentation | `_TEMPLATE-ADR.md`, `_TEMPLATE-ARCHITECTURE-SYSTEM.md`, `_TEMPLATE-DOC-VALIDATE-REPORT.md`, `_TEMPLATE-CONTRIBUTING.md`, `CLAUDE.md`, `SYSTEM_SPECS.md` | Docs generation, ADR, target adapters. | Generated documentation views. |
+| Observability/ops | `_TEMPLATE-TELEMETRY-EVENT.json`, `_TEMPLATE-TELEMETRY-REPORT.md`, runbooks | Telemetry hooks, telemetry analyze, ops skills. | Event schemas + report renderers. |
+| Git/PR/release | `_TEMPLATE-CHANGELOG-ENTRY.md`, `_TEMPLATE-RELEASE-CHECKLIST.md`, `_TEMPLATE-PR-IMPLEMENTATION.md`, `_TEMPLATE-PR-BACKLOG.md` | Release/changelog/PR body rendering. | Strict renderers with evidence schema. |
+| Meta-generator/infra | `_TEMPLATE-SKILL.md`, `constitution/*`, `domains/**`, `fragments/*`, `config-templates/*`, `cicd-templates/**/*.njk` | Generator, authoring, CI/CD assembler. | Template/profile/fragment registry. |
+
+Decisões:
+
+- Todo template ganha `template_id`, versão, categoria, input schema e consumidores.
+- JSON templates como `_TEMPLATE-EXECUTION-STATE.json` viram schemas, não texto copiado.
+- Templates `.njk`/YAML pertencem à composition engine, não ao lifecycle de skills.
+- Goldens continuam testes de regressão, não fonte de verdade.
+
+### 8.6. Artefatos padrão gerados
+
+Artefatos são instâncias persistidas no disco. A fonte de layout v4 é `ai/README.md`: `ai/epics/epic-XXXX-<slug>/` concentra épico, stories, planos, relatórios, telemetria e estado; `ai/releases/` guarda release state; `ai/runs/` guarda artefatos por sessão/execução. Fluxos legados podem usar `plans/epic-XXXX/`, mas a semântica é a mesma.
+
+#### 8.6.1. Raiz do épico
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico. | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, builders internos. | Operadores, story creation, refinement, orchestrators, audits. |
+| `story-XXXX-YYYY.md` | Contrato implementável da story. | `x-story-create`, `x-epic-decompose`, builders internos. | `x-story-implement`, `x-task-implement`, reviews, CI. |
+| `IMPLEMENTATION-MAP.md` | DAG e fases entre stories. | `x-epic-map`, `x-feature-create`, `x-epic-decompose`. | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`. |
+| `execution-state.json` | Checkpoint de orquestração. | Orchestrators e status services. | Resume, phase gates, refinement gate, continuous flow, runtime Forge. |
+| `epic-execution-plan.md` | Plano materializado do épico. | Epic build plan / implement. | `x-epic-implement`, relatórios, auditoria humana. |
+| `epic-execution-report.md` | Encerramento agregado do épico. | `x-epic-implement`, report writer. | Release train, stakeholders, CI. |
+| `spec-*.md` | Entrada de decomposição. | Humano ou feature pipeline. | Epic/story creation, refinement. |
+
+#### 8.6.2. `plans/`
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `arch-story-*.md` | Plano arquitetural. | `x-arch-plan` / build-plan. | Implementação, `x-arch-update`, reviews, Surface 07. |
+| `plan-story-*.md` | Plano de implementação. | `x-internal-story-build-plan`. | Task implement, context loader, verify. |
+| `tests-story-*.md` | Plano TDD/TPP. | `x-test-plan` / build-plan. | Task implement, QA, coverage. |
+| `tasks-story-*.md` | Decomposição de tasks. | `x-lib-task-decomposer`. | Task implement, execution state. |
+| `plan-task-*.md` / `task-plan-TASK-*.md` | Plano por task. | `x-task-plan`, `x-story-plan`. | Task implement, parallel eval. |
+| `security-story-*.md` | Avaliação de segurança. | Build-plan Phase 1E. | Security review, compliance. |
+| `compliance-story-*.md` | Avaliação compliance. | Build-plan Phase 1F. | Compliance gates. |
+| `planning-report-story-*.md` / `story-planning-report-*.md` | Relatório de planejamento. | `x-story-plan`, `x-epic-orchestrate`. | DoR, resume, operadores. |
+| `dor-story-*.md` | Definition of Ready. | `x-story-plan`. | `x-epic-orchestrate`, planning gate. |
+| `review-*-story-*.md` | Review especialista. | `x-review`. | Dashboard, remediation, Surface 04. |
+| `review-dashboard-story-*.md` | Consolidação de reviews. | `x-review`. | Tech lead, story owner. |
+| `techlead-review-story-*.md` | Veredito GO/NO-GO. | `x-review-pr`. | Merge gate, Surface 05. |
+| `remediation-story-*.md` | Plano de correções pós-review. | Story implement remediation phase. | PR fixes, implementation. |
+
+O pacote de Fase 1 em fluxos zero-bypass é tipicamente: arch plan, implementation plan, test plan, task breakdown, security assessment e compliance assessment.
+
+#### 8.6.3. `reports/`
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-story-report`. | Operadores, merge checklist, execution integrity audit. |
+| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-story-verify`. | CI, audits, Surface 03. |
+| `verify-envelope-epic-XXXX.json` | Verificação de épico. | `x-internal-epic-integrity-gate`. | CI, release. |
+| `dependency-audit-STORY-ID.md` | Evidência supply chain. | `x-dependency-audit`. | Security, PR evidence, Surface 08. |
+| `doc-validate-report-STORY-ID.md` | Evidência doc-as-DoD. | `x-doc-validate`. | Stop hook, CI doc freshness. |
+| `phase-report-epic-XXXX.md` | Relatório de fase. | `x-epic-implement`. | Epic orchestration, stakeholders. |
+| `epic-planning-report-XXXX.md` | Planejamento consolidado. | `x-epic-orchestrate`. | Equipe, resume/replanning. |
+
+#### 8.6.4. Telemetria, releases e adjacentes
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; Forge runtime na V0. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
+| `ai/releases/release-state-X.Y.Z.json` | Estado monotônico de release. | `x-release`. | Próximo release, CI, operadores. |
+| `ai/runs/*` | Evidência por sessão/execução. | Ferramentas, hooks ou ops skills. | Troubleshooting/forensics. |
+| `tasks/task-TASK-*.md` | Contrato task-first. | `x-story-plan`, `x-task-plan`. | `x-task-implement`. |
+| `contracts/{STORY_ID}-*.yaml\|proto` | Contratos API-first. | Story implement Phase 0.5. | Contract lint, implementação, API review. |
+| `.claude/state/pr-watch-{PR}.json` | Estado de CI-watch. | `x-pr-watch-ci`. | Stop hook, operadores, Surface 06. |
+| PR body `## Orchestrator Evidence` | Ponte entre GitHub e evidências locais. | `x-pr-create`, PR body renderer. | Revisores, CI audit, Surface 11. |
+| `governance/baselines/*.txt` | Exceções explícitas. | Humanos/scripts de baseline. | CI auditors, hotfix exceptions. |
+
+Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autorizado e consumidores declarados. O runtime deixa de inferir por path e passa a validar contratos.
+
+---
+
+## 9. Alterações Estruturais Necessárias
+
+| # | Mudança | De | Para | Risco / mitigação |
+| --- | --- | --- | --- | --- |
+| 0 | Inversão de controle | LLM orquestra; hooks tentam bloquear bypass. | Forge orquestra; LLM é worker. | Portar 1 orquestrador por vez e validar dual-mode. |
+| 1 | Harness abstraction | Claude Code only. | Claude Code, Cursor, Windsurf, Aider, generic MCP. | Começar com Claude Code + Cursor. |
+| 2 | LLM abstraction | Anthropic-only. | Claude/GPT/Gemini/local. | Prompt matrix por provider. |
+| 3 | Governança como código | Rules markdown. | Policies executáveis. | Começar com YAML+JSONLogic para rules críticas. |
+| 4 | Output do generator | Regen-only. | Overlay system. | 3-way merge declarativo + `forge doctor`. |
+| 5 | Telemetria | NDJSON via hooks. | Runtime telemetry + OTel-compatible. | Importer para histórico. |
+| 6 | Distribuição de skills | Copy in-repo. | Marketplace/cache local versionado. | Assinatura, sandbox e core offline. |
+| 7 | Multi-projeto | Repos isolados. | Opt-in cross-project intelligence. | Differential privacy e local-only default. |
+| 8 | Multi-tenancy | N/A. | RBAC/cloud opt-in na V0. | Caminho feliz local single-user; cloud multi-tenant não pode virar pré-requisito. |
+| 9 | Backward compat | Flow versions legados. | Migration assistant. | Testar contra profiles e epics canônicos. |
+| 10 | OSS vs commercial | 100% OSS hoje. | Core OSS + cloud paid. | Linha clara desde o dia 1. |
+| 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
+| 12 | Rules engine | Prosa interpretada. | Policy engine + CI check. | Migrar só o que é realmente enforceable primeiro. |
+
+---
+
+## 10. Riscos Transversais
+
+### 10.1. Técnicos
+
+- **Performance da composition em escala.** Com plugins externos, pode crescer de centenas para milhares de artefatos. Cache local é V0.
+- **Determinismo cross-LLM.** Separar composição determinística de conteúdo criativo gerado por LLM.
+- **Estado distribuído.** A V0 precisa suportar local single-user, resume cross-machine e colaboração, preservando Git/Markdown como fonte canônica e SQLite/blob store como projeções locais.
+- **Trace OTel.** Migrar `events.ndjson` sem quebrar análises atuais.
+- **Migração de hooks.** Perda de invariante é o maior risco. Dual-mode e testes por script mitigam.
+
+### 10.2. Produto
+
+- **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `forge init` e `forge doctor` são centrais.
+- **Adoption friction.** Usuários com histórico de epics 0001-0071 precisam migrar sem perder evidência.
+- **Marketplace cold-start.** Portar todos os ativos oficiais atuais como cache local embarcado.
+- **Modelo de pricing.** Core local-first deve permanecer gratuito; cloud/marketplace/observability podem ser pagos.
+
+### 10.3. Compliance e segurança
+
+- **LGPD/GDPR para telemetria remota.** Scrubbing client-side e opt-in granular.
+- **Supply chain do marketplace.** SBOM, signing, sandbox, trust score.
+- **Auditabilidade legal.** Audit log local imutável começa na V0.
+- **Cost-attack vector.** Budget guardrails por skill/provider.
+
+### 10.4. Estratégia
+
+- **Posicionamento.** Diferenciar por governance-first, evidence-first, local-first e multi-LLM.
+- **OSS strategy.** Core Apache 2.0 é bom candidato; cloud/commercial separado.
+- **Contribuição.** Extension points limpos: target adapter, capability, policy pack, template pack, plugin.
 
 ---
 
 ## 11. Próximos Passos
 
-1. Decidir o nome real do produto e registrar domínio/organização.
+1. Registrar `Forge` como nome oficial do produto e validar domínio/organização.
 2. Definir licença do core e fronteira comercial.
 3. Validar hipótese com 5-10 usuários atuais do `ia-dev-env`.
 4. Rodar spike de inversão de controle com um orquestrador.
 5. Rodar spike de target adapter Cursor.
 6. Criar ADRs para as 12 mudanças estruturais antes de código de produção.
 7. Aplicar refinement gate neste próprio plano, com personas PO, Tech Lead, Architect, Security, QA e SRE/DevOps.
-8. Transformar V0 sugerida em épicos, depois stories e tasks.
+8. Transformar o escopo completo da V0 em capacidades, features, épicos, stories e tasks.
 9. Planejar transição dual-mode: hooks/scripts atuais e Forge rodando em paralelo por 1 release.
 
 ---
 
 ## 12. Notas de Processo
 
-Este plano para em `Feature`. Quando aprovado, cada Feature deve passar por refinement antes de virar Epic. Cada Epic resultante deve produzir os artefatos de planejamento e evidência exigidos pelo próprio modelo que queremos vender.
+Este plano é a fonte estratégica para gerar capacidades, features, épicos e histórias. Quando aprovado, cada Product/Capacity/Feature deve passar por refinement antes de virar Epic. Cada Epic resultante deve produzir os artefatos de planejamento e evidência exigidos pelo próprio modelo que queremos vender.
 
-O princípio local-first é vinculante para toda Feature `[V0]`: se uma Feature não puder rodar como CLI local, não é V0.
+O princípio local-first é vinculante para toda Feature `[V0]`: cloud, marketplace, SaaS e analytics podem existir na V0, mas o caminho feliz de engenharia precisa continuar executável localmente, sem rede obrigatória.
 
 O princípio de inversão de controle também é vinculante para toda Feature `[V0]`: se uma Feature depende do LLM para orquestrar ordem, gates, commits ou validações, ela está no produto errado. O LLM pode gerar conteúdo; o Forge deve controlar o fluxo.
