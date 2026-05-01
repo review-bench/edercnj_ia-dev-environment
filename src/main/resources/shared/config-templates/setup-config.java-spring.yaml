@@ -123,6 +123,27 @@ testing:
   chaos_tests: true
 
 # ═══════════════════════════════════════════════════
+# SECTION 11b: QUALITY GATES (EPIC-0072)
+# ═══════════════════════════════════════════════════
+quality:
+  performance:
+    enabled: false
+    slo:
+      rest: { p50_ms: 100, p95_ms: 200, p99_ms: 500, throughput_rps: 100 }
+      grpc: { p50_ms: 20, p95_ms: 100, p99_ms: 200 }
+      cli:  { gen_time_p95_ms: 3000 }
+    baseline_tolerance_pct: 10
+  mutation:
+    enabled: false
+    threshold: 80
+    runtime_cap_min: 10
+  contract:
+    enabled: false
+    pact: false
+    openapi_breaking: true
+    proto_breaking: true
+
+# ═══════════════════════════════════════════════════
 # SECTION 12: DOMAIN TEMPLATE
 # ═══════════════════════════════════════════════════
 domain:
