@@ -2050,88 +2050,257 @@ Regras gerais:
 - `BLOCKED` precisa declarar dependency ou policy que bloqueou.
 - `REMOTE_CHECKPOINTED` exige SHA remoto verificável.
 
-### 10.4. Schemas mínimos de artefatos estratégicos
+### 10.4. Schemas canônicos de artefatos e prompts
 
-Os exemplos abaixo são contratos de intenção. O formato final pode ser Markdown com frontmatter YAML ou JSON sidecar, mas os campos são obrigatórios para o runtime.
+Todo artefato estratégico do Forge deve ser um arquivo Markdown com frontmatter YAML. O frontmatter é o contrato tipado consumido pelo runtime, pelo índice SQLite, pelo blob store, pelas policies e pelo CI. O corpo Markdown é o contrato semântico consumido por humanos e usado pelo Forge para montar contexto de LLM.
 
-`product-*.md`:
+Regra central: YAML decide identidade, estado, relações, NFRs, lineage e validação; Markdown explica intenção, problema, decisões, comportamento esperado e trade-offs.
+
+Formato canônico:
+
+```md
+---
+artifact_kind: forge.feature
+schema_version: 1
+id: FEAT-Forge-STORY-RUNTIME
+slug: story-runtime
+title: Story Runtime Orchestration
+status: READY_FOR_EPIC
+# demais campos tipados do artifact_kind
+---
+# Story Runtime Orchestration
+
+## Problem
+
+Texto descritivo para humanos e LLMs.
+
+## Desired Behavior
+
+Texto com comportamento esperado, decisões e exemplos.
+```
+
+Campos comuns a todos os artefatos:
+
+| Campo | Significado | Consumidores |
+| --- | --- | --- |
+| `artifact_kind` | Tipo canônico do artefato, por exemplo `forge.feature` ou `forge.prompt`. | Runtime, registry, CI, indexador. |
+| `schema_version` | Versão do schema daquele tipo. | Migrator, validator, CI. |
+| `id` | Identidade estável e global no control repository. | Relações, lineage, URLs, comandos. |
+| `slug` | Nome curto legível e estável para paths e UI. | CLI, UI, docs. |
+| `title` | Nome humano do artefato. | UI, prompts, relatórios. |
+| `status` | Estado de lifecycle controlado por enum. | State machines, gates, CI. |
+| `parent` | Relação ascendente direta. | Lineage, freshness, criação de descendentes. |
+| `lineage` | Origem, gerador, artefatos fonte, filhos e checkpoints. | Evidence Ledger, rebuild, auditoria. |
+| `body_contract` | Seções Markdown obrigatórias para o tipo. | LLM context builder, doc validator. |
+| `llm_context` | Como o Forge deve transformar o artefato em contexto de prompt. | AI Workers, prompt renderer. |
+| `remote_checkpoint` | Branch, SHA, PR e estado remoto aprovado. | Git adapter, CI, recovery. |
+
+#### 10.4.1. Product
+
+`product-*.md` descreve o produto como unidade de valor. Ele precisa carregar contexto suficiente para orientar capacities, features, arquitetura, métricas e trade-offs comerciais.
 
 ```yaml
 artifact_kind: forge.product
 schema_version: 1
 id: PRODUCT-Forge-0001
-project_id: PROJECT-Forge
-status: APPROVED
+slug: forge
 title: Forge
-value_proposition: "Local-first orchestration for governed AI-assisted delivery."
-target_users:
-  - platform engineers
-  - tech leads
+status: APPROVED
+parent:
+  project_id: PROJECT-Forge
+value:
+  problem: "AI-assisted delivery lacks deterministic orchestration and evidence."
+  value_proposition: "Local-first orchestration for governed AI-assisted delivery."
+  target_users:
+    - platform engineers
+    - tech leads
+    - AI-assisted developers
+  differentiators:
+    - local-first by default
+    - evidence-first lifecycle
+    - multi-LLM orchestration
 success_metrics:
   - id: ttfv
     target: "first useful artifact in <= 5 minutes"
+  - id: bypass_rate
+    target: "0 bypasses in official flow"
 constraints:
   local_first: true
-  network_required: false
+  network_required_for_happy_path: false
+  cloud_opt_in: true
+body_contract:
+  required_sections:
+    - Problem
+    - Target Users
+    - Value Proposition
+    - Success Metrics
+    - Constraints
+llm_context:
+  summary: "Forge is the product that owns governed AI-assisted delivery."
+  include_sections:
+    - Problem
+    - Value Proposition
+    - Constraints
 remote_checkpoint:
   branch: product/PRODUCT-Forge-0001
   sha: "<remote-sha>"
+  pr: "<pr-url>"
 ```
 
-`capacity-*.md`:
+#### 10.4.2. Capacity
+
+`capacity-*.md` descreve uma capacidade de produto/plataforma. Ela é maior que uma feature e menor que o produto inteiro.
 
 ```yaml
 artifact_kind: forge.capacity
 schema_version: 1
 id: CAP-Forge-RUNTIME
-product_id: PRODUCT-Forge-0001
+slug: orchestration-runtime
+title: Orchestration Runtime
 status: APPROVED
-domain: orchestration-runtime
-outcomes:
-  - deterministic state machine controls implementation flow
-dependencies:
-  - CAP-Forge-REGISTRY
+parent:
+  product_id: PRODUCT-Forge-0001
+domain: execution-governance
+value:
+  outcome: "Forge controls lifecycle state machines instead of asking LLMs to interpret markdown."
+  users_impacted:
+    - developers
+    - tech leads
+    - release owners
+boundaries:
+  owns:
+    - command lifecycle
+    - phase gates
+    - recovery and replay
+  delegates:
+    - creative generation to AI Workers
+    - git operations to Source Control
+relationships:
+  depends_on:
+    - CAP-Forge-REGISTRY
+  enables:
+    - FEAT-Forge-STORY-RUNTIME
 events:
-  - forge.run.started
-  - forge.run.completed
+  emits:
+    - forge.run.started
+    - forge.run.completed
+body_contract:
+  required_sections:
+    - Outcome
+    - Boundaries
+    - Dependencies
+    - Events
 ```
 
-`feature-*.md`:
+#### 10.4.3. Feature
+
+`feature-*.md` precisa conter contexto completo de produto, comportamento, fronteiras, NFRs e critérios de aceite. Ele não deve ser apenas um envelope técnico.
 
 ```yaml
 artifact_kind: forge.feature
 schema_version: 1
 id: FEAT-Forge-STORY-RUNTIME
-capacity_id: CAP-Forge-RUNTIME
+slug: story-runtime
+title: Story Runtime Orchestration
 status: READY_FOR_EPIC
-hypothesis: "If Forge owns story execution, bypass and evidence gaps drop to zero."
+parent:
+  project_id: PROJECT-Forge
+  product_id: PRODUCT-Forge-0001
+  capacity_id: CAP-Forge-RUNTIME
+lineage:
+  created_by: forge feature create
+  source_artifacts:
+    - CAP-Forge-RUNTIME
+  architecture_plan_id: ARCH-FEAT-Forge-STORY-RUNTIME
+  generated_epic_ids: []
+  generated_story_ids: []
+value:
+  problem: "LLM-led story execution can bypass phases and produce weak evidence."
+  hypothesis: "If Forge owns story execution, bypass and evidence gaps drop to zero."
+  outcome: "Story implementation becomes deterministic, resumable and auditable."
+  target_users:
+    - tech leads
+    - platform engineers
+    - AI-assisted developers
 scope:
   includes:
     - story runtime state machine
     - artifact evidence validation
-    - full release orchestration
+    - policy-gated task execution
+    - resume and replay
+    - PR/review/release orchestration
+  boundaries:
+    - LLM proposes code and text, but never mutates lifecycle state directly.
+    - Git and Markdown remain canonical; SQLite and blob store are operational projections.
 nfrs:
-  max_resume_time_seconds: 10
-  local_only: true
-architecture_plan_id: ARCH-FEAT-Forge-STORY-RUNTIME
+  performance:
+    max_resume_time_seconds: 10
+  reliability:
+    resumable: true
+    deterministic_replay: true
+  storage:
+    local_first: true
+    sqlite_index_required: true
+    blob_store_required: true
+  security:
+    audit_log_required: true
+    secret_scrubbing_required: true
+acceptance:
+  gherkin_refs:
+    - AC-FEAT-STORY-RUNTIME-001
+  success_metrics:
+    - id: bypass_rate
+      target: "0 bypasses in official flow"
+    - id: evidence_completeness
+      target: "100% mutable commands produce evidence envelopes"
+llm_context:
+  summary: "This feature moves story execution from LLM-interpreted markdown into Forge runtime code."
+  include_sections:
+    - Problem
+    - Desired Behavior
+    - Runtime Responsibilities
+    - Acceptance Criteria
+  prompt_hints:
+    - "Preserve deterministic orchestration."
+    - "Treat LLM output as proposal, never as committed state."
+body_contract:
+  required_sections:
+    - Problem
+    - Desired Behavior
+    - Runtime Responsibilities
+    - Acceptance Criteria
+    - Risks
+remote_checkpoint:
+  branch: feature/FEAT-Forge-STORY-RUNTIME
+  sha: "<remote-sha>"
+  pr: "<pr-url>"
 ```
 
-`architecture-feature-*.md`:
+#### 10.4.4. Architecture Plan
+
+`architecture-*.md` registra decisões sistêmicas para product, capacity ou feature. Ele precisa ser linkável e reusável por epic/story/task.
 
 ```yaml
 artifact_kind: forge.architecture_plan
 schema_version: 1
 id: ARCH-FEAT-Forge-STORY-RUNTIME
-scope: feature
-feature_id: FEAT-Forge-STORY-RUNTIME
+slug: story-runtime-architecture
+title: Story Runtime Architecture
 status: APPROVED
-parent_architecture:
-  product: ARCH-PRODUCT-Forge
-  capacity: ARCH-CAP-Forge-RUNTIME
+scope: feature
+parent:
+  feature_id: FEAT-Forge-STORY-RUNTIME
+  capacity_architecture_id: ARCH-CAP-Forge-RUNTIME
+  product_architecture_id: ARCH-PRODUCT-Forge
+nfr_profile:
+  users: "local developer and CI runner"
+  max_resume_time_seconds: 10
+  availability_target: "local command must be recoverable after interruption"
 decisions:
   - id: ADR-MINI-001
-    decision: "Use Git-backed Markdown as the canonical store and SQLite as a reconstructable operational index."
-    consequence: "The runtime gets fast local queries without making Git a database; cross-machine resume uses Git checkpoints plus synchronized asset index/blob snapshots."
+    title: Git-backed Markdown plus SQLite/blob operational store
+    decision: "Use Markdown in Git as canonical and SQLite/blob store as reconstructable operational projections."
+    consequence: "Fast local queries and snapshots without making Git a database."
 runtime_components:
   - StoryRuntime
   - PolicyEngine
@@ -2143,6 +2312,426 @@ readiness_checklist:
   - state machine states declared
   - policy failures mapped to error codes
   - artifact kinds declared
+  - storage and recovery strategy declared
+body_contract:
+  required_sections:
+    - Context
+    - Components
+    - Decisions
+    - Data Flow
+    - Risks
+    - Readiness Checklist
+```
+
+#### 10.4.5. Epic
+
+`epic-*.md` é o pacote implementável derivado de uma feature aprovada e de um architecture plan aprovado.
+
+```yaml
+artifact_kind: forge.epic
+schema_version: 1
+id: EPIC-Forge-0001
+slug: story-runtime-implementation
+title: Implement Story Runtime Orchestration
+status: BACKLOG_READY
+parent:
+  feature_id: FEAT-Forge-STORY-RUNTIME
+  architecture_plan_id: ARCH-FEAT-Forge-STORY-RUNTIME
+lineage:
+  created_by: forge epic create
+  source_artifacts:
+    - FEAT-Forge-STORY-RUNTIME
+    - ARCH-FEAT-Forge-STORY-RUNTIME
+story_index:
+  - id: STORY-Forge-0001
+    title: Define story runtime state machine
+    depends_on: []
+  - id: STORY-Forge-0002
+    title: Persist evidence envelopes
+    depends_on:
+      - STORY-Forge-0001
+dod:
+  required_artifacts:
+    - forge.artifact.implementation-map
+    - forge.artifact.epic-execution-report
+    - forge.artifact.verify-envelope
+policies:
+  required:
+    - POLICY-Forge-REFINEMENT-GATE
+    - POLICY-Forge-EXECUTION-INTEGRITY
+body_contract:
+  required_sections:
+    - Goal
+    - Scope
+    - Story Index
+    - Cross-Cutting Rules
+    - Definition of Done
+```
+
+#### 10.4.6. Story
+
+`story-*.md` é a menor fatia de comportamento implementável e verificável. Ele deve ter contexto suficiente para gerar tasks e testes.
+
+```yaml
+artifact_kind: forge.story
+schema_version: 1
+id: STORY-Forge-0001
+slug: story-runtime-state-machine
+title: Define Story Runtime State Machine
+status: REFINEMENT_REQUIRED
+parent:
+  epic_id: EPIC-Forge-0001
+  feature_id: FEAT-Forge-STORY-RUNTIME
+behavior:
+  actor: "developer"
+  intent: "run forge story implement with deterministic phases"
+  outcome: "story lifecycle state changes are persisted and auditable"
+acceptance_criteria:
+  - id: AC-STORY-Forge-0001-001
+    given: "a refined story and approved implementation map"
+    when: "forge story implement starts"
+    then: "Forge records phase state before invoking any LLM worker"
+contracts:
+  inputs:
+    - STORY-ID
+    - implementation-map
+    - architecture-plan
+  outputs:
+    - story-completion-report
+    - verify-envelope
+dependencies:
+  stories: []
+  policies:
+    - POLICY-Forge-REFINEMENT-GATE
+task_ids:
+  - TASK-Forge-0001-001
+  - TASK-Forge-0001-002
+body_contract:
+  required_sections:
+    - User Value
+    - Acceptance Criteria
+    - Contracts
+    - Dependencies
+    - Task Breakdown
+```
+
+#### 10.4.7. Task
+
+`task-*.md` é a unidade atômica do loop TDD e do commit semântico.
+
+```yaml
+artifact_kind: forge.task
+schema_version: 1
+id: TASK-Forge-0001-001
+slug: story-runtime-domain-model
+title: Create Story Runtime Domain Model
+status: READY
+parent:
+  story_id: STORY-Forge-0001
+execution:
+  tdd_required: true
+  commit_required: true
+  expected_files:
+    write:
+      - java/src/main/java/dev/forge/deliveryorchestration/domain/StoryRuntime.java
+    read:
+      - docs/forge-strategic-plan-v3.md
+io_contract:
+  inputs:
+    - refined story schema
+    - state machine enum contract
+  outputs:
+    - domain model
+    - unit tests
+completion:
+  tests:
+    - StoryRuntimeTest
+  evidence:
+    - forge.artifact.task-commit
+    - forge.artifact.verify-envelope
+body_contract:
+  required_sections:
+    - Objective
+    - Inputs
+    - Outputs
+    - TDD Plan
+    - Completion Criteria
+```
+
+#### 10.4.8. Policy e guideline
+
+Rules atuais se dividem em `forge.policy` quando são executáveis e `forge.guideline` quando são doutrina para humanos/LLMs.
+
+```yaml
+artifact_kind: forge.policy
+schema_version: 1
+id: POLICY-Forge-REFINEMENT-GATE
+slug: refinement-gate
+title: Refinement Gate
+status: ACTIVE
+enforcement:
+  points:
+    - command: forge story implement
+      phase: preflight
+    - command: forge epic implement
+      phase: preflight
+  failure_code: REFINEMENT_REQUIRED
+inputs:
+  required_fields:
+    - story.status
+    - story.refinement_verdict.status
+rule:
+  expression_language: jsonlogic
+  expression:
+    and:
+      - { "==": [{ "var": "story.status" }, "REFINED"] }
+      - { "==": [{ "var": "story.refinement_verdict.status" }, "approved"] }
+evidence:
+  emits:
+    - forge.artifact.policy-decision
+body_contract:
+  required_sections:
+    - Intent
+    - Enforcement Points
+    - Failure Modes
+    - Recovery
+```
+
+```yaml
+artifact_kind: forge.guideline
+schema_version: 1
+id: GUIDE-Forge-CODING-STANDARDS
+slug: coding-standards
+title: Coding Standards Guidance
+status: ACTIVE
+applies_to:
+  domains:
+    - engineering-standards
+used_by:
+  prompts:
+    - PROMPT-Forge-CODE-GENERATE
+    - PROMPT-Forge-CODE-REVIEW
+body_contract:
+  required_sections:
+    - Principles
+    - Examples
+    - Anti-Patterns
+```
+
+#### 10.4.9. Knowledge Pack
+
+KPs viram artefatos de conhecimento versionados, indexáveis e citáveis pelo prompt builder.
+
+```yaml
+artifact_kind: forge.knowledge_pack
+schema_version: 1
+id: KP-Forge-STORY-PLANNING
+slug: story-planning
+title: Story Planning Knowledge Pack
+status: ACTIVE
+domain: planning-product
+applies_to:
+  artifact_kinds:
+    - forge.story
+    - forge.task
+used_by:
+  prompts:
+    - PROMPT-Forge-STORY-REFINE
+    - PROMPT-Forge-TASK-PLAN
+sections:
+  - id: decomposition
+    title: Story Decomposition
+  - id: acceptance-criteria
+    title: Acceptance Criteria
+  - id: dependency-mapping
+    title: Dependency Mapping
+retrieval:
+  default_mode: section-aware
+  max_tokens_per_prompt: 4000
+body_contract:
+  required_sections:
+    - Principles
+    - Procedures
+    - Examples
+    - Checklists
+```
+
+#### 10.4.10. Skills viram prompts, commands, adapters ou policies
+
+No Forge, `skill` deixa de ser um contrato externo para a LLM. Para a LLM, existe apenas prompt renderizado, contexto e schema de saída. `Skill` pode continuar como termo de migração interna, mas o registry canônico usa tipos mais precisos:
+
+| Skill atual | Forma canônica no Forge | Exemplo |
+| --- | --- | --- |
+| Orquestra lifecycle, git, PR, fases ou gates | `forge.command` ou `forge.internal_service` | `x-story-implement` -> `forge story implement`. |
+| Executa ferramenta determinística | `forge.adapter` | `x-test-run` -> build/test adapter. |
+| Pede julgamento ou geração criativa à LLM | `forge.prompt` | `x-arch-plan` -> `PROMPT-Forge-ARCH-PLAN`. |
+| Define regra bloqueante | `forge.policy` | Rule 29 -> `POLICY-Forge-REFINEMENT-GATE`. |
+| Ensina contexto, sem side effects | `forge.knowledge_pack` ou `forge.guideline` | `testing`, `security`, `architecture`. |
+| Define forma de output | `forge.template` | `_TEMPLATE-STORY.md`. |
+
+#### 10.4.11. Prompt
+
+`forge.prompt` é o artefato que substitui as skills LLM-facing. Ele declara entrada, contexto, modelo, saída esperada e critérios de aceitação. O Forge renderiza o prompt final e valida a resposta.
+
+```yaml
+artifact_kind: forge.prompt
+schema_version: 1
+id: PROMPT-Forge-STORY-REFINE
+slug: story-refine
+title: Story Refinement Prompt
+status: ACTIVE
+worker_kind: refinement
+model_requirements:
+  reasoning: high
+  structured_output: true
+input_schema:
+  artifact_refs:
+    - forge.story
+    - forge.feature
+    - forge.architecture_plan
+context_requirements:
+  knowledge_packs:
+    - KP-Forge-STORY-PLANNING
+    - KP-Forge-TESTING
+  policies:
+    - POLICY-Forge-REFINEMENT-GATE
+  include_markdown_sections:
+    - User Value
+    - Acceptance Criteria
+    - Contracts
+output_schema: SCHEMA-Forge-REFINEMENT-VERDICT-v1
+validation:
+  reject_if:
+    - output_missing_required_fields
+    - ungrounded_scope_change
+body_contract:
+  required_sections:
+    - System Role
+    - Task
+    - Context Assembly Rules
+    - Output Contract
+    - Rejection Criteria
+```
+
+#### 10.4.12. Template
+
+Templates são renderizadores tipados, não apenas arquivos copiáveis.
+
+```yaml
+artifact_kind: forge.template
+schema_version: 1
+id: TEMPLATE-Forge-STORY
+slug: story-template
+title: Story Markdown Template
+status: ACTIVE
+renders_artifact_kind: forge.story
+input_schema: SCHEMA-Forge-STORY-INPUT-v1
+output_schema: SCHEMA-Forge-STORY-v1
+renderer:
+  engine: markdown-frontmatter
+  deterministic: true
+body_contract:
+  required_sections:
+    - Frontmatter Mapping
+    - Markdown Sections
+    - Rendering Rules
+```
+
+#### 10.4.13. Command, adapter e plugin
+
+Commands são entrada pública, adapters encapsulam ferramentas externas e plugins distribuem extensões assinadas.
+
+```yaml
+artifact_kind: forge.command
+schema_version: 1
+id: COMMAND-Forge-STORY-IMPLEMENT
+slug: story-implement
+title: forge story implement
+status: ACTIVE
+cli:
+  name: forge story implement
+  args_schema: SCHEMA-Forge-STORY-IMPLEMENT-ARGS-v1
+lifecycle:
+  state_machine: STATE-Forge-STORY-IMPLEMENT-v1
+  policies:
+    - POLICY-Forge-REFINEMENT-GATE
+    - POLICY-Forge-EXECUTION-INTEGRITY
+emits:
+  artifacts:
+    - forge.artifact.story-completion-report
+    - forge.artifact.verify-envelope
+    - forge.artifact.telemetry-run
+```
+
+```yaml
+artifact_kind: forge.adapter
+schema_version: 1
+id: ADAPTER-Forge-GIT
+slug: git-adapter
+title: Git Adapter
+status: ACTIVE
+capabilities:
+  - ensure_branch
+  - commit_changes
+  - push_branch
+  - create_pull_request
+ports:
+  implements:
+    - GitClientPort
+security:
+  requires_user_workspace: true
+  masks_secrets: true
+```
+
+```yaml
+artifact_kind: forge.plugin
+schema_version: 1
+id: PLUGIN-Forge-JIRA
+slug: jira
+status: ACTIVE
+distribution:
+  semver: 1.0.0
+  signature_required: true
+  sbom_required: true
+permissions:
+  network:
+    - atlassian
+  writes:
+    - forge.jira.issue-link
+provides:
+  commands:
+    - COMMAND-Forge-JIRA-CREATE-EPIC
+  prompts: []
+  adapters:
+    - ADAPTER-Forge-JIRA
+```
+
+#### 10.4.14. Artifact schema
+
+Todo schema também é artefato versionado. Isso permite migration, validation, compatibility matrix e CI audit.
+
+```yaml
+artifact_kind: forge.artifact_schema
+schema_version: 1
+id: SCHEMA-Forge-FEATURE-v1
+slug: feature-schema-v1
+title: Feature Schema v1
+status: ACTIVE
+validates_artifact_kind: forge.feature
+format: json-schema
+compatibility:
+  backward_compatible_with: []
+  migration_to_next: null
+required_fields:
+  - artifact_kind
+  - schema_version
+  - id
+  - status
+  - parent
+  - value
+  - scope
+  - nfrs
+  - body_contract
 ```
 
 ### 10.5. Command contracts
@@ -2235,6 +2824,15 @@ O runtime não deve inferir semântica apenas pelo path. Cada artefato persistid
 | `forge.execution_state` | runtime commands | resume, phase gates, CI verify. | Stale se command version incompatível. |
 | `forge.verify_envelope` | gate services | PR body, CI verify, reports. | Immutable for run ID. |
 | `forge.audit_event` | runtime telemetry | audit log, forensics, analytics. | Append-only. |
+| `forge.policy` | governance authoring / migration | runtime gates, CI, command preflight. | Stale se input schema, command contract ou enforcement point muda. |
+| `forge.guideline` | governance authoring / migration | prompt builder, docs, reviews. | Stale se domain taxonomy ou linked policy muda. |
+| `forge.knowledge_pack` | KP authoring / migration | prompt builder, retrieval, reviews. | Stale se referenced schema, policy ou domain changes. |
+| `forge.prompt` | prompt authoring / migration | AI Workers, model router, output validator. | Stale se input/output schema ou required KP muda. |
+| `forge.template` | template authoring / renderer | artifact generation, PR body, reports. | Stale se rendered artifact schema muda. |
+| `forge.command` | runtime command registry | CLI, TUI, IDE, CI, docs. | Stale se args schema, lifecycle ou policies mudam. |
+| `forge.adapter` | adapter registry | command services, plugin runtime. | Stale se port contract ou permission model muda. |
+| `forge.plugin` | marketplace / plugin installer | capability resolver, command registry. | Stale se signature, SBOM, semver ou permissions mudam. |
+| `forge.artifact_schema` | schema authoring / migration | validators, CI, migration assistant. | Immutable by version; superseded by newer schema. |
 
 ### 10.9. Arquitetura hexagonal e bounded contexts do runtime
 
