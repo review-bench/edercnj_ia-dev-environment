@@ -42,6 +42,7 @@ public final class KnowledgePackSelection {
         packs.addAll(selectPciDssRequirementsPack(config));
         packs.addAll(selectOwaspAsvsReferencePack(config));
         packs.addAll(selectQualityPerformancePacks(config));
+        packs.addAll(selectQualityMutationPacks(config));
         return packs;
     }
 
@@ -117,5 +118,12 @@ public final class KnowledgePackSelection {
         List<String> packs = new ArrayList<>();
         packs.add("performance-engineering");
         return packs;
+    }
+
+    private static List<String> selectQualityMutationPacks(ProjectConfig config) {
+        if (!config.quality().mutation().enabled()) {
+            return List.of();
+        }
+        return List.of("mutation-testing");
     }
 }
