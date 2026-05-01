@@ -1,0 +1,21 @@
+id: quality.regression.self
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Regression-shell self mode — generates all 9 canonical profiles in a sandbox temp directory,
+  diffs each output bytewise against the golden fixtures, and runs a post-generation smoke
+  (./setup.sh simulated + hook installation verification). Invoked by /x-test-regression-shell
+  when quality.regression.mode = self (CLI generator projects).
+requires-capabilities: []
+requires: []
+excludes: [quality.regression.service]
+universal: false
+parameters:
+  scenarios-file:
+    type: string
+    default: tests/regression/scenarios.yaml
+  sandbox-dir:
+    type: string
+    default: /tmp/ia-dev-regression-self

@@ -113,7 +113,9 @@ class Epic0072ContractSkillSmokeIT {
                     new QualityConfig(
                             QualityConfig.PerformanceConfig.DEFAULT,
                             QualityConfig.MutationConfig.DEFAULT,
-                            new QualityConfig.ContractConfig(true, false, true, true));
+                            new QualityConfig.ContractConfig(true, false, true, true),
+                            QualityConfig.RegressionConfig.DEFAULT,
+                            QualityConfig.DastConfig.DEFAULT);
             var configWithQuality =
                     new dev.iadev.domain.model.ProjectConfig(
                             baseConfig.core(),
