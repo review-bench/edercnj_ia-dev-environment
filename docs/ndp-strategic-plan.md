@@ -499,6 +499,62 @@ Estas skills coordenam fluxo suficiente para não serem tratadas como leaf promp
 
 **Princípio invariante:** se a skill atual era principalmente *fluxo* (decidir ordem, validar, comitar, abrir PR, consolidar workers, controlar retry/resume), vira comando ou serviço NDP. Se era principalmente *criatividade* (gerar plano, redigir review, escrever ADR), continua como prompt versionado consumido pelo comando NDP correspondente. Se hoje é pública apenas porque o LLM precisava chamá-la manualmente, sua visibilidade deve ser reavaliada: no NDP, o usuário vê comandos de produto; o restante é API interna.
 
+### 5.2. Inventário — Skills puras / não-orquestradoras
+
+As skills abaixo já têm o nível de isolamento necessário para serem consideradas **skills puras**: cada uma possui uma responsabilidade dominante, entrada/saída relativamente delimitada e não deveria decidir o fluxo maior de implementação, release, PR, refinement ou governança. No NDP, elas podem virar prompts versionados, comandos utilitários, adapters de tooling ou serviços internos, mas **não precisam carregar state machine própria nem coordenar lifecycle amplo**.
+
+Critério usado: uma skill pura executa um trabalho focado — formatar, validar, auditar, gerar um artefato, revisar uma dimensão, rodar uma suíte, fazer scaffold, sincronizar com uma integração ou produzir uma recomendação. Quando houver retries, chamadas auxiliares ou validações internas, isso permanece aceitável desde que a skill continue responsável por **um único resultado de produto**.
+
+#### 5.2.1. Conditional skills
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `conditional/dev` | `x-setup-stack` | Setup pontual de stack local. |
+| `conditional/ops` | `x-obs-instrument` | Instrumentação de observabilidade. |
+| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-obs`, `x-review-security` | Reviews especialistas por uma dimensão técnica. |
+| `conditional/security` | `x-security-container`, `x-security-dast`, `x-security-infra`, `x-security-sast`, `x-security-secrets`, `x-security-sonar` | Scans e avaliações de segurança por superfície. |
+| `conditional/test` | `x-test-contract-lint`, `x-test-contract`, `x-test-e2e`, `x-test-perf`, `x-test-smoke-api`, `x-test-smoke-socket` | Execução ou validação de uma categoria de teste. |
+
+#### 5.2.2. Core code/dev/git skills
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/code` | `x-code-format`, `x-code-lint` | Formatação e lint como operações determinísticas. |
+| `core/dev` | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Scaffold ou geração pontual de componente. |
+| `core/dev` | `x-ci-generate`, `x-mcp-recommend`, `x-setup-env`, `x-spec-drift` | Geração de CI, recomendação, diagnóstico de ambiente ou drift report. |
+| `core/git` | `x-git-branch`, `x-git-cleanup-branches`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-planning-commit` | Primitivas Git isoladas, reutilizáveis pelos orquestradores. |
+
+#### 5.2.3. Internal skills com responsabilidade única
+
+Estas skills continuam sendo candidatas naturais a serviços internos do NDP, mas não por serem orquestradoras de produto; elas são primitivas bem delimitadas usadas por fluxos maiores.
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/internal/git` | `x-internal-epic-branch-ensure`, `x-internal-worktree-precheck` | Garantia de branch e pré-check de worktree. |
+| `core/internal/ops` | `x-internal-args-normalize`, `x-internal-report-write`, `x-internal-status-update` | Normalização de argumentos, escrita de relatório e atualização de estado. |
+| `core/internal/plan` | `x-frontmatter-migrate`, `x-internal-epic-build-plan`, `x-internal-epic-create`, `x-internal-epic-integrity-gate`, `x-internal-epic-map`, `x-internal-phase-gate`, `x-internal-story-create`, `x-internal-story-load-context`, `x-internal-story-report`, `x-internal-story-resume`, `x-internal-story-verify` | Migração, geração, carga de contexto, verificação, gates e reports com um objetivo explícito por skill. |
+| `core/internal/pr` | `x-internal-pr-body-render` | Renderização do corpo de PR. |
+
+#### 5.2.4. Integrações, bibliotecas e operações
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/jira` | `x-jira-create-epic`, `x-jira-create-stories` | Sincronização local → Jira. |
+| `core/lib` | `x-lib-group-verifier`, `x-lib-task-decomposer` | Verificação de grupo ou decomposição estrutural. |
+| `core/ops` | `x-doc-generate`, `x-doc-validate`, `x-ops-incident`, `x-ops-troubleshoot`, `x-perf-profile`, `x-release-changelog`, `x-status-reconcile`, `x-telemetry-analyze`, `x-telemetry-trend` | Documentação, troubleshooting, profiling, changelog, reconciliação e análise operacional. |
+
+#### 5.2.5. Planning, PR, review, security e test
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/plan` | `planning-standards-kp`, `x-adr-generate`, `x-arch-plan`, `x-arch-system-update`, `x-arch-update`, `x-parallel-eval`, `x-task-plan`, `x-template-migrate`, `x-threat-model` | Knowledge pack, planos, ADRs, atualização documental, avaliação de paralelismo, migração de template e threat model. |
+| `core/pr` | `x-pr-create`, `x-pr-fix`, `x-pr-merge`, `x-pr-watch-ci` | Operações pontuais de PR, correção localizada, merge e watch de CI. |
+| `core/review` | `x-review-perf`, `x-review-pr`, `x-review-qa` | Reviews focados em performance, checklist Tech Lead de PR ou QA. |
+| `core/security` | `x-dependency-audit`, `x-hardening-eval`, `x-owasp-scan`, `x-runtime-eval`, `x-security-dashboard`, `x-security-pipeline`, `x-supply-chain-audit` | Auditorias e avaliações de segurança com saída própria. |
+| `core/test` | `x-test-plan`, `x-test-run` | Plano de testes ou execução de testes/cobertura. |
+
+**Decisão de migração:** estas 98 skills devem ser portadas sem inflar seu escopo. O NDP pode chamá-las como workers, comandos auxiliares ou serviços internos, mas a responsabilidade de coordenar ordem, retries globais, gates cross-phase, commits, PRs e evidências pertence ao runtime de orquestração (§P2), não a essas skills.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
