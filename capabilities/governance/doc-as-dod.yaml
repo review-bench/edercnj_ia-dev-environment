@@ -1,0 +1,39 @@
+id: governance.doc-as-dod
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Documentation as Definition-of-Done gate — enforces that documentation targets
+  (README, OpenAPI, AsyncAPI, ADR, skill-docs, system-architecture) are updated
+  before a story PR may be merged. Installs skill x-doc-validate, skill x-doc-generate
+  v2, CI audit audit-doc-freshness.sh, and mandatory Phase 3 invocation in
+  x-story-implement. Universal — stack-agnostic (target selection is stack-aware
+  at runtime via the documentation.targets YAML block or auto-detection).
+requires-capabilities: []
+requires: []
+excludes: []
+universal: true
+parameters:
+  freshness-window-hours:
+    type: integer
+    default: 0
+    description: >
+      Grace period in hours before a missing doc update blocks the PR.
+      0 = immediate (default). Rarely > 0; used for releases with grace periods.
+  targets:
+    type: array
+    items:
+      type: string
+    default: []
+    description: >
+      Explicit list of documentation targets to validate. Empty = auto-detect from
+      project interfaces (README + ADR always; OpenAPI when interfaces[].spec=openapi;
+      AsyncAPI when interfaces[].broker not empty; gRPC proto when spec=proto3;
+      skill-docs and system-architecture checked at runtime).
+tags:
+  - governance
+  - documentation
+  - dod
+  - freshness-gate
+  - quality-gate
