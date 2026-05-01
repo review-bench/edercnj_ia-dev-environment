@@ -1,0 +1,19 @@
+{
+  "storyId": "story-0071-0006",
+  "epicId": "EPIC-0071",
+  "passed": true,
+  "verifiedAt": "2026-05-01T06:00:00Z",
+  "prNumber": 896,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "acCheckResults": [
+    { "scenario": "Happy — Phase 3 invokes doc skills with success", "passed": true },
+    { "scenario": "Degenerate — story with only docs/refactor still invokes doc skills", "passed": true },
+    { "scenario": "Error — x-doc-validate failure aborts Phase 3 (DOC_VALIDATION_FAILED)", "passed": true },
+    { "scenario": "Boundary — --skip-doc in Recovery block is legitimate (Rule 27 Exception 1)", "passed": true },
+    { "scenario": "Performance — overhead of doc skills in Phase 3 < 60s", "passed": true },
+    { "scenario": "Security — --skip-doc outside Recovery → BYPASS_FLAG_VIOLATION", "passed": true }
+  ],
+  "acCheckCount": 6,
+  "missingArtifacts": []
+}

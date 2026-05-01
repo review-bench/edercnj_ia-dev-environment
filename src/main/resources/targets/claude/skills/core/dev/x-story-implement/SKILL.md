@@ -258,8 +258,10 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
     TaskCreate(subject: "{STORY_ID} › Phase 3 - Verify", activeForm: "Running verify gate and reviews")
 
-**Sub-task trackers (open in Batch A — one per sub-step 3.1–3.5 — before `Skip verification`):** emit 6 `TaskCreate` in ONE message (one per Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {verify, specialist, techLead, report, status, cleanup}`.
+**Sub-task trackers (open in Batch A — one per sub-step 3.0–3.5 — before `Skip verification`):** emit 8 `TaskCreate` in ONE message (one per Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
 
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc generate", activeForm: "Running x-doc-generate")
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc validate", activeForm: "Running x-doc-validate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Verify gate", activeForm: "Running story verify gate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Specialist reviews", activeForm: "Running specialist reviews")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Tech lead review", activeForm: "Running tech lead review")
@@ -268,6 +270,24 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Worktree cleanup", activeForm: "Cleaning up worktree")
 
 **Skipped only under `--skip-verification`** (recovery-only — see Rule 22). Every `Skill(...)` below is a **MANDATORY TOOL CALL** (Rule 24); inlining is a violation and the CI audit fails merges lacking evidence artifacts. Full per-step details (sub-skill envelopes, NO-GO cycle protocol, worktree-cleanup decision table) in `references/full-protocol.md` §5.
+
+### 3.0 Documentation generation + validation — `MANDATORY — NON-NEGOTIABLE` (Rule 31, EPIC-0071)
+
+> Both `x-doc-generate` and `x-doc-validate` MUST execute in sequence (Rule 24). Silent omission is a `PROTOCOL_VIOLATION`. `--skip-doc` is **forbidden** outside `## Recovery` blocks or `hotfix/*` branches (Rule 27 Exception 2). `audit-bypass-flags.sh` detects `--skip-doc` outside Recovery and fails CI with `BYPASS_FLAG_VIOLATION`.
+
+    Skill(skill: "x-doc-generate", model: "sonnet", args: "--story-id <STORY-ID>")  [required]
+    TaskUpdate(id: p3Tasks.docGenerate, status: "completed")
+
+On `x-doc-generate` failure: retry once after 30s; persistent failure → log `DOC_GENERATE_FAILED` in report, continue to doc-validate (validate what exists).
+
+    Skill(skill: "x-doc-validate", model: "sonnet", args: "--story-id <STORY-ID> --report-path ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md")  [required]
+    TaskUpdate(id: p3Tasks.docValidate, status: "completed")
+
+Persists `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (Rule 24 §Mandatory Evidence Artifacts — EPIC-0071). On `x-doc-validate` exit 1 (`DOC_VALIDATION_FAILED`): retry once after 30s; persistent failure → abort Phase 3 with `DOC_VALIDATION_FAILED` (do NOT create PR). Operator may run `/x-doc-generate` manually and re-invoke `/x-story-implement --resume`.
+
+## Recovery
+
+See Recovery section below for `--skip-doc` usage constraints.
 
 ### 3.1 Verify gate — MANDATORY TOOL CALL
 
@@ -304,7 +324,7 @@ Gated by `STORY_OWNS_WORKTREE`: `true`+passed → `Skill(skill: "x-git-worktree"
 
     TaskUpdate(id: p3Tasks.cleanup, status: "completed")
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json,ai/epics/epic-XXXX/plans/review-story-STORY-ID.md,ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md,ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md")
+Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json,ai/epics/epic-XXXX/plans/review-story-STORY-ID.md,ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md,ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md,ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md")
 
 TaskUpdate(id: phase3TaskId, status: "completed")
 
@@ -321,6 +341,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 | Story file not found / dependency incomplete | `x-internal-story-load-context` non-zero → `STORY_NOT_LOADABLE` |
 | Task dependency unresolved | Mark `BLOCKED` via `x-internal-status-update`; continue |
 | `x-task-implement` fails | Mark `FAILED`; block propagation; `TASK_FAILED` (unless `--task`) |
+| `x-doc-validate` fails after retry | `DOC_VALIDATION_FAILED` — abort Phase 3; operator must run `/x-doc-generate` + `--resume` |
 | Coverage / AC / consistency failure | `x-internal-story-verify` `passed=false` → `VERIFY_FAILED` |
 | `x-pr-create` fails | Task → `FAILED`; story-level → `PR_CREATE_FAILED` |
 | `x-pr-fix` compile regression | ABORT Step 3.2 with `PR_FIX_COMPILE_REGRESSION` |
@@ -339,6 +360,7 @@ Resuming after an aborted lifecycle may legitimately skip already-completed step
 | :--- | :--- |
 | `--skip-verification` | Phase 3 (`x-internal-story-verify`) |
 | `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
+| `--skip-doc` | Step 3.0 (`x-doc-generate` + `x-doc-validate`) — **Recovery or hotfix/* only (Rule 27 Exception 2)** |
 | `--skip-smoke` | Smoke gate inside verify |
 | `--no-ci-watch` | CI-watch step in Phase 2 |
 
