@@ -46,7 +46,8 @@ import java.util.Set;
  * @param mutation mutation-testing threshold (stack-aware via {@code /x-test-mutation})
  * @param contract contract-breaking-change gate (stack-aware via {@code /x-test-contract})
  * @param regression regression-shell gate (stack-aware via {@code /x-test-regression-shell})
- * @param dast dynamic application security testing gate (stack-aware via {@code /x-pentest-dynamic})
+ * @param dast dynamic application security testing gate (stack-aware via {@code
+ *     /x-pentest-dynamic})
  * @see dev.iadev.domain.model.Governance
  */
 public record QualityConfig(
@@ -234,7 +235,8 @@ public record QualityConfig(
      * Regression-shell gate configuration.
      *
      * @param enabled whether the regression gate is active
-     * @param mode execution mode — SELF (generator validates its own output) or SERVICE (client project)
+     * @param mode execution mode — SELF (generator validates its own output) or SERVICE (client
+     *     project)
      * @param scenariosFile path to regression scenarios YAML file
      */
     public record RegressionConfig(boolean enabled, String mode, String scenariosFile) {
@@ -252,7 +254,8 @@ public record QualityConfig(
             return new RegressionConfig(
                     MapHelper.optionalBoolean(m, "enabled", false),
                     MapHelper.optionalString(m, "mode", "service"),
-                    MapHelper.optionalString(m, "scenarios-file", "tests/regression/scenarios.yaml"));
+                    MapHelper.optionalString(
+                            m, "scenarios-file", "tests/regression/scenarios.yaml"));
         }
     }
 
@@ -330,16 +333,15 @@ public record QualityConfig(
         /**
          * Nuclei scanner configuration.
          *
-         * <p>Templates version must be pinned to a stable series (vN.x or vN.M.P). Values
-         * 'latest', 'master', 'HEAD' are rejected ({@code NUCLEI_VERSION_UNPINNED}).
+         * <p>Templates version must be pinned to a stable series (vN.x or vN.M.P). Values 'latest',
+         * 'master', 'HEAD' are rejected ({@code NUCLEI_VERSION_UNPINNED}).
          */
         public record NucleiConfig(boolean enabled, String templatesVersion) {
 
             private static final java.util.regex.Pattern PINNED_VERSION =
                     java.util.regex.Pattern.compile("^v\\d+(\\.x|\\.\\d+(\\.\\d+)?)$");
 
-            private static final Set<String> UNPINNED =
-                    Set.of("latest", "master", "head");
+            private static final Set<String> UNPINNED = Set.of("latest", "master", "head");
 
             public static final NucleiConfig DEFAULT = new NucleiConfig(false, "v9.x");
 

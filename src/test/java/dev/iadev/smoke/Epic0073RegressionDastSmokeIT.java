@@ -109,7 +109,8 @@ class Epic0073RegressionDastSmokeIT {
                 .as("regression gate must carry conditional Rule 28 marker")
                 .contains("flag.quality_regression_enabled");
         assertThat(content)
-                .as("regression gate must carry [conditional: flag.quality_regression_enabled] Rule 28 marker")
+                .as(
+                        "regression gate must carry [conditional: flag.quality_regression_enabled] Rule 28 marker")
                 .contains("flag.quality_regression_enabled");
         assertThat(content)
                 .as("regression gate must produce a report artifact")
@@ -157,8 +158,9 @@ class Epic0073RegressionDastSmokeIT {
                 .as("SKILL.md must document REGRESSION_DETECTED exit code")
                 .contains("REGRESSION_DETECTED");
         assertThat(content)
-                .as("D-R11 fast-fail note must document skipping perf+mutation+contract on"
-                        + " regression failure")
+                .as(
+                        "D-R11 fast-fail note must document skipping perf+mutation+contract on"
+                                + " regression failure")
                 .contains("D-R11");
     }
 
@@ -197,9 +199,7 @@ class Epic0073RegressionDastSmokeIT {
         assertThat(REGRESSION_BASELINE.toAbsolutePath())
                 .as("regression-shell-baseline.txt must exist")
                 .exists();
-        assertThat(DAST_BASELINE.toAbsolutePath())
-                .as("dast-gate-baseline.txt must exist")
-                .exists();
+        assertThat(DAST_BASELINE.toAbsolutePath()).as("dast-gate-baseline.txt must exist").exists();
     }
 
     // ─── Scenario 5 ──────────────────────────────────────────────────────────
