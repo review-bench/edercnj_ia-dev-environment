@@ -555,6 +555,83 @@ Estas skills continuam sendo candidatas naturais a serviços internos do NDP, ma
 
 **Decisão de migração:** estas 98 skills devem ser portadas sem inflar seu escopo. O NDP pode chamá-las como workers, comandos auxiliares ou serviços internos, mas a responsabilidade de coordenar ordem, retries globais, gates cross-phase, commits, PRs e evidências pertence ao runtime de orquestração (§P2), não a essas skills.
 
+### 5.3. Inventário — Hooks e scripts de validação atuais
+
+Os hooks e scripts atuais existem porque o Claude Code executa o fluxo por interpretação de markdown. Eles formam uma malha de defesa: alguns **bloqueiam antes** de um tool call, outros **avisam no fim do turno**, outros **detectam em CI** que uma evidência obrigatória não foi produzida. No NDP, a maior parte desse comportamento deixa de ser shell/hook e vira código do runtime (§P2), com uma única camada detectiva em CI (§P6.C1.F5).
+
+Fonte conceitual: `HooksAssembler` gera `.claude/hooks/*.sh` e registra eventos em `.claude/settings.json`; `ScriptsAssembler` gera `scripts/audit-*.sh`. Em projetos consumidores, esses arquivos são saída gerada. A responsabilidade real vem das Rules 24, 25, 26, 27, 29, 31 e 45.
+
+#### 5.3.1. Mapa de gatilhos
+
+| Gatilho | Hooks/scripts envolvidos | Responsabilidade no processo |
+| --- | --- | --- |
+| `SessionStart` | `telemetry-session.sh` | Abre trilha de telemetria da sessão. |
+| `PreToolUse` | `telemetry-pretool.sh`, `enforce-phase-sequence.sh`, `enforce-no-bypass-flags.sh`, `enforce-refinement-gate.sh`, `enforce-preflight-gates.sh` | Mede início de tool call e bloqueia bypass, fase inválida, ausência de refinement ou operação remota sem preflight. |
+| `PostToolUse` (`Write\|Edit`) | `post-compile-check.sh` | Compila após edição Java para capturar quebra imediatamente. |
+| `PostToolUse` (`*`) | `telemetry-posttool.sh` | Fecha medição de tool call e emite evento `tool.call`. |
+| `SubagentStop` | `telemetry-subagent.sh` | Registra encerramento de subagente. |
+| `Stop` | `telemetry-stop.sh`, `verify-story-completion.sh`, `verify-phase-gates.sh`, `enforce-continuous-flow.sh`, `stage-telemetry.sh` | Fecha sessão, verifica evidências, alerta phase gates falhos, detecta stall em modo não-interativo e prepara telemetria para commit. |
+| PR/CI/`mvn verify` | `scripts/audit-*.sh`, `*AuditTest.java` | Validação detectiva sobre o repositório: falha o build quando o disco não contém as evidências esperadas. |
+
+#### 5.3.2. Hooks preventivos e de verificação
+
+| Artefato | Tipo | O que faz | Bloqueia/dispara | Skills/fluxos impactados | Destino NDP |
+| --- | --- | --- | --- | --- | --- |
+| `enforce-phase-sequence.sh` | PreToolUse / phase gate | Lê `execution-state.json.taskTracking.phaseGateResults` e impede avanço quando a última fase falhou. | `exit 2` bloqueia tool call; opt-out local `CLAUDE_PHASE_GATE_DISABLED=1`. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | `phaseGate.assertPre/assertPost` em código. |
+| `enforce-no-bypass-flags.sh` | PreToolUse / anti-bypass | Intercepta `Skill(...)` e bloqueia `--skip-*` / `--no-ci-watch` fora de recovery. | `exit 1` bloqueia; `exit 2` erro operacional; `CLAUDE_RECOVERY_MODE=1` apenas bypass aceito. | `x-story-implement`, `x-task-implement`, `x-epic-implement`, `x-pr-fix-epic`, `x-release`, `x-internal-story-verify`. | Validação tipada de flags nos comandos NDP. |
+| `enforce-refinement-gate.sh` | PreToolUse / DoR gate | Exige `refinementVerdict.status=approved` antes de implementar/orquestrar. | `exit 33 REFINEMENT_REQUIRED`; exceções: recovery, `hotfix/*`, `flowVersion=1`. | `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate`. | Pré-condição nativa de `ndp story/epic/task`. |
+| `enforce-preflight-gates.sh` + `scripts/preflight.sh` | PreToolUse / preflight remoto | Roda checagens locais antes de `git push`, `gh pr create` e `x-pr-create`. | Bloqueia operação remota quando review, verify, coverage ou execution integrity falham. | `x-git-push`, `x-pr-create`, fluxos de release/story/task que abrem PR. | Preflight in-process antes de push/PR. |
+| `post-compile-check.sh` | PostToolUse / compile gate | Após `Write`/`Edit` em `.java`, roda `compileJava` via Gradle. | `exit 2` com JSON `decision: block` se compilação quebra. | Qualquer skill que edite Java, especialmente `x-task-implement` e `x-test-tdd`. | Adapter de build por stack; Maven/Gradle tipados. |
+| `verify-story-completion.sh` | Stop / evidence gate | Detecta commit/PR de story e verifica artefatos obrigatórios em `plans/`, `reports/` e `.claude/state`. | `exit 2` warning bloqueante quando falta evidência. | `x-story-implement`, `x-review`, `x-review-pr`, `x-internal-story-verify`, `x-internal-story-report`, `x-doc-validate`, `x-dependency-audit`, `x-pr-watch-ci`. | Gate de completion no runtime + espelho em CI. |
+| `verify-phase-gates.sh` | Stop / phase warning | Lê gates com `passed=false` e mostra tarefas/artefatos faltantes. | `exit 2` warning; não muta estado. | Orquestradores com task hierarchy. | Diagnóstico de phase gate no runtime. |
+| `enforce-continuous-flow.sh` | Stop / stall detector | Em modo não-interativo, detecta fase aberta sem próximo tool call obrigatório. | `exit 2 CONTINUOUS_FLOW_INTERRUPT` orienta o próximo tool call. | Orquestradores long-running, principalmente `x-epic-implement` e `x-story-implement`. | Scheduler/state machine do NDP; não precisa de nudge textual. |
+| `stage-telemetry.sh` | Stop / staging helper | Dá `git add` em `events.ndjson` para telemetria virar evidência commitada. | Fail-open, sempre `exit 0`; usa lock para worktrees paralelos. | Fluxos com telemetria obrigatória Rule 24/27. | Telemetria escrita e anexada pelo próprio NDP. |
+
+#### 5.3.3. Telemetria automática
+
+| Artefato | Gatilho | O que emite | Bloqueia? | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `telemetry-session.sh` | `SessionStart` | `session.start` | Não; fail-open. | Run/session lifecycle in-process. |
+| `telemetry-pretool.sh` | `PreToolUse` | Marca início para calcular `durationMs`. | Não; fail-open. | Span start no runtime. |
+| `telemetry-posttool.sh` | `PostToolUse` | `tool.call` com `tool`, `status`, `durationMs`. | Não; fail-open. | Span end no runtime. |
+| `telemetry-subagent.sh` | `SubagentStop` | `subagent.end`. | Não; fail-open. | Worker lifecycle in-process. |
+| `telemetry-stop.sh` | `Stop` | `session.end` e limpeza de temporários. | Não; fail-open. | Run finalization in-process. |
+| `telemetry-phase.sh` | Chamado pelas skills | `phase.start`, `phase.end`, `subagent.start/end`, `mcp-start/end`. | Não; sempre deve deixar a skill continuar. | Eventos de fase emitidos diretamente pelo orquestrador NDP. |
+| `telemetry-emit.sh` / `telemetry-lib.sh` | Helpers | Scrub, contexto epic/story/task e append em `events.ndjson`. | Não; fail-open. | Biblioteca de telemetria do NDP com schema OTel-compatible. |
+
+#### 5.3.4. Scripts detectivos de CI e auditoria
+
+Os `scripts/audit-*.sh` são a camada detectiva: eles não impedem o LLM de tentar pular uma etapa durante a sessão, mas falham PR/CI quando o resultado no disco viola o contrato. O padrão de exit code é Rule 26: `0` sucesso, `1` violação, `2` erro operacional, `3` baseline/exemption corrompido. Todos devem ter `--self-check`.
+
+| Família/script | Responsabilidade | O que bloqueia | Skills/fluxos impactados | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `audit-execution-integrity.sh` | Verifica as 12 superfícies Rule 24/27: evidence de verify, review, PR body, telemetry, dependency audit, doc validate, CI watch. | PR com `EIE_EVIDENCE_MISSING`, baseline inválido ou exemption inválida. | `x-story-implement`, `x-task-implement`, `x-review`, `x-review-pr`, `x-pr-create`, `x-pr-watch-ci`, `x-doc-validate`, `x-dependency-audit`. | CI Camada B: validar artefatos que o NDP prometeu gerar. |
+| `audit-bypass-flags.sh` | Busca `--skip-*` e `--no-ci-watch` fora de blocos `## Recovery`. | Uso indevido de bypass no happy path. | Orquestradores e skills com flags de escape. | Lint de definição de comando/skill + CI Camada B. |
+| `audit-phase-gates.sh` | Confere `phaseGateResults`, tasks concluídas e artefatos esperados. | Fase marcada como concluída sem filhos/evidências. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | Testes do state machine + CI Camada B. |
+| `audit-task-hierarchy.sh` | Valida hierarquia Epic › Story › Phase › Wave/Cycle. | Task tracking quebrado, profundidade inválida, filhos inconsistentes. | Todos os fluxos com Rule 25. | Validação de modelo de estado. |
+| `audit-refinement-gate.sh` | Confirma verdict aprovado e hash consistente entre state e markdown. | Implementação sem refinement aprovado. | `x-story-refine`, `x-epic-refine`, `x-story-implement`, `x-epic-implement`, `x-task-implement`. | Pré-condição nativa + CI de consistência. |
+| `audit-doc-freshness.sh` | Garante documentação atualizada como DoD. | Código alterado sem README/API/ADR/system docs quando aplicável. | `x-doc-validate`, `x-doc-generate`, `x-story-implement`, `x-release-changelog`. | Gate de documentação no runtime + CI. |
+| `audit-template-version.sh` | Garante templates v2/value-driven em epics novos. | Template legado fora de baseline. | `x-template-migrate`, `x-internal-epic-create`, `x-internal-story-create`. | Validador de schema/template. |
+| `audit-flow-version.sh` | Verifica semântica de `flowVersion` e fallbacks Rule 19. | Estado legado usado sem marcação/compatibilidade. | Orquestradores que leem `execution-state.json`. | Migração + schema validator. |
+| `audit-epic-branches.sh` | Confere modelo de branches `epic/*`. | Branch de epic ausente/divergente ou violação de target. | `x-internal-epic-branch-ensure`, `x-epic-implement`, `x-epic-orchestrate`. | Branch policy service. |
+| `audit-skill-visibility.sh` | Valida visibilidade, catálogo e referências de scripts/skills. | Skill interna exposta, referência órfã, gate sem catálogo. | Catálogo inteiro de skills/rules. | Registry/linter de pacotes NDP. |
+| `audit-model-selection.sh` | Confere Rule 23/modelos permitidos por tier. | Uso de modelo fora da política. | Skills multi-agent/review/refinement. | Model router policy. |
+| `audit-capability-graph.sh` | Valida grafo de capabilities e frontmatter v3+. | Capability ausente, ciclo, schema inválido. | Composition engine, skills/rules/agents/templates. | Resolver tipado + testes. |
+
+#### 5.3.5. Leitura estratégica
+
+Hoje os hooks/scripts compensam três riscos estruturais: o LLM pode pular uma etapa, pode simular uma skill sem gerar evidência, ou pode executar uma operação remota antes de validar o estado local. Eles também dão observabilidade porque o runtime real é o Claude Code, não o produto.
+
+No NDP, esses riscos mudam de lugar:
+
+- **Gates preventivos** (`enforce-*`, `verify-*`, preflight) viram funções do runtime. O comando não avança se a pré-condição falhar.
+- **Audits CI** continuam existindo, mas como Camada B simples: validar no disco o que o NDP declarou ter produzido.
+- **Telemetria** deixa de ser append via shell e passa a ser emitida no mesmo processo que controla a state machine.
+- **Compile/test/doc/security checks** deixam de ser hooks genéricos e viram adapters por stack chamados em pontos explícitos do fluxo.
+- **Bypass** deixa de depender de regex em markdown/args e vira política tipada: flags de recovery existem apenas onde o comando declarar.
+
+**Decisão de migração:** nenhum hook shell deve sobreviver como mecanismo primário da V0. Para cada hook/script atual, o trabalho de migração é extrair o invariante, escrever teste de unidade/integração no NDP e manter no máximo um `ndp ci verify` detectivo para PRs. A existência de muitos hooks hoje é um sintoma da arquitetura atual; no NDP, o runtime deve tornar esses bypasses impossíveis por construção.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
