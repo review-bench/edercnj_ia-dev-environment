@@ -348,6 +348,18 @@
 
 ---
 
+### audit-contract-breaking.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 26 §Audit Gate Lifecycle (EPIC-0072 story-0072-0007) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Contract artifacts (OpenAPI YAML, proto, Avro AVSC) changed in a PR are classified as breaking vs non-breaking. Breaking changes without a `## Breaking` entry in `CHANGELOG.md` (or `BREAKING CHANGE:` footer in a commit message per Conventional Commits Rule 08) are blocked. Breaking changes with documented migration are passed with WARN and appended to `governance/audits/contract-breaking-history.log`. Rejects path traversal and command injection in artifact filenames. |
+| **Introduced** | story-0072-0007 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (no breaking, or breaking with documented migration — WARN emitted) · `1` = `CONTRACT_BREAKING_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ### audit-mutation-score.sh
 
 | Field | Value |
