@@ -19,9 +19,12 @@ class DocumentationConfigTest {
 
         @Test
         void fromMap_fullBlock_parsesTargetsAndFreshnessWindow() {
-            var docMap = Map.<String, Object>of(
-                    "targets", List.of("readme", "openapi", "adr"),
-                    "freshness-window-hours", 24);
+            var docMap =
+                    Map.<String, Object>of(
+                            "targets",
+                            List.of("readme", "openapi", "adr"),
+                            "freshness-window-hours",
+                            24);
 
             var cfg = DocumentationConfig.fromMap(docMap);
 
@@ -86,8 +89,7 @@ class DocumentationConfigTest {
 
         @Test
         void targets_returnsImmutableList() {
-            var cfg = DocumentationConfig.fromMap(
-                    Map.of("targets", List.of("readme")));
+            var cfg = DocumentationConfig.fromMap(Map.of("targets", List.of("readme")));
             assertThatThrownBy(() -> cfg.targets().add("openapi"))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
@@ -100,9 +102,8 @@ class DocumentationConfigTest {
         @Test
         @Timeout(1)
         void fromMap_largeTargetsList_completesWithinTimeout() {
-            var manyTargets = java.util.stream.IntStream.range(0, 55)
-                    .mapToObj(i -> "target-" + i)
-                    .toList();
+            var manyTargets =
+                    java.util.stream.IntStream.range(0, 55).mapToObj(i -> "target-" + i).toList();
             var docMap = Map.<String, Object>of("targets", manyTargets);
 
             var start = System.currentTimeMillis();

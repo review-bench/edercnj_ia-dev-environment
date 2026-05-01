@@ -6,15 +6,15 @@ import java.util.Map;
 /**
  * Documentation governance configuration for a {@link ProjectConfig}.
  *
- * <p>Captures which documentation targets are maintained in the project and the grace period
- * before a missing doc update is treated as a blocker. Introduced by EPIC-0071 (Documentation
- * as DoD) to support the {@code /x-doc-validate} gate.
+ * <p>Captures which documentation targets are maintained in the project and the grace period before
+ * a missing doc update is treated as a blocker. Introduced by EPIC-0071 (Documentation as DoD) to
+ * support the {@code /x-doc-validate} gate.
  *
- * <p>When {@code targets} is empty the project uses auto-detection (see {@link #autoDetect()}):
- * the {@code x-doc-validate} skill derives the effective target list from the project's interface
+ * <p>When {@code targets} is empty the project uses auto-detection (see {@link #autoDetect()}): the
+ * {@code x-doc-validate} skill derives the effective target list from the project's interface
  * declarations (REST → OpenAPI, broker → AsyncAPI, etc.) plus always-included targets (README,
- * ADR). Filesystem-dependent targets (skill-docs, system-architecture) are resolved by the skill
- * at runtime.
+ * ADR). Filesystem-dependent targets (skill-docs, system-architecture) are resolved by the skill at
+ * runtime.
  *
  * <p>YAML block parsed from the project configuration file:
  *
@@ -28,8 +28,8 @@ import java.util.Map;
  * }</pre>
  *
  * @param targets the explicit list of documentation targets to maintain; empty = auto-detect
- * @param freshnessWindowHours grace period in hours before a missing doc update blocks the PR;
- *     0 = immediate (default)
+ * @param freshnessWindowHours grace period in hours before a missing doc update blocks the PR; 0 =
+ *     immediate (default)
  */
 public record DocumentationConfig(List<String> targets, int freshnessWindowHours) {
 

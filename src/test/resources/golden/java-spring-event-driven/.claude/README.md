@@ -93,9 +93,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 29 | `29-refinement-gate.md` | refinement gate |
 | 30 | `30-value-driven-templates.md` | value driven templates |
+| 31 | `31-documentation-freshness-gate.md` | documentation freshness gate |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 27 rules**
+**Total: 28 rules**
 
 ### Numbering
 
@@ -124,7 +125,8 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-code-format** | `/x-code-format` | Formats source code using the appropriate formatter for {{LANGUAGE}}. First step of the pre-commit chain (format -> lint -> compile -> commit). Supports --check (dry-run) and --changed-only modes. |
 | **x-code-lint** | `/x-code-lint` | Analyzes source code with the appropriate linter for {{LANGUAGE}}. Second step in the pre-commit chain (RULE-007: format -> lint -> compile -> commit). Supports --fix, --changed-only, and --strict modes. |
 | **x-dependency-audit** | `/x-dependency-audit` | Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report. |
-| **x-doc-generate** | `/x-doc-generate` | Documentation automation: detects documentation type needed (API, README, ADR, changelog) from code changes, delegates to specialized skills or generates inline. Single entry point for all documentation updates. |
+| **x-doc-generate** | `/x-doc-generate` | Documentation automation v2: stack-aware generation consuming documentation.targets from ProjectConfig. Detects documentation type needed (API, README, ADR, changelog, system-architecture) from code changes and stack config, delegates to specialized skills or generates inline. Invokes x-arch-system-update on architectural change detection. |
+| **x-doc-validate** | `/x-doc-validate` | Documentation freshness gate: validates 6 dimensions (readme, api-specs, grpc-proto, adr, skill-docs, system-architecture) against code changes in a PR. Stack-aware — only validates targets declared/auto-detected from ProjectConfig.documentation.targets. Returns exit non-zero on staleness; produces structured report. |
 | **x-epic-implement** | `/x-epic-implement` | Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-args-normalize), Phase 1 (load+plan via x-internal-epic-build-plan), Phase 2 (epic branch via x-internal-epic-branch-ensure), Phase 3 (sequential-by-default story loop via x-story-implement), Phase 4 (integrity gate + report via x-internal-epic-integrity-gate + x-internal-report-write), Phase 5 (final PR epic/XXXX → develop via x-git-merge + x-pr-create). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill. |
 | **x-epic-orchestrate** | `/x-epic-orchestrate` | Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support. |
 | **x-epic-refine** | `/x-epic-refine` | Multi-persona 4-phase strategic epic refinement dispatcher. Phase A: 5-6 parallel specialist agents analyse the epic for strategic gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-6 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict with scope=epic and dual-writes to execution-state.json + epic markdown. |
@@ -153,7 +155,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-pr-merge-train** | `/x-pr-merge-train` | Merge-train automation: discovers, validates, and merges a sequence of PRs into develop in deterministic order. Supports --prs, --epic, and --pattern discovery modes with pre-merge validation and dry-run auditing. |
 | **x-pr-watch-ci** | `/x-pr-watch-ci` | Polls a PR's CI checks and Copilot review status, blocking until checks complete or timeout. Returns one of 8 stable exit codes (SUCCESS=0, CI_PENDING_PROCEED=10, CI_FAILED=20, TIMEOUT=30, PR_ALREADY_MERGED=40, NO_CI_CONFIGURED=50, PR_CLOSED=60, PR_NOT_FOUND=70). Writes a versioned state-file for session resume. |
 | **x-release** | `/x-release` | Orchestrates complete release flow using Git Flow release branches with approval gate, PR-flow (gh CLI) and deep validation: version bump (auto-detect or explicit), release branch creation from develop, deep validation (coverage, golden files, version consistency), version file updates, changelog generation, release commit, release PR via gh (optionally reviewed by x-review-pr), human approval gate with persistent state file, tag on main after merged PR, back-merge PR to develop with conflict detection, and cleanup. Supports hotfix releases from main, dry-run mode, resume via --continue-after-merge, in-session pause via --interactive, GPG-signed tags, skip-review opt-out, and custom state file path. |
-| **x-release-changelog** | `/x-release-changelog` | Generates CHANGELOG.md from Conventional Commits history. Parses git log, groups by commit type, maps to Keep a Changelog sections (Added, Changed, Fixed, etc.), and performs incremental updates preserving existing entries. |
+| **x-release-changelog** | `/x-release-changelog` | Changelog generator v2: hybrid format combining narrative Highlights block (derived from 'Entrega de Valor' of merged v2 epics) with Keep-a-Changelog sections (Added/Changed/Fixed/Breaking/Deprecated). Stack-aware via documentation.changelog.format config. Falls back gracefully when EPIC-0070 epics unavailable (D-R10). |
 | **x-review** | `/x-review` | Parallel code review with specialist engineers (Security, QA, Performance, Database, Observability, DevOps, API, Event). Invokes individual review skills in parallel via Skill tool, then consolidates into a scored report. Use for pre-PR quality validation. |
 | **x-review-api** | `/x-review-api` | Validates REST API endpoints for RFC 7807 error responses, pagination, URL versioning, OpenAPI documentation, status codes, and DTO patterns. |
 | **x-review-devops** | `/x-review-devops` | DevOps specialist review: validates Dockerfile, container security, CI/CD pipeline, resource limits, health probes, graceful shutdown, and deployment configuration. |
@@ -184,7 +186,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-test-tdd** | `/x-test-tdd` | Executes systematic Red-Green-Refactor TDD cycles for a task. Reads the task plan generated by x-task-plan, runs each cycle in TPP order, validates RED/GREEN/REFACTOR phases, delegates atomic commits to x-git-commit with TDD tags, and supports resume and dry-run. |
 | **x-threat-model** | `/x-threat-model` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 
-**Total: 93 skills**
+**Total: 94 skills**
 
 ### Usage Examples
 
@@ -344,8 +346,8 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 27 |
-| Skills (.claude) | 74 |
+| Rules (.claude) | 28 |
+| Skills (.claude) | 75 |
 | Knowledge Packs (.claude) | 19 |
 | Agents (.claude) | 12 |
 | Hooks (.claude) | 17 |

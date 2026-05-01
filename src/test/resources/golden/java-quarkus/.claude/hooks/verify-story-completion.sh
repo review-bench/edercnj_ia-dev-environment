@@ -139,6 +139,11 @@ if [[ ! -f "${REPORTS_DIR}/story-completion-report-${STORY_ID}.md" ]]; then
     MISSING+=("x-internal-story-report → ${REPORTS_DIR}/story-completion-report-${STORY_ID}.md")
 fi
 
+# EPIC-0071 story-0071-0006 — doc-validate evidence check (Rule 24 §Mandatory Evidence, Rule 31).
+if [[ ! -f "${REPORTS_DIR}/doc-validate-report-${STORY_ID}.md" ]]; then
+    MISSING+=("x-doc-validate → ${REPORTS_DIR}/doc-validate-report-${STORY_ID}.md")
+fi
+
 # EPIC-0057 story-0057-0006 — extended artefact checks (Rule 24 §32-42).
 # Hard artefacts: x-pr-watch-ci state file (only when PR exists for current
 # branch) and x-dependency-audit report. Soft artefacts: test-run + threat

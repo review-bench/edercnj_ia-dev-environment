@@ -58,7 +58,12 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
         this(
                 new CoreStack(project, architecture, interfaces, language, framework),
                 new TechStack(data, infrastructure, security, testing, mcp),
-                new Governance(compliance, platforms, branchingModel, telemetryEnabled, DocumentationConfig.DEFAULT));
+                new Governance(
+                        compliance,
+                        platforms,
+                        branchingModel,
+                        telemetryEnabled,
+                        DocumentationConfig.DEFAULT));
     }
 
     /**

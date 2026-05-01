@@ -48,9 +48,7 @@ class Epic0071DocAsDoDSmokeIT {
     void scenario1_auditDocFreshness_detectsReadmeStaleness() throws IOException {
         Path script = SCRIPTS_ROOT.resolve("audit-doc-freshness.sh").toAbsolutePath();
 
-        assertThat(script)
-                .as("audit-doc-freshness.sh must exist (story-0071-0005)")
-                .exists();
+        assertThat(script).as("audit-doc-freshness.sh must exist (story-0071-0005)").exists();
 
         String content = Files.readString(script, StandardCharsets.UTF_8);
 
@@ -103,12 +101,9 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario3_xDocValidate_skillPresent_withPassContract")
     void scenario3_xDocValidate_skillPresent_withPassContract() throws IOException {
-        Path skillFile =
-                SKILLS_ROOT.resolve("ops/x-doc-validate/SKILL.md").toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("ops/x-doc-validate/SKILL.md").toAbsolutePath();
 
-        assertThat(skillFile)
-                .as("x-doc-validate SKILL.md must exist (story-0071-0002)")
-                .exists();
+        assertThat(skillFile).as("x-doc-validate SKILL.md must exist (story-0071-0002)").exists();
 
         String content = Files.readString(skillFile, StandardCharsets.UTF_8);
 
@@ -143,8 +138,7 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario4_xStoryImplement_phase3DocGate_blocksOnDocValidateFail")
     void scenario4_xStoryImplement_phase3DocGate_blocksOnDocValidateFail() throws IOException {
-        Path skillFile =
-                SKILLS_ROOT.resolve("dev/x-story-implement/SKILL.md").toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("dev/x-story-implement/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile).exists();
         String content = Files.readString(skillFile, StandardCharsets.UTF_8);
@@ -172,7 +166,8 @@ class Epic0071DocAsDoDSmokeIT {
                 .contains("DOC_VALIDATION_FAILED");
 
         assertThat(content)
-                .as("x-story-implement MUST document that doc gate runs BEFORE verify gate (step 3.0)")
+                .as(
+                        "x-story-implement MUST document that doc gate runs BEFORE verify gate (step 3.0)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("3.0"),
                         c -> assertThat(c).contains("step 3.0"),
@@ -184,8 +179,7 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario5_skipDoc_confinedToRecoveryBlock")
     void scenario5_skipDoc_confinedToRecoveryBlock() throws IOException {
-        Path skillFile =
-                SKILLS_ROOT.resolve("dev/x-story-implement/SKILL.md").toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("dev/x-story-implement/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile).exists();
         String content = Files.readString(skillFile, StandardCharsets.UTF_8);
@@ -199,14 +193,8 @@ class Epic0071DocAsDoDSmokeIT {
                         "x-story-implement MUST confine --skip-doc to Recovery or hotfix/* context"
                                 + " (Rule 27)")
                 .satisfiesAnyOf(
-                        c ->
-                                assertThat(c)
-                                        .contains("Recovery")
-                                        .contains("--skip-doc"),
-                        c ->
-                                assertThat(c)
-                                        .contains("Recovery-only")
-                                        .contains("skip-doc"));
+                        c -> assertThat(c).contains("Recovery").contains("--skip-doc"),
+                        c -> assertThat(c).contains("Recovery-only").contains("skip-doc"));
 
         assertThat(content)
                 .as(
@@ -276,15 +264,11 @@ class Epic0071DocAsDoDSmokeIT {
 
         Path baseline = BASELINES_ROOT.resolve("doc-freshness-baseline.txt").toAbsolutePath();
 
-        assertThat(baseline)
-                .as("doc-freshness-baseline.txt must exist (story-0071-0005)")
-                .exists();
+        assertThat(baseline).as("doc-freshness-baseline.txt must exist (story-0071-0005)").exists();
 
         String baselineContent = Files.readString(baseline, StandardCharsets.UTF_8);
         long nonCommentLines =
-                baselineContent.lines()
-                        .filter(l -> !l.isBlank() && !l.startsWith("#"))
-                        .count();
+                baselineContent.lines().filter(l -> !l.isBlank() && !l.startsWith("#")).count();
         assertThat(nonCommentLines)
                 .as(
                         "doc-freshness-baseline.txt MUST have zero active entries"
@@ -299,9 +283,7 @@ class Epic0071DocAsDoDSmokeIT {
     void scenario8_verifyStoryCompletion_checksDocValidateArtifact() throws IOException {
         Path hook = HOOKS_ROOT.resolve("verify-story-completion.sh").toAbsolutePath();
 
-        assertThat(hook)
-                .as("verify-story-completion.sh must exist")
-                .exists();
+        assertThat(hook).as("verify-story-completion.sh must exist").exists();
 
         String content = Files.readString(hook, StandardCharsets.UTF_8);
 

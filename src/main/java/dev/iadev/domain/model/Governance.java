@@ -20,8 +20,8 @@ import java.util.Set;
  * @param branchingModel the branching strategy (optional, default {@link BranchingModel#GITFLOW})
  * @param telemetryEnabled whether telemetry hooks are injected (optional, default {@code true});
  *     maps to YAML {@code telemetry.enabled} (story-0040-0004)
- * @param documentation the documentation governance config (optional, default auto-detect);
- *     maps to YAML {@code documentation} block (EPIC-0071, story-0071-0001)
+ * @param documentation the documentation governance config (optional, default auto-detect); maps to
+ *     YAML {@code documentation} block (EPIC-0071, story-0071-0001)
  */
 public record Governance(
         String compliance,

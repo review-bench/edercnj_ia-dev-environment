@@ -46,6 +46,7 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 | `x-git-commit` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
 | `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
 | `x-threat-model` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-doc-validate` | `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` | Camada 3 (EPIC-0071) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
