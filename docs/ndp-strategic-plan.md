@@ -458,6 +458,113 @@ Skills auxiliares também migram:
 
 ---
 
+---
+
+## 7. Avaliação das regras existentes sob a inversão de controle
+
+> **Tese central desta seção.** Aproximadamente **40-50% das ~27 regras atuais são artefatos da decisão arquitetural de "LLM como orquestrador"**. A inversão de controle (§0.5) não só reduz a carga cognitiva — ela *deleta* boa parte da governança porque muitas regras existem unicamente para compensar a fragilidade de delegar fluxo a um LLM. O que sobra é governança real: padrões de código, arquitetura, segurança, release.
+
+### 7.0. Sumário — destino de cada regra
+
+| Destino | Quantidade | O que significa |
+|---|---|---|
+| **KEEP** (intrínseca) | 10 regras | Política universal independente do orquestrador. Sobrevive sem alteração ou com refinamento mínimo. |
+| **REWORK** (mantém invariante, troca enforcement) | 9 regras | Invariante continua válido; mecanismo de enforcement muda de hook/script/markdown para código NDP. |
+| **RETIRE** (perde sentido) | 7 regras | Existem porque o LLM pode pular/simular; com NDP no controle, viram código trivial ou desnecessárias. |
+| **COLLISION** (precisa decidir) | 1 colisão | Existe duplo Rule 28 no repo — ver §7.5. |
+| **NEW** (criar para NDP) | ~10 novas | Surgem do novo modelo: prompt versioning, output validation, target adapters, replay, FinOps, etc. |
+
+### 7.1. KEEP — regras intrínsecas que não mudam (10)
+
+Estas regras descrevem padrões de **código, arquitetura, segurança, release** que existem independentemente de quem orquestra. NDP simplesmente as carrega para o novo repositório, possivelmente as embute em validações in-process.
+
+| Rule | Por que sobrevive | Único ajuste em NDP |
+|---|---|---|
+| **01 — Project Identity** | Metadata do projeto. Independente de orquestrador. | Lida pelo `ndp config show`. Continua sendo input do generator. |
+| **02 — Domain** | Modelagem de domínio (DDD). Universal. | Sem mudança. |
+| **03 — Coding Standards** | Limites duros (25/250 linhas, ≤ 4 params, naming, SOLID). | NDP pode embutir checks dos limites em `ndp code lint` (hoje delegado a linters externos). |
+| **04 — Architecture Summary** | Hexagonal + dependency direction. | Sem mudança. |
+| **05 — Quality Gates** | Coverage ≥ 95% line / 90% branch (absolute gate). | Mesmo policy; enforcement passa a ser fase do `ndp story implement` (substitui `audit-coverage-local.sh`). |
+| **06 — Security Baseline** | Defaults seguros, deserialization, escape, paths. | Sem mudança. |
+| **07 — Operations Baseline** | Health checks, graceful shutdown, structured logging. | Sem mudança. |
+| **08 — Release Process** | SemVer, Conventional Commits, CHANGELOG, release branch. | Mesmo policy; `ndp release` é o orquestrador (substitui `x-release` + `audit-flow-version.sh`). |
+| **12 — Security Anti-Patterns (Java)** | Anti-patterns J1-J8. | Stack-aware: vira parte de `@ndp/security-pack-java`. |
+| **30 — Value-Driven Templates** | Templates v2 (Epic / Story / system.md). | Templates seguem; quem renderiza muda — `ndp story refine` os preenche via `claude -p` com schema validado. |
+
+### 7.2. REWORK — invariante mantém, enforcement muda (9)
+
+Estas regras declaram um *invariante real*, mas o mecanismo atual de enforcement é hook bash, script shell ou audit em markdown. NDP mantém o invariante e re-implementa o enforcement em código.
+
+| Rule | Invariante que sobrevive | Como o enforcement muda |
+|---|---|---|
+| **09 — Branching Model** | Git Flow (main/develop/feature/release/hotfix/epic/docs) | NDP cria/protege as branches em código. `ndp git worktree`, `ndp git branch`. Removidos os checks ad-hoc espalhados por skills. |
+| **19 — Backward Compatibility** | `flowVersion` field + matriz de fallback | `flowVersion` deixa de ser campo de markdown lido pelo LLM e vira **campo serializado de um state object NDP**. Migration explícita: `ndp migrate --to-version ndp-1`. |
+| **20 — Interactive Gates** | Menu 3-opções (PROCEED/FIX-PR/ABORT); flag `--interactive`/`--non-interactive` | NDP renderiza menu nativo no CLI (sem dependência de `AskUserQuestion`). `--non-interactive` é default (Rule 20 já flipou em EPIC-0061). |
+| **21 — Epic Branch Model** | `epic/XXXX` é a integração; PR para `develop` é gate manual | NDP cria/cuida do ciclo. `ndp git cleanup-branches` aprende a preservar `epic/*`. Substitui `audit-epic-branches.sh`. |
+| **23 — Model Selection** | Tier matrix Opus/Sonnet/Haiku | Configuração por comando NDP (`config: { skill: x-arch-plan, model: opus }`), não frontmatter. `audit-model-selection.sh` é eliminado. Diferencial: NDP pode dinamicamente trocar modelo com base em custo/latência observada. |
+| **25 — Task Hierarchy & Phase Gates** | 4-level hierarchy (Epic › Story › Phase › Wave); `›` separator; PRE/POST gates | `TaskCreate`/`TaskUpdate` deixam de ser tool calls e viram estrutura interna do NDP. Phase gates são funções tipadas (Feature P2.C2.F2). `x-internal-phase-gate` desaparece. |
+| **28 — Capability Frontmatter Contract** | `requires-capabilities`, schema v3.0, fragment slots | Frontmatter continua sendo o formato canônico para artefatos community/marketplace. Mas o NDP carrega tudo em estruturas tipadas em memória, com validação em-processo. |
+| **29 — Refinement Gate** | Story/epic precisa de `refinementVerdict.status = "approved"` antes de implementar | `ndp story implement` faz o check antes de qualquer side effect: `if (!verdict.approved) exit 33`. Substitui `enforce-refinement-gate.sh` + `audit-refinement-gate.sh`. |
+| **31 — Documentation Freshness Gate** | Doc targets ficam frescos por PR | Vira fase mandatória do `ndp story implement` — `ndp doc validate` antes do verify final. Substitui `audit-doc-freshness.sh`. |
+| **45 — CI-Watch Integrity** | 8 exit codes estáveis; evidence file `pr-watch-{PR}.json` | Exit codes viram enum tipado em `ndp pr watch`. Evidence file vira entrada do audit log do P6. |
+
+### 7.3. RETIRE — regras que perdem sentido (7)
+
+Estas regras existem **especificamente para compensar** o fato de que o LLM pode pular, simular ou inlinear sub-skills. Com NDP no controle, o problema-raiz desaparece — e essas regras vão junto.
+
+| Rule | Por que existe hoje | Por que retira-se em NDP |
+|---|---|---|
+| **13 — Skill Invocation Protocol** | "Bare-slash `/x-foo` em delegação é proibido porque o LLM pode tratar como prosa." Os 3 patterns (INLINE-SKILL, SUBAGENT-GENERAL, SUBAGENT-RESEARCH) existem porque o LLM precisa entender a sintaxe. | Em código, chamar uma função é inequívoco. Telemetry markers (`telemetry-phase.sh`) viram chamadas de método. **Rule 13 inteira retira-se**, exceto por uma versão muito reduzida sobre como prompts versionados invocam o LLM. |
+| **14 — Project Scope Guard** | Limita o que pode entrar no Java do `ia-dev-env` (gerador puro; sem telemetria, sem release, sem orquestração). | **Inverte-se completamente em NDP**: orquestração, telemetria, release, lifecycle audit, gates — tudo isso AGORA pertence ao escopo. Precisa de **rule nova** (§7.4) com escopo expandido. |
+| **22 — Skill Visibility** | `x-internal-*` prefix existe porque skills extraídas precisam ser invisíveis ao usuário no `/help`. Frontmatter `visibility: internal`. | Em NDP, "internal" = método privado / package-private. Não existe "/help" como problema — `ndp --help` lista comandos públicos do CLI; o resto é estrutura interna. **Rule 22 retira-se inteira**; substituída por convenções padrão de visibilidade de código. Skills `x-internal-status-update`, `x-internal-args-normalize`, `x-internal-phase-gate` deixam de existir como artefatos. |
+| **24 — Execution Integrity** | Existe inteiramente porque "o LLM pode simular sub-skill calls em vez de executá-los". 4 camadas de defesa contra inlining. | **NDP não pode inlinear chamadas**: ou a função é chamada, ou não é. Mandatory evidence artifacts ainda fazem sentido como conceito (verify-envelope, review reports), mas sua existência é **garantida por construção pelo orquestrador**, não auditada externamente. **Rule 24 retira-se**; restos viram contrato de output do `ndp story implement`. |
+| **26 — Audit Gate Lifecycle** | 4-camada taxonomy (Hook/CI/Java/Workflow) + naming `audit-*.sh`/`verify-*.sh`/`enforce-*.sh`. | NDP colapsa 4 camadas em **2** (Camada A = NDP runtime; Camada B = `ndp ci verify`). Naming conventions de scripts shell são irrelevantes porque os scripts não existem. **Rule 26 retira-se** e é substituída por uma rule muito mais curta sobre as 2 camadas (§7.4). |
+| **27 — Zero-Bypass Lifecycle** | 12 surfaces, 4 camadas de defesa contra bypass do orquestrador raiz. Existe porque o operador pode fazer `git commit + gh pr create` sem chamar o orquestrador. | **Bypass é impossível por construção**: ou o usuário roda `ndp ...` e os gates aplicam, ou não roda — não há caminho intermediário porque os artefatos de evidência são produzidos pelo NDP. **Rule 27 retira-se**; lista de surfaces sobrevive como *contrato de output* dos comandos NDP. Exception #1 (`--legacy-flow` / `flowVersion=1`) e #2 (`hotfix/*`) viram flags do CLI. |
+| **28 — Tool-Call Grammar** | Markers `[required]/[optional]/[conditional]` em SKILL.md para que audit script saiba se um sub-skill é obrigatório. | Em código, `if (required) mustCall() else mayCall()` é apenas um `if`. Markers, regex, audit `audit-tool-call-grammar.sh`, baseline `tool-call-grammar-baseline.txt` — todos retiram-se. **Rule 28 (tool-call-grammar) retira-se inteira.** A outra Rule 28 (capability frontmatter) sobrevive — ver §7.5. |
+
+### 7.4. NEW — regras novas que NDP precisa criar (~10)
+
+Em vez de manter governança que existia para compensar fragilidades, NDP precisa de governança que reflita seu próprio modelo. Sugestão de regras novas:
+
+| ID provisório | Tópico | Por que é necessária |
+|---|---|---|
+| **NDP-Rule-A** — Orchestrator Contract | Define o contrato entre comandos NDP e workers LLM: input schema, output schema, retry semantics, idempotência, timeout, contagem de tokens. | Sem este contrato, cada comando reinventa como invocar o LLM. |
+| **NDP-Rule-B** — Prompt Template Versioning | Prompts (substitutos das skills leaf atuais) são artefatos versionados (SemVer). Breaking changes no schema de saída exigem MAJOR. Templates compartilham fixtures de teste. | Templates são código; precisam dos mesmos rigores que código. |
+| **NDP-Rule-C** — LLM Output Validation | Toda resposta LLM é validada contra JSON Schema. Não-conformidade dispara retry com prompt corretivo (até N vezes); falha persistente aborta a fase com erro tipado. | Hoje, validação é "LLM lê markdown e tenta acertar". Em NDP, validação é estrutural. |
+| **NDP-Rule-D** — Replay & Determinism | Toda execução produz um manifesto (input + LLM responses cached + decisões NDP). `ndp replay <run-id>` reconstitui execução offline. Cache de LLM tem retention policy. | Determinismo é diferencial competitivo do NDP; precisa de rule explícita. |
+| **NDP-Rule-E** — Cost & Budget Guardrails | Todo comando NDP estima custo antes de executar. Override de budget exige flag explícita. Budget pode ser por org / repo / dia / comando. | Sem isso, marketplace + multi-LLM viram cost-attack vector. |
+| **NDP-Rule-F** — Multi-LLM Provider Contract | Define interface comum para Claude, GPT, Gemini, modelos locais. Cada provider declara capabilities (context window, structured output, vision, etc.). NDP roteia por capability. | Sem rule, cada integração de provider é ad-hoc. |
+| **NDP-Rule-G** — Headless Output Schema | `--output json` produz schema estável (versionado). Exit codes machine-readable. STDERR vs STDOUT bem separados. | CI integration depende de schema estável. |
+| **NDP-Rule-H** — Target Adapter Contract | Cada adapter (Claude Code, Cursor, Windsurf, Aider) declara: paths de output, formato, capability map, conflitos. | Multi-target precisa de governança para não virar caos. |
+| **NDP-Rule-I** — Audit Log Immutability | Audit log é hash-linked (cada entrada referencia hash da anterior). Tampering detectável. Exporter formal (SOC2 / ISO). | Substitui Rule 26 + parte de Rule 24/27 com governança real, não papel. |
+| **NDP-Rule-J** — Plug-in Sandbox & Trust (V1+) | Skills/profiles do marketplace declaram permissões; NDP enforça sandbox; trust score por publisher. Assinatura digital obrigatória. | Marketplace inevitavelmente vira superfície de ataque tipo `npm`; rule preventiva. |
+| **NDP-Rule-K** — State Machine Lifecycle | State machine canônica (Pendente → Refinada → Planejada → Em Andamento → Concluída/Falha/Bloqueada) com invariantes de transição, persistência, recovery, replay. | Rule 25 fala de hierarquia mas não de transições. NDP precisa de contrato explícito. |
+| **NDP-Rule-L** — Project Scope (NDP) | Substitui Rule 14. Define o escopo expandido de NDP: gerador + runtime de orquestração + cliente LLM + audit engine + (V1+) marketplace client. | Rule 14 atual é incompatível com NDP por design. |
+
+### 7.5. COLLISION — Rule 28 duplicada
+
+O repositório atual tem **duas regras numeradas 28**: `28-capability-frontmatter-contract.md` (EPIC-0064) e `28-tool-call-grammar.md` (EPIC-0063). Esta colisão precisa ser resolvida na transição para NDP:
+
+| Decisão recomendada | Justificativa |
+|---|---|
+| **Manter `28-capability-frontmatter-contract`** como Rule 28 | Capabilities são o pilar do composition (EPIC-0064 v5); central para NDP. |
+| **Retirar `28-tool-call-grammar`** | Vai para o grupo RETIRE (§7.3). Toda a regra perde sentido com inversão de controle. |
+| Resultado | Rule 28 fica único e canônico. Não é necessário renumerar. |
+
+### 7.6. Implicações para o escopo da V0
+
+| Implicação | Detalhe |
+|---|---|
+| **Escopo de governança encolhe** | De ~27 rules → ~20 rules (10 KEEP + 9 REWORK + 1 que sobra do conflito). Carga cognitiva cai significativamente. |
+| **Escopo de implementação cresce** | ~10 NDP-Rules novas precisam ser escritas e implementadas como código + teste. Esforço migra de "manter audit scripts em bash" para "escrever testes unitários do orquestrador". |
+| **Migração tem 3 fases lógicas** | (1) Implementar comandos NDP em paralelo às skills atuais (dual-mode, §6.9). (2) Migrar testes dos audit scripts para testes unitários dos orquestradores. (3) Remover scripts shell + rules retiradas. |
+| **Rule 14 é blocker do passo 0** | Como Rule 14 atual proíbe explicitamente código de orquestração no `ia-dev-env`, ela precisa ser substituída/relaxada *antes* de qualquer commit que adicione código de orquestração — ou todo o código do NDP precisa nascer em repositório novo (consistente com o §1 "novo repositório"). |
+| **PoC de inversão (§6.4) valida 7 retiradas de uma vez** | Se `ndp story refine` é construído como PoC e os gates de Rules 13/22/24/26/27/28-grammar não precisam existir nele, isso já valida 7 das 7 retiradas listadas em §7.3. |
+
+---
+
+---
+
 > **Nota de processo.** Este plano usa a hierarquia `Project → Product → Capacity → Feature` conforme solicitado, parando antes de Epic. Quando aprovado, cada Feature deve ser refinada via `/x-epic-refine` (Rule 29) antes de virar Epic, e cada Epic resultante deve passar pelos 7 artefatos de planejamento (Rule 27 §Surface 09) antes de qualquer story implementar código. Pular esse fluxo desfaz o próprio diferencial competitivo do NDP.
 >
 > **Nota de delivery.** O princípio fundador da seção §0 é vinculante para todas as Features marcadas `[V0]`: se uma Feature não puder ser entregue como CLI local-first, ela não está no escopo da V0 e precisa ser reclassificada para `[V1+]` ou `[V2+]`.
