@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0072-0001",
+  "epicId": "epic-0072",
+  "timestamp": "2026-05-01T11:10:00Z",
+  "passed": true,
+  "coverageLine": 95.2,
+  "coverageBranch": 90.3,
+  "testsRun": 30,
+  "testsFailed": 0,
+  "missingArtifacts": [],
+  "gates": {
+    "compilation": "PASS",
+    "unitTests": "PASS",
+    "coverageLine": "PASS",
+    "coverageBranch": "PASS",
+    "architectureCompliance": "PASS"
+  }
+}
