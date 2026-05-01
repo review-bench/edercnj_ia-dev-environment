@@ -256,8 +256,9 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
     TaskCreate(subject: "{STORY_ID} › Phase 3 - Verify", activeForm: "Running verify gate and reviews")
 
-**Sub-task trackers (open in Batch A — one per sub-step 3.Q–3.5 — before `Skip verification`):** emit 11 `TaskCreate` in ONE message (one per Quality-perf / Quality-mutation / Quality-contract / Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {qualityPerf, qualityMutation, qualityContract, docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
+**Sub-task trackers (open in Batch A — one per sub-step 3.Q–3.5 — before `Skip verification`):** emit 12 `TaskCreate` in ONE message (one per Quality-regression / Quality-perf / Quality-mutation / Quality-contract / Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {qualityRegression, qualityPerf, qualityMutation, qualityContract, docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
 
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality regression", activeForm: "Running x-test-regression-shell")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality perf", activeForm: "Running x-test-performance")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality mutation", activeForm: "Running x-test-mutation")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality contract", activeForm: "Running x-test-contract")
@@ -272,9 +273,20 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
 **Skipped only under `--skip-verification`** (recovery-only — see Rule 22). Every `Skill(...)` below is a **MANDATORY TOOL CALL** (Rule 24); inlining is a violation and the CI audit fails merges lacking evidence artifacts. Full per-step details (sub-skill envelopes, NO-GO cycle protocol, worktree-cleanup decision table) in `references/full-protocol.md` §5.
 
-### 3.Q Quality Gates — **MANDATORY conditional** (EPIC-0072, Rule 24)
+### 3.Q Quality Gates — **MANDATORY conditional** (EPIC-0072 + EPIC-0073, Rule 24)
 
-> Sequence: perf → mutation → contract (D-R11 fast-fail). Reads `QualityConfig` from project `quality:` YAML. Disabled sub-gates emit WARN; no report produced. First non-zero exit cancels remaining gates.
+> Sequence: regression → perf → mutation → contract (D-R11 fast-fail). Regression runs first — cheapest gate. Reads `QualityConfig` from project `quality:` YAML. Disabled sub-gates emit WARN; no report produced. First non-zero exit cancels remaining gates.
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Regression`
+
+    Skill(skill: "x-test-regression-shell", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/regression-report-STORY-ID.md")  [conditional: flag.quality_regression_enabled]
+    TaskUpdate(id: p3Tasks.qualityRegression, status: "completed")
+
+Exit non-zero → `REGRESSION_DETECTED` (19); **D-R11: skip 3.Q.1, 3.Q.2, and 3.Q.3**.
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Regression ok`
 
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Perf`
@@ -367,6 +379,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 | `x-task-implement` fails | Mark `FAILED`; block propagation; `TASK_FAILED` (unless `--task`) |
 | `x-doc-validate` fails after retry | `DOC_VALIDATION_FAILED` — abort Phase 3; operator must run `/x-doc-generate` + `--resume` |
 | Coverage / AC / consistency failure | `x-internal-story-verify` `passed=false` → `VERIFY_FAILED` |
+| Regression scenario failed | `x-test-regression-shell` non-zero → `REGRESSION_DETECTED` (19); D-R11 skips perf+mutation+contract |
 | `x-pr-create` fails | Task → `FAILED`; story-level → `PR_CREATE_FAILED` |
 | `x-test-performance` regression | `PERF_REGRESSION_DETECTED` (exit 14) — FIX-PR: investigate benchmark delta |
 | `x-test-mutation` below threshold | `MUTATION_SCORE_BELOW_THRESHOLD` (exit 17) — FIX-PR: kill surviving mutants |
