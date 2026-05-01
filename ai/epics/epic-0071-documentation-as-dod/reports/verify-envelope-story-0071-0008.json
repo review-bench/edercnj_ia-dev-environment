@@ -6,6 +6,7 @@
   "scope": "SIMPLE",
   "coverageLine": null,
   "coverageBranch": null,
+  "failures": [],
   "coverageNote": "No Java production code added — smoke test only; no coverage delta applicable",
   "acceptanceCriteria": [
     {

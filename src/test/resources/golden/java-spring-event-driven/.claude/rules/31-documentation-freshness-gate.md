@@ -70,7 +70,7 @@ When `freshness-window-hours > 0`, a target is stale only if the grace period ha
 | **0 — PreToolUse** | `enforce-preflight-gates.sh` (EPIC-0063) | `git push`, `gh pr create`, `Skill x-pr-create` | Blocks if `x-doc-validate` evidence absent |
 | **1 — Normative** | This rule + CLAUDE.md (EPIC-0071) | Every conversation | — |
 | **2 — CI Script** | `audit-doc-freshness.sh` | PR open/sync to `develop` or `epic/*` | 1 `DOC_FRESHNESS_VIOLATION` |
-| **3 — Java Test** | `Epic0071DocFreshnessSmokeIT` | `mvn verify` | JUnit assertion failure |
+| **3 — Java Test** | `Epic0071DocAsDoDSmokeIT` | `mvn verify` | JUnit assertion failure |
 
 ## Mandatory Invocation in `x-story-implement`
 
@@ -81,7 +81,7 @@ Skill(skill: "x-doc-generate", model: "sonnet", args: "<STORY-ID> --target-stack
 Skill(skill: "x-doc-validate", model: "sonnet", args: "<STORY-ID>")                        [required]
 ```
 
-Silent omission is a `PROTOCOL_VIOLATION` under Rule 24. The evidence artifact produced by `x-doc-validate` is `ai/epics/epic-XXXX/reports/doc-validate-STORY-ID.md` (template `_TEMPLATE-DOC-VALIDATE-REPORT.md`, delivered in story-0071-0002).
+Silent omission is a `PROTOCOL_VIOLATION` under Rule 24. The evidence artifact produced by `x-doc-validate` is `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (template `_TEMPLATE-DOC-VALIDATE-REPORT.md`, delivered in story-0071-0002).
 
 ## `--skip-doc` Constraint
 

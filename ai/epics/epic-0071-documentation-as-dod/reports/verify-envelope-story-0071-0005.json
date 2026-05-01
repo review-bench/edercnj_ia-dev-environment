@@ -6,6 +6,7 @@
   "prNumber": 895,
   "coverageLine": null,
   "coverageBranch": null,
+  "failures": [],
   "acCheckResults": [
     { "scenario": "Happy — PR with updated docs passes", "passed": true },
     { "scenario": "Degenerate — doc-only PR auto-skipped", "passed": true },

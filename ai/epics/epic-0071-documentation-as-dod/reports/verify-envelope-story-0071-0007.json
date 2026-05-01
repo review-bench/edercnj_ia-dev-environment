@@ -6,6 +6,7 @@
   "scope": "SIMPLE",
   "coverageLine": null,
   "coverageBranch": null,
+  "failures": [],
   "coverageNote": "No Java production code added in this story — CHANGELOG.md and dogfood-notes.md only. Coverage gate not applicable.",
   "acceptanceCriteriaResults": [
     {

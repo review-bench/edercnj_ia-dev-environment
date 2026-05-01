@@ -63,13 +63,14 @@ self_check() {
     local broken=0
     command -v grep >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: grep required" >&2; broken=1; }
     command -v git  >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: git required"  >&2; broken=1; }
-    command -v jq   >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: jq required"   >&2; broken=1; }
+    command -v sed  >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: sed required"  >&2; broken=1; }
+    command -v find >/dev/null 2>&1 || { echo "OPERATIONAL_ERROR: find required" >&2; broken=1; }
     if [[ ! -f "${BASELINE_FILE}" ]]; then
         echo "OPERATIONAL_ERROR: baseline ${BASELINE_FILE} missing" >&2
         broken=1
     fi
     if [[ ! -f "${RULE_FILE}" ]]; then
-        log_warn "rule file ${RULE_FILE} not found — gate wiring incomplete"
+        echo "OPERATIONAL_ERROR: rule file ${RULE_FILE} missing — gate wiring broken" >&2
         broken=1
     fi
     [[ ${broken} -eq 0 ]] && exit 0 || exit 2
@@ -94,8 +95,8 @@ load_baseline() {
         echo "OPERATIONAL_ERROR: ${BASELINE_FILE} missing" >&2
         exit 2
     fi
-    # Validate baseline format: lines must be blank, comment (#), or PR-number
-    if grep -qE "^[^#[:space:]][^0-9]" "${BASELINE_FILE}" 2>/dev/null; then
+    # Validate baseline format: lines must be blank, comment (#), or PR-number optionally followed by comment
+    if grep -vE "^([[:space:]]*(#.*)?$|[0-9]+([[:space:]].*)?$)" "${BASELINE_FILE}" 2>/dev/null | grep -q .; then
         echo "BASELINE_CORRUPT: ${BASELINE_FILE} contains unexpected lines" >&2
         exit 3
     fi
@@ -138,7 +139,7 @@ is_doc_only_change() {
     # Files that are NOT doc-only
     local non_doc
     non_doc=$(echo "${changed_files}" | grep -vE \
-        '(^docs/|^CHANGELOG\.md$|^README\.md$|^ai/epics/|\.md$|^\.github/)' \
+        '(^docs/|^CHANGELOG\.md$|^README\.md$|^ai/epics/|^[^/]*\.md$|^\.github/)' \
         | grep -vE '(^src/test/|/test/|/__tests__/|Test\.java$|Spec\.(ts|js|py|rb|go)$)' \
         || true)
     [[ -z "${non_doc}" ]]

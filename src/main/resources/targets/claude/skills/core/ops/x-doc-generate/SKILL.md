@@ -43,6 +43,7 @@ Single entry point for generating and updating all project documentation for {{P
 | `--scope` | String | No | Path to limit change analysis (e.g., `src/main/java/com/example/api/`). |
 | `--force` | Flag | No | Regenerate even if no changes detected. |
 | `--dry-run` | Flag | No | List what would be updated without writing any file. |
+| `--target-stack-aware` | Flag | No | **(default)** Reads `documentation.targets` from ProjectConfig and generates only targets relevant to the project stack. Invokes `x-arch-system-update` when architectural changes detected. |
 | `--legacy-v1` | Flag | No | **DEPRECATED** — emits WARNING: "v1 behavior deprecated; will be removed in 2 releases". Mutually exclusive with `--target-stack-aware`. |
 
 **Flag conflict:** passing both `--legacy-v1` and `--target-stack-aware` in the same invocation exits with `FLAG_CONFLICT` and lists both flags as mutually exclusive.

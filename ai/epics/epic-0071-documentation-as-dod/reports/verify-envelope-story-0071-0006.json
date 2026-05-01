@@ -6,6 +6,7 @@
   "prNumber": 896,
   "coverageLine": null,
   "coverageBranch": null,
+  "failures": [],
   "acCheckResults": [
     { "scenario": "Happy — Phase 3 invokes doc skills with success", "passed": true },
     { "scenario": "Degenerate — story with only docs/refactor still invokes doc skills", "passed": true },

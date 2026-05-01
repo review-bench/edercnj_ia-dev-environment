@@ -4,7 +4,7 @@
 **Date:** 2026-04-30  
 **Deciders:** Architect (EPIC-0071)  
 **Epic:** EPIC-0071 (Documentation as DoD)  
-**Rule:** [Rule 31 — Documentation Freshness Gate](.claude/rules/31-documentation-freshness-gate.md)
+**Rule:** [Rule 31 — Documentation Freshness Gate](../../.claude/rules/31-documentation-freshness-gate.md)
 
 ---
 
@@ -61,7 +61,7 @@ The only overlap is the `system.md` target (Rule 30 defines it; Rule 31 enforces
 
 ## Related
 
-- [Rule 30 — Value-Driven Templates](.claude/rules/30-value-driven-templates.md)
-- [Rule 24 — Execution Integrity](.claude/rules/24-execution-integrity.md)
-- [Rule 26 — Audit Gate Lifecycle](.claude/rules/26-audit-gate-lifecycle.md)
-- [EPIC-0071 Implementation Map](ai/epics/epic-0071-documentation-as-dod/IMPLEMENTATION-MAP.md)
+- [Rule 30 — Value-Driven Templates](../../.claude/rules/30-value-driven-templates.md)
+- [Rule 24 — Execution Integrity](../../.claude/rules/24-execution-integrity.md)
+- [Rule 26 — Audit Gate Lifecycle](../../.claude/rules/26-audit-gate-lifecycle.md)
+- [EPIC-0071 Implementation Map](../../ai/epics/epic-0071-documentation-as-dod/IMPLEMENTATION-MAP.md)

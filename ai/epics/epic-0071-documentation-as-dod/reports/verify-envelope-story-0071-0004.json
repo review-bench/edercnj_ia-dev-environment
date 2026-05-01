@@ -7,7 +7,7 @@
   "coverageBranch": null,
   "buildStatus": "SUCCESS",
   "testsRun": 4567,
-  "failures": 0,
+  "failures": [],
   "errors": 0,
   "note": "Story delivers SKILL.md update + template only (no Java source). Java test count inherited from project baseline.",
   "artifacts": {
