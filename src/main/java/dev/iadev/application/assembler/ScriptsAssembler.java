@@ -46,7 +46,7 @@ public final class ScriptsAssembler implements Assembler {
 
     /**
      * The canonical list of audit and utility scripts bundled in the flat source-of-truth directory
-     * (legacy). Ordered alphabetically. Golden tests assert all 11 are present in generated output.
+     * (legacy). Ordered alphabetically. Golden tests assert all 12 are present in generated output.
      */
     public static final List<String> AUDIT_SCRIPTS =
             List.of(
@@ -54,6 +54,7 @@ public final class ScriptsAssembler implements Assembler {
                     "audit-execution-integrity.sh",
                     "audit-flow-version.sh",
                     "audit-model-selection.sh",
+                    "audit-mutation-score.sh",
                     "audit-perf-baseline.sh",
                     "audit-pr-template.sh",
                     "audit-refinement-gate.sh",

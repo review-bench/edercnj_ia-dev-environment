@@ -108,9 +108,9 @@ class Epic0072PerfBaselineSmokeIT {
         }
 
         @Test
-        @DisplayName("scenario8_auditScripts_has11Scripts")
-        void scenario8_auditScripts_has11Scripts() {
-            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(11);
+        @DisplayName("scenario8_auditScripts_has12Scripts")
+        void scenario8_auditScripts_has12Scripts() {
+            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(12);
         }
     }
 

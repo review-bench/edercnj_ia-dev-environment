@@ -348,6 +348,18 @@
 
 ---
 
+### audit-mutation-score.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 05 §Mutation Score Threshold (EPIC-0072 story-0072-0006) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Mutation score from `mutation-report.json` meets `quality.mutation.threshold` AND does not regress vs `governance/baselines/mutation-baseline.json` beyond `quality.mutation.regression-tolerance-pct`. Stage policy: first release with `mutation.enabled=true` emits WARN only (baseline `release_count=0→1`); subsequent releases enforce FAIL. Rejects symlinks and path traversal on report path. |
+| **Introduced** | story-0072-0006 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or first-release WARN) · `1` = `MUTATION_SCORE_VIOLATION` or `MUTATION_REGRESSION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ### audit-perf-baseline.sh
 
 | Field | Value |
