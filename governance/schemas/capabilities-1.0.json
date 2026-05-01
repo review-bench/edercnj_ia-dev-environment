@@ -17,7 +17,7 @@
       "enum": [
         "language", "framework", "interface", "data", "messaging",
         "architecture", "observability", "deployment", "security",
-        "compliance", "testing", "cloud", "governance"
+        "compliance", "testing", "cloud", "governance", "quality"
       ],
       "description": "Top-level namespace canônico. Lista fechada; novas categorias requerem revisão de ADR-0016."
     },

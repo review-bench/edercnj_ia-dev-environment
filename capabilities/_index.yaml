@@ -44,3 +44,21 @@ categories:
     capabilities:
       - governance.refinement-gate
       - governance.value-driven-templates
+      - governance.doc-as-dod
+
+  - name: quality
+    description: Quality gates — performance, mutation, and contract testing
+    capabilities:
+      - quality.performance.rest
+      - quality.performance.grpc
+      - quality.performance.cli
+      - quality.performance.graphql
+      - quality.performance.socket
+      - quality.mutation.java-pit
+      - quality.mutation.stryker
+      - quality.mutation.mutmut
+      - quality.mutation.go-mutesting
+      - quality.contract.openapi-diff
+      - quality.contract.pact
+      - quality.contract.buf
+      - quality.contract.scc
