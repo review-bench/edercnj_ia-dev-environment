@@ -29,14 +29,7 @@ class Epic0072MutationSkillSmokeIT {
                     "x-test-mutation");
 
     private static final Path KP_ROOT =
-            Path.of(
-                    "src",
-                    "main",
-                    "resources",
-                    "targets",
-                    "claude",
-                    "knowledge",
-                    "testing");
+            Path.of("src", "main", "resources", "targets", "claude", "knowledge", "testing");
 
     private static final Path TEMPLATES_ROOT =
             Path.of("src", "main", "resources", "shared", "templates");
@@ -83,9 +76,7 @@ class Epic0072MutationSkillSmokeIT {
             assertThat(content)
                     .as("must reference quality.mutation.threshold")
                     .contains("quality.mutation.threshold");
-            assertThat(content)
-                    .as("must document runtime-cap-min")
-                    .contains("runtime-cap-min");
+            assertThat(content).as("must document runtime-cap-min").contains("runtime-cap-min");
         }
 
         @Test
@@ -201,9 +192,7 @@ class Epic0072MutationSkillSmokeIT {
         void scenario15_mutationPlanTemplate_containsMandatorySections() throws Exception {
             String content =
                     Files.readString(
-                            TEMPLATES_ROOT
-                                    .resolve("_TEMPLATE-MUTATION-PLAN.md")
-                                    .toAbsolutePath());
+                            TEMPLATES_ROOT.resolve("_TEMPLATE-MUTATION-PLAN.md").toAbsolutePath());
             assertThat(content).as("must have Header section").contains("## Header");
             assertThat(content).as("must have Summary section").contains("## Summary");
             assertThat(content)

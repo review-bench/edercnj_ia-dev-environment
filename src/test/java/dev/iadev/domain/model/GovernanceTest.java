@@ -56,7 +56,13 @@ class GovernanceTest {
         @DisplayName("null branchingModel defaults to GITFLOW")
         void ctor_nullBranchingModel_defaultsGitFlow() {
             Governance gov =
-                    new Governance("none", Set.of(), null, true, DocumentationConfig.DEFAULT, QualityConfig.DEFAULT);
+                    new Governance(
+                            "none",
+                            Set.of(),
+                            null,
+                            true,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT);
 
             assertThat(gov.branchingModel()).isEqualTo(BranchingModel.GITFLOW);
         }

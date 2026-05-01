@@ -89,9 +89,7 @@ class Epic0072Phase3IntegratedSmokeIT {
         @DisplayName("scenario3_skillMd_fastFailSequenceDocumented")
         void scenario3_skillMd_fastFailSequenceDocumented() throws Exception {
             String content = Files.readString(SKILL_MD.toAbsolutePath());
-            assertThat(content)
-                    .as("SKILL.md must document D-R11 fast-fail")
-                    .contains("D-R11");
+            assertThat(content).as("SKILL.md must document D-R11 fast-fail").contains("D-R11");
             assertThat(content)
                     .as("SKILL.md must reference PERF_REGRESSION_DETECTED abort code")
                     .contains("PERF_REGRESSION_DETECTED");
@@ -125,8 +123,7 @@ class Epic0072Phase3IntegratedSmokeIT {
 
         @Test
         @DisplayName("scenario5_skillMd_containsTelemetryMarkersForAllThreeQualityPhases")
-        void scenario5_skillMd_containsTelemetryMarkersForAllThreeQualityPhases()
-                throws Exception {
+        void scenario5_skillMd_containsTelemetryMarkersForAllThreeQualityPhases() throws Exception {
             String content = Files.readString(SKILL_MD.toAbsolutePath());
             assertThat(content)
                     .as("must emit Phase-3-Quality-Perf telemetry marker")
@@ -145,11 +142,17 @@ class Epic0072Phase3IntegratedSmokeIT {
             String content = Files.readString(SKILL_MD.toAbsolutePath());
             long perfStarts =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh start") && l.contains("Phase-3-Quality-Perf"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh start")
+                                                    && l.contains("Phase-3-Quality-Perf"))
                             .count();
             long perfEnds =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh end") && l.contains("Phase-3-Quality-Perf"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh end")
+                                                    && l.contains("Phase-3-Quality-Perf"))
                             .count();
             assertThat(perfStarts)
                     .as("Phase-3-Quality-Perf must have exactly 1 start marker")
@@ -160,11 +163,17 @@ class Epic0072Phase3IntegratedSmokeIT {
 
             long mutationStarts =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh start") && l.contains("Phase-3-Quality-Mutation"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh start")
+                                                    && l.contains("Phase-3-Quality-Mutation"))
                             .count();
             long mutationEnds =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh end") && l.contains("Phase-3-Quality-Mutation"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh end")
+                                                    && l.contains("Phase-3-Quality-Mutation"))
                             .count();
             assertThat(mutationStarts)
                     .as("Phase-3-Quality-Mutation must have exactly 1 start marker")
@@ -175,11 +184,17 @@ class Epic0072Phase3IntegratedSmokeIT {
 
             long contractStarts =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh start") && l.contains("Phase-3-Quality-Contract"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh start")
+                                                    && l.contains("Phase-3-Quality-Contract"))
                             .count();
             long contractEnds =
                     content.lines()
-                            .filter(l -> l.contains("telemetry-phase.sh end") && l.contains("Phase-3-Quality-Contract"))
+                            .filter(
+                                    l ->
+                                            l.contains("telemetry-phase.sh end")
+                                                    && l.contains("Phase-3-Quality-Contract"))
                             .count();
             assertThat(contractStarts)
                     .as("Phase-3-Quality-Contract must have exactly 1 start marker")

@@ -29,14 +29,7 @@ class Epic0072ContractSkillSmokeIT {
                     "x-test-contract");
 
     private static final Path KP_ROOT =
-            Path.of(
-                    "src",
-                    "main",
-                    "resources",
-                    "targets",
-                    "claude",
-                    "knowledge",
-                    "testing");
+            Path.of("src", "main", "resources", "targets", "claude", "knowledge", "testing");
 
     private static final Path TEMPLATES_ROOT =
             Path.of("src", "main", "resources", "shared", "templates");
@@ -72,9 +65,7 @@ class Epic0072ContractSkillSmokeIT {
             assertThat(content)
                     .as("must document CONTRACT_BREAKING_CHANGE")
                     .contains("CONTRACT_BREAKING_CHANGE");
-            assertThat(content)
-                    .as("must document OPERATIONAL_ERROR")
-                    .contains("OPERATIONAL_ERROR");
+            assertThat(content).as("must document OPERATIONAL_ERROR").contains("OPERATIONAL_ERROR");
             assertThat(content)
                     .as("must document CONTRACT_ARTIFACT_INVALID")
                     .contains("CONTRACT_ARTIFACT_INVALID");
@@ -203,9 +194,7 @@ class Epic0072ContractSkillSmokeIT {
         void scenario14_contractPlanTemplate_containsMandatorySections() throws Exception {
             String content =
                     Files.readString(
-                            TEMPLATES_ROOT
-                                    .resolve("_TEMPLATE-CONTRACT-PLAN.md")
-                                    .toAbsolutePath());
+                            TEMPLATES_ROOT.resolve("_TEMPLATE-CONTRACT-PLAN.md").toAbsolutePath());
             assertThat(content).as("must have Header section").contains("## Header");
             assertThat(content).as("must have Summary section").contains("## Summary");
             assertThat(content)

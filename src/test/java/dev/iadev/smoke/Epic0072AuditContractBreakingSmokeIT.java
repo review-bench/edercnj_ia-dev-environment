@@ -9,7 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Epic0072AuditContractBreakingSmokeIT — audit-contract-breaking.sh structural invariants")
+@DisplayName(
+        "Epic0072AuditContractBreakingSmokeIT — audit-contract-breaking.sh structural invariants")
 class Epic0072AuditContractBreakingSmokeIT {
 
     private static final Path SCRIPTS_ROOT =
@@ -31,9 +32,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario2_auditScript_containsSelfCheck() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content).as("must implement --self-check flag").contains("--self-check");
             assertThat(content)
                     .as("must check jq availability in self-check")
@@ -48,18 +47,12 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario3_auditScript_containsExitCodes() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must document CONTRACT_BREAKING_VIOLATION")
                     .contains("CONTRACT_BREAKING_VIOLATION");
-            assertThat(content)
-                    .as("must document OPERATIONAL_ERROR")
-                    .contains("OPERATIONAL_ERROR");
-            assertThat(content)
-                    .as("must document BASELINE_CORRUPT")
-                    .contains("BASELINE_CORRUPT");
+            assertThat(content).as("must document OPERATIONAL_ERROR").contains("OPERATIONAL_ERROR");
+            assertThat(content).as("must document BASELINE_CORRUPT").contains("BASELINE_CORRUPT");
         }
 
         @Test
@@ -67,9 +60,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario4_auditScript_containsPathTraversalGuard() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must reject path traversal in artifact paths")
                     .contains("traversal detected");
@@ -80,9 +71,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario5_auditScript_containsCommandInjectionGuard() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must have filename sanitizer against command injection")
                     .contains("rejected by sanitizer");
@@ -93,15 +82,11 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario6_auditScript_containsChangelogBreakingDetection() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must detect ## Breaking entry in CHANGELOG.md diff")
                     .contains("CHANGELOG.md");
-            assertThat(content)
-                    .as("must match Breaking header regex")
-                    .contains("Breaking");
+            assertThat(content).as("must match Breaking header regex").contains("Breaking");
         }
 
         @Test
@@ -109,9 +94,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario7_auditScript_containsConventionalCommitBreakingSignal() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must accept BREAKING CHANGE: footer as secondary signal")
                     .contains("BREAKING CHANGE:");
@@ -122,9 +105,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario8_auditScript_containsShallowCloneHandling() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must detect and handle shallow clone")
                     .contains("is-shallow-repository");
@@ -135,9 +116,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         void scenario9_auditScript_containsAuditHistoryLog() throws Exception {
             String content =
                     Files.readString(
-                            SCRIPTS_ROOT
-                                    .resolve("audit-contract-breaking.sh")
-                                    .toAbsolutePath());
+                            SCRIPTS_ROOT.resolve("audit-contract-breaking.sh").toAbsolutePath());
             assertThat(content)
                     .as("must append to contract-breaking-history.log for documented breakers")
                     .contains("contract-breaking-history.log");
@@ -180,10 +159,7 @@ class Epic0072AuditContractBreakingSmokeIT {
         @DisplayName("scenario13_contractBreakingBaseline_exists")
         void scenario13_contractBreakingBaseline_exists() {
             assertThat(
-                            Path.of(
-                                            "governance",
-                                            "baselines",
-                                            "contract-breaking-baseline.txt")
+                            Path.of("governance", "baselines", "contract-breaking-baseline.txt")
                                     .toAbsolutePath())
                     .exists();
         }

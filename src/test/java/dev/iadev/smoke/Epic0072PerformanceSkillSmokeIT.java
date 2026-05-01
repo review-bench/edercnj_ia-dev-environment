@@ -67,17 +67,25 @@ class Epic0072PerformanceSkillSmokeIT {
         @DisplayName("scenario3_skillFile_containsExitCodes")
         void scenario3_skillFile_containsExitCodes() throws Exception {
             String content = Files.readString(SKILL_ROOT.resolve("SKILL.md").toAbsolutePath());
-            assertThat(content).as("must document PERF_REGRESSION_DETECTED").contains("PERF_REGRESSION_DETECTED");
+            assertThat(content)
+                    .as("must document PERF_REGRESSION_DETECTED")
+                    .contains("PERF_REGRESSION_DETECTED");
             assertThat(content).as("must document TOOL_NOT_FOUND").contains("TOOL_NOT_FOUND");
-            assertThat(content).as("must document PERF_DISABLED exit code").contains("PERF_DISABLED");
+            assertThat(content)
+                    .as("must document PERF_DISABLED exit code")
+                    .contains("PERF_DISABLED");
         }
 
         @Test
         @DisplayName("scenario4_skillFile_containsBaselineComparison")
         void scenario4_skillFile_containsBaselineComparison() throws Exception {
             String content = Files.readString(SKILL_ROOT.resolve("SKILL.md").toAbsolutePath());
-            assertThat(content).as("must reference performance-baseline.json").contains("performance-baseline.json");
-            assertThat(content).as("must document baseline-tolerance-pct").contains("baseline-tolerance-pct");
+            assertThat(content)
+                    .as("must reference performance-baseline.json")
+                    .contains("performance-baseline.json");
+            assertThat(content)
+                    .as("must document baseline-tolerance-pct")
+                    .contains("baseline-tolerance-pct");
         }
 
         @Test
@@ -85,8 +93,12 @@ class Epic0072PerformanceSkillSmokeIT {
         void scenario5_skillFile_requiresCapabilityFrontmatter() throws Exception {
             String content = Files.readString(SKILL_ROOT.resolve("SKILL.md").toAbsolutePath());
             assertThat(content).as("must declare requires-any").contains("requires-any:");
-            assertThat(content).as("must list quality.performance.rest").contains("quality.performance.rest");
-            assertThat(content).as("must list quality.performance.grpc").contains("quality.performance.grpc");
+            assertThat(content)
+                    .as("must list quality.performance.rest")
+                    .contains("quality.performance.rest");
+            assertThat(content)
+                    .as("must list quality.performance.grpc")
+                    .contains("quality.performance.grpc");
         }
     }
 
@@ -99,20 +111,22 @@ class Epic0072PerformanceSkillSmokeIT {
         void scenario6_qualityPerformanceEnabled_selectsXTestPerformance() {
             // Build a config with quality.performance.enabled=true via Governance override
             var baseConfig = TestConfigBuilder.builder().build();
-            var qualityConfig = new QualityConfig(
-                    new QualityConfig.PerformanceConfig(true, null, 10, java.util.Map.of()),
-                    QualityConfig.MutationConfig.DEFAULT,
-                    QualityConfig.ContractConfig.DEFAULT);
-            var configWithQuality = new dev.iadev.domain.model.ProjectConfig(
-                    baseConfig.core(),
-                    baseConfig.tech(),
-                    new dev.iadev.domain.model.Governance(
-                            baseConfig.governance().compliance(),
-                            baseConfig.governance().platforms(),
-                            baseConfig.governance().branchingModel(),
-                            baseConfig.governance().telemetryEnabled(),
-                            baseConfig.governance().documentation(),
-                            qualityConfig));
+            var qualityConfig =
+                    new QualityConfig(
+                            new QualityConfig.PerformanceConfig(true, null, 10, java.util.Map.of()),
+                            QualityConfig.MutationConfig.DEFAULT,
+                            QualityConfig.ContractConfig.DEFAULT);
+            var configWithQuality =
+                    new dev.iadev.domain.model.ProjectConfig(
+                            baseConfig.core(),
+                            baseConfig.tech(),
+                            new dev.iadev.domain.model.Governance(
+                                    baseConfig.governance().compliance(),
+                                    baseConfig.governance().platforms(),
+                                    baseConfig.governance().branchingModel(),
+                                    baseConfig.governance().telemetryEnabled(),
+                                    baseConfig.governance().documentation(),
+                                    qualityConfig));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
             assertThat(skills).contains("x-test-performance");
         }
@@ -177,13 +191,15 @@ class Epic0072PerformanceSkillSmokeIT {
         @Test
         @DisplayName("scenario14_performancePlanTemplate_exists")
         void scenario14_performancePlanTemplate_exists() {
-            assertThat(TEMPLATES_ROOT.resolve("_TEMPLATE-PERFORMANCE-PLAN.md").toAbsolutePath()).exists();
+            assertThat(TEMPLATES_ROOT.resolve("_TEMPLATE-PERFORMANCE-PLAN.md").toAbsolutePath())
+                    .exists();
         }
 
         @Test
         @DisplayName("scenario15_performanceBaselineJson_exists")
         void scenario15_performanceBaselineJson_exists() {
-            assertThat(BASELINES_ROOT.resolve("performance-baseline.json").toAbsolutePath()).exists();
+            assertThat(BASELINES_ROOT.resolve("performance-baseline.json").toAbsolutePath())
+                    .exists();
         }
 
         @Test
@@ -199,10 +215,14 @@ class Epic0072PerformanceSkillSmokeIT {
         void scenario17_performancePlanTemplate_containsMandatorySections() throws Exception {
             String content =
                     Files.readString(
-                            TEMPLATES_ROOT.resolve("_TEMPLATE-PERFORMANCE-PLAN.md").toAbsolutePath());
+                            TEMPLATES_ROOT
+                                    .resolve("_TEMPLATE-PERFORMANCE-PLAN.md")
+                                    .toAbsolutePath());
             assertThat(content).as("must have Header section").contains("## Header");
             assertThat(content).as("must have Summary section").contains("## Summary");
-            assertThat(content).as("must have Results per Endpoint section").contains("Results per Endpoint");
+            assertThat(content)
+                    .as("must have Results per Endpoint section")
+                    .contains("Results per Endpoint");
             assertThat(content).as("must have Tooling section").contains("## Tooling");
         }
     }

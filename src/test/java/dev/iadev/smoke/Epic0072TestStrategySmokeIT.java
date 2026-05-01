@@ -111,18 +111,15 @@ class Epic0072TestStrategySmokeIT {
         assertThat(content)
                 .as("must document PERF_REGRESSION_DETECTED exit code for blocking")
                 .contains("PERF_REGRESSION_DETECTED");
-        assertThat(content)
-                .as("must document REST stack → Newman dispatch")
-                .contains("Newman");
-        assertThat(content)
-                .as("must reference p95 regression threshold check")
-                .contains("p95");
+        assertThat(content).as("must document REST stack → Newman dispatch").contains("Newman");
+        assertThat(content).as("must reference p95 regression threshold check").contains("p95");
         assertThat(content)
                 .as("must reference baseline tolerance percentage")
                 .contains("baseline-tolerance-pct");
         assertThat(content)
                 .as("PERF_REGRESSION_DETECTED must map to non-zero exit")
-                .containsPattern("(?s)PERF_REGRESSION_DETECTED.*[1-9]\\d*|[1-9]\\d*.*PERF_REGRESSION_DETECTED");
+                .containsPattern(
+                        "(?s)PERF_REGRESSION_DETECTED.*[1-9]\\d*|[1-9]\\d*.*PERF_REGRESSION_DETECTED");
     }
 
     // ─── Scenario 2 ──────────────────────────────────────────────────────────
@@ -137,9 +134,7 @@ class Epic0072TestStrategySmokeIT {
         assertThat(content)
                 .as("must document SUCCESS exit code (0) for within-tolerance case")
                 .contains("SUCCESS");
-        assertThat(content)
-                .as("must document tolerance-pct default (10)")
-                .contains("10");
+        assertThat(content).as("must document tolerance-pct default (10)").contains("10");
         assertThat(content)
                 .as("audit script for performance baseline must exist")
                 .satisfies(
@@ -161,18 +156,13 @@ class Epic0072TestStrategySmokeIT {
         assertThat(content)
                 .as("must document MUTATION_SCORE_BELOW_THRESHOLD exit code")
                 .contains("MUTATION_SCORE_BELOW_THRESHOLD");
-        assertThat(content)
-                .as("must dispatch PIT for Java stack")
-                .containsAnyOf("PIT", "pitest");
-        assertThat(content)
-                .as("must enforce threshold check")
-                .contains("threshold");
-        assertThat(content)
-                .as("must document Java stack dispatch")
-                .containsAnyOf("Java", "java");
+        assertThat(content).as("must dispatch PIT for Java stack").containsAnyOf("PIT", "pitest");
+        assertThat(content).as("must enforce threshold check").contains("threshold");
+        assertThat(content).as("must document Java stack dispatch").containsAnyOf("Java", "java");
         assertThat(content)
                 .as("MUTATION_SCORE_BELOW_THRESHOLD must map to non-zero exit")
-                .containsPattern("(?s)MUTATION_SCORE_BELOW_THRESHOLD.*[1-9]|[1-9].*MUTATION_SCORE_BELOW_THRESHOLD");
+                .containsPattern(
+                        "(?s)MUTATION_SCORE_BELOW_THRESHOLD.*[1-9]|[1-9].*MUTATION_SCORE_BELOW_THRESHOLD");
     }
 
     // ─── Scenario 4 ──────────────────────────────────────────────────────────
@@ -187,9 +177,7 @@ class Epic0072TestStrategySmokeIT {
         assertThat(content)
                 .as("must document SUCCESS exit code (0) for above-threshold case")
                 .contains("SUCCESS");
-        assertThat(content)
-                .as("must document default threshold (80)")
-                .contains("80");
+        assertThat(content).as("must document default threshold (80)").contains("80");
         assertThat(content)
                 .as("audit script for mutation score must exist")
                 .satisfies(
@@ -216,8 +204,13 @@ class Epic0072TestStrategySmokeIT {
                 .contains("openapi-diff");
         assertThat(content)
                 .as("must document blocking on undocumented breaking change")
-                .containsAnyOf("without CHANGELOG", "no CHANGELOG", "lacks CHANGELOG",
-                        "## BREAKING", "CHANGELOG detection", "Breaking");
+                .containsAnyOf(
+                        "without CHANGELOG",
+                        "no CHANGELOG",
+                        "lacks CHANGELOG",
+                        "## BREAKING",
+                        "CHANGELOG detection",
+                        "Breaking");
     }
 
     // ─── Scenario 6 ──────────────────────────────────────────────────────────
@@ -229,9 +222,7 @@ class Epic0072TestStrategySmokeIT {
     void contractBreakingWithChangelogPasses_Proto3Stack() throws Exception {
         String content = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
-        assertThat(content)
-                .as("must dispatch buf for proto3/gRPC stack")
-                .contains("buf");
+        assertThat(content).as("must dispatch buf for proto3/gRPC stack").contains("buf");
         assertThat(content)
                 .as("must document CHANGELOG integration step")
                 .contains("CHANGELOG Integration");
@@ -304,12 +295,8 @@ class Epic0072TestStrategySmokeIT {
         String contractContent = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
         // x-test-performance stack dispatch
-        assertThat(perfContent)
-                .as("x-test-performance: REST stack → Newman")
-                .contains("Newman");
-        assertThat(perfContent)
-                .as("x-test-performance: gRPC stack → ghz")
-                .contains("ghz");
+        assertThat(perfContent).as("x-test-performance: REST stack → Newman").contains("Newman");
+        assertThat(perfContent).as("x-test-performance: gRPC stack → ghz").contains("ghz");
         assertThat(perfContent)
                 .as("x-test-performance: CLI stack → hyperfine")
                 .contains("hyperfine");
@@ -332,8 +319,6 @@ class Epic0072TestStrategySmokeIT {
         assertThat(contractContent)
                 .as("x-test-contract: REST/OpenAPI → openapi-diff")
                 .contains("openapi-diff");
-        assertThat(contractContent)
-                .as("x-test-contract: gRPC/proto3 → buf")
-                .contains("buf");
+        assertThat(contractContent).as("x-test-contract: gRPC/proto3 → buf").contains("buf");
     }
 }

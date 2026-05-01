@@ -48,12 +48,8 @@ class Epic0072PerfBaselineSmokeIT {
             assertThat(content)
                     .as("must document PERF_BASELINE_VIOLATION")
                     .contains("PERF_BASELINE_VIOLATION");
-            assertThat(content)
-                    .as("must document OPERATIONAL_ERROR")
-                    .contains("OPERATIONAL_ERROR");
-            assertThat(content)
-                    .as("must document BASELINE_CORRUPT")
-                    .contains("BASELINE_CORRUPT");
+            assertThat(content).as("must document OPERATIONAL_ERROR").contains("OPERATIONAL_ERROR");
+            assertThat(content).as("must document BASELINE_CORRUPT").contains("BASELINE_CORRUPT");
         }
 
         @Test
@@ -65,9 +61,7 @@ class Epic0072PerfBaselineSmokeIT {
             assertThat(content)
                     .as("must contain path traversal rejection")
                     .contains("path traversal");
-            assertThat(content)
-                    .as("must use realpath for path normalization")
-                    .contains("realpath");
+            assertThat(content).as("must use realpath for path normalization").contains("realpath");
         }
 
         @Test

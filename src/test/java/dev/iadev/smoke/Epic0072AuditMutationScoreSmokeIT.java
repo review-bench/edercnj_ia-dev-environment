@@ -49,12 +49,8 @@ class Epic0072AuditMutationScoreSmokeIT {
             assertThat(content)
                     .as("must document MUTATION_REGRESSION")
                     .contains("MUTATION_REGRESSION");
-            assertThat(content)
-                    .as("must document OPERATIONAL_ERROR")
-                    .contains("OPERATIONAL_ERROR");
-            assertThat(content)
-                    .as("must document BASELINE_CORRUPT")
-                    .contains("BASELINE_CORRUPT");
+            assertThat(content).as("must document OPERATIONAL_ERROR").contains("OPERATIONAL_ERROR");
+            assertThat(content).as("must document BASELINE_CORRUPT").contains("BASELINE_CORRUPT");
         }
 
         @Test
@@ -66,9 +62,7 @@ class Epic0072AuditMutationScoreSmokeIT {
             assertThat(content)
                     .as("must reject path traversal")
                     .contains("path traversal rejected");
-            assertThat(content)
-                    .as("must use realpath for path normalization")
-                    .contains("realpath");
+            assertThat(content).as("must use realpath for path normalization").contains("realpath");
         }
 
         @Test
@@ -117,9 +111,7 @@ class Epic0072AuditMutationScoreSmokeIT {
             assertThat(content)
                     .as("must validate required JSON fields")
                     .contains("malformed mutation report");
-            assertThat(content)
-                    .as("must check for 'score' field")
-                    .contains("\"score\"");
+            assertThat(content).as("must check for 'score' field").contains("\"score\"");
             assertThat(content)
                     .as("must check for 'total_mutations' field")
                     .contains("\"total_mutations\"");
@@ -187,9 +179,7 @@ class Epic0072AuditMutationScoreSmokeIT {
             assertThat(content)
                     .as("Rule 05 must document stage policy WARN→FAIL")
                     .contains("Stage Policy");
-            assertThat(content)
-                    .as("Rule 05 must mention release_count")
-                    .contains("release_count");
+            assertThat(content).as("Rule 05 must mention release_count").contains("release_count");
         }
     }
 

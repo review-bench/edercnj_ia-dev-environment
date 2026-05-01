@@ -29,9 +29,10 @@ import java.util.Map;
  *     proto_breaking: true
  * }</pre>
  *
- * @param performance performance-testing SLO thresholds (stack-aware via {@code /x-test-performance})
- * @param mutation    mutation-testing threshold (stack-aware via {@code /x-test-mutation})
- * @param contract    contract-breaking-change gate (stack-aware via {@code /x-test-contract})
+ * @param performance performance-testing SLO thresholds (stack-aware via {@code
+ *     /x-test-performance})
+ * @param mutation mutation-testing threshold (stack-aware via {@code /x-test-mutation})
+ * @param contract contract-breaking-change gate (stack-aware via {@code /x-test-contract})
  * @see dev.iadev.domain.model.Governance
  */
 public record QualityConfig(
@@ -64,10 +65,10 @@ public record QualityConfig(
     /**
      * Performance-testing gate configuration.
      *
-     * @param enabled              whether the performance gate is active
-     * @param slo                  SLO thresholds per interface type
+     * @param enabled whether the performance gate is active
+     * @param slo SLO thresholds per interface type
      * @param baselineTolerancePct tolerance % for baseline drift (default 10)
-     * @param toolVersions         optional tool version pins (default empty)
+     * @param toolVersions optional tool version pins (default empty)
      */
     public record PerformanceConfig(
             boolean enabled,
@@ -97,7 +98,7 @@ public record QualityConfig(
      *
      * @param rest REST P50/P95/P99 latency + throughput
      * @param grpc gRPC P50/P95/P99 latency
-     * @param cli  CLI generation-time P95
+     * @param cli CLI generation-time P95
      */
     public record SloConfig(RestSlo rest, GrpcSlo grpc, CliSlo cli) {
 
@@ -158,8 +159,8 @@ public record QualityConfig(
     /**
      * Mutation-testing gate configuration.
      *
-     * @param enabled      whether the mutation gate is active
-     * @param threshold    minimum mutation score % (default 80)
+     * @param enabled whether the mutation gate is active
+     * @param threshold minimum mutation score % (default 80)
      * @param runtimeCapMin maximum mutation-run time in minutes (default 10)
      * @param toolVersions optional tool version pins
      */
@@ -184,10 +185,10 @@ public record QualityConfig(
     /**
      * Contract-testing gate configuration.
      *
-     * @param enabled        whether the contract gate is active
-     * @param pact           whether Pact consumer-driven contracts are enabled
+     * @param enabled whether the contract gate is active
+     * @param pact whether Pact consumer-driven contracts are enabled
      * @param openapiBreaking whether OpenAPI breaking-change detection is enabled (default true)
-     * @param protoBreaking   whether Protobuf breaking-change detection is enabled (default true)
+     * @param protoBreaking whether Protobuf breaking-change detection is enabled (default true)
      */
     public record ContractConfig(
             boolean enabled, boolean pact, boolean openapiBreaking, boolean protoBreaking) {
