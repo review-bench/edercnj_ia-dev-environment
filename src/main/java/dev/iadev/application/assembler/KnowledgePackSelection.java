@@ -41,6 +41,9 @@ public final class KnowledgePackSelection {
         packs.addAll(selectDddStrategicPack(config));
         packs.addAll(selectPciDssRequirementsPack(config));
         packs.addAll(selectOwaspAsvsReferencePack(config));
+        packs.addAll(selectQualityPerformancePacks(config));
+        packs.addAll(selectQualityMutationPacks(config));
+        packs.addAll(selectQualityContractPacks(config));
         return packs;
     }
 
@@ -107,5 +110,28 @@ public final class KnowledgePackSelection {
             return List.of("owasp-asvs");
         }
         return List.of();
+    }
+
+    private static List<String> selectQualityPerformancePacks(ProjectConfig config) {
+        if (!config.quality().performance().enabled()) {
+            return List.of();
+        }
+        List<String> packs = new ArrayList<>();
+        packs.add("performance-engineering");
+        return packs;
+    }
+
+    private static List<String> selectQualityMutationPacks(ProjectConfig config) {
+        if (!config.quality().mutation().enabled()) {
+            return List.of();
+        }
+        return List.of("mutation-testing");
+    }
+
+    private static List<String> selectQualityContractPacks(ProjectConfig config) {
+        if (!config.quality().contract().enabled()) {
+            return List.of();
+        }
+        return List.of("contract-testing");
     }
 }

@@ -348,6 +348,42 @@
 
 ---
 
+### audit-contract-breaking.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 26 §Audit Gate Lifecycle (EPIC-0072 story-0072-0007) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Contract artifacts (OpenAPI YAML, proto, Avro AVSC) changed in a PR are classified as breaking vs non-breaking. Breaking changes without a `## Breaking` entry in `CHANGELOG.md` (or `BREAKING CHANGE:` footer in a commit message per Conventional Commits Rule 08) are blocked. Breaking changes with documented migration are passed with WARN and appended to `governance/audits/contract-breaking-history.log`. Rejects path traversal and command injection in artifact filenames. |
+| **Introduced** | story-0072-0007 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (no breaking, or breaking with documented migration — WARN emitted) · `1` = `CONTRACT_BREAKING_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-mutation-score.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 05 §Mutation Score Threshold (EPIC-0072 story-0072-0006) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Mutation score from `mutation-report.json` meets `quality.mutation.threshold` AND does not regress vs `governance/baselines/mutation-baseline.json` beyond `quality.mutation.regression-tolerance-pct`. Stage policy: first release with `mutation.enabled=true` emits WARN only (baseline `release_count=0→1`); subsequent releases enforce FAIL. Rejects symlinks and path traversal on report path. |
+| **Introduced** | story-0072-0006 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or first-release WARN) · `1` = `MUTATION_SCORE_VIOLATION` or `MUTATION_REGRESSION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-perf-baseline.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0072 (Comprehensive Test Strategy) story-0072-0005 |
+| **Layer** | 2 — CI Script |
+| **Validates** | Integrity of `governance/baselines/performance-baseline.json`: JSON parse-valid, `_format_version` field present, no silent overwrite (baseline modified in PR without corresponding entry in `perf-baseline-updates.log`), symlink rejection, path traversal rejection, file size ≤ 1MB |
+| **Introduced** | story-0072-0005 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or baseline absent on first run) · `1` = `PERF_BASELINE_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

@@ -11,9 +11,10 @@ class GovernanceQualityTest {
 
     @Test
     void fromMap_noQualityBlock_defaultsAllDisabled() {
-        var root = Map.<String, Object>of(
-                "compliance", "none",
-                "branching-model", "gitflow");
+        var root =
+                Map.<String, Object>of(
+                        "compliance", "none",
+                        "branching-model", "gitflow");
 
         var gov = Governance.fromMap(root);
 
@@ -25,14 +26,13 @@ class GovernanceQualityTest {
 
     @Test
     void fromMap_qualityBlockPresent_parsedCorrectly() {
-        var qualityMap = Map.<String, Object>of(
-                "performance", Map.of("enabled", true),
-                "mutation", Map.<String, Object>of("enabled", true, "threshold", 90),
-                "contract", Map.of("enabled", true));
+        var qualityMap =
+                Map.<String, Object>of(
+                        "performance", Map.of("enabled", true),
+                        "mutation", Map.<String, Object>of("enabled", true, "threshold", 90),
+                        "contract", Map.of("enabled", true));
 
-        var root = Map.<String, Object>of(
-                "compliance", "none",
-                "quality", qualityMap);
+        var root = Map.<String, Object>of("compliance", "none", "quality", qualityMap);
 
         var gov = Governance.fromMap(root);
 

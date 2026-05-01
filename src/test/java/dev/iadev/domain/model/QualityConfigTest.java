@@ -54,9 +54,10 @@ class QualityConfigTest {
 
         @Test
         void fromMap_baselineTolerancePct_parsed() {
-            var m = Map.<String, Object>of(
-                    "performance",
-                    Map.<String, Object>of("enabled", true, "baseline_tolerance_pct", 15));
+            var m =
+                    Map.<String, Object>of(
+                            "performance",
+                            Map.<String, Object>of("enabled", true, "baseline_tolerance_pct", 15));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -65,11 +66,14 @@ class QualityConfigTest {
 
         @Test
         void fromMap_sloRestBlock_parsed() {
-            var restSlo = Map.<String, Object>of(
-                    "p50_ms", 50, "p95_ms", 200, "p99_ms", 500, "throughput_rps", 1000);
-            var m = Map.<String, Object>of(
-                    "performance",
-                    Map.<String, Object>of("enabled", true, "slo", Map.of("rest", restSlo)));
+            var restSlo =
+                    Map.<String, Object>of(
+                            "p50_ms", 50, "p95_ms", 200, "p99_ms", 500, "throughput_rps", 1000);
+            var m =
+                    Map.<String, Object>of(
+                            "performance",
+                            Map.<String, Object>of(
+                                    "enabled", true, "slo", Map.of("rest", restSlo)));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -82,9 +86,11 @@ class QualityConfigTest {
         @Test
         void fromMap_sloGrpcBlock_parsed() {
             var grpcSlo = Map.<String, Object>of("p50_ms", 20, "p95_ms", 100, "p99_ms", 200);
-            var m = Map.<String, Object>of(
-                    "performance",
-                    Map.<String, Object>of("enabled", true, "slo", Map.of("grpc", grpcSlo)));
+            var m =
+                    Map.<String, Object>of(
+                            "performance",
+                            Map.<String, Object>of(
+                                    "enabled", true, "slo", Map.of("grpc", grpcSlo)));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -95,9 +101,10 @@ class QualityConfigTest {
         @Test
         void fromMap_sloCliBlock_parsed() {
             var cliSlo = Map.<String, Object>of("gen_time_p95_ms", 4000);
-            var m = Map.<String, Object>of(
-                    "performance",
-                    Map.<String, Object>of("enabled", true, "slo", Map.of("cli", cliSlo)));
+            var m =
+                    Map.<String, Object>of(
+                            "performance",
+                            Map.<String, Object>of("enabled", true, "slo", Map.of("cli", cliSlo)));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -122,9 +129,9 @@ class QualityConfigTest {
 
         @Test
         void fromMap_mutationEnabled_parsesThreshold() {
-            var m = Map.<String, Object>of(
-                    "mutation",
-                    Map.<String, Object>of("enabled", true, "threshold", 85));
+            var m =
+                    Map.<String, Object>of(
+                            "mutation", Map.<String, Object>of("enabled", true, "threshold", 85));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -134,9 +141,10 @@ class QualityConfigTest {
 
         @Test
         void fromMap_mutationRuntimeCap_parsed() {
-            var m = Map.<String, Object>of(
-                    "mutation",
-                    Map.<String, Object>of("enabled", true, "runtime_cap_min", 20));
+            var m =
+                    Map.<String, Object>of(
+                            "mutation",
+                            Map.<String, Object>of("enabled", true, "runtime_cap_min", 20));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -158,13 +166,14 @@ class QualityConfigTest {
 
         @Test
         void fromMap_contractEnabled_parsesFlags() {
-            var m = Map.<String, Object>of(
-                    "contract",
+            var m =
                     Map.<String, Object>of(
-                            "enabled", true,
-                            "pact", true,
-                            "openapi_breaking", false,
-                            "proto_breaking", false));
+                            "contract",
+                            Map.<String, Object>of(
+                                    "enabled", true,
+                                    "pact", true,
+                                    "openapi_breaking", false,
+                                    "proto_breaking", false));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -190,21 +199,33 @@ class QualityConfigTest {
 
         @Test
         void constructor_nullPerformance_usesDefault() {
-            var cfg = new QualityConfig(null, QualityConfig.DEFAULT.mutation(), QualityConfig.DEFAULT.contract());
+            var cfg =
+                    new QualityConfig(
+                            null,
+                            QualityConfig.DEFAULT.mutation(),
+                            QualityConfig.DEFAULT.contract());
 
             assertThat(cfg.performance().enabled()).isFalse();
         }
 
         @Test
         void constructor_nullMutation_usesDefault() {
-            var cfg = new QualityConfig(QualityConfig.DEFAULT.performance(), null, QualityConfig.DEFAULT.contract());
+            var cfg =
+                    new QualityConfig(
+                            QualityConfig.DEFAULT.performance(),
+                            null,
+                            QualityConfig.DEFAULT.contract());
 
             assertThat(cfg.mutation().threshold()).isEqualTo(80);
         }
 
         @Test
         void constructor_nullContract_usesDefault() {
-            var cfg = new QualityConfig(QualityConfig.DEFAULT.performance(), QualityConfig.DEFAULT.mutation(), null);
+            var cfg =
+                    new QualityConfig(
+                            QualityConfig.DEFAULT.performance(),
+                            QualityConfig.DEFAULT.mutation(),
+                            null);
 
             assertThat(cfg.contract().openapiBreaking()).isTrue();
         }
