@@ -769,6 +769,120 @@ Esses grupos viram a taxonomia oficial do NDP para empacotar e descobrir capacid
 
 **Regra de ouro:** standards viram policies, explicações viram KPs, estruturas repetíveis viram templates, ações continuam commands/workers.
 
+### 5.6. Inventário — Templates e consumidores
+
+Os templates atuais são uma parte essencial do produto: eles definem a forma dos artefatos que skills e regras esperam encontrar em disco. No modelo atual, a fonte principal fica em `src/main/resources/shared/templates/`, com subárvores complementares (`constitution/`, `domains/`, `examples/`, `fragments/`). Há ainda `src/main/resources/shared/config-templates/` para profiles YAML e `src/main/resources/shared/cicd-templates/` para templates determinísticos de CI/CD, Docker e Kubernetes.
+
+No NDP, templates não devem ser arquivos soltos copiados para cada projeto sem identidade. Eles viram ativos de registry com `template_id`, versão, categoria, schema de entrada, modo de renderização e consumidores declarados.
+
+#### 5.6.1. Planning product templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-EPIC.md` | Estrutura v2/value-driven para documento de épico. | `x-internal-epic-create`, `x-epic-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/epic-XXXX.md`. | Template registry + schema de epic/refinement. |
+| `_TEMPLATE-STORY.md` | História implementável com contratos, Gherkin, tarefas e refinement verdict. | `x-internal-story-create`, `x-story-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/story-XXXX-YYYY.md`. | Template registry + validação estrutural. |
+| `_TEMPLATE-TASK.md` | Contrato de tarefa fina no modelo task-first. | `x-story-plan`, `x-task-plan`. | `ai/epics/.../tasks/task-TASK-*.md`. | Template de task contract. |
+| `_TEMPLATE-TASK-PLAN.md` | Plano de implementação por tarefa, incluindo TDD e file footprint. | `x-task-plan`. | `ai/epics/.../plans/plan-task-*.md`. | Prompt/output template versionado. |
+| `_TEMPLATE-TASK-IMPLEMENTATION-MAP.md` | Mapa de dependências e paralelismo entre tarefas. | `x-story-plan`. | `plans/task-implementation-map-*.md`. | Renderer determinístico + grafo. |
+| `_TEMPLATE-IMPLEMENTATION-MAP.md` | Mapa de implementação do épico. | `x-internal-epic-map`, `x-epic-map`, `x-feature-create`. | `ai/epics/.../IMPLEMENTATION-MAP.md`. | Core planning renderer. |
+| `_TEMPLATE-STORY-PLANNING-REPORT.md` | Relatório consolidado do planejamento multi-agente da story. | `x-story-plan`. | `plans/story-planning-report-*.md`. | Report renderer. |
+| `_TEMPLATE-DOR-CHECKLIST.md` | Checklist de Definition of Ready. | `x-story-plan`, refinement/planning gates. | `plans/` ou relatório de DoR. | Policy checklist renderizado. |
+| `_TEMPLATE.md` | Modelo amplo de especificação técnica inicial. | Uso manual ou pipeline de spec/feature. | `docs/specs/` ou entrada para feature creation. | Spec template opcional do registry. |
+
+#### 5.6.2. Execution governance templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | Plano de implementação por story. | `x-story-implement`, `x-internal-story-build-plan`. | `ai/epics/.../plans/plan-story-*.md`. | Prompt + evidência obrigatória. |
+| `_TEMPLATE-TASK-BREAKDOWN.md` | Quebra de tarefas a partir de plano/testes. | `x-lib-task-decomposer`, `x-internal-story-build-plan`. | `plans/tasks-story-*.md`. | Estrutura de decomposição. |
+| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | Plano de execução de épico com DAG, fases e critical path. | `x-internal-epic-build-plan`, `x-internal-report-write`. | `ai/epics/.../epic-execution-plan.md`. | Renderer determinístico de plano. |
+| `_TEMPLATE-EPIC-EXECUTION-REPORT.md` | Relatório pós-implementação de épico. | `x-epic-implement`, `x-internal-report-write`. | `ai/epics/.../reports/`. | Report renderer. |
+| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | Relatório de conclusão de fase. | `x-epic-implement`. | `reports/phase-report-epic-*.md`. | Report renderer de phase gate. |
+| `_TEMPLATE-STORY-COMPLETION-REPORT.md` | Fechamento de story com PR, coverage, tasks e findings. | `x-internal-story-report`, `x-internal-report-write`. | `reports/story-completion-report-*.md`. | Report renderer obrigatório. |
+| `_TEMPLATE-EXECUTION-STATE.json` | Esqueleto JSON de estado de execução. | Orquestradores, `x-internal-status-update`. | `ai/epics/.../execution-state.json`. | Schema tipado, não template textual LLM. |
+| `_TEMPLATE-REFINEMENT-VERDICT.md` | Estrutura textual do verdict de refinement. | `x-story-refine`, `x-epic-refine`. | Markdown + dual-write em `execution-state.json`. | Schema + view markdown gerada. |
+
+#### 5.6.3. Review governance templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-ARCHITECTURE-PLAN.md` | Plano arquitetural com diagramas, NFRs e mini-ADRs. | `x-arch-plan`. | `plans/arch-story-*.md`. | Prompt output estruturado. |
+| `_TEMPLATE-SPECIALIST-REVIEW.md` | Relatório de review por especialista. | `x-review` e review specialists. | `plans/review-story-*.md`. | Worker review template. |
+| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | Dashboard consolidado dos reviews especialistas. | `x-review`. | `plans/review-dashboard-*.md`. | Report renderer + scorecard. |
+| `_TEMPLATE-TECH-LEAD-REVIEW.md` | Review final Tech Lead com GO/NO-GO. | `x-review-pr`. | `plans/techlead-review-story-*.md`. | Veredito estruturado. |
+| `_TEMPLATE-REVIEW-REMEDIATION.md` | Plano de correção pós-review. | `x-story-implement` fase de remediação. | `plans/remediation-story-*.md`. | Backlog de remediação. |
+
+#### 5.6.4. Security, compliance and quality templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-SECURITY-ASSESSMENT.md` | Avaliação de segurança da story. | `x-internal-story-build-plan` fase 1E. | `plans/security-story-*.md`. | Prompt + policy evidence. |
+| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | Avaliação compliance da story. | `x-internal-story-build-plan` fase 1F. | `plans/compliance-story-*.md`. | Prompt condicionado por compliance pack. |
+| `_TEMPLATE-THREAT-MODEL.md` | Threat model estruturado. | `x-threat-model`. | `plans/threat-model-story-*.md` ou reports. | Security document template. |
+| `_TEMPLATE-SLO-SLI-DEFINITION.md` | Definição de SLO/SLI. | Ops/governance docs. | `governance/slo-sli/` ou docs. | Policy/doc template. |
+| `_TEMPLATE-TEST-PLAN.md` | Plano de testes Double-Loop TDD. | `x-test-plan`, `x-internal-story-build-plan`. | `plans/tests-story-*.md`. | Prompt output obrigatório. |
+
+#### 5.6.5. Documentation templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-SERVICE-ARCHITECTURE.md` | Documento de arquitetura do serviço. | Composer/scaffold. | `docs/architecture/` ou steering docs. | Generated documentation view. |
+| `_TEMPLATE-ARCHITECTURE-SYSTEM.md` | Arquitetura de sistema com decision log. | `x-arch-system-update`, scaffold. | `docs/architecture/system.md`. | Patchable document template. |
+| `_TEMPLATE-GRPC-REFERENCE.md` | Referência gRPC/protobuf. | Contract/docs generation. | `contracts/api/grpc-reference.md`. | Protocol docs template. |
+| `_TEMPLATE-ADR.md` | Estrutura de ADR. | `x-adr-generate`, scaffold. | `docs/adr/ADR-*.md`. | ADR registry + numbering engine. |
+| `_TEMPLATE-DOC-VALIDATE-REPORT.md` | Relatório de doc freshness. | `x-doc-validate`. | `reports/doc-validate-report-*.md`. | Report renderer de documentation gate. |
+| `_TEMPLATE-PERFORMANCE-BASELINE.md` | Baseline de performance. | Performance/profile docs. | Docs ou reports de performance. | Optional performance template. |
+| `_TEMPLATE-DATA-MIGRATION-PLAN.md` | Plano de migração de dados. | Data migration planning. | Docs/plans. | Optional planning template. |
+| `_TEMPLATE-CONTRIBUTING.md` | Guia de contribuição. | Generator/docs scaffold. | `CONTRIBUTING.md` ou docs. | Generated repo documentation. |
+| `CLAUDE.md` | Memória/guia de agentes para o projeto gerado. | Composer. | `CLAUDE.md` no repo alvo. | Generated target adapter view. |
+| `SYSTEM_SPECS.md` | Especificação base do sistema. | Scaffold/spec generation. | Specs/documentação inicial. | Generated spec view. |
+| `domain-template.md`, `project-identity-template.md` | Overlays de domínio e identidade. | Profile/domain composition. | Seções de docs/rules. | Profile overlay templates. |
+
+#### 5.6.6. Observability and operations templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-TELEMETRY-EVENT.json` | Forma canônica de evento de telemetria. | `telemetry-*`, `telemetry-emit.sh`, `telemetry-phase.sh`. | `events.ndjson`. | Event schema versionado. |
+| `_TEMPLATE-TELEMETRY-EVENT.README.md` | Documenta campos do evento de telemetria. | Operadores/devs, docs geradas. | README/doc interno. | Schema documentation generated view. |
+| `_TEMPLATE-TELEMETRY-REPORT.md` | Relatório agregado de telemetria. | `x-telemetry-analyze`. | Markdown/JSON/CSV report. | Report renderer determinístico. |
+| `_TEMPLATE-DEPLOY-RUNBOOK.md` | Runbook de deploy. | Ops docs/scaffold. | `results/runbooks/deploy-runbook.md`. | Ops pack template. |
+| `_TEMPLATE-INCIDENT-RESPONSE.md` e runbooks similares | Resposta a incidente e procedimentos operacionais. | `x-ops-incident`, ops docs. | `results/runbooks/`. | Ops workflow templates. |
+
+#### 5.6.7. Git, PR and release templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-CHANGELOG-ENTRY.md` | Entrada de changelog. | `x-release-changelog`, release flow. | `CHANGELOG.md`. | SemVer/changelog renderer. |
+| `_TEMPLATE-RELEASE-CHECKLIST.md` | Checklist de release. | `x-release`. | `ai/releases/` ou release report. | Release workflow checklist. |
+| `_TEMPLATE-PR-IMPLEMENTATION.md` | Corpo de PR de implementação com evidências. | `x-internal-pr-body-render --kind implementation`, `x-pr-create`. | PR body. | Strict PR body renderer. |
+| `_TEMPLATE-PR-BACKLOG.md` | Corpo de PR de backlog/spec. | `x-internal-pr-body-render --kind backlog`, `x-feature-create`. | PR body de docs/backlog. | Strict PR body renderer. |
+
+#### 5.6.8. Meta-generator, infra and overlays
+
+| Template/família | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-AUDIT-GATES-CATALOG.md` | Catálogo dos gates/audits instalados. | Generator/governance docs. | `docs/audit-gates-catalog.md`. | Generated governance view. |
+| `_TEMPLATE-SKILL.md` | Template de autoria de nova skill. | Autores de skills, generator docs. | `SKILL.md`. | Authoring template do registry. |
+| `constitution/CONSTITUTION.md` | Constituição/base normativa do projeto. | Scaffold/governance. | Docs ou governance base. | Governance pack template. |
+| `domains/**/domain-*.md`, `domains/**/domain-rules.md` | Overlays por domínio vertical. | Capability/domain composition. | Rules/docs fragmentados por domínio. | Domain overlay packs. |
+| `examples/**` | Exemplos de domínios e specs. | Docs, demos, tests. | Exemplos em docs. | Demo/sample packs. |
+| `fragments/*.md` | Fragmentos para DB, messaging, microservices, PCI/security etc. | Composer/Pebble. | Seções em rules/docs/CLAUDE. | Fragment registry. |
+| `config-templates/setup-config.*.yaml` | Seeds de configuração por stack/profile. | `ndp init`/generator atual. | Profile YAML. | Profile template registry. |
+| `cicd-templates/**/*.njk` | CI/CD, Docker e K8s determinísticos. | CI/CD assembler. | `.github/workflows/`, Dockerfile, K8s manifests. | Infra deterministic renderer. |
+
+#### 5.6.9. Decisões de migração
+
+| Decisão | Implicação |
+| --- | --- |
+| Todo template ganha `template_id`, versão e categoria canônica. | O registry consegue resolver compatibilidade e drift. |
+| Separar templates LLM-open de renderers determinísticos. | Prompts com julgamento continuam workers; Markdown/JSON de relatório vira renderer testável. |
+| `_TEMPLATE-EXECUTION-STATE.json` e `_TEMPLATE-TELEMETRY-EVENT.json` viram schemas. | Estado e telemetria deixam de ser texto copiado e passam a ter contrato tipado. |
+| Templates `.njk`/YAML pertencem à composition engine, não ao lifecycle de skills. | CI/CD e profiles são renderização determinística, não prompts. |
+| Goldens continuam como testes de regressão, não fonte de verdade. | O NDP compara checksum/versão do SoT com outputs gerados. |
+| Templates de scaffold migram para `template` + `render command`. | `spring-controller`, `quarkus-resource` etc. deixam de carregar snippets duplicados. |
+
+**Risco principal:** template drift. Hoje o mesmo conceito pode existir no SoT, em `.claude/templates/`, em goldens e em texto dentro de skills. O NDP deve ter uma fonte única e gerar as views para cada target, com golden tests apenas como verificação.
+
 ---
 
 ## 6. Próximos passos sugeridos (sem entrar em épicos ainda)
