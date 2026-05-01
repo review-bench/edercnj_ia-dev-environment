@@ -86,11 +86,12 @@ class ScriptsAssemblerTest {
     }
 
     @Test
-    @DisplayName("AUDIT_SCRIPTS list contains exactly 12 scripts")
+    @DisplayName("AUDIT_SCRIPTS list contains exactly 13 scripts")
     void auditScripts_constantHasExpectedSize() {
         assertThat(ScriptsAssembler.AUDIT_SCRIPTS)
-                .hasSize(12)
+                .hasSize(13)
                 .contains(
+                        "audit-contract-breaking.sh",
                         "audit-flow-version.sh",
                         "audit-epic-branches.sh",
                         "audit-skill-visibility.sh",
