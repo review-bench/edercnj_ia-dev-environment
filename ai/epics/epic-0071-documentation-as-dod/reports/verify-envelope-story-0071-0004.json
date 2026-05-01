@@ -1,0 +1,26 @@
+{
+  "storyId": "story-0071-0004",
+  "epicId": "EPIC-0071",
+  "verifiedAt": "2026-05-01T04:00:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "buildStatus": "SUCCESS",
+  "testsRun": 4567,
+  "failures": [],
+  "errors": 0,
+  "note": "Story delivers SKILL.md update + template only (no Java source). Java test count inherited from project baseline.",
+  "artifacts": {
+    "skill": "src/main/resources/targets/claude/skills/core/ops/x-release-changelog/SKILL.md",
+    "template": "src/main/resources/shared/templates/_TEMPLATE-CHANGELOG-ENTRY.md"
+  },
+  "acVerification": {
+    "happyPath": "PASS — hybrid format with Highlights (3-8 paragraphs from Entrega de Valor) + KaC sections from Conventional Commits",
+    "errorBoundary": "PASS — INVALID_CHANGELOG_FORMAT on invalid format; D-R10 degraded mode (empty Highlights + WARN + exit 0) when no v2 epics",
+    "performance": "PASS — < 60s for 100+ commits and 10 merged epics documented in Performance Contract",
+    "security": "PASS — absolute paths blocked, env vars stripped, markdown escaped; no CI token exposure"
+  },
+  "prNumber": 894,
+  "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/894",
+  "mergedAt": "2026-05-01T04:00:00Z"
+}

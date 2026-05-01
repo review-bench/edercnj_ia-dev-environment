@@ -336,6 +336,18 @@
 
 ---
 
+### audit-doc-freshness.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 31 (Documentation Freshness Gate, EPIC-0071) |
+| **Layer** | 2 — CI Script |
+| **Validates** | PRs that modify code requiring a documentation update (REST endpoints → OpenAPI; new ADR refs → ADR file; new SKILL.md → README; new Java packages → system.md) have the corresponding doc targets updated in the same change-set |
+| **Introduced** | story-0071-0005 (EPIC-0071) |
+| **Exit Codes** | `0` = OK · `1` = `DOC_FRESHNESS_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` or `INVALID_EXEMPTION` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

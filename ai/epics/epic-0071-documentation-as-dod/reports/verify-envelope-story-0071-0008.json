@@ -1,0 +1,74 @@
+{
+  "storyId": "story-0071-0008",
+  "epicId": "EPIC-0071",
+  "verifiedAt": "2026-05-01T08:30:00Z",
+  "passed": true,
+  "scope": "SIMPLE",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "failures": [],
+  "coverageNote": "No Java production code added — smoke test only; no coverage delta applicable",
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "description": "scenario1_auditDocFreshness_detectsReadmeStaleness passes",
+      "passed": true
+    },
+    {
+      "id": "AC-002",
+      "description": "scenario2_auditDocFreshness_detectsOpenApiStaleness passes",
+      "passed": true
+    },
+    {
+      "id": "AC-003",
+      "description": "scenario3_xDocValidate_skillPresent_withPassContract passes",
+      "passed": true
+    },
+    {
+      "id": "AC-004",
+      "description": "scenario4_xStoryImplement_phase3DocGate_blocksOnDocValidateFail passes",
+      "passed": true
+    },
+    {
+      "id": "AC-005",
+      "description": "scenario5_skipDoc_confinedToRecoveryBlock passes",
+      "passed": true
+    },
+    {
+      "id": "AC-006",
+      "description": "scenario6_auditExempt_withoutReason_rejected passes",
+      "passed": true
+    },
+    {
+      "id": "AC-007",
+      "description": "scenario7_rule31Governance_filesPresent passes — Rule 31 file exists, references audit-doc-freshness.sh and x-doc-validate, baseline has zero active entries",
+      "passed": true
+    },
+    {
+      "id": "AC-008",
+      "description": "scenario8_verifyStoryCompletion_checksDocValidateArtifact passes — verify-story-completion.sh checks doc-validate-report",
+      "passed": true
+    }
+  ],
+  "planningArtifacts": {
+    "archPlan": "not-required-simple-scope",
+    "implPlan": "not-required-simple-scope",
+    "testPlan": "not-required-simple-scope",
+    "taskBreakdown": "ai/epics/epic-0071-documentation-as-dod/plans/tasks-story-0071-0008.md",
+    "securityAssessment": "not-required-simple-scope",
+    "complianceAssessment": "not-required-simple-scope"
+  },
+  "reviewArtifacts": {
+    "specialistReview": "ai/epics/epic-0071-documentation-as-dod/plans/review-story-0071-0008.md",
+    "techLeadReview": "ai/epics/epic-0071-documentation-as-dod/plans/techlead-review-story-0071-0008.md",
+    "specialistVerdict": "GO",
+    "techLeadVerdict": "GO"
+  },
+  "testsRun": {
+    "command": "mvn test -Dtest=Epic0071DocAsDoDSmokeIT",
+    "result": "BUILD SUCCESS",
+    "testsRun": 8,
+    "failures": 0,
+    "errors": 0
+  }
+}

@@ -223,7 +223,6 @@ Read tasks from `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 f
     TaskUpdate(id: currentTaskId, status: "completed")
 
 ### 2.1 Per-task dispatch
-
 1. Check deps against `execution-state.json`; unresolved → `BLOCKED` via `x-internal-status-update`, skip.
 2. **Dispatch TDD:** `Skill(skill: "x-task-implement", model: "sonnet", args: "<TASK-ID> --orchestrated --target-branch <targetBranch> [--auto-merge <strategy>] [--epic-id <EPIC-ID>] [--auto-approve-pr] [--non-interactive]")` → RED/GREEN/REFACTOR + atomic commit + push `feat/task-XXXX-YYYY-NNN-desc`. Returns `{status, taskId, commitSha, branchName, coverageLine, coverageBranch}`.
 3. **CI-watch (Rule 21 + Rule 45):** unless `--no-ci-watch`. **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** `Skill(skill: "x-pr-watch-ci", args: "--branch <branchName>")` — 8 exit codes. Persists `.claude/state/pr-watch-{PR}.json`; absence on a merged PR fails Camada 3 audit.
@@ -231,7 +230,6 @@ Read tasks from `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 f
 5. **Status:** `Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type task --id <TASK-ID> --field status --value <STATUS>")`.
 
 ### 2.2 Fail-fast + story-level PR
-
 On `status=FAILED`, mark dependants `BLOCKED` and exit Phase 2 with `TASK_FAILED` (unless `--task` — single-task mode). When `--auto-approve-pr` is set, after all tasks succeed push parent branch and create story-level PR:
 
     Skill(skill: "x-pr-create", model: "haiku", args: "--story-id <STORY-ID> --head feat/story-<STORY-ID> --target-branch <targetBranch> --auto-merge <strategy> --epic-id <EPIC-ID>")
@@ -258,8 +256,10 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
     TaskCreate(subject: "{STORY_ID} › Phase 3 - Verify", activeForm: "Running verify gate and reviews")
 
-**Sub-task trackers (open in Batch A — one per sub-step 3.1–3.5 — before `Skip verification`):** emit 6 `TaskCreate` in ONE message (one per Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {verify, specialist, techLead, report, status, cleanup}`.
+**Sub-task trackers (open in Batch A — one per sub-step 3.0–3.5 — before `Skip verification`):** emit 8 `TaskCreate` in ONE message (one per Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
 
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc generate", activeForm: "Running x-doc-generate")
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc validate", activeForm: "Running x-doc-validate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Verify gate", activeForm: "Running story verify gate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Specialist reviews", activeForm: "Running specialist reviews")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Tech lead review", activeForm: "Running tech lead review")
@@ -269,6 +269,15 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
 **Skipped only under `--skip-verification`** (recovery-only — see Rule 22). Every `Skill(...)` below is a **MANDATORY TOOL CALL** (Rule 24); inlining is a violation and the CI audit fails merges lacking evidence artifacts. Full per-step details (sub-skill envelopes, NO-GO cycle protocol, worktree-cleanup decision table) in `references/full-protocol.md` §5.
 
+### 3.0 Documentation — `MANDATORY — NON-NEGOTIABLE` (Rule 31, EPIC-0071)
+
+`--skip-doc` in `## Recovery`/`hotfix/*` only (Rule 27 Ex. 2). Retry/abort: `references/full-protocol.md` §5.
+
+    Skill(skill: "x-doc-generate", model: "sonnet", args: "--story-id <STORY-ID>")  [required]
+    TaskUpdate(id: p3Tasks.docGenerate, status: "completed")
+    Skill(skill: "x-doc-validate", model: "sonnet", args: "--story-id <STORY-ID> --report-path ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md")  [required]
+    TaskUpdate(id: p3Tasks.docValidate, status: "completed")
+
 ### 3.1 Verify gate — MANDATORY TOOL CALL
 
     Skill(skill: "x-internal-story-verify", args: "--story-id <STORY-ID> --epic-id <EPIC-ID> [--coverage-threshold-line 95] [--coverage-threshold-branch 90]")
@@ -277,15 +286,12 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 Persists `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json`. On `passed=false` → `VERIFY_FAILED`.
 
 ### 3.2 Specialist + Tech-Lead reviews — `MANDATORY — NON-NEGOTIABLE` (unless `--skip-review`)
-> Both `x-review` and `x-review-pr` MUST execute in sequence. Silent omission is a `PROTOCOL_VIOLATION` — subagents MUST abort with `"PROTOCOL_VIOLATION: Step 3.2 specialist/tech-lead review skipped without --skip-verification"`. `MANDATORY — NON-NEGOTIABLE`: the specialist-review step (`x-review`) and tech-lead review step (`x-review-pr`) each persist evidence artifacts validated by CI audit.
-
+Both MUST execute in sequence; silent omission is `PROTOCOL_VIOLATION`. NO-GO cycle protocol in `references/full-protocol.md` §5.
     Skill(skill: "x-review", model: "sonnet", args: "<STORY-ID>")
     TaskUpdate(id: p3Tasks.specialist, status: "completed")
-
     Skill(skill: "x-review-pr", model: "sonnet", args: "<STORY-ID>")
     TaskUpdate(id: p3Tasks.techLead, status: "completed")
-
-On Tech-Lead GO, optional `Skill(skill: "x-pr-fix", args: "<prNumber>")` unless `--no-auto-remediation`. NO-GO: up to 2 fix-and-review cycles; persistent NO-GO flags WARNING in report.
+On Tech-Lead GO, optional `x-pr-fix` unless `--no-auto-remediation`.
 
 ### 3.3 Final report — MANDATORY TOOL CALL
 
@@ -293,18 +299,16 @@ On Tech-Lead GO, optional `Skill(skill: "x-pr-fix", args: "<prNumber>")` unless 
     TaskUpdate(id: p3Tasks.report, status: "completed")
 
 ### 3.4 Status finalize
-
 Finalize atomically via `x-internal-status-update`: IMPLEMENTATION-MAP + Story `**Status:**` → `Concluída`, Jira → `Done`, state.json → `COMPLETE`.
 
     TaskUpdate(id: p3Tasks.status, status: "completed")
 
 ### 3.5 Worktree cleanup (standalone Mode 2 only)
-
 Gated by `STORY_OWNS_WORKTREE`: `true`+passed → `Skill(skill: "x-git-worktree", args: "remove --id story-XXXX-YYYY")` + re-sync develop; `true`+failed → preserve (Rule 14 §4); `false` → skip.
 
     TaskUpdate(id: p3Tasks.cleanup, status: "completed")
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json,ai/epics/epic-XXXX/plans/review-story-STORY-ID.md,ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md,ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md")
+Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-implement --phase Phase-3-Verify --expected-artifacts ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json,ai/epics/epic-XXXX/plans/review-story-STORY-ID.md,ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md,ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md,ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md")
 
 TaskUpdate(id: phase3TaskId, status: "completed")
 
@@ -321,6 +325,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 | Story file not found / dependency incomplete | `x-internal-story-load-context` non-zero → `STORY_NOT_LOADABLE` |
 | Task dependency unresolved | Mark `BLOCKED` via `x-internal-status-update`; continue |
 | `x-task-implement` fails | Mark `FAILED`; block propagation; `TASK_FAILED` (unless `--task`) |
+| `x-doc-validate` fails after retry | `DOC_VALIDATION_FAILED` — abort Phase 3; operator must run `/x-doc-generate` + `--resume` |
 | Coverage / AC / consistency failure | `x-internal-story-verify` `passed=false` → `VERIFY_FAILED` |
 | `x-pr-create` fails | Task → `FAILED`; story-level → `PR_CREATE_FAILED` |
 | `x-pr-fix` compile regression | ABORT Step 3.2 with `PR_FIX_COMPILE_REGRESSION` |
@@ -339,20 +344,15 @@ Resuming after an aborted lifecycle may legitimately skip already-completed step
 | :--- | :--- |
 | `--skip-verification` | Phase 3 (`x-internal-story-verify`) |
 | `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
+| `--skip-doc` | Step 3.0 (`x-doc-generate` + `x-doc-validate`) — **Recovery or hotfix/* only (Rule 27 Exception 2)** |
 | `--skip-smoke` | Smoke gate inside verify |
 | `--no-ci-watch` | CI-watch step in Phase 2 |
 
 ## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
-
 All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `epicId` auto-derived — identical to EPIC-0048. `--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
 
 ## Integration Notes
-
 `x-internal-args-normalize` (0.1), `x-internal-story-load-context` (0.2), `x-internal-story-resume` (0.4 cond.), `x-internal-story-build-plan` (1), `x-task-implement` (2 per-task), `x-pr-create` (2 per-task+story), `x-pr-watch-ci` (2), `x-parallel-eval` (1), `x-review`/`x-review-pr`/`x-pr-fix` (3.2), `x-internal-story-verify` (3.1), `x-internal-story-report` (3.3), `x-internal-status-update` (all phases), `x-git-worktree` (0.3+3.5), `x-epic-implement` (caller).
-
-### `events.ndjson` as Committed Evidence (EPIC-0059 story-0059-0008)
-
-`ai/epics/epic-XXXX/telemetry/events.ndjson` is committed evidence under Rule 24 Camada 4 — `phase.start x-story-implement` events for all 4 phases prove the orchestrator ran (validated by `audit-execution-integrity.sh --scope=telemetry`). The `stage-telemetry.sh` Stop hook stages it at end-of-turn when status=`Em Andamento`. `CLAUDE_TELEMETRY_DISABLED=1` disables staging (Rule 07 fail-open); `CLAUDE_SKIP_AUDIT=1` does NOT bypass (RULE-059-07). `{{PLACEHOLDER}}` tokens are runtime-filled by the agent.
 
 ## Full Protocol
 

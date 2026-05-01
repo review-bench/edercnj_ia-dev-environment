@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0071 (Documentation as DoD)
+
+Antes desta release, documentação era um artefato opcional no `x-story-implement`: o step existia, sabia gerar README, OpenAPI e ADRs, mas era invocado "se sobrasse tempo". PRs merged sem atualizar doc passavam CI sem fricção. O resultado era um débito documental silencioso — endpoints novos entravam na API sem entrada na OpenAPI spec; ADRs eram referenciados em PRs sem estarem publicados em `docs/adr/`; o CHANGELOG acumulava linhas técnicas como `- expand X interface` sem dizer **o que mudou para o usuário**.
+
+**A partir desta release, a atualização de documentação é um gate bloqueante.** O step `x-doc-validate` (Rule 31 — Documentation Freshness Gate) é invocado como **MANDATORY TOOL CALL** no Phase 3 de `x-story-implement`, antes do verify gate. `--skip-doc` foi removido dos parâmetros regulares e movido para o bloco `## Recovery` (bypass de emergência apenas). Ausência do artefato `doc-validate-report-STORY-ID.md` falha tanto o Stop hook (`verify-story-completion.sh`) quanto o CI audit (`scripts/audit-execution-integrity.sh`).
+
+O gate é **stack-aware**: o alvo de validação é determinado pelo YAML do projeto — `README` é sempre obrigatório; `OpenAPI` é checado quando `interfaces[].spec=openapi`; `asyncapi` quando há broker; `gRPC proto` quando `interfaces[].type=grpc`; `docs/architecture/system.md` é validado quando um componente novo é introduzido e `x-arch-system-update` não foi invocado. ADRs referenciados em `Decision Rationale` de stories v2 precisam ter o arquivo publicado em `docs/adr/`. Skill-docs (frontmatter v3.0 + `## Triggers` + `## Examples`) são validados quando a story modifica um `SKILL.md`.
+
+**O formato do CHANGELOG muda nesta release.** O skill `x-release-changelog` v2 gera um bloco `### Highlights` narrativo no topo de cada entry de versão, lendo o campo "Entrega de Valor" dos épicos v2 (EPIC-0070) merged no range da release. O resultado são releases comunicáveis para stakeholders — não mais um dump bruto de commits, mas uma narrativa de "o que entrou, o que muda para o usuário, quais valores foram entregues". Esta própria entry é o primeiro dogfood do formato: gerada pela lógica do v2 aplicada ao EPIC-0071, self-referencial por design.
+
+O CI script `audit-doc-freshness.sh` (Camada 2, Rule 26) complementa o gate local com verificação post-merge: detecta PRs que tiveram mudanças em código mas não tocaram os documentos esperados (heurísticas: novo `@RestController`/`@GetMapping` → requer update em `openapi.yaml`; nova referência `ADR-XXXX` em epic files → requer publicação em `docs/adr/`; novo pacote Java em `application/` ou `adapter/` → requer update em `system.md`). Baseline vazio em `governance/baselines/doc-freshness-baseline.txt` (imutável após merge do EPIC-0071).
+
+### Added — EPIC-0071 (Documentation as DoD)
+
+- **Capability `governance.doc-as-dod`** declared in `capabilities/governance/doc-as-dod.yaml` (universal — `requires-capabilities: []`). All EPIC-0071 artefacts (skills, rules, hooks, scripts) declare `requires-capabilities: [governance.doc-as-dod]` in their frontmatter (Rule 28).
+- **Rule 31 — Documentation Freshness Gate** + **ADR-0024**: defines the blocking documentation gate enforced at 4 layers — normative (Rule 31), local gate (`x-doc-validate` mandatory in Phase 3), CI (`audit-doc-freshness.sh` exit 1 `DOC_FRESHNESS_VIOLATION`), and observability (`doc-validate-report` artifact). Exception paths: `--skip-doc` in `## Recovery` block only, `hotfix/*` branches (Rule 27 Exception 2), `CLAUDE_RECOVERY_MODE=1`.
+- **Skill `/x-doc-validate`** (public, `model: sonnet`): blocking doc freshness gate with stack-aware targets (README, OpenAPI, asyncapi, gRPC proto, ADRs, skill-docs, system.md). Validated targets determined by project YAML configuration. Exit codes: `0`=OK, `1`=`DOC_FRESHNESS_VIOLATION` (produces report), `2`=`DOC_VALIDATION_ERROR`. Produces mandatory evidence artifact `doc-validate-report-STORY-ID.md`.
+- **Skill `/x-doc-generate` v2** (public, `model: sonnet`): gains `--target-stack-aware` mode (default) that reads project YAML and updates only relevant targets. Integration with `x-arch-system-update` (EPIC-0070) when architectural changes are detected.
+- **Skill `/x-release-changelog` v2**: generates hybrid format — `### Highlights` narrative block (3-8 paragraphs from "Entrega de Valor" of merged epics via EPIC-0070 v2 templates) + standard Keep-a-Changelog sections. Fallback (D-R10): when no EPIC-0070 v2 epics found, exits 0 with empty Highlights + visible WARN `"Highlights manual"`. Version placeholder (D-R12): emits `## [Unreleased]` / `## [vNEXT]`; `x-release` materializes the real version at release time per Rule 08 SemVer.
+- **`audit-doc-freshness.sh`** (Camada 2 CI Script, Rule 26): post-merge gate detecting code changes without corresponding doc updates. 4 heuristics: (1) new `@RestController`/`@GetMapping` → requires `openapi.yaml` update; (2) ADR-XXXX references in epic files → requires `docs/adr/ADR-XXXX-*.md`; (3) SKILL.md change → advisory notice (non-blocking); (4) new Java packages in `application/` or `adapter/` → requires `system.md` update. Auto-skips doc-only and test-only PRs. Exit codes: `0`=OK, `1`=`DOC_FRESHNESS_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT` or `INVALID_EXEMPTION`. Implements `--self-check` and `--pr-body-file` (audit-exempt detection).
+- **`governance/baselines/doc-freshness-baseline.txt`**: empty baseline (immutable after EPIC-0071 merges to develop).
+- **`docs/audit-gates-catalog.md`**: entry added for `audit-doc-freshness.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **`x-story-implement` Phase 3 extended**: step 3.0 added — `x-doc-generate` + `x-doc-validate` as **MANDATORY TOOL CALL** (Rule 24 + Rule 31), executed before the verify gate (step 3.1). Sub-task trackers expanded from 6 to 8 (added `docGenerate` + `docValidate`). Mandatory evidence artifact `doc-validate-report-STORY-ID.md` added to `--expected-artifacts` in final phase gate.
+- **`verify-story-completion.sh`** (Stop hook) extended: checks for `doc-validate-report-STORY-ID.md` after `story-completion-report` check. Missing artifact → `EXECUTION INTEGRITY WARNING` (exit 2).
+- **`audit-bypass-flags.sh` (all 7 stack templates)**: pattern extended to detect `--skip-doc` usage outside `## Recovery` blocks — emits `BYPASS_FLAG_VIOLATION`.
+- **Rule 24 §Mandatory Evidence Artifacts** extended: new row — `x-doc-validate` → `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (Camada 3, EPIC-0071).
+
+### [Breaking] — EPIC-0071
+
+> **`x-story-implement` Phase 3 now requires doc-generate + doc-validate.** Every story that runs through `x-story-implement` Phase 3 must produce `doc-validate-report-STORY-ID.md` as a mandatory evidence artifact (Rule 24). The CI audit (`audit-execution-integrity.sh`) will fail PRs missing this artifact; the Stop hook (`verify-story-completion.sh`) warns at turn-end. Recovery only: `--skip-doc` is accepted exclusively inside a `## Recovery` block of the calling skill — any other usage is blocked by `audit-bypass-flags.sh` (`BYPASS_FLAG_VIOLATION`).
+
 ### Added — EPIC-0070 (Value-Driven Templates v2)
 
 - **Capability `governance.value-driven-templates`** — all EPIC-0070 artefacts (skills, scripts, templates) declare `requires-capabilities: [governance.value-driven-templates]` (Rule 28).
