@@ -2,7 +2,6 @@
 name: dast-playbook
 description: DAST guidance — smoke vs full tier, finding remediation OWASP Top 10 mapping, Nuclei template curation policy, ZAP active scan policy tuning.
 visibility: internal
-user-invocable: false
 requires-capabilities:
   - quality.dast.zap-passive
   - quality.dast.zap-active

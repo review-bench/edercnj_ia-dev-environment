@@ -2,7 +2,6 @@
 name: regression-shell-playbook
 description: Guidance for regression shell quality gate — self vs service mode, drift troubleshooting, golden regeneration policy, scenarios.yaml schema.
 visibility: internal
-user-invocable: false
 requires-capabilities:
   - quality.regression.self
   - quality.regression.service
