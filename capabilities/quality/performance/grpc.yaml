@@ -1,0 +1,28 @@
+id: quality.performance.grpc
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  gRPC performance gate — runs ghz against gRPC services and validates P50/P95/P99
+  latency against QualityConfig.performance.slo.grpc thresholds. Invoked by
+  /x-test-performance when interfaces[].type = grpc.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [ghz]
+    default: ghz
+  slo:
+    p50_ms:
+      type: integer
+      default: 20
+    p95_ms:
+      type: integer
+      default: 100
+    p99_ms:
+      type: integer
+      default: 200
