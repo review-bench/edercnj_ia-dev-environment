@@ -1,0 +1,25 @@
+{
+  "storyId": "story-0071-0003",
+  "epicId": "EPIC-0071",
+  "verifiedAt": "2026-05-01T03:30:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "buildStatus": "SUCCESS",
+  "testsRun": 4567,
+  "failures": 0,
+  "errors": 0,
+  "note": "Story delivers SKILL.md update only (no Java source). Java test count inherited from project baseline.",
+  "artifacts": {
+    "skill": "src/main/resources/targets/claude/skills/core/ops/x-doc-generate/SKILL.md"
+  },
+  "acVerification": {
+    "happyPath": "PASS — Stack-aware default generates only relevant targets for Java/Spring/REST profile (readme + openapi + skill-docs + system-arch)",
+    "errorBoundary": "PASS — FLAG_CONFLICT exit on --legacy-v1 + --target-stack-aware; auto-detect when targets empty",
+    "performance": "PASS — < 60s for 20+ targets documented as Performance Contract in SKILL.md",
+    "security": "PASS — PATH_TRAVERSAL_REJECTED for ../etc/passwd; symlinks never followed; no credential exposure"
+  },
+  "prNumber": 893,
+  "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/893",
+  "mergedAt": "2026-05-01T03:30:00Z"
+}
