@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
  *   <li>x-internal-story-create emits v2 value-driven template by default (story-0070-0005)
  *   <li>_TEMPLATE-ARCHITECTURE-SYSTEM.md is present and has §11 Decision Log (story-0070-0004)
  *   <li>x-arch-system-update skill is present with idempotency contract (story-0070-0006)
- *   <li>x-template-migrate skill is present with PARSER_ERROR and --dry-run support (story-0070-0007)
+ *   <li>x-template-migrate skill is present with PARSER_ERROR and --dry-run support
+ *       (story-0070-0007)
  *   <li>EPIC-0056 is formally marked SUPERSEDED (story-0070-0008)
  * </ol>
  */
@@ -27,24 +28,13 @@ import org.junit.jupiter.api.Test;
 class Epic0070ValueTemplatesSmokeIT {
 
     private static final Path SKILLS_ROOT =
-            Path.of(
-                    "src",
-                    "main",
-                    "resources",
-                    "targets",
-                    "claude",
-                    "skills",
-                    "core");
+            Path.of("src", "main", "resources", "targets", "claude", "skills", "core");
 
     private static final Path TEMPLATES_ROOT =
             Path.of("src", "main", "resources", "shared", "templates");
 
     private static final Path EPIC_0056 =
-            Path.of(
-                    "ai",
-                    "epics",
-                    "epic-0056-ra9-planning-templates",
-                    "epic-0056.md");
+            Path.of("ai", "epics", "epic-0056-ra9-planning-templates", "epic-0056.md");
 
     // ─── Scenario 1: x-internal-epic-create emits v2 by default ──────────────
 
@@ -105,8 +95,7 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario3_systemArchTemplate_presentWithDecisionLog")
     void scenario3_systemArchTemplate_presentWithDecisionLog() throws IOException {
-        Path template =
-                TEMPLATES_ROOT.resolve("_TEMPLATE-ARCHITECTURE-SYSTEM.md").toAbsolutePath();
+        Path template = TEMPLATES_ROOT.resolve("_TEMPLATE-ARCHITECTURE-SYSTEM.md").toAbsolutePath();
 
         assertThat(template)
                 .as("_TEMPLATE-ARCHITECTURE-SYSTEM.md must exist (story-0070-0004)")
@@ -127,10 +116,7 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario4_archSystemUpdate_presentWithIdempotencyContract")
     void scenario4_archSystemUpdate_presentWithIdempotencyContract() throws IOException {
-        Path skillFile =
-                SKILLS_ROOT
-                        .resolve("plan/x-arch-system-update/SKILL.md")
-                        .toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("plan/x-arch-system-update/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile)
                 .as("x-arch-system-update SKILL.md must exist (story-0070-0006)")
@@ -154,10 +140,7 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario5_templateMigrate_presentWithParserErrorAndDryRun")
     void scenario5_templateMigrate_presentWithParserErrorAndDryRun() throws IOException {
-        Path skillFile =
-                SKILLS_ROOT
-                        .resolve("plan/x-template-migrate/SKILL.md")
-                        .toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("plan/x-template-migrate/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile)
                 .as("x-template-migrate SKILL.md must exist (story-0070-0007)")

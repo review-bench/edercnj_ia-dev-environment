@@ -11,11 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates value-driven structural invariants of {@code _TEMPLATE-STORY.md} v2
- * (story-0070-0003).
+ * Validates value-driven structural invariants of {@code _TEMPLATE-STORY.md} v2 (story-0070-0003).
  *
- * <p>Checks: all 9 section headers present, v2-specific AC categories in Gherkin section,
- * Decision Rationale micro-template, and File Footprint preserved in Dependências section.
+ * <p>Checks: all 9 section headers present, v2-specific AC categories in Gherkin section, Decision
+ * Rationale micro-template, and File Footprint preserved in Dependências section.
  */
 @DisplayName("TemplateStoryV2StructureTest")
 class TemplateStoryV2StructureTest {

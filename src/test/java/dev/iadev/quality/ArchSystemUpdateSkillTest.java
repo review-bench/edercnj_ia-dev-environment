@@ -10,8 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates structural invariants of the {@code x-arch-system-update} SKILL.md
- * (EPIC-0070 / story-0070-0006).
+ * Validates structural invariants of the {@code x-arch-system-update} SKILL.md (EPIC-0070 /
+ * story-0070-0006).
  *
  * <p>Checks: frontmatter contract (model: sonnet, requires-capabilities, user-invocable),
  * idempotency contract documentation, error codes, and ## Examples section.
@@ -67,7 +67,8 @@ class ArchSystemUpdateSkillTest {
     void skill_frontmatter_isUserInvocable() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-arch-system-update is a public skill (Rule 22) — must NOT set user-invocable: false")
+                .as(
+                        "x-arch-system-update is a public skill (Rule 22) — must NOT set user-invocable: false")
                 .doesNotContain("user-invocable: false");
     }
 
@@ -76,7 +77,8 @@ class ArchSystemUpdateSkillTest {
     void skill_documentsIdempotencyContract() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-arch-system-update MUST document idempotency contract (story-0070-0006 AC: Boundary)")
+                .as(
+                        "x-arch-system-update MUST document idempotency contract (story-0070-0006 AC: Boundary)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("Idempotency"),
                         c -> assertThat(c).contains("idempoten"));
@@ -87,7 +89,8 @@ class ArchSystemUpdateSkillTest {
     void skill_documentsSystemMdMissingError() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-arch-system-update MUST document SYSTEM_MD_MISSING error (story-0070-0006 AC: Error)")
+                .as(
+                        "x-arch-system-update MUST document SYSTEM_MD_MISSING error (story-0070-0006 AC: Error)")
                 .contains("SYSTEM_MD_MISSING");
     }
 

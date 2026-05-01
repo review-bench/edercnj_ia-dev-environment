@@ -10,11 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates structural invariants of the {@code x-template-migrate} SKILL.md
- * (EPIC-0070 / story-0070-0007).
+ * Validates structural invariants of the {@code x-template-migrate} SKILL.md (EPIC-0070 /
+ * story-0070-0007).
  *
- * <p>Checks: frontmatter contract (model: sonnet, requires-capabilities),
- * error codes, idempotency/dry-run support, recovery contract, and ## Examples section.
+ * <p>Checks: frontmatter contract (model: sonnet, requires-capabilities), error codes,
+ * idempotency/dry-run support, recovery contract, and ## Examples section.
  */
 @DisplayName("TemplateMigrateSkillTest")
 class TemplateMigrateSkillTest {
@@ -46,7 +46,8 @@ class TemplateMigrateSkillTest {
     void skill_frontmatter_hasModelSonnet() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST declare model: sonnet (Rule 23 — parser + diff render)")
+                .as(
+                        "x-template-migrate MUST declare model: sonnet (Rule 23 — parser + diff render)")
                 .contains("model: sonnet");
     }
 
@@ -67,7 +68,8 @@ class TemplateMigrateSkillTest {
     void skill_documentsParserErrorCode() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST document PARSER_ERROR code (story-0070-0007 AC: Error)")
+                .as(
+                        "x-template-migrate MUST document PARSER_ERROR code (story-0070-0007 AC: Error)")
                 .contains("PARSER_ERROR");
     }
 
@@ -76,7 +78,8 @@ class TemplateMigrateSkillTest {
     void skill_documentsDryRunMode() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST document --dry-run flag (story-0070-0007 AC: Boundary)")
+                .as(
+                        "x-template-migrate MUST document --dry-run flag (story-0070-0007 AC: Boundary)")
                 .contains("--dry-run");
     }
 
@@ -85,7 +88,8 @@ class TemplateMigrateSkillTest {
     void skill_documentsAtomicWrite() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST document atomic write (story-0070-0007 AC: Error — file not written on parse failure)")
+                .as(
+                        "x-template-migrate MUST document atomic write (story-0070-0007 AC: Error — file not written on parse failure)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("atomic"),
                         c -> assertThat(c).contains("Atomic"));
@@ -96,7 +100,8 @@ class TemplateMigrateSkillTest {
     void skill_documentsRecoveryStateFile() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST document recovery state-file (story-0070-0007 §4 task-007-008)")
+                .as(
+                        "x-template-migrate MUST document recovery state-file (story-0070-0007 §4 task-007-008)")
                 .contains("template-migrate-")
                 .contains(".json");
     }

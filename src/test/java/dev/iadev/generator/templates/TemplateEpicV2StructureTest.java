@@ -11,8 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates value-driven structural invariants of {@code _TEMPLATE-EPIC.md} v2
- * (story-0070-0002).
+ * Validates value-driven structural invariants of {@code _TEMPLATE-EPIC.md} v2 (story-0070-0002).
  *
  * <p>Checks: all 9 section headers present and v2-specific value-driven content for hypothesis,
  * OKRs, and alternatives.
@@ -36,11 +35,7 @@ class TemplateEpicV2StructureTest {
                     "## Refinement Verdict");
 
     private static final List<String> REQUIRED_V2_CONTENT =
-            List.of(
-                    "Hipótese de Valor",
-                    "Decisão de rejeição:",
-                    "story-XXXX-",
-                    "File Footprint");
+            List.of("Hipótese de Valor", "Decisão de rejeição:", "story-XXXX-", "File Footprint");
 
     @Test
     @DisplayName("epicTemplate_hasAllNineRa9Sections")

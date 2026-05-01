@@ -119,7 +119,8 @@ public final class DocsAssembler implements Assembler {
         if (!content.startsWith(FRONTMATTER_DELIMITER)) {
             return content;
         }
-        int secondDelimiter = content.indexOf(FRONTMATTER_DELIMITER, FRONTMATTER_DELIMITER.length());
+        int secondDelimiter =
+                content.indexOf(FRONTMATTER_DELIMITER, FRONTMATTER_DELIMITER.length());
         if (secondDelimiter < 0) {
             return content;
         }
