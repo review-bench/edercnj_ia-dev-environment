@@ -37,6 +37,12 @@ import java.util.Map;
 public record QualityConfig(
         PerformanceConfig performance, MutationConfig mutation, ContractConfig contract) {
 
+    public QualityConfig {
+        performance = performance == null ? PerformanceConfig.DEFAULT : performance;
+        mutation = mutation == null ? MutationConfig.DEFAULT : mutation;
+        contract = contract == null ? ContractConfig.DEFAULT : contract;
+    }
+
     /** All quality gates disabled — safe default when {@code quality:} block is absent. */
     public static final QualityConfig DEFAULT =
             new QualityConfig(

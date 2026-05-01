@@ -28,7 +28,8 @@ class GovernanceTest {
                             platforms,
                             BranchingModel.TRUNK,
                             false,
-                            DocumentationConfig.DEFAULT);
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT);
 
             assertThat(gov.compliance()).isEqualTo("pci-dss");
             assertThat(gov.platforms()).containsExactly(Platform.CLAUDE_CODE);
@@ -45,7 +46,8 @@ class GovernanceTest {
                             null,
                             BranchingModel.GITFLOW,
                             true,
-                            DocumentationConfig.DEFAULT);
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT);
 
             assertThat(gov.platforms()).isEmpty();
         }
@@ -54,7 +56,7 @@ class GovernanceTest {
         @DisplayName("null branchingModel defaults to GITFLOW")
         void ctor_nullBranchingModel_defaultsGitFlow() {
             Governance gov =
-                    new Governance("none", Set.of(), null, true, DocumentationConfig.DEFAULT);
+                    new Governance("none", Set.of(), null, true, DocumentationConfig.DEFAULT, QualityConfig.DEFAULT);
 
             assertThat(gov.branchingModel()).isEqualTo(BranchingModel.GITFLOW);
         }
@@ -71,7 +73,8 @@ class GovernanceTest {
                             mutable,
                             BranchingModel.GITFLOW,
                             true,
-                            DocumentationConfig.DEFAULT);
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT);
 
             mutable.add(Platform.SHARED);
 
@@ -87,7 +90,8 @@ class GovernanceTest {
                             Set.of(Platform.CLAUDE_CODE),
                             BranchingModel.GITFLOW,
                             true,
-                            DocumentationConfig.DEFAULT);
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT);
 
             assertThatThrownBy(() -> gov.platforms().add(Platform.SHARED))
                     .isInstanceOf(UnsupportedOperationException.class);
