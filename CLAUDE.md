@@ -54,6 +54,11 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > - Audit script: [`audit-template-version.sh`](src/main/resources/targets/claude/scripts/audit-template-version.sh)
 > - Superseded: [`epic-0056.md`](ai/epics/epic-0056-ra9-planning-templates/epic-0056.md) → EPIC-0070
 
+> **Concluded — EPIC-0071 (Documentation as DoD).** Documentation updates are now a blocking gate in the story lifecycle. Key changes: (1) `x-doc-validate` invoked as **MANDATORY TOOL CALL** in `x-story-implement` Phase 3 (before verify gate) — `--skip-doc` confined to `## Recovery` blocks only; (2) stack-aware targets: README always, OpenAPI/asyncapi/gRPC conditional on project YAML; (3) `x-release-changelog` v2 generates hybrid `### Highlights` narrative block from epic "Entrega de Valor" + Keep-a-Changelog sections; (4) `audit-doc-freshness.sh` (Camada 2 CI gate, Rule 26) + `governance/baselines/doc-freshness-baseline.txt` (empty, immutable); (5) Rule 31 (Documentation Freshness Gate) + ADR-0024; (6) Rule 24 §Mandatory Evidence Artifacts extended: `x-doc-validate` → `doc-validate-report-STORY-ID.md`; (7) `verify-story-completion.sh` extended to check doc-validate artifact; (8) all 7 `audit-bypass-flags.sh` templates detect `--skip-doc` outside Recovery blocks. Tag `documentation-as-dod-frozen` marks epic closure.
+> - Rule: [`.claude/rules/31-documentation-freshness-gate.md`](.claude/rules/31-documentation-freshness-gate.md)
+> - Skill: [`x-doc-validate`](src/main/resources/targets/claude/skills/core/ops/x-doc-validate/SKILL.md)
+> - Audit script: [`audit-doc-freshness.sh`](src/main/resources/targets/claude/scripts/audit-doc-freshness.sh)
+
 > **REFINEMENT GATE — INEGOCIÁVEL (NEW — EPIC-0069):** Toda story/epic DEVE
 > ser refinada via `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes
 > de invocar `x-story-implement`, `x-epic-implement`, `x-task-implement`, ou

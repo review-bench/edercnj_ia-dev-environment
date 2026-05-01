@@ -355,8 +355,11 @@
       }
     },
     "story-0071-0008": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 898,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/898",
+      "mergedAt": "2026-05-01T08:45:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
