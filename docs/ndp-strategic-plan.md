@@ -15,7 +15,7 @@ Antes de qualquer Product, Capacity ou Feature deste plano, vale a regra de deli
 ### O que isso implica
 
 | Decisão | Consequência |
-|---|---|
+| --- | --- |
 | **Local-first por padrão** | Código-fonte, telemetria, audit log e estado de execução vivem no disco do desenvolvedor. Nada é enviado para nuvem sem opt-in explícito do usuário. |
 | **V0 = CLI** | A primeira release entregável é executável via terminal (`ndp ...`), análoga ao `ia-dev-env generate` / `ia-dev-env validate` de hoje. Sem servidor, sem login, sem dependência de rede para o caminho feliz. |
 | **Frontend é v1+** | Web console (P3.C1), IDE extensions (P3.C2), TUI (P3.C3.F2) são trabalho **posterior**. O core precisa estar estável e auditável via CLI antes de ganhar UI. |
@@ -109,7 +109,7 @@ Em ambos os casos o NDP usa o `claude` CLI (Anthropic CLI ou equivalente em V1+)
 O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diretório `.claude/` opinativo a partir de um YAML de stack. Os ativos centrais são:
 
 | Camada | O que existe hoje | Limite percebido |
-|---|---|---|
+| --- | --- | --- |
 | **Núcleo de geração** | `CapabilityResolver` + `CapabilityAwareComposer` + `OutputPruner` (EPIC-0064 v5) | Composição é file-system + Pebble, sem runtime; mudança = regenerar + commit |
 | **Governança** | 31+ Rules (`.claude/rules/`), 4 camadas de audit gates (Rule 26), zero-bypass (Rule 27), refinement gate (Rule 29) | Carga cognitiva alta; regras são markdown estático, não programáveis |
 | **Orquestração** | ~85 skills (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-review`, …), TDD double-loop, multi-agent dispatch via `Agent(...)` | Acoplado ao Claude Code (CLI Anthropic); single-LLM (Claude Opus/Sonnet/Haiku) |
@@ -399,10 +399,10 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 ## 5. Considerações de migração (para não perder o que existe)
 
 | Ativo atual | Plano de migração |
-|---|---|
+| --- | --- |
 | 31 Rules (`.claude/rules/01-31`) | Portadas como `@ndp/governance-base@1.0.0` rule pack oficial. Subset enforced (24/26/27/28/29) vira engine executável (§3 #12); resto fica como doc humana. |
-| **8 skills orquestradoras** (Anexo B Rule 25) | **Reimplementadas como comandos NDP** — ver §5.1 |
-| ~77 skills leaf restantes | Portadas como `@ndp/skills-core@1.0.0` (Apache 2.0); viram *prompts versionados* invocados pelo NDP via `claude -p`; marketplace permite forks |
+| **Skills orquestradoras** | Separadas em três destinos: comandos públicos do CLI, orquestradores internos do aplicativo, e auxiliares com visibilidade a decidir — ver §5.1 |
+| Skills leaf restantes | Portadas como `@ndp/skills-core@1.0.0` (Apache 2.0); viram *prompts versionados* invocados pelo NDP via `claude -p`; marketplace permite forks |
 | 7 capability categories (EPIC-0064) | Migram 1:1 para v6 schema; campos novos (`provides:`) opcionais até v7 |
 | Profiles (`my-java-cli`, etc.) | `ndp migrate --from-iadev <profile.yaml>` gera profile NDP equivalente |
 | Telemetria histórica (`events.ndjson`) | Importable via `ndp telemetry import --format ndjson-iadev` |
@@ -410,37 +410,605 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 | ADRs 0001-0024 | Permanecem no repositório do projeto; NDP não migra ADRs (são do projeto, não do gerador) |
 | Stories/Epics em flight (0001-0071) | EPIC-0049's `flowVersion` semântica preservada; NDP entende flowVersion 1/2/3/4 + adiciona "ndp-1" |
 
-### 5.1. Mapeamento — Skills orquestradoras → Comandos NDP
+### 5.1. Mapeamento — Skills orquestradoras → NDP
 
-Estas são as **8 skills orquestradoras canônicas** (Anexo B da Rule 25). Todas viram comandos do CLI `ndp`. Os hooks/scripts associados a cada uma são eliminados em conjunto.
+O inventário atual tem três classes de skills com comportamento de orquestração. A decisão de migração não é apenas "skill vira prompt": quando a skill decide ordem, coordena fases, valida gates, manipula estado, abre PR, comita, dispara subskills/subagents, ou consolida múltiplos workers, ela precisa sair do markdown interpretado pelo LLM e virar código NDP.
 
-| Skill atual | Comando NDP V0 | Hooks/scripts substituídos | Notas |
-|---|---|---|---|
-| `x-epic-implement` | `ndp epic implement <ID>` | `enforce-phase-sequence.sh`, `verify-phase-gates.sh`, `audit-execution-integrity.sh`, `audit-bypass-flags.sh`, `audit-tool-call-grammar.sh` | State machine de 6 fases tipada; phase gates como métodos |
-| `x-story-implement` | `ndp story implement <ID>` | `verify-story-completion.sh`, `enforce-refinement-gate.sh`, `audit-refinement-gate.sh`, `audit-doc-freshness.sh` | Fase 1 dispara workers paralelos via `claude -p` (5-7 personas); resultado validado contra schema |
-| `x-task-implement` | `ndp task implement <ID>` | `enforce-preflight-gates.sh`, `preflight.sh`, `audit-coverage-local.sh`, `audit-review-content.sh`, `audit-verify-envelope.sh` | TDD double-loop em código; LLM só redige teste falho e código mínimo |
-| `x-release` | `ndp release [--patch\|--minor\|--major]` | `audit-flow-version.sh`, `audit-epic-branches.sh` | Versionamento, changelog, release branch, gates — tudo determinístico |
-| `x-epic-orchestrate` | `ndp epic orchestrate <ID>` | (nenhum específico — usa os do `epic implement`) | Loop sequencial determinístico sobre stories |
-| `x-review` | `ndp review <STORY>` | (nenhum específico — usa o audit log do P6) | Especialistas em paralelo via `claude -p` (Security, QA, Performance, …); consolidação determinística |
-| `x-review-pr` | `ndp review pr <PR>` | `audit-skill-visibility.sh` parcial | Tech-lead 45-point review; veredito GO/NO-GO em código |
-| `x-pr-merge-train` | `ndp merge-train [--epic <ID>\|--prs <list>]` | `audit-immutability.sh` | Ordem topológica em código; idempotência tipada |
+#### 5.1.1. Orquestradoras principais → comandos públicos do CLI
 
-Skills auxiliares também migram:
+Estas são as candidatas diretas a comandos de primeira classe do CLI. O NDP deve controlar a state machine, persistência, gates, telemetria, retries, idempotência, permissões e saída estruturada; o LLM entra apenas como worker criativo nas etapas que exigirem geração ou julgamento.
 
-| Skill auxiliar | Comando / função NDP V0 |
-|---|---|
-| `x-pr-watch-ci` | `ndp pr watch <PR>` (8 exit codes da Rule 45 viram enum tipado) |
-| `x-pr-create` | `ndp pr create` (PR body padrão `## Orchestrator Evidence` gerado em código) |
-| `x-pr-fix` / `x-pr-fix-epic` | `ndp pr fix <PR>` / `ndp pr fix-epic <EPIC>` |
-| `x-git-commit` | `ndp git commit` (Conventional Commits + pre-commit chain em código) |
-| `x-git-worktree` | `ndp git worktree` (lifecycle típico — Rule 14) |
-| `x-internal-phase-gate` | **Eliminado** — vira método `phaseGate.assertPre/assertPost` do P2.C2 |
-| `x-internal-story-verify` | `ndp story verify <ID>` (continua produzindo `verify-envelope.json` do mesmo formato) |
-| `x-internal-status-update` | **Eliminado** — `execution-state.json` é estado interno do NDP, não um arquivo a ser editado por skill |
-| `x-story-refine` / `x-epic-refine` | `ndp story refine <ID>` / `ndp epic refine <ID>` |
-| `x-test-tdd` / `x-test-run` / `x-test-plan` | `ndp test tdd` / `ndp test run` / `ndp test plan` (tooling determinístico + LLM só onde precisa) |
+| Skill atual | Destino NDP V0 | Nota de migração |
+| --- | --- | --- |
+| `x-epic-implement` | `ndp epic implement <ID>` | State machine de 6 fases tipada; substitui hooks de phase gate, execution integrity e bypass audit. |
+| `x-story-implement` | `ndp story implement <ID>` | Loop end-to-end de story: planning, task execution, PR, review, verify e report. |
+| `x-task-implement` | `ndp task implement <ID>` | TDD double-loop em código; LLM só redige teste, implementação mínima e refactors pontuais. |
+| `x-release` | `ndp release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, PR, aprovação, tag e back-merge sob controle determinístico. |
+| `x-epic-orchestrate` | `ndp epic orchestrate <ID>` | Planejamento/orquestração multi-story com ordem de dependências, checkpoints e resume. |
+| `x-pr-merge-train` | `ndp merge-train [--epic <ID>\|--prs <list>]` | Merge train com descoberta, validação, ordenação, waves, smoke verify e report. |
+| `x-review` | `ndp review <STORY>` | Fan-out/fan-in de especialistas em paralelo; consolidação e scoring em código. |
+| `x-review-pr` | `ndp review pr <PR>` | Review Tech Lead com checklist e veredito GO/NO-GO estruturado. |
+| `x-story-refine` | `ndp story refine <ID>` | Refinement multi-persona; Q&A e verdict persistidos por schema validado. |
+| `x-epic-refine` | `ndp epic refine <ID>` | Refinement estratégico multi-persona de epic; verdict de escopo `epic`. |
+| `x-story-plan` | `ndp story plan <ID>` | Planejamento multi-agente, task breakdown, task plans e DoR validation. |
+| `x-feature-create` | `ndp feature create <SPEC>` | Pipeline completo spec → epic → stories → implementation map → branch/PR. |
+| `x-feature-ideate` | `ndp feature ideate` | Prosa livre → spec RA9 + PR docs; fluxo público de entrada no backlog. |
+| `x-test-tdd` | `ndp test tdd <TASK>` | Ciclos Red/Green/Refactor, validações e commits ficam em código; LLM atua por ciclo. |
 
-**Princípio invariante:** se a skill atual era principalmente *fluxo* (decidir ordem, validar, comitar, abrir PR), vira comando NDP. Se era principalmente *criatividade* (gerar plano, redigir review, escrever ADR), continua como prompt versionado consumido pelo comando NDP correspondente.
+#### 5.1.2. Orquestradores internos → serviços internos do aplicativo
+
+Estas skills não devem aparecer como comandos públicos por padrão. Elas viram serviços, componentes ou métodos internos chamados pelos comandos acima. O equivalente NDP deve ser testável em unidade, tipado, idempotente e com contratos de entrada/saída estáveis.
+
+- `x-internal-story-build-plan`
+- `x-internal-epic-build-plan`
+- `x-internal-phase-gate`
+- `x-internal-story-verify`
+- `x-internal-epic-integrity-gate`
+- `x-internal-epic-branch-ensure`
+- `x-internal-status-update`
+- `x-internal-report-write`
+- `x-internal-pr-body-render`
+- `x-internal-story-load-context`
+- `x-internal-story-resume`
+- `x-internal-story-report`
+- `x-internal-args-normalize`
+- `x-internal-worktree-precheck`
+- `x-lib-group-verifier`
+
+Destino sugerido:
+
+| Grupo interno | Forma em NDP |
+| --- | --- |
+| Gates (`x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate`) | Serviços de policy/gate chamados antes/depois de cada fase. |
+| Estado (`x-internal-status-update`, `x-internal-story-resume`, `x-internal-story-load-context`) | Repositório de estado + state machine local com locking e schema. |
+| Planejamento (`x-internal-story-build-plan`, `x-internal-epic-build-plan`) | Builders de execution plan e dispatchers internos de workers LLM. |
+| Renderização (`x-internal-report-write`, `x-internal-pr-body-render`, `x-internal-story-report`) | Renderers tipados com templates versionados e golden tests. |
+| Git/precheck (`x-internal-epic-branch-ensure`, `x-internal-worktree-precheck`) | Serviços internos usados pelos comandos `ndp epic`, `ndp story` e `ndp git`. |
+| Build groups (`x-lib-group-verifier`) | Verificador interno entre waves paralelas. |
+
+#### 5.1.3. Orquestradoras auxiliares → avaliar visibilidade pública
+
+Estas skills coordenam fluxo suficiente para não serem tratadas como leaf prompts, mas nem todas precisam continuar públicas. Cada uma deve passar por uma decisão explícita: comando público, subcomando avançado, serviço interno, ou prompt/tool privado chamado por outro comando.
+
+| Skill auxiliar | Decisão a tomar |
+| --- | --- |
+| `x-code-audit` | Provável comando público (`ndp code audit`) ou parte de `ndp ci verify`; mantém fan-out de dimensões em workers. |
+| `x-lib-audit-rules` | Provável serviço interno de governance/audit; avaliar se precisa de modo público para autores de rules. |
+| `x-doc-generate` | Provável comando público (`ndp doc generate`) e fase interna de `ndp story implement`. |
+| `x-template-migrate` | Provável comando público de migração (`ndp template migrate`), mas com engine interna reutilizável. |
+| `x-pr-create` | Provável comando público (`ndp pr create`) e serviço interno de PR usado por story/task/release. |
+| `x-pr-fix` | Provável comando público (`ndp pr fix <PR>`). |
+| `x-pr-fix-epic` | Provável comando público (`ndp pr fix-epic <EPIC>`) ou modo de `ndp pr fix --epic`. |
+| `x-pr-watch-ci` | Provável comando público (`ndp pr watch <PR>`) com exit codes como enum tipado. |
+| `x-pr-merge` | Avaliar: comando público avançado (`ndp pr merge`) ou serviço interno usado por merge-train/release. |
+| `x-git-push` | Avaliar: pode virar subcomandos `ndp git push/commit/pr`; parte pode ser interna. |
+| `x-git-commit` | Provável comando público (`ndp git commit`) e serviço interno de commit transacional. |
+| `x-git-worktree` | Provável comando público (`ndp git worktree`) e serviço interno de lifecycle. |
+| `x-git-cleanup-branches` | Provável comando público avançado (`ndp git cleanup-branches`) com confirmação e dry-run. |
+| `x-status-reconcile` | Avaliar: comando de recovery/admin (`ndp status reconcile`) ou ferramenta interna de migração. |
+| `x-ci-generate` | Provável comando público (`ndp ci generate`). |
+| `x-setup-env` | Provável comando público (`ndp doctor` / `ndp setup env`). |
+| `x-perf-profile` | Provável comando público (`ndp perf profile`) com adapters por stack. |
+| `x-ops-troubleshoot` | Avaliar: comando público assistivo (`ndp troubleshoot`) ou prompt versionado acionado por falhas. |
+| `x-ops-incident` | Avaliar: comando público opcional; pode ficar fora do core V0 se não for essencial ao fluxo local-first. |
+| `x-jira-create-stories` | Avaliar: integração opcional/plugin (`ndp jira create stories`), não core offline obrigatório. |
+| `x-adr-generate` | Provável comando público (`ndp adr generate`) e fase interna de arquitetura/migração. |
+| `x-owasp-scan` | Provável comando público (`ndp security owasp-scan`) e entrada do `ndp ci verify`. |
+| `x-security-dashboard` | Avaliar: comando público de agregação local (`ndp security dashboard`) ou recurso V1+ com UI. |
+| `x-security-pentest` | Avaliar: comando público condicional por capability, com restrições fortes de ambiente. |
+
+**Princípio invariante:** se a skill atual era principalmente *fluxo* (decidir ordem, validar, comitar, abrir PR, consolidar workers, controlar retry/resume), vira comando ou serviço NDP. Se era principalmente *criatividade* (gerar plano, redigir review, escrever ADR), continua como prompt versionado consumido pelo comando NDP correspondente. Se hoje é pública apenas porque o LLM precisava chamá-la manualmente, sua visibilidade deve ser reavaliada: no NDP, o usuário vê comandos de produto; o restante é API interna.
+
+### 5.2. Inventário — Skills puras / não-orquestradoras
+
+As skills abaixo já têm o nível de isolamento necessário para serem consideradas **skills puras**: cada uma possui uma responsabilidade dominante, entrada/saída relativamente delimitada e não deveria decidir o fluxo maior de implementação, release, PR, refinement ou governança. No NDP, elas podem virar prompts versionados, comandos utilitários, adapters de tooling ou serviços internos, mas **não precisam carregar state machine própria nem coordenar lifecycle amplo**.
+
+Critério usado: uma skill pura executa um trabalho focado — formatar, validar, auditar, gerar um artefato, revisar uma dimensão, rodar uma suíte, fazer scaffold, sincronizar com uma integração ou produzir uma recomendação. Quando houver retries, chamadas auxiliares ou validações internas, isso permanece aceitável desde que a skill continue responsável por **um único resultado de produto**.
+
+#### 5.2.1. Conditional skills
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `conditional/dev` | `x-setup-stack` | Setup pontual de stack local. |
+| `conditional/ops` | `x-obs-instrument` | Instrumentação de observabilidade. |
+| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-obs`, `x-review-security` | Reviews especialistas por uma dimensão técnica. |
+| `conditional/security` | `x-security-container`, `x-security-dast`, `x-security-infra`, `x-security-sast`, `x-security-secrets`, `x-security-sonar` | Scans e avaliações de segurança por superfície. |
+| `conditional/test` | `x-test-contract-lint`, `x-test-contract`, `x-test-e2e`, `x-test-perf`, `x-test-smoke-api`, `x-test-smoke-socket` | Execução ou validação de uma categoria de teste. |
+
+#### 5.2.2. Core code/dev/git skills
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/code` | `x-code-format`, `x-code-lint` | Formatação e lint como operações determinísticas. |
+| `core/dev` | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Scaffold ou geração pontual de componente. |
+| `core/dev` | `x-ci-generate`, `x-mcp-recommend`, `x-setup-env`, `x-spec-drift` | Geração de CI, recomendação, diagnóstico de ambiente ou drift report. |
+| `core/git` | `x-git-branch`, `x-git-cleanup-branches`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-planning-commit` | Primitivas Git isoladas, reutilizáveis pelos orquestradores. |
+
+#### 5.2.3. Internal skills com responsabilidade única
+
+Estas skills continuam sendo candidatas naturais a serviços internos do NDP, mas não por serem orquestradoras de produto; elas são primitivas bem delimitadas usadas por fluxos maiores.
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/internal/git` | `x-internal-epic-branch-ensure`, `x-internal-worktree-precheck` | Garantia de branch e pré-check de worktree. |
+| `core/internal/ops` | `x-internal-args-normalize`, `x-internal-report-write`, `x-internal-status-update` | Normalização de argumentos, escrita de relatório e atualização de estado. |
+| `core/internal/plan` | `x-frontmatter-migrate`, `x-internal-epic-build-plan`, `x-internal-epic-create`, `x-internal-epic-integrity-gate`, `x-internal-epic-map`, `x-internal-phase-gate`, `x-internal-story-create`, `x-internal-story-load-context`, `x-internal-story-report`, `x-internal-story-resume`, `x-internal-story-verify` | Migração, geração, carga de contexto, verificação, gates e reports com um objetivo explícito por skill. |
+| `core/internal/pr` | `x-internal-pr-body-render` | Renderização do corpo de PR. |
+
+#### 5.2.4. Integrações, bibliotecas e operações
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/jira` | `x-jira-create-epic`, `x-jira-create-stories` | Sincronização local → Jira. |
+| `core/lib` | `x-lib-group-verifier`, `x-lib-task-decomposer` | Verificação de grupo ou decomposição estrutural. |
+| `core/ops` | `x-doc-generate`, `x-doc-validate`, `x-ops-incident`, `x-ops-troubleshoot`, `x-perf-profile`, `x-release-changelog`, `x-status-reconcile`, `x-telemetry-analyze`, `x-telemetry-trend` | Documentação, troubleshooting, profiling, changelog, reconciliação e análise operacional. |
+
+#### 5.2.5. Planning, PR, review, security e test
+
+| Grupo | Skills puras | Responsabilidade isolada |
+| --- | --- | --- |
+| `core/plan` | `planning-standards-kp`, `x-adr-generate`, `x-arch-plan`, `x-arch-system-update`, `x-arch-update`, `x-parallel-eval`, `x-task-plan`, `x-template-migrate`, `x-threat-model` | Knowledge pack, planos, ADRs, atualização documental, avaliação de paralelismo, migração de template e threat model. |
+| `core/pr` | `x-pr-create`, `x-pr-fix`, `x-pr-merge`, `x-pr-watch-ci` | Operações pontuais de PR, correção localizada, merge e watch de CI. |
+| `core/review` | `x-review-perf`, `x-review-pr`, `x-review-qa` | Reviews focados em performance, checklist Tech Lead de PR ou QA. |
+| `core/security` | `x-dependency-audit`, `x-hardening-eval`, `x-owasp-scan`, `x-runtime-eval`, `x-security-dashboard`, `x-security-pipeline`, `x-supply-chain-audit` | Auditorias e avaliações de segurança com saída própria. |
+| `core/test` | `x-test-plan`, `x-test-run` | Plano de testes ou execução de testes/cobertura. |
+
+**Decisão de migração:** estas 98 skills devem ser portadas sem inflar seu escopo. O NDP pode chamá-las como workers, comandos auxiliares ou serviços internos, mas a responsabilidade de coordenar ordem, retries globais, gates cross-phase, commits, PRs e evidências pertence ao runtime de orquestração (§P2), não a essas skills.
+
+### 5.3. Inventário — Hooks e scripts de validação atuais
+
+Os hooks e scripts atuais existem porque o Claude Code executa o fluxo por interpretação de markdown. Eles formam uma malha de defesa: alguns **bloqueiam antes** de um tool call, outros **avisam no fim do turno**, outros **detectam em CI** que uma evidência obrigatória não foi produzida. No NDP, a maior parte desse comportamento deixa de ser shell/hook e vira código do runtime (§P2), com uma única camada detectiva em CI (§P6.C1.F5).
+
+Fonte conceitual: `HooksAssembler` gera `.claude/hooks/*.sh` e registra eventos em `.claude/settings.json`; `ScriptsAssembler` gera `scripts/audit-*.sh`. Em projetos consumidores, esses arquivos são saída gerada. A responsabilidade real vem das Rules 24, 25, 26, 27, 29, 31 e 45.
+
+#### 5.3.1. Mapa de gatilhos
+
+| Gatilho | Hooks/scripts envolvidos | Responsabilidade no processo |
+| --- | --- | --- |
+| `SessionStart` | `telemetry-session.sh` | Abre trilha de telemetria da sessão. |
+| `PreToolUse` | `telemetry-pretool.sh`, `enforce-phase-sequence.sh`, `enforce-no-bypass-flags.sh`, `enforce-refinement-gate.sh`, `enforce-preflight-gates.sh` | Mede início de tool call e bloqueia bypass, fase inválida, ausência de refinement ou operação remota sem preflight. |
+| `PostToolUse` (`Write\|Edit`) | `post-compile-check.sh` | Compila após edição Java para capturar quebra imediatamente. |
+| `PostToolUse` (`*`) | `telemetry-posttool.sh` | Fecha medição de tool call e emite evento `tool.call`. |
+| `SubagentStop` | `telemetry-subagent.sh` | Registra encerramento de subagente. |
+| `Stop` | `telemetry-stop.sh`, `verify-story-completion.sh`, `verify-phase-gates.sh`, `enforce-continuous-flow.sh`, `stage-telemetry.sh` | Fecha sessão, verifica evidências, alerta phase gates falhos, detecta stall em modo não-interativo e prepara telemetria para commit. |
+| PR/CI/`mvn verify` | `scripts/audit-*.sh`, `*AuditTest.java` | Validação detectiva sobre o repositório: falha o build quando o disco não contém as evidências esperadas. |
+
+#### 5.3.2. Hooks preventivos e de verificação
+
+| Artefato | Tipo | O que faz | Bloqueia/dispara | Skills/fluxos impactados | Destino NDP |
+| --- | --- | --- | --- | --- | --- |
+| `enforce-phase-sequence.sh` | PreToolUse / phase gate | Lê `execution-state.json.taskTracking.phaseGateResults` e impede avanço quando a última fase falhou. | `exit 2` bloqueia tool call; opt-out local `CLAUDE_PHASE_GATE_DISABLED=1`. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | `phaseGate.assertPre/assertPost` em código. |
+| `enforce-no-bypass-flags.sh` | PreToolUse / anti-bypass | Intercepta `Skill(...)` e bloqueia `--skip-*` / `--no-ci-watch` fora de recovery. | `exit 1` bloqueia; `exit 2` erro operacional; `CLAUDE_RECOVERY_MODE=1` apenas bypass aceito. | `x-story-implement`, `x-task-implement`, `x-epic-implement`, `x-pr-fix-epic`, `x-release`, `x-internal-story-verify`. | Validação tipada de flags nos comandos NDP. |
+| `enforce-refinement-gate.sh` | PreToolUse / DoR gate | Exige `refinementVerdict.status=approved` antes de implementar/orquestrar. | `exit 33 REFINEMENT_REQUIRED`; exceções: recovery, `hotfix/*`, `flowVersion=1`. | `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate`. | Pré-condição nativa de `ndp story/epic/task`. |
+| `enforce-preflight-gates.sh` + `scripts/preflight.sh` | PreToolUse / preflight remoto | Roda checagens locais antes de `git push`, `gh pr create` e `x-pr-create`. | Bloqueia operação remota quando review, verify, coverage ou execution integrity falham. | `x-git-push`, `x-pr-create`, fluxos de release/story/task que abrem PR. | Preflight in-process antes de push/PR. |
+| `post-compile-check.sh` | PostToolUse / compile gate | Após `Write`/`Edit` em `.java`, roda `compileJava` via Gradle. | `exit 2` com JSON `decision: block` se compilação quebra. | Qualquer skill que edite Java, especialmente `x-task-implement` e `x-test-tdd`. | Adapter de build por stack; Maven/Gradle tipados. |
+| `verify-story-completion.sh` | Stop / evidence gate | Detecta commit/PR de story e verifica artefatos obrigatórios em `plans/`, `reports/` e `.claude/state`. | `exit 2` warning bloqueante quando falta evidência. | `x-story-implement`, `x-review`, `x-review-pr`, `x-internal-story-verify`, `x-internal-story-report`, `x-doc-validate`, `x-dependency-audit`, `x-pr-watch-ci`. | Gate de completion no runtime + espelho em CI. |
+| `verify-phase-gates.sh` | Stop / phase warning | Lê gates com `passed=false` e mostra tarefas/artefatos faltantes. | `exit 2` warning; não muta estado. | Orquestradores com task hierarchy. | Diagnóstico de phase gate no runtime. |
+| `enforce-continuous-flow.sh` | Stop / stall detector | Em modo não-interativo, detecta fase aberta sem próximo tool call obrigatório. | `exit 2 CONTINUOUS_FLOW_INTERRUPT` orienta o próximo tool call. | Orquestradores long-running, principalmente `x-epic-implement` e `x-story-implement`. | Scheduler/state machine do NDP; não precisa de nudge textual. |
+| `stage-telemetry.sh` | Stop / staging helper | Dá `git add` em `events.ndjson` para telemetria virar evidência commitada. | Fail-open, sempre `exit 0`; usa lock para worktrees paralelos. | Fluxos com telemetria obrigatória Rule 24/27. | Telemetria escrita e anexada pelo próprio NDP. |
+
+#### 5.3.3. Telemetria automática
+
+| Artefato | Gatilho | O que emite | Bloqueia? | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `telemetry-session.sh` | `SessionStart` | `session.start` | Não; fail-open. | Run/session lifecycle in-process. |
+| `telemetry-pretool.sh` | `PreToolUse` | Marca início para calcular `durationMs`. | Não; fail-open. | Span start no runtime. |
+| `telemetry-posttool.sh` | `PostToolUse` | `tool.call` com `tool`, `status`, `durationMs`. | Não; fail-open. | Span end no runtime. |
+| `telemetry-subagent.sh` | `SubagentStop` | `subagent.end`. | Não; fail-open. | Worker lifecycle in-process. |
+| `telemetry-stop.sh` | `Stop` | `session.end` e limpeza de temporários. | Não; fail-open. | Run finalization in-process. |
+| `telemetry-phase.sh` | Chamado pelas skills | `phase.start`, `phase.end`, `subagent.start/end`, `mcp-start/end`. | Não; sempre deve deixar a skill continuar. | Eventos de fase emitidos diretamente pelo orquestrador NDP. |
+| `telemetry-emit.sh` / `telemetry-lib.sh` | Helpers | Scrub, contexto epic/story/task e append em `events.ndjson`. | Não; fail-open. | Biblioteca de telemetria do NDP com schema OTel-compatible. |
+
+#### 5.3.4. Scripts detectivos de CI e auditoria
+
+Os `scripts/audit-*.sh` são a camada detectiva: eles não impedem o LLM de tentar pular uma etapa durante a sessão, mas falham PR/CI quando o resultado no disco viola o contrato. O padrão de exit code é Rule 26: `0` sucesso, `1` violação, `2` erro operacional, `3` baseline/exemption corrompido. Todos devem ter `--self-check`.
+
+| Família/script | Responsabilidade | O que bloqueia | Skills/fluxos impactados | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `audit-execution-integrity.sh` | Verifica as 12 superfícies Rule 24/27: evidence de verify, review, PR body, telemetry, dependency audit, doc validate, CI watch. | PR com `EIE_EVIDENCE_MISSING`, baseline inválido ou exemption inválida. | `x-story-implement`, `x-task-implement`, `x-review`, `x-review-pr`, `x-pr-create`, `x-pr-watch-ci`, `x-doc-validate`, `x-dependency-audit`. | CI Camada B: validar artefatos que o NDP prometeu gerar. |
+| `audit-bypass-flags.sh` | Busca `--skip-*` e `--no-ci-watch` fora de blocos `## Recovery`. | Uso indevido de bypass no happy path. | Orquestradores e skills com flags de escape. | Lint de definição de comando/skill + CI Camada B. |
+| `audit-phase-gates.sh` | Confere `phaseGateResults`, tasks concluídas e artefatos esperados. | Fase marcada como concluída sem filhos/evidências. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | Testes do state machine + CI Camada B. |
+| `audit-task-hierarchy.sh` | Valida hierarquia Epic › Story › Phase › Wave/Cycle. | Task tracking quebrado, profundidade inválida, filhos inconsistentes. | Todos os fluxos com Rule 25. | Validação de modelo de estado. |
+| `audit-refinement-gate.sh` | Confirma verdict aprovado e hash consistente entre state e markdown. | Implementação sem refinement aprovado. | `x-story-refine`, `x-epic-refine`, `x-story-implement`, `x-epic-implement`, `x-task-implement`. | Pré-condição nativa + CI de consistência. |
+| `audit-doc-freshness.sh` | Garante documentação atualizada como DoD. | Código alterado sem README/API/ADR/system docs quando aplicável. | `x-doc-validate`, `x-doc-generate`, `x-story-implement`, `x-release-changelog`. | Gate de documentação no runtime + CI. |
+| `audit-template-version.sh` | Garante templates v2/value-driven em epics novos. | Template legado fora de baseline. | `x-template-migrate`, `x-internal-epic-create`, `x-internal-story-create`. | Validador de schema/template. |
+| `audit-flow-version.sh` | Verifica semântica de `flowVersion` e fallbacks Rule 19. | Estado legado usado sem marcação/compatibilidade. | Orquestradores que leem `execution-state.json`. | Migração + schema validator. |
+| `audit-epic-branches.sh` | Confere modelo de branches `epic/*`. | Branch de epic ausente/divergente ou violação de target. | `x-internal-epic-branch-ensure`, `x-epic-implement`, `x-epic-orchestrate`. | Branch policy service. |
+| `audit-skill-visibility.sh` | Valida visibilidade, catálogo e referências de scripts/skills. | Skill interna exposta, referência órfã, gate sem catálogo. | Catálogo inteiro de skills/rules. | Registry/linter de pacotes NDP. |
+| `audit-model-selection.sh` | Confere Rule 23/modelos permitidos por tier. | Uso de modelo fora da política. | Skills multi-agent/review/refinement. | Model router policy. |
+| `audit-capability-graph.sh` | Valida grafo de capabilities e frontmatter v3+. | Capability ausente, ciclo, schema inválido. | Composition engine, skills/rules/agents/templates. | Resolver tipado + testes. |
+
+#### 5.3.5. Leitura estratégica
+
+Hoje os hooks/scripts compensam três riscos estruturais: o LLM pode pular uma etapa, pode simular uma skill sem gerar evidência, ou pode executar uma operação remota antes de validar o estado local. Eles também dão observabilidade porque o runtime real é o Claude Code, não o produto.
+
+No NDP, esses riscos mudam de lugar:
+
+- **Gates preventivos** (`enforce-*`, `verify-*`, preflight) viram funções do runtime. O comando não avança se a pré-condição falhar.
+- **Audits CI** continuam existindo, mas como Camada B simples: validar no disco o que o NDP declarou ter produzido.
+- **Telemetria** deixa de ser append via shell e passa a ser emitida no mesmo processo que controla a state machine.
+- **Compile/test/doc/security checks** deixam de ser hooks genéricos e viram adapters por stack chamados em pontos explícitos do fluxo.
+- **Bypass** deixa de depender de regex em markdown/args e vira política tipada: flags de recovery existem apenas onde o comando declarar.
+
+**Decisão de migração:** nenhum hook shell deve sobreviver como mecanismo primário da V0. Para cada hook/script atual, o trabalho de migração é extrair o invariante, escrever teste de unidade/integração no NDP e manter no máximo um `ndp ci verify` detectivo para PRs. A existência de muitos hooks hoje é um sintoma da arquitetura atual; no NDP, o runtime deve tornar esses bypasses impossíveis por construção.
+
+### 5.4. Fronteira — Rules, Knowledge Packs e Skills
+
+O NDP precisa corrigir uma ambiguidade do modelo atual: parte do que hoje aparece como `SKILL.md` não é exatamente uma ação de produto; parte é política, parte é material de referência, parte é template/heurística. A migração deve separar esses papéis para evitar drift textual entre rule, KP e skill.
+
+#### 5.4.1. Critério de classificação
+
+| Tipo-alvo | Pergunta discriminante | Forma no NDP |
+| --- | --- | --- |
+| **Rule / policy** | Deve valer sempre? Pode bloquear, validar ou impor uma invariável independente do julgamento do LLM? | Policy pack versionado, função tipada, schema, gate runtime ou `ndp ci verify`. |
+| **Knowledge Pack (KP)** | Serve para ensinar contexto, padrões, heurísticas, checklists ou vocabulário, sem ser dono de side effects? | Pacote de conhecimento versionado, carregado sob demanda por comandos/workers. |
+| **Skill / comando / worker** | Executa uma ação com entrada/saída clara: gera artefato, roda ferramenta, abre PR, aplica mudança, cria relatório ou faz review? | Comando público, serviço interno ou prompt worker versionado. |
+| **Template / snippet** | É principalmente estrutura reutilizável de código/documento? | Template renderizado por engine determinística, referenciado por capability/stack. |
+
+**Regra prática:** checklist dentro de uma skill não torna a skill um KP. O que decide é a responsabilidade principal. Se a entrega é um artefato ou uma execução, permanece skill/worker. Se a entrega é apenas critério, política ou contexto, deve migrar para rule ou KP.
+
+#### 5.4.2. Rules atuais — destino no NDP
+
+| Domínio de rule | Exemplos atuais | Destino NDP |
+| --- | --- | --- |
+| Identidade, domínio e contexto | Rules 01, 02 | Doctrine humana + defaults de profile. Pouca execução, exceto validação de metadados. |
+| Coding standards, arquitetura e quality gates | Rules 03, 04, 05 | Híbrido: thresholds e limites viram policy executável; explicações e exemplos viram KP de engenharia. |
+| Segurança, operações e compliance | Rules 06, 07, conditional rules | Policy pack por domínio regulado + KP de referência. Gates SARIF/CI ficam executáveis. |
+| Branching, release e Git Flow | Rules 08, 09, Rule 21 | Serviços de branch/release em código (`ndp release`, `ndp epic branch`) + CI de consistência. |
+| Skill invocation, visibility e capability grammar | Rules 13, 22, 28 | Registry/linter tipado. A gramática de tool-call vira schema/AST, não regex em markdown. |
+| Model selection e custo | Rule 23 | Policy executável no model router: tier, fallback, custo e provider permitidos. |
+| Execution integrity e zero-bypass | Rules 24, 27 | Propriedade arquitetural do runtime NDP. CI só valida evidência pós-fato. |
+| Task hierarchy e phase gates | Rule 25 | State machine tipada + phase gate service + testes de unidade. |
+| Audit lifecycle | Rule 26 | Taxonomia vira documentação curta; exit codes, baselines e self-check viram biblioteca de auditoria. |
+| Refinement e DoR | Rule 29 | Pré-condição nativa de `ndp story/epic/task implement`. |
+| Documentation as DoD | Rule 31 | Policy executável de doc freshness + KP stack-aware explicando o que conta como documentação. |
+
+**Decisão:** rules críticas deixam de ser prosa interpretada pelo LLM. Elas ganham `policy_id`, versão, testes e ponto de execução claro: runtime, CI Camada B, ou apenas doctrine humana quando não houver predicado determinístico.
+
+#### 5.4.3. Knowledge Packs atuais — destino no NDP
+
+Os KPs devem virar pacotes oficiais versionados, com binding explícito por stack/profile e consumo declarado pelos comandos. O NDP deve saber **qual KP carregar, quando carregar e para qual worker**, em vez de deixar cada skill repetir blocos grandes de contexto.
+
+| KP/domínio | Destino NDP | Consumo típico |
+| --- | --- | --- |
+| `architecture`, `layer-templates`, `patterns` | KP oficial de arquitetura + templates stack-specific. | `ndp arch plan`, scaffolds, code workers. |
+| `coding-standards` | KP de engenharia + ponte para policies executáveis de limites. | `ndp task implement`, `ndp review`, `ndp code audit`. |
+| `testing`, `story-planning`, `planning-standards-kp` | KP de TDD, TPP, RA9 e decomposição. | `ndp story plan`, `ndp task plan`, `ndp test tdd`. |
+| `security`, `compliance` | KP base + overlays regulados (`pci`, `hipaa`, `lgpd`, `soc2`). | `ndp review security`, `ndp threat model`, `ndp ci verify`. |
+| `observability`, `resilience`, `infrastructure`, `dockerfile` | KPs condicionais por capability de runtime/infra. | `ndp ops`, `ndp review devops`, `ndp perf profile`. |
+| `api-design`, `protocols` | KP por interface (`rest`, `grpc`, `graphql`, `event`). | `ndp review api`, `ndp arch plan`, contract tests. |
+
+**Decisão:** KP não deve ter side effect nem ser "invocado" como comando principal. Quando o usuário quiser consultar conhecimento, o produto pode ter `ndp explain <topic>`, mas isso é UX de leitura, não lifecycle.
+
+#### 5.4.4. Skills candidatas a virar KP, rule ou template
+
+| Skill atual | Tipo-alvo provável | Justificativa |
+| --- | --- | --- |
+| `planning-standards-kp` | Knowledge Pack | Já é explicitamente uma fonte RA9; deve sair da lista de comandos e virar contexto versionado de planejamento. |
+| `x-mcp-recommend` | KP + advisor command | O catálogo de MCPs é conhecimento versionado; o comando só aplica matching contra o profile. |
+| `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Template/snippet + render command | A maior parte do valor é template stack-specific. O comando NDP deve renderizar templates e aplicar variações, não conter conhecimento espalhado. |
+| `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, demais especialistas | Worker skill + KP externo | Devem permanecer workers se produzem review estruturado, mas seus critérios precisam vir de KPs/policies, não de prosa duplicada em cada skill. |
+| `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | Rule/policy service | São gates normativos. No NDP viram funções do runtime e contratos de CI, não skills markdown. |
+| `x-doc-validate` | Policy + command | A regra de documentação é policy; a execução continua comando/gate. Separar critério de enforcement. |
+| `x-lib-audit-rules` | Policy/registry validator | Seu papel é validar rules/KPs/skills; no NDP vira `ndp lint policy` ou validação do registry. |
+| `audit-*.sh` e `verify/enforce-*.sh` | Policy executable | Não são skills; seus invariantes migram para runtime e `ndp ci verify`. |
+
+#### 5.4.5. Skills que permanecem skills, consumindo rules/KPs explicitamente
+
+| Grupo | Permanecem como | Como consomem rule/KP |
+| --- | --- | --- |
+| Orquestradoras públicas | Comandos NDP (`ndp story implement`, `ndp epic implement`, `ndp release`, etc.) | Declaram `requires-policies` para gates e `requires-context` para KPs por fase. |
+| Planejamento e arquitetura | Worker prompts/comandos (`x-arch-plan`, `x-task-plan`, `x-threat-model`, `x-adr-generate`) | Geram artefatos, mas carregam KPs RA9, arquitetura, segurança e testing por contrato. |
+| Testes, lint, format e scans | Comandos determinísticos/adapters | Executam tooling; thresholds vêm de policies. |
+| Git/PR/Jira/ops | Comandos ou plugins | Executam integração; branching/release/CI rules vêm de policies. |
+| Reviews especialistas | Workers de julgamento estruturado | Critérios vêm de KPs; veredito e schema de saída vêm da policy do review. |
+
+Contrato sugerido para o registry NDP:
+
+```yaml
+id: ndp.story.implement
+kind: command
+requires-policies:
+  - ndp.policy.refinement-gate@1
+  - ndp.policy.execution-integrity@1
+  - ndp.policy.task-hierarchy@1
+requires-context:
+  - ndp.kp.story-planning@1
+  - ndp.kp.testing.tdd@1
+  - ndp.kp.security.baseline@1
+produces:
+  - story-completion-report
+  - verify-envelope
+  - telemetry-run
+```
+
+#### 5.4.6. Riscos e próximos movimentos
+
+| Risco | Mitigação NDP |
+| --- | --- |
+| Drift triplo: a mesma regra em Rule markdown, KP e SKILL.md. | Uma fonte canônica por `policy_id`/`kp_id`; views markdown geradas. |
+| KP gigante carregado em todo prompt. | Roteamento por capability, stack, fase e worker. Compliance pesado só entra quando o profile pede. |
+| Skills virando pseudo-KP só para "ler contexto". | Separar UX de consulta (`ndp explain`) de commands com side effects. |
+| Reclassificar ação como rule e perder extensibilidade. | Manter comando quando há artefato/execução; extrair apenas critérios e thresholds para policy/KP. |
+| Templates de scaffold duplicados em várias skills. | Template registry por stack, com golden tests e render engine determinística. |
+
+**Decisão de migração:** no NDP, cada ativo precisa declarar `kind` (`command`, `worker`, `policy`, `knowledge-pack`, `template`, `adapter`) e dependências explícitas. Skills deixam de carregar política e conhecimento embutidos; elas passam a consumir policies e KPs versionados. Isso reduz tokens, remove duplicação e torna possível testar governance como código.
+
+### 5.5. Grupos canônicos — Rules, KPs e skills reclassificadas
+
+Para o registry NDP, os ativos devem ser agrupados por domínio de responsabilidade, não pelo formato atual do arquivo (`SKILL.md`, rule markdown, KP ou shell script). O agrupamento abaixo define o vocabulário inicial para `policy_id`, `kp_id`, capability bundles e navegação futura no marketplace.
+
+| Grupo canônico | O que governa | Rules/policies | KPs | Skills/artefatos relacionados |
+| --- | --- | --- | --- | --- |
+| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, SOLID/Clean Code, limites de método/classe. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-code-format`, `x-code-lint`, `x-code-audit`, review specialists consomem este grupo. |
+| `architecture-standards` | Estrutura, camadas, dependency direction e decisões de design. | Architecture summary, dependency rules, capability/frontmatter constraints quando afetam arquitetura. | `architecture`, `api-design`, `protocols`, `resilience`, `layer-templates`. | `x-arch-plan`, `x-arch-update`, `x-arch-system-update`; scaffolds viram templates stack-specific. |
+| `security-compliance` | Segurança mínima, compliance e postura regulatória. | Security baseline, conditional security rules, compliance gates, evidence requirements. | `security`, `compliance` e overlays `pci`, `hipaa`, `lgpd`, `soc2`. | `x-owasp-scan`, `x-hardening-eval`, `x-runtime-eval`, `x-dependency-audit`, `x-supply-chain-audit`, `x-doc-validate` como command/policy hybrid. |
+| `testing-quality` | Como provar comportamento, cobertura e aceitação. | Coverage thresholds, TDD requirements, acceptance criteria coverage, smoke/contract requirements. | `testing`, `story-planning`. | `x-test-plan`, `x-test-run`, `x-test-tdd`, `x-test-e2e`, `x-test-contract`, `x-test-perf`, `x-test-smoke-*`. |
+| `planning-product` | Como transformar intenção em backlog, planos e artefatos RA9. | Refinement gate, value-driven templates, flow version rules, DoR. | `story-planning`, `planning-standards-kp`. | `planning-standards-kp` vira KP; `x-story-plan`, `x-task-plan`, `x-template-migrate`, `x-feature-create`, `x-feature-ideate` consomem policies/KPs. |
+| `execution-governance` | Integridade de execução, anti-bypass, phase gates e lifecycle. | Execution Integrity, Zero-bypass Lifecycle, Task Hierarchy, Phase Gates, Audit Lifecycle, Refinement Gate. | Guidance curta de lifecycle para humanos; critérios executáveis vivem em policy. | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate`, `verify-*`, `enforce-*`, `audit-execution-integrity.sh`, `audit-phase-gates.sh`, `audit-task-hierarchy.sh`. |
+| `git-release-pr` | Branching, commits, PRs, merge train e releases. | Branching model, release process, commit conventions, PR evidence requirements, CI-watch integrity. | Git/release workflow guidance. | `x-git-branch`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-pr-create`, `x-pr-merge`, `x-pr-watch-ci`, `x-pr-merge-train`, `x-release`. |
+| `documentation` | Documentação como DoD e rastreabilidade técnica. | Documentation freshness, ADR requirements, changelog rules, system architecture update rules. | Architecture docs guidance, API docs guidance, ADR/changelog knowledge. | `x-doc-generate`, `x-doc-validate`, `x-adr-generate`, `x-release-changelog`, `x-arch-system-update`. |
+| `observability-ops` | Telemetria, operação, incidentes e troubleshooting. | Telemetry privacy, operations baseline, CI-watch observability signals. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | `telemetry-*` hooks viram telemetry service; `x-telemetry-analyze`, `x-telemetry-trend`, `x-ops-troubleshoot`, `x-ops-incident`, `x-perf-profile`. |
+| `review-governance` | Critérios e vereditos de review técnico. | Mandatory review surfaces, GO/NO-GO schema, review evidence requirements. | `security`, `testing`, `architecture`, `api-design`, `observability`, `resilience`. | `x-review`, `x-review-pr`, `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, `x-review-db`, `x-review-events`, `x-review-graphql`, `x-review-grpc`. |
+| `capability-registry` | Como capabilities, skills, rules, KPs e policies são descritos e distribuídos. | Capability frontmatter, skill visibility, audit gate lifecycle, model selection. | Governance authoring guidance, capability composition knowledge. | `x-lib-audit-rules`, `x-frontmatter-migrate`, `audit-capability-graph.sh`, `audit-skill-visibility.sh`, `audit-model-selection.sh`. |
+| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, MCP/Jira/GitHub boundaries, provider usage policy. | MCP catalog, Jira workflow knowledge, provider docs. | `x-mcp-recommend` vira KP + advisor command; `x-jira-create-epic`, `x-jira-create-stories` viram plugins/commands. |
+
+#### 5.5.1. Regras de reclassificação por grupo
+
+| Caso | Classificação NDP |
+| --- | --- |
+| Standard obrigatório e testável | `policy` dentro do grupo correspondente. |
+| Explicação, heurística, checklist ou vocabulário | `knowledge-pack`. |
+| Scaffold ou estrutura repetível | `template` + render command. |
+| Execução de ferramenta, geração de artefato, PR, commit, scan ou review | `command` ou `worker`. |
+| Gate interno, audit script ou hook de bloqueio | `policy executable` + runtime/CI service. |
+
+#### 5.5.2. Decisão de produto
+
+Esses grupos viram a taxonomia oficial do NDP para empacotar e descobrir capacidades. Um pacote pode conter múltiplos tipos (`policy`, `knowledge-pack`, `template`, `command`), mas todos devem declarar o mesmo domínio canônico. Exemplo: `security-compliance` pode conter o KP `security`, a policy `owasp-baseline`, templates de SARIF e commands de scan; o registry mostra tudo como uma capacidade coerente em vez de uma lista plana de skills.
+
+**Regra de ouro:** standards viram policies, explicações viram KPs, estruturas repetíveis viram templates, ações continuam commands/workers.
+
+### 5.6. Inventário — Templates e consumidores
+
+Os templates atuais são uma parte essencial do produto: eles definem a forma dos artefatos que skills e regras esperam encontrar em disco. No modelo atual, a fonte principal fica em `src/main/resources/shared/templates/`, com subárvores complementares (`constitution/`, `domains/`, `examples/`, `fragments/`). Há ainda `src/main/resources/shared/config-templates/` para profiles YAML e `src/main/resources/shared/cicd-templates/` para templates determinísticos de CI/CD, Docker e Kubernetes.
+
+No NDP, templates não devem ser arquivos soltos copiados para cada projeto sem identidade. Eles viram ativos de registry com `template_id`, versão, categoria, schema de entrada, modo de renderização e consumidores declarados.
+
+#### 5.6.1. Planning product templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-EPIC.md` | Estrutura v2/value-driven para documento de épico. | `x-internal-epic-create`, `x-epic-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/epic-XXXX.md`. | Template registry + schema de epic/refinement. |
+| `_TEMPLATE-STORY.md` | História implementável com contratos, Gherkin, tarefas e refinement verdict. | `x-internal-story-create`, `x-story-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/story-XXXX-YYYY.md`. | Template registry + validação estrutural. |
+| `_TEMPLATE-TASK.md` | Contrato de tarefa fina no modelo task-first. | `x-story-plan`, `x-task-plan`. | `ai/epics/.../tasks/task-TASK-*.md`. | Template de task contract. |
+| `_TEMPLATE-TASK-PLAN.md` | Plano de implementação por tarefa, incluindo TDD e file footprint. | `x-task-plan`. | `ai/epics/.../plans/plan-task-*.md`. | Prompt/output template versionado. |
+| `_TEMPLATE-TASK-IMPLEMENTATION-MAP.md` | Mapa de dependências e paralelismo entre tarefas. | `x-story-plan`. | `plans/task-implementation-map-*.md`. | Renderer determinístico + grafo. |
+| `_TEMPLATE-IMPLEMENTATION-MAP.md` | Mapa de implementação do épico. | `x-internal-epic-map`, `x-epic-map`, `x-feature-create`. | `ai/epics/.../IMPLEMENTATION-MAP.md`. | Core planning renderer. |
+| `_TEMPLATE-STORY-PLANNING-REPORT.md` | Relatório consolidado do planejamento multi-agente da story. | `x-story-plan`. | `plans/story-planning-report-*.md`. | Report renderer. |
+| `_TEMPLATE-DOR-CHECKLIST.md` | Checklist de Definition of Ready. | `x-story-plan`, refinement/planning gates. | `plans/` ou relatório de DoR. | Policy checklist renderizado. |
+| `_TEMPLATE.md` | Modelo amplo de especificação técnica inicial. | Uso manual ou pipeline de spec/feature. | `docs/specs/` ou entrada para feature creation. | Spec template opcional do registry. |
+
+#### 5.6.2. Execution governance templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | Plano de implementação por story. | `x-story-implement`, `x-internal-story-build-plan`. | `ai/epics/.../plans/plan-story-*.md`. | Prompt + evidência obrigatória. |
+| `_TEMPLATE-TASK-BREAKDOWN.md` | Quebra de tarefas a partir de plano/testes. | `x-lib-task-decomposer`, `x-internal-story-build-plan`. | `plans/tasks-story-*.md`. | Estrutura de decomposição. |
+| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | Plano de execução de épico com DAG, fases e critical path. | `x-internal-epic-build-plan`, `x-internal-report-write`. | `ai/epics/.../epic-execution-plan.md`. | Renderer determinístico de plano. |
+| `_TEMPLATE-EPIC-EXECUTION-REPORT.md` | Relatório pós-implementação de épico. | `x-epic-implement`, `x-internal-report-write`. | `ai/epics/.../reports/`. | Report renderer. |
+| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | Relatório de conclusão de fase. | `x-epic-implement`. | `reports/phase-report-epic-*.md`. | Report renderer de phase gate. |
+| `_TEMPLATE-STORY-COMPLETION-REPORT.md` | Fechamento de story com PR, coverage, tasks e findings. | `x-internal-story-report`, `x-internal-report-write`. | `reports/story-completion-report-*.md`. | Report renderer obrigatório. |
+| `_TEMPLATE-EXECUTION-STATE.json` | Esqueleto JSON de estado de execução. | Orquestradores, `x-internal-status-update`. | `ai/epics/.../execution-state.json`. | Schema tipado, não template textual LLM. |
+| `_TEMPLATE-REFINEMENT-VERDICT.md` | Estrutura textual do verdict de refinement. | `x-story-refine`, `x-epic-refine`. | Markdown + dual-write em `execution-state.json`. | Schema + view markdown gerada. |
+
+#### 5.6.3. Review governance templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-ARCHITECTURE-PLAN.md` | Plano arquitetural com diagramas, NFRs e mini-ADRs. | `x-arch-plan`. | `plans/arch-story-*.md`. | Prompt output estruturado. |
+| `_TEMPLATE-SPECIALIST-REVIEW.md` | Relatório de review por especialista. | `x-review` e review specialists. | `plans/review-story-*.md`. | Worker review template. |
+| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | Dashboard consolidado dos reviews especialistas. | `x-review`. | `plans/review-dashboard-*.md`. | Report renderer + scorecard. |
+| `_TEMPLATE-TECH-LEAD-REVIEW.md` | Review final Tech Lead com GO/NO-GO. | `x-review-pr`. | `plans/techlead-review-story-*.md`. | Veredito estruturado. |
+| `_TEMPLATE-REVIEW-REMEDIATION.md` | Plano de correção pós-review. | `x-story-implement` fase de remediação. | `plans/remediation-story-*.md`. | Backlog de remediação. |
+
+#### 5.6.4. Security, compliance and quality templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-SECURITY-ASSESSMENT.md` | Avaliação de segurança da story. | `x-internal-story-build-plan` fase 1E. | `plans/security-story-*.md`. | Prompt + policy evidence. |
+| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | Avaliação compliance da story. | `x-internal-story-build-plan` fase 1F. | `plans/compliance-story-*.md`. | Prompt condicionado por compliance pack. |
+| `_TEMPLATE-THREAT-MODEL.md` | Threat model estruturado. | `x-threat-model`. | `plans/threat-model-story-*.md` ou reports. | Security document template. |
+| `_TEMPLATE-SLO-SLI-DEFINITION.md` | Definição de SLO/SLI. | Ops/governance docs. | `governance/slo-sli/` ou docs. | Policy/doc template. |
+| `_TEMPLATE-TEST-PLAN.md` | Plano de testes Double-Loop TDD. | `x-test-plan`, `x-internal-story-build-plan`. | `plans/tests-story-*.md`. | Prompt output obrigatório. |
+
+#### 5.6.5. Documentation templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-SERVICE-ARCHITECTURE.md` | Documento de arquitetura do serviço. | Composer/scaffold. | `docs/architecture/` ou steering docs. | Generated documentation view. |
+| `_TEMPLATE-ARCHITECTURE-SYSTEM.md` | Arquitetura de sistema com decision log. | `x-arch-system-update`, scaffold. | `docs/architecture/system.md`. | Patchable document template. |
+| `_TEMPLATE-GRPC-REFERENCE.md` | Referência gRPC/protobuf. | Contract/docs generation. | `contracts/api/grpc-reference.md`. | Protocol docs template. |
+| `_TEMPLATE-ADR.md` | Estrutura de ADR. | `x-adr-generate`, scaffold. | `docs/adr/ADR-*.md`. | ADR registry + numbering engine. |
+| `_TEMPLATE-DOC-VALIDATE-REPORT.md` | Relatório de doc freshness. | `x-doc-validate`. | `reports/doc-validate-report-*.md`. | Report renderer de documentation gate. |
+| `_TEMPLATE-PERFORMANCE-BASELINE.md` | Baseline de performance. | Performance/profile docs. | Docs ou reports de performance. | Optional performance template. |
+| `_TEMPLATE-DATA-MIGRATION-PLAN.md` | Plano de migração de dados. | Data migration planning. | Docs/plans. | Optional planning template. |
+| `_TEMPLATE-CONTRIBUTING.md` | Guia de contribuição. | Generator/docs scaffold. | `CONTRIBUTING.md` ou docs. | Generated repo documentation. |
+| `CLAUDE.md` | Memória/guia de agentes para o projeto gerado. | Composer. | `CLAUDE.md` no repo alvo. | Generated target adapter view. |
+| `SYSTEM_SPECS.md` | Especificação base do sistema. | Scaffold/spec generation. | Specs/documentação inicial. | Generated spec view. |
+| `domain-template.md`, `project-identity-template.md` | Overlays de domínio e identidade. | Profile/domain composition. | Seções de docs/rules. | Profile overlay templates. |
+
+#### 5.6.6. Observability and operations templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-TELEMETRY-EVENT.json` | Forma canônica de evento de telemetria. | `telemetry-*`, `telemetry-emit.sh`, `telemetry-phase.sh`. | `events.ndjson`. | Event schema versionado. |
+| `_TEMPLATE-TELEMETRY-EVENT.README.md` | Documenta campos do evento de telemetria. | Operadores/devs, docs geradas. | README/doc interno. | Schema documentation generated view. |
+| `_TEMPLATE-TELEMETRY-REPORT.md` | Relatório agregado de telemetria. | `x-telemetry-analyze`. | Markdown/JSON/CSV report. | Report renderer determinístico. |
+| `_TEMPLATE-DEPLOY-RUNBOOK.md` | Runbook de deploy. | Ops docs/scaffold. | `results/runbooks/deploy-runbook.md`. | Ops pack template. |
+| `_TEMPLATE-INCIDENT-RESPONSE.md` e runbooks similares | Resposta a incidente e procedimentos operacionais. | `x-ops-incident`, ops docs. | `results/runbooks/`. | Ops workflow templates. |
+
+#### 5.6.7. Git, PR and release templates
+
+| Template | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-CHANGELOG-ENTRY.md` | Entrada de changelog. | `x-release-changelog`, release flow. | `CHANGELOG.md`. | SemVer/changelog renderer. |
+| `_TEMPLATE-RELEASE-CHECKLIST.md` | Checklist de release. | `x-release`. | `ai/releases/` ou release report. | Release workflow checklist. |
+| `_TEMPLATE-PR-IMPLEMENTATION.md` | Corpo de PR de implementação com evidências. | `x-internal-pr-body-render --kind implementation`, `x-pr-create`. | PR body. | Strict PR body renderer. |
+| `_TEMPLATE-PR-BACKLOG.md` | Corpo de PR de backlog/spec. | `x-internal-pr-body-render --kind backlog`, `x-feature-create`. | PR body de docs/backlog. | Strict PR body renderer. |
+
+#### 5.6.8. Meta-generator, infra and overlays
+
+| Template/família | Para que serve | Quem consome hoje | Saída típica | Destino NDP |
+| --- | --- | --- | --- | --- |
+| `_TEMPLATE-AUDIT-GATES-CATALOG.md` | Catálogo dos gates/audits instalados. | Generator/governance docs. | `docs/audit-gates-catalog.md`. | Generated governance view. |
+| `_TEMPLATE-SKILL.md` | Template de autoria de nova skill. | Autores de skills, generator docs. | `SKILL.md`. | Authoring template do registry. |
+| `constitution/CONSTITUTION.md` | Constituição/base normativa do projeto. | Scaffold/governance. | Docs ou governance base. | Governance pack template. |
+| `domains/**/domain-*.md`, `domains/**/domain-rules.md` | Overlays por domínio vertical. | Capability/domain composition. | Rules/docs fragmentados por domínio. | Domain overlay packs. |
+| `examples/**` | Exemplos de domínios e specs. | Docs, demos, tests. | Exemplos em docs. | Demo/sample packs. |
+| `fragments/*.md` | Fragmentos para DB, messaging, microservices, PCI/security etc. | Composer/Pebble. | Seções em rules/docs/CLAUDE. | Fragment registry. |
+| `config-templates/setup-config.*.yaml` | Seeds de configuração por stack/profile. | `ndp init`/generator atual. | Profile YAML. | Profile template registry. |
+| `cicd-templates/**/*.njk` | CI/CD, Docker e K8s determinísticos. | CI/CD assembler. | `.github/workflows/`, Dockerfile, K8s manifests. | Infra deterministic renderer. |
+
+#### 5.6.9. Decisões de migração
+
+| Decisão | Implicação |
+| --- | --- |
+| Todo template ganha `template_id`, versão e categoria canônica. | O registry consegue resolver compatibilidade e drift. |
+| Separar templates LLM-open de renderers determinísticos. | Prompts com julgamento continuam workers; Markdown/JSON de relatório vira renderer testável. |
+| `_TEMPLATE-EXECUTION-STATE.json` e `_TEMPLATE-TELEMETRY-EVENT.json` viram schemas. | Estado e telemetria deixam de ser texto copiado e passam a ter contrato tipado. |
+| Templates `.njk`/YAML pertencem à composition engine, não ao lifecycle de skills. | CI/CD e profiles são renderização determinística, não prompts. |
+| Goldens continuam como testes de regressão, não fonte de verdade. | O NDP compara checksum/versão do SoT com outputs gerados. |
+| Templates de scaffold migram para `template` + `render command`. | `spring-controller`, `quarkus-resource` etc. deixam de carregar snippets duplicados. |
+
+**Risco principal:** template drift. Hoje o mesmo conceito pode existir no SoT, em `.claude/templates/`, em goldens e em texto dentro de skills. O NDP deve ter uma fonte única e gerar as views para cada target, com golden tests apenas como verificação.
+
+### 5.7. Inventário — Artefatos padrão gerados (`ai/` e adjacentes)
+
+Esta seção lista **instâncias** de trabalho (não os templates da seção 5.6): arquivos que skills, hooks ou o gerador criam durante o ciclo de vida. O ponto de partida normativo para layout v4 é `ai/README.md`: `ai/epics/epic-XXXX-<slug>/` concentra épico, stories, planos, relatórios, telemetria e estado; `ai/releases/` guarda estado de release; `ai/runs/` guarda artefatos por sessão/execução. Épicos legados (`flowVersion` ≤ 2) podem ainda usar `plans/epic-XXXX/` — o `PathResolver` escolhe o diretório; a **semântica** dos artefatos abaixo é a mesma.
+
+Para cada família: **objetivo**, **geradores típicos** (skill ou componente), **o que o arquivo representa na prática**, e **consumidores** (humanos, hooks, CI, outros skills).
+
+#### 5.7.1. Raiz do diretório do épico (`{epicDir}/`)
+
+| Artefato | Objetivo | Quem gera | O que faz / conteúdo | Consumidores |
+| --- | --- | --- | --- | --- |
+| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico (índice de stories, regras, status). | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, `x-internal-epic-create`; atualizações em fases de planejamento (`x-epic-orchestrate`, `x-epic-map`, orquestradores). | Markdown vivo: escopo, DoR/DoD, story index, colunas de status; pode incluir `refinementVerdict`, `flowVersion`. | Operadores; `x-story-create` / `x-story-implement` (contexto); hooks de refinement; auditorias de epic branch / flow version. |
+| `story-XXXX-YYYY.md` | Contrato implementável da story (critérios, dependências, tarefas). | `x-story-create`, `x-epic-decompose`, `x-internal-story-create`; updates de `x-story-plan` / `x-epic-orchestrate` (ex.: Seção 8 / status). | História + Gherkin + dados de planejamento; ancora todos os paths `plans/*` e `reports/*` da story. | `x-internal-story-load-context`, `x-story-implement`, `x-task-implement`, reviews, CI de integridade. |
+| `IMPLEMENTATION-MAP.md` | DAG e fases de execução entre stories. | `x-epic-map`, `x-internal-epic-map`, `x-feature-create`, `x-epic-decompose`. | Ordem, paralelismo, critical path; pode incluir “file footprint” / restrições de paralelismo (EPIC-0041). | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`, planejamento humano. |
+| `execution-state.json` | Checkpoint único de orquestração (épico e/ou stories). | `x-epic-implement`, `x-epic-orchestrate`, `x-story-implement` (via `x-internal-status-update`), `x-internal-story-resume`, fases de gate. | JSON: status por story, fase atual, `refinementVerdict`, flags (`flowVersion`, `interactiveMode`, downgrades de paralelismo, etc.). | Resume/`--resume`; hooks (`enforce-phase-sequence`, `enforce-refinement-gate`, `enforce-continuous-flow`); operadores; futuro runtime NDP. |
+| `epic-execution-plan.md` | Plano de execução materializado do épico (fases, ondas, critérios). | `x-internal-epic-build-plan`, `x-epic-implement` (fases iniciais). | Markdown derivado do mapa + políticas; guia para waves. | `x-epic-implement`; relatórios finais; auditoria humana. |
+| `epic-execution-report.md` / relatórios de épico em `reports/` | Encerramento e evidências agregadas do épico. | `x-epic-implement`, `x-internal-report-write`. | Resumo de stories, gates, métricas, bloqueios. | Release train, stakeholders, CI de epic integrity quando aplicável. |
+| `spec-*.md` ou especificação anexa | Entrada de decomposição (feature/spec-driven). | Autor humano ou `x-feature-create` / pipeline de spec. | Requisitos fonte para épico/stories. | `x-epic-create`, `x-epic-decompose`, refinamento. |
+| `reviews/review-*.md` (alguns épicos) | Reviews agregados ao nível do épico (legado ou relatórios consolidados). | Varia: `x-review`, `x-epic-implement`, relatórios manuais. | Opinião especializada consolidada. | Tech lead, arquivo de épico; tende a convergir para `plans/` por story em fluxos novos. |
+
+#### 5.7.2. `plans/` — planejamento e evidência de design
+
+| Artefato (padrão de nome) | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `arch-story-XXXX-YYYY.md` | Plano arquitetural da story. | `x-arch-plan` (via `x-internal-story-build-plan` / Phase 1). | Componentes, diagramas, mini-ADRs, NFRs. | Implementação, `x-arch-update`, revisores; **Surface 07** (Rule 27). |
+| `plan-story-XXXX-YYYY.md` | Plano de implementação (fases, riscos, footprint). | `x-internal-story-build-plan` → template implementation plan. | Blueprint da codificação; alinha tasks e PRs. | `x-task-implement`, `x-internal-story-load-context` (staleness), verify gate. |
+| `tests-story-XXXX-YYYY.md` | Plano de testes Double-Loop / TPP. | `x-test-plan` ou wave interna de plano. | Ordem de testes, cenários AT/UT. | `x-task-implement`, QA, coverage gate. |
+| `tasks-story-XXXX-YYYY.md` | Decomposição em tasks. | `x-lib-task-decomposer` / build-plan. | Lista de tasks com IDs estáveis. | `x-task-implement`, execution-state, wave commits. |
+| `plan-task-*.md` / `task-plan-TASK-*-story-*.md` | Plano fino por task (TDD, footprint). | `x-task-plan`, `x-story-plan` (orquestração multi-task). | Passos atômicos por task. | `x-task-implement`, auditorias de paralelismo. |
+| `task-implementation-map-*.md` | DAG de tasks e paralelismo. | `x-story-plan`. | Ordem entre tasks da story. | `x-task-implement`, operadores. |
+| `security-story-XXXX-YYYY.md` | Avaliação de segurança. | Fase 1E do build-plan. | Threats, controles, evidências. | Security review, compliance gate. |
+| `compliance-story-XXXX-YYYY.md` | Avaliação compliance. | Fase 1F do build-plan. | Mapeamento normativo. | Compliance, auditores. |
+| `story-planning-report-*.md` / `planning-report-story-*.md` | Relatório do wave de planejamento. | `x-story-plan`, `x-epic-orchestrate` (per story). | Síntese do plano + DoR inputs. | `x-epic-orchestrate` (veredito DoR), operadores. |
+| `dor-story-XXXX-YYYY.md` | Definition of Ready por story. | `x-story-plan` subagent. | Checklist e **veredito READY/NOT_READY**. | `x-epic-orchestrate` (checkpoint), replanejamento. |
+| `remediation-story-XXXX-YYYY.md` | Plano de correção pós-review. | `x-story-implement` (fase de remediação). | Itens acionáveis pós-`x-review` / `x-review-pr`. | Implementação iterativa, PR fixes. |
+| `review-*-story-*.md` (especialistas) | Review por dimensão (security, qa, perf, …). | `x-review` (+ sub-skills especializadas). | Achados e scores por especialista. | Dashboard consolidado, remediação; **Surface 04** (Rule 27). |
+| `review-dashboard-story-*.md` | Consolidação multi-especialista. | `x-review`. | Visão única para decisão. | Tech lead, story owner. |
+| `techlead-review-story-*.md` | Veredito GO/NO-GO. | `x-review-pr`. | Checklist TL; **Surface 05**. | Merge gate humano, evidência em PR. |
+| `threat-model-story-*.md` | Threat model dedicado. | `x-threat-model`. | Cenários STRIDE/LINDDUN (conforme skill). | Security, auditorias. |
+
+**Pacote “6 artefatos de Fase 1”** (Rule 27 **Surface 09**): em fluxos zero-bypass, `x-internal-story-build-plan` materializa o conjunto esperado sob `{epicDir}/plans/` — tipicamente **arch, implementation plan, test plan, task breakdown, security, compliance** (com variação SIMPLE que pode omitir security/compliance). O hook `x-internal-phase-gate` e o loader de contexto tratam esse conjunto como evidência.
+
+#### 5.7.3. `reports/` — evidência de conclusão, verificação e auditoria
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-story-report` ao final de `x-story-implement`. | Resumo de PRs, coverage, tasks, achados; **Surface 01**. | Operadores, merge checklist, `audit-execution-integrity.sh`. |
+| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-story-verify`. | Assinatura de que fases obrigatórias rodaram; **Surface 03**. | CI (integridade), auditorias JSON. |
+| `verify-envelope-epic-XXXX.json` | Verificação ao nível do épico. | `x-internal-epic-integrity-gate`. | Agregado de gates de épico; **Surface 10**. | CI, release. |
+| `dependency-audit-STORY-ID.md` | Evidência de auditoria de dependências. | `x-dependency-audit`; **Surface 08**. | Vulnerabilidades, licenças, drift. | Segurança, supply chain, PR evidence. |
+| `doc-validate-report-STORY-ID.md` | Evidência do documentation gate (EPIC-0071). | `x-doc-validate`. | Arquivos verificados, deltas, falhas. | `verify-story-completion.sh`, CI doc freshness. |
+| `phase-report-epic-XXXX.md` | Relatório de fase do épico. | `x-epic-implement`. | Checkpoint entre fases grandes. | Epic orchestration, stakeholders. |
+| `epic-planning-report-XXXX.md` | Saída consolidada do planejamento multi-story. | `x-epic-orchestrate` Phase 3. | Status DoR por story, próximos passos. | Equipe, re-run com `--resume`. |
+| `epic-execution-plan-*.md` / `epic-orchestrator-state.json` (variações) | Estado ou plano exportado em alguns fluxos legados ou extensões. | Skills de épico / relatório interno. | Snapshots para ferramentas externas. | Integrações, debug (normalizar no NDP). |
+
+**Pacote “4 artefatos de Fase 3”** (narrativa Rule 27): na prática são as **evidências pós-implementação** exigidas para merge (relatório de story, verify envelope, auditorias correlatas, doc validate quando no escopo). A lista exata é validada por `scripts/audit-execution-integrity.sh` e pelo Stop hook `verify-story-completion.sh`.
+
+#### 5.7.4. `telemetry/events.ndjson`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `telemetry/events.ndjson` | Trilha auditável tempo-fase-skill. | Hooks (`telemetry-session`, `telemetry-pretool`/`posttool`, `telemetry-phase.sh`) + marcações nas skills. | NDJSON append-only: fases, subagentes, durações, scrubbed privacy. | `x-telemetry-analyze`, `x-telemetry-trend`; **Surface 12** / Camada 4 (Rule 27); operadores. |
+
+#### 5.7.5. `tasks/` (task-first) e contratos fora de `ai/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `tasks/task-TASK-*.md` | Contrato de task isolável. | `x-story-plan`, planejadores task-first. | Escopo mínimo por task. | `x-task-implement`, estado por task. |
+| `contracts/{STORY_ID}-*.yaml` / `.proto` / AsyncAPI | Contratos API-first. | `x-story-implement` Phase 0.5 (condicional) + linters. | Schemas aprovados antes do código. | `x-test-contract-lint`, implementação, revisores de API. |
+
+#### 5.7.6. `ai/releases/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| `release-state-X.Y.Z.json` (padrão v4) | Estado monotônico de um release. | `x-release`, automações de versão. | Versão, branches, checklist, timestamps. | Próximo `x-release`, CI, operadores. |
+
+#### 5.7.7. `ai/runs/`
+
+| Artefato | Objetivo | Quem gera | O que faz | Consumidores |
+| --- | --- | --- | --- | --- |
+| Arquivos por sessão/execução (transcripts, logs de ferramenta) | Diagnóstico forense fora do épico. | Ferramentas / skills de ops ou hooks (conforme projeto). | Evidência bruta de uma execução. | Troubleshooting, auditoria pontual; **não** substitui `events.ndjson` para métricas agregadas. |
+
+#### 5.7.8. Adjacentes críticos (não sob `ai/epics/`, mas cadeia de evidência)
+
+| Artefato | Objetivo | Quem gera | Consumidores |
+| --- | --- | --- | --- |
+| `.claude/state/pr-watch-{PR}.json` | Estado do CI-watch / Copilot para um PR. | `x-pr-watch-ci`; **Surface 06**. | Stop hook `verify-story-completion`, operadores. |
+| Corpo de PR (`## Orchestrator Evidence`) | Ligação entre git e artefatos em disco. | `x-internal-pr-body-render`, `x-pr-create`; **Surface 11**. | Revisores, `audit-execution-integrity.sh`. |
+| `governance/baselines/*.txt` | Exceções explícitas a políticas (hotfix, capabilities, etc.). | Humanos + scripts de baseline. | CI auditors (`audit-*`), bypass documentado (Rule 27 Exception 2). |
+
+#### 5.7.9. Síntese — grafo de consumo
+
+```mermaid
+flowchart LR
+  subgraph gen [Geração]
+    A[Skills de criação / mapa]
+    B[Wave de plano Phase 1]
+    C[x-story-implement / x-task-implement]
+    D[Verify e relatórios]
+    E[Hooks de telemetria]
+  end
+  subgraph disk [Disco]
+    P[plans/]
+    R[reports/]
+    T[telemetry/]
+    S[execution-state.json]
+  end
+  subgraph use [Consumo]
+    H[Hooks Camada 0/2]
+    I[CI audit-execution-integrity]
+    J[x-internal-story-load-context]
+    K[x-telemetry-analyze]
+  end
+  A --> S
+  B --> P
+  C --> P
+  C --> R
+  D --> R
+  E --> T
+  P --> J
+  R --> H
+  R --> I
+  T --> K
+  S --> H
+```
+
+**Implicação para o NDP:** cada linha desta seção vira um **tipo de artefato versionado** no registry (`artifact_kind`, schema, gerador autorizado, consumidores declarados). O runtime substitui inferência “por convenção de path” por **contratos explícitos**, mantendo paridade com as Surfaces 01–12 enquanto migramos de shell hooks para gates em processo.
 
 ---
 
@@ -455,113 +1023,6 @@ Skills auxiliares também migram:
 7. **Refinement gate aplicado a este próprio plano** — passar pelas 6 personas (PO, Tech Lead, Architect, Security, QA, SRE/DevOps) com `/x-epic-refine` adaptado, antes de promover qualquer Capacity para Epic.
 8. **Definir o scope da V0** — escolher subconjunto mínimo de Features `[V0]` que entrega valor end-to-end via CLI. Sugestão de núcleo mínimo: P2.C0 (todos os 8 orquestradores), P2.C2 (phase gates como código), P2.C3.F1+F2+F4 (LLM abstraction básica + custo), P5.C1.F1 (telemetria local), P6.C1.F1+F2+F5 (audit log + evidence vault + `ndp ci verify`). Sem isso, não é V0.
 9. **Plano de transição dual-mode** — durante 1 release, hooks/scripts atuais e NDP rodam em paralelo, validando paridade. Só então os scripts shell são removidos.
-
----
-
----
-
-## 7. Avaliação das regras existentes sob a inversão de controle
-
-> **Tese central desta seção.** Aproximadamente **40-50% das ~27 regras atuais são artefatos da decisão arquitetural de "LLM como orquestrador"**. A inversão de controle (§0.5) não só reduz a carga cognitiva — ela *deleta* boa parte da governança porque muitas regras existem unicamente para compensar a fragilidade de delegar fluxo a um LLM. O que sobra é governança real: padrões de código, arquitetura, segurança, release.
-
-### 7.0. Sumário — destino de cada regra
-
-| Destino | Quantidade | O que significa |
-|---|---|---|
-| **KEEP** (intrínseca) | 10 regras | Política universal independente do orquestrador. Sobrevive sem alteração ou com refinamento mínimo. |
-| **REWORK** (mantém invariante, troca enforcement) | 9 regras | Invariante continua válido; mecanismo de enforcement muda de hook/script/markdown para código NDP. |
-| **RETIRE** (perde sentido) | 7 regras | Existem porque o LLM pode pular/simular; com NDP no controle, viram código trivial ou desnecessárias. |
-| **COLLISION** (precisa decidir) | 1 colisão | Existe duplo Rule 28 no repo — ver §7.5. |
-| **NEW** (criar para NDP) | ~10 novas | Surgem do novo modelo: prompt versioning, output validation, target adapters, replay, FinOps, etc. |
-
-### 7.1. KEEP — regras intrínsecas que não mudam (10)
-
-Estas regras descrevem padrões de **código, arquitetura, segurança, release** que existem independentemente de quem orquestra. NDP simplesmente as carrega para o novo repositório, possivelmente as embute em validações in-process.
-
-| Rule | Por que sobrevive | Único ajuste em NDP |
-|---|---|---|
-| **01 — Project Identity** | Metadata do projeto. Independente de orquestrador. | Lida pelo `ndp config show`. Continua sendo input do generator. |
-| **02 — Domain** | Modelagem de domínio (DDD). Universal. | Sem mudança. |
-| **03 — Coding Standards** | Limites duros (25/250 linhas, ≤ 4 params, naming, SOLID). | NDP pode embutir checks dos limites em `ndp code lint` (hoje delegado a linters externos). |
-| **04 — Architecture Summary** | Hexagonal + dependency direction. | Sem mudança. |
-| **05 — Quality Gates** | Coverage ≥ 95% line / 90% branch (absolute gate). | Mesmo policy; enforcement passa a ser fase do `ndp story implement` (substitui `audit-coverage-local.sh`). |
-| **06 — Security Baseline** | Defaults seguros, deserialization, escape, paths. | Sem mudança. |
-| **07 — Operations Baseline** | Health checks, graceful shutdown, structured logging. | Sem mudança. |
-| **08 — Release Process** | SemVer, Conventional Commits, CHANGELOG, release branch. | Mesmo policy; `ndp release` é o orquestrador (substitui `x-release` + `audit-flow-version.sh`). |
-| **12 — Security Anti-Patterns (Java)** | Anti-patterns J1-J8. | Stack-aware: vira parte de `@ndp/security-pack-java`. |
-| **30 — Value-Driven Templates** | Templates v2 (Epic / Story / system.md). | Templates seguem; quem renderiza muda — `ndp story refine` os preenche via `claude -p` com schema validado. |
-
-### 7.2. REWORK — invariante mantém, enforcement muda (9)
-
-Estas regras declaram um *invariante real*, mas o mecanismo atual de enforcement é hook bash, script shell ou audit em markdown. NDP mantém o invariante e re-implementa o enforcement em código.
-
-| Rule | Invariante que sobrevive | Como o enforcement muda |
-|---|---|---|
-| **09 — Branching Model** | Git Flow (main/develop/feature/release/hotfix/epic/docs) | NDP cria/protege as branches em código. `ndp git worktree`, `ndp git branch`. Removidos os checks ad-hoc espalhados por skills. |
-| **19 — Backward Compatibility** | `flowVersion` field + matriz de fallback | `flowVersion` deixa de ser campo de markdown lido pelo LLM e vira **campo serializado de um state object NDP**. Migration explícita: `ndp migrate --to-version ndp-1`. |
-| **20 — Interactive Gates** | Menu 3-opções (PROCEED/FIX-PR/ABORT); flag `--interactive`/`--non-interactive` | NDP renderiza menu nativo no CLI (sem dependência de `AskUserQuestion`). `--non-interactive` é default (Rule 20 já flipou em EPIC-0061). |
-| **21 — Epic Branch Model** | `epic/XXXX` é a integração; PR para `develop` é gate manual | NDP cria/cuida do ciclo. `ndp git cleanup-branches` aprende a preservar `epic/*`. Substitui `audit-epic-branches.sh`. |
-| **23 — Model Selection** | Tier matrix Opus/Sonnet/Haiku | Configuração por comando NDP (`config: { skill: x-arch-plan, model: opus }`), não frontmatter. `audit-model-selection.sh` é eliminado. Diferencial: NDP pode dinamicamente trocar modelo com base em custo/latência observada. |
-| **25 — Task Hierarchy & Phase Gates** | 4-level hierarchy (Epic › Story › Phase › Wave); `›` separator; PRE/POST gates | `TaskCreate`/`TaskUpdate` deixam de ser tool calls e viram estrutura interna do NDP. Phase gates são funções tipadas (Feature P2.C2.F2). `x-internal-phase-gate` desaparece. |
-| **28 — Capability Frontmatter Contract** | `requires-capabilities`, schema v3.0, fragment slots | Frontmatter continua sendo o formato canônico para artefatos community/marketplace. Mas o NDP carrega tudo em estruturas tipadas em memória, com validação em-processo. |
-| **29 — Refinement Gate** | Story/epic precisa de `refinementVerdict.status = "approved"` antes de implementar | `ndp story implement` faz o check antes de qualquer side effect: `if (!verdict.approved) exit 33`. Substitui `enforce-refinement-gate.sh` + `audit-refinement-gate.sh`. |
-| **31 — Documentation Freshness Gate** | Doc targets ficam frescos por PR | Vira fase mandatória do `ndp story implement` — `ndp doc validate` antes do verify final. Substitui `audit-doc-freshness.sh`. |
-| **45 — CI-Watch Integrity** | 8 exit codes estáveis; evidence file `pr-watch-{PR}.json` | Exit codes viram enum tipado em `ndp pr watch`. Evidence file vira entrada do audit log do P6. |
-
-### 7.3. RETIRE — regras que perdem sentido (7)
-
-Estas regras existem **especificamente para compensar** o fato de que o LLM pode pular, simular ou inlinear sub-skills. Com NDP no controle, o problema-raiz desaparece — e essas regras vão junto.
-
-| Rule | Por que existe hoje | Por que retira-se em NDP |
-|---|---|---|
-| **13 — Skill Invocation Protocol** | "Bare-slash `/x-foo` em delegação é proibido porque o LLM pode tratar como prosa." Os 3 patterns (INLINE-SKILL, SUBAGENT-GENERAL, SUBAGENT-RESEARCH) existem porque o LLM precisa entender a sintaxe. | Em código, chamar uma função é inequívoco. Telemetry markers (`telemetry-phase.sh`) viram chamadas de método. **Rule 13 inteira retira-se**, exceto por uma versão muito reduzida sobre como prompts versionados invocam o LLM. |
-| **14 — Project Scope Guard** | Limita o que pode entrar no Java do `ia-dev-env` (gerador puro; sem telemetria, sem release, sem orquestração). | **Inverte-se completamente em NDP**: orquestração, telemetria, release, lifecycle audit, gates — tudo isso AGORA pertence ao escopo. Precisa de **rule nova** (§7.4) com escopo expandido. |
-| **22 — Skill Visibility** | `x-internal-*` prefix existe porque skills extraídas precisam ser invisíveis ao usuário no `/help`. Frontmatter `visibility: internal`. | Em NDP, "internal" = método privado / package-private. Não existe "/help" como problema — `ndp --help` lista comandos públicos do CLI; o resto é estrutura interna. **Rule 22 retira-se inteira**; substituída por convenções padrão de visibilidade de código. Skills `x-internal-status-update`, `x-internal-args-normalize`, `x-internal-phase-gate` deixam de existir como artefatos. |
-| **24 — Execution Integrity** | Existe inteiramente porque "o LLM pode simular sub-skill calls em vez de executá-los". 4 camadas de defesa contra inlining. | **NDP não pode inlinear chamadas**: ou a função é chamada, ou não é. Mandatory evidence artifacts ainda fazem sentido como conceito (verify-envelope, review reports), mas sua existência é **garantida por construção pelo orquestrador**, não auditada externamente. **Rule 24 retira-se**; restos viram contrato de output do `ndp story implement`. |
-| **26 — Audit Gate Lifecycle** | 4-camada taxonomy (Hook/CI/Java/Workflow) + naming `audit-*.sh`/`verify-*.sh`/`enforce-*.sh`. | NDP colapsa 4 camadas em **2** (Camada A = NDP runtime; Camada B = `ndp ci verify`). Naming conventions de scripts shell são irrelevantes porque os scripts não existem. **Rule 26 retira-se** e é substituída por uma rule muito mais curta sobre as 2 camadas (§7.4). |
-| **27 — Zero-Bypass Lifecycle** | 12 surfaces, 4 camadas de defesa contra bypass do orquestrador raiz. Existe porque o operador pode fazer `git commit + gh pr create` sem chamar o orquestrador. | **Bypass é impossível por construção**: ou o usuário roda `ndp ...` e os gates aplicam, ou não roda — não há caminho intermediário porque os artefatos de evidência são produzidos pelo NDP. **Rule 27 retira-se**; lista de surfaces sobrevive como *contrato de output* dos comandos NDP. Exception #1 (`--legacy-flow` / `flowVersion=1`) e #2 (`hotfix/*`) viram flags do CLI. |
-| **28 — Tool-Call Grammar** | Markers `[required]/[optional]/[conditional]` em SKILL.md para que audit script saiba se um sub-skill é obrigatório. | Em código, `if (required) mustCall() else mayCall()` é apenas um `if`. Markers, regex, audit `audit-tool-call-grammar.sh`, baseline `tool-call-grammar-baseline.txt` — todos retiram-se. **Rule 28 (tool-call-grammar) retira-se inteira.** A outra Rule 28 (capability frontmatter) sobrevive — ver §7.5. |
-
-### 7.4. NEW — regras novas que NDP precisa criar (~10)
-
-Em vez de manter governança que existia para compensar fragilidades, NDP precisa de governança que reflita seu próprio modelo. Sugestão de regras novas:
-
-| ID provisório | Tópico | Por que é necessária |
-|---|---|---|
-| **NDP-Rule-A** — Orchestrator Contract | Define o contrato entre comandos NDP e workers LLM: input schema, output schema, retry semantics, idempotência, timeout, contagem de tokens. | Sem este contrato, cada comando reinventa como invocar o LLM. |
-| **NDP-Rule-B** — Prompt Template Versioning | Prompts (substitutos das skills leaf atuais) são artefatos versionados (SemVer). Breaking changes no schema de saída exigem MAJOR. Templates compartilham fixtures de teste. | Templates são código; precisam dos mesmos rigores que código. |
-| **NDP-Rule-C** — LLM Output Validation | Toda resposta LLM é validada contra JSON Schema. Não-conformidade dispara retry com prompt corretivo (até N vezes); falha persistente aborta a fase com erro tipado. | Hoje, validação é "LLM lê markdown e tenta acertar". Em NDP, validação é estrutural. |
-| **NDP-Rule-D** — Replay & Determinism | Toda execução produz um manifesto (input + LLM responses cached + decisões NDP). `ndp replay <run-id>` reconstitui execução offline. Cache de LLM tem retention policy. | Determinismo é diferencial competitivo do NDP; precisa de rule explícita. |
-| **NDP-Rule-E** — Cost & Budget Guardrails | Todo comando NDP estima custo antes de executar. Override de budget exige flag explícita. Budget pode ser por org / repo / dia / comando. | Sem isso, marketplace + multi-LLM viram cost-attack vector. |
-| **NDP-Rule-F** — Multi-LLM Provider Contract | Define interface comum para Claude, GPT, Gemini, modelos locais. Cada provider declara capabilities (context window, structured output, vision, etc.). NDP roteia por capability. | Sem rule, cada integração de provider é ad-hoc. |
-| **NDP-Rule-G** — Headless Output Schema | `--output json` produz schema estável (versionado). Exit codes machine-readable. STDERR vs STDOUT bem separados. | CI integration depende de schema estável. |
-| **NDP-Rule-H** — Target Adapter Contract | Cada adapter (Claude Code, Cursor, Windsurf, Aider) declara: paths de output, formato, capability map, conflitos. | Multi-target precisa de governança para não virar caos. |
-| **NDP-Rule-I** — Audit Log Immutability | Audit log é hash-linked (cada entrada referencia hash da anterior). Tampering detectável. Exporter formal (SOC2 / ISO). | Substitui Rule 26 + parte de Rule 24/27 com governança real, não papel. |
-| **NDP-Rule-J** — Plug-in Sandbox & Trust (V1+) | Skills/profiles do marketplace declaram permissões; NDP enforça sandbox; trust score por publisher. Assinatura digital obrigatória. | Marketplace inevitavelmente vira superfície de ataque tipo `npm`; rule preventiva. |
-| **NDP-Rule-K** — State Machine Lifecycle | State machine canônica (Pendente → Refinada → Planejada → Em Andamento → Concluída/Falha/Bloqueada) com invariantes de transição, persistência, recovery, replay. | Rule 25 fala de hierarquia mas não de transições. NDP precisa de contrato explícito. |
-| **NDP-Rule-L** — Project Scope (NDP) | Substitui Rule 14. Define o escopo expandido de NDP: gerador + runtime de orquestração + cliente LLM + audit engine + (V1+) marketplace client. | Rule 14 atual é incompatível com NDP por design. |
-
-### 7.5. COLLISION — Rule 28 duplicada
-
-O repositório atual tem **duas regras numeradas 28**: `28-capability-frontmatter-contract.md` (EPIC-0064) e `28-tool-call-grammar.md` (EPIC-0063). Esta colisão precisa ser resolvida na transição para NDP:
-
-| Decisão recomendada | Justificativa |
-|---|---|
-| **Manter `28-capability-frontmatter-contract`** como Rule 28 | Capabilities são o pilar do composition (EPIC-0064 v5); central para NDP. |
-| **Retirar `28-tool-call-grammar`** | Vai para o grupo RETIRE (§7.3). Toda a regra perde sentido com inversão de controle. |
-| Resultado | Rule 28 fica único e canônico. Não é necessário renumerar. |
-
-### 7.6. Implicações para o escopo da V0
-
-| Implicação | Detalhe |
-|---|---|
-| **Escopo de governança encolhe** | De ~27 rules → ~20 rules (10 KEEP + 9 REWORK + 1 que sobra do conflito). Carga cognitiva cai significativamente. |
-| **Escopo de implementação cresce** | ~10 NDP-Rules novas precisam ser escritas e implementadas como código + teste. Esforço migra de "manter audit scripts em bash" para "escrever testes unitários do orquestrador". |
-| **Migração tem 3 fases lógicas** | (1) Implementar comandos NDP em paralelo às skills atuais (dual-mode, §6.9). (2) Migrar testes dos audit scripts para testes unitários dos orquestradores. (3) Remover scripts shell + rules retiradas. |
-| **Rule 14 é blocker do passo 0** | Como Rule 14 atual proíbe explicitamente código de orquestração no `ia-dev-env`, ela precisa ser substituída/relaxada *antes* de qualquer commit que adicione código de orquestração — ou todo o código do NDP precisa nascer em repositório novo (consistente com o §1 "novo repositório"). |
-| **PoC de inversão (§6.4) valida 7 retiradas de uma vez** | Se `ndp story refine` é construído como PoC e os gates de Rules 13/22/24/26/27/28-grammar não precisam existir nele, isso já valida 7 das 7 retiradas listadas em §7.3. |
-
----
 
 ---
 
