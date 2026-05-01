@@ -1,0 +1,26 @@
+{
+  "storyId": "story-0071-0002",
+  "epicId": "EPIC-0071",
+  "verifiedAt": "2026-05-01T03:00:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "buildStatus": "SUCCESS",
+  "testsRun": 4567,
+  "failures": 0,
+  "errors": 0,
+  "note": "Story delivers SKILL.md + template only (no Java source). Java test count inherited from project baseline.",
+  "artifacts": {
+    "skill": "src/main/resources/targets/claude/skills/core/ops/x-doc-validate/SKILL.md",
+    "template": "src/main/resources/shared/templates/_TEMPLATE-DOC-VALIDATE-REPORT.md"
+  },
+  "acVerification": {
+    "happyPath": "PASS — SKILL.md documents OK exit when all 6 dimensions pass for PR with updated docs",
+    "errorBoundary": "PASS — DOC_VALIDATION_FAILED exit documented; degenerate docs-only PR returns SKIP for code-triggered dimensions",
+    "performance": "PASS — < 30s for 500 files documented as Performance Contract in SKILL.md",
+    "security": "PASS — no absolute paths/tokens in report; path traversal rejected; symlinks never followed"
+  },
+  "prNumber": 892,
+  "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/892",
+  "mergedAt": "2026-05-01T03:00:00Z"
+}
