@@ -30,13 +30,13 @@ Regra editorial desta versão: inventários detalhados continuam presentes porqu
 
 ### 1.1. Princípio fundador — local-first, CLI-first
 
-O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A V0 é uma CLI, como o `ia-dev-env` é hoje. Toda interface gráfica (TUI, web console, dashboards, IDE extensions, SaaS) é pós-V0 e não bloqueia nenhuma capacidade do core.
+O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do desenvolvedor. A V0 é uma CLI, como o `ia-dev-env` é hoje. Toda interface gráfica (TUI, web console, dashboards, IDE extensions, SaaS) é parte da V0 e não bloqueia nenhuma capacidade do core.
 
 | Decisão | Consequência |
 | --- | --- |
 | Local-first por padrão | Código-fonte, telemetria, audit log e estado de execução vivem no disco do desenvolvedor. Nada é enviado para nuvem sem opt-in explícito. |
-| V0 = CLI | A primeira release entregável é `forge ...`, sem servidor, sem login e sem dependência de rede no caminho feliz. |
-| UI é v1+ | TUI, IDE panels e web console consomem o mesmo core da CLI. Nenhuma regra de negócio vive apenas na UI. |
+| V0 = produto completo local-first | A primeira release entregável inclui `forge ...`, TUI, web console local, IDE panels, marketplace opt-in, SaaS opt-in e cloud sem bloquear o caminho feliz offline. |
+| CLI é canônica | TUI, IDE panels, web console e SaaS consomem o mesmo core da CLI. Nenhuma regra de negócio vive apenas na UI. |
 | Headless friendly | Todo comando core precisa ser scriptável, com `--output json`, `--output text` e, quando fizer sentido, `--output ndjson`. |
 | Network como opt-in | Marketplace, telemetria remota, analytics cross-project e multi-tenancy são desligados por padrão. |
 | Sem vendor lock-in cloud | Cloud é serviço opcional sobre o core, não pré-requisito. |
@@ -44,10 +44,10 @@ O Forge é, em primeiro lugar, uma ferramenta que roda 100% local na máquina do
 Roadmap de interfaces:
 
 ```text
-V0  -> CLI (forge <command>)                      -> single source of truth
-V1  -> TUI (forge tui) e IDE panel mínimo         -> melhora UX, mesmo core
-V2  -> Web console local (forge ui, localhost)    -> dashboard offline opcional
-V3+ -> SaaS multi-tenant e marketplace remoto   -> opt-in, separado do core
+V0 -> CLI (forge <command>)                    -> single source of truth
+V0 -> TUI (forge tui) e IDE panels             -> melhora UX, mesmo core
+V0 -> Web console local (forge ui, localhost)  -> dashboard offline
+V0 -> SaaS multi-tenant e marketplace remoto   -> opt-in, separado do core
 ```
 
 A CLI permanece canônica em todas as versões. Nenhuma feature do core pode existir apenas na UI.
@@ -158,6 +158,7 @@ Runtime determinístico
   - state machine
   - gates
   - artifact registry
+  - SQLite operational index
   - policy engine
   - telemetry/audit log
   - provider/router de LLM
@@ -204,6 +205,30 @@ produces:
   - forge.artifact.telemetry-run@1
 ```
 
+#### 3.3.1. Storage de ativos — Git canônico, SQLite operacional
+
+O registry não deve transformar Git em banco operacional. A decisão arquitetural do Forge é separar fonte normativa e projeção de leitura:
+
+| Camada | Papel |
+| --- | --- |
+| Git | Fonte de verdade, histórico, diff, recuperação e colaboração. |
+| Filesystem | Arquivos `.md`, templates e evidências editáveis no working tree. |
+| SQLite local | Índice operacional reconstruível: metadados, relações, hashes, busca e freshness. |
+| Blob store local | Conteúdo comprimido/deduplicado por `sha256`, obrigatório na V0 para leitura rápida, snapshots e recuperação local. |
+
+Na V0, o Forge mantém o conteúdo canônico nos arquivos versionados, grava uma projeção local em `.forge/state/index.sqlite` e persiste blobs comprimidos/deduplicados em `.forge/blobs/sha256/`. O índice contém `asset_id`, `artifact_kind`, `path`, `sha256`, `schema_version`, `status`, `indexed_at`, `git_commit`, relações, ponteiro de blob e FTS5 para busca textual. Se o índice for apagado ou corrompido, `forge index rebuild` reconstrói tudo a partir do working tree, do histórico Git e dos blobs válidos.
+
+O ciclo de escrita é:
+
+```text
+edit/save -> forge sync -> SQLite atualizado
+          -> blob comprimido/deduplicado atualizado
+approve/refine/generate/phase complete -> commit semântico
+push/PR/merge -> checkpoint remoto
+```
+
+O Forge não deve commitar a cada save. Mudanças locais atualizam o índice e podem entrar em um `sync_journal` append-only para recuperação; Git fica reservado para eventos significativos como aprovação, publicação, refinement, geração e fechamento de fase.
+
 ### 3.4. Regra de ouro de classificação
 
 | Se o ativo... | Então vira... |
@@ -230,9 +255,19 @@ Essa cadeia resolve um gap do fluxo atual: hoje o épico pode nascer diretamente
 
 O Forge deve operar sobre um **control repository** local-first e versionado no GitHub. Esse repositório é a fonte oficial de produto, capacidades, features, arquitetura, épicos, stories, status e evidências. Ele pode ser o próprio repositório do projeto quando o time é pequeno, ou um repositório dedicado de planejamento quando há múltiplos serviços.
 
+O control repository é a camada normativa. O runtime lê uma projeção operacional em `.forge/state/index.sqlite`, mas essa projeção é cache reconstruível, não fonte de verdade. A regra é: Markdown + Git definem o estado oficial; SQLite acelera consulta, validação, freshness e lineage.
+
 Layout proposto:
 
 ```text
+  .forge/
+    state/
+      index.sqlite
+      sync-journal.ndjson
+    blobs/
+      sha256/
+        ab/
+          abcdef....zst
   projects/
     project-XXXX/
       project-XXXX.md
@@ -279,6 +314,9 @@ Decisões:
 
 - `project`, `product`, `capacity`, `feature`, `epic`, `story` e `task` formam uma cadeia de rastreabilidade, não apenas uma estrutura de pastas.
 - Arquitetura existe em três níveis: produto, capacidade e feature. Cada nível tem escopo próprio e evita que uma feature precise redescobrir decisões globais.
+- Git e arquivos `.md` são canônicos; `.forge/state/index.sqlite` é uma projeção operacional reconstruível.
+- `forge sync` atualiza o índice e o blob store a partir do working tree; `forge index rebuild` recria o índice completo quando necessário.
+- Commits são semânticos e acontecem em eventos de lifecycle, não a cada save.
 - `epic` só pode ser criado quando existe feature aprovada e `architecture-feature-*` aprovado.
 - `story` só pode ser criada dentro de um epic aprovado ou em geração controlada pelo `forge epic create`.
 - `task` só pode ser criada a partir de uma story aprovada ou durante o planejamento da story.
@@ -310,7 +348,7 @@ O Forge deve tratar “commitado no GitHub” como um checkpoint verificável:
 - commit local presente no remote (`origin/<branch>` contém o SHA);
 - PR criado ou mergeado conforme política do artefato;
 - artefato com status `APPROVED`;
-- `execution-state.json` ou registry local apontando para o SHA remoto aprovado.
+- artifact index local apontando para o SHA remoto aprovado.
 
 Relações obrigatórias:
 
@@ -345,6 +383,8 @@ Relações obrigatórias:
 | `forge architecture plan capacity <CAPACITY-CODE>` | Capacity aprovada + arquitetura do product | `architecture-capacity-*.md` | Define arquitetura da capability/domínio. |
 | `forge architecture plan feature <FEATURE-CODE>` | Feature aprovada + arquiteturas product/capacity + NFRs | `architecture-feature-*.md` | Define arquitetura sistêmica necessária para a feature. |
 | `forge epic create <FEATURE-CODE>` | Architecture Plan aprovado | Epic + stories + implementation map | Só depois disso `forge epic implement <EPIC-CODE>` entra. |
+| `forge sync` | Working tree local | `.forge/state/index.sqlite` e `.forge/blobs/**` atualizados | Reindexa mudanças incrementais sem criar commit. |
+| `forge index rebuild` | Control repository + blob store | Índice SQLite recriado do zero | Recuperação quando o índice local está ausente, stale ou corrompido. |
 
 #### 3.5.4. Dados mínimos para Architecture Plan
 
@@ -768,7 +808,7 @@ Etapas:
 2. **Início de telemetria.** O runtime registra `run.start` para que toda a execução tenha correlação, duração e status final.
 3. **Gate pré-args.** O runtime verifica se pode iniciar a fase de argumentos: ambiente válido, estado legível e nenhuma fase anterior pendente.
 4. **Normalização de argumentos.** Flags legadas, `--resume`, `--parallel`, `--dry-run`, `flowVersion`, estratégia de merge e modo interativo são resolvidos em um contrato único.
-5. **Persistência de contexto.** O runtime salva `interactiveMode` e metadados do comando em `execution-state.json`, permitindo resume e diagnósticos posteriores.
+5. **Persistência de contexto.** O runtime salva `interactiveMode` e metadados do comando em `execution-state.json`, permitindo resume e diagnósticos incluídas na V0.
 6. **Gate pós-args.** Confirma que a fase de argumentos produziu estado suficiente para continuar.
 7. **Gate pré-planejamento.** Antes de ler backlog e mapas, valida que a fase de args passou e que o épico é elegível.
 8. **Leitura de backlog.** Carrega épico, stories e `IMPLEMENTATION-MAP.md`; aqui aparecem gaps de arquivo ausente, story órfã ou mapa divergente.
@@ -1339,8 +1379,8 @@ Estas coordenam fluxo suficiente para não serem leaf prompts. A visibilidade p�
 | `x-setup-env` | `forge setup env` ou `forge doctor`. |
 | `x-perf-profile` | `forge perf profile`. |
 | `x-ops-troubleshoot` | `forge troubleshoot` ou worker acionado por falhas. |
-| `x-ops-incident` | Comando opcional; provável V1+ ou plugin ops. |
-| `x-jira-create-epic`, `x-jira-create-stories` | Plugins `forge jira ...`, fora do core offline. |
+| `x-ops-incident` | Comando V0 de operação/incidente, também instalável como plugin ops quando o time quiser empacotar extensões. |
+| `x-jira-create-epic`, `x-jira-create-stories` | Plugins V0 `forge jira ...`; fora do core offline obrigatório, mas dentro do escopo V0 via marketplace/plugin opt-in. |
 | `x-adr-generate` | `forge adr generate` e fase interna de arquitetura. |
 | `x-owasp-scan`, `x-security-dashboard`, `x-security-pentest` | `forge security ...`, alguns condicionais por capability/permissão. |
 
@@ -1534,7 +1574,7 @@ O pacote de Fase 1 em fluxos zero-bypass é tipicamente: arch plan, implementati
 
 | Artefato | Objetivo | Quem gera | Consumidores |
 | --- | --- | --- | --- |
-| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; Forge runtime no futuro. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
+| `telemetry/events.ndjson` | Trilha auditável de fases/tools/subagentes. | Hooks e `telemetry-phase.sh` hoje; Forge runtime na V0. | `x-telemetry-analyze`, `x-telemetry-trend`, audit, Surface 12. |
 | `ai/releases/release-state-X.Y.Z.json` | Estado monotônico de release. | `x-release`. | Próximo release, CI, operadores. |
 | `ai/runs/*` | Evidência por sessão/execução. | Ferramentas, hooks ou ops skills. | Troubleshooting/forensics. |
 | `tasks/task-TASK-*.md` | Contrato task-first. | `x-story-plan`, `x-task-plan`. | `x-task-implement`. |
@@ -1578,9 +1618,7 @@ Decisão de produto: essa taxonomia vira a navegação oficial do Forge para cap
 
 Hierarquia: `Project → Product → Capacity → Feature`. A marcação indica release alvo:
 
-- `[V0]`: CLI local-first, core obrigatório.
-- `[V1+]`: expansão de UX, marketplace ou integração, depois do core.
-- `[V2+]`: cloud, multi-tenancy, analytics cross-project ou interface avançada.
+- `[V0]`: escopo completo deste plano. A ordem de implementação pode ser incremental, mas todas as features listadas abaixo pertencem à primeira release.
 
 ### 6.2. Product P0 — Product Design & Architecture Design
 
@@ -1591,7 +1629,7 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 - P0.C1.F1 `[V0]`: `forge ideate --kind product|capacity|feature` para transformar ideia livre em template estruturado.
 - P0.C1.F2 `[V0]`: Templates versionados de Project, Product, Capacity e Feature com schema.
 - P0.C1.F3 `[V0]`: Approval workflow para Product, Capacity e Feature (`draft -> approved -> remote checkpoint`).
-- P0.C1.F4 `[V1+]`: Multi-round ideation com personas e comparação de alternativas.
+- P0.C1.F4 `[V0]`: Multi-round ideation com personas e comparação de alternativas.
 
 #### P0.C2 — Product/Capacity/Feature Lifecycle
 
@@ -1615,7 +1653,7 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 - P0.C4.F1 `[V0]`: `forge epic create <FEATURE-CODE>` gera epic, stories e implementation map a partir da feature e do Architecture Plan.
 - P0.C4.F2 `[V0]`: Link bidirecional `Feature -> Architecture Plan -> Epic -> Stories`.
 - P0.C4.F3 `[V0]`: Versionamento Git/PR para backlog gerado.
-- P0.C4.F4 `[V1+]`: Replanejamento incremental quando arquitetura ou feature mudam.
+- P0.C4.F4 `[V0]`: Replanejamento incremental quando arquitetura ou feature mudam.
 
 ### 6.3. Product P1 — Core Engine
 
@@ -1626,28 +1664,28 @@ Evolução direta do gerador Java. Continua sendo fonte da verdade de compositio
 - P1.C1.F1 `[V0]`: Schema unificado de profile com JSON-Schema versionado.
 - P1.C1.F2 `[V0]`: Migração assistida v5 (`ia-dev-env`) → v6 (`Forge`) com `forge migrate --from-iadev`.
 - P1.C1.F3 `[V0]`: Profile inheritance & overlays.
-- P1.C1.F4 `[V1+]`: Detecção automática de stack.
+- P1.C1.F4 `[V0]`: Detecção automática de stack.
 
 #### P1.C2 — Capability Composition v2
 
 - P1.C2.F1 `[V0]`: Capability resolver com cache local.
 - P1.C2.F2 `[V0]`: Frontmatter v4 com `provides:`.
-- P1.C2.F3 `[V1+]`: Plug-in capabilities externas.
+- P1.C2.F3 `[V0]`: Plug-in capabilities externas.
 - P1.C2.F4 `[V0]`: Composition diff & dry-run.
 
 #### P1.C3 — Artifact Generation Multi-Target
 
 - P1.C3.F1 `[V0]`: Target adapter `claude-code`.
 - P1.C3.F2 `[V0]`: Target adapter `cursor`.
-- P1.C3.F3 `[V1+]`: Targets `windsurf`, `aider`, `gemini-cli`, `codex-cli`.
-- P1.C3.F4 `[V1+]`: Target adapter `generic-mcp`.
+- P1.C3.F3 `[V0]`: Targets `windsurf`, `aider`, `gemini-cli`, `codex-cli`.
+- P1.C3.F4 `[V0]`: Target adapter `generic-mcp`.
 - P1.C3.F5 `[V0]`: Overlay system para customizações sem perder regen.
 
 #### P1.C4 — Multi-Stack & Multi-Language
 
 - P1.C4.F1 `[V0]`: Catálogo de stacks oficial.
-- P1.C4.F2 `[V1+]`: Stack templates community-contributed.
-- P1.C4.F3 `[V2+]`: Polyglot monorepos.
+- P1.C4.F2 `[V0]`: Stack templates community-contributed.
+- P1.C4.F3 `[V0]`: Polyglot monorepos.
 - P1.C4.F4 `[V0]`: Reutilização de KPs via taxonomia comum.
 
 ### 6.4. Product P2 — Orchestration Runtime
@@ -1673,7 +1711,7 @@ Produto-âncora da V0. Substitui markdown interpretado por state machines em có
 
 - P2.C1.F1 `[V0]`: State machine local.
 - P2.C1.F2 `[V0]`: Pause/resume de orquestração.
-- P2.C1.F3 `[V2+]`: Resume cross-machine.
+- P2.C1.F3 `[V0]`: Resume cross-machine.
 - P2.C1.F4 `[V0]`: Fan-out/fan-in declarativo.
 
 #### P2.C2 — Task Hierarchy & Phase Gates v2
@@ -1681,7 +1719,7 @@ Produto-âncora da V0. Substitui markdown interpretado por state machines em có
 - P2.C2.F1 `[V0]`: Task tree como entidade de primeira classe.
 - P2.C2.F2 `[V0]`: Phase gates tipados em código.
 - P2.C2.F3 `[V0]`: Pré-condições in-process antes de efeitos colaterais.
-- P2.C2.F4 `[V1+]`: Gates customizáveis por org.
+- P2.C2.F4 `[V0]`: Gates customizáveis por org.
 - P2.C2.F5 `[V0]`: Replay determinístico de execução.
 
 #### P2.C3 — LLM Abstraction Layer
@@ -1700,7 +1738,7 @@ Produto-âncora da V0. Substitui markdown interpretado por state machines em có
 
 ### 6.5. Product P3 — Developer Experience
 
-CLI primária; TUI, IDE e web UI são camadas posteriores.
+CLI primária; TUI, IDE e web UI são camadas incluídas na V0.
 
 #### P3.C1 — CLI v2
 
@@ -1712,23 +1750,23 @@ CLI primária; TUI, IDE e web UI são camadas posteriores.
 
 #### P3.C2 — TUI & Local UI
 
-- P3.C2.F1 `[V1+]`: `forge tui`.
-- P3.C2.F2 `[V1+]`: `forge watch`.
-- P3.C2.F3 `[V2+]`: `forge ui` local.
-- P3.C2.F4 `[V2+]`: Editor visual de rules/skills.
+- P3.C2.F1 `[V0]`: `forge tui`.
+- P3.C2.F2 `[V0]`: `forge watch`.
+- P3.C2.F3 `[V0]`: `forge ui` local.
+- P3.C2.F4 `[V0]`: Editor visual de rules/skills.
 
 #### P3.C3 — IDE Extensions
 
-- P3.C3.F1 `[V1+]`: Extensão VS Code.
-- P3.C3.F2 `[V2+]`: Extensão JetBrains.
-- P3.C3.F3 `[V1+]`: Painel inline de evidências.
-- P3.C3.F4 `[V1+]`: Auto-complete de profile/capabilities.
+- P3.C3.F1 `[V0]`: Extensão VS Code.
+- P3.C3.F2 `[V0]`: Extensão JetBrains.
+- P3.C3.F3 `[V0]`: Painel inline de evidências.
+- P3.C3.F4 `[V0]`: Auto-complete de profile/capabilities.
 
 #### P3.C4 — Onboarding & Time-to-Value
 
 - P3.C4.F1 `[V0]`: `forge init` com 5-7 perguntas.
 - P3.C4.F2 `[V0]`: Templates por persona.
-- P3.C4.F3 `[V1+]`: Tutorial guiado in-IDE.
+- P3.C4.F3 `[V0]`: Tutorial guiado in-IDE.
 - P3.C4.F4 `[V0]`: `forge doctor`.
 
 ### 6.6. Product P4 — Knowledge & Marketplace
@@ -1737,65 +1775,65 @@ Ecossistema compartilhado, opt-in e network-required; core funciona offline com 
 
 #### P4.C1 — Skill Marketplace
 
-- P4.C1.F1 `[V1+]`: Registry central ou self-hosted.
-- P4.C1.F2 `[V1+]`: SemVer obrigatório.
-- P4.C1.F3 `[V1+]`: Dependency resolution.
-- P4.C1.F4 `[V1+]`: Trust model com assinatura e sandbox.
-- P4.C1.F5 `[V2+]`: Compatibility matrix por modelo/provider.
+- P4.C1.F1 `[V0]`: Registry central ou self-hosted.
+- P4.C1.F2 `[V0]`: SemVer obrigatório.
+- P4.C1.F3 `[V0]`: Dependency resolution.
+- P4.C1.F4 `[V0]`: Trust model com assinatura e sandbox.
+- P4.C1.F5 `[V0]`: Compatibility matrix por modelo/provider.
 
 #### P4.C2 — Rule & Governance Library
 
-- P4.C2.F1 `[V1+]`: Rule packs por domínio.
-- P4.C2.F2 `[V2+]`: Rule simulator.
-- P4.C2.F3 `[V1+]`: Rule conflict detector.
-- P4.C2.F4 `[V1+]`: Custom rule authoring.
+- P4.C2.F1 `[V0]`: Rule packs por domínio.
+- P4.C2.F2 `[V0]`: Rule simulator.
+- P4.C2.F3 `[V0]`: Rule conflict detector.
+- P4.C2.F4 `[V0]`: Custom rule authoring.
 
 #### P4.C3 — Template & Profile Catalog
 
-- P4.C3.F1 `[V1+]`: Catálogo de profiles oficial/community.
-- P4.C3.F2 `[V2+]`: Rating e usage stats.
-- P4.C3.F3 `[V1+]`: `forge profile fork`.
-- P4.C3.F4 `[V1+]`: Profile lineage.
+- P4.C3.F1 `[V0]`: Catálogo de profiles oficial/community.
+- P4.C3.F2 `[V0]`: Rating e usage stats.
+- P4.C3.F3 `[V0]`: `forge profile fork`.
+- P4.C3.F4 `[V0]`: Profile lineage.
 
 #### P4.C4 — Cross-Project Intelligence
 
-- P4.C4.F1 `[V2+]`: Padrões agregados anonimizados.
-- P4.C4.F2 `[V2+]`: Recommendation engine.
-- P4.C4.F3 `[V2+]`: Drift detection cross-repo.
-- P4.C4.F4 `[V2+]`: Knowledge graph navegável.
+- P4.C4.F1 `[V0]`: Padrões agregados anonimizados.
+- P4.C4.F2 `[V0]`: Recommendation engine.
+- P4.C4.F3 `[V0]`: Drift detection cross-repo.
+- P4.C4.F4 `[V0]`: Knowledge graph navegável.
 
 ### 6.7. Product P5 — Observability, Analytics & FinOps
 
-V0 entrega observabilidade local; streaming remoto e dashboards são opt-in e posteriores.
+V0 entrega observabilidade local, streaming remoto opt-in, dashboards, alerting, analytics e FinOps. O caminho feliz continua local-first, mas as integrações remotas já fazem parte da release.
 
 #### P5.C1 — Local & Real-Time Telemetry
 
 - P5.C1.F1 `[V0]`: Captura local NDJSON + queries CLI.
-- P5.C1.F2 `[V1+]`: Streaming opt-in para OTLP/Datadog/custom HTTP.
-- P5.C1.F3 `[V2+]`: Dashboard live de execução.
-- P5.C1.F4 `[V1+]`: Alerting.
-- P5.C1.F5 `[V1+]`: Trace OTel-compatible.
+- P5.C1.F2 `[V0]`: Streaming opt-in para OTLP/Datadog/custom HTTP.
+- P5.C1.F3 `[V0]`: Dashboard live de execução.
+- P5.C1.F4 `[V0]`: Alerting.
+- P5.C1.F5 `[V0]`: Trace OTel-compatible.
 
 #### P5.C2 — Quality & Compliance Metrics
 
 - P5.C2.F1 `[V0]`: Coverage longitudinal.
 - P5.C2.F2 `[V0]`: Refinement quality score.
-- P5.C2.F3 `[V1+]`: Doc freshness heatmap.
-- P5.C2.F4 `[V1+]`: Compliance posture report.
+- P5.C2.F3 `[V0]`: Doc freshness heatmap.
+- P5.C2.F4 `[V0]`: Compliance posture report.
 
 #### P5.C3 — FinOps & Cost Insights
 
 - P5.C3.F1 `[V0]`: Custo de LLM por skill/story/epic/org.
-- P5.C3.F2 `[V1+]`: Sugestão de model downgrade.
+- P5.C3.F2 `[V0]`: Sugestão de model downgrade.
 - P5.C3.F3 `[V0]`: Budget guardrails locais.
-- P5.C3.F4 `[V1+]`: Comparativo por provider.
+- P5.C3.F4 `[V0]`: Comparativo por provider.
 
 #### P5.C4 — Research & Benchmarking
 
-- P5.C4.F1 `[V2+]`: A/B testing de skills.
-- P5.C4.F2 `[V1+]`: Benchmark suite.
-- P5.C4.F3 `[V2+]`: Regression detection.
-- P5.C4.F4 `[V2+]`: Public leaderboard opt-in.
+- P5.C4.F1 `[V0]`: A/B testing de skills.
+- P5.C4.F2 `[V0]`: Benchmark suite.
+- P5.C4.F3 `[V0]`: Regression detection.
+- P5.C4.F4 `[V0]`: Public leaderboard opt-in.
 
 ### 6.8. Product P6 — Governance, Security & Trust
 
@@ -1805,14 +1843,14 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 - P6.C1.F1 `[V0]`: Audit log local imutável.
 - P6.C1.F2 `[V0]`: Evidence vault local.
-- P6.C1.F3 `[V1+]`: Reports SOC2 / ISO 27001 / LGPD.
-- P6.C1.F4 `[V1+]`: Forensics.
+- P6.C1.F3 `[V0]`: Reports SOC2 / ISO 27001 / LGPD.
+- P6.C1.F4 `[V0]`: Forensics.
 - P6.C1.F5 `[V0]`: CI Camada B com `forge ci verify`.
 
 #### P6.C2 — Refinement & Quality Gates v2
 
 - P6.C2.F1 `[V0]`: AI-assisted refinement.
-- P6.C2.F2 `[V1+]`: Refinement memory.
+- P6.C2.F2 `[V0]`: Refinement memory.
 - P6.C2.F3 `[V0]`: Refinement templates por domínio.
 - P6.C2.F4 `[V0]`: NO-GO library.
 
@@ -1821,14 +1859,14 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 - P6.C3.F1 `[V0]`: Continuous threat modeling.
 - P6.C3.F2 `[V0]`: SBOM gerado e validado.
 - P6.C3.F3 `[V0]`: Secret scanning integrado.
-- P6.C3.F4 `[V1+]`: Supply chain trust score.
+- P6.C3.F4 `[V0]`: Supply chain trust score.
 
 #### P6.C4 — Privacy, Multi-Tenancy & RBAC
 
-- P6.C4.F1 `[V2+]`: Multi-tenant.
-- P6.C4.F2 `[V2+]`: RBAC.
-- P6.C4.F3 `[V2+]`: Data residency.
-- P6.C4.F4 `[V1+]`: PII scrubbing para telemetria remota.
+- P6.C4.F1 `[V0]`: Multi-tenant.
+- P6.C4.F2 `[V0]`: RBAC.
+- P6.C4.F3 `[V0]`: Data residency.
+- P6.C4.F4 `[V0]`: PII scrubbing para telemetria remota.
 
 ---
 
@@ -1844,7 +1882,7 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 | 5 | Telemetria | NDJSON via hooks. | Runtime telemetry + OTel-compatible. | Importer para histórico. |
 | 6 | Distribuição de skills | Copy in-repo. | Marketplace/cache local versionado. | Assinatura, sandbox e core offline. |
 | 7 | Multi-projeto | Repos isolados. | Opt-in cross-project intelligence. | Differential privacy e local-only default. |
-| 8 | Multi-tenancy | N/A. | RBAC/cloud opcional V2+. | Manter V0/V1 single-user local. |
+| 8 | Multi-tenancy | N/A. | RBAC/cloud opt-in na V0. | Caminho feliz local single-user; cloud multi-tenant não pode virar pré-requisito. |
 | 9 | Backward compat | Flow versions legados. | Migration assistant. | Testar contra profiles e epics canônicos. |
 | 10 | OSS vs commercial | 100% OSS hoje. | Core OSS + cloud paid. | Linha clara desde o dia 1. |
 | 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
@@ -1858,7 +1896,7 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 - **Performance da composition em escala.** Com plugins externos, pode crescer de centenas para milhares de artefatos. Cache local é V0.
 - **Determinismo cross-LLM.** Separar composição determinística de conteúdo criativo gerado por LLM.
-- **Estado distribuído.** Para V0/V1, file-based local com lock é suficiente; cross-machine fica V2+.
+- **Estado distribuído.** A V0 precisa suportar local single-user, resume cross-machine e colaboração, preservando Git/Markdown como fonte canônica e SQLite/blob store como projeções locais.
 - **Trace OTel.** Migrar `events.ndjson` sem quebrar análises atuais.
 - **Migração de hooks.** Perda de invariante é o maior risco. Dual-mode e testes por script mitigam.
 
@@ -1884,25 +1922,24 @@ P6 reduz escopo porque gates básicos migram para P2. Fica com auditabilidade, c
 
 ---
 
-## 9. V0 Sugerida
+## 9. V0 Completa
 
-O núcleo mínimo da V0 precisa provar o diferencial completo: Forge controla execução localmente, chama LLM como worker e produz evidências verificáveis.
+A V0 completa precisa entregar todo o diferencial do Forge: controle local-first, runtime determinístico, LLM como worker, evidências verificáveis, marketplace, UI local, IDEs, analytics, compliance, multi-tenancy opt-in e operação cloud sem comprometer o caminho feliz offline.
 
-Escopo mínimo sugerido:
+Escopo completo da V0:
 
-| Área | Features mínimas |
+| Área | Features da V0 |
 | --- | --- |
-| Planejamento estratégico | P0.C1.F1-F3, P0.C2.F1-F5, P0.C3.F1-F6, P0.C4.F1-F3. |
-| Orquestração | P2.C0.F1-F5, P2.C0.F7, P2.C0.F9, P2.C0.F12. |
-| Runtime gates | P2.C2.F1-F3, P2.C4.F2-F4. |
-| LLM/provider | P2.C3.F1-F4 com Claude como primeiro provider. |
-| CLI/DX | P3.C1.F1-F5, P3.C4.F1, P3.C4.F4. |
-| Composition/migration | P1.C1.F1-F3, P1.C2.F1-F2/F4, P1.C3.F1-F2/F5. |
-| Telemetria/custos | P5.C1.F1, P5.C3.F1, P5.C3.F3. |
-| Audit/evidence | P6.C1.F1-F2/F5. |
-| Refinement/security | P6.C2.F1/F3/F4, P6.C3.F1-F3. |
+| Planejamento estratégico | Todos os itens P0.C1-F4, P0.C2, P0.C3 e P0.C4, incluindo ideation multi-round e replanejamento incremental. |
+| Core/composition | Todos os itens P1.C1-C4, incluindo detecção automática de stack, plugins externos, todos os targets e polyglot monorepos. |
+| Orquestração | Todos os itens P2.C0-C4, incluindo release, merge train, PR fix, pipeline run, resume cross-machine e gates customizáveis por org. |
+| CLI/DX/UI | Todos os itens P3.C1-C4, incluindo CLI, REPL, TUI, watch, web console local, VS Code, JetBrains, painéis de evidência, autocomplete e tutorial in-IDE. |
+| Knowledge/marketplace | Todos os itens P4.C1-C4, incluindo registry central/self-hosted, signing, sandbox, rule packs, profile catalog, ratings, lineage, recommendation engine e knowledge graph. |
+| Observabilidade/FinOps | Todos os itens P5.C1-C4, incluindo NDJSON, OTel, streaming remoto opt-in, dashboard live, alerting, heatmaps, compliance posture, model downgrade, benchmarking e regression detection. |
+| Governança/segurança/trust | Todos os itens P6.C1-C4, incluindo evidence vault, SOC2/ISO/LGPD reports, forensics, refinement memory, trust score, RBAC, multi-tenancy, data residency e PII scrubbing. |
+| Storage operacional | Git/Markdown canônicos, SQLite FTS, blob store local comprimido/deduplicado, sync journal, rebuild completo e snapshots recuperáveis. |
 
-Primeiro spike recomendado: reimplementar **um único orquestrador** como código, preferencialmente `forge story refine` ou `forge story implement` em escopo reduzido. Comparar contra a skill atual:
+Primeiro spike recomendado: reimplementar **um único orquestrador** como código, preferencialmente `forge story refine` ou `forge story implement`, já usando os contratos finais de storage, policy, telemetry, worker routing e evidence ledger. Comparar contra a skill atual:
 
 - tempo total;
 - taxa de bypass;
@@ -1921,26 +1958,26 @@ Esta seção transforma a estratégia em contratos próximos de implementação.
 
 ### 10.1. Contrato fechado da V0
 
-A V0 não deve tentar entregar o Forge inteiro. Ela precisa provar uma fatia vertical completa: o Forge controla um fluxo local, chama LLM como worker, persiste estado, aplica gates em código, produz evidência verificável e consegue retomar execução.
+A V0 deve entregar o Forge inteiro conforme este plano. Ela precisa provar a fatia vertical completa e também incluir as capacidades avançadas de produto, runtime, marketplace, UI, analytics, segurança e operação: o Forge controla um fluxo local, chama LLM como worker, persiste estado, aplica gates em código, produz evidência verificável e consegue retomar execução.
 
 | Dimensão | Contrato V0 |
 | --- | --- |
-| Interface | CLI `forge`, sem UI obrigatória, com `--output text`, `--output json` e logs locais. |
-| Execução | Local-first, single-user, file-based state store, locking local e Git como checkpoint remoto. |
-| LLM | Um provider oficial inicial, com abstração para múltiplos providers e validação de saída por schema. |
-| Orquestração | Pelo menos um fluxo end-to-end controlado pelo runtime, não por skill markdown. |
-| Planejamento | Cadeia mínima `Project -> Product -> Capacity -> Feature -> Architecture Plan -> Epic`. |
-| Evidência | Artifact registry tipado, audit log local, verify envelopes e PR body com evidências quando houver PR. |
-| Migração | Leitura/importação do layout atual `ia-dev-env` sem exigir reescrita manual dos artefatos existentes. |
-| CI | `forge ci verify` como Camada B para validar o que o runtime produziu. |
+| Interface | CLI `forge`, TUI, web console local, IDE extensions e SaaS opt-in, todos sobre o mesmo core e com `--output text`, `--output json` e logs locais. |
+| Execução | Local-first, Git-backed control repository, índice SQLite local reconstruível, blob store comprimido/deduplicado, locking local, resume cross-machine, colaboração e Git como checkpoint remoto. |
+| LLM | Abstração multi-provider completa: Claude, GPT, Gemini, providers locais e roteamento/fallback/custo por execução com validação de saída por schema. |
+| Orquestração | Lifecycle completo controlado pelo runtime: planning, refinement, implementation, task loop, review, PR, CI watch, merge train, release, recovery e replay determinístico. |
+| Planejamento | Cadeia completa `Project -> Product -> Capacity -> Feature -> Architecture Plan -> Epic -> Story -> Task`, com ideation multi-round e replanejamento incremental. |
+| Evidência | Artifact registry tipado, `artifact_kind` indexado, audit log local, evidence vault, blob snapshots, verify envelopes, PR body, compliance reports e forensics. |
+| Migração | Leitura/importação do layout atual `ia-dev-env`, dual-mode controlado, migração assistida e validação de compatibilidade sem reescrita manual dos artefatos existentes. |
+| CI/Cloud | `forge ci verify` como Camada B, marketplace assinado, SaaS opt-in, multi-tenancy, RBAC, data residency e telemetria remota com PII scrubbing. |
 
-Não-goals da V0:
+Escopo obrigatório da V0:
 
 - SaaS, multi-tenancy, RBAC organizacional e marketplace remoto.
 - Dashboard web, IDE extension completa ou TUI rica.
 - Execução cross-machine ou colaboração em tempo real.
-- Compatibilidade com todos os LLM providers; a arquitetura deve permitir, mas a entrega pode começar com um provider.
-- Reimplementação de todas as skills atuais; V0 deve portar o caminho crítico e manter o restante em dual-mode.
+- Compatibilidade real com todos os LLM providers definidos no plano, incluindo providers locais e fallback automático.
+- Reimplementação de todas as skills atuais como commands, services, adapters, policies, templates ou worker prompts do Forge; dual-mode existe apenas como mecanismo de migração, não como escopo reduzido.
 
 Métricas de sucesso:
 
@@ -1955,31 +1992,38 @@ Métricas de sucesso:
 
 ### 10.2. Vertical slice recomendado
 
-O primeiro slice deve ser pequeno o suficiente para ser implementável, mas completo o suficiente para provar a tese de inversão de controle.
+O primeiro slice continua sendo a ordem recomendada de implementação, mas não limita escopo. A V0 completa inclui todos os produtos, capacities e features do roadmap.
 
 ```text
 forge init
   -> forge product create|approve
   -> forge capacity create|approve
   -> forge feature create|approve
+  -> forge ideate --multi-round
   -> forge architecture plan feature
   -> forge epic create
-  -> forge story refine ou forge story implement reduzido
+  -> forge story refine
+  -> forge story implement
+  -> forge review / forge review pr
+  -> forge pr watch / forge pr fix
+  -> forge merge-train / forge release
   -> forge ci verify
+  -> forge tui / forge ui / IDE panel
+  -> forge marketplace / forge analytics / forge compliance
 ```
 
 Recorte sugerido:
 
-| Slice | Inclui | Exclui |
+| Slice | Inclui | Também deve incluir na V0 |
 | --- | --- | --- |
-| S0 — bootstrap | `forge init`, profile mínimo, control repo detection, `forge doctor`. | Marketplace, target adapters múltiplos. |
-| S1 — strategic chain | Product, Capacity, Feature, approvals e remote checkpoint. | Ideation multi-round e personas avançadas. |
-| S2 — architecture intake | `architecture-feature-*` com NFR gate e mini-ADRs. | Arquitetura product/capacity profunda quando o repo ainda é simples. |
-| S3 — backlog generation | `forge epic create` gera epic, stories e implementation map com links. | Replanejamento incremental automático. |
-| S4 — runtime proof | `forge story refine` ou `forge story implement` reduzido com state machine real. | Todo o lifecycle de PR/review/release. |
-| S5 — CI evidence | `forge ci verify` valida registry, estados, links e evidências. | Compliance reports formais. |
+| S0 — bootstrap | `forge init`, profile completo, control repo detection, `forge doctor`. | Marketplace, target adapters múltiplos e blob store local. |
+| S1 — strategic chain | Product, Capacity, Feature, approvals e remote checkpoint. | Ideation multi-round, personas avançadas e comparação de alternativas. |
+| S2 — architecture intake | `architecture-product-*`, `architecture-capacity-*` e `architecture-feature-*` com NFR gate e mini-ADRs. | Arquitetura profunda de produto, capacidade e feature. |
+| S3 — backlog generation | `forge epic create` gera epic, stories e implementation map com links. | Replanejamento incremental automático quando arquitetura ou feature mudam. |
+| S4 — runtime completo | `forge story refine`, `forge story implement`, `forge epic implement`, reviews, PRs, release e merge train. | Lifecycle completo de PR/review/release. |
+| S5 — CI evidence | `forge ci verify` valida registry, estados, links e evidências. | Compliance reports formais, forensics e posture reports. |
 
-Critério de corte: se uma feature V0 não ajuda a provar esse slice, ela deve ir para V1+ ou virar plugin experimental.
+Critério de corte: todas as features deste plano pertencem à V0. A ordem pode ser incremental, mas o escopo de release permanece completo.
 
 ### 10.3. State machines canônicas
 
@@ -2065,7 +2109,6 @@ scope:
   includes:
     - story runtime state machine
     - artifact evidence validation
-  excludes:
     - full release orchestration
 nfrs:
   max_resume_time_seconds: 10
@@ -2087,12 +2130,14 @@ parent_architecture:
   capacity: ARCH-CAP-Forge-RUNTIME
 decisions:
   - id: ADR-MINI-001
-    decision: "Use file-based state store for V0."
-    consequence: "Cross-machine resume is V2+."
+    decision: "Use Git-backed Markdown as the canonical store and SQLite as a reconstructable operational index."
+    consequence: "The runtime gets fast local queries without making Git a database; cross-machine resume uses Git checkpoints plus synchronized asset index/blob snapshots."
 runtime_components:
   - StoryRuntime
   - PolicyEngine
   - ArtifactRegistry
+  - ArtifactIndex
+  - BlobStore
   - LlmWorkerRouter
 readiness_checklist:
   - state machine states declared
@@ -2386,14 +2431,14 @@ O mapa abaixo define como os contextos se relacionam. Ele é mais importante que
 
 `Evidence Ledger`
 
-- Domínio: controla schemas, artifact kinds, lineage, freshness e evidence envelopes.
-- Possui: Artifact Kind, Evidence Envelope, Lineage, Freshness Rule, Checkpoint, Superseded Artifact e generator authorization.
+- Domínio: controla schemas, artifact kinds, lineage, freshness, evidence envelopes, índice operacional de artefatos e blobs locais deduplicados.
+- Possui: Artifact Kind, Evidence Envelope, Lineage, Freshness Rule, Checkpoint, Superseded Artifact, Asset Index, Blob Snapshot e generator authorization.
 - Não possui: regra de aprovação de produto, decisão de gate ou renderização criativa.
-- Use cases: `RegisterArtifactKind`, `WriteEvidenceEnvelope`, `ValidateArtifact`, `EvaluateFreshness`, `ResolveLineage`.
-- Ports de entrada: `WriteEvidenceUseCase`, `ValidateArtifactUseCase`, `ResolveLineageUseCase`.
-- Ports de saída: `ArtifactStoragePort`, `SchemaRegistryPort`, `ChecksumPort`.
-- Eventos: `EvidenceWritten`, `ArtifactValidated`, `ArtifactMarkedStale`, `ArtifactSuperseded`.
-- Invariante central: artefato sem schema ou gerador autorizado não entra como evidência válida.
+- Use cases: `RegisterArtifactKind`, `WriteEvidenceEnvelope`, `ValidateArtifact`, `EvaluateFreshness`, `ResolveLineage`, `SyncAssetIndex`, `RebuildAssetIndex`, `WriteBlobSnapshot`, `CompactBlobStore`.
+- Ports de entrada: `WriteEvidenceUseCase`, `ValidateArtifactUseCase`, `ResolveLineageUseCase`, `SyncAssetIndexUseCase`.
+- Ports de saída: `ArtifactStoragePort`, `ArtifactIndexPort`, `BlobStorePort`, `SchemaRegistryPort`, `ChecksumPort`, `CompressionPort`, `GitMetadataPort`.
+- Eventos: `EvidenceWritten`, `ArtifactValidated`, `ArtifactMarkedStale`, `ArtifactSuperseded`, `AssetIndexed`, `AssetIndexRebuilt`, `BlobSnapshotWritten`, `BlobStoreCompacted`.
+- Invariante central: artefato sem schema ou gerador autorizado não entra como evidência válida; o índice SQLite e o blob store são sempre reconstruíveis a partir do control repository.
 
 `AI Workers`
 
@@ -2723,7 +2768,7 @@ forge plugin install <PACKAGE>
   -> internal: allow rollback to previous registry state
 ```
 
-Na V0, esse fluxo pode existir apenas como design contract; execução real fica V1+.
+Na V0, esse fluxo deve existir como execução real, com assinatura, SBOM, permissões, cache local e rollback.
 
 #### Manual story ou task creation controlado
 
@@ -2781,7 +2826,7 @@ Antes de decompor a V0 em épicos, o refinement deve confirmar:
 - Cada policy V0 tem enforcement point, evidence e teste planejado.
 - Cada state machine tem transições autorizadas e recovery behavior.
 - Cada artefato estratégico tem schema mínimo e freshness rule.
-- O vertical slice está separado do backlog V0 expandido.
+- O vertical slice define ordem de implementação, mas não reduz o escopo completo da V0.
 - Não há dependência obrigatória de cloud, UI ou marketplace para o caminho feliz.
 
 ---
