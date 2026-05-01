@@ -348,6 +348,18 @@
 
 ---
 
+### audit-perf-baseline.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0072 (Comprehensive Test Strategy) story-0072-0005 |
+| **Layer** | 2 — CI Script |
+| **Validates** | Integrity of `governance/baselines/performance-baseline.json`: JSON parse-valid, `_format_version` field present, no silent overwrite (baseline modified in PR without corresponding entry in `perf-baseline-updates.log`), symlink rejection, path traversal rejection, file size ≤ 1MB |
+| **Introduced** | story-0072-0005 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or baseline absent on first run) · `1` = `PERF_BASELINE_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

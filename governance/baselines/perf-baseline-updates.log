@@ -1,0 +1,4 @@
+# Performance Baseline Updates Log
+# Format: <ISO8601-timestamp>\t<git-sha>\t<author>\t"<reason>"
+# Append-only — do NOT remove entries.
+# One entry required per baseline update committed to any PR.
