@@ -1,0 +1,31 @@
+id: quality.performance.rest
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  REST performance gate — runs Newman/k6/Artillery against REST endpoints and
+  validates P50/P95/P99 latency and throughput against QualityConfig.performance.slo.rest
+  thresholds. Invoked by /x-test-performance when interfaces[].type = rest.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [k6, artillery, newman]
+    default: k6
+  slo:
+    p50_ms:
+      type: integer
+      default: 100
+    p95_ms:
+      type: integer
+      default: 200
+    p99_ms:
+      type: integer
+      default: 500
+    throughput_rps:
+      type: integer
+      default: 100
