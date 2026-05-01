@@ -49,6 +49,11 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > antes do remote op; Camadas 1-4 (Rule 24) são **detectivas** — pegam após o fato.
 > Ver [Rule 24 §Camada 0](.claude/rules/24-execution-integrity.md).
 
+> **Concluded — EPIC-0070 (Value-Driven Templates v2).** `flowVersion: "4"` epics born after 2026-04-30 MUST use v2 value-driven template format. Key changes: (1) `_TEMPLATE-STORY.md` and `_TEMPLATE-EPIC.md` now include `## 3. Hipótese & OKRs` + `## Refinement Verdict`; (2) `x-internal-epic-create` and `x-internal-story-create` emit v2 by default (`--legacy-template-v1` deprecated, 2-release window); (3) `_TEMPLATE-ARCHITECTURE-SYSTEM.md` with §11 Decision Log; (4) `/x-arch-system-update` (incremental `system.md` updater, idempotent); (5) `/x-template-migrate` (v1→v2 assistant with atomic write, `PARSER_ERROR` abort, `--dry-run`); (6) `audit-template-version.sh` (Camada 2 CI gate) + empty baseline `governance/baselines/template-version-baseline.txt`; (7) EPIC-0056 marked `## ⛔ SUPERSEDED`. Tag `value-driven-templates-v2-frozen` marks epic closure.
+> - Skills: [`/x-arch-system-update`](src/main/resources/targets/claude/skills/core/plan/x-arch-system-update/SKILL.md) · [`/x-template-migrate`](src/main/resources/targets/claude/skills/core/plan/x-template-migrate/SKILL.md)
+> - Audit script: [`audit-template-version.sh`](src/main/resources/targets/claude/scripts/audit-template-version.sh)
+> - Superseded: [`epic-0056.md`](ai/epics/epic-0056-ra9-planning-templates/epic-0056.md) → EPIC-0070
+
 > **REFINEMENT GATE — INEGOCIÁVEL (NEW — EPIC-0069):** Toda story/epic DEVE
 > ser refinada via `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes
 > de invocar `x-story-implement`, `x-epic-implement`, `x-task-implement`, ou

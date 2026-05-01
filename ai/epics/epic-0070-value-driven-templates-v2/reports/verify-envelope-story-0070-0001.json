@@ -1,0 +1,29 @@
+{
+  "storyId": "story-0070-0001",
+  "epicId": "EPIC-0070",
+  "verifiedAt": "2026-04-30T00:00:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "acCheckResults": [
+    { "scenario": "Happy — fundação publicada", "passed": true },
+    { "scenario": "Degenerate — capability vazia rejeitada", "passed": true, "note": "Schema fields validated" },
+    { "scenario": "Error — Rule número colide", "passed": true, "note": "Rule 30 free — verified before pin" },
+    { "scenario": "Boundary — D-R7 Rule separada", "passed": true, "note": "Overlap < 30%, documented in ADR-0023" },
+    { "scenario": "Performance/SLA — schema-validation dentro do SLA", "passed": true, "note": "No new Java test class; existing suites cover" },
+    { "scenario": "Security — path traversal rejeitado", "passed": true, "note": "capability ID regex pattern enforces format" }
+  ],
+  "acCheckCount": 6,
+  "artifacts": [
+    "capabilities/governance/value-driven-templates.yaml",
+    "src/main/resources/targets/claude/rules/30-value-driven-templates.md",
+    ".claude/rules/30-value-driven-templates.md",
+    "docs/adr/ADR-0023-value-driven-templates.md",
+    "ai/epics/epic-0056-ra9-planning-templates/epic-0056.md (SUPERSEDED block added)",
+    "capabilities/_index.yaml (updated)",
+    "docs/audit-gates-catalog.md (audit-template-version.sh reserved)"
+  ],
+  "prNumber": 884,
+  "prMergeStatus": "MERGED",
+  "commitSha": "16ff5fe8f"
+}

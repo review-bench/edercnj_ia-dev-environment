@@ -29,7 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Smoke test validating that all 25 assemblers execute and contribute output for every registered
+ * Smoke test validating that all 26 assemblers execute and contribute output for every registered
  * profile.
  *
  * <p>Detects assembler regressions:
@@ -54,7 +54,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @DisplayName("AssemblerRegressionSmokeTest")
 class AssemblerRegressionSmokeTest extends SmokeTestBase {
 
-    static final int EXPECTED_ASSEMBLER_COUNT = 25;
+    static final int EXPECTED_ASSEMBLER_COUNT = 26;
 
     static final List<String> EXPECTED_ORDER =
             List.of(
@@ -78,6 +78,7 @@ class AssemblerRegressionSmokeTest extends SmokeTestBase {
                     "SloSliTemplateAssembler",
                     "DocsContributingAssembler",
                     "DataMigrationPlanAssembler",
+                    "SystemArchAssembler",
                     "CicdAssembler",
                     "EpicReportAssembler",
                     "PlanTemplatesAssembler",
@@ -111,7 +112,7 @@ class AssemblerRegressionSmokeTest extends SmokeTestBase {
     class AssemblerRegistration {
 
         @Test
-        @DisplayName("factory returns exactly 25 " + "assemblers")
+        @DisplayName("factory returns exactly 26 " + "assemblers")
         void buildAssemblers_returnsExactCount() {
             List<AssemblerDescriptor> descriptors = AssemblerPipeline.buildAssemblers();
 

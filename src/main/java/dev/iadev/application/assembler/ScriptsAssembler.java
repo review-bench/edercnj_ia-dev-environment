@@ -46,7 +46,7 @@ public final class ScriptsAssembler implements Assembler {
 
     /**
      * The canonical list of audit and utility scripts bundled in the flat source-of-truth directory
-     * (legacy). Ordered alphabetically. Golden tests assert all 7 are present in generated output.
+     * (legacy). Ordered alphabetically. Golden tests assert all 10 are present in generated output.
      */
     public static final List<String> AUDIT_SCRIPTS =
             List.of(
@@ -58,6 +58,7 @@ public final class ScriptsAssembler implements Assembler {
                     "audit-refinement-gate.sh",
                     "audit-review-frontmatter.sh",
                     "audit-skill-visibility.sh",
+                    "audit-template-version.sh",
                     "telemetry-consolidate.sh");
 
     private static final Map<String, Map<String, String>> PLACEHOLDER_TABLE =

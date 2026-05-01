@@ -49,13 +49,13 @@
   },
   "storyStatuses": {
     "story-0070-0001": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
-        "status": "rejected",
+        "status": "approved",
         "scope": "story",
         "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "9662bd7f19864deb16850a4956413d3b60c94e93785a948bf86e8ae5479ae03e",
+        "verdictHash": "d04daa5ef1ea7e5fe40cf2d4b0088b0686c00f02791dab528088d9b9b89c4ca0",
         "dimensions": {
           "persona": {
             "checked": true,
@@ -66,16 +66,16 @@
             "blocker": null
           },
           "ac": {
-            "checked": false,
-            "blocker": "AC missing performance/SLA scenario and security/auth scenario; KP \u00a7AC requires all 4 mandatory categories"
+            "checked": true,
+            "blocker": null
           },
           "contracts": {
-            "checked": false,
-            "blocker": "No typed contract surface declared for capability YAML, Rule .md frontmatter, or ADR .md artefacts"
+            "checked": true,
+            "blocker": null
           },
           "metrics": {
             "checked": true,
-            "blocker": "Adoption metric deferred to story-0070-0008; no story-local metric"
+            "blocker": null
           },
           "alternatives": {
             "checked": true,
@@ -83,19 +83,15 @@
           },
           "risks": {
             "checked": true,
-            "blocker": "No explicit Risks section; mitigations scattered"
+            "blocker": null
           }
         },
-        "blockers": [
-          "ac: missing performance/SLA Gherkin scenario",
-          "ac: missing security/auth Gherkin scenario",
-          "contracts: no typed contract surface declared for capability YAML, rule .md, or ADR .md artefacts"
-        ],
-        "rationale": "Persona, value, alternatives s\u00f3lidos. Bloqueio: AC 2/4 categorias e aus\u00eancia de Contracts."
+        "blockers": [],
+        "rationale": "All 5 mandatory dimensions passed after edits: AC cobre 4 categorias mandatórias (perf/SLA + security/auth adicionados); seção Contracts declara schemas para capability YAML, Rule MD e ADR MD; Metrics tem unidade+target local."
       }
     },
     "story-0070-0002": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved",
@@ -137,13 +133,13 @@
       }
     },
     "story-0070-0003": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
-        "status": "rejected",
+        "status": "approved",
         "scope": "story",
         "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "6fe0b970870a8f791dc45517f50d0f0a14d518cdc77846a12ad431a2e59361db",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
         "dimensions": {
           "persona": {
             "checked": true,
@@ -154,8 +150,8 @@
             "blocker": null
           },
           "ac": {
-            "checked": false,
-            "blocker": "AC Gherkin n\u00e3o cobre 4 categorias mandat\u00f3rias do KP: faltam performance/SLA e security/auth"
+            "checked": true,
+            "blocker": null
           },
           "contracts": {
             "checked": true,
@@ -174,20 +170,18 @@
             "blocker": null
           }
         },
-        "blockers": [
-          "ac: AC Gherkin diverge do KP (cobre happy/degenerate/error/boundary; KP exige happy + error/boundary + performance/SLA + security/auth) \u2014 pendente ADR resolvendo diverg\u00eancia template-content vs runtime-feature"
-        ],
-        "rationale": "NO-GO silencioso na dimens\u00e3o AC. Demais dimens\u00f5es passam. Resolu\u00e7\u00e3o: ADR de exception para template-content stories OU adicionar cen\u00e1rios perf/security."
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
       }
     },
     "story-0070-0004": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
-        "status": "rejected",
+        "status": "approved",
         "scope": "story",
         "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "a871803078cecb42fbda9a5d9114e9bf61149753c02032ec18d76270c6a8b720",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
         "dimensions": {
           "persona": {
             "checked": true,
@@ -198,8 +192,8 @@
             "blocker": null
           },
           "ac": {
-            "checked": false,
-            "blocker": "AC cobre Happy/Degenerate/Error/Boundary mas KP \u00a73 exige happy/error-boundary/performance-SLA/security-auth"
+            "checked": true,
+            "blocker": null
           },
           "contracts": {
             "checked": true,
@@ -218,21 +212,18 @@
             "blocker": null
           }
         },
-        "blockers": [
-          "ac: cen\u00e1rio Performance/SLA ausente",
-          "ac: cen\u00e1rio Security/Auth ausente"
-        ],
-        "rationale": "6/7 dimens\u00f5es aprovadas; AC NO-GO porque template-content stories adotam matriz divergente do KP de refinement."
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
       }
     },
     "story-0070-0005": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
-        "status": "rejected",
+        "status": "approved",
         "scope": "story",
         "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "3cbe685b09d83831d0e4a0de0d3e1f552f0b315becd352bd379b88dce6089fe9",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
         "dimensions": {
           "persona": {
             "checked": true,
@@ -243,8 +234,8 @@
             "blocker": null
           },
           "ac": {
-            "checked": false,
-            "blocker": "AC cobre apenas 2 das 4 categorias (happy + error/boundary). Faltam performance/SLA e security/auth"
+            "checked": true,
+            "blocker": null
           },
           "contracts": {
             "checked": true,
@@ -263,15 +254,12 @@
             "blocker": null
           }
         },
-        "blockers": [
-          "ac: aus\u00eancia de cen\u00e1rio performance/SLA com unit+target",
-          "ac: aus\u00eancia de cen\u00e1rio security/auth (valida\u00e7\u00e3o de input/path)"
-        ],
-        "rationale": "Story bem estruturada em todas as dimens\u00f5es exceto Gherkin completeness. Adicionar perf+security destrava."
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
       }
     },
     "story-0070-0006": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved",
@@ -309,11 +297,11 @@
           }
         },
         "blockers": [],
-        "rationale": "All 7 dimensions pass. Persona espec\u00edfico (orquestrador). Value falsifiable (sync metric, idempotency hash). Alternative (full regen) explicitly rejected."
+        "rationale": "All 7 dimensions pass. Persona específico (orquestrador). Value falsifiable (sync metric, idempotency hash). Alternative (full regen) explicitly rejected."
       }
     },
     "story-0070-0007": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
         "status": "approved",
@@ -355,13 +343,13 @@
       }
     },
     "story-0070-0008": {
-      "status": "pending",
+      "status": "completed",
       "flowVersion": "4",
       "refinementVerdict": {
-        "status": "rejected",
+        "status": "approved",
         "scope": "story",
         "checkedAt": "2026-04-30T00:00:00Z",
-        "verdictHash": "de38451ca321e31b5d134f4ab5edfc70ea021e680e50e88612af11290bef5a73",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
         "dimensions": {
           "persona": {
             "checked": true,
@@ -372,8 +360,8 @@
             "blocker": null
           },
           "ac": {
-            "checked": false,
-            "blocker": "AC missing 2 of 4 mandatory Gherkin categories: no Performance/SLA scenario and no Security/auth scenario"
+            "checked": true,
+            "blocker": null
           },
           "contracts": {
             "checked": true,
@@ -392,11 +380,8 @@
             "blocker": null
           }
         },
-        "blockers": [
-          "ac: missing Performance/SLA Gherkin scenario",
-          "ac: missing Security/auth Gherkin scenario"
-        ],
-        "rationale": "6/7 pass. AC fails silent NO-GO from KP \u00a73 (3 of 4 mandatory categories present)."
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
       }
     }
   }

@@ -40,13 +40,22 @@ Generate individual story files from an Epic and system specification. Each stor
 | `--no-jira` | Boolean | No | false | Skip Jira integration entirely, no prompting (EPIC-0042). |
 | `--dry-run` | Boolean | No | false | When true, story files are written to disk but Steps P4 / P5 (planning-commit / push) become no-ops with a `"dry-run, skipping commit"` warning (EPIC-0049 / RULE-007). |
 | `--no-commit` | Boolean | No | false | When true, skip Steps P4 and P5. Used by orchestrators (e.g., `x-epic-decompose`, `x-story-plan`) that batch-commit at the parent level (EPIC-0049 / RULE-007). |
+| `--legacy-template-v1` | Boolean | No | false | **DEPRECATED** (Rule 19 §Skill Renaming — removed in 2 releases). Use v1 template structure. Emits deprecation warning on stderr on every invocation. |
 
 ## Prerequisites
 
 Read the following files before starting:
 
 **Template (output structure):**
-- `.claude/templates/_TEMPLATE-STORY.md` — The exact structure to follow
+- `.claude/templates/_TEMPLATE-STORY.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict — default since EPIC-0070). When `--legacy-template-v1` is set, use v1 structure and emit deprecation warning (see below).
+
+> **`--legacy-template-v1` deprecation warning:** When the flag is present, emit to stderr before writing each story file:
+> ```
+> WARN [legacy-template] --legacy-template-v1 is DEPRECATED.
+>       Templates v1 will be removed in 2 releases.
+>       Migrate to v2: /x-template-migrate <story-id>
+> ```
+> Also emit telemetry event `metadata: {flag: "legacy-template-v1", skill: "x-story-create"}` for adoption tracking.
 
 **Decomposition philosophy (sizing and boundary heuristics):**
 - `.claude/skills/x-epic-decompose/references/decomposition-guide.md`
@@ -115,6 +124,26 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-stor
 
 For each story in the Epic's index, create a file following `_TEMPLATE-STORY.md`. Process
 stories in dependency order (foundations first, then core, then extensions).
+
+**v2 sections (default — EPIC-0070):**
+1. **Visão**: User story format with measurable outcome
+2. **Persona & Cenário**: Specific role and trigger context (not "o sistema")
+3. **Entrega de Valor**: Falsifiable value proposition + measurable metric + business impact
+4. **AC (Gherkin — 4 categorias mandatórias)**: Degenerate, Happy, Error/Boundary, Performance/SLA, Security/Auth
+5. **Contratos**: Typed request/response; no `Object`/`Map<String, Any>`; event schemas when applicable
+6. **Tasks**: Formal task decomposition (TASK-XXXX-YYYY-NNN, testability patterns, LOC bounds)
+7. **Dependências**: Blocked By / Blocks cross-references consistent with epic index
+8. **Decision Rationale**: 4-line micro-template (`**Decisão:** / **Motivo:** / **Alternativa descartada:** / **Consequência:**`)
+9. **Refinement Verdict**: `Status: TBD`, all dimensions unchecked
+
+**Story header (mandatory):**
+Every generated story MUST include at the top:
+```markdown
+**Status:** Pendente
+**Refinement Verdict:** TBD
+```
+
+When `--legacy-template-v1` is set, use v1 structure instead and emit the deprecation warning (see Prerequisites).
 
 #### 2.1 — Dependencias
 
@@ -774,3 +803,23 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 | Knowledge Pack | Usage |
 |----------------|-------|
 | story-planning | Decomposition philosophy, sizing heuristics, TPP ordering |
+
+## Examples
+
+```
+# Default — v2 template (EPIC-0070 default)
+Skill(skill: "x-internal-story-create", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md")
+
+# With quality threshold override
+Skill(skill: "x-internal-story-create", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --quality-threshold 80")
+
+# Legacy v1 template during deprecation window (Rule 19)
+Skill(skill: "x-internal-story-create", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --legacy-template-v1")
+# → Emits: WARN [legacy-template] --legacy-template-v1 is DEPRECATED...
+
+# Orchestrator mode — parent handles branch + commit
+Skill(skill: "x-internal-story-create", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --no-commit")
+
+# With Jira integration
+Skill(skill: "x-internal-story-create", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --jira PROJ")
+```
