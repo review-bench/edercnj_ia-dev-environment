@@ -216,6 +216,418 @@ produces:
 | Define a forma de um documento/código | `template`. |
 | É arquivo persistido com evidência | `artifact-kind`. |
 
+### 3.5. Blueprint de sequência dos comandos
+
+Os comandos são o ponto de entrada do produto. Por isso, a forma mais clara de entender o NDP é partir do comando mais amplo e expandir as delegações. O fluxo raiz é `ndp epic implement`: ele coordena épico, histórias, tasks, PRs, reviews, gates, evidências e telemetria. Sempre que uma chamada delega para outro orquestrador e o diagrama ficaria ilegível, o detalhe aparece no diagrama seguinte.
+
+Regra de leitura:
+
+- `NDP Runtime` substitui a skill markdown atual como dono da state machine.
+- `Policy/Gate Engine` substitui phase gates, hooks preventivos e audit checks locais.
+- `Artifact Store` representa `ai/epics/*`, `ai/releases/*`, `ai/runs/*`, PR body e state local.
+- `LLM Worker` só aparece quando há geração criativa ou julgamento.
+- `Adapters` representam git, build, test, docs, security, GitHub/PR e CI.
+
+#### 3.5.1. `ndp epic implement <EPIC-ID>` — sequência raiz
+
+Este é o fluxo equivalente ao `x-epic-implement`. Ele preserva as seis fases atuais: args, plano, branch, loop de stories, gate de integridade e PR final.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as Developer
+  participant CLI as NDP CLI
+  participant RT as NDP Runtime
+  participant Gate as Policy/Gate Engine
+  participant State as Execution State
+  participant Art as Artifact Store
+  participant Git as Git Adapter
+  participant Story as ndp story implement
+  participant PR as PR Adapter
+  participant Tele as Telemetry/Audit
+
+  User->>CLI: ndp epic implement EPIC-XXXX [flags]
+  CLI->>RT: parse command envelope
+  RT->>Tele: run.start(epic implement)
+  RT->>Gate: assertPre(Phase 0 - Args)
+  RT->>RT: normalize args, resolve flowVersion, flags, mode
+  RT->>State: persist interactiveMode and command context
+  RT->>Gate: assertPost(Phase 0 - Args)
+
+  RT->>Gate: assertPre(Phase 1 - Plan)
+  RT->>Art: read epic, stories, IMPLEMENTATION-MAP
+  RT->>RT: build DAG, phases, critical path, resume projection
+  RT->>Art: write epic-execution-plan
+  RT->>Gate: assertPost(Phase 1 - Plan, expected plan)
+
+  alt dry-run
+    RT-->>CLI: return plan path and stop
+  else executable run
+    alt flowVersion is legacy
+      RT->>Tele: skip Phase 2 branch setup
+    else v2/v4 flow
+      RT->>Gate: assertPre(Phase 2 - Branch)
+      RT->>Git: ensure epic/XXXX from develop and push
+      Git-->>RT: branch ready or conflict
+      RT->>Gate: assertPost(Phase 2 - Branch)
+    end
+
+    RT->>Gate: assertPre(Phase 3 - Stories)
+    loop each implementation phase
+      loop each story in topological order
+        RT->>State: mark story IN_PROGRESS
+        RT->>Story: ndp story implement STORY-ID --target-branch epic/XXXX --auto-merge strategy
+        Story-->>RT: story envelope {status, pr, coverage, report}
+        RT->>State: persist story status, PR status, evidence paths
+        alt story failed
+          RT->>State: mark dependants BLOCKED
+          RT->>Gate: raise STORY_FAILED or trigger recovery policy
+        end
+      end
+      RT->>Gate: assertWave(phase stories completed and merged)
+    end
+    RT->>Gate: assertPost(Phase 3 - Stories)
+
+    RT->>Gate: assertPre(Phase 4 - Integrity)
+    RT->>Art: read story reports, verify envelopes, PR evidence, telemetry
+    RT->>Gate: run epic integrity gate
+    alt gate failed
+      RT->>PR: optional ndp pr fix-epic or revert policy
+      PR-->>RT: remediation result
+      RT->>Gate: retry integrity gate once
+    end
+    RT->>Art: write epic execution report and verify envelope
+    RT->>Gate: assertPost(Phase 4 - Integrity)
+
+    alt non-legacy final PR
+      RT->>Git: merge develop into epic/XXXX
+      Git-->>RT: synced or conflict
+      RT->>PR: create final PR epic/XXXX -> develop
+      PR-->>RT: PR url/number
+    end
+  end
+
+  RT->>Tele: run.end(epic implement, status)
+  RT-->>CLI: structured output
+  CLI-->>User: summary, evidence paths, final PR
+```
+
+#### 3.5.2. `ndp story implement <STORY-ID>` — ciclo de story
+
+Este diagrama expande a chamada feita no loop do épico. Ele corresponde ao `x-story-implement`: prepara contexto, cria/valida contratos, planeja, executa tasks, cria PRs, valida, roda docs/reviews e escreve relatório final.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Epic as ndp epic implement
+  participant Story as ndp story implement
+  participant Gate as Policy/Gate Engine
+  participant State as Execution State
+  participant Art as Artifact Store
+  participant Contract as Contract Adapter
+  participant Plan as Story Planning Service
+  participant Task as ndp task implement
+  participant PR as PR/CI Adapter
+  participant Docs as Docs Adapter
+  participant Review as Review Commands
+  participant Tele as Telemetry/Audit
+
+  Epic->>Story: implement STORY-ID with target branch and flags
+  Story->>Tele: phase.start(Prepare)
+  Story->>Gate: assertPre(Phase 0 - Context)
+  Story->>State: persist interactiveMode
+  Story->>Art: load story, predecessor status, existing artifacts
+  Story->>State: resume projection if --resume
+  Story->>Gate: assertPost(Phase 0 - Context)
+
+  opt story declares API contracts
+    Story->>Contract: generate OpenAPI/Proto/AsyncAPI draft
+    Contract->>Contract: lint contract
+    Contract-->>Story: contract envelope
+    Story->>Art: persist contracts
+  end
+
+  alt planning artifacts are fresh
+    Story->>Tele: skip Phase 1 as PRE_PLANNED
+  else planning required
+    Story->>Gate: assertPre(Phase 1 - Plan)
+    Story->>Plan: build story plan wave
+    Plan-->>Story: artifacts envelope
+    Story->>Gate: assertWave(arch, impl, tests, tasks, security, compliance)
+    Story->>Gate: assertPost(Phase 1 - Plan)
+  end
+
+  Story->>Gate: assertPre(Phase 2 - Execute)
+  Story->>Art: read tasks-story and task plans
+  loop each pending task
+    Story->>State: check dependencies
+    alt dependency unresolved
+      Story->>State: mark task BLOCKED
+    else executable task
+      Story->>Task: ndp task implement TASK-ID --orchestrated
+      Task-->>Story: task envelope {status, branch, commit, coverage}
+      alt task failed
+        Story->>State: mark task FAILED and dependants BLOCKED
+        Story-->>Epic: TASK_FAILED envelope
+      else task done
+        Story->>PR: create/watch/merge task PR
+        PR-->>Story: prNumber, mergeStatus, ciStatus
+        Story->>State: update task status and PR evidence
+      end
+    end
+  end
+
+  opt parent story PR mode
+    Story->>PR: create story-level PR
+    PR-->>Story: story PR envelope
+  end
+  Story->>Gate: assertPost(Phase 2 - Execute)
+
+  Story->>Gate: assertPre(Phase 3 - Verify)
+  Story->>Docs: generate docs
+  Docs-->>Story: docs changed
+  Story->>Docs: validate documentation freshness
+  Docs-->>Story: doc-validate-report
+  Story->>Gate: verify story evidence, coverage, ACs
+  Gate-->>Story: verify-envelope
+  Story->>Review: ndp review STORY-ID
+  Review-->>Story: specialist dashboard
+  Story->>Review: ndp review pr STORY-ID
+  Review-->>Story: GO or NO-GO verdict
+  alt NO-GO and remediation enabled
+    Story->>PR: ndp pr fix
+    PR-->>Story: remediation result
+    Story->>Review: rerun required review gate
+  end
+  Story->>Art: write story-completion-report
+  Story->>State: mark story COMPLETE
+  Story->>Gate: assertFinal(verify, reviews, report, docs)
+  Story->>Tele: phase.end(story lifecycle)
+  Story-->>Epic: story envelope
+```
+
+#### 3.5.3. Story planning wave — workers paralelos
+
+Este diagrama detalha o subfluxo de planejamento (`x-internal-story-build-plan`). Ele é separado porque tem fan-out/fan-in e vários artefatos de Fase 1.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Story as ndp story implement
+  participant Plan as Story Planning Service
+  participant Gate as Policy/Gate Engine
+  participant LLM as LLM Worker Pool
+  participant Art as Artifact Store
+  participant Parallel as Parallelism Evaluator
+
+  Story->>Plan: build plan for STORY-ID with scope
+  Plan->>Gate: assertPre(planning wave)
+  Plan->>LLM: x-arch-plan worker
+  par implementation plan
+    Plan->>LLM: implementation-plan worker
+  and test plan
+    Plan->>LLM: test-plan worker
+  and task breakdown
+    Plan->>LLM: task-breakdown worker
+  and security assessment when scope requires
+    Plan->>LLM: security-assessment worker
+  and compliance assessment when scope requires
+    Plan->>LLM: compliance-assessment worker
+  end
+  LLM-->>Plan: structured artifact drafts
+  Plan->>Art: write arch, plan, tests, tasks, security, compliance
+  Plan->>Parallel: evaluate file footprint and hotspots
+  alt hard or regen collision
+    Parallel-->>Plan: degrade affected wave to serial
+    Plan->>Art: record parallelismDowngrades
+  else no collision
+    Parallel-->>Plan: parallel execution allowed
+  end
+  Plan->>Gate: assertWave(expected artifacts)
+  Plan-->>Story: artifacts envelope
+```
+
+#### 3.5.4. `ndp task implement <TASK-ID>` — TDD inner loop
+
+Este diagrama expande o menor orquestrador de implementação. Ele mantém o Double-Loop TDD em código: o runtime decide ciclo, valida RED/GREEN/REFACTOR e chama LLM apenas para gerar teste/código quando necessário.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Story as ndp story implement
+  participant Task as ndp task implement
+  participant Gate as Policy/Gate Engine
+  participant State as Execution State
+  participant Art as Artifact Store
+  participant Git as Git Adapter
+  participant Build as Build/Test Adapter
+  participant LLM as LLM Worker
+  participant CI as CI Watch
+  participant Tele as Telemetry/Audit
+
+  Story->>Task: implement TASK-ID
+  Task->>Tele: run.start(task implement)
+  Task->>Gate: assertPre(Phase 0 - Setup)
+  Task->>Art: resolve task file, task plan, implementation map
+  Task->>Git: detect worktree context
+  Task->>State: persist interactiveMode
+  Task->>Gate: assertPost(Phase 0 - Setup)
+
+  Task->>Gate: assertPre(Phase 1 - Prepare)
+  Task->>Art: load KPs, plan, contracts, acceptance criteria
+  Task->>LLM: prepare TDD implementation plan
+  LLM-->>Task: ordered TDD cycles
+  Task->>Gate: assertPost(Phase 1 - Prepare)
+
+  Task->>Gate: assertPre(Phase 2 - TDD)
+  loop each TDD cycle
+    Task->>LLM: write failing test for next behavior
+    LLM-->>Task: test patch
+    Task->>Build: run targeted tests expecting RED
+    alt test does not fail
+      Task->>Gate: raise RED_NOT_OBSERVED
+    else RED observed
+      Task->>Git: commit RED test
+    end
+    Task->>LLM: write minimal implementation
+    LLM-->>Task: implementation patch
+    Task->>Build: run tests expecting GREEN
+    alt tests fail
+      Task->>LLM: repair minimal implementation
+      Task->>Build: rerun tests
+    end
+    Task->>Git: commit GREEN implementation
+    Task->>LLM: propose refactor if useful
+    LLM-->>Task: refactor patch or no-op
+    Task->>Build: rerun tests
+    alt refactor broke tests
+      Task->>Gate: raise REFACTOR_BROKE_TESTS
+    else tests stay green
+      Task->>Git: commit REFACTOR when changed
+    end
+  end
+  Task->>Gate: assertWave(all TDD cycle tasks complete)
+
+  Task->>Gate: assertPre(Phase 3 - Validate)
+  Task->>Build: run acceptance tests and coverage
+  Build-->>Task: coverage and test envelope
+  Task->>Art: update task status and task map row
+  Task->>Gate: assertPost(Phase 3 - Validate)
+
+  Task->>Gate: assertPre(Phase 4 - Commit)
+  Task->>Git: create final atomic task commit if needed
+  opt standalone worktree PR
+    Task->>CI: watch PR checks
+    CI-->>Task: ci status file
+  end
+  Task->>Gate: assertPost(Phase 4 - Commit)
+
+  Task->>Gate: assertPre(Phase 5 - Cleanup)
+  Task->>Git: cleanup worktree according to mode
+  Task->>Gate: assertFinal(Phase 5 - Cleanup)
+  Task->>Tele: run.end(task implement)
+  Task-->>Story: task envelope
+```
+
+#### 3.5.5. PR, CI-watch e auto-merge
+
+Este diagrama detalha o fluxo que hoje é repartido entre `x-pr-create`, `x-pr-watch-ci`, `x-pr-merge` e renderização de PR body.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Caller as Story/Task/Epic Runtime
+  participant PR as PR Service
+  participant Gate as Policy/Gate Engine
+  participant Art as Artifact Store
+  participant Render as PR Body Renderer
+  participant GitHub as GitHub Adapter
+  participant CI as CI Watch Service
+  participant Merge as Merge Service
+
+  Caller->>PR: create PR envelope {head, target, kind, autoMerge}
+  PR->>Gate: validate branch, task/story/epic ids, target policy
+  PR->>Gate: preflight tests and evidence availability
+  PR->>Render: render PR body
+  Render->>Art: read story report, verify envelope, review paths, telemetry pointers
+  Render-->>PR: body with Orchestrator Evidence
+  PR->>GitHub: create PR with labels and body
+  GitHub-->>PR: prNumber, prUrl
+  PR->>CI: watch checks unless disabled by recovery policy
+  CI-->>Art: write .claude/state/pr-watch-{PR}.json
+  CI-->>PR: ci status
+  alt autoMerge != none and CI green
+    PR->>Merge: merge PR with selected strategy
+    Merge->>GitHub: merge
+    GitHub-->>Merge: merge result
+    Merge-->>PR: prMergeStatus
+  else manual or blocked
+    PR-->>Caller: PR left open with evidence
+  end
+  PR-->>Caller: PR envelope
+```
+
+#### 3.5.6. Review gates — especialistas e Tech Lead
+
+Este diagrama detalha as chamadas `ndp review` e `ndp review pr`, acionadas dentro de `story implement` e também úteis como comandos públicos.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Story as ndp story implement
+  participant Review as ndp review
+  participant TL as ndp review pr
+  participant Gate as Policy/Gate Engine
+  participant LLM as Specialist Worker Pool
+  participant Build as Build/Test Adapter
+  participant Art as Artifact Store
+  participant Fix as ndp pr fix
+
+  Story->>Review: run specialist review for STORY-ID
+  Review->>Art: idempotency check for existing reports
+  Review->>Review: detect diff and active specialists
+  Review->>Gate: assertPre(SpecialistReviews)
+  par QA
+    Review->>LLM: qa review worker
+  and Performance
+    Review->>LLM: perf review worker
+  and Security when active
+    Review->>LLM: security review worker
+  and Database/API/Event/DevOps when active
+    Review->>LLM: conditional specialist workers
+  end
+  LLM-->>Review: review reports and scores
+  Review->>Art: write review reports and dashboard
+  Review->>Gate: assertWave(review reports exist)
+  Review-->>Story: specialist dashboard
+
+  Story->>TL: run Tech Lead review
+  TL->>Art: load specialist dashboard, plans, tests, PR diff
+  TL->>Build: compile, test, coverage, smoke when configured
+  TL->>LLM: holistic 57-point review
+  LLM-->>TL: GO or NO-GO report
+  TL->>Art: write techlead review and update dashboard
+  alt NO-GO and auto remediation enabled
+    TL->>Fix: apply actionable fixes
+    Fix-->>TL: fix result
+    TL->>Build: rerun compile/tests
+    TL->>LLM: rerun focused review
+  end
+  TL->>Gate: assertFinal(techlead report and dashboard)
+  TL-->>Story: final review verdict
+```
+
+#### 3.5.7. Implicação para o design do runtime
+
+Esses diagramas revelam a estrutura real do produto:
+
+- `ndp epic implement` é um **composite command** que não deve conter lógica de story/task/review inline; ele coordena envelopes e policies.
+- `ndp story implement` é o principal command de delivery: ele integra planejamento, task loop, docs, verify, review e report.
+- `ndp task implement` é o inner loop TDD, onde a maior parte da criação de código acontece.
+- PR/CI/review são subdomínios reutilizáveis, não detalhes acidentais de story.
+- Cada seta que escreve em disco deve produzir um `artifact_kind` tipado.
+- Cada `alt` de erro/recovery deve virar exceção tipada, política de retry ou estado persistido.
+
 ---
 
 ## 4. Inventário Canônico de Ativos Atuais e Destino NDP
