@@ -8,8 +8,10 @@
   },
   "storyStatuses": {
     "story-0073-0001": {
-      "status": "refinada",
+      "status": "concluída",
       "flowVersion": "4",
+      "prNumber": 922,
+      "completedAt": "2026-05-01T18:35:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
