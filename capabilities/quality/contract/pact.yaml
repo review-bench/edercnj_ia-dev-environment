@@ -1,0 +1,20 @@
+id: quality.contract.pact
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Pact consumer-driven contract gate — verifies provider against Pact broker contracts.
+  Enabled only when QualityConfig.contract.pact = true. Invoked by /x-test-contract
+  when a Pact broker is configured.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  broker_url:
+    type: string
+    default: ""
+  publish_results:
+    type: boolean
+    default: true

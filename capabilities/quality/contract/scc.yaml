@@ -1,0 +1,22 @@
+id: quality.contract.scc
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Event schema compatibility gate using schema-compatibility-checker (SCC) — validates
+  Avro/JSON Schema evolution rules (BACKWARD / FULL compatibility). Invoked by
+  /x-test-contract when interfaces[].broker is not empty.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [scc]
+    default: scc
+  compatibility:
+    type: string
+    enum: [BACKWARD, FORWARD, FULL]
+    default: BACKWARD

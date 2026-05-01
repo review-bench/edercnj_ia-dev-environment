@@ -1,0 +1,21 @@
+id: quality.contract.buf
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Protobuf breaking-change gate using buf — runs `buf breaking` against the current
+  proto files and a baseline, fails on breaking changes. Invoked by /x-test-contract
+  when interfaces[].spec contains a proto path.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [buf]
+    default: buf
+  against:
+    type: string
+    default: ".git#branch=main"

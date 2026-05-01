@@ -1,0 +1,24 @@
+id: quality.mutation.stryker
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  JavaScript/TypeScript mutation gate using Stryker — runs stryker run, fails when
+  mutation score < QualityConfig.mutation.threshold. Runtime capped by runtimeCapMin.
+  Invoked by /x-test-mutation when language = javascript or typescript.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [stryker]
+    default: stryker
+  threshold:
+    type: integer
+    default: 80
+  runtime_cap_min:
+    type: integer
+    default: 10
