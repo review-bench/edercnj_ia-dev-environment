@@ -317,21 +317,30 @@ public final class ScriptsAssembler implements Assembler {
         String rawName = config.project() != null ? config.project().name() : null;
         String projectName = rawName != null ? rawName : "project";
 
-        String restBlock = hasInterface(config, "rest") ? loadSnippet(
-                "shared/templates/regression/blocks/rest.yaml.snippet") : "";
-        String grpcBlock = hasInterface(config, "grpc") ? loadSnippet(
-                "shared/templates/regression/blocks/grpc.yaml.snippet") : "";
-        String wsBlock = hasInterface(config, "websocket") ? loadSnippet(
-                "shared/templates/regression/blocks/socket.yaml.snippet") : "";
-        String cliBlock = hasInterface(config, "cli") ? loadSnippet(
-                "shared/templates/regression/blocks/cli.yaml.snippet") : "";
+        String restBlock =
+                hasInterface(config, "rest")
+                        ? loadSnippet("shared/templates/regression/blocks/rest.yaml.snippet")
+                        : "";
+        String grpcBlock =
+                hasInterface(config, "grpc")
+                        ? loadSnippet("shared/templates/regression/blocks/grpc.yaml.snippet")
+                        : "";
+        String wsBlock =
+                hasInterface(config, "websocket")
+                        ? loadSnippet("shared/templates/regression/blocks/socket.yaml.snippet")
+                        : "";
+        String cliBlock =
+                hasInterface(config, "cli")
+                        ? loadSnippet("shared/templates/regression/blocks/cli.yaml.snippet")
+                        : "";
 
-        String rendered = mainTemplate
-                .replace("{{PROJECT_NAME}}", projectName)
-                .replace("{{INTERFACE_REST_BLOCK}}", restBlock)
-                .replace("{{INTERFACE_GRPC_BLOCK}}", grpcBlock)
-                .replace("{{INTERFACE_WEBSOCKET_BLOCK}}", wsBlock)
-                .replace("{{INTERFACE_CLI_BLOCK}}", cliBlock);
+        String rendered =
+                mainTemplate
+                        .replace("{{PROJECT_NAME}}", projectName)
+                        .replace("{{INTERFACE_REST_BLOCK}}", restBlock)
+                        .replace("{{INTERFACE_GRPC_BLOCK}}", grpcBlock)
+                        .replace("{{INTERFACE_WEBSOCKET_BLOCK}}", wsBlock)
+                        .replace("{{INTERFACE_CLI_BLOCK}}", cliBlock);
 
         // Replace PROJECT_NAME inside CLI block placeholder too
         rendered = rendered.replace("{{PROJECT_NAME}}", projectName);
@@ -364,8 +373,7 @@ public final class ScriptsAssembler implements Assembler {
         if (config.interfaces() == null) {
             return false;
         }
-        return config.interfaces().stream()
-                .anyMatch(iface -> type.equalsIgnoreCase(iface.type()));
+        return config.interfaces().stream().anyMatch(iface -> type.equalsIgnoreCase(iface.type()));
     }
 
     private void setExecutable(Path file) {

@@ -73,13 +73,7 @@ class Epic0073ScenariosTemplateSmokeIT {
                     "cli.yaml.snippet");
 
     private static final Path MAIN_TEMPLATE =
-            Path.of(
-                    "src",
-                    "main",
-                    "resources",
-                    "shared",
-                    "templates",
-                    "scenarios.yaml.template");
+            Path.of("src", "main", "resources", "shared", "templates", "scenarios.yaml.template");
 
     private static final Path REGRESSION_SKILL =
             Path.of(
@@ -124,9 +118,7 @@ class Epic0073ScenariosTemplateSmokeIT {
         assertThat(content)
                 .as("must contain CLI block placeholder")
                 .contains("{{INTERFACE_CLI_BLOCK}}");
-        assertThat(content)
-                .as("must contain scenarios: root key")
-                .contains("scenarios:");
+        assertThat(content).as("must contain scenarios: root key").contains("scenarios:");
     }
 
     // ─── Scenario 3 ──────────────────────────────────────────────────────────
@@ -213,8 +205,7 @@ class Epic0073ScenariosTemplateSmokeIT {
                     + "CLI interface injects cli block with project name substituted")
     void renderRegressionScenarios_cliInterface_includesCliBlock(@TempDir Path outputDir)
             throws Exception {
-        ProjectConfig config =
-                buildConfig(true, List.of(new InterfaceConfig("cli", null, null)));
+        ProjectConfig config = buildConfig(true, List.of(new InterfaceConfig("cli", null, null)));
         ScriptsAssembler assembler = new ScriptsAssembler();
 
         Path result = assembler.renderRegressionScenarios(config, outputDir);
@@ -274,8 +265,8 @@ class Epic0073ScenariosTemplateSmokeIT {
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    private static ProjectConfig buildConfig(boolean regressionEnabled,
-            List<InterfaceConfig> interfaces) {
+    private static ProjectConfig buildConfig(
+            boolean regressionEnabled, List<InterfaceConfig> interfaces) {
         Map<String, Object> rawQuality =
                 regressionEnabled
                         ? Map.of(
@@ -320,7 +311,8 @@ class Epic0073ScenariosTemplateSmokeIT {
                                                 })
                                         .collect(java.util.stream.Collectors.toList()),
                         "language", Map.of("name", "java", "version", "21"),
-                        "framework", Map.of("name", "picocli", "version", "4.7", "build-tool", "maven"),
+                        "framework",
+                                Map.of("name", "picocli", "version", "4.7", "build-tool", "maven"),
                         "quality", rawQuality));
     }
 }

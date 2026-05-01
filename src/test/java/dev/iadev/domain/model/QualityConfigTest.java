@@ -287,8 +287,7 @@ class QualityConfigTest {
         void fromMap_regressionSelfMode_parsedCorrectly() {
             var m =
                     Map.<String, Object>of(
-                            "regression",
-                            Map.<String, Object>of("enabled", true, "mode", "self"));
+                            "regression", Map.<String, Object>of("enabled", true, "mode", "self"));
 
             var cfg = QualityConfig.fromMap(m);
 
@@ -301,13 +300,14 @@ class QualityConfigTest {
                     Map.<String, Object>of(
                             "regression",
                             Map.<String, Object>of(
-                                    "enabled", true,
-                                    "scenarios-file", "tests/regression/custom.yaml"));
+                                    "enabled",
+                                    true,
+                                    "scenarios-file",
+                                    "tests/regression/custom.yaml"));
 
             var cfg = QualityConfig.fromMap(m);
 
-            assertThat(cfg.regression().scenariosFile())
-                    .isEqualTo("tests/regression/custom.yaml");
+            assertThat(cfg.regression().scenariosFile()).isEqualTo("tests/regression/custom.yaml");
         }
 
         @Test
@@ -358,8 +358,7 @@ class QualityConfigTest {
         void dastConfig_targetProduction_throwsConfigValidationException() {
             var dastMap = Map.<String, Object>of("enabled", true, "target", "production");
 
-            assertThatThrownBy(
-                            () -> QualityConfig.DastConfig.fromMap(dastMap))
+            assertThatThrownBy(() -> QualityConfig.DastConfig.fromMap(dastMap))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("DAST_TARGET_PRODUCTION_FORBIDDEN");
         }
@@ -369,7 +368,10 @@ class QualityConfigTest {
             assertThatThrownBy(
                             () ->
                                     new QualityConfig.DastConfig(
-                                            true, "smoke", "full", "Production",
+                                            true,
+                                            "smoke",
+                                            "full",
+                                            "Production",
                                             QualityConfig.DastConfig.ZapConfig.DEFAULT,
                                             QualityConfig.DastConfig.NucleiConfig.DEFAULT,
                                             java.util.List.of()))
@@ -379,7 +381,8 @@ class QualityConfigTest {
 
         @Test
         void fromMap_zapBlock_parsed() {
-            var zapMap = Map.<String, Object>of("enabled", true, "active-scan-policy", "custom-pci");
+            var zapMap =
+                    Map.<String, Object>of("enabled", true, "active-scan-policy", "custom-pci");
             var m = Map.<String, Object>of("dast", Map.<String, Object>of("zap", zapMap));
 
             var cfg = QualityConfig.fromMap(m);
@@ -390,8 +393,7 @@ class QualityConfigTest {
 
         @Test
         void fromMap_nucleiBlock_pinnedVersion_accepted() {
-            var nucleiMap =
-                    Map.<String, Object>of("enabled", true, "templates-version", "v9.x");
+            var nucleiMap = Map.<String, Object>of("enabled", true, "templates-version", "v9.x");
             var m = Map.<String, Object>of("dast", Map.<String, Object>of("nuclei", nucleiMap));
 
             var cfg = QualityConfig.fromMap(m);
@@ -402,8 +404,7 @@ class QualityConfigTest {
 
         @Test
         void fromMap_nucleiBlock_pinnedVersionFull_accepted() {
-            var nucleiMap =
-                    Map.<String, Object>of("enabled", true, "templates-version", "v9.0.1");
+            var nucleiMap = Map.<String, Object>of("enabled", true, "templates-version", "v9.0.1");
             var m = Map.<String, Object>of("dast", Map.<String, Object>of("nuclei", nucleiMap));
 
             var cfg = QualityConfig.fromMap(m);
@@ -413,40 +414,28 @@ class QualityConfigTest {
 
         @Test
         void nucleiConfig_latestVersion_throwsNucleiVersionUnpinned() {
-            assertThatThrownBy(
-                            () ->
-                                    new QualityConfig.DastConfig.NucleiConfig(
-                                            true, "latest"))
+            assertThatThrownBy(() -> new QualityConfig.DastConfig.NucleiConfig(true, "latest"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("NUCLEI_VERSION_UNPINNED");
         }
 
         @Test
         void nucleiConfig_masterVersion_throwsNucleiVersionUnpinned() {
-            assertThatThrownBy(
-                            () ->
-                                    new QualityConfig.DastConfig.NucleiConfig(
-                                            true, "master"))
+            assertThatThrownBy(() -> new QualityConfig.DastConfig.NucleiConfig(true, "master"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("NUCLEI_VERSION_UNPINNED");
         }
 
         @Test
         void nucleiConfig_headVersion_throwsNucleiVersionUnpinned() {
-            assertThatThrownBy(
-                            () ->
-                                    new QualityConfig.DastConfig.NucleiConfig(
-                                            true, "HEAD"))
+            assertThatThrownBy(() -> new QualityConfig.DastConfig.NucleiConfig(true, "HEAD"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("NUCLEI_VERSION_UNPINNED");
         }
 
         @Test
         void nucleiConfig_arbitraryUnpinnedString_throwsNucleiVersionUnpinned() {
-            assertThatThrownBy(
-                            () ->
-                                    new QualityConfig.DastConfig.NucleiConfig(
-                                            true, "nightly"))
+            assertThatThrownBy(() -> new QualityConfig.DastConfig.NucleiConfig(true, "nightly"))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("NUCLEI_VERSION_UNPINNED");
         }
@@ -455,8 +444,7 @@ class QualityConfigTest {
         void fromMap_complianceList_parsed() {
             var dastMap =
                     Map.<String, Object>of(
-                            "enabled", true,
-                            "compliance", java.util.List.of("pci", "lgpd"));
+                            "enabled", true, "compliance", java.util.List.of("pci", "lgpd"));
             var m = Map.<String, Object>of("dast", dastMap);
 
             var cfg = QualityConfig.fromMap(m);
