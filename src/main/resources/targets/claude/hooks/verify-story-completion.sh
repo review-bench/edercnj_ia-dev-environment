@@ -124,12 +124,14 @@ if [[ ! -f "${REPORTS_DIR}/verify-envelope-${STORY_ID}.json" ]]; then
 fi
 
 if ! ls "${PLANS_DIR}/review-"*"-${STORY_ID}.md" >/dev/null 2>&1 \
-        && ! [[ -f "${PLANS_DIR}/review-story-${STORY_ID}.md" ]]; then
+        && ! [[ -f "${PLANS_DIR}/review-story-${STORY_ID}.md" ]] \
+        && ! [[ -f "${PLANS_DIR}/review-${STORY_ID}.md" ]]; then
     MISSING+=("x-review → ${PLANS_DIR}/review-story-${STORY_ID}.md")
 fi
 
 if ! ls "${PLANS_DIR}/techlead-review-"*"-${STORY_ID}.md" >/dev/null 2>&1 \
-        && ! [[ -f "${PLANS_DIR}/techlead-review-story-${STORY_ID}.md" ]]; then
+        && ! [[ -f "${PLANS_DIR}/techlead-review-story-${STORY_ID}.md" ]] \
+        && ! [[ -f "${PLANS_DIR}/techlead-review-${STORY_ID}.md" ]]; then
     MISSING+=("x-review-pr → ${PLANS_DIR}/techlead-review-story-${STORY_ID}.md")
 fi
 
