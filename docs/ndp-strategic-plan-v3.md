@@ -1582,7 +1582,7 @@ Hierarquia: `Project → Product → Capacity → Feature`. A marcação indica 
 - `[V1+]`: expansão de UX, marketplace ou integração, depois do core.
 - `[V2+]`: cloud, multi-tenancy, analytics cross-project ou interface avançada.
 
-### 6.2. Product P0 — Strategic Planning & Architecture Intake
+### 6.2. Product P0 — Product Design & Architecture Design
 
 Camada inicial antes do épico. Garante que produto, capacidade, feature e arquitetura sistêmica existam como artefatos aprovados, versionados e sincronizados no GitHub antes de qualquer backlog técnico ser criado.
 
@@ -2191,23 +2191,388 @@ O runtime não deve inferir semântica apenas pelo path. Cada artefato persistid
 | `ndp.verify_envelope` | gate services | PR body, CI verify, reports. | Immutable for run ID. |
 | `ndp.audit_event` | runtime telemetry | audit log, forensics, analytics. | Append-only. |
 
-### 10.9. Runtime module boundaries
+### 10.9. Arquitetura hexagonal e bounded contexts do runtime
 
-Uma implementação saudável deve manter o core independente de CLI, GitHub e provider específico.
+O NDP deve ser implementado como um conjunto de bounded contexts em arquitetura hexagonal. O objetivo é impedir que a CLI, GitHub, filesystem, provider de LLM ou templates virem o centro do produto. O centro do produto é o domínio: estados, políticas, artefatos, rastreabilidade, comandos de lifecycle e invariantes.
 
-| Módulo | Responsabilidade | Não deve fazer |
+Regra arquitetural:
+
+```text
+Inbound adapters -> Application services -> Domain model <- Domain services
+                                |
+                                v
+                        Outbound ports
+                                |
+                                v
+                        Outbound adapters
+```
+
+Dependências sempre apontam para dentro:
+
+- `domain` não importa CLI, Picocli, GitHub SDK, filesystem, HTTP, provider LLM, JSON parser específico ou template engine.
+- `application` orquestra casos de uso, transações, ports e policies, mas não contém regra de negócio profunda.
+- `adapters.inbound` traduz entrada externa para comandos de aplicação.
+- `adapters.outbound` implementa ports para Git, filesystem, LLM, CI, PR, templates, telemetry e migration.
+- `infrastructure` configura wiring, profile, clock, IDs, serialization e runtime local.
+
+#### 10.9.1. Camadas hexagonais
+
+| Camada | Responsabilidade | Contém | Não deve conter |
+| --- | --- | --- | --- |
+| `domain` | Modelar conceitos centrais e invariantes que continuam verdadeiros independentemente da interface. | Aggregates, entities, value objects, domain services, domain events, policy decisions, error codes. | IO, CLI, GitHub, filesystem, LLM calls, templates, JSON/YAML concreto. |
+| `application` | Executar casos de uso e coordenar transições entre aggregates usando ports. | Use cases, command handlers, transaction scripts finos, orchestration services, DTOs de entrada/saída. | Decisão de policy hardcoded, parsing de CLI, chamadas diretas a SDKs externos. |
+| `ports.inbound` | Contratos de entrada para qualquer interface. | Interfaces como `CreateFeatureUseCase`, `ImplementStoryUseCase`, `VerifyCiUseCase`. | Detalhe de Picocli, REST, TUI ou IDE. |
+| `ports.outbound` | Contratos que o core precisa do mundo externo. | `ArtifactRepository`, `GitPort`, `LlmPort`, `PolicyCatalogPort`, `TelemetryPort`, `ClockPort`. | Implementação concreta, retry de SDK, path hardcoded. |
+| `adapters.inbound.cli` | CLI local-first da V0. | Picocli commands, parsing de flags, output text/json/ndjson, prompts humanos. | Regra de negócio, state transition direta, bypass de use case. |
+| `adapters.inbound.ci` | Entrada para `ndp ci verify` e automação headless. | Comandos CI, exit code mapping, machine-readable reports. | Regras duplicadas do policy engine. |
+| `adapters.outbound.fs` | Persistência local e leitura de artefatos. | Implementações de repositories, path resolver, locks, snapshots. | Interpretação semântica fora do artifact registry. |
+| `adapters.outbound.git` | Operações de versionamento. | Branch, commit, push, worktree, status, remote SHA. | Decidir se uma story está pronta. |
+| `adapters.outbound.llm` | Chamada a modelos e validação de resposta bruta. | Claude/GPT/local providers, schema validation, cost envelope. | Orquestrar lifecycle ou aprovar artefato por conta própria. |
+| `adapters.outbound.pr_ci` | Integração com GitHub/PR/CI. | PR create/watch/merge, labels, checks, CI status. | Decidir evidência mínima; isso pertence a policies. |
+| `adapters.outbound.rendering` | Renderização de documentos. | Markdown renderer, template engine, PR body renderer. | Buscar contexto ou calcular estado. |
+| `infrastructure` | Wiring técnico e runtime local. | Dependency injection, config, profile loading, logging, serialization, filesystem root. | Regra de domínio. |
+
+#### 10.9.2. Bounded contexts com linguagem ubíqua
+
+Bounded context não é sinônimo de feature de backlog. Um bounded context é uma fronteira de linguagem, modelo e invariantes. Para closed scope com IA, cada feature implementável deve declarar **em qual bounded context vive** e quais arquivos/ports pode tocar. Assim a IA trabalha em uma fatia pequena sem quebrar a coerência do domínio.
+
+Decisão de linguagem: evitar nomes técnicos demais como `strategicplanning`, `artifactevidence` ou `vcsprci`. O código precisa falar a mesma língua que PO, QA, engenharia e arquitetura usarão para discutir o produto.
+
+| Bounded context | Nome de pacote | Linguagem ubíqua | Responsabilidade principal |
+| --- | --- | --- | --- |
+| Product Design | `productdesign` | Project, Product, Product Capability, Feature, Hypothesis, Success Metric, Approval. | Transformar intenção de produto em features aprovadas e rastreáveis. |
+| Architecture Design | `architecturedesign` | Architecture Plan, NFR, Decision, Risk, Integration, Readiness. | Desenhar a arquitetura necessária para uma feature virar backlog implementável. |
+| Delivery Backlog | `deliverybacklog` | Epic, Story, Task, Implementation Map, Dependency Graph, Backlog Consistency. | Converter feature aprovada em unidades de entrega planejáveis e testáveis. |
+| Delivery Orchestration | `deliveryorchestration` | Run, Phase, Wave, Resume, Lock, Command Execution, Task Execution. | Controlar execução determinística de epic/story/task. |
+| Delivery Governance | `deliverygovernance` | Policy, Gate, Violation, Verdict, Recovery, Phase Gate, Refinement Gate. | Garantir que a entrega siga os invariantes do NDP. |
+| Evidence Ledger | `evidenceledger` | Artifact Kind, Evidence Envelope, Lineage, Freshness, Checkpoint, Superseded Artifact. | Manter o livro-razão local de evidências e rastreabilidade. |
+| AI Workers | `aiworkers` | Worker, Prompt, Model Route, Structured Output, Budget, Provider Failure. | Invocar LLMs como workers criativos, sob contrato e sem controle de lifecycle. |
+| Source Control | `sourcecontrol` | Branch, Commit, Pull Request, Check, Merge, Remote Checkpoint. | Encapsular Git, PR e CI como operações externas rastreáveis. |
+| Telemetry & Costs | `telemetrycosts` | Audit Event, Trace, Span, Cost Event, Metric. | Registrar telemetria local, trilha auditável e custo de execução. |
+| Platform Composition | `platformcomposition` | Profile, Target, Template, Plugin, Technical Capability, Package, Compatibility. | Resolver o que o NDP gera, instala, renderiza e compõe para outros ambientes. |
+| Migration | `migration` | Migration Plan, Imported Artifact, Legacy Source, Dual Mode, Compatibility Report. | Migrar do `ia-dev-env` para NDP sem perder evidência histórica. |
+
+Notas de modelagem:
+
+- `Product Capability` substitui o uso isolado de `Capacity` dentro do código. Isso evita confusão com capacidade técnica, throughput ou capability de composição.
+- `Epic` nasce a partir de Product Design e Architecture Design, mas pertence ao `Delivery Backlog`, porque já é uma embalagem de entrega.
+- `Task` é planejada no `Delivery Backlog`, mas executada pelo `Delivery Orchestration`.
+- `Policy` pertence ao `Delivery Governance`; o runtime apenas pede decisões e aplica o resultado.
+- `Evidence Ledger` não é storage genérico. Ele é o registro confiável do que foi produzido, validado, invalidado ou substituído.
+- `AI Workers` não é "o cérebro" do produto. É um contexto auxiliar que entrega output estruturado para outros contextos.
+
+#### 10.9.3. Agrupamento por mapa de processo
+
+O fluxo de produto vira um pipeline de contextos. Essa leitura ajuda a fechar escopo para IA e a orientar testes por persona.
+
+```text
+Product Design
+  -> Product
+  -> Product Capability
+  -> Feature
+
+Architecture Design
+  -> Architecture Plan
+  -> Decisions
+  -> Readiness
+
+Delivery Backlog
+  -> Epic
+  -> Story
+  -> Task
+  -> Implementation Map
+
+Delivery Orchestration
+  -> Run
+  -> Phase
+  -> Task Execution
+  -> Resume
+
+Delivery Governance
+  -> Gates
+  -> Policies
+  -> Verdicts
+
+Evidence Ledger
+  -> Evidence
+  -> Lineage
+  -> Freshness
+```
+
+Regra para features implementáveis:
+
+| Tipo de mudança | Contexto primário | Contextos que podem ser consultados | Contextos que não devem ser alterados |
+| --- | --- | --- | --- |
+| Criar/aprovar produto | `productdesign` | `evidenceledger`, `sourcecontrol`, `aiworkers`. | `deliveryorchestration`, `deliverybacklog`. |
+| Planejar arquitetura | `architecturedesign` | `productdesign`, `aiworkers`, `evidenceledger`. | `sourcecontrol` direto, exceto via port. |
+| Criar epic/stories/tasks | `deliverybacklog` | `productdesign`, `architecturedesign`, `aiworkers`, `evidenceledger`. | `deliveryorchestration`. |
+| Implementar story/task | `deliveryorchestration` | `deliverybacklog`, `deliverygovernance`, `evidenceledger`, `sourcecontrol`, `aiworkers`. | `productdesign`, exceto leitura de lineage. |
+| Avaliar gate/policy | `deliverygovernance` | `evidenceledger`, `deliverybacklog`, `productdesign`. | `sourcecontrol` direto. |
+| Registrar evidência | `evidenceledger` | schemas e lineage publicados. | Regras de aprovação de produto ou execução. |
+
+#### 10.9.4. Context map inicial
+
+O mapa abaixo define como os contextos se relacionam. Ele é mais importante que a estrutura de pastas, porque evita dependências acidentais.
+
+| Relação | Tipo | Contrato |
 | --- | --- | --- |
-| `ndp-cli` | Parse de argumentos, renderização de output e UX de prompts. | Decidir policy ou mutar estado diretamente. |
-| `runtime-core` | State machines, command orchestration, locks, resume. | Chamar provider ou GitHub diretamente. |
-| `artifact-registry` | Schemas, artifact kinds, path resolver, freshness. | Gerar conteúdo criativo. |
-| `policy-engine` | Executar gates e produzir violações tipadas. | Renderizar markdown ou PR body. |
-| `state-store` | Persistência local, snapshots, run metadata. | Aplicar regra de negócio. |
-| `llm-router` | Provider abstraction, model routing, budget, schema validation. | Orquestrar lifecycle. |
-| `template-renderer` | Renderizar documentos a partir de dados tipados. | Buscar contexto sozinho. |
-| `git-adapter` | Branch, commit, push, worktree, status. | Interpretar backlog. |
-| `ci-pr-adapter` | GitHub/PR/CI watch e merge. | Decidir se evidência é suficiente. |
-| `telemetry-audit` | Eventos, spans, cost events e audit log local. | Bloquear fluxo fora de policy. |
-| `migration` | Importar layout `ia-dev-env`, detectar drift, gerar plano. | Alterar artefatos sem checkpoint. |
+| `Product Design` -> `Architecture Design` | Customer/Supplier | Feature aprovada fornece hipótese, escopo, Product Capability e NFRs para Architecture Plan. |
+| `Architecture Design` -> `Delivery Backlog` | Conformist | Epic só nasce de `architecture-feature-*` aprovado e remoto. |
+| `Delivery Backlog` -> `Delivery Orchestration` | Customer/Supplier | Implementation Map fornece DAG, fases, stories e tasks executáveis. |
+| `Delivery Orchestration` -> `Delivery Governance` | Open Host Service | Orchestration pede decisões de gate; Governance retorna pass/fail/violations. |
+| `Delivery Orchestration` -> `Evidence Ledger` | Open Host Service | Orchestration grava e consulta evidence envelopes por interface tipada. |
+| `Delivery Orchestration` -> `AI Workers` | Anti-Corruption Layer | Orchestration envia worker request estruturado; nunca recebe decisão de lifecycle do LLM. |
+| `Delivery Orchestration` -> `Source Control` | Anti-Corruption Layer | GitHub/Git/CI são detalhes externos atrás de ports. |
+| `Evidence Ledger` -> `Telemetry & Costs` | Published Language | Writes, validations e freshness checks emitem eventos auditáveis. |
+| `Platform Composition` -> todos | Shared Kernel controlado | Schemas, ids, templates e capability metadata são compartilhados com versionamento rígido. |
+| `Migration` -> todos | Anti-Corruption Layer | Layout legado é traduzido para linguagem NDP antes de entrar no domínio. |
+
+#### 10.9.5. Detalhamento por bounded context
+
+`Product Design`
+
+- Domínio: decide se `Project`, `Product`, `ProductCapability` e `Feature` estão prontos para avançar.
+- Possui: visão de produto, hipótese, proposta de valor, Product Capability, Feature, métricas de sucesso, aprovação e remote checkpoint estratégico.
+- Não possui: epic, story, task, implementation map ou execução.
+- Use cases: `CreateProduct`, `ApproveProduct`, `ProposeProductCapabilities`, `CreateProductCapability`, `ApproveProductCapability`, `CreateFeature`, `ApproveFeature`.
+- Ports de entrada: `CreateProductUseCase`, `ApproveProductUseCase`, `CreateFeatureUseCase`, `ApproveFeatureUseCase`.
+- Ports de saída: `ProductDesignRepository`, `ApprovalPolicyPort`, `RemoteCheckpointPort`, `IdeationWorkerPort`.
+- Eventos: `ProductApproved`, `ProductCapabilityApproved`, `FeatureApproved`, `ProductDesignArtifactSuperseded`.
+- Invariante central: nenhum descendente de produto nasce se o pai não está aprovado e checkpointed.
+
+`Architecture Design`
+
+- Domínio: transforma feature aprovada em decisões sistêmicas mínimas para backlog.
+- Possui: Architecture Plan, NFR Profile, riscos, integrações, decisões, readiness checklist e mini-ADRs.
+- Não possui: story breakdown, execução de task ou merge de PR.
+- Use cases: `PlanProductArchitecture`, `PlanProductCapabilityArchitecture`, `PlanFeatureArchitecture`, `ApproveArchitecturePlan`, `MarkArchitectureStale`.
+- Ports de entrada: `PlanFeatureArchitectureUseCase`, `ApproveArchitecturePlanUseCase`, `MarkArchitectureStaleUseCase`.
+- Ports de saída: `ArchitectureWorkerPort`, `NfrQuestionnairePort`, `ArchitecturePlanRepository`, `DecisionLogPort`.
+- Eventos: `ArchitecturePlanApproved`, `ArchitecturePlanMarkedStale`, `ArchitectureDecisionRecorded`.
+- Invariante central: `Epic` não pode ser criado sem `ArchitecturePlan` de feature aprovado.
+
+`Delivery Backlog`
+
+- Domínio: cria backlog implementável a partir de feature e arquitetura aprovadas.
+- Possui: Epic, Story, Task, story index, task breakdown, Implementation Map, DAG, critical path e regras de consistência.
+- Não possui: execução de testes, commits, PRs ou chamadas diretas ao LLM provider.
+- Use cases: `CreateEpicFromFeature`, `CreateStories`, `CreateTasks`, `BuildImplementationMap`, `ValidateBacklogConsistency`.
+- Ports de entrada: `CreateEpicUseCase`, `CreateStoryUseCase`, `CreateTaskUseCase`, `BuildImplementationMapUseCase`.
+- Ports de saída: `BacklogWorkerPort`, `DeliveryBacklogRepository`, `DependencyGraphPort`, `ParallelismEvaluatorPort`.
+- Eventos: `EpicCreated`, `StoryCreated`, `TaskCreated`, `ImplementationMapCreated`, `BacklogRejected`.
+- Invariante central: toda story/task implementável aparece no índice e no mapa correspondente.
+
+`Delivery Orchestration`
+
+- Domínio: controla runs, fases, waves, locks, resume e transições de execução.
+- Possui: Run, Phase, Wave, Execution State, Lock, Resume Projection, task execution state e idempotency keys.
+- Não possui: regras de produto, critérios de approval ou implementação concreta de Git/CI/LLM.
+- Use cases: `ImplementEpic`, `ImplementStory`, `ImplementTask`, `ResumeRun`, `CancelRun`, `RecoverRun`.
+- Ports de entrada: `ImplementEpicUseCase`, `ImplementStoryUseCase`, `ImplementTaskUseCase`, `ResumeRunUseCase`.
+- Ports de saída: `ExecutionStateRepository`, `PolicyDecisionPort`, `EvidenceLedgerPort`, `SourceControlPort`, `TaskWorkerPort`, `BuildTestPort`.
+- Eventos: `RunStarted`, `PhaseStarted`, `WaveCompleted`, `TaskCompleted`, `RunFailed`, `RunSucceeded`.
+- Invariante central: nenhum side effect ocorre antes do gate correspondente passar.
+
+`Delivery Governance`
+
+- Domínio: avalia regras executáveis como refinement, phase gate, doc freshness, remote predecessor e recovery.
+- Possui: Policy, Gate, Violation, Verdict, Recovery Request, NO-GO reason e policy decision.
+- Não possui: execução de correção, escrita de artefato final ou operação Git direta.
+- Use cases: `EvaluatePolicy`, `AssertPrecondition`, `AssertPhaseGate`, `EvaluateRecoveryRequest`, `GenerateViolationReport`.
+- Ports de entrada: `EvaluatePolicyUseCase`, `AssertGateUseCase`, `EvaluateRecoveryUseCase`.
+- Ports de saída: `PolicyCatalogRepository`, `EvidenceReaderPort`, `ClockPort`.
+- Eventos: `PolicyPassed`, `PolicyViolated`, `RecoveryApproved`, `RecoveryRejected`.
+- Invariante central: policy produz decisão tipada; quem aplica a decisão é o contexto chamador.
+
+`Evidence Ledger`
+
+- Domínio: controla schemas, artifact kinds, lineage, freshness e evidence envelopes.
+- Possui: Artifact Kind, Evidence Envelope, Lineage, Freshness Rule, Checkpoint, Superseded Artifact e generator authorization.
+- Não possui: regra de aprovação de produto, decisão de gate ou renderização criativa.
+- Use cases: `RegisterArtifactKind`, `WriteEvidenceEnvelope`, `ValidateArtifact`, `EvaluateFreshness`, `ResolveLineage`.
+- Ports de entrada: `WriteEvidenceUseCase`, `ValidateArtifactUseCase`, `ResolveLineageUseCase`.
+- Ports de saída: `ArtifactStoragePort`, `SchemaRegistryPort`, `ChecksumPort`.
+- Eventos: `EvidenceWritten`, `ArtifactValidated`, `ArtifactMarkedStale`, `ArtifactSuperseded`.
+- Invariante central: artefato sem schema ou gerador autorizado não entra como evidência válida.
+
+`AI Workers`
+
+- Domínio: trata LLM como worker com contrato, custo e saída estruturada.
+- Possui: Worker, Prompt, Model Route, Structured Output, Budget, Retry Policy, Fallback Policy e provider failure.
+- Não possui: lifecycle, aprovação de artifact, merge de PR ou decisão de gate.
+- Use cases: `InvokeWorker`, `RouteModel`, `ValidateStructuredOutput`, `TrackCost`, `RetryOrFallback`.
+- Ports de entrada: `InvokeWorkerUseCase`, `RouteModelUseCase`.
+- Ports de saída: `ModelProviderPort`, `PromptCatalogPort`, `BudgetRepository`, `OutputSchemaPort`.
+- Eventos: `WorkerStarted`, `WorkerOutputAccepted`, `WorkerOutputRejected`, `BudgetExceeded`.
+- Invariante central: LLM nunca muda estado do lifecycle diretamente; ele apenas propõe output validável.
+
+`Source Control`
+
+- Domínio: encapsula Git, PR e CI como transações externas rastreáveis.
+- Possui: Branch, Commit, Pull Request, Check, Merge, Remote Checkpoint, CI Status e PR Evidence Pointer.
+- Não possui: regra de qualidade, aprovação de feature ou decisão de policy.
+- Use cases: `EnsureBranch`, `CommitChanges`, `PushBranch`, `CreatePullRequest`, `WatchCi`, `MergePullRequest`.
+- Ports de entrada: `CreatePullRequestUseCase`, `WatchCiUseCase`, `MergePullRequestUseCase`, `RemoteCheckpointUseCase`.
+- Ports de saída: `GitClientPort`, `PullRequestProviderPort`, `CiProviderPort`.
+- Eventos: `BranchReady`, `CommitCreated`, `PullRequestOpened`, `CiPassed`, `CiFailed`, `PullRequestMerged`.
+- Invariante central: PR/merge não decide qualidade; apenas executa operação quando policies autorizam.
+
+`Telemetry & Costs`
+
+- Domínio: captura eventos, spans, custos e audit log local.
+- Possui: Audit Event, Trace, Span, Cost Event, Metric, Run Correlation e local audit stream.
+- Não possui: bloqueio de fluxo fora de policy ou interpretação de backlog.
+- Use cases: `RecordAuditEvent`, `StartSpan`, `EndSpan`, `RecordCost`, `QueryTelemetry`.
+- Ports de entrada: `RecordAuditEventUseCase`, `QueryTelemetryUseCase`, `RecordCostUseCase`.
+- Ports de saída: `TelemetryStorePort`, `AuditLogPort`, `CostExporterPort`.
+- Eventos: `AuditEventRecorded`, `CostRecorded`, `TraceCompleted`.
+- Invariante central: audit log é append-only; telemetry remota é opt-in.
+
+`Platform Composition`
+
+- Domínio: resolve profiles, capabilities técnicas, targets, templates, plugins e compatibilidade.
+- Possui: Profile, Target Adapter, Template, Plugin, Technical Capability, Package, Compatibility Matrix e Signature.
+- Não possui: Product Capability de negócio; esse termo pertence ao `Product Design`.
+- Use cases: `ResolveCapabilities`, `RenderTarget`, `ValidateTemplateInput`, `InstallPlugin`, `CheckCompatibility`.
+- Ports de entrada: `ResolveCapabilitiesUseCase`, `RenderTargetUseCase`, `InstallPluginUseCase`.
+- Ports de saída: `PackageRepositoryPort`, `TemplateStorePort`, `SignatureVerifierPort`, `TargetRendererPort`.
+- Eventos: `CapabilityResolved`, `TemplateRendered`, `PluginInstalled`, `CompatibilityViolationFound`.
+- Invariante central: pacote externo só entra no runtime depois de validação de versão, assinatura e permissões.
+
+`Migration`
+
+- Domínio: traduz o mundo legado `ia-dev-env` para a linguagem NDP.
+- Possui: Migration Plan, Imported Artifact, Legacy Source, Drift, Dual Mode, Compatibility Report e source metadata.
+- Não possui: nova regra de produto ou reinterpretação silenciosa de evidência.
+- Use cases: `DiagnoseLegacyRepo`, `PlanMigration`, `ImportLegacyArtifacts`, `RunDualModeVerification`, `FinalizeMigration`.
+- Ports de entrada: `DiagnoseLegacyRepoUseCase`, `PlanMigrationUseCase`, `ImportLegacyArtifactsUseCase`.
+- Ports de saída: `LegacyLayoutReaderPort`, `MigrationWriterPort`, `DiffPort`, `CompatibilityPolicyPort`.
+- Eventos: `LegacyRepoDiagnosed`, `MigrationPlanCreated`, `ArtifactImported`, `DualModeVerified`.
+- Invariante central: migração não apaga nem reinterpreta evidência histórica sem lineage explícito.
+
+#### 10.9.6. Organização sugerida de pacotes
+
+A estrutura abaixo é sugestiva para um modular monolith. A regra obrigatória é a direção das dependências, não o nome exato dos diretórios.
+
+```text
+dev.ndp
+  productdesign
+    domain
+    application
+    port.inbound
+    port.outbound
+    adapter.inbound.cli
+    adapter.outbound.fs
+  architecturedesign
+    domain
+    application
+    port.inbound
+    port.outbound
+    adapter.outbound.llm
+  deliverybacklog
+    domain
+    application
+    port.inbound
+    port.outbound
+  deliveryorchestration
+    domain
+    application
+    port.inbound
+    port.outbound
+  deliverygovernance
+    domain
+    application
+    port.inbound
+    port.outbound
+  evidenceledger
+    domain
+    application
+    port.inbound
+    port.outbound
+  aiworkers
+    domain
+    application
+    port.inbound
+    port.outbound
+    adapter.outbound.anthropic
+    adapter.outbound.openai
+  sourcecontrol
+    domain
+    application
+    port.inbound
+    port.outbound
+    adapter.outbound.git
+    adapter.outbound.github
+  telemetrycosts
+    domain
+    application
+    port.inbound
+    port.outbound
+  platformcomposition
+    domain
+    application
+    port.inbound
+    port.outbound
+  migration
+    domain
+    application
+    port.inbound
+    port.outbound
+  bootstrap
+    infrastructure
+    cli
+```
+
+#### 10.9.7. Closed scope para desenvolvimento com IA
+
+Cada story de implementação deve declarar um `AI Scope Envelope`. Esse envelope impede pesquisa ampla e deixa explícito o contrato que a IA pode alterar.
+
+```yaml
+ai_scope:
+  primary_context: productdesign
+  feature_slice: approve-product
+  allowed_packages:
+    - dev.ndp.productdesign.domain
+    - dev.ndp.productdesign.application
+    - dev.ndp.productdesign.port.inbound
+    - dev.ndp.productdesign.port.outbound
+    - dev.ndp.productdesign.adapter.inbound.cli
+  readonly_contexts:
+    - evidenceledger
+    - sourcecontrol
+  forbidden_contexts:
+    - deliveryorchestration
+    - deliverybacklog
+  inbound_ports:
+    - ApproveProductUseCase
+  outbound_ports:
+    - ProductDesignRepository
+    - RemoteCheckpointPort
+  acceptance_tests:
+    - ApproveProductUseCaseTest
+    - ProductApproveCliIT
+```
+
+Regras para IA:
+
+- Uma feature slice tem um contexto primário.
+- Contextos de leitura são permitidos apenas por ports ou published language.
+- Nenhum adapter concreto de outro contexto pode ser chamado diretamente.
+- Se a feature exigir dois contextos primários, provavelmente ela deve ser quebrada.
+- O plano de implementação deve listar os packages permitidos antes de código.
+
+#### 10.9.8. Regras de implementação
+
+- Um bounded context não acessa repository concreto de outro contexto; chama use case, port ou consome domain event.
+- Value objects compartilhados só entram em `Shared Kernel` se forem estáveis: `ArtifactId`, `RunId`, `RemoteSha`, `PolicyId`, `ErrorCode`.
+- `Shared Kernel` deve ser pequeno; se começar a conter regra de negócio, o contexto ainda não foi bem delimitado.
+- Adapters podem depender de SDKs externos; domain e application não.
+- Tests de domain não usam filesystem, Git, rede, LLM ou templates reais.
+- Tests de application usam ports fake/in-memory para provar orquestração.
+- Tests de adapters provam integração com filesystem, Git, provider ou template engine.
+- `ndp-cli` deve ser substituível por TUI, IDE ou API sem reimplementar regra de negócio.
+- `AI Workers` deve ser substituível por provider local/offline sem alterar `Delivery Orchestration`.
+- `Source Control` deve permitir GitHub primeiro, mas não deve impedir GitLab, Bitbucket ou provider local no futuro.
 
 ### 10.10. Fluxos adicionais obrigatórios
 
@@ -2216,27 +2581,78 @@ Uma implementação saudável deve manter o core independente de CLI, GitHub e p
 ```text
 idea
   -> ndp ideate --kind product
-  -> ndp product create|approve
+       -> internal: render product ideation draft
+       -> internal: validate draft schema
+  -> ndp product create
+       -> internal: create product artifact
+       -> internal: validate product DoR
+       -> internal: commit/push/open review checkpoint
+  -> ndp product approve
+       -> internal: assert approval policy
+       -> internal: mark product APPROVED
+       -> internal: persist remote checkpoint
   -> ndp product propose-capacities
-  -> ndp capacity create|approve
-  -> ndp feature create|approve
+       -> internal: derive capacity candidates
+       -> internal: write proposal report
+  -> ndp capacity create
+       -> internal: create capacity artifact from proposal or ideation
+       -> internal: validate parent product checkpoint
+  -> ndp capacity approve
+       -> internal: mark capacity APPROVED
+       -> internal: persist remote checkpoint
+  -> ndp feature create
+       -> internal: create feature artifact from capacity context
+       -> internal: capture hypothesis, scope, NFR placeholders and success metrics
+  -> ndp feature approve
+       -> internal: mark feature APPROVED
+       -> internal: persist remote checkpoint
   -> ndp architecture plan feature
+       -> internal: collect required NFRs
+       -> internal: generate architecture-feature-* draft
+       -> internal: validate architecture readiness
+       -> internal: mark architecture plan APPROVED
   -> ndp epic create
+       -> internal: ndp story create for each story in the generated story index
+       -> internal: ndp epic map to build IMPLEMENTATION-MAP.md
+       -> internal: validate backlog consistency
+       -> internal: commit/push/open backlog PR
   -> ndp story refine
+       -> internal: run multi-persona refinement
+       -> internal: persist refinement verdict
+       -> internal: block if verdict is NO-GO
+  -> ndp story plan
+       -> internal: generate architecture/implementation/test/security/compliance plans
+       -> internal: ndp task create through task breakdown
+       -> internal: generate task plans and file footprints
+       -> internal: evaluate parallelism and hotspots
   -> ndp story implement
+       -> internal: load approved story plan and task breakdown
+       -> internal: ndp task implement for each executable task
+       -> internal: create/watch/merge task PRs when configured
+       -> internal: generate docs, verify envelope and story completion report
   -> ndp ci verify
+       -> internal: validate artifact schemas, policies, evidence and lineage
   -> PR with Orchestrator Evidence
 ```
+
+Decisão: `story create` é serviço interno de `ndp epic create` no caminho feliz. `task create` é serviço interno de `ndp story plan`. Ambos podem existir como comandos públicos avançados para recovery ou edição manual controlada, mas não devem aparecer como passos obrigatórios para o usuário no golden path.
 
 #### Mudança em feature ou arquitetura
 
 ```text
 feature or architecture changes
-  -> mark descendants STALE
-  -> compute impacted epics/stories/tasks
-  -> require re-approval or controlled regeneration
-  -> preserve old artifacts as SUPERSEDED
-  -> create migration/replan report
+  -> ndp feature amend <FEATURE-CODE> or ndp architecture amend <ARCH-ID>
+       -> internal: load descendants linked by lineage
+       -> internal: compare old ancestor SHA vs new ancestor SHA
+       -> internal: classify impact as compatible, replan-required or breaking
+       -> internal: mark impacted architecture/epics/stories/tasks as STALE
+       -> internal: preserve replaced artifacts as SUPERSEDED
+       -> internal: write impact report
+  -> ndp replan <FEATURE-CODE|EPIC-CODE>
+       -> internal: regenerate affected epic/story/task artifacts only
+       -> internal: preserve manual decisions when compatible
+       -> internal: validate implementation map and dependencies
+       -> internal: require approval before implementation resumes
 ```
 
 Regra: nenhum descendente stale pode ser implementado sem `--replan` ou aprovação explícita de compatibilidade.
@@ -2246,10 +2662,15 @@ Regra: nenhum descendente stale pode ser implementado sem `--replan` ou aprovaç
 ```text
 run interrupted
   -> ndp status
-  -> load execution_state + audit events
-  -> validate locks and artifact freshness
-  -> classify safe resume, recovery needed or manual intervention
+       -> internal: load execution_state + audit events
+       -> internal: inspect current phase, locks and last side effect
+       -> internal: validate artifact freshness and idempotency keys
+       -> internal: classify as safe resume, recovery needed or manual intervention
   -> ndp <command> --resume
+       -> internal: rebuild resume projection
+       -> internal: skip completed idempotent steps
+       -> internal: rerun only safe deterministic checks
+       -> internal: continue from first incomplete transition
 ```
 
 O resume nunca deve repetir side effects remotos sem idempotency key.
@@ -2258,10 +2679,17 @@ O resume nunca deve repetir side effects remotos sem idempotency key.
 
 ```text
 gate fails
-  -> stop before side effect
-  -> write violation envelope
-  -> return typed error
-  -> suggest exact command to fix
+  -> runtime stops before side effect
+  -> internal: write violation envelope
+  -> internal: record audit event
+  -> internal: mark run FAILED or BLOCKED according to policy
+  -> return typed error with phase, artifact path and nextAction
+  -> user runs suggested command
+       -> examples:
+          -> ndp story refine STORY-ID
+          -> ndp architecture plan feature FEATURE-CODE
+          -> ndp doc validate STORY-ID
+          -> ndp replan EPIC-CODE
 ```
 
 Falhas de policy são resultado esperado do produto, não exceptions genéricas.
@@ -2270,9 +2698,12 @@ Falhas de policy são resultado esperado do produto, não exceptions genéricas.
 
 ```text
 LLM call fails or returns invalid schema
-  -> retry according to provider policy
-  -> fallback when configured and budget allows
-  -> persist failed worker envelope
+  -> internal: classify failure as timeout, provider-error, schema-invalid or budget-exceeded
+  -> internal: retry according to provider policy
+  -> internal: fallback when configured and budget allows
+  -> internal: persist failed worker envelope
+  -> internal: record cost and audit events
+  -> internal: mark draft as NEEDS_INPUT or run as FAILED
   -> never mark artifact approved from invalid output
 ```
 
@@ -2282,14 +2713,42 @@ O LLM pode falhar; o runtime não pode perder rastreabilidade.
 
 ```text
 ndp plugin install <PACKAGE>
-  -> verify signature
-  -> show permissions
-  -> cache locally
-  -> register capabilities
-  -> allow rollback
+  -> internal: resolve package metadata
+  -> internal: verify signature and SBOM
+  -> internal: show permissions and required capabilities
+  -> internal: require explicit approval
+  -> internal: cache package locally
+  -> internal: register capabilities, templates, policies or adapters
+  -> internal: write plugin install checkpoint
+  -> internal: allow rollback to previous registry state
 ```
 
 Na V0, esse fluxo pode existir apenas como design contract; execução real fica V1+.
+
+#### Manual story ou task creation controlado
+
+Este fluxo não é caminho feliz, mas precisa existir para casos em que o backlog gerado precisa de ajuste humano sem quebrar rastreabilidade.
+
+```text
+ndp story create --epic EPIC-CODE
+  -> internal: assert epic approved or in controlled replan
+  -> internal: load feature, architecture plan and existing implementation map
+  -> internal: create story artifact with parent epic link
+  -> internal: update epic story index
+  -> internal: regenerate or patch IMPLEMENTATION-MAP.md
+  -> internal: validate no orphan story exists
+  -> internal: commit/push/open review checkpoint
+
+ndp task create --story STORY-ID
+  -> internal: assert story refined or in story planning
+  -> internal: load story plan, tests plan and file footprint
+  -> internal: create task artifact with parent story link
+  -> internal: update task breakdown and task implementation map
+  -> internal: validate dependencies and parallelism
+  -> internal: commit/push/open review checkpoint when outside active planning run
+```
+
+Regra: criação manual de story/task sempre atualiza índice/mapa no mesmo run. Uma story ou task órfã é violação de policy.
 
 ### 10.11. Migration contract
 
