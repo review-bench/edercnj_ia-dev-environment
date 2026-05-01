@@ -233,7 +233,6 @@ O NDP deve operar sobre um **control repository** local-first e versionado no Gi
 Layout proposto:
 
 ```text
-ai/
   projects/
     project-XXXX/
       project-XXXX.md
