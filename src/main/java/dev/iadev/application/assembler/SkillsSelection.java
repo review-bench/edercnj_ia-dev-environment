@@ -4,6 +4,7 @@ import dev.iadev.application.assembler.gates.ComplianceGate;
 import dev.iadev.application.assembler.gates.InfraGate;
 import dev.iadev.application.assembler.gates.InterfaceGate;
 import dev.iadev.application.assembler.gates.PentestGate;
+import dev.iadev.application.assembler.gates.QualityGate;
 import dev.iadev.application.assembler.gates.ReviewGate;
 import dev.iadev.application.assembler.gates.SecurityGate;
 import dev.iadev.application.assembler.gates.SecurityScanningGate;
@@ -36,6 +37,7 @@ public final class SkillsSelection {
     private static final ComplianceGate COMPLIANCE_GATE = new ComplianceGate();
     private static final PentestGate PENTEST_GATE = new PentestGate();
     private static final ReviewGate REVIEW_GATE = new ReviewGate();
+    private static final QualityGate QUALITY_GATE = new QualityGate();
 
     private static final List<SkillGateEvaluator> EVALUATORS =
             List.of(
@@ -46,7 +48,8 @@ public final class SkillsSelection {
                     SCANNING_GATE,
                     COMPLIANCE_GATE,
                     PENTEST_GATE,
-                    REVIEW_GATE);
+                    REVIEW_GATE,
+                    QUALITY_GATE);
 
     private SkillsSelection() {
         // utility class
@@ -130,6 +133,16 @@ public final class SkillsSelection {
      */
     public static List<String> selectReviewSkills(ProjectConfig config) {
         return REVIEW_GATE.evaluate(config);
+    }
+
+    /**
+     * Selects quality-gate skills based on {@code quality.*} config (EPIC-0072).
+     *
+     * @param config the project configuration
+     * @return list of conditional quality skill names
+     */
+    public static List<String> selectQualitySkills(ProjectConfig config) {
+        return QUALITY_GATE.evaluate(config);
     }
 
     /**
