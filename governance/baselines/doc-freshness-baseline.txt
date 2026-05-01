@@ -1,0 +1,9 @@
+# doc-freshness-baseline.txt
+# Lists PRs merged before EPIC-0071 (Documentation as DoD) that are exempt
+# from the doc-freshness gate.
+#
+# Format: <PR-number>  # <reason>
+# This file is append-only and immutable after EPIC-0071 merges to develop.
+# New exemptions must use the per-PR <!-- audit-exempt: <reason> --> marker.
+#
+# Introduced: story-0071-0005 (EPIC-0071)
