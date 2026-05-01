@@ -1,8 +1,3 @@
----
-name: rule-30-value-driven-templates
-requires-capabilities: []
----
-
 # Rule 30 — Value-Driven Templates
 
 > **Related:** Rule 04 (Architecture Summary), Rule 22 (Skill Visibility), Rule 28 (Capability Frontmatter Contract).
