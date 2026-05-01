@@ -91,8 +91,11 @@
       "mergedAt": "2026-05-01T02:36:17Z"
     },
     "story-0071-0002": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 892,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/892",
+      "mergedAt": "2026-05-01T03:00:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -132,8 +135,11 @@
       }
     },
     "story-0071-0003": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 893,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/893",
+      "mergedAt": "2026-05-01T03:30:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -173,8 +179,11 @@
       }
     },
     "story-0071-0004": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 894,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/894",
+      "mergedAt": "2026-05-01T04:00:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -214,8 +223,11 @@
       }
     },
     "story-0071-0005": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 895,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/895",
+      "mergedAt": "2026-05-01T05:00:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -255,8 +267,11 @@
       }
     },
     "story-0071-0006": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 896,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/896",
+      "mergedAt": "2026-05-01T06:00:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -296,8 +311,11 @@
       }
     },
     "story-0071-0007": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 897,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/897",
+      "mergedAt": "2026-05-01T07:30:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
@@ -337,8 +355,11 @@
       }
     },
     "story-0071-0008": {
-      "status": "refinada",
+      "status": "concluida",
       "flowVersion": "4",
+      "prNumber": 898,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/898",
+      "mergedAt": "2026-05-01T08:45:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
