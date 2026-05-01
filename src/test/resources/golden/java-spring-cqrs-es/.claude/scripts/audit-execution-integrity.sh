@@ -184,6 +184,26 @@ check_evidence() {
         fi
     fi
 
+    # EPIC-0072 — Conditional quality gate artifact checks (Rule 24 §Mandatory Evidence Artifacts).
+    # Set QUALITY_PERFORMANCE_ENABLED=true / QUALITY_MUTATION_ENABLED=true /
+    # QUALITY_CONTRACT_ENABLED=true in CI when quality.*.enabled=true in project YAML.
+    # All gates default to disabled for backward compatibility (Rule 19).
+    if [[ "${QUALITY_PERFORMANCE_ENABLED:-false}" == "true" ]]; then
+        if [[ ! -f "${reports_dir}/perf-report-${story_id}.md" ]]; then
+            missing+=("perf-report (x-test-performance, quality.performance.enabled=true)")
+        fi
+    fi
+    if [[ "${QUALITY_MUTATION_ENABLED:-false}" == "true" ]]; then
+        if [[ ! -f "${reports_dir}/mutation-report-${story_id}.md" ]]; then
+            missing+=("mutation-report (x-test-mutation, quality.mutation.enabled=true)")
+        fi
+    fi
+    if [[ "${QUALITY_CONTRACT_ENABLED:-false}" == "true" ]]; then
+        if [[ ! -f "${reports_dir}/contract-report-${story_id}.md" ]]; then
+            missing+=("contract-report (x-test-contract, quality.contract.enabled=true)")
+        fi
+    fi
+
     if [[ ${#missing[@]} -gt 0 ]]; then
         printf "  ❌ %s — missing: %s\n" "${story_id}" "$(IFS=,; echo "${missing[*]}")" >&2
         return 1

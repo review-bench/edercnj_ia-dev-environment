@@ -256,8 +256,11 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
 
     TaskCreate(subject: "{STORY_ID} › Phase 3 - Verify", activeForm: "Running verify gate and reviews")
 
-**Sub-task trackers (open in Batch A — one per sub-step 3.0–3.5 — before `Skip verification`):** emit 8 `TaskCreate` in ONE message (one per Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
+**Sub-task trackers (open in Batch A — one per sub-step 3.Q–3.5 — before `Skip verification`):** emit 11 `TaskCreate` in ONE message (one per Quality-perf / Quality-mutation / Quality-contract / Doc generate / Doc validate / Verify gate / Specialist reviews / Tech lead review / Report / Status finalize / Worktree cleanup). Store IDs: `p3Tasks = {qualityPerf, qualityMutation, qualityContract, docGenerate, docValidate, verify, specialist, techLead, report, status, cleanup}`.
 
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality perf", activeForm: "Running x-test-performance")
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality mutation", activeForm: "Running x-test-mutation")
+    TaskCreate(subject: "{STORY_ID} › Phase 3 › Quality contract", activeForm: "Running x-test-contract")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc generate", activeForm: "Running x-doc-generate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Doc validate", activeForm: "Running x-doc-validate")
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Verify gate", activeForm: "Running story verify gate")
@@ -268,6 +271,43 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
     TaskCreate(subject: "{STORY_ID} › Phase 3 › Worktree cleanup", activeForm: "Cleaning up worktree")
 
 **Skipped only under `--skip-verification`** (recovery-only — see Rule 22). Every `Skill(...)` below is a **MANDATORY TOOL CALL** (Rule 24); inlining is a violation and the CI audit fails merges lacking evidence artifacts. Full per-step details (sub-skill envelopes, NO-GO cycle protocol, worktree-cleanup decision table) in `references/full-protocol.md` §5.
+
+### 3.Q Quality Gates — **MANDATORY conditional** (EPIC-0072, Rule 24)
+
+> Sequence: perf → mutation → contract (D-R11 fast-fail). Reads `QualityConfig` from project `quality:` YAML. Disabled sub-gates emit WARN; no report produced. First non-zero exit cancels remaining gates.
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Perf`
+
+    Skill(skill: "x-test-performance", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md")  [conditional: flag.quality_performance_enabled]
+    TaskUpdate(id: p3Tasks.qualityPerf, status: "completed")
+
+Exit non-zero → `PERF_REGRESSION_DETECTED` (14); **D-R11: skip 3.Q.2 and 3.Q.3**.
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Perf ok`
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Mutation`
+
+    Skill(skill: "x-test-mutation", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md")  [conditional: flag.quality_mutation_enabled]
+    TaskUpdate(id: p3Tasks.qualityMutation, status: "completed")
+
+Exit non-zero → `MUTATION_SCORE_BELOW_THRESHOLD` (17); **D-R11: skip 3.Q.3**.
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Mutation ok`
+
+<!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Contract`
+
+    Skill(skill: "x-test-contract", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md")  [conditional: flag.quality_contract_enabled]
+    TaskUpdate(id: p3Tasks.qualityContract, status: "completed")
+
+Exit non-zero → `CONTRACT_BREAKING_CHANGE` (18).
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Contract ok`
 
 ### 3.0 Documentation — `MANDATORY — NON-NEGOTIABLE` (Rule 31, EPIC-0071)
 
@@ -328,6 +368,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 | `x-doc-validate` fails after retry | `DOC_VALIDATION_FAILED` — abort Phase 3; operator must run `/x-doc-generate` + `--resume` |
 | Coverage / AC / consistency failure | `x-internal-story-verify` `passed=false` → `VERIFY_FAILED` |
 | `x-pr-create` fails | Task → `FAILED`; story-level → `PR_CREATE_FAILED` |
+| `x-test-performance` regression | `PERF_REGRESSION_DETECTED` (exit 14) — FIX-PR: investigate benchmark delta |
+| `x-test-mutation` below threshold | `MUTATION_SCORE_BELOW_THRESHOLD` (exit 17) — FIX-PR: kill surviving mutants |
+| `x-test-contract` breaking change | `CONTRACT_BREAKING_CHANGE` (exit 18) — FIX-PR: revert or bump MAJOR |
 | `x-pr-fix` compile regression | ABORT Step 3.2 with `PR_FIX_COMPILE_REGRESSION` |
 | Template missing (RULE-012) | WARN; `x-internal-report-write` degrades to inline format |
 | Corrupted `execution-state.json` on resume | `x-internal-story-resume` reinitializes |
@@ -344,6 +387,7 @@ Resuming after an aborted lifecycle may legitimately skip already-completed step
 | :--- | :--- |
 | `--skip-verification` | Phase 3 (`x-internal-story-verify`) |
 | `--skip-review` | Step 3.2 (`x-review` + `x-review-pr`) |
+| `--skip-quality` | Step 3.Q (`x-test-performance` + `x-test-mutation` + `x-test-contract`) — **Recovery or hotfix/* only** |
 | `--skip-doc` | Step 3.0 (`x-doc-generate` + `x-doc-validate`) — **Recovery or hotfix/* only (Rule 27 Exception 2)** |
 | `--skip-smoke` | Smoke gate inside verify |
 | `--no-ci-watch` | CI-watch step in Phase 2 |
