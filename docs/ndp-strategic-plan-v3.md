@@ -221,7 +221,7 @@ produces:
 Antes de existir um épico implementável, o NDP precisa garantir que existe uma linha de rastreabilidade estratégica mínima:
 
 ```text
-Project -> Product -> Capacity -> Feature -> Architecture Plan -> Epic -> Stories -> Tasks
+Project -> Product -> Capacity -> Feature -> Architecture Plans -> Epic -> Stories -> Tasks
 ```
 
 Essa cadeia resolve um gap do fluxo atual: hoje o épico pode nascer diretamente de uma spec ou ideia, mas o produto, a capacidade e a feature que justificam aquele épico nem sempre existem como artefatos versionados. Na v3, o épico só nasce depois que a feature existe e possui um plano de arquitetura sistêmica aprovado.
@@ -239,8 +239,12 @@ ai/
       project-XXXX.md
       products/
         product-XXXX.md
+        architecture/
+          architecture-product-XXXX.md
         capacities/
           capacity-XXXX-YYYY.md
+          architecture/
+            architecture-capacity-XXXX-YYYY.md
           features/
             feature-XXXX-YYYY-ZZZZ.md
             architecture/
@@ -250,19 +254,35 @@ ai/
                 epic-XXXX.md
                 story-XXXX-0001.md
                 IMPLEMENTATION-MAP.md
+                tasks/
+                  task-TASK-XXXX-0001-001.md
                 plans/
                 reports/
                 telemetry/
 ```
 
+Glossário operacional:
+
+| Elemento | Papel no processo | O que precisa conter | O que não deve conter |
+| --- | --- | --- | --- |
+| `Project` | Guarda-chuva estratégico e organizacional. É a raiz de planejamento que agrupa um ou mais produtos relacionados a um objetivo maior. | Visão estratégica, patrocinadores, contexto de negócio, restrições globais, repos envolvidos, políticas de governança. | Detalhe de implementação, backlog granular ou desenho de microserviço. |
+| `Product` | Produto a ser construído ou evoluído dentro do project. | Problema que resolve, público-alvo, proposta de valor, canais, métricas de sucesso, restrições comerciais, compliance e modelo operacional. | Tasks técnicas, histórias individuais ou decisões de código. |
+| `Capacity` | Capacidade de negócio ou plataforma dentro do produto. Representa um conjunto coerente de funcionalidades que habilita valor recorrente. | Domínio, processos, dependências, eventos principais, usuários impactados, fronteiras funcionais e indicadores. | Uma entrega pontual demais; isso é feature. |
+| `Feature` | Entrega concreta dentro de uma capacity. É a menor unidade estratégica que justifica arquitetura, épico e stories. | Escopo, fluxo de usuário/sistema, hipótese, valor, NFRs, integrações, critérios de sucesso e restrições. | Plano de task ou desenho de classe. |
+| `architecture-product-*` | Arquitetura sistêmica do produto. Define a visão macro de canais, plataformas, domínios, padrões técnicos e restrições transversais. | Canais (CLI/web/mobile/API), macrocomponentes, auth global, regiões, compliance, observabilidade, integração entre capacities. | Detalhamento de uma feature específica. |
+| `architecture-capacity-*` | Arquitetura da capacidade. Traduz a arquitetura do produto para um domínio/capability específico. | Subdomínios, fluxos, dados principais, integrações, eventos, APIs, dependências entre serviços e constraints da capability. | Stories/tasks ou decisões locais de uma única feature. |
+| `architecture-feature-*` | Arquitetura sistêmica da feature. Define o desenho necessário para entregar aquela feature específica, considerando produto e capacidade. | Componentes necessários, serviços, dados, cache, filas, gateways, LLM provider, NFRs, riscos e mini-ADRs. | Arquitetura de um microserviço isolado ou design de classe. |
+| `Epic` | Pacote implementável gerado a partir da feature e do architecture plan aprovado. | Escopo técnico, story index, regras transversais, DoR/DoD, relação com feature e arquitetura. | Ideação livre sem feature aprovada. |
+| `Story` | Fatia implementável e testável do epic. Deve entregar valor verificável ou uma fundação técnica necessária para valor. | Critérios de aceite, contratos, dependências, dados, riscos, referência ao epic/feature, plano de validação. | Várias entregas independentes misturadas ou task técnica sem comportamento observável. |
+| `Task` | Unidade de execução atômica dentro da story. É o item que o TDD loop implementa e comita. | Entrada/saída, arquivos esperados, dependências, critérios de conclusão, plano TDD quando aplicável. | Coordenação de várias stories ou decisão de produto. |
+
 Decisões:
 
-- `project` é o guarda-chuva estratégico.
-- `product` descreve o produto a ser construído.
-- `capacity` descreve uma capacidade de negócio ou plataforma dentro do produto.
-- `feature` descreve uma entrega concreta dentro da capacidade.
-- `architecture-feature-*` é arquitetura **sistêmica** da feature, não arquitetura de um microserviço isolado.
-- `epic` só pode ser criado quando existe feature aprovada e arquitetura aprovada.
+- `project`, `product`, `capacity`, `feature`, `epic`, `story` e `task` formam uma cadeia de rastreabilidade, não apenas uma estrutura de pastas.
+- Arquitetura existe em três níveis: produto, capacidade e feature. Cada nível tem escopo próprio e evita que uma feature precise redescobrir decisões globais.
+- `epic` só pode ser criado quando existe feature aprovada e `architecture-feature-*` aprovado.
+- `story` só pode ser criada dentro de um epic aprovado ou em geração controlada pelo `ndp epic create`.
+- `task` só pode ser criada a partir de uma story aprovada ou durante o planejamento da story.
 - Todos esses artefatos têm branch, commit, PR e estado remoto, como os artefatos de implementação.
 
 #### 3.5.2. Invariantes de versionamento antes de criar descendentes
@@ -272,11 +292,18 @@ Nenhum artefato filho pode ser criado se o predecessor não estiver remoto e lim
 | Ação | Pré-condição obrigatória |
 | --- | --- |
 | Criar Product | Project aprovado, commitado e sincronizado no GitHub; worktree limpo. |
-| Criar Capacity | Product aprovado, commitado e sincronizado no GitHub; worktree limpo. |
-| Criar Feature | Capacity aprovada, commitada e sincronizada no GitHub; worktree limpo. |
-| Planejar arquitetura | Feature aprovada, commitada e sincronizada no GitHub; worktree limpo. |
-| Criar Epic | Architecture Plan aprovado, commitado e sincronizado no GitHub; worktree limpo. |
+| Planejar arquitetura do Product | Product aprovado, commitado e sincronizado no GitHub; worktree limpo. |
+| Criar Capacity | Product aprovado, `architecture-product-*` aprovado, commitado e sincronizado no GitHub; worktree limpo. |
+| Planejar arquitetura da Capacity | Capacity aprovada, commitada e sincronizada no GitHub; worktree limpo. |
+| Criar Feature | Capacity aprovada, `architecture-capacity-*` aprovado, commitado e sincronizado no GitHub; worktree limpo. |
+| Planejar arquitetura da Feature | Feature aprovada, `architecture-product-*` e `architecture-capacity-*` disponíveis; worktree limpo. |
+| Criar Epic | `architecture-feature-*` aprovado, commitado e sincronizado no GitHub; worktree limpo. |
+| Criar Story | Epic aprovado, story index definido, `IMPLEMENTATION-MAP.md` inexistente ou em modo regeneração controlada; worktree limpo. |
+| Criar Implementation Map | Epic e stories aprovados; todas as dependências de story declaradas; worktree limpo. |
+| Criar Task | Story aprovada ou story planning em andamento; `IMPLEMENTATION-MAP.md` ou `task-implementation-map` consistente; worktree limpo. |
 | Implementar Epic | Epic aprovado, stories/mapa gerados, architecture plan da feature disponível; worktree limpo. |
+| Implementar Story | Epic aprovado, story aprovada, `IMPLEMENTATION-MAP.md` aprovado, architecture plan da feature disponível; worktree limpo. |
+| Implementar Task | Story aprovada, task aprovada ou planejada, task plan disponível, dependências de task satisfeitas; worktree limpo. |
 
 O NDP deve tratar “commitado no GitHub” como um checkpoint verificável:
 
@@ -285,6 +312,21 @@ O NDP deve tratar “commitado no GitHub” como um checkpoint verificável:
 - PR criado ou mergeado conforme política do artefato;
 - artefato com status `APPROVED`;
 - `execution-state.json` ou registry local apontando para o SHA remoto aprovado.
+
+Relações obrigatórias:
+
+| Relação | Regra |
+| --- | --- |
+| Product -> Capacity | Toda capacity referencia exatamente um product. |
+| Capacity -> Feature | Toda feature referencia exatamente uma capacity. |
+| Feature -> Architecture Plans | Toda feature herda `architecture-product-*` e `architecture-capacity-*`, e possui exatamente um `architecture-feature-*` aprovado para cada ciclo de epic creation. |
+| Feature -> Epic | Todo epic referencia uma feature aprovada e o SHA do `architecture-feature-*` usado para sua decomposição. |
+| Epic -> Story | Toda story referencia exatamente um epic e deve aparecer no story index do epic. |
+| Epic -> Implementation Map | Todo epic implementável possui um `IMPLEMENTATION-MAP.md` coerente com o story index. |
+| Implementation Map -> Story | Toda story do mapa existe em disco; nenhuma story fora do mapa pode ser implementada sem regeneração controlada. |
+| Story -> Task | Toda task referencia exatamente uma story e aparece no task breakdown ou task implementation map da story. |
+| Task -> Task Plan | Toda task implementável possui task plan ou plano de fallback aprovado. |
+| Task -> Commit/PR | Toda task implementada produz commit rastreável e, quando em modo PR, evidência de PR/CI. |
 
 #### 3.5.3. Commands novos de planejamento
 
@@ -300,12 +342,22 @@ O NDP deve tratar “commitado no GitHub” como um checkpoint verificável:
 | `ndp ideate --kind feature` | Ideia livre + capacity | Draft de feature template | Feature pode nascer manualmente. |
 | `ndp feature create <CAPACITY-CODE>` | Capacity aprovada | `feature-*.md` draft | Pode usar ideation ou proposta derivada. |
 | `ndp feature approve <FEATURE-CODE>` | Feature draft | Feature aprovada | Libera arquitetura. |
-| `ndp architecture plan <FEATURE-CODE>` | Feature aprovada + NFRs | Architecture Plan aprovado/draft | Define arquitetura sistêmica necessária para a feature. |
+| `ndp architecture plan product <PRODUCT-CODE>` | Product aprovado + contexto macro | `architecture-product-*.md` | Define arquitetura macro do produto. |
+| `ndp architecture plan capacity <CAPACITY-CODE>` | Capacity aprovada + arquitetura do product | `architecture-capacity-*.md` | Define arquitetura da capability/domínio. |
+| `ndp architecture plan feature <FEATURE-CODE>` | Feature aprovada + arquiteturas product/capacity + NFRs | `architecture-feature-*.md` | Define arquitetura sistêmica necessária para a feature. |
 | `ndp epic create <FEATURE-CODE>` | Architecture Plan aprovado | Epic + stories + implementation map | Só depois disso `ndp epic implement <EPIC-CODE>` entra. |
 
 #### 3.5.4. Dados mínimos para Architecture Plan
 
-O planejamento de arquitetura acontece por feature, mas herda contexto de product e capacity. O objetivo não é desenhar classe, pacote ou microserviço específico; é decidir a arquitetura base necessária para entregar aquela feature.
+O planejamento de arquitetura possui três arquivos complementares. O plano de feature continua sendo o gatilho direto para criar épico, mas ele não deve carregar sozinho todas as decisões sistêmicas.
+
+| Arquivo | Escopo | Pergunta que responde |
+| --- | --- | --- |
+| `architecture-product-*` | Produto inteiro. | Qual é a arquitetura macro do produto, seus canais, boundaries, padrões, integrações globais e restrições transversais? |
+| `architecture-capacity-*` | Capacidade específica. | Como essa capability se encaixa no produto e quais domínios, dados, eventos, APIs e dependências ela exige? |
+| `architecture-feature-*` | Feature concreta. | Qual desenho sistêmico mínimo entrega esta feature, respeitando as arquiteturas de produto e capacidade? |
+
+O objetivo não é desenhar classe, pacote ou microserviço específico. É decidir a arquitetura base necessária para entregar valor com rastreabilidade e sem redescobrir decisões globais a cada feature.
 
 Dados mínimos:
 
@@ -318,21 +370,11 @@ Dados mínimos:
 | Segurança | autenticação, autorização, dados sensíveis, auditoria, threat model inicial, compliance. |
 | Canais | CLI, web, mobile, API pública, integrações, workers, backoffice. |
 
-Saídas esperadas do Architecture Plan:
+Saídas esperadas dos Architecture Plans:
 
-- estilo arquitetural recomendado;
-- componentes necessários (frontend, backend, microserviços, workers, CLI, mobile, gateways);
-- banco(s) de dados e racional;
-- autenticação/autorização;
-- cache, filas/eventos, object storage;
-- provedores LLM/Claude provider quando houver IA no fluxo;
-- integrações externas;
-- observabilidade;
-- segurança e compliance;
-- deployment topology;
-- riscos e decisões em formato mini-ADR;
-- impactos sobre épicos/stories;
-- checklist de prontidão para `ndp epic create`.
+- `architecture-product-*`: estilo arquitetural macro, canais (CLI/web/mobile/API), auth global, regiões, compliance, observabilidade, padrões de integração, plataforma de dados e restrições transversais.
+- `architecture-capacity-*`: domínio/capability, serviços ou módulos candidatos, eventos, APIs, dados, dependências com outras capacities, ownership e riscos de integração.
+- `architecture-feature-*`: componentes necessários para a feature, banco(s), cache, filas/eventos, gateways, provedores LLM/Claude provider quando houver IA, NFRs específicos, deployment topology, mini-ADRs e checklist para `ndp epic create`.
 
 #### 3.5.5. Sequência — `ndp ideate` para Product, Capacity ou Feature
 
@@ -514,7 +556,7 @@ Etapas:
 22. **Checkpoint remoto.** Sincroniza aprovação.
 23. **Liberação para arquitetura.** Feature pode entrar em `ndp architecture plan`.
 
-#### 3.5.8. Sequência — `ndp architecture plan <FEATURE-CODE>`
+#### 3.5.8. Sequência — `ndp architecture plan product|capacity|feature <CODE>`
 
 ```mermaid
 sequenceDiagram
@@ -528,17 +570,17 @@ sequenceDiagram
   participant Art as Artifact Store
   participant Git as Git Adapter
 
-  User->>CLI: ndp architecture plan FEATURE-CODE
+  User->>CLI: ndp architecture plan product|capacity|feature CODE
   CLI->>RT: 1. parse architecture plan envelope
-  RT->>Repo: 2. load feature, capacity, product and project context
-  RT->>Gate: 3. assert feature approved and remote-clean
+  RT->>Repo: 2. load target and ancestor context
+  RT->>Gate: 3. assert target approved and remote-clean
   RT->>Gate: 4. validate required NFR inputs
   alt missing NFR data
     RT-->>CLI: 5. request users, concurrency, latency, availability, data volume
   else NFR data complete
-    RT->>LLM: 6. design system architecture for feature
+    RT->>LLM: 6. design system architecture for selected scope
     LLM-->>RT: 7. architecture draft + decisions + risks
-    RT->>Art: 8. write architecture-feature-*.md
+    RT->>Art: 8. write architecture-product|capacity|feature-*.md
     RT->>Gate: 9. validate architecture readiness
     alt architecture needs human approval
       RT-->>CLI: 10. expose review questions and approval checklist
@@ -546,27 +588,27 @@ sequenceDiagram
       RT->>Art: 11. mark Architecture Plan APPROVED
       RT->>Git: 12. branch, commit, push, PR or merge approval
       Git-->>RT: 13. remote checkpoint
-      RT-->>CLI: 14. feature ready for epic creation
+      RT-->>CLI: 14. target ready for next descendant
     end
   end
 ```
 
 Etapas:
 
-1. **Parse do architecture plan.** Identifica feature e flags.
-2. **Carga de contexto completo.** Lê feature, capacity, product e project.
-3. **Gate da feature.** Exige feature aprovada, remota e worktree limpa.
+1. **Parse do architecture plan.** Identifica se o alvo é product, capacity ou feature.
+2. **Carga de contexto completo.** Lê o alvo e seus ancestrais: product lê project; capacity lê product; feature lê capacity, product e project.
+3. **Gate do alvo.** Exige alvo aprovado, remoto e worktree limpa; capacity também exige `architecture-product-*`; feature exige `architecture-product-*` e `architecture-capacity-*`.
 4. **Validação de NFRs.** Confere usuários, simultaneidade, latência, disponibilidade, dados, segurança.
 5. **Perguntas obrigatórias.** Se faltar dado, solicita antes de desenhar arquitetura.
-6. **Desenho sistêmico.** LLM/worker propõe arquitetura da feature.
+6. **Desenho sistêmico.** LLM/worker propõe arquitetura no escopo correto: produto, capacidade ou feature.
 7. **Draft arquitetural.** Retorna componentes, serviços, dados, segurança, riscos e decisões.
-8. **Persistência do plano.** Grava `architecture-feature-*.md`.
+8. **Persistência do plano.** Grava `architecture-product-*`, `architecture-capacity-*` ou `architecture-feature-*`.
 9. **Architecture readiness gate.** Valida completude e coerência.
 10. **Review humano quando necessário.** Expõe decisões críticas.
 11. **Aprovação do plano.** Marca architecture plan como aprovado.
 12. **Versionamento.** Commit, push, PR ou merge conforme política.
 13. **Checkpoint remoto.** Registra SHA remoto aprovado.
-14. **Liberação para epic.** Feature pode gerar épico/stories.
+14. **Liberação do próximo descendente.** Product architecture libera capacity planning; capacity architecture libera feature planning; feature architecture libera epic creation.
 
 #### 3.5.9. Sequência — `ndp epic create <FEATURE-CODE>`
 
@@ -1562,10 +1604,12 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 
 #### P0.C3 — System Architecture Planning
 
-- P0.C3.F1 `[V0]`: `ndp architecture plan <FEATURE-CODE>`.
+- P0.C3.F1 `[V0]`: `ndp architecture plan product <PRODUCT-CODE>`.
 - P0.C3.F2 `[V0]`: Coleta obrigatória de NFRs mínimos (usuários, concorrência, latência, disponibilidade, volume, segurança).
-- P0.C3.F3 `[V0]`: Architecture Plan sistêmico por feature (componentes, dados, auth, canais, gateways, cache, filas, LLM providers, deployment).
-- P0.C3.F4 `[V0]`: Gate `Architecture Plan approved + remote-clean` antes de `ndp epic create`.
+- P0.C3.F3 `[V0]`: `ndp architecture plan capacity <CAPACITY-CODE>`.
+- P0.C3.F4 `[V0]`: `ndp architecture plan feature <FEATURE-CODE>`.
+- P0.C3.F5 `[V0]`: Architecture Plans em três níveis (`architecture-product-*`, `architecture-capacity-*`, `architecture-feature-*`).
+- P0.C3.F6 `[V0]`: Gate `architecture-feature approved + remote-clean` antes de `ndp epic create`.
 
 #### P0.C4 — Feature to Epic Generation
 
@@ -1849,7 +1893,7 @@ Escopo mínimo sugerido:
 
 | Área | Features mínimas |
 | --- | --- |
-| Planejamento estratégico | P0.C1.F1-F3, P0.C2.F1-F5, P0.C3.F1-F4, P0.C4.F1-F3. |
+| Planejamento estratégico | P0.C1.F1-F3, P0.C2.F1-F5, P0.C3.F1-F6, P0.C4.F1-F3. |
 | Orquestração | P2.C0.F1-F5, P2.C0.F7, P2.C0.F9, P2.C0.F12. |
 | Runtime gates | P2.C2.F1-F3, P2.C4.F2-F4. |
 | LLM/provider | P2.C3.F1-F4 com Claude como primeiro provider. |
