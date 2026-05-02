@@ -22,8 +22,8 @@ import java.util.Map;
  * @param license action when a dependency license is not in the {@link LicenseWhitelist}
  * @param minVersion action when a dependency version is below the declared minimum
  * @param maxVersion action when a dependency version exceeds the declared maximum
- * @param freshness action when a dependency has not been updated within
- *     {@code freshness-window-days}
+ * @param freshness action when a dependency has not been updated within {@code
+ *     freshness-window-days}
  */
 public record BlockOnPolicy(
         BlockAction severityCve,
@@ -61,7 +61,9 @@ public record BlockOnPolicy(
                 BlockAction.fromYaml(MapHelper.optionalString(blockOnMap, "severity-cve", null)),
                 BlockAction.fromYaml(MapHelper.optionalString(blockOnMap, "license", null)),
                 BlockAction.fromYaml(MapHelper.optionalString(blockOnMap, "min-version", null)),
-                BlockAction.fromYaml(MapHelper.optionalString(blockOnMap, "max-version", "warn-only")),
-                BlockAction.fromYaml(MapHelper.optionalString(blockOnMap, "freshness", "warn-only")));
+                BlockAction.fromYaml(
+                        MapHelper.optionalString(blockOnMap, "max-version", "warn-only")),
+                BlockAction.fromYaml(
+                        MapHelper.optionalString(blockOnMap, "freshness", "warn-only")));
     }
 }

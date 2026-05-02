@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0074 (Dependency Policy & SCA Final Gate)
+
+Antes desta release, projetos gerados por `ia-dev-env` podiam declarar qualquer versão de dependência, independente de CVEs conhecidas, licenças banidas, ou staleness — nenhum gate existia para enforçar política organizacional em CI. O resultado: vulnerabilidades descobertas acumulavam silenciosamente, compliance de licença era checado manualmente, e freshness drifted até um audit forçar remediação reativa.
+
+**A partir desta release, o gate de política de dependências está codificado no lifecycle do `x-story-implement`.** Quando `dependencies.policy.enabled: true` no YAML do projeto, o skill `x-dep-policy-validate` é invocado como **MANDATORY TOOL CALL** em Phase 3 (após os gates de qualidade EPIC-0072/0073). O gate valida em sequência: CVEs hard-block (`denied-cves` — RULE-074-01, independe de scope), severidade CVE (threshold configurável), whitelist de licenças SPDX, versões mínimas e máximas (cross-stack: JVM groupId/artifactId, NPM/PyPI name, Go module), e freshness window. Cada dimensão tem ação configurável (`BLOCK`, `WARN_ONLY`, `IGNORE`) com defaults D-R10 e overrides por escopo D-R11.
+
+**Safe default (Rule 19):** `dependencies.policy.enabled: false` — projetos existentes são completamente não afetados até opt-in.
+
+**Surface 13 adicionada ao Zero-Bypass Lifecycle (Rule 27):** `dep-policy-validation-report-STORY-ID.md` é agora artefato de evidência obrigatório quando o gate está ativo. A Camada 3 (`audit-dep-policy.sh`) verifica sua presença por story merged via `DEPENDENCY_POLICY_ENABLED` env var.
+
+### Added — EPIC-0074 (Dependency Policy & SCA Final Gate)
+
+- **Domain model** (`DependencyPolicyConfig`, `BlockAction`, `BlockOnPolicy`, `ScopePolicy`, `VersionConstraint`, `LicenseWhitelist`): 6 novos records/enums para o modelo de política de dependências. `DependencyPolicyConfig` inclui `enabled`, `minVersions`, `maxVersions`, `allowedLicenses`, `deniedCves`, `freshnessWindowDays`, `blockOn`, `scopePolicy`. `BlockAction.fromYaml` suporta aliases (`any-violation → BLOCK`, `warn-only → WARN_ONLY`). `VersionConstraint` suporta 3 formatos mutuamente exclusivos: JVM (`groupId+artifactId`), NPM/PyPI (`name`), Go (`module`). Introduzido por story-0074-0001.
+- **Skill `x-dep-policy-validate`** (conditional, `model: haiku`, `requires-capabilities: [governance.dependency-policy]`): 4 fases — Parse (load policy config), Resolve (scan manifests via x-dependency-audit), Validate (CVE/license/version/freshness checks), Report. Exit codes: `0`=DEP_POLICY_PASS, `20`=DEP_POLICY_BLOCK, `21`=DEP_POLICY_WARN, `22`=DEP_POLICY_DISABLED, `2`=OPERATIONAL_ERROR. `--policy` flag em `x-dependency-audit` para delegação direta. Introduzido por story-0074-0002.
+- **`_TEMPLATE-DEP-POLICY-REPORT.md`**: template de evidência para `dep-policy-validation-report-STORY-ID.md`. Seções: Header, Summary, Blocking Violations, Warning Violations, Policy Snapshot, Tooling. Registrado em `PlanTemplateDefinitions.TEMPLATE_SECTIONS`. Introduzido por story-0074-0002.
+- **`_TEMPLATE-DEP-POLICY-DECLARATION.md`**: template de documentação de política do projeto. Seções: Policy Status, Enforcement Matrix (D-R10), Scope Policy (D-R11), Version Constraints, CVE Exceptions, License Rationale. Gerado por `DocsAssembler` quando `governance.dependency-policy` capability ativa. Introduzido por story-0074-0003.
+- **6 capabilities** (`governance/dependency-policy`, `.cve`, `.license`, `.version`, `.freshness`, `.scope`): declaradas em `capabilities/governance/` + registradas em `capabilities/_index.yaml`. `requires-capabilities: [governance.dependency-policy]` no frontmatter do skill. Introduzido por story-0074-0001.
+- **`audit-dep-policy.sh`** (Camada 2 CI Script, Rule 26): verifica artefatos `dep-policy-validation-report-*.md` por story merged quando `DEPENDENCY_POLICY_ENABLED=true`; baseline grandfathering via `governance/baselines/dep-policy-baseline.txt`. Exit codes: `0`=OK, `1`=DEPENDENCY_POLICY_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implementa `--self-check`. Introduzido por story-0074-0004.
+- **`governance/baselines/dep-policy-baseline.txt`**: baseline vazio (imutável após EPIC-0074 merge). Introduzido por story-0074-0004.
+- **`docs/adr/ADR-0027-dependency-policy-gate.md`**: decision record para o gate de política de dependências, abordagem safe-default, schema de versionamento cross-stack, e sequência D-R11 de enforcement por escopo. Introduzido por story-0074-0001.
+- **Rule 32 — Dependency Policy Gate** (`32-dependency-policy-gate.md`): nova rule com YAML block `dependencies.policy`, matriz de enforcement D-R10, scope policy D-R11, RULE-074-01 hard-block CVE, backward compatibility (Rule 19). Gerada para todos os 10 perfis golden. Introduzido por story-0074-0001.
+- **`x-story-implement` Phase 3.Q extended** (EPIC-0074): `x-dep-policy-validate` adicionado como gate Phase 3.Q.5 (após contract gate); `[conditional: flag.dep_policy_enabled]` grammar marker (Rule 28); telemetry sub-phase `Phase-3-Quality-DepPolicy`; exit code 20 `DEP_POLICY_BLOCK` adicionado ao Error Envelope. Arquivo comprimido para 410 linhas (RULE-004). Introduzido por story-0074-0005.
+- **Rule 24 Evidence Artifacts extended**: `x-dep-policy-validate → dep-policy-validation-report-STORY-ID.md` adicionado como Camada 3 (soft — conditional: `dependencies.policy.enabled=true`, EPIC-0074). Introduzido por story-0074-0005.
+- **Rule 27 Surface 13 added**: "Dependency policy gate" adicionado à tabela Non-bypass Contract; "13 surfaces" documentado (era 12). Introduzido por story-0074-0005.
+- **`knowledge/security/dependency-policy-playbook.md`**: knowledge pack com playbook de política de dependências (CVE triage, license review, version pinning, freshness management). Introduzido por story-0074-0003.
+- **`Epic0074DepPolicyValidateSmokeIT`** (27 E2E scenarios): SKILL.md structure, exit codes, enforcement dimensions, RULE-074-01 hard-block, capability frontmatter, dep-audit `--policy` flag, domain model defaults, CI audit script structure, baseline, Rule 32, x-story-implement integration, Rule 24/27 updates, BlockAction values, capabilities index, ADR-0027, declaration template sections, golden profiles.
+
+### [Breaking] — EPIC-0074
+
+> **`x-story-implement` Phase 3 gains a 5th conditional quality gate.** When `dependencies.policy.enabled=true`, `x-dep-policy-validate` is invoked as MANDATORY TOOL CALL (exit code 20 `DEP_POLICY_BLOCK`). The gate runs after the contract gate (D-R11 ordering). Projects with `dependencies.policy.enabled=false` (the default — Rule 19 safe default) are completely unaffected. The `p3Tasks` task tracker map gains a `qualityDepPolicy` entry — implementations that pattern-match on the exact map size will need updating (13 trackers total in Phase 3).
+
 ### Highlights — EPIC-0073 (Regression Shell + DAST)
 
 Antes desta release, projetos gerados por `ia-dev-env` podiam declarar testes de regressão e DAST no YAML mas **nenhum gate os executava automaticamente** — as skills `x-test-regression-shell` e `x-pentest-dynamic` existiam como comandos manuais sem integração no lifecycle do `x-story-implement`. DAST era especialmente opaco: precisava de configuração manual de ZAP, sem template de workflow, sem gate em PR, sem nightly separado.

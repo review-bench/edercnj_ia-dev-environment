@@ -3,8 +3,8 @@ package dev.iadev.smoke;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.application.assembler.PlanTemplateDefinitions;
+import dev.iadev.domain.model.BlockAction;
 import dev.iadev.domain.model.DependencyPolicyConfig;
-import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.testutil.TestConfigBuilder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,9 +79,7 @@ class Epic0074DepPolicyValidateSmokeIT {
         void scenario3_skillFile_containsEnforcementDimensions() throws Exception {
             String content = Files.readString(SKILL_ROOT.resolve("SKILL.md").toAbsolutePath());
             assertThat(content).as("must reference denied-cves").contains("denied-cves");
-            assertThat(content)
-                    .as("must reference allowed-licenses")
-                    .contains("allowed-licenses");
+            assertThat(content).as("must reference allowed-licenses").contains("allowed-licenses");
             assertThat(content).as("must reference min-versions").contains("min-versions");
             assertThat(content).as("must reference max-versions").contains("max-versions");
             assertThat(content)
@@ -155,7 +153,14 @@ class Epic0074DepPolicyValidateSmokeIT {
     class AuditScript {
 
         private static final Path AUDIT_SCRIPT =
-                Path.of("src", "main", "resources", "targets", "claude", "scripts", "audit-dep-policy.sh");
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "scripts",
+                        "audit-dep-policy.sh");
 
         private static final Path BASELINE =
                 Path.of("governance", "baselines", "dep-policy-baseline.txt");
@@ -180,9 +185,7 @@ class Epic0074DepPolicyValidateSmokeIT {
         @DisplayName("scenario15_auditScript_conformsToRule26ExitCodes")
         void scenario15_auditScript_conformsToRule26ExitCodes() throws Exception {
             String content = Files.readString(AUDIT_SCRIPT.toAbsolutePath());
-            assertThat(content)
-                    .as("must document exit 0 = OK")
-                    .contains("0=OK");
+            assertThat(content).as("must document exit 0 = OK").contains("0=OK");
             assertThat(content)
                     .as("must document exit 1 = DEPENDENCY_POLICY_VIOLATION")
                     .contains("DEPENDENCY_POLICY_VIOLATION");
@@ -204,9 +207,7 @@ class Epic0074DepPolicyValidateSmokeIT {
         @DisplayName("scenario17_auditScript_referencesRule32")
         void scenario17_auditScript_referencesRule32() throws Exception {
             String content = Files.readString(AUDIT_SCRIPT.toAbsolutePath());
-            assertThat(content)
-                    .as("must reference Rule 32")
-                    .contains("Rule 32");
+            assertThat(content).as("must reference Rule 32").contains("Rule 32");
         }
     }
 
@@ -287,12 +288,107 @@ class Epic0074DepPolicyValidateSmokeIT {
         @DisplayName("scenario21_rule27_includesSurface13")
         void scenario21_rule27_includesSurface13() throws Exception {
             String content = Files.readString(RULE_27.toAbsolutePath());
-            assertThat(content)
-                    .as("Rule 27 must enumerate 13 surfaces")
-                    .contains("13 surfaces");
+            assertThat(content).as("Rule 27 must enumerate 13 surfaces").contains("13 surfaces");
             assertThat(content)
                     .as("Rule 27 must list dep-policy-validation-report as Surface 13")
                     .contains("dep-policy-validation-report-STORY-ID.md");
+        }
+    }
+
+    @Nested
+    @DisplayName("End-to-end delivery (story-0074-0006)")
+    class EndToEnd {
+
+        private static final Path CAPABILITIES_INDEX = Path.of("capabilities", "_index.yaml");
+
+        private static final Path ADR_0027 =
+                Path.of("docs", "adr", "ADR-0027-dependency-policy-gate.md");
+
+        private static final Path DEP_POLICY_DECLARATION_TEMPLATE =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "shared",
+                        "templates",
+                        "_TEMPLATE-DEP-POLICY-DECLARATION.md");
+
+        @Test
+        @DisplayName("scenario22_blockAction_hasAllThreeValues")
+        void scenario22_blockAction_hasAllThreeValues() {
+            assertThat(BlockAction.values())
+                    .as("BlockAction must have BLOCK, WARN_ONLY, IGNORE")
+                    .containsExactlyInAnyOrder(
+                            BlockAction.BLOCK, BlockAction.WARN_ONLY, BlockAction.IGNORE);
+        }
+
+        @Test
+        @DisplayName("scenario23_blockAction_fromYaml_parsesAnyViolationAsBlock")
+        void scenario23_blockAction_fromYaml_parsesAnyViolationAsBlock() {
+            assertThat(BlockAction.fromYaml("any-violation"))
+                    .as("'any-violation' must map to BLOCK (Rule 32 §block-on)")
+                    .isEqualTo(BlockAction.BLOCK);
+            assertThat(BlockAction.fromYaml("warn-only"))
+                    .as("'warn-only' must map to WARN_ONLY")
+                    .isEqualTo(BlockAction.WARN_ONLY);
+            assertThat(BlockAction.fromYaml("ignore"))
+                    .as("'ignore' must map to IGNORE")
+                    .isEqualTo(BlockAction.IGNORE);
+        }
+
+        @Test
+        @DisplayName("scenario24_capabilitiesIndex_includesDependencyPolicy")
+        void scenario24_capabilitiesIndex_includesDependencyPolicy() throws Exception {
+            String content = Files.readString(CAPABILITIES_INDEX.toAbsolutePath());
+            assertThat(content)
+                    .as("capabilities/_index.yaml must list governance.dependency-policy")
+                    .contains("governance.dependency-policy");
+        }
+
+        @Test
+        @DisplayName("scenario25_adr0027_exists")
+        void scenario25_adr0027_exists() {
+            assertThat(ADR_0027.toAbsolutePath()).exists();
+        }
+
+        @Test
+        @DisplayName("scenario26_declarationTemplate_hasMandatorySections")
+        void scenario26_declarationTemplate_hasMandatorySections() throws Exception {
+            String content = Files.readString(DEP_POLICY_DECLARATION_TEMPLATE.toAbsolutePath());
+            assertThat(content)
+                    .as("declaration template must have Policy Status section")
+                    .contains("## Policy Status");
+            assertThat(content)
+                    .as("declaration template must have Enforcement Matrix (D-R10)")
+                    .contains("D-R10");
+            assertThat(content)
+                    .as("declaration template must have Scope Policy (D-R11)")
+                    .contains("D-R11");
+            assertThat(content)
+                    .as("declaration template must document RULE-074-01 hard-block")
+                    .contains("RULE-074-01");
+        }
+
+        @Test
+        @DisplayName("scenario27_goldenProfiles_includeRule32")
+        void scenario27_goldenProfiles_includeRule32() throws Exception {
+            Path goldenRoot = Path.of("src", "test", "resources", "golden");
+            long profilesWithRule32 =
+                    Files.walk(goldenRoot, 3)
+                            .filter(
+                                    p ->
+                                            p.getFileName().toString().equals("README.md")
+                                                    && p.toString().contains(".claude"))
+                            .map(p -> p.getParent().resolve("rules"))
+                            .filter(
+                                    rulesDir ->
+                                            rulesDir.resolve("32-dependency-policy-gate.md")
+                                                    .toFile()
+                                                    .exists())
+                            .count();
+            assertThat(profilesWithRule32)
+                    .as("all golden profiles must include Rule 32 in .claude/rules/")
+                    .isGreaterThanOrEqualTo(9L);
         }
     }
 
@@ -303,10 +399,7 @@ class Epic0074DepPolicyValidateSmokeIT {
         @Test
         @DisplayName("scenario9_depPolicyReportTemplate_exists")
         void scenario9_depPolicyReportTemplate_exists() {
-            assertThat(
-                            TEMPLATES_ROOT
-                                    .resolve("_TEMPLATE-DEP-POLICY-REPORT.md")
-                                    .toAbsolutePath())
+            assertThat(TEMPLATES_ROOT.resolve("_TEMPLATE-DEP-POLICY-REPORT.md").toAbsolutePath())
                     .exists();
         }
 
@@ -334,9 +427,7 @@ class Epic0074DepPolicyValidateSmokeIT {
             assertThat(content)
                     .as("must have Warning Violations section")
                     .contains("Warning Violations");
-            assertThat(content)
-                    .as("must have Policy Snapshot section")
-                    .contains("Policy Snapshot");
+            assertThat(content).as("must have Policy Snapshot section").contains("Policy Snapshot");
             assertThat(content).as("must have Tooling section").contains("## Tooling");
         }
 

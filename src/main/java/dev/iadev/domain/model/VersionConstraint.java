@@ -10,10 +10,8 @@ import java.util.Map;
  * <ul>
  *   <li><b>JVM</b> — Maven/Gradle: {@code groupId + artifactId + version}. {@code artifactId}
  *       accepts the wildcard {@code "*"} to match all artifacts under the group.
- *   <li><b>NPM/PyPI</b> — {@code name + version}. Wildcard {@code "*"} in {@code name} is
- *       rejected.
- *   <li><b>Go</b> — {@code module + version}. Full module path (e.g.
- *       {@code github.com/foo/bar}).
+ *   <li><b>NPM/PyPI</b> — {@code name + version}. Wildcard {@code "*"} in {@code name} is rejected.
+ *   <li><b>Go</b> — {@code module + version}. Full module path (e.g. {@code github.com/foo/bar}).
  * </ul>
  *
  * <p>Formats are mutually exclusive. Combining fields from different formats (e.g. {@code groupId}
