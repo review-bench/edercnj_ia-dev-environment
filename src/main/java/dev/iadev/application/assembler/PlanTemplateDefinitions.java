@@ -21,7 +21,7 @@ import java.util.Map;
 public final class PlanTemplateDefinitions {
 
     /** Number of templates currently managed. */
-    public static final int TEMPLATE_COUNT = 26;
+    public static final int TEMPLATE_COUNT = 27;
 
     private static final List<Map.Entry<String, List<String>>> STORY_PLANNING_TEMPLATES =
             List.of(
@@ -295,7 +295,17 @@ public final class PlanTemplateDefinitions {
                                     "CHANGELOG Integration",
                                     "Tooling",
                                     "Risks and Gaps",
-                                    "Recommended Action")));
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-DEP-POLICY-REPORT.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Blocking Violations",
+                                    "Warning Violations",
+                                    "Suppressed",
+                                    "Policy Snapshot",
+                                    "Tooling")));
 
     private static final List<Map.Entry<String, List<String>>> PR_BODY_TEMPLATES =
             List.of(
