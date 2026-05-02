@@ -1,0 +1,6 @@
+# dep-policy-baseline.txt
+# Stories exempted from the dependency policy evidence artifact check.
+# Format: story-XXXX-YYYY  # reason
+# Immutable after EPIC-0074 merges — no new entries may be added.
+#
+# Initial baseline: empty (EPIC-0074 ships the gate; no pre-existing stories to grandfather).

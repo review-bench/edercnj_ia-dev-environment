@@ -151,6 +151,66 @@ class Epic0074DepPolicyValidateSmokeIT {
     }
 
     @Nested
+    @DisplayName("CI audit script — audit-dep-policy.sh")
+    class AuditScript {
+
+        private static final Path AUDIT_SCRIPT =
+                Path.of("src", "main", "resources", "targets", "claude", "scripts", "audit-dep-policy.sh");
+
+        private static final Path BASELINE =
+                Path.of("governance", "baselines", "dep-policy-baseline.txt");
+
+        @Test
+        @DisplayName("scenario13_auditScript_exists")
+        void scenario13_auditScript_exists() {
+            assertThat(AUDIT_SCRIPT.toAbsolutePath()).exists();
+        }
+
+        @Test
+        @DisplayName("scenario14_auditScript_implementsSelfCheck")
+        void scenario14_auditScript_implementsSelfCheck() throws Exception {
+            String content = Files.readString(AUDIT_SCRIPT.toAbsolutePath());
+            assertThat(content).as("must implement --self-check flag").contains("--self-check");
+            assertThat(content)
+                    .as("must emit OPERATIONAL_ERROR on missing prerequisite")
+                    .contains("OPERATIONAL_ERROR");
+        }
+
+        @Test
+        @DisplayName("scenario15_auditScript_conformsToRule26ExitCodes")
+        void scenario15_auditScript_conformsToRule26ExitCodes() throws Exception {
+            String content = Files.readString(AUDIT_SCRIPT.toAbsolutePath());
+            assertThat(content)
+                    .as("must document exit 0 = OK")
+                    .contains("0=OK");
+            assertThat(content)
+                    .as("must document exit 1 = DEPENDENCY_POLICY_VIOLATION")
+                    .contains("DEPENDENCY_POLICY_VIOLATION");
+            assertThat(content)
+                    .as("must document exit 2 = OPERATIONAL_ERROR")
+                    .contains("2=OPERATIONAL_ERROR");
+            assertThat(content)
+                    .as("must document exit 3 = BASELINE_CORRUPT")
+                    .contains("3=BASELINE_CORRUPT");
+        }
+
+        @Test
+        @DisplayName("scenario16_baselineFile_exists")
+        void scenario16_baselineFile_exists() {
+            assertThat(BASELINE.toAbsolutePath()).exists();
+        }
+
+        @Test
+        @DisplayName("scenario17_auditScript_referencesRule32")
+        void scenario17_auditScript_referencesRule32() throws Exception {
+            String content = Files.readString(AUDIT_SCRIPT.toAbsolutePath());
+            assertThat(content)
+                    .as("must reference Rule 32")
+                    .contains("Rule 32");
+        }
+    }
+
+    @Nested
     @DisplayName("Template artifacts")
     class Artifacts {
 
