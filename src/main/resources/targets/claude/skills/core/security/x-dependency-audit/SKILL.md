@@ -3,7 +3,7 @@ name: x-dependency-audit
 description: "Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
-argument-hint: "[--scope all|vulnerabilities|outdated|licenses|sbom|license-report|tree]"
+argument-hint: "[--scope all|vulnerabilities|outdated|licenses|sbom|license-report|tree] [--policy]"
 requires-capabilities: []
 ---
 
@@ -28,12 +28,14 @@ Audits all dependencies of {{PROJECT_NAME}} for security vulnerabilities, outdat
 - `/x-dependency-audit --scope sbom` — generate CycloneDX SBOM only
 - `/x-dependency-audit --scope license-report` — generate license attribution report
 - `/x-dependency-audit --scope tree` — generate dependency tree visualization
+- `/x-dependency-audit --scope all --policy` — full audit + dependency policy validation (requires `dependencies.policy.enabled: true`)
 
 ## Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `--scope` | Enum | `all` | Audit scope: all, vulnerabilities, outdated, licenses, sbom, license-report, tree |
+| `--policy` | Boolean | `false` | After standard audit, invoke `x-dep-policy-validate` to enforce `DependencyPolicyConfig` (EPIC-0074, Rule 32) |
 
 ## Workflow
 
@@ -381,3 +383,18 @@ Write tree to `results/audits/dependency-tree-YYYY-MM-DD.md`:
 | `x-supply-chain-audit` | complementary | Handles deeper supply chain risks (maintainer, typosquatting, SLSA) |
 | `x-ci-generate` | called-by | Dependency audit pipeline references audit commands from this skill |
 | `x-security-dashboard` | reads | Dashboard aggregates results from this skill |
+| `x-dep-policy-validate` | delegates-to | When `--policy` flag is set, delegates policy enforcement to this skill after standard audit completes |
+
+## `--policy` Flag — Policy Validation Integration
+
+When `--policy` is passed:
+
+1. Execute the standard audit workflow (Steps 1-5) normally.
+2. After generating the standard audit report, invoke the policy validator:
+   ```
+   Skill(skill: "x-dep-policy-validate", args: "--story-id <STORY-ID> --report <artifact-path>")
+   ```
+3. Propagate exit code: if `x-dep-policy-validate` exits 1 (`DEP_POLICY_BLOCK`), this skill also exits non-zero.
+4. The standard audit report and the policy validation report are independent artifacts.
+
+This flag is a no-op when `dependencies.policy.enabled: false` or the `governance.dependency-policy` capability is not declared in the project profile.

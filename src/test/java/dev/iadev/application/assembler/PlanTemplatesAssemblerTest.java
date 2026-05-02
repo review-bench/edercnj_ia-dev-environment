@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for PlanTemplatesAssembler -- copies 26 planning and review templates to
+ * Tests for PlanTemplatesAssembler -- copies 27 planning and review templates to
  * .claude/templates/.
  *
- * <p>TPP order: degenerate (empty source) -> constant (single template) -> collection (all 26) ->
+ * <p>TPP order: degenerate (empty source) -> constant (single template) -> collection (all 27) ->
  * conditional (section validation) -> error (missing template).
  */
 @DisplayName("PlanTemplatesAssembler")
@@ -52,7 +52,8 @@ class PlanTemplatesAssemblerTest {
                     "_TEMPLATE-PR-IMPLEMENTATION.md",
                     "_TEMPLATE-PERFORMANCE-PLAN.md",
                     "_TEMPLATE-MUTATION-PLAN.md",
-                    "_TEMPLATE-CONTRACT-PLAN.md");
+                    "_TEMPLATE-CONTRACT-PLAN.md",
+                    "_TEMPLATE-DEP-POLICY-REPORT.md");
 
     @Nested
     @DisplayName("implements Assembler interface")
@@ -71,15 +72,15 @@ class PlanTemplatesAssemblerTest {
     class ConstantsValidation {
 
         @Test
-        @DisplayName("TEMPLATE_COUNT equals 26")
+        @DisplayName("TEMPLATE_COUNT equals 27")
         void templateCount_equals26() {
-            assertThat(PlanTemplatesAssembler.TEMPLATE_COUNT).isEqualTo(26);
+            assertThat(PlanTemplatesAssembler.TEMPLATE_COUNT).isEqualTo(27);
         }
 
         @Test
-        @DisplayName("TEMPLATE_SECTIONS has exactly 26" + " entries")
+        @DisplayName("TEMPLATE_SECTIONS has exactly 27" + " entries")
         void templateSections_has26Entries() {
-            assertThat(PlanTemplatesAssembler.TEMPLATE_SECTIONS).hasSize(26);
+            assertThat(PlanTemplatesAssembler.TEMPLATE_SECTIONS).hasSize(27);
         }
 
         @Test
@@ -126,8 +127,8 @@ class PlanTemplatesAssemblerTest {
     class HappyPath {
 
         @Test
-        @DisplayName("copies 26 templates to .claude/templates/")
-        void assemble_allValid_copies26Files(@TempDir Path tempDir) throws IOException {
+        @DisplayName("copies 27 templates to .claude/templates/")
+        void assemble_allValid_copies27Files(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -138,12 +139,12 @@ class PlanTemplatesAssemblerTest {
             AssemblerResult result =
                     assembler.assembleWithResult(config, new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(26);
+            assertThat(result.files()).hasSize(27);
             assertThat(result.warnings()).isEmpty();
         }
 
         @Test
-        @DisplayName("all 26 templates exist in" + " .claude/templates/")
+        @DisplayName("all 27 templates exist in" + " .claude/templates/")
         void assemble_allValid_existsInClaude(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
@@ -248,7 +249,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(25);
+            assertThat(result.files()).hasSize(26);
             assertThat(result.warnings())
                     .anyMatch(w -> w.contains("_TEMPLATE-TEST-PLAN.md"))
                     .anyMatch(w -> w.contains("Missing mandatory section"));
@@ -275,7 +276,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(25);
+            assertThat(result.files()).hasSize(26);
 
             assertThat(
                             outputDir.resolve(
@@ -306,7 +307,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(25);
+            assertThat(result.files()).hasSize(26);
             assertThat(result.warnings())
                     .anyMatch(w -> w.contains("Template not found"))
                     .anyMatch(w -> w.contains("_TEMPLATE-ARCHITECTURE" + "-PLAN.md"));
@@ -356,7 +357,7 @@ class PlanTemplatesAssemblerTest {
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
             assertThat(result).isNotNull();
-            assertThat(result.files()).hasSize(26);
+            assertThat(result.files()).hasSize(27);
             assertThat(result.warnings()).isEmpty();
         }
     }
@@ -366,8 +367,8 @@ class PlanTemplatesAssemblerTest {
     class AssembleFileList {
 
         @Test
-        @DisplayName("assemble returns 26 file paths")
-        void assemble_allValid_returns26Paths(@TempDir Path tempDir) throws IOException {
+        @DisplayName("assemble returns 27 file paths")
+        void assemble_allValid_returns27Paths(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -377,7 +378,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assemble(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(files).hasSize(26);
+            assertThat(files).hasSize(27);
         }
 
         @Test
@@ -400,7 +401,7 @@ class PlanTemplatesAssemblerTest {
     // -- Helpers ------------------------------------------------
 
     /**
-     * Creates all 26 templates with valid mandatory sections in {tempDir}/res/shared/templates/.
+     * Creates all 27 templates with valid mandatory sections in {tempDir}/res/shared/templates/.
      */
     private static Path setupAllTemplates(Path tempDir) throws IOException {
         Path resourcesDir = tempDir.resolve("res");
@@ -811,6 +812,21 @@ class PlanTemplatesAssemblerTest {
                                 "Tooling",
                                 "Risks and Gaps",
                                 "Recommended Action"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-DEP-POLICY-REPORT.md",
+                buildContent(
+                        "Dep Policy Report",
+                        List.of(
+                                "Header",
+                                "Summary",
+                                "Blocking Violations",
+                                "Warning Violations",
+                                "Suppressed",
+                                "Policy Snapshot",
+                                "Tooling"),
                         false));
 
         return resourcesDir;
