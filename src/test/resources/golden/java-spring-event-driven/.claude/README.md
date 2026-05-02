@@ -94,9 +94,10 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 29 | `29-refinement-gate.md` | refinement gate |
 | 30 | `30-value-driven-templates.md` | value driven templates |
 | 31 | `31-documentation-freshness-gate.md` | documentation freshness gate |
+| 32 | `32-dependency-policy-gate.md` | dependency policy gate |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 28 rules**
+**Total: 29 rules**
 
 ### Numbering
 
@@ -347,7 +348,7 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 28 |
+| Rules (.claude) | 29 |
 | Skills (.claude) | 76 |
 | Knowledge Packs (.claude) | 19 |
 | Agents (.claude) | 12 |

@@ -64,7 +64,8 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
                         branchingModel,
                         telemetryEnabled,
                         DocumentationConfig.DEFAULT,
-                        QualityConfig.DEFAULT));
+                        QualityConfig.DEFAULT,
+                        DependencyPolicyConfig.DEFAULT));
     }
 
     /**
@@ -335,5 +336,16 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
 
     static QualityConfig parseQuality(Map<String, Object> map) {
         return QualityConfig.fromMap(MapHelper.optionalMap(map, "quality"));
+    }
+
+    public DependencyPolicyConfig dependencyPolicy() {
+        return governance.dependencyPolicy();
+    }
+
+    @SuppressWarnings("unchecked")
+    static DependencyPolicyConfig parseDependencyPolicy(Map<String, Object> map) {
+        Map<String, Object> deps = MapHelper.optionalMap(map, "dependencies");
+        Map<String, Object> policy = MapHelper.optionalMap(deps, "policy");
+        return DependencyPolicyConfig.fromMap(policy);
     }
 }

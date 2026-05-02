@@ -1,0 +1,29 @@
+id: governance.dependency-policy
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Dependency Policy & SCA Final Gate — enables the dependencies.policy YAML block
+  that configures min/max version constraints (cross-stack D-R9), license whitelist,
+  denied CVEs, freshness window, and a per-dimension block-on enforcement matrix.
+  Installs domain model DependencyPolicyConfig, skill x-dep-policy-validate,
+  CI audit audit-dep-policy.sh, and mandatory conditional invocation in
+  x-story-implement Phase 3. Universal — all stacks (JVM, NPM, PyPI, Go).
+requires-capabilities: []
+requires: []
+excludes: []
+universal: true
+parameters:
+  enabled:
+    type: boolean
+    default: false
+    description: >
+      Whether the dependency policy gate is active. Safe default false — existing
+      projects are unaffected until they set dependencies.policy.enabled: true.
+tags:
+  - governance
+  - dependency-policy
+  - sca
+  - security-gate
+  - quality-gate
