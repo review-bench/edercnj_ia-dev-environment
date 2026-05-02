@@ -211,6 +211,92 @@ class Epic0074DepPolicyValidateSmokeIT {
     }
 
     @Nested
+    @DisplayName("x-story-implement Phase 3 integration (story-0074-0005)")
+    class StoryImplementIntegration {
+
+        private static final Path STORY_IMPLEMENT =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "skills",
+                        "core",
+                        "dev",
+                        "x-story-implement",
+                        "SKILL.md");
+
+        private static final Path RULE_24 =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "rules",
+                        "24-execution-integrity.md");
+
+        private static final Path RULE_27 =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "rules",
+                        "27-zero-bypass-lifecycle.md");
+
+        @Test
+        @DisplayName("scenario18_storyImplement_containsDepPolicyValidateSkillCall")
+        void scenario18_storyImplement_containsDepPolicyValidateSkillCall() throws Exception {
+            String content = Files.readString(STORY_IMPLEMENT.toAbsolutePath());
+            assertThat(content)
+                    .as("must invoke x-dep-policy-validate in Phase 3")
+                    .contains("x-dep-policy-validate");
+            assertThat(content)
+                    .as("must mark invocation as conditional on dep_policy_enabled")
+                    .contains("flag.dep_policy_enabled");
+            assertThat(content)
+                    .as("must produce dep-policy-validation-report evidence artifact")
+                    .contains("dep-policy-validation-report-STORY-ID.md");
+        }
+
+        @Test
+        @DisplayName("scenario19_storyImplement_documentsDepPolicyBlockExitCode")
+        void scenario19_storyImplement_documentsDepPolicyBlockExitCode() throws Exception {
+            String content = Files.readString(STORY_IMPLEMENT.toAbsolutePath());
+            assertThat(content)
+                    .as("must document DEP_POLICY_BLOCK exit code")
+                    .contains("DEP_POLICY_BLOCK");
+        }
+
+        @Test
+        @DisplayName("scenario20_rule24_includesDepPolicyEvidenceArtifact")
+        void scenario20_rule24_includesDepPolicyEvidenceArtifact() throws Exception {
+            String content = Files.readString(RULE_24.toAbsolutePath());
+            assertThat(content)
+                    .as("Rule 24 must register dep-policy-validate as mandatory evidence artifact")
+                    .contains("x-dep-policy-validate");
+            assertThat(content)
+                    .as("Rule 24 must reference dep-policy-validation-report artifact path")
+                    .contains("dep-policy-validation-report-STORY-ID.md");
+        }
+
+        @Test
+        @DisplayName("scenario21_rule27_includesSurface13")
+        void scenario21_rule27_includesSurface13() throws Exception {
+            String content = Files.readString(RULE_27.toAbsolutePath());
+            assertThat(content)
+                    .as("Rule 27 must enumerate 13 surfaces")
+                    .contains("13 surfaces");
+            assertThat(content)
+                    .as("Rule 27 must list dep-policy-validation-report as Surface 13")
+                    .contains("dep-policy-validation-report-STORY-ID.md");
+        }
+    }
+
+    @Nested
     @DisplayName("Template artifacts")
     class Artifacts {
 

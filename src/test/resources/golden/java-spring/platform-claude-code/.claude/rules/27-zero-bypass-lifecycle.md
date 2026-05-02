@@ -35,7 +35,7 @@ Every task implementation MUST be traceable to an invocation of `x-task-implemen
 No PR targeting `epic/*` or `develop` may be merged without all required evidence
 artifacts present on disk and referenced in the PR body.
 
-The 12 surfaces (orchestration points) where bypass is explicitly catalogued and
+The 13 surfaces (orchestration points) where bypass is explicitly catalogued and
 prohibited are:
 
 | # | Surface | Required orchestrator | Evidence artifact |
@@ -52,6 +52,7 @@ prohibited are:
 | 10 | Epic integrity gate | `x-internal-epic-integrity-gate` | `ai/epics/epic-XXXX/reports/verify-envelope-epic-XXXX.json` |
 | 11 | Story-level PR body | `x-pr-create` (structured body) | `## Orchestrator Evidence` section in PR description |
 | 12 | Telemetry stream | `telemetry-phase.sh` markers | `ai/epics/epic-XXXX/telemetry/events.ndjson` (phase.start + phase.end pairs) |
+| 13 | Dependency policy gate | `x-dep-policy-validate` (conditional: `dependencies.policy.enabled=true`) | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` |
 
 ## Enforcement Layers
 
@@ -76,7 +77,7 @@ Orchestrator SKILL.md files phrase every mandatory invocation as
 ### Camada 3 — CI audit
 
 `scripts/audit-execution-integrity.sh` runs on every PR to `develop` or `epic/*`.
-- Verifies all 12 surface evidence artifacts for each merged story.
+- Verifies all 13 surface evidence artifacts for each merged story.
 - Fails with `EIE_EVIDENCE_MISSING` when any mandatory artifact is absent.
 - Extended in EPIC-0059 (story-0059-0003) to include bypass-flag checks:
   `scripts/audit-bypass-flags.sh` scans every merged SKILL.md change for
@@ -135,7 +136,7 @@ EPIC-0059, story-0059-0005).
 ## Audit
 
 `scripts/audit-execution-integrity.sh` (extended in EPIC-0059 story-0059-0003) is
-the primary CI gate for Rule 27. It verifies all 12 surfaces listed in the
+the primary CI gate for Rule 27. It verifies all 13 surfaces listed in the
 Non-bypass Contract. Exit codes follow the Rule 26 §Standardized Exit Codes matrix:
 
 | Exit | Code | Condition |
