@@ -77,9 +77,11 @@ class DependencyPolicyConfigTest {
 
         @Test
         void fromMap_enabled_parsesMinVersions() {
-            var map = Map.of(
-                    "enabled", true,
-                    "min-versions",
+            var map =
+                    Map.of(
+                            "enabled",
+                            true,
+                            "min-versions",
                             List.of(
                                     Map.of(
                                             "groupId", "org.springframework.boot",
@@ -97,9 +99,12 @@ class DependencyPolicyConfigTest {
 
         @Test
         void fromMap_enabled_parsesNpmConstraint() {
-            var map = Map.of(
-                    "enabled", true,
-                    "min-versions", List.of(Map.of("name", "lodash", "version", "4.17.21")));
+            var map =
+                    Map.of(
+                            "enabled",
+                            true,
+                            "min-versions",
+                            List.of(Map.of("name", "lodash", "version", "4.17.21")));
 
             var cfg = DependencyPolicyConfig.fromMap(map);
 
@@ -110,9 +115,11 @@ class DependencyPolicyConfigTest {
 
         @Test
         void fromMap_enabled_parsesGoConstraint() {
-            var map = Map.of(
-                    "enabled", true,
-                    "max-versions",
+            var map =
+                    Map.of(
+                            "enabled",
+                            true,
+                            "max-versions",
                             List.of(Map.of("module", "github.com/foo/bar", "version", "v1.2.0")));
 
             var cfg = DependencyPolicyConfig.fromMap(map);
@@ -124,10 +131,14 @@ class DependencyPolicyConfigTest {
 
         @Test
         void fromMap_enabled_parsesDeniedCvesAndFreshness() {
-            var map = Map.of(
-                    "enabled", true,
-                    "denied-cves", List.of("CVE-2024-12345"),
-                    "freshness-window-days", 180);
+            var map =
+                    Map.of(
+                            "enabled",
+                            true,
+                            "denied-cves",
+                            List.of("CVE-2024-12345"),
+                            "freshness-window-days",
+                            180);
 
             var cfg = DependencyPolicyConfig.fromMap(map);
 
@@ -137,9 +148,12 @@ class DependencyPolicyConfigTest {
 
         @Test
         void fromMap_enabled_parsesAllowedLicenses() {
-            var map = Map.of(
-                    "enabled", true,
-                    "allowed-licenses", List.of("Apache-2.0", "MIT", "BSD-3-Clause"));
+            var map =
+                    Map.of(
+                            "enabled",
+                            true,
+                            "allowed-licenses",
+                            List.of("Apache-2.0", "MIT", "BSD-3-Clause"));
 
             var cfg = DependencyPolicyConfig.fromMap(map);
 
@@ -154,8 +168,7 @@ class DependencyPolicyConfigTest {
 
         @Test
         void nullMinVersions_defaults_toEmptyList() {
-            var cfg = new DependencyPolicyConfig(
-                    false, null, null, null, null, 365, null, null);
+            var cfg = new DependencyPolicyConfig(false, null, null, null, null, 365, null, null);
             assertThat(cfg.minVersions()).isEmpty();
             assertThat(cfg.maxVersions()).isEmpty();
             assertThat(cfg.deniedCves()).isEmpty();
@@ -164,8 +177,10 @@ class DependencyPolicyConfigTest {
         @Test
         void negativeFreshnessWindow_throws() {
             assertThatThrownBy(
-                            () -> new DependencyPolicyConfig(
-                                    false, List.of(), List.of(), null, List.of(), -1, null, null))
+                            () ->
+                                    new DependencyPolicyConfig(
+                                            false, List.of(), List.of(), null, List.of(), -1, null,
+                                            null))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("freshness-window-days");
         }
@@ -173,8 +188,9 @@ class DependencyPolicyConfigTest {
         @Test
         void minVersionsList_isImmutable() {
             var mutable = new java.util.ArrayList<VersionConstraint>();
-            var cfg = new DependencyPolicyConfig(
-                    true, mutable, List.of(), null, List.of(), 365, null, null);
+            var cfg =
+                    new DependencyPolicyConfig(
+                            true, mutable, List.of(), null, List.of(), 365, null, null);
             assertThatThrownBy(() -> cfg.minVersions().add(null))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
@@ -187,9 +203,15 @@ class DependencyPolicyConfigTest {
         @Test
         void ambiguousFormat_groupIdAndName_throws() {
             assertThatThrownBy(
-                            () -> VersionConstraint.fromMap(
-                                    Map.of("groupId", "com.example", "name", "foo", "version",
-                                            "1.0")))
+                            () ->
+                                    VersionConstraint.fromMap(
+                                            Map.of(
+                                                    "groupId",
+                                                    "com.example",
+                                                    "name",
+                                                    "foo",
+                                                    "version",
+                                                    "1.0")))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("mutually exclusive");
         }
@@ -204,8 +226,7 @@ class DependencyPolicyConfigTest {
 
         @Test
         void missingIdentifierField_throws() {
-            assertThatThrownBy(
-                            () -> VersionConstraint.fromMap(Map.of("version", "1.0")))
+            assertThatThrownBy(() -> VersionConstraint.fromMap(Map.of("version", "1.0")))
                     .isInstanceOf(ConfigValidationException.class)
                     .hasMessageContaining("groupId, name, module");
         }

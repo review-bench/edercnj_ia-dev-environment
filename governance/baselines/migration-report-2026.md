@@ -483,3 +483,51 @@ The file is append-only; multiple runs add new sections.
 | Epic | flowVersion | Source | Destination | Action |
 | :--- | :--- | :--- | :--- | :--- |
 | 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T13:54:36Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T13:54:36Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T13:58:01Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T13:58:01Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T14:14:29Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T14:14:29Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T14:17:41Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-02T14:17:41Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |

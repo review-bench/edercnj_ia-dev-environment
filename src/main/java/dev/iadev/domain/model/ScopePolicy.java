@@ -65,10 +65,10 @@ public record ScopePolicy(
             case "dev", "devdependency", "devdependencies" -> dev;
             case "provided" -> provided;
             case "build" -> build;
-            default -> throw new ConfigValidationException(
-                    "Unknown dependency scope: '%s'. Accepted: compile, runtime, test, dev,"
-                            + " provided, build"
-                            .formatted(scope));
+            default ->
+                    throw new ConfigValidationException(
+                            "Unknown dependency scope: '%s'. Accepted: compile, runtime, test, dev,"
+                                    + " provided, build".formatted(scope));
         };
     }
 

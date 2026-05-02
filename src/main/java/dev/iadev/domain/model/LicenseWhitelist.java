@@ -8,13 +8,13 @@ import java.util.Map;
  *
  * <p>When the list is empty, the license gate is effectively disabled for whitelist enforcement
  * (but {@link BlockOnPolicy#license()} may still report {@code WARN_ONLY}). An empty whitelist
- * combined with {@code license: any-violation} block action triggers a
- * {@link ConfigValidationException} — it would block everything including allowed deps.
+ * combined with {@code license: any-violation} block action triggers a {@link
+ * ConfigValidationException} — it would block everything including allowed deps.
  *
  * <p>Introduced by EPIC-0074 — story-0074-0001.
  *
- * @param allowed the list of SPDX identifiers explicitly permitted (e.g. {@code Apache-2.0},
- *     {@code MIT})
+ * @param allowed the list of SPDX identifiers explicitly permitted (e.g. {@code Apache-2.0}, {@code
+ *     MIT})
  */
 public record LicenseWhitelist(List<String> allowed) {
 

@@ -107,8 +107,7 @@ public record DependencyPolicyConfig(
         LicenseWhitelist allowedLicenses = LicenseWhitelist.fromMap(policyMap);
         List<String> deniedCves = MapHelper.optionalStringList(policyMap, "denied-cves");
         int freshnessWindowDays = MapHelper.optionalInt(policyMap, "freshness-window-days", 365);
-        BlockOnPolicy blockOn =
-                BlockOnPolicy.fromMap(MapHelper.optionalMap(policyMap, "block-on"));
+        BlockOnPolicy blockOn = BlockOnPolicy.fromMap(MapHelper.optionalMap(policyMap, "block-on"));
         ScopePolicy scopePolicy =
                 ScopePolicy.fromMap(MapHelper.optionalMap(policyMap, "scope-policy"));
 

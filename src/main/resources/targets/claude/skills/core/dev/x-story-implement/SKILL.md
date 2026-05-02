@@ -281,7 +281,6 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-stor
     TaskUpdate(id: p3Tasks.qualityRegression, status: "completed")
 Exit non-zero → `REGRESSION_DETECTED` (19); **D-R11: skip 3.Q.1, 3.Q.2, and 3.Q.3**.
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Regression ok`
-
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Perf`
 
@@ -303,7 +302,6 @@ Exit non-zero → `MUTATION_SCORE_BELOW_THRESHOLD` (17); **D-R11: skip 3.Q.3**.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Mutation ok`
-
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Contract`
     Skill(skill: "x-test-contract", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md")  [conditional: flag.quality_contract_enabled]
     TaskUpdate(id: p3Tasks.qualityContract, status: "completed")
