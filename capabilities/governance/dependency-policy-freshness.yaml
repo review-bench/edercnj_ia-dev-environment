@@ -1,0 +1,27 @@
+id: governance.dependency-policy.freshness
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Freshness window sub-gate for the Dependency Policy gate. Warns or blocks when a
+  dependency has not received an update within the configured number of days (default
+  365). Default action is WARN_ONLY per D-R10. Requires governance.dependency-policy
+  to be active.
+requires-capabilities: [governance.dependency-policy]
+requires: []
+excludes: []
+universal: true
+parameters:
+  freshness-window-days:
+    type: integer
+    default: 365
+    description: >
+      Number of days since last release before a dependency is considered stale.
+      Must be >= 0. 0 = always stale (useful for testing the gate).
+tags:
+  - governance
+  - dependency-policy
+  - freshness
+  - staleness
+  - sca

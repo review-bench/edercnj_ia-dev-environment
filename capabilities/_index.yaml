@@ -45,6 +45,12 @@ categories:
       - governance.refinement-gate
       - governance.value-driven-templates
       - governance.doc-as-dod
+      - governance.dependency-policy
+      - governance.dependency-policy.cve
+      - governance.dependency-policy.license
+      - governance.dependency-policy.version
+      - governance.dependency-policy.freshness
+      - governance.dependency-policy.scope
 
   - name: quality
     description: Quality gates — performance, mutation, contract, regression, and DAST testing

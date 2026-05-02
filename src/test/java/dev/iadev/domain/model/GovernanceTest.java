@@ -29,7 +29,8 @@ class GovernanceTest {
                             BranchingModel.TRUNK,
                             false,
                             DocumentationConfig.DEFAULT,
-                            QualityConfig.DEFAULT);
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT);
 
             assertThat(gov.compliance()).isEqualTo("pci-dss");
             assertThat(gov.platforms()).containsExactly(Platform.CLAUDE_CODE);
@@ -47,7 +48,8 @@ class GovernanceTest {
                             BranchingModel.GITFLOW,
                             true,
                             DocumentationConfig.DEFAULT,
-                            QualityConfig.DEFAULT);
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT);
 
             assertThat(gov.platforms()).isEmpty();
         }
@@ -62,7 +64,8 @@ class GovernanceTest {
                             null,
                             true,
                             DocumentationConfig.DEFAULT,
-                            QualityConfig.DEFAULT);
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT);
 
             assertThat(gov.branchingModel()).isEqualTo(BranchingModel.GITFLOW);
         }
@@ -80,7 +83,8 @@ class GovernanceTest {
                             BranchingModel.GITFLOW,
                             true,
                             DocumentationConfig.DEFAULT,
-                            QualityConfig.DEFAULT);
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT);
 
             mutable.add(Platform.SHARED);
 
@@ -97,7 +101,8 @@ class GovernanceTest {
                             BranchingModel.GITFLOW,
                             true,
                             DocumentationConfig.DEFAULT,
-                            QualityConfig.DEFAULT);
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT);
 
             assertThatThrownBy(() -> gov.platforms().add(Platform.SHARED))
                     .isInstanceOf(UnsupportedOperationException.class);
