@@ -1,6 +1,7 @@
 package dev.iadev.domain.model;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Per-scope enforcement override for the dependency policy gate.
@@ -67,8 +68,9 @@ public record ScopePolicy(
             case "build" -> build;
             default ->
                     throw new ConfigValidationException(
-                            "Unknown dependency scope: '%s'. Accepted: compile, runtime, test, dev,"
-                                    + " provided, build".formatted(scope));
+                            ("Unknown dependency scope: '%s'. Accepted: compile, runtime, test,"
+                                            + " dev, provided, build")
+                                    .formatted(scope));
         };
     }
 
@@ -79,6 +81,15 @@ public record ScopePolicy(
      * @return a populated {@link ScopePolicy}
      */
     static ScopePolicy fromMap(Map<String, Object> scopeMap) {
+        Set<String> known = Set.of("compile", "runtime", "test", "dev", "provided", "build");
+        for (String key : scopeMap.keySet()) {
+            if (!known.contains(key)) {
+                throw new ConfigValidationException(
+                        ("Unknown scope-policy key: '%s'. Accepted: compile, runtime, test,"
+                                        + " dev, provided, build")
+                                .formatted(key));
+            }
+        }
         return new ScopePolicy(
                 BlockAction.fromYaml(MapHelper.optionalString(scopeMap, "compile", null)),
                 BlockAction.fromYaml(MapHelper.optionalString(scopeMap, "runtime", null)),

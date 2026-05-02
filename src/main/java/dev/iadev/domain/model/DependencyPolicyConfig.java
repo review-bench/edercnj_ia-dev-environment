@@ -111,6 +111,15 @@ public record DependencyPolicyConfig(
         ScopePolicy scopePolicy =
                 ScopePolicy.fromMap(MapHelper.optionalMap(policyMap, "scope-policy"));
 
+        if (policyMap.containsKey("allowed-licenses")
+                && allowedLicenses.isEmpty()
+                && blockOn.license() == BlockAction.BLOCK) {
+            throw new ConfigValidationException(
+                    "allowed-licenses: [] combined with block-on.license: any-violation blocks"
+                            + " every dependency. Declare at least one SPDX license, or set"
+                            + " block-on.license: warn-only.");
+        }
+
         return new DependencyPolicyConfig(
                 true,
                 minVersions,

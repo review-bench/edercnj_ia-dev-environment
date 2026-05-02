@@ -160,6 +160,19 @@ class DependencyPolicyConfigTest {
             assertThat(cfg.allowedLicenses().allowed())
                     .containsExactly("Apache-2.0", "MIT", "BSD-3-Clause");
         }
+
+        @Test
+        void fromMap_emptyAllowedLicensesWithBlock_throws() {
+            var map = new java.util.HashMap<String, Object>();
+            map.put("enabled", true);
+            map.put("allowed-licenses", List.of());
+            map.put("block-on", Map.of("license", "any-violation"));
+
+            assertThatThrownBy(() -> DependencyPolicyConfig.fromMap(map))
+                    .isInstanceOf(ConfigValidationException.class)
+                    .hasMessageContaining("allowed-licenses: []")
+                    .hasMessageContaining("block-on.license: any-violation");
+        }
     }
 
     @Nested

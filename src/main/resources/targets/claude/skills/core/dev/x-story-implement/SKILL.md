@@ -283,34 +283,31 @@ Exit non-zero → `REGRESSION_DETECTED` (19); **D-R11: skip 3.Q.1, 3.Q.2, and 3.
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Regression ok`
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Perf`
-
     Skill(skill: "x-test-performance", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md")  [conditional: flag.quality_performance_enabled]
     TaskUpdate(id: p3Tasks.qualityPerf, status: "completed")
-
 Exit non-zero → `PERF_REGRESSION_DETECTED` (14); **D-R11: skip 3.Q.2 and 3.Q.3**.
-
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Perf ok`
-
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Mutation`
-
     Skill(skill: "x-test-mutation", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md")  [conditional: flag.quality_mutation_enabled]
     TaskUpdate(id: p3Tasks.qualityMutation, status: "completed")
-
 Exit non-zero → `MUTATION_SCORE_BELOW_THRESHOLD` (17); **D-R11: skip 3.Q.3**.
-
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Mutation ok`
+<!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-Contract`
     Skill(skill: "x-test-contract", model: "sonnet", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md")  [conditional: flag.quality_contract_enabled]
     TaskUpdate(id: p3Tasks.qualityContract, status: "completed")
 Exit non-zero → `CONTRACT_BREAKING_CHANGE` (18).
+<!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-Contract ok`
+<!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-implement Phase-3-Quality-DepPolicy`
     Skill(skill: "x-dep-policy-validate", model: "haiku", args: "--story-id <STORY-ID> --report ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md")  [conditional: flag.dep_policy_enabled]
     TaskUpdate(id: p3Tasks.qualityDepPolicy, status: "completed")
 Exit non-zero → `DEP_POLICY_BLOCK` (20); gate fails, merge blocked (Rule 32 §Enforcement).
+<!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-implement Phase-3-Quality-DepPolicy ok`
 
 ### 3.0 Documentation — `MANDATORY — NON-NEGOTIABLE` (Rule 31, EPIC-0071)
