@@ -2038,6 +2038,7 @@ Além do golden path principal, a V0 precisa especificar fluxos de mudança, rec
 | Feature change | `forge feature change open/assess/approve/implement` | Mudança de comportamento aprovada como revision, change epic ou nova feature, nunca como task solta. |
 | Deprecation/removal | `forge feature deprecate/remove` | Plano de depreciação, migração, comunicação, rollback e remoção controlada. |
 | Security/spec/maintenance intake | `forge security finding`, `forge spec drift`, `forge maintenance open` | Entradas pós-entrega classificadas antes de virarem bug, change, epic, story ou task. |
+| Squad operating system | `forge intake`, `forge backlog groom`, `forge sprint plan`, `forge squad health` | Fluxo operacional da squad com esforço misto humano/IA, WIP, review queue, daily, métricas e release readiness. |
 | Recovery/resume | `forge <command> --resume` ou `--recovery` | Continuação tipada sem duplicar artefatos, com audit event. |
 | Policy failure | qualquer comando mutável | Erro tipado, evidence de falha e próxima ação. |
 | LLM/provider failure | qualquer prompt worker | Retry/fallback conforme budget, output rejeitado sem mudar lifecycle state. |
@@ -2141,6 +2142,7 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 - P0.C4.F4 `[V0]`: Replanejamento incremental quando arquitetura ou feature mudam.
 - P0.C4.F5 `[V0]`: Change epic e correction story gerados a partir de bug/change aprovados, preservando lineage para a feature original.
 - P0.C4.F6 `[V0]`: Regra "no isolated behavior task": alteração de comportamento nunca entra direto como task sem story/change aprovado.
+- P0.C4.F7 `[V0]`: Scoring de backlog com esforço misto humano/IA antes de sugerir sprint ou wave de implementação.
 
 ### 7.3. Product P1 — Core Engine
 
@@ -2255,6 +2257,16 @@ CLI primária; TUI, IDE e web UI são camadas incluídas na V0.
 - P3.C4.F2 `[V0]`: Templates por persona.
 - P3.C4.F3 `[V0]`: Tutorial guiado in-IDE.
 - P3.C4.F4 `[V0]`: `forge doctor`.
+
+#### P3.C5 — Squad Operating System
+
+- P3.C5.F1 `[V0]`: `forge intake` como fila única para bugs, changes, support, incidents, findings, ideias e tech debt.
+- P3.C5.F2 `[V0]`: `forge backlog groom` e `forge item ready-check` para DoR contínuo.
+- P3.C5.F3 `[V0]`: `forge backlog score` com valor, risco, dependências, esforço humano, esforço de IA e custo de supervisão.
+- P3.C5.F4 `[V0]`: `forge sprint plan|start|close` com proposta de sprint baseada em capacidade real da squad e paralelismo seguro.
+- P3.C5.F5 `[V0]`: `forge review queue|assign|nudge` para SLA de PR/review e roteamento de especialistas.
+- P3.C5.F6 `[V0]`: `forge daily`, `forge status report`, `forge squad health` e `forge release readiness`.
+- P3.C5.F7 `[V0]`: `forge metrics flow|quality|ai` com métricas de ciclo, retrabalho, qualidade e efetividade de IA.
 
 ### 7.6. Product P4 — Knowledge & Marketplace
 
@@ -3005,7 +3017,393 @@ Nenhum descendente `STALE` pode ser implementado sem `forge replan` ou aprovaç�
 
 ---
 
-## 10. Alterações Estruturais Necessárias
+## 10. Squad Operating System
+
+O Forge não deve automatizar apenas a escrita de código. Em uma squad real, o gargalo alterna entre intake, refinamento, priorização, implementação por IA, revisão humana, CI, release, incidentes e aprendizado de fluxo. A V0 precisa tratar a squad como um sistema operacional local-first: comandos que organizam trabalho, medem capacidade, propõem planos e mantêm evidência sem substituir julgamento humano.
+
+Princípio: **IA é capacidade produtiva, mas não é capacidade infinita**. Planejamento precisa estimar esforço humano e esforço de IA separadamente, depois compor um esforço misto que considere supervisão, custo, risco, contexto, review e probabilidade de retrabalho.
+
+### 10.1. Entradas operacionais da squad
+
+| Entrada | Origem típica | Primeiro comando | Próximo artefato |
+| --- | --- | --- | --- |
+| Ideia de produto | PO, stakeholder, discovery | `forge intake open --kind idea` | Product/Capacity/Feature draft ou rejection. |
+| Bug | Usuário, CI, suporte, telemetria | `forge intake open --kind bug` | `Bug` com feature linkage. |
+| Pedido de mudança | PO, suporte, review, métrica | `forge intake open --kind change` | `FeatureChange`. |
+| Incidente | Produção, operação, CI, release | `forge incident open` | Incident, mitigation, postmortem e actions. |
+| Vulnerabilidade | Scanner, pentest, review, CVE | `forge security finding open` | `SecurityFinding`. |
+| Dívida técnica | Review, implementação, arquitetura | `forge maintenance open` | Maintenance item. |
+| Upgrade | Dependabot, plataforma, EOL | `forge dependency upgrade open` | Upgrade item. |
+| Pergunta/suporte | Usuário, Slack, Jira, GitHub | `forge support intake` | Bug, change, docs ou resposta. |
+| Flaky/CI failure | CI, PR watch, developer | `forge ci triage` | Bug, maintenance ou test debt. |
+| Métrica degradada | Observability, telemetry, perf gate | `forge metric anomaly open` | Bug, performance change ou incident. |
+
+`forge intake` é a fila única. Ele não implementa nada; ele classifica, deduplica, vincula lineage e sugere o próximo comando.
+
+### 10.2. Intake e triage automatizados
+
+```text
+forge intake open --kind auto --source github|jira|slack|manual|ci|telemetry
+forge intake triage INTAKE-CODE
+forge intake route INTAKE-CODE
+forge intake close INTAKE-CODE --reason duplicate|answered|rejected|converted
+```
+
+O triage automatizável deve responder:
+
+| Pergunta | Automação possível |
+| --- | --- |
+| Já existe item parecido? | Similaridade semântica contra bugs, changes, incidents, PRs e support requests. |
+| Qual feature/capacity parece afetada? | Busca por contratos, paths tocados, labels, stacktrace, docs e lineage. |
+| É problema de comportamento ou pedido novo? | Comparar evidência com critérios de aceite e contratos aprovados. |
+| Há severidade objetiva? | Regras por impacto, segurança, produção, perda de dados, usuários afetados e SLA. |
+| Falta informação? | Gerar perguntas mínimas para reproduzir, avaliar ou priorizar. |
+| O item pode ser automatizado por IA? | Classificar complexidade, contexto necessário, risco e necessidade de supervisão. |
+
+Saídas de triage:
+
+| Resultado | Próximo comando |
+| --- | --- |
+| `bug` | `forge bug open --from-intake INTAKE-CODE` |
+| `feature-change` | `forge feature change open --from-intake INTAKE-CODE` |
+| `new-feature` | `forge ideate --kind feature --from-intake INTAKE-CODE` |
+| `security-finding` | `forge security finding open --from-intake INTAKE-CODE` |
+| `incident` | `forge incident open --from-intake INTAKE-CODE` |
+| `maintenance` | `forge maintenance open --from-intake INTAKE-CODE` |
+| `docs` | `forge doc task open --from-intake INTAKE-CODE` |
+| `question` | Resposta com referências; sem backlog técnico. |
+| `duplicate` | Link para item existente. |
+| `reject` | Decision log com motivo. |
+
+### 10.3. Modelo de esforço misto humano/IA
+
+Estimativa tradicional por story points fica incompleta quando a IA implementa ou corrige. O Forge deve estimar pelo menos cinco dimensões.
+
+| Dimensão | Pergunta | Exemplo de escala |
+| --- | --- | --- |
+| `human_effort` | Quanto trabalho humano direto é necessário? | `XS/S/M/L/XL` ou horas. |
+| `ai_effort` | Quanto trabalho de IA é esperado para gerar código, testes, docs e análises? | `XS/S/M/L/XL`, tokens, turns ou minutos. |
+| `supervision_effort` | Quanto humano precisa orientar, revisar, corrigir prompts e aprovar decisões? | `low/medium/high`. |
+| `review_effort` | Quanto review humano/especialista é necessário para confiar no resultado? | `standard/deep/specialist`. |
+| `risk_effort` | Quanto custo de retrabalho existe por incerteza, arquitetura, segurança ou dados? | `low/medium/high/critical`. |
+
+Campos propostos no item planejável:
+
+```yaml
+effort:
+  human:
+    estimate: S
+    drivers:
+      - product decision
+      - review approval
+  ai:
+    estimate: M
+    expected_turns: 6
+    expected_token_band: 80k-160k
+    agent_mix:
+      - planner
+      - code-worker
+      - qa-reviewer
+    context_load: high
+  supervision:
+    estimate: M
+    checkpoints:
+      - approve behavior change
+      - review generated tests
+      - approve PR
+  review:
+    estimate: deep
+    specialist_required:
+      - security
+      - architecture
+  risk:
+    estimate: high
+    drivers:
+      - touches shared runtime
+      - changes public CLI behavior
+  blended:
+    score: 13
+    confidence: medium
+    rationale: "AI can generate most code, but shared runtime and CLI contract require deep human review."
+```
+
+Interpretação:
+
+| Situação | Leitura correta |
+| --- | --- |
+| Baixo `human_effort`, alto `ai_effort` | Bom candidato para automação longa, desde que haja orçamento e contexto estável. |
+| Alto `supervision_effort` | IA ajuda, mas o gargalo é decisão/review humano. Não planejar como item barato. |
+| Alto `ai_effort`, alto `risk_effort` | Dividir em spike, architecture amend ou story menor antes da implementação. |
+| Baixo `ai_effort`, alto `human_effort` | Problema de decisão, coordenação ou aprovação; automação não resolve o gargalo principal. |
+| Alto `review_effort` | Reservar reviewer especialista antes de iniciar a task. |
+
+### 10.4. Scoring e priorização de backlog
+
+```text
+forge backlog score --scope sprint|release|feature|squad
+forge backlog explain-score ITEM-CODE
+forge backlog reorder --strategy value-risk-ai-capacity
+```
+
+Score sugerido:
+
+| Fator | Peso inicial | Observação |
+| --- | --- | --- |
+| Valor/urgência | Alto | Bugs severos, security e commitments sobem prioridade. |
+| Risco reduzido | Alto | Itens que desbloqueiam arquitetura, release ou compliance sobem. |
+| Custo de atraso | Médio/alto | SLA, incidentes, dependências externas e lançamento. |
+| Dependências desbloqueadas | Médio | Priorizar itens que liberam muitas stories/tasks. |
+| Readiness | Alto | Item sem DoR não deve entrar em sprint, mesmo com valor alto. |
+| Esforço misto | Médio | Usar `human_effort + supervision + ai_effort + review + risk`, não só story points. |
+| Paralelismo seguro | Médio | Itens sem conflito de arquivos/contexto sobem quando a squad está ociosa. |
+| Confiança da IA | Médio | Itens com padrões conhecidos e testes bons são melhores candidatos para automação. |
+| Custo de tokens/provider | Baixo/médio | Não bloqueia valor alto, mas afeta sequencing e budget. |
+
+O output deve explicar a priorização, não apenas ordenar:
+
+```text
+ITEM-123 score=82 confidence=high
+  value: high
+  readiness: pass
+  mixed_effort: M
+  ai_fit: high
+  supervision: low
+  risk: medium
+  reason: "Fixes S2 bug, has reproduction, isolated files, regression test path clear."
+```
+
+### 10.5. Grooming e Definition of Ready contínuos
+
+```text
+forge backlog groom --scope feature|release|sprint
+forge item ready-check ITEM-CODE
+forge item ask-missing ITEM-CODE
+```
+
+Ready-check deve validar:
+
+| Categoria | Critério |
+| --- | --- |
+| Lineage | Item referencia feature/capacity/product corretos. |
+| Problema | Descrição separa sintoma, causa conhecida e comportamento esperado. |
+| Valor | Impacto e outcome estão claros. |
+| Aceite | Critérios testáveis existem. |
+| Arquitetura | Architecture plan está aprovado ou explicitamente não necessário. |
+| Segurança/compliance | Risco avaliado quando toca dados, auth, secrets, payments ou policy. |
+| Testabilidade | Há caminho claro para teste automatizado ou evidência manual. |
+| Esforço misto | Estimativa humana/IA/supervisão/review registrada. |
+| Dependências | Bloqueios e predecessores declarados. |
+| Contexto IA | Arquivos, contracts, KPs e examples necessários são localizáveis. |
+
+Quando faltar informação, o Forge deve produzir uma pergunta objetiva ou uma task de discovery, não inventar resposta.
+
+### 10.6. Sprint planning e WIP
+
+```text
+forge sprint plan --team TEAM-CODE --window 2w
+forge sprint start SPRINT-CODE
+forge sprint rebalance SPRINT-CODE
+forge sprint close SPRINT-CODE
+```
+
+O plano de sprint deve considerar:
+
+| Capacidade | Como medir |
+| --- | --- |
+| Capacidade humana | Disponibilidade, feriados, plantão, reviewer bandwidth e especialidades. |
+| Capacidade de IA | Budget de tokens, limites de provider, tempo esperado por agente, concorrência segura e contexto disponível. |
+| Capacidade de supervisão | Quantos checkpoints humanos a squad consegue absorver sem virar fila. |
+| Capacidade de review | PRs por reviewer, profundidade exigida, security/architecture review. |
+| Capacidade de CI | Tempo de pipeline, flakiness, filas e custo de reexecução. |
+| Capacidade de release | Janelas, freeze, approvals e risco de rollout. |
+
+O Forge deve sugerir WIP limits por tipo:
+
+| WIP | Por quê |
+| --- | --- |
+| `ai-runs-active` | Evita gerar mais PRs do que a squad consegue revisar. |
+| `human-review-active` | Evita fila de PRs parados. |
+| `high-risk-active` | Evita múltiplas mudanças críticas simultâneas. |
+| `same-hotspot-active` | Evita conflitos em arquivos/arquitetura compartilhada. |
+| `ci-heavy-active` | Evita saturar pipeline. |
+
+### 10.7. Planejamento de execução por IA
+
+Antes de mandar a IA implementar, o Forge deve decidir o modo de execução.
+
+```text
+forge ai plan ITEM-CODE
+forge ai run ITEM-CODE --mode assisted|autonomous|pairing|review-only
+forge ai budget forecast ITEM-CODE
+```
+
+Modos:
+
+| Modo | Quando usar | Gates |
+| --- | --- | --- |
+| `assisted` | IA implementa, humano aprova checkpoints. | Planning, test plan, review humano obrigatório. |
+| `autonomous` | Baixo risco, padrão conhecido, testes fortes. | Budget, CI, review padrão. |
+| `pairing` | Alta incerteza ou decisão frequente. | Perguntas curtas, checkpoints frequentes. |
+| `review-only` | Humano implementa; IA revisa/testa/documenta. | Review report e verify. |
+| `spike` | Contexto insuficiente ou arquitetura incerta. | Timebox, findings, no production change. |
+
+Sinais para evitar modo autônomo:
+
+- mudança de contrato público;
+- área sem testes;
+- segurança/compliance;
+- migração de dados;
+- arquitetura compartilhada;
+- alto número de arquivos desconhecidos;
+- baixa confiança no plano;
+- reviewer especialista indisponível.
+
+### 10.8. Review queue e SLA
+
+```text
+forge review queue
+forge review assign PR|ITEM-CODE
+forge review nudge --stale-after 24h
+forge review load --reviewer USER
+```
+
+Automatizações:
+
+| Situação | Ação sugerida |
+| --- | --- |
+| PR sem reviewer | Atribuir por ownership, domínio e carga. |
+| PR parado | Nudge ou split suggestion. |
+| PR grande demais | Sugerir divisão por story/task ou review specialist primeiro. |
+| CI falhou | Classificar falha e acionar `forge troubleshoot` ou `forge pr fix`. |
+| Comentário sem resposta | Agrupar comentários acionáveis e sugerir fix. |
+| Reviewer sobrecarregado | Rebalancear ou atrasar nova execução de IA. |
+| Risco alto | Exigir tech lead/security/architecture review. |
+
+Regra: IA pode preparar fix e responder comentários, mas não deve aprovar seu próprio PR.
+
+### 10.9. Daily, status e comunicação
+
+```text
+forge daily --team TEAM-CODE
+forge status report --sprint current
+forge stakeholder update --release RELEASE-CODE
+```
+
+Relatórios devem sair de evidência, não de memória:
+
+| Bloco | Fonte |
+| --- | --- |
+| Concluído desde ontem | PRs, commits, story reports, verify envelopes. |
+| Em andamento | Runs, branches, tasks, review queue. |
+| Bloqueios | Policy failures, stale artifacts, failed CI, missing approvals. |
+| Risco de sprint/release | WIP, bugs severos, readiness, review backlog. |
+| Trabalho de IA | Runs ativos, custo, sucesso/falha, itens aguardando supervisão. |
+| Próximas ações | Comandos sugeridos com IDs e owners. |
+
+O daily não deve substituir conversa da squad; deve reduzir tempo gasto reconstruindo estado.
+
+### 10.10. Incident to backlog e postmortem
+
+```text
+forge incident open --severity SEV1|SEV2|SEV3|SEV4
+forge incident mitigate INCIDENT-CODE
+forge incident postmortem INCIDENT-CODE
+forge incident create-actions INCIDENT-CODE
+```
+
+Postmortem deve gerar ações tipadas:
+
+| Achado | Ação |
+| --- | --- |
+| Defeito funcional | `Bug`. |
+| Lacuna de produto | `FeatureChange`. |
+| Lacuna de arquitetura | `architecture revise` + `replan`. |
+| Vulnerabilidade | `SecurityFinding`. |
+| Observabilidade insuficiente | Maintenance/observability story. |
+| Runbook ausente | Docs task. |
+| Processo falhou | Policy/gate change proposal. |
+
+Toda action herdada de incident deve carregar `incident_id`, severidade e deadline sugerido.
+
+### 10.11. Release readiness
+
+```text
+forge release readiness --release X.Y.Z
+forge release risk --release X.Y.Z
+```
+
+Checks:
+
+| Check | Bloqueia? |
+| --- | --- |
+| Bugs S0/S1 abertos | Sim, salvo override explícito. |
+| Security critical/high sem decisão | Sim. |
+| Breaking change sem migration/deprecation | Sim. |
+| Docs/changelog stale | Sim quando público ou developer-facing. |
+| Feature flags sem decisão | Warn ou block conforme target. |
+| PRs parcialmente mergeados | Sim se release inclui feature incompleta. |
+| Evidence incompleta | Sim. |
+| Rollback plan ausente para alto risco | Sim. |
+| AI-generated changes sem review exigido | Sim. |
+
+### 10.12. Métricas de fluxo, qualidade e IA
+
+```text
+forge metrics flow --window 30d
+forge metrics quality --window 30d
+forge metrics ai --window 30d
+```
+
+Métricas de fluxo:
+
+| Métrica | Uso |
+| --- | --- |
+| Lead time | Tempo do intake ao fechamento. |
+| Cycle time | Tempo de execução após ready. |
+| Review time | Gargalo humano de PR. |
+| Wait time | Tempo bloqueado por approval, CI, context ou dependency. |
+| Replan rate | Frequência de replanejamento por feature/epic. |
+| WIP aging | Itens envelhecendo sem avanço. |
+
+Métricas de qualidade:
+
+| Métrica | Uso |
+| --- | --- |
+| Escaped defects | Bugs após release por feature/capacity. |
+| Regression rate | Bugs causados por changes recentes. |
+| Flaky rate | Instabilidade de testes/pipeline. |
+| Coverage/freshness | Sinal de risco, não meta isolada. |
+| Review finding density | Quantidade e severidade por PR/story. |
+| Rollback rate | Indicador de release risk. |
+
+Métricas de IA:
+
+| Métrica | Uso |
+| --- | --- |
+| AI success rate | Runs que chegaram a PR verificável sem intervenção excessiva. |
+| Human intervention count | Quantas vezes humano precisou corrigir direção. |
+| Token/cost per accepted change | Custo por entrega aceita, não por tentativa. |
+| Rework after AI | Correções pós-review/CI em código gerado por IA. |
+| Context miss rate | Falhas por contexto insuficiente ou stale. |
+| Prompt/schema rejection rate | Saídas inválidas por worker/prompt. |
+| Autonomy fit accuracy | Se a classificação `autonomous/assisted/pairing` foi correta. |
+
+Essas métricas devem avaliar o sistema, não rankear pessoas. O objetivo é reduzir atrito e melhorar previsibilidade.
+
+### 10.13. Políticas operacionais da squad
+
+- Item sem `ready-check` não entra em sprint, exceto incidente/hotfix.
+- Sprint plan deve respeitar capacidade humana, capacidade de IA e capacidade de review.
+- IA não deve iniciar mais trabalho do que a squad consegue supervisionar e revisar.
+- Item de alto risco exige reviewer nomeado antes da implementação.
+- PR gerado por IA precisa declarar `ai_effort`, modo de execução e evidence de review.
+- Métricas de IA são usadas para calibrar estimativas, não para justificar bypass.
+- Daily/status/release readiness devem ser regeneráveis a partir do Evidence Ledger.
+- Trabalho operacional não deve quebrar lineage: intake vira bug/change/feature/maintenance, nunca task órfã.
+
+---
+
+## 11. Alterações Estruturais Necessárias
 
 | # | Mudança | De | Para | Risco / mitigação |
 | --- | --- | --- | --- | --- |
@@ -3023,34 +3421,38 @@ Nenhum descendente `STALE` pode ser implementado sem `forge replan` ou aprovaç�
 | 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
 | 12 | Rules engine | Prosa interpretada. | Policy engine + CI check. | Migrar só o que é realmente enforceable primeiro. |
 | 13 | Pós-entrega informal | Bug/change/removal tratados como exceções manuais ou tasks soltas. | Post-delivery lifecycle tipado com intake, triage, impact assessment, lineage e replan. | Começar por bug/change/security finding e expandir para removal/experiment/support. |
+| 14 | Operação de squad fora do sistema | Planning, daily, review queue, sprint e métricas vivem em ferramentas separadas ou memória humana. | Squad Operating System local-first com intake, grooming, esforço misto humano/IA, WIP, review SLA, release readiness e métricas. | Manter comandos como propostas/verificações; humanos continuam decidindo prioridades e aprovações. |
 
 ---
 
-## 11. Riscos Transversais
+## 12. Riscos Transversais
 
-### 11.1. Técnicos
+### 12.1. Técnicos
 
 - **Performance da composition em escala.** Com plugins externos, pode crescer de centenas para milhares de artefatos. Cache local é V0.
 - **Determinismo cross-LLM.** Separar composição determinística de conteúdo criativo gerado por LLM.
 - **Estado distribuído.** A V0 precisa suportar local single-user, resume cross-machine e colaboração, preservando Git/Markdown como fonte canônica e SQLite/blob store como projeções locais.
 - **Trace OTel.** Migrar `events.ndjson` sem quebrar análises atuais.
 - **Migração de hooks.** Perda de invariante é o maior risco. Dual-mode e testes por script mitigam.
+- **Estimativas de IA instáveis.** Provider, contexto e qualidade do plano mudam custo/tempo rapidamente. Mitigar calibrando com métricas reais por tipo de item.
 
-### 11.2. Produto
+### 12.2. Produto
 
 - **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `forge init` e `forge doctor` são centrais.
 - **Adoption friction.** Usuários com histórico de epics 0001-0071 precisam migrar sem perder evidência.
 - **Marketplace cold-start.** Portar todos os ativos oficiais atuais como cache local embarcado.
 - **Modelo de pricing.** Core local-first deve permanecer gratuito; cloud/marketplace/observability podem ser pagos.
+- **Sensação de microgestão.** Métricas de squad podem parecer vigilância. Mitigação: medir fluxo/sistema, não rankear indivíduos.
 
-### 11.3. Compliance e segurança
+### 12.3. Compliance e segurança
 
 - **LGPD/GDPR para telemetria remota.** Scrubbing client-side e opt-in granular.
 - **Supply chain do marketplace.** SBOM, signing, sandbox, trust score.
 - **Auditabilidade legal.** Audit log local imutável começa na V0.
 - **Cost-attack vector.** Budget guardrails por skill/provider.
+- **Dados sensíveis em intake/status.** Support requests, incidentes e findings podem conter PII/segredos. Mitigação: redaction local e permissões por artifact kind.
 
-### 11.4. Estratégia
+### 12.4. Estratégia
 
 - **Posicionamento.** Diferenciar por governance-first, evidence-first, local-first e multi-LLM.
 - **OSS strategy.** Core Apache 2.0 é bom candidato; cloud/commercial separado.
@@ -3058,22 +3460,23 @@ Nenhum descendente `STALE` pode ser implementado sem `forge replan` ou aprovaç�
 
 ---
 
-## 12. Próximos Passos
+## 13. Próximos Passos
 
 1. Registrar `Forge` como nome oficial do produto e validar domínio/organização.
 2. Definir licença do core e fronteira comercial.
 3. Validar hipótese com 5-10 usuários atuais do `ia-dev-env`.
 4. Rodar spike de inversão de controle com um orquestrador.
 5. Rodar spike de target adapter Cursor.
-6. Criar ADRs para as 12 mudanças estruturais antes de código de produção.
+6. Criar ADRs para as 14 mudanças estruturais antes de código de produção.
 7. Aplicar refinement gate neste próprio plano, com personas PO, Tech Lead, Architect, Security, QA e SRE/DevOps.
 8. Transformar o escopo completo da V0 em capacidades, features, épicos, stories e tasks.
 9. Planejar transição dual-mode: hooks/scripts atuais e Forge rodando em paralelo por 1 release.
 10. Decompor o Post-Delivery Lifecycle em capacidades/features próprias antes de implementar bug/change/removal.
+11. Decompor o Squad Operating System em features V0, começando por intake, ready-check, backlog score e review queue.
 
 ---
 
-## 13. Notas de Processo
+## 14. Notas de Processo
 
 Este plano é a fonte estratégica para gerar capacidades, features, épicos e histórias. Quando aprovado, cada Product/Capacity/Feature deve passar por refinement antes de virar Epic. Cada Epic resultante deve produzir os artefatos de planejamento e evidência exigidos pelo próprio modelo que queremos vender.
 
