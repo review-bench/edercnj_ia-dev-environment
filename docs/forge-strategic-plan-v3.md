@@ -2034,6 +2034,10 @@ Além do golden path principal, a V0 precisa especificar fluxos de mudança, rec
 | --- | --- | --- |
 | Golden path | `forge init -> product -> capacity -> feature -> architecture -> epic -> story -> task -> PR/release` | Cadeia completa com evidência e checkpoint remoto. |
 | Mudança em feature/arquitetura | `forge feature update` ou `forge architecture plan --revise` | Descendentes marcados `STALE`, replanejamento incremental e lineage preservado. |
+| Bug de feature | `forge bug open/triage/fix --feature FEATURE-CODE` | Defeito rastreável ligado à feature, com severidade, reprodução, classificação e fix/replan conforme impacto. |
+| Feature change | `forge feature change open/assess/approve/implement` | Mudança de comportamento aprovada como revision, change epic ou nova feature, nunca como task solta. |
+| Deprecation/removal | `forge feature deprecate/remove` | Plano de depreciação, migração, comunicação, rollback e remoção controlada. |
+| Security/spec/maintenance intake | `forge security finding`, `forge spec drift`, `forge maintenance open` | Entradas pós-entrega classificadas antes de virarem bug, change, epic, story ou task. |
 | Recovery/resume | `forge <command> --resume` ou `--recovery` | Continuação tipada sem duplicar artefatos, com audit event. |
 | Policy failure | qualquer comando mutável | Erro tipado, evidence de falha e próxima ação. |
 | LLM/provider failure | qualquer prompt worker | Retry/fallback conforme budget, output rejeitado sem mudar lifecycle state. |
@@ -2115,6 +2119,10 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 - P0.C2.F3 `[V0]`: `forge capacity create|approve`.
 - P0.C2.F4 `[V0]`: `forge feature create|approve`.
 - P0.C2.F5 `[V0]`: Gate de predecessor remoto e worktree limpa antes de criar descendentes.
+- P0.C2.F6 `[V0]`: `forge bug open|triage|fix` com vínculo obrigatório a feature, epic/story opcional e severidade tipada.
+- P0.C2.F7 `[V0]`: `forge feature change open|assess|approve|implement` para mudança comportamental pós-entrega.
+- P0.C2.F8 `[V0]`: `forge feature deprecate|remove` com plano de migração, comunicação e rollback.
+- P0.C2.F9 `[V0]`: `forge security finding`, `forge spec drift` e `forge maintenance open` como entradas governadas de pós-entrega.
 
 #### P0.C3 — System Architecture Planning
 
@@ -2131,6 +2139,8 @@ Camada inicial antes do épico. Garante que produto, capacidade, feature e arqui
 - P0.C4.F2 `[V0]`: Link bidirecional `Feature -> Architecture Plan -> Epic -> Stories`.
 - P0.C4.F3 `[V0]`: Versionamento Git/PR para backlog gerado.
 - P0.C4.F4 `[V0]`: Replanejamento incremental quando arquitetura ou feature mudam.
+- P0.C4.F5 `[V0]`: Change epic e correction story gerados a partir de bug/change aprovados, preservando lineage para a feature original.
+- P0.C4.F6 `[V0]`: Regra "no isolated behavior task": alteração de comportamento nunca entra direto como task sem story/change aprovado.
 
 ### 7.3. Product P1 — Core Engine
 
@@ -2612,7 +2622,390 @@ Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autor
 
 ---
 
-## 9. Alterações Estruturais Necessárias
+## 9. Post-Delivery Lifecycle
+
+O golden path cria uma feature nova. O Forge também precisa governar o que acontece depois que a feature já foi entregue: defeitos, mudança de comportamento, remoção, vulnerabilidades, drift, dívida técnica, upgrades, rollback, experimentos e feedback de suporte. Esses fluxos não devem furar a cadeia `Product -> Capacity -> Feature -> Architecture -> Epic -> Story -> Task`; eles devem decidir qual descendente precisa nascer e quais ancestrais ficam `STALE`, `REVISED` ou `SUPERSEDED`.
+
+Regra central: **artefatos estratégicos aprovados não são editados silenciosamente para reescrever história**. Mudanças pós-entrega criam uma entrada tipada, uma avaliação de impacto, uma revisão ou descendente novo, e uma trilha de lineage que conecta a alteração ao comportamento entregue.
+
+### 9.1. Taxonomia oficial de entradas pós-entrega
+
+| Tipo | Quando usar | Quem decide | Saída possível | O que não pode acontecer |
+| --- | --- | --- | --- | --- |
+| `Bug` | O comportamento entregue diverge do comportamento aprovado. | Triage policy + owner da feature. | Correction story, hotfix, replan ou fechamento como duplicate/won't-fix. | Mudar contrato de produto fingindo que é correção. |
+| `FeatureChange` | O comportamento esperado mudou por decisão de produto, feedback ou nova regra. | Product owner + architecture/readiness gate. | Feature revision, change epic, nova feature ou deprecation. | Criar task solta que muda comportamento sem aprovação. |
+| `FeatureDeprecation` | A feature continua existindo, mas deve deixar de ser recomendada ou suportada no futuro. | Product owner + tech lead + docs/release gate. | Plano de depreciação, migration story, changelog e comunicação. | Remover código ou contrato antes de comunicar/migrar. |
+| `FeatureRemoval` | A feature deve sair do produto ou de um target. | Product owner + architecture + release governance. | Removal epic, rollback plan, cleanup stories e breaking-change note. | Apagar artefatos históricos ou lineage. |
+| `SecurityFinding` | Vulnerabilidade, exposição de segredo, CVE, pentest finding ou policy violation. | Security policy + severity SLA. | Security fix, emergency hotfix, dependency upgrade ou risk acceptance. | Tratar vulnerabilidade crítica como tech debt comum. |
+| `SpecDrift` | Código, docs, contratos ou comportamento real divergem da feature/story aprovada. | Drift detector + owner do artefato. | Doc correction, bug, feature change ou replan. | Corrigir só documentação quando o código está errado, ou vice-versa. |
+| `Maintenance` | Refactor, limpeza, performance interna ou dívida técnica sem mudança comportamental. | Tech lead + quality policy. | Maintenance story/task, refactor PR ou architecture note. | Introduzir mudança funcional sem virar feature change. |
+| `DependencyUpgrade` | Upgrade de runtime, framework, action, provider LLM, plugin ou biblioteca. | Platform owner + compatibility gate. | Upgrade epic, compatibility matrix, migration tasks e rollback plan. | Atualizar stack sem matriz de impacto. |
+| `Rollback` | Entrega precisa ser revertida total ou parcialmente. | Release owner + incident/recovery gate. | Revert PR, rollback run, compensating change ou deprecation. | Reescrever histórico Git ou esconder evidência da falha. |
+| `Experiment` | Variação controlada por feature flag, rollout gradual ou A/B test. | Product owner + telemetry/privacy policy. | Experiment plan, guarded change epic, promotion ou rollback. | Tratar experimento como comportamento permanente sem decisão. |
+| `SupportRequest` | Pedido de usuário ainda ambíguo vindo de suporte, operação ou stakeholder. | Intake triage. | Bug, feature change, docs task, duplicate ou won't-do. | Virar backlog técnico sem classificar o problema. |
+
+### 9.2. Layout e artefatos
+
+As entradas pós-entrega vivem perto da feature porque a feature é a menor unidade estratégica que define comportamento. Epics, stories e tasks continuam sendo unidades de implementação, não de intake.
+
+```text
+projects/
+  project-XXXX/
+    products/
+      product-XXXX.md
+      capacities/
+        capacity-XXXX-YYYY.md
+        features/
+          feature-XXXX-YYYY-ZZZZ.md
+          post-delivery/
+            bugs/
+              bug-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            changes/
+              change-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            deprecations/
+              deprecation-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            removals/
+              removal-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            security-findings/
+              finding-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            drift/
+              drift-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            maintenance/
+              maintenance-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            experiments/
+              experiment-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+            support/
+              support-FEATURE-XXXX-YYYY-ZZZZ-0001.md
+          architecture/
+            architecture-feature-XXXX-YYYY-ZZZZ.md
+          epics/
+            epic-XXXX/
+```
+
+Campos mínimos compartilhados:
+
+| Campo | Obrigatório | Uso |
+| --- | --- | --- |
+| `id` | Sim | Identidade estável para CLI, UI, audit e PR. |
+| `kind` | Sim | Um dos tipos da taxonomia pós-entrega. |
+| `feature_id` | Sim | Feature afetada. |
+| `reported_by` | Sim | Origem humana, CI, security scanner, telemetry, support ou integration. |
+| `reported_at` | Sim | Ordenação e SLA. |
+| `status` | Sim | State machine própria do tipo. |
+| `severity` | Condicional | Obrigatória para bug/security/incident; opcional nos demais. |
+| `evidence` | Sim | Logs, screenshots, comandos, traces, contrato, PR, issue externa ou telemetry event. |
+| `expected_behavior` | Bug/change/drift | O que deveria acontecer segundo artefato aprovado ou nova decisão. |
+| `actual_behavior` | Bug/drift/support | O que acontece hoje. |
+| `impact` | Sim | Usuários, APIs, dados, docs, segurança, compatibilidade e release. |
+| `classification` | Após triage | Resultado tipado que decide próximo comando. |
+| `lineage` | Sim | Artefatos ancestrais, descendentes gerados, SHA aprovado e superseded/revision links. |
+| `decision_log` | Sim | Motivo de triage, aceite de risco, replan, deprecation ou fechamento. |
+
+### 9.3. State machines resumidas
+
+| Tipo | Estados principais |
+| --- | --- |
+| `Bug` | `OPEN -> TRIAGED -> ACCEPTED/DUPLICATE/WONT_FIX/NEEDS_INFO -> PLANNED -> IN_PROGRESS -> FIXED -> VERIFIED -> CLOSED` |
+| `FeatureChange` | `DRAFT -> ASSESSED -> APPROVED/REJECTED/SPLIT -> PLANNED -> IMPLEMENTED -> VERIFIED -> CLOSED` |
+| `FeatureDeprecation` | `PROPOSED -> IMPACT_ASSESSED -> APPROVED -> ANNOUNCED -> MIGRATION_READY -> DEPRECATED -> CLOSED` |
+| `FeatureRemoval` | `PROPOSED -> IMPACT_ASSESSED -> APPROVED -> REMOVAL_PLANNED -> IMPLEMENTED -> VERIFIED -> REMOVED -> CLOSED` |
+| `SecurityFinding` | `OPEN -> TRIAGED -> ACCEPTED/RISK_ACCEPTED/FALSE_POSITIVE -> FIX_PLANNED -> FIXED -> VERIFIED -> CLOSED` |
+| `SpecDrift` | `DETECTED -> CLASSIFIED -> DOC_FIX/BUG/CHANGE/REPLAN -> RESOLVED -> VERIFIED -> CLOSED` |
+| `Maintenance` | `PROPOSED -> CLASSIFIED -> APPROVED -> PLANNED -> COMPLETED -> VERIFIED -> CLOSED` |
+| `DependencyUpgrade` | `PROPOSED -> COMPATIBILITY_ASSESSED -> APPROVED -> UPGRADED -> VERIFIED -> ROLLED_OUT/ROLLED_BACK -> CLOSED` |
+| `Rollback` | `REQUESTED -> IMPACT_ASSESSED -> APPROVED -> EXECUTED -> VERIFIED -> RECONCILED -> CLOSED` |
+| `Experiment` | `PROPOSED -> GUARDRAILS_APPROVED -> RUNNING -> EVALUATED -> PROMOTED/ROLLED_BACK/ABANDONED -> CLOSED` |
+| `SupportRequest` | `RECEIVED -> TRIAGED -> LINKED_TO_BUG/LINKED_TO_CHANGE/DOCS/DUPLICATE/WONT_DO -> CLOSED` |
+
+Todo estado terminal deve gerar um `decision_log` e um evidence envelope. Todo estado que cria descendente deve gravar o ID do epic/story/task gerado.
+
+### 9.4. Bug de feature
+
+Comandos:
+
+```text
+forge bug open --feature FEATURE-CODE --title "..." --severity S2 --evidence <path|url>
+forge bug triage BUG-CODE
+forge bug fix BUG-CODE
+forge bug verify BUG-CODE
+forge bug close BUG-CODE
+```
+
+Classificação de triage:
+
+| Classificação | Critério | Próximo passo |
+| --- | --- | --- |
+| `correction-task` | Fix pequeno, sem alterar contrato, story ainda ativa e task map compatível. | Criar correction task sob story existente ou maintenance story curta. |
+| `correction-story` | Defeito exige teste de aceite novo, mas comportamento esperado já estava aprovado. | Criar story de correção no epic de manutenção da feature. |
+| `bugfix-epic` | Defeito impacta várias stories, targets ou módulos. | Criar epic de correção vinculado à feature. |
+| `spec-gap` | Artefato aprovado não descrevia o caso, mas produto confirma que deveria. | `forge feature change open` ou `forge story amend` antes do fix. |
+| `architecture-impact` | Fix exige alterar componentização, dados, contratos ou NFR. | `forge architecture plan feature --revise` + `forge replan`. |
+| `security-critical` | Defeito é vulnerabilidade explorável ou exposição sensível. | Converter/linkar para `SecurityFinding`; usar SLA e hotfix policy. |
+| `hotfix` | Produção quebrada com urgência e escopo pequeno. | Branch hotfix com evidence mínima, depois reconciliation no lineage. |
+| `duplicate` | Já existe bug/finding aberto. | Linkar e fechar sem novo backlog. |
+| `cannot-reproduce` | Evidência insuficiente. | `NEEDS_INFO`; não criar execução. |
+| `wont-fix` | Comportamento é aceito ou custo/risco não justifica. | Fechar com decision log e aprovação. |
+
+Invariantes:
+
+- Bug sempre referencia uma feature. Pode referenciar epic/story/task/release, mas feature é obrigatória.
+- Bug fix não pode mudar comportamento esperado. Se a correção altera contrato, defaults, UX, API ou NFR prometido, o runtime deve exigir `FeatureChange`.
+- Bug fix deve criar teste de regressão antes ou junto da implementação.
+- Bugs `S0/S1` podem usar hotfix, mas precisam de reconciliation posterior: artifact completo, links para feature e relatório de causa.
+- Fechar bug como `FIXED` exige verify envelope, teste de regressão e doc/changelog quando usuário percebe a mudança.
+
+### 9.5. Feature change
+
+Comandos:
+
+```text
+forge feature change open FEATURE-CODE --title "..." --reason feedback|strategy|compliance|ops
+forge feature change assess CHANGE-CODE
+forge feature change approve CHANGE-CODE
+forge feature change implement CHANGE-CODE
+```
+
+Matriz de decisão:
+
+| Tipo de mudança | Sinal | Saída |
+| --- | --- | --- |
+| `compatible-change` | Adiciona comportamento sem quebrar usuários existentes. | Change epic sob a mesma feature. |
+| `behavior-change` | Altera regra, fluxo, default ou critério de aceite. | Feature revision + change epic. |
+| `breaking-change` | Quebra contrato/API/dados/CLI ou remove caminho suportado. | Feature revision + architecture revise + migration/deprecation plan. |
+| `scope-expansion` | Pedido amplia objetivo para além da feature original. | Nova feature sob a mesma capacity, com arquitetura própria. |
+| `scope-split` | Mudança mistura objetivos independentes. | Dividir em múltiplos changes/features. |
+| `architecture-impact` | Muda storage, provider, integração, NFR ou topology. | `forge architecture plan feature --revise`, depois replan. |
+| `docs-only` | Comportamento correto, documentação incompleta. | Doc task com evidence; não criar change epic. |
+| `rejected` | Baixo valor, conflito estratégico ou risco excessivo. | Fechar com decisão e alternativa. |
+
+Regra de ouro: **task isolada não é veículo para mudança de comportamento**. Uma task pode implementar parte do change, mas o change precisa ser aprovado e decomposto em story/epic antes.
+
+### 9.6. Deprecation e removal
+
+Deprecation é aviso e transição; removal é retirada efetiva. O Forge deve separar os dois porque stakeholders, docs, changelog, migration e rollback são diferentes.
+
+```text
+forge feature deprecate FEATURE-CODE --reason "..." --target-version X.Y
+forge feature remove FEATURE-CODE --after-deprecation DEPRECATION-CODE
+```
+
+Checklist de deprecation:
+
+| Item | Obrigatório |
+| --- | --- |
+| Motivo de negócio/técnico | Sim |
+| Usuários/targets afetados | Sim |
+| Alternativa recomendada | Sim |
+| Versão alvo de remoção | Sim |
+| Documentação e changelog | Sim |
+| Telemetria de uso, quando existir | Recomendado |
+| Plano de comunicação | Sim para breaking/developer-facing |
+| Migration story | Sim quando há dados, API, CLI ou config |
+
+Checklist de removal:
+
+| Item | Obrigatório |
+| --- | --- |
+| Deprecation aprovada ou exceção explícita | Sim |
+| Impact report atualizado | Sim |
+| Removal epic/story | Sim |
+| Testes removidos ou substituídos intencionalmente | Sim |
+| Contratos/docs/changelog atualizados | Sim |
+| Rollback ou compensating plan | Sim |
+| Evidence de que dependentes foram migrados | Sim |
+
+### 9.7. Security finding
+
+Security finding é parecido com bug, mas tem severidade, confidencialidade e SLA próprios.
+
+```text
+forge security finding open --feature FEATURE-CODE --source scanner|pentest|review|incident
+forge security finding triage FINDING-CODE
+forge security finding fix FINDING-CODE
+forge security finding accept-risk FINDING-CODE --expires YYYY-MM-DD
+```
+
+Regras:
+
+- `CRITICAL` e `HIGH` exigem owner, prazo e branch de correção ou risk acceptance aprovada.
+- Finding pode ficar privado no control repo se contiver detalhes exploráveis; o public PR body deve apontar para evidence redigida.
+- Dependency CVE pode gerar `DependencyUpgrade`, mas mantém link com `SecurityFinding`.
+- Risk acceptance precisa expirar; não pode ser fechamento permanente sem revisão.
+
+### 9.8. Spec drift
+
+Spec drift detecta divergência entre intenção aprovada e realidade. Ele pode nascer de `forge spec drift`, CI, review, suporte ou auditoria.
+
+```text
+forge spec drift detect --feature FEATURE-CODE
+forge spec drift classify DRIFT-CODE
+forge spec drift resolve DRIFT-CODE
+```
+
+Classificações:
+
+| Drift | Exemplo | Resolução |
+| --- | --- | --- |
+| `docs-stale` | README/API docs não refletem código aprovado. | `forge doc generate/validate`. |
+| `code-stale` | Código não entrega story/feature aprovada. | Bug ou correction story. |
+| `contract-stale` | OpenAPI/proto/schema diverge de implementação. | Contract fix ou feature change se contrato novo é desejado. |
+| `architecture-stale` | Implementação violou arquitetura aprovada. | Architecture revise ou refactor/bugfix. |
+| `backlog-stale` | Epic/story/task não refletem feature revisada. | `forge replan`. |
+
+### 9.9. Maintenance, tech debt e refactor
+
+Maintenance cobre mudanças sem comportamento observável: limpeza, refactor, performance interna, redução de dívida, atualização de testes e organização.
+
+```text
+forge maintenance open --feature FEATURE-CODE --type refactor|perf|test-debt|cleanup
+forge maintenance plan MAINT-CODE
+forge maintenance implement MAINT-CODE
+```
+
+Invariantes:
+
+- Maintenance não pode alterar comportamento, contrato ou UX. Se alterar, converter para `FeatureChange`.
+- Refactor exige teste antes/depois ou prova de equivalência.
+- Performance interna sem alteração de SLO pode ser maintenance; mudança de SLO é feature/architecture change.
+- Tech debt pode gerar task direta apenas quando está dentro de uma maintenance story aprovada.
+
+### 9.10. Dependency/platform upgrade
+
+Upgrades são mudanças de plataforma com risco transversal. Eles podem ser originados por segurança, compatibilidade, performance ou lifecycle de suporte.
+
+```text
+forge dependency upgrade open --scope product|capacity|feature --target java|maven|plugin|provider
+forge dependency upgrade assess UPGRADE-CODE
+forge dependency upgrade implement UPGRADE-CODE
+```
+
+Avaliação mínima:
+
+| Dimensão | Pergunta |
+| --- | --- |
+| Compatibilidade | Que targets, templates, plugins e stacks quebram? |
+| Segurança | O upgrade fecha CVE ou cria nova superfície? |
+| Migração | Há mudança de config, API, schema, CLI ou dados? |
+| Rollback | É possível voltar sem perda de dados? |
+| Testes | Quais smoke/golden/contract/performance tests provam o upgrade? |
+
+### 9.11. Rollback, revert e recovery pós-release
+
+Rollback é fluxo de produto, não apenas `git revert`. Ele deve preservar evidência e reconciliar backlog depois.
+
+```text
+forge rollback request --feature FEATURE-CODE --release X.Y.Z
+forge rollback execute ROLLBACK-CODE
+forge rollback reconcile ROLLBACK-CODE
+```
+
+Decisões:
+
+- `git revert` é uma estratégia possível, não o workflow inteiro.
+- Rollback de feature entregue deve marcar descendentes afetados como `ROLLED_BACK` ou `STALE`.
+- Se rollback temporário será reaplicado depois, criar `FeatureChange` ou `Bug` vinculado para a correção definitiva.
+- Reconciliation é obrigatória: docs, changelog, release notes, telemetry e status dos artefatos precisam refletir o estado real.
+
+### 9.12. Experiment e feature flag
+
+Experimentos permitem mudança controlada sem declarar imediatamente o novo comportamento como permanente.
+
+```text
+forge experiment open --feature FEATURE-CODE --metric METRIC-ID
+forge experiment start EXPERIMENT-CODE
+forge experiment evaluate EXPERIMENT-CODE
+forge experiment promote|rollback EXPERIMENT-CODE
+```
+
+Guardrails:
+
+- Métrica de sucesso, métrica de dano e janela de avaliação são obrigatórias.
+- Feature flag, rollout e rollback precisam ser testáveis.
+- Telemetria deve respeitar local-first e privacy opt-in.
+- Promover experimento para comportamento padrão exige `FeatureChange` aprovado ou atualização da feature revision.
+
+### 9.13. Support request e feedback intake
+
+Support request é entrada bruta, não backlog. O Forge deve ajudar a classificar sem criar ruído técnico prematuro.
+
+```text
+forge support intake --feature FEATURE-CODE --from jira|github|manual|slack
+forge support triage SUPPORT-CODE
+```
+
+Resultados:
+
+| Resultado | Ação |
+| --- | --- |
+| `bug` | Criar/linkar `Bug`. |
+| `feature-change` | Criar/linkar `FeatureChange`. |
+| `docs` | Criar doc task ou `SpecDrift` docs-stale. |
+| `question` | Responder com referência; sem backlog. |
+| `duplicate` | Linkar item existente. |
+| `wont-do` | Fechar com rationale. |
+
+### 9.14. Impact assessment e stale propagation
+
+Todo fluxo pós-entrega que muda intenção ou arquitetura roda análise de impacto antes de criar backlog executável.
+
+```text
+forge impact assess <BUG|CHANGE|FINDING|DRIFT|REMOVAL-CODE>
+  -> load feature lineage
+  -> compare approved ancestor SHA vs proposed revision SHA
+  -> classify impact: none, docs-only, compatible, replan-required, breaking
+  -> mark impacted architecture/epics/stories/tasks as STALE when needed
+  -> preserve replaced artifacts as SUPERSEDED
+  -> write impact report and next actions
+```
+
+Matriz de stale:
+
+| Impacto | Ação |
+| --- | --- |
+| `none` | Nenhum descendente muda; registrar decisão. |
+| `docs-only` | Rodar doc generation/validation; implementação bloqueada só se doc-as-DoD exigir. |
+| `compatible` | Criar change/correction story; descendentes existentes continuam válidos. |
+| `replan-required` | Marcar epic/story/task afetados como `STALE`; exigir `forge replan`. |
+| `breaking` | Exigir architecture revise, migration/deprecation/removal plan e aprovação humana. |
+
+Nenhum descendente `STALE` pode ser implementado sem `forge replan` ou aprovação explícita de compatibilidade.
+
+### 9.15. Comandos públicos propostos
+
+| Comando | Papel |
+| --- | --- |
+| `forge bug open` | Registra defeito com evidence e vínculo à feature. |
+| `forge bug triage` | Classifica bug e decide se vira task, story, epic, change, hotfix ou fechamento. |
+| `forge bug fix` | Executa o caminho aprovado, delegando para story/task/hotfix conforme classificação. |
+| `forge feature change open` | Registra pedido de mudança comportamental. |
+| `forge feature change assess` | Avalia impacto, compatibilidade e necessidade de arquitetura/replan. |
+| `forge feature change approve` | Aprova revision/change epic/nova feature. |
+| `forge feature change implement` | Cria backlog descendente e chama implementação governada. |
+| `forge feature deprecate` | Abre e aprova plano de depreciação. |
+| `forge feature remove` | Executa remoção governada depois de deprecation ou exceção. |
+| `forge security finding open/triage/fix/accept-risk` | Fluxo de vulnerabilidade com SLA e confidencialidade. |
+| `forge spec drift detect/classify/resolve` | Detecta e resolve divergência entre docs, contratos, código e backlog. |
+| `forge maintenance open/plan/implement` | Refactor/dívida sem mudança comportamental. |
+| `forge dependency upgrade open/assess/implement` | Upgrade de stack, provider, plugin ou dependência. |
+| `forge rollback request/execute/reconcile` | Rollback/revert com reconciliação de estado e evidência. |
+| `forge experiment open/start/evaluate/promote/rollback` | Experimento controlado por métricas e guardrails. |
+| `forge support intake/triage` | Classificação de feedback/suporte antes de backlog. |
+| `forge impact assess` | Serviço comum para stale propagation e lineage. |
+
+### 9.16. Políticas inegociáveis
+
+- `Bug` corrige desvio contra comportamento aprovado; `FeatureChange` muda o comportamento aprovado.
+- Toda entrada pós-entrega tem feature owner e lineage. Sem feature, a entrada fica em intake global e não pode virar implementação.
+- Mudança comportamental não entra como task isolada.
+- Architecture impact exige architecture revision antes de `epic/story/task implement`.
+- Security critical pode acelerar branch/hotfix, mas não remove evidence, triage nem reconciliation.
+- Removal não apaga histórico; artefatos ficam `SUPERSEDED`, `DEPRECATED`, `REMOVED` ou `ROLLED_BACK`.
+- Risk acceptance e won't-fix exigem rationale, aprovador e, quando aplicável, expiração.
+- `forge ci verify` deve validar que PRs de bug/change/removal carregam `## Orchestrator Evidence` com IDs pós-entrega relacionados.
+
+---
+
+## 10. Alterações Estruturais Necessárias
 
 | # | Mudança | De | Para | Risco / mitigação |
 | --- | --- | --- | --- | --- |
@@ -2629,12 +3022,13 @@ Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autor
 | 10 | OSS vs commercial | 100% OSS hoje. | Core OSS + cloud paid. | Linha clara desde o dia 1. |
 | 11 | Hooks/scripts shell | `.claude/hooks`, `scripts/audit-*`. | Runtime gates + `forge ci verify`. | Um teste por invariante migrado. |
 | 12 | Rules engine | Prosa interpretada. | Policy engine + CI check. | Migrar só o que é realmente enforceable primeiro. |
+| 13 | Pós-entrega informal | Bug/change/removal tratados como exceções manuais ou tasks soltas. | Post-delivery lifecycle tipado com intake, triage, impact assessment, lineage e replan. | Começar por bug/change/security finding e expandir para removal/experiment/support. |
 
 ---
 
-## 10. Riscos Transversais
+## 11. Riscos Transversais
 
-### 10.1. Técnicos
+### 11.1. Técnicos
 
 - **Performance da composition em escala.** Com plugins externos, pode crescer de centenas para milhares de artefatos. Cache local é V0.
 - **Determinismo cross-LLM.** Separar composição determinística de conteúdo criativo gerado por LLM.
@@ -2642,21 +3036,21 @@ Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autor
 - **Trace OTel.** Migrar `events.ndjson` sem quebrar análises atuais.
 - **Migração de hooks.** Perda de invariante é o maior risco. Dual-mode e testes por script mitigam.
 
-### 10.2. Produto
+### 11.2. Produto
 
 - **Time-to-first-value.** O usuário precisa ver valor em 5 minutos; `forge init` e `forge doctor` são centrais.
 - **Adoption friction.** Usuários com histórico de epics 0001-0071 precisam migrar sem perder evidência.
 - **Marketplace cold-start.** Portar todos os ativos oficiais atuais como cache local embarcado.
 - **Modelo de pricing.** Core local-first deve permanecer gratuito; cloud/marketplace/observability podem ser pagos.
 
-### 10.3. Compliance e segurança
+### 11.3. Compliance e segurança
 
 - **LGPD/GDPR para telemetria remota.** Scrubbing client-side e opt-in granular.
 - **Supply chain do marketplace.** SBOM, signing, sandbox, trust score.
 - **Auditabilidade legal.** Audit log local imutável começa na V0.
 - **Cost-attack vector.** Budget guardrails por skill/provider.
 
-### 10.4. Estratégia
+### 11.4. Estratégia
 
 - **Posicionamento.** Diferenciar por governance-first, evidence-first, local-first e multi-LLM.
 - **OSS strategy.** Core Apache 2.0 é bom candidato; cloud/commercial separado.
@@ -2664,7 +3058,7 @@ Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autor
 
 ---
 
-## 11. Próximos Passos
+## 12. Próximos Passos
 
 1. Registrar `Forge` como nome oficial do produto e validar domínio/organização.
 2. Definir licença do core e fronteira comercial.
@@ -2675,10 +3069,11 @@ Implicação Forge: cada artefato vira `artifact_kind` com schema, gerador autor
 7. Aplicar refinement gate neste próprio plano, com personas PO, Tech Lead, Architect, Security, QA e SRE/DevOps.
 8. Transformar o escopo completo da V0 em capacidades, features, épicos, stories e tasks.
 9. Planejar transição dual-mode: hooks/scripts atuais e Forge rodando em paralelo por 1 release.
+10. Decompor o Post-Delivery Lifecycle em capacidades/features próprias antes de implementar bug/change/removal.
 
 ---
 
-## 12. Notas de Processo
+## 13. Notas de Processo
 
 Este plano é a fonte estratégica para gerar capacidades, features, épicos e histórias. Quando aprovado, cada Product/Capacity/Feature deve passar por refinement antes de virar Epic. Cada Epic resultante deve produzir os artefatos de planejamento e evidência exigidos pelo próprio modelo que queremos vender.
 
