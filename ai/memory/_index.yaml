@@ -286,3 +286,13 @@ entries:
     superseded-by: null
     created: "2026-05-03"
     last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0076
+    slug: verb-first-skill-naming-refactor
+    summary-path: epic-0076-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
