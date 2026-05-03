@@ -55,7 +55,43 @@
 
 O épico Product-First Lifecycle & Planning C4 Model estabelece a hierarquia Ideation → Product → Capability → Feature → Epic → Story → Task como fundação canônica da plataforma. Define templates + skills + artefatos persistentes obrigatórios em cada nível de planejamento. Introduz C4 Model como contrato visual inviolável (C1: System Context, C2: Container, C3: Component, C4: Code) para validação de arquitetura em plans. Refoca QA em AC measurability, error-message catalog, response-time SLO, success metrics e E2E validação. Implementa RNF como entrada obrigatória com gate no-relax na refinement. Atualiza flowVersion para "5" em todos os artefatos de planejamento.
 
-**Escopo Incluído:**
+### 1.1 Problema Observável
+
+Hoje a plataforma consegue planejar bem do nível **Epic → Story → Task**, mas não possui uma cadeia persistente e validável que conecte a intenção inicial de produto aos artefatos técnicos gerados. O efeito observável é que decisões de arquitetura, qualidade e segurança entram tarde demais no fluxo, gerando retrabalho e correções espalhadas ao longo do planejamento.
+
+**Evidências observáveis no próprio backlog deste épico:**
+- são necessárias **5 refatorações de skills de planning** (`story-0077-0011` até `story-0077-0015`) para inserir C4, herança de RNF e validações que hoje não existem na origem do fluxo;
+- são necessárias **4 stories de audit/validação** (`story-0077-0016` até `story-0077-0019`) para cobrir lacunas de integridade estrutural, RNF e pentest que hoje dependem de checagem tardia;
+- `story-0077-0001` existe apenas para dar **ancoragem normativa** ao modelo, sinal de que o framework atual não formaliza essa cadeia de ponta a ponta;
+- `story-0077-0028` precisa de um smoke test E2E cobrindo ideação → produto → capability → feature → epic → story → tasks porque esse fluxo ainda não é validado como contrato único.
+
+Em termos operacionais, a dor é: **rastreabilidade upstream incompleta, descoberta tardia de gaps de C4/RNF/security e excesso de retrofits para alinhar planejamento, arquitetura e governança**.
+
+### 1.2 Personas Afetadas
+
+As personas impactadas por este épico são mais amplas do que um único executor técnico:
+
+- **Primary persona — Product Engineering / Platform Excellence:** time que mantém o framework de planejamento e precisa garantir que novos artefatos nasçam com governança, rastreabilidade e validação automática;
+- **Secondary persona — Product Managers e Staff Engineers / Tech Leads:** responsáveis por transformar ideação em produto, capability e feature sem perder contexto de negócio, critérios de qualidade e dependências;
+- **Secondary persona — Arquitetos e QA/Security leads:** precisam validar C4, RNFs, smoke coverage e requisitos de segurança antes que a decomposição chegue ao nível de story/task.
+
+### 1.3 Hipótese & OKRs
+
+**Hipótese de Valor**
+
+Se formalizarmos a cadeia **Ideation → Product → Capability → Feature → Epic → Story → Task** com artefatos persistentes, C4 Mermaid obrigatório, herança de RNFs e pentest always-on desde o início do planejamento, então reduziremos retrabalho e falhas tardias de governança, arquitetura e qualidade, **porque** escopo, arquitetura, critérios de teste e controles de segurança passarão a ser validados antes da criação das stories e não apenas nas fases finais.
+
+**OKRs / KPIs do Épico**
+
+| Objetivo / KPI | Baseline | Target | Horizon | Measurement method |
+| :--- | :--- | :--- | :--- | :--- |
+| **Upstream traceability completeness** — porcentagem de iniciativas piloto com cadeia completa ideação → produto → capability → feature → epic → story persistida | 0% das iniciativas novas usam cadeia persistente completa; o fluxo atual nasce em epic/story | 100% do fluxo piloto EPIC-0077 gera e persiste toda a cadeia upstream | Até `story-0077-0028` | `Epic0077ProductFirstSmokeIT` + presença de artefatos em `ai/products`, `ai/capabilities`, `ai/features` e `ai/epics` |
+| **Late planning gate failures** — quantidade de falhas críticas por ausência de C4/RNF/product lineage no fluxo piloto | Baseline implícita: o backlog precisa de 5 refatorações e 4 audits para cobrir lacunas atuais | 0 falhas críticas de C4/RNF/lineage no fluxo smoke do épico | Fases 6 e 7 | `x-internal-c4-validate`, `enforce-refinement-gate.sh`, `audit-*.sh` e smoke E2E |
+| **Security planning coverage** — porcentagem de features do fluxo piloto com pentest e critérios de segurança planejados antes do merge | Pentest e security review ainda não são parte explícita e sempre-ligada do fluxo base | 100% das features do piloto com pentest plan e security controls declarados | Até `story-0077-0023` | output de `x-plan-story` v5 + `story-0077-0023` + evidências de pentest gate |
+| **Automated acceptance coverage** — quantidade de cenários smoke cobrindo a cadeia completa | 0 cenários smoke cobrindo a cadeia completa ideação → tasks | 4 cenários happy-path executando sem erro | Até `story-0077-0028` | `Smoke.yaml` + `Epic0077ProductFirstSmokeIT` |
+
+### 1.4 Escopo Incluído
+
 - 4 templates novos (Product, Capability, Feature, RNF-Validation)
 - 1 template refatorado (Epic v3)
 - 4 skills novas (x-create-product, x-create-capability, x-create-feature, x-promote-ideation)
@@ -66,13 +102,23 @@ O épico Product-First Lifecycle & Planning C4 Model estabelece a hierarquia Ide
 - 28 stories distribuídas em 7 phases (0-7, seriais)
 - Quality gates (DoR 6-item, DoD 28-story + cobertura + audits)
 
-**Escopo Excluído:**
+### 1.5 Fora do Escopo
+
 - Refatoração de skill-invoke ou runtime executor
 - Mudança em contrato de artefatos persistentes versionados (v4)
 - Implementação de tooling CI/CD (vide EPIC-0088)
 - Data migration de ideations/products existentes (vide EPIC-0089)
 
-### 1.1 Referências e Anexos
+### 1.6 Riscos Estratégicos
+
+| Tipo | Risco | Impacto | Mitigação |
+| :--- | :--- | :--- | :--- |
+| Produto | Times continuarem iniciando planejamento direto em epic/story e ignorarem Product/Capability/Feature | O fluxo product-first vira exceção e não padrão corporativo | Rule 19 v5 normativa + skills `x-promote-ideation` / `x-create-*` + smoke E2E obrigatório |
+| Produto | PMs e tech leads perceberem a hierarquia nova como burocracia adicional | Baixa adoção e retorno ao planejamento manual | Automatizar geração dos artefatos e provar ganho com `Epic0077ProductFirstSmokeIT` |
+| Técnico | Ausência ou inconsistência de diagramas C4 Mermaid quebrar DoR e refactors de planning | Planning bloqueado nas fases 4-6 | `c4-model-architecture.md` + `x-internal-c4-validate` + gates de C4 completeness |
+| Técnico | RNFs, pentest e critérios de segurança continuarem entrando tarde no fluxo | Rejeições em refinement, findings tardios e retrabalho em stories | RNF root table obrigatória + `quality.pentest-always-on` + gates de refinement e smoke |
+
+### 1.7 Referências e Anexos
 
 - [Planning Standards KP (RA9 v2)](../../rules/planning-standards-kp.md)
 - [Rule 22: Lifecycle Integrity](../../rules/22-lifecycle-integrity.md)
@@ -276,18 +322,43 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | :--- | :--- | :--- | :--- |
 | Input validation | Whitelist product ID format (PRODUCT-PP, 01-99) | RULE-002, RULE-006 | Regex `/^PRODUCT-\d{2}$/`. Rejeitar strings contendo `../`, `%`, null bytes |
 | Input validation | Whitelist capability ID format (CAPABILITY-CC-CCC) | RULE-002, RULE-006 | Regex `/^CAPABILITY-\d{2}-\d{3}$/`. SQL injection prevention via prepared statements |
-| Authentication | Product create requer role ROLE_PRODUCT_OWNER | RULE-006 | OAuth2 token introspection. Deny anonymous |
-| Authentication | Feature promote requer role ROLE_FEATURE_LEAD | RULE-006 | Audit log + timestamp em feature.yaml |
+| Authentication | Product create requer role ROLE_PRODUCT_OWNER | RULE-006 | OAuth2 por **active introspection** contra authorization server corporativo. TTL máximo do token: **15 minutos**. Deny anonymous e allowlist explícita de roles |
+| Authentication | Feature promote requer role ROLE_FEATURE_LEAD | RULE-006 | Mesma política de active introspection + TTL 15 min. Auditoria imutável da ação com `who`, `what`, `when`, `resource_id`, `outcome`, `correlation_id` |
 | Sensitive data | RNF tables MUST NOT conter credentials/tokens | RULE-004, RULE-006 | Scanning rule: rejeitar `password`, `secret`, `key` em RNF schema |
-| Path operations | product.yaml sempre em ai/products/PRODUCT-PP/ dir | RULE-002, RULE-006 | Normalize paths, prevent traversal (CWE-22). Deny `../../` |
+| Data classification | `product.yaml`, `capability.yaml`, `feature.yaml` são classificados como `INTERNAL` por padrão | RULE-006 | Artefatos persistidos no repositório **não podem conter PII bruta**; se a entrada tiver dados pessoais, apenas sumário redigido pode ser persistido |
+| Path operations | product.yaml sempre em ai/products/PRODUCT-PP/ dir | RULE-002, RULE-006 | Normalizar caminho com `Path.normalize()` + `toRealPath()` sob base canônica, bloqueando traversal e bypass por encoding (CWE-22) |
+| Outbound URL handling | `--roadmap-url` em `x-create-product` | RULE-006 | Aceitar apenas `https://` e hosts aprovados; negar RFC1918, metadata endpoints e schemas não aprovados para prevenir SSRF |
 | CSRF protection | x-create-product POST requires CSRF token | RULE-006 | State-based CSRF validation via skill middleware |
 | Rate limiting | Product create API 10 req/min por user | RULE-006 | Redis-backed rate limiter. Return 429 se excedido |
 
-**Riscos em aberto do refinement:**
-- Estratégia de validação de token OAuth2, allowlist de algoritmos e TTL máximo ainda não foram confirmados
-- `--roadmap-url <str>` em `x-create-product` exige mitigação explícita de SSRF via allowlist de hosts ou restrição de schema
-- Classificação e retenção de `product.yaml`, `capability.yaml` e `feature.yaml` seguem indefinidas e bloqueiam fechamento de compliance
-- Audit log mínimo para ações privilegiadas (`who`, `what`, `when`, `resource_id`) ainda precisa de contrato explícito
+### 6.1 Gatilhos de Compliance
+
+- **LGPD (condicional):** aplica-se sempre que ideação, visão de produto, roadmap links ou anexos upstream contiverem dados pessoais, user research identificável ou exemplos reais de clientes. Nesses casos, a regra é **minimização e redação antes da persistência**; os artefatos canônicos do repositório não armazenam PII bruta.
+- **Internal audit / SOC2-style control baseline:** aplica-se a toda ação privilegiada protegida por OAuth2 (`x-create-product`, `x-create-feature`, `x-promote-ideation`) e exige trilha de auditoria imutável com retenção operacional mínima de **12 meses**.
+- **PCI/HIPAA:** não são acionados por este épico, porque o fluxo não introduz pagamento, PHI ou processamento clínico. Se um produto futuro herdar esse fluxo para domínio regulado, a capability correspondente deve elevar o baseline na fase de planning.
+
+### 6.2 Escopo de Threat Modeling
+
+**Boundaries em escopo**
+- operador ↔ CLI/skills de planning;
+- CLI ↔ authorization server corporativo (active introspection);
+- CLI ↔ filesystem versionado (`ai/products`, `ai/capabilities`, `ai/features`, `ai/epics`);
+- CLI ↔ GitHub/Jira/links externos aprovados.
+
+**Ameaças priorizadas**
+- uso indevido de token, role spoofing ou token stale;
+- SSRF via `--roadmap-url`;
+- path traversal / escrita fora do diretório canônico;
+- enumeração de IDs sequenciais e leitura indevida de artefatos;
+- adulteração de artefatos gerados sem trilha de auditoria;
+- ausência de pentest e critérios de segurança antes da criação das stories.
+
+**Mitigações mandatórias**
+- active introspection com TTL máximo de 15 min;
+- allowlist de roles e de hosts externos;
+- normalização canônica de paths;
+- audit log append-only para ações privilegiadas;
+- pentest coverage obrigatório no fluxo piloto (`story-0077-0019` e `story-0077-0023`).
 
 ---
 
