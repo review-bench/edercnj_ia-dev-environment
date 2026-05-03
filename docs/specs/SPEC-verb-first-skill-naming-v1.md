@@ -1,10 +1,16 @@
 # SPEC — Verb-First Skill Naming Refactor
 
-**Status:** Refined  
-**Versão:** 1.1  
-**Data:** 2026-04-29  
+**Status:** Accepted  
+**Versão:** 1.2  
+**Data:** 2026-05-03  
 **Autor:** GitHub Copilot CLI + Eder Junior  
 **Epic:** EPIC-0076
+
+> **v1.2 — Inventário real (2026-05-03):**
+> - Auditoria completa do catálogo em disco (`src/main/resources/targets/claude/skills/**`) contra a matriz v1.1.
+> - 2 skills encontradas no disco mas ausentes da SPEC: `x-arch-system-update` (seção 6.4) e `x-pentest-dynamic` (seção 6.7) — adicionadas.
+> - 17 skills fantasmas (na SPEC mas não materializadas no disco) marcadas com nota `[não materializada — skip rename]`. As skills públicas `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create` existiam como skills públicas mas foram convertidas a internals por EPIC-0065 (hard-cut). As demais (`x-test-property`, `x-test-quality`, `x-test-regression-service`, `x-test-regression-self`, `x-doc-generate-v2`, `x-pr-body-render`, `x-license-check`, `x-dep-validate-with-policy`, internals do pr-body e doc) não foram materializadas por épicos predecessores.
+> - Matriz v1.2 é a fonte canônica para execução das stories 0003–0005.
 
 > **v1.1 — Refinamento (2026-04-29):**
 > - 11 skills do catálogo atual ausentes na v1.0 foram adicionadas à matriz canônica nas seções 6.1 e 6.4.
@@ -114,13 +120,14 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | :--- | :--- |
 | x-feature-ideate | x-ideate-feature |
 | x-feature-create | x-create-feature |
-| x-epic-create | x-create-epic |
-| x-story-create | x-create-story |
-| x-epic-decompose | x-decompose-epic |
-| x-epic-map | x-map-epic |
+| x-epic-create | ~~x-create-epic~~ *[não materializada — skip rename: convertida a x-internal-epic-create por EPIC-0065]* |
+| x-story-create | ~~x-create-story~~ *[não materializada — skip rename: convertida a x-internal-story-create por EPIC-0065]* |
+| x-epic-decompose | ~~x-decompose-epic~~ *[não materializada — skip rename: removida hard-cut por EPIC-0065]* |
+| x-epic-map | ~~x-map-epic~~ *[não materializada — skip rename: convertida a x-internal-epic-map por EPIC-0065]* |
 | x-epic-orchestrate | x-orchestrate-epic |
 | x-arch-plan | x-plan-architecture |
 | x-arch-update | x-update-architecture |
+| x-arch-system-update | x-update-system-architecture |
 | x-adr-generate | x-generate-adr |
 | x-story-plan | x-plan-story |
 | x-task-plan | x-plan-task |
@@ -148,11 +155,11 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-test-perf | x-execute-performance-tests |
 | x-test-performance *(se EPIC-0072 introduzir nome expandido)* | x-execute-performance-tests |
 | x-test-mutation | x-execute-mutation-tests |
-| x-test-property | x-execute-property-tests |
-| x-test-quality | x-assess-test-quality |
+| x-test-property | ~~x-execute-property-tests~~ *[não materializada — skip rename]* |
+| x-test-quality | ~~x-assess-test-quality~~ *[não materializada — skip rename]* |
 | x-test-regression-shell | x-execute-shell-regression-tests |
-| x-test-regression-service | x-execute-service-regression-tests |
-| x-test-regression-self | x-execute-self-regression-tests |
+| x-test-regression-service | ~~x-execute-service-regression-tests~~ *[não materializada — skip rename]* |
+| x-test-regression-self | ~~x-execute-self-regression-tests~~ *[não materializada — skip rename]* |
 
 ### 6.3 Review
 
@@ -182,7 +189,7 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-code-format | x-format-code |
 | x-code-lint | x-lint-code |
 | x-doc-generate | x-generate-docs |
-| x-doc-generate-v2 | x-generate-docs-v2 |
+| x-doc-generate-v2 | ~~x-generate-docs-v2~~ *[não materializada — skip rename]* |
 | x-doc-validate | x-validate-docs |
 | x-template-migrate | x-migrate-templates |
 | x-frontmatter-migrate | x-migrate-frontmatter |
@@ -208,7 +215,7 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-pr-merge | x-merge-pr |
 | x-pr-merge-train | x-manage-pr-merge-train |
 | x-pr-watch-ci | x-watch-pr-ci |
-| x-pr-body-render | x-render-pr-body |
+| x-pr-body-render | ~~x-render-pr-body~~ *[não materializada — skip rename]* |
 
 ### 6.6 Operações, release e telemetria
 
@@ -240,12 +247,13 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-security-sast | x-run-sast |
 | x-security-dast | x-run-dast |
 | x-security-container | x-scan-container-security |
+| x-pentest-dynamic | x-run-dynamic-pentest |
 | x-security-pentest | x-run-pentest |
 | x-security-infra | x-assess-infrastructure-security |
 | x-security-sonar | x-run-sonar-security |
-| x-license-check | x-check-licenses |
+| x-license-check | ~~x-check-licenses~~ *[não materializada — skip rename]* |
 | x-dep-policy-validate | x-validate-dependency-policy |
-| x-dep-validate-with-policy | x-validate-dependencies-with-policy |
+| x-dep-validate-with-policy | ~~x-validate-dependencies-with-policy~~ *[não materializada — skip rename]* |
 
 ### 6.8 Jira
 
@@ -276,11 +284,11 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 | x-internal-story-verify | x-internal-verify-story |
 | x-internal-worktree-precheck | x-internal-precheck-worktree |
 | x-internal-pr-body-render | x-internal-render-pr-body |
-| x-internal-pr-body-render-backlog | x-internal-render-backlog-pr-body |
-| x-internal-pr-body-render-impl | x-internal-render-implementation-pr-body |
-| x-internal-pr-backlog-render | x-internal-render-pr-backlog |
-| x-internal-doc-generate-step | x-internal-generate-doc-step |
-| x-internal-doc-validate-step | x-internal-validate-doc-step |
+| x-internal-pr-body-render-backlog | ~~x-internal-render-backlog-pr-body~~ *[não materializada — skip rename]* |
+| x-internal-pr-body-render-impl | ~~x-internal-render-implementation-pr-body~~ *[não materializada — skip rename]* |
+| x-internal-pr-backlog-render | ~~x-internal-render-pr-backlog~~ *[não materializada — skip rename]* |
+| x-internal-doc-generate-step | ~~x-internal-generate-doc-step~~ *[não materializada — skip rename]* |
+| x-internal-doc-validate-step | ~~x-internal-validate-doc-step~~ *[não materializada — skip rename]* |
 
 ### 6.10 Libs internas
 
