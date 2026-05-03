@@ -292,7 +292,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | **[RULE-007]** | O QUE (Product/Capability/Feature) vs O COMO (Epic/Story) | Product = problema de negócio. Feature = solução de negócio. Epic = como implementar. Story = task técnica. Plan DEVE mencionar trade-off entre o quê e como. Decision Rationale mínimo de 4 linhas. |
 | **[RULE-008]** | flowVersion "5" em Todos Artefatos Planning | Epic v3, Story v4, Task v2, Product v1, Capability v1, Feature v1, RNF-Validation v1. Cada artifact contem `flowVersion: "5"` em frontmatter. Mismatch bloqueia planning-gate. |
 | **[RULE-009]** | Decision Rationale Split (Produto / Execução / Local) | CADA decisão DEVE ser categorizada: Produto (O QUE — visível ao PM), Execução (COMO — visível ao tech lead), Local (implementation detail — visível ao dev). 4 linhas mínimo por decisão. Produto decisions bloqueiam refactoring, execução decisions bloqueiam deploys. |
-| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `story-0077-0003` fecha o naming contract com EPIC-0065 antes de `story-0077-0011`. Enquanto isso, `x-create-feature` é o nome canônico no escopo deste épico; o rename de EPIC-0065 fica encapsulado por alias backward-compatible. |
+| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `story-0077-0003` fecha o naming contract com EPIC-0065 antes de `story-0077-0011`. Neste épico, `x-create-feature` é o nome canônico; o comando legado `x-feature-create` permanece apenas como alias backward-compatible apontando para `x-create-feature` durante a transição. |
 
 ---
 
@@ -470,7 +470,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Alternativa descartada:** Monolith única skill "create-all" (impossível validar in stages). Lazy validation post-decompose (permite epics mal-formados).
 
-**Consequência:** Cada skill nova + refatorada é uma story separada. `story-0077-0003` fecha o naming contract com EPIC-0065 antes de qualquer alteração em `x-create-feature`; aliases backward-compatible absorvem o rename no limite entre os dois épicos. `x-skill-invoke` adapta UnicodeScript → bash bridge.
+**Consequência:** Cada skill nova + refatorada é uma story separada. `story-0077-0003` fecha o naming contract com EPIC-0065 antes de qualquer alteração em `x-create-feature`; durante a migração, `x-feature-create` permanece como alias backward-compatible apontando para `x-create-feature`. `x-skill-invoke` adapta UnicodeScript → bash bridge.
 
 ---
 
