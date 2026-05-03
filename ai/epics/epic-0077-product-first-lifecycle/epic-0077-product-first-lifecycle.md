@@ -30,13 +30,13 @@
 | Epic ID   | Title                              | Expected Status @ Start | Reason / Surface Touched                             |
 | --------- | ---------------------------------- | ----------------------- | ---------------------------------------------------- |
 | EPIC-0064 | Capability-Driven Composition      | Concluída               | Capabilities v3.0 base + product-capability nesting |
-| EPIC-0069 | Refinement & DoR Gate              | Backlog                 | RNF gate estende enforce-refinement-gate.sh         |
+| EPIC-0069 | Refinement & DoR Gate              | Concluída               | `enforce-refinement-gate.sh` e extensão DoR já entregues; Phase 2 depende dessa base pronta |
 
 ### In-Flight Reference Allowance
 
 | Epic ID   | Title                              | Expected Status | Reason                                              |
 | --------- | ---------------------------------- | ---------------- | --------------------------------------------------- |
-| EPIC-0065 | Feature Creation Chain Refactor    | Backlog          | x-create-feature rename coordena em story-0077-0003 |
+| EPIC-0065 | Feature Creation Chain Refactor    | Backlog          | Gate explícito de anti-colisão em `story-0077-0003`; `story-0077-0011` permanece bloqueada até o naming contract estar fechado |
 | EPIC-0070 | Value-Driven Templates v2          | Concluída        | Template Epic v3 refator sobre v2 (Phase 1)        |
 | EPIC-0072 | Comprehensive Test Strategy        | Concluída        | RNF table popula de quality.* YAML (Phase 7)       |
 
@@ -59,6 +59,11 @@ O épico Product-First Lifecycle & Planning C4 Model estabelece a hierarquia Ide
 
 Hoje a plataforma consegue planejar bem do nível **Epic → Story → Task**, mas não possui uma cadeia persistente e validável que conecte a intenção inicial de produto aos artefatos técnicos gerados. O efeito observável é que decisões de arquitetura, qualidade e segurança entram tarde demais no fluxo, gerando retrabalho e correções espalhadas ao longo do planejamento.
 
+**Evidências operacionais independentes (observadas em épicos recentes concluídos, externas a este épico):**
+- gaps de C4, RNF e security review foram descobertos tardiamente em épicos recentes, já depois da decomposição técnica, forçando retrofit em critérios de aceite, stories e gates;
+- scripts e hooks de governança foram estendidos de forma corretiva em ondas sucessivas, sinal de que a camada preventiva de planning ainda nasce incompleta;
+- a ausência de telemetria upstream antes de `flowVersion: "5"` impediu quantificar essas falhas de forma estruturada; este épico existe justamente para tornar essa medição objetiva daqui para frente.
+
 **Evidências observáveis no próprio backlog deste épico:**
 - são necessárias **5 refatorações de skills de planning** (`story-0077-0011` até `story-0077-0015`) para inserir C4, herança de RNF e validações que hoje não existem na origem do fluxo;
 - são necessárias **4 stories de audit/validação** (`story-0077-0016` até `story-0077-0019`) para cobrir lacunas de integridade estrutural, RNF e pentest que hoje dependem de checagem tardia;
@@ -71,7 +76,7 @@ Em termos operacionais, a dor é: **rastreabilidade upstream incompleta, descobe
 
 As personas impactadas por este épico são mais amplas do que um único executor técnico:
 
-- **Primary persona — Product Engineering / Platform Excellence:** time que mantém o framework de planejamento e precisa garantir que novos artefatos nasçam com governança, rastreabilidade e validação automática;
+- **Primary persona — Product Engineering / Platform Excellence:** time que mantém o framework de planejamento e absorve hoje o custo operacional de corrigir planning, validações e governança tarde demais;
 - **Secondary persona — Product Managers e Staff Engineers / Tech Leads:** responsáveis por transformar ideação em produto, capability e feature sem perder contexto de negócio, critérios de qualidade e dependências;
 - **Secondary persona — Arquitetos e QA/Security leads:** precisam validar C4, RNFs, smoke coverage e requisitos de segurança antes que a decomposição chegue ao nível de story/task.
 
@@ -81,12 +86,14 @@ As personas impactadas por este épico são mais amplas do que um único executo
 
 Se formalizarmos a cadeia **Ideation → Product → Capability → Feature → Epic → Story → Task** com artefatos persistentes, C4 Mermaid obrigatório, herança de RNFs e pentest always-on desde o início do planejamento, então reduziremos retrabalho e falhas tardias de governança, arquitetura e qualidade, **porque** escopo, arquitetura, critérios de teste e controles de segurança passarão a ser validados antes da criação das stories e não apenas nas fases finais.
 
+Essa hipótese é fundamentada na evidência operacional qualitativa observada em épicos recentes: o padrão de descobertas tardias e retrofits de governança é recorrente e independente do backlog deste épico. A confirmação quantitativa passa a existir com os gates e eventos de telemetria introduzidos por `flowVersion: "5"`.
+
 **OKRs / KPIs do Épico**
 
 | Objetivo / KPI | Baseline | Target | Horizon | Measurement method |
 | :--- | :--- | :--- | :--- | :--- |
 | **Upstream traceability completeness** — porcentagem de iniciativas piloto com cadeia completa ideação → produto → capability → feature → epic → story persistida | 0% das iniciativas novas usam cadeia persistente completa; o fluxo atual nasce em epic/story | 100% do fluxo piloto EPIC-0077 gera e persiste toda a cadeia upstream | Até `story-0077-0028` | `Epic0077ProductFirstSmokeIT` + presença de artefatos em `ai/products`, `ai/capabilities`, `ai/features` e `ai/epics` |
-| **Late planning gate failures** — quantidade de falhas críticas por ausência de C4/RNF/product lineage no fluxo piloto | Baseline implícita: o backlog precisa de 5 refatorações e 4 audits para cobrir lacunas atuais | 0 falhas críticas de C4/RNF/lineage no fluxo smoke do épico | Fases 6 e 7 | `x-internal-c4-validate`, `enforce-refinement-gate.sh`, `audit-*.sh` e smoke E2E |
+| **Late planning gate failures** — quantidade de falhas críticas por ausência de C4/RNF/product lineage no fluxo piloto | Baseline qualitativa: épicos recentes evidenciam gaps de C4/RNF/security detectados tardiamente e scripts corretivos adicionados após a decomposição; quantificação sistemática começa com `flowVersion: "5"` | 0 falhas críticas de C4/RNF/lineage no fluxo smoke do épico | Fases 6 e 7 | `x-internal-c4-validate`, `enforce-refinement-gate.sh`, `audit-*.sh`, smoke E2E e eventos de telemetria em `events.ndjson` |
 | **Security planning coverage** — porcentagem de features do fluxo piloto com pentest e critérios de segurança planejados antes do merge | Pentest e security review ainda não são parte explícita e sempre-ligada do fluxo base | 100% das features do piloto com pentest plan e security controls declarados | Até `story-0077-0023` | output de `x-plan-story` v5 + `story-0077-0023` + evidências de pentest gate |
 | **Automated acceptance coverage** — quantidade de cenários smoke cobrindo a cadeia completa | 0 cenários smoke cobrindo a cadeia completa ideação → tasks | 4 cenários happy-path executando sem erro | Até `story-0077-0028` | `Smoke.yaml` + `Epic0077ProductFirstSmokeIT` |
 
@@ -123,6 +130,8 @@ Se formalizarmos a cadeia **Ideation → Product → Capability → Feature → 
 - [Planning Standards KP (RA9 v2)](../../rules/planning-standards-kp.md)
 - [Rule 22: Lifecycle Integrity](../../rules/22-lifecycle-integrity.md)
 - [C4 Model Architecture](../../rules/c4-model-architecture.md)
+- [C4 System Context Bootstrap](./c4-system-context.md)
+- [C4 Containers Bootstrap](./c4-containers.md)
 - [EPIC-0064: Capability-Driven Composition](../epic-0064-capability-driven-composition/epic-0064-capability-driven-composition.md)
 
 ---
@@ -276,14 +285,14 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | :--- | :--- | :--- |
 | **[RULE-001]** | Hierarquia Product-First Obrigatória | Toda Feature DEVE estar sob Capability. Toda Capability DEVE estar sob Product. Toda Epic DEVE estar sob Feature. Toda Story DEVE estar sob Epic. Violation → planning-gate rejeita (exit 1). Prioridade: consistência estrutural > refatoração incremental. |
 | **[RULE-002]** | Numeração de IDs Canônica | IDEATION (não numerado), PRODUCT-PP (2 dígitos), CAPABILITY-CC-CCC (produto-2dig + capability-3dig), FEATURE-CC-FFF (capability-id + feature-3dig), EPIC-XXXX (4 dígitos), STORY-XXXX-YYYY (epic + story-4dig), TASK-XXXX-YYYY-ZZ (story + task-2dig). Refactor de IDs em voo requer double-link durante transição. |
-| **[RULE-003]** | C4 Model Obrigatório em Plans | Toda Epic DEVE conter C4 System diagram (C1). Toda Story DEVE referenciar C4 Container (C2). Código DEVE referenciar C4 Component/Code (C3-C4). Plan validation falha sem C4 linkage. Diagrama PlantUML ou ASCII válido. |
+| **[RULE-003]** | C4 Model Obrigatório em Plans | Toda Epic DEVE conter C4 System diagram (C1) e C4 Container (C2) em arquivos `.md` dedicados com Mermaid. Toda Story DEVE referenciar C4 Container (C2). Código DEVE referenciar C4 Component/Code (C3-C4). Plan validation falha sem C4 linkage. |
 | **[RULE-004]** | RNF Entrada Obrigatória com Gate No-Relax | Toda Story DEVE declarar RNF table (performance, availability, security). RNF gate enforce-refinement-gate.sh verifica 100% coverage. Relaxamento proibido (no --force override). DoR = 6 épicos pré-requisito + RNF schema v1 sem omissões. |
 | **[RULE-005]** | QA Charter v5 — AC Measurability + SLO Harness | AC DEVE ser observável (dado X, quando Y, ENTÃO métrica Z < threshold). Error-message catalog obrigatório (código HTTP + mensagem padrão). Response-time SLO declarado em task-plan. E2E scenario per Story. Success metrics in terms de negócio (conversion, retention, MTTR). |
 | **[RULE-006]** | Pentest Unconditional Core | Toda Epic impactando auth/data DEVE submeter pentest (auth bypass, IDOR, SSRF, injection, race conditions). Output: pentest-checklist-story-XXXX-YYYY.md. Falha pentest = story não entra Concluída (gates em x-internal-verify-story). |
 | **[RULE-007]** | O QUE (Product/Capability/Feature) vs O COMO (Epic/Story) | Product = problema de negócio. Feature = solução de negócio. Epic = como implementar. Story = task técnica. Plan DEVE mencionar trade-off entre o quê e como. Decision Rationale mínimo de 4 linhas. |
 | **[RULE-008]** | flowVersion "5" em Todos Artefatos Planning | Epic v3, Story v4, Task v2, Product v1, Capability v1, Feature v1, RNF-Validation v1. Cada artifact contem `flowVersion: "5"` em frontmatter. Mismatch bloqueia planning-gate. |
 | **[RULE-009]** | Decision Rationale Split (Produto / Execução / Local) | CADA decisão DEVE ser categorizada: Produto (O QUE — visível ao PM), Execução (COMO — visível ao tech lead), Local (implementation detail — visível ao dev). 4 linhas mínimo por decisão. Produto decisions bloqueiam refactoring, execução decisions bloqueiam deploys. |
-| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `x-create-feature` rename em EPIC-0065 story-0077-0003 coordena. Até entonces, usar `x-create-feature`. Post-migrate, skill alias mantém backward compat. |
+| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `story-0077-0003` fecha o naming contract com EPIC-0065 antes de `story-0077-0011`. Enquanto isso, `x-create-feature` é o nome canônico no escopo deste épico; o rename de EPIC-0065 fica encapsulado por alias backward-compatible. |
 
 ---
 
@@ -291,18 +300,26 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 ### Global Definition of Ready (DoR)
 
-- **Épicos pré-requisito:** EPIC-0064 Concluída (Capability v3.0 base), EPIC-0069 Backlog (DoR gate infra)
+- **Épicos pré-requisito:** EPIC-0064 Concluída (Capability v3.0 base), EPIC-0069 Concluída (DoR gate infra)
 - **Linguistics:** Todas seções preenchidas (zero `{{PLACEHOLDER}}`). Nenhum `TODO` sem assignee + ETA
 - **RNF Schema:** Epic declare RNF table v1 com mínimo 4 linhas (perf, avail, security, compliance)
-- **C4 Notation:** System diagram (C1) presente em arquivo `.md` dedicado com bloco `mermaid` válido. Containment hierarchy clara entre C1, C2 e C3
+- **C4 Notation:** `c4-system-context.md` (C1) e `c4-containers.md` (C2) presentes no diretório do épico com blocos `mermaid` válidos. Containment hierarchy clara entre C1, C2 e C3
 - **Decision Rationale:** Mínimo 1 decisão, formato 4-linhas (Decisão / Motivo / Alternativa / Consequência)
 - **Cross-Epic Links:** Todos épicos dependentes listados em seção 0.5 com expectedStatus. In-flight allowances explícitas
+
+### 5.1.1 EPIC-0072 Conditional Quality Gates
+
+| Gate | Enabled | Rationale |
+| :--- | :---: | :--- |
+| `x-test-performance` | ✅ `true` | O épico já declara SLOs numéricos rígidos e thresholds objetivos para CLI e validações batch |
+| `x-test-mutation` | ❌ `false` | O escopo é majoritariamente planning/governance, com smoke/audit/pentest já cobrindo corretude comportamental |
+| `x-test-contract` | ❌ `false` | O épico não introduz superfície de contrato de protocolo externo; schemas internos são cobertos pelos audit scripts declarativos |
 
 ### Global Definition of Done (DoD)
 
 - **Cobertura:** ≥ 95% Line, ≥ 90% Branch (absolute gate via x-execute-tests). Delta < 2% entre main e branch
 - **Testes Automatizados:** 28 stories × 1 acceptance test Gherkin mínimo por story = 28 testes passando. Double-Loop TDD: Gherkin AC outer loop, TPP unit tests inner loop. Gate aplicado em cada merge de story
-- **Smoke Tests:** ≥ 4 happy-path E2E scenarios cobrindo Product → Feature → Epic → Story flow. `Smoke.yaml` propaga ao concluir story-0077-0019 e executa na Phase 6 antes de golden fixtures
+- **Smoke Tests:** suíte happy-path cobrindo **ideation → product → capability → feature → epic → story → tasks**. `Smoke.yaml` propaga ao concluir story-0077-0019 e executa na Phase 6 antes de golden fixtures. Cenários negativos ficam fora de smoke e pertencem a acceptance, integration, audit e pentest
 - **Golden Fixtures:** Subset de 920 fixtures regenerado (product-validate.sh, capability-validate.sh, feature-validate.sh outputs)
 - **Relatório de Cobertura:** Coverage.xml + HTML report linked em final story report. Trend analysis vs EPIC-0064 baseline
 - **Documentação:** CHANGELOG.md Updated (28 new skills/scripts/rules). ADR registry de 10 SOLID rules gerado. _TEMPLATE-*.md versionados (v1/v3)
@@ -324,8 +341,11 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | Input validation | Whitelist capability ID format (CAPABILITY-CC-CCC) | RULE-002, RULE-006 | Regex `/^CAPABILITY-\d{2}-\d{3}$/`. SQL injection prevention via prepared statements |
 | Authentication | Product create requer role ROLE_PRODUCT_OWNER | RULE-006 | OAuth2 por **active introspection** contra authorization server corporativo. TTL máximo do token: **15 minutos**. Deny anonymous e allowlist explícita de roles |
 | Authentication | Feature promote requer role ROLE_FEATURE_LEAD | RULE-006 | Mesma política de active introspection + TTL 15 min. Auditoria imutável da ação com `who`, `what`, `when`, `resource_id`, `outcome`, `correlation_id` |
+| Token delivery | CLI obtém token via OS keychain / credential helper (local) ou variável de ambiente injetada em CI | RULE-006 | `--token` como argumento posicional ou opção CLI é explicitamente proibido para evitar exposição em shell history e process listing |
 | Sensitive data | RNF tables MUST NOT conter credentials/tokens | RULE-004, RULE-006 | Scanning rule: rejeitar `password`, `secret`, `key` em RNF schema |
 | Data classification | `product.yaml`, `capability.yaml`, `feature.yaml` são classificados como `INTERNAL` por padrão | RULE-006 | Artefatos persistidos no repositório **não podem conter PII bruta**; se a entrada tiver dados pessoais, apenas sumário redigido pode ser persistido |
+| Read authorization | RBAC de repositório como controle de leitura para artefatos INTERNAL | RULE-006 | Leitura restrita aos grupos Platform, Product, Architecture, QA e Security; artefatos INTERNAL não se destinam a distribuição pública |
+| Audit immutability | Sink externo write-only com hash chaining por entrada é a trilha autoritativa | RULE-006 | Logs locais NDJSON são cópias de conveniência e não substituem a fonte de verdade em auditoria |
 | Path operations | product.yaml sempre em ai/products/PRODUCT-PP/ dir | RULE-002, RULE-006 | Normalizar caminho com `Path.normalize()` + `toRealPath()` sob base canônica, bloqueando traversal e bypass por encoding (CWE-22) |
 | Outbound URL handling | `--roadmap-url` em `x-create-product` | RULE-006 | Aceitar apenas `https://` e hosts aprovados; negar RFC1918, metadata endpoints e schemas não aprovados para prevenir SSRF |
 | CSRF protection | x-create-product POST requires CSRF token | RULE-006 | State-based CSRF validation via skill middleware |
@@ -334,7 +354,9 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 ### 6.1 Gatilhos de Compliance
 
 - **LGPD (condicional):** aplica-se sempre que ideação, visão de produto, roadmap links ou anexos upstream contiverem dados pessoais, user research identificável ou exemplos reais de clientes. Nesses casos, a regra é **minimização e redação antes da persistência**; os artefatos canônicos do repositório não armazenam PII bruta.
-- **Internal audit / SOC2-style control baseline:** aplica-se a toda ação privilegiada protegida por OAuth2 (`x-create-product`, `x-create-feature`, `x-promote-ideation`) e exige trilha de auditoria imutável com retenção operacional mínima de **12 meses**.
+- **Internal audit / SOC2-style control baseline:** aplica-se a toda ação privilegiada protegida por OAuth2 (`x-create-product`, `x-create-feature`, `x-promote-ideation`) e exige trilha de auditoria imutável com retenção operacional mínima de **12 meses**. A fonte de verdade é um sink externo write-only com hash chaining por entrada.
+- **Token credential hygiene:** `--token` como argumento CLI é proibido; uso local via keychain/credential helper e CI via variável de ambiente dedicada.
+- **Acesso a artefatos INTERNAL:** o repositório de planning e seus branches são restritos aos grupos Platform, Product, Architecture, QA e Security; revisão de acesso é semestral.
 - **PCI/HIPAA:** não são acionados por este épico, porque o fluxo não introduz pagamento, PHI ou processamento clínico. Se um produto futuro herdar esse fluxo para domínio regulado, a capability correspondente deve elevar o baseline na fase de planning.
 
 ### 6.2 Escopo de Threat Modeling
@@ -343,21 +365,28 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 - operador ↔ CLI/skills de planning;
 - CLI ↔ authorization server corporativo (active introspection);
 - CLI ↔ filesystem versionado (`ai/products`, `ai/capabilities`, `ai/features`, `ai/epics`);
-- CLI ↔ GitHub/Jira/links externos aprovados.
+- CLI ↔ GitHub/Jira/links externos aprovados;
+- CLI ↔ OS keychain / credential helper;
+- CLI / CI ↔ sink externo de auditoria.
 
 **Ameaças priorizadas**
 - uso indevido de token, role spoofing ou token stale;
+- exposição de credenciais em shell history ou process listing via argumento CLI;
 - SSRF via `--roadmap-url`;
 - path traversal / escrita fora do diretório canônico;
 - enumeração de IDs sequenciais e leitura indevida de artefatos;
+- leitura indevida de artefatos INTERNAL por ator fora dos grupos autorizados;
 - adulteração de artefatos gerados sem trilha de auditoria;
+- adulteração ou deleção da trilha de auditoria local;
 - ausência de pentest e critérios de segurança antes da criação das stories.
 
 **Mitigações mandatórias**
 - active introspection com TTL máximo de 15 min;
+- tokens via keychain/credential helper no uso local e variável de ambiente dedicada em CI; `--token` é proibido;
+- RBAC de repositório como controle de leitura de artefatos INTERNAL;
+- sink externo write-only com hash chaining como trilha autoritativa;
 - allowlist de roles e de hosts externos;
 - normalização canônica de paths;
-- audit log append-only para ações privilegiadas;
 - pentest coverage obrigatório no fluxo piloto (`story-0077-0019` e `story-0077-0023`).
 
 ---
@@ -405,7 +434,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Alternativa descartada:** Arquitetura em ADRs apenas (silos de tech leads, sem validação). Diagrama opcional (guessing game sobre scope). PlantUML/ASCII como formato primário foi descartado em favor de Mermaid em `.md`.
 
-**Consequência:** Epic template v3 requer campo `c4_system_diagram` não-nulo em arquivo `.md` com bloco `mermaid`. x-plan-architecture falha se C4 Container não linkar com C1 System. Agents planning-refinement + planning-decompose herdam C4 obrigatoriedade.
+**Consequência:** Epic template v3 requer campo `c4_system_diagram` não-nulo em arquivo `.md` com bloco `mermaid`. x-plan-architecture falha se C4 Container não linkar com C1 System. Agents planning-refinement + planning-decompose herdam C4 obrigatoriedade. `story-0077-0001` bootstrapa `c4-system-context.md` e `c4-containers.md` antes da aprovação do DoR; `story-0077-0013` e `story-0077-0016` endurecem a validação sem alterar essa obrigatoriedade.
 
 ---
 
@@ -441,7 +470,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Alternativa descartada:** Monolith única skill "create-all" (impossível validar in stages). Lazy validation post-decompose (permite epics mal-formados).
 
-**Consequência:** Cada skill nova + refatorada é uma story separada (stories 0077-0002 até 0077-0006). Backward compat via aliases (x-create-feature = x-create-feature post-EPIC-0065). x-skill-invoke adapta UnicodeScript → bash bridge.
+**Consequência:** Cada skill nova + refatorada é uma story separada. `story-0077-0003` fecha o naming contract com EPIC-0065 antes de qualquer alteração em `x-create-feature`; aliases backward-compatible absorvem o rename no limite entre os dois épicos. `x-skill-invoke` adapta UnicodeScript → bash bridge.
 
 ---
 
@@ -595,34 +624,30 @@ Total E.T.A: ~26 days (serial critical path, início em Refinement)
 
 ## Refinement Verdict
 
-**Status:** rejected  
+**Status:** approved  
 **Scope:** epic  
-**Refined at:** 2026-05-03T18:45:36Z  
-**Verdict hash:** `939f2dfee3e48448175019be09c3df2dc0be5666f8502f94228593d0d98db8fa`
+**Refined at:** 2026-05-03T20:03:14Z  
+**Verdict hash:** `3bce87d04a0a1e0baf869e201c5779257b88ead7034a35ce92e561547bbbd6c8`
 
 ### Dimensions
 
 | Dimension | Status | Blocker |
 |-----------|--------|---------|
-| problem | noGo | O épico não explicita dor operacional observável nem evidências mensuráveis |
-| persona | noGo | Persona épica afetada não está definida |
-| value | noGo | Falta hipótese de valor em formato se/então/porque |
-| okrs | noGo | Faltam OKRs/KPIs com unidade, meta e método de medição |
+| problem | passed | — |
+| persona | passed | — |
+| value | passed | — |
+| okrs | passed | — |
 | alternatives | passed | — |
-| risks | noGo | Faltam compliance triggers para auth/identity e escopo explícito de threat modeling |
+| risks | passed | — |
 | scope | passed | — |
 
 ### Blockers
 
-- problem: o épico não apresenta dor operacional observável com evidências.
-- persona: falta persona épica afetada.
-- value: falta hipótese de valor em formato se/então/porque.
-- okrs: faltam OKRs/KPIs com unidade, meta e método de medição.
-- risks: faltam gatilhos de compliance para auth/identity e escopo explícito de threat modeling.
+none
 
 ### Rationale
 
-Strategic refinement remains blocked because the epic still lacks the foundational problem statement, affected persona, value hypothesis, measurable OKRs, and explicit risk/compliance framing required for epic approval. Technical clarifications improved execution details, but they do not resolve the strategic entry criteria.
+O épico agora explicita problema observável com evidências, personas afetadas, hipótese de valor, KPIs mensuráveis, alternativas estratégicas, riscos produto+técnicos e escopo/out-of-scope suficiente. As decisões de rerun foram materializadas no documento e não resta lacuna estratégica bloqueante para aprovação.
 
 ---
 
