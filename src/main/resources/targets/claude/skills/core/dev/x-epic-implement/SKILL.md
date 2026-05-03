@@ -229,6 +229,13 @@ On conflict → `FINAL_PR_CONFLICTS`. Then create final PR:
 
 Interactive menu (only when `--interactive`): PROCEED / FIX-PR / ABORT. Default is non-interactive (Rule 20, EPIC-0061).
 
+**MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24 + Rule 33):** Generate epic memory summary when `governance.ai-memory` capability is active:
+
+    Skill(skill: "x-internal-epic-summary", model: "haiku", args: "--epic-id <ID>")
+    [conditional: flag.ai_memory_enabled]
+
+Exit code handling: 0 = proceed; 7 `MANUAL_REFINEMENT_PRESENT` = proceed (human override preserved); any other non-zero → log warning, proceed (memory is best-effort; does not block PR creation).
+
     TaskUpdate(id: phase5TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
