@@ -106,10 +106,10 @@ The summary file is preserved. This is useful for decisions that are fully super
 
 ## Tag Taxonomy
 
-The canonical tag list lives in [`tags-catalog.yaml`](tags-catalog.yaml) (30 initial tags).
+The canonical tag list lives in [`tags-catalog.md`](tags-catalog.md) (30 initial tags).
 Use only tags from that list. Tags outside the catalog emit a WARNING from `x-internal-epic-summary` (not an error).
 
-To add a new tag: open a PR editing `tags-catalog.yaml` with an `id`, `description`, and `introduced-by` entry. The PR requires human tech-lead review and cannot be auto-merged.
+To add a new tag: open a PR editing `tags-catalog.md` with an `id`, `description`, and `introduced-by` entry. The PR requires human tech-lead review and cannot be auto-merged.
 
 ## Updating a Summary
 

@@ -1,14 +1,25 @@
-# ai-memory-playbook/tags-catalog.yaml
-# Canonical tag taxonomy for ai/memory/ epic summaries.
-# Used by x-memory-search --by-tag and x-internal-epic-summary validation.
-#
-# Process to add a new tag:
-#   1. Open a PR adding the entry below with `id`, `description`, and `introduced-by`.
-#   2. PR requires human tech-lead review (not auto-mergeable).
-#   3. Update x-memory-search --help to include the new tag in the documented list.
-#
-# Format: id must be kebab-case. description: 1 sentence max.
+---
+name: ai-memory-tags-catalog
+description: Canonical tag taxonomy for ai/memory/ epic summaries
+requires-capabilities: [governance.ai-memory]
+---
 
+# Tags Catalog — AI Memory Summaries
+
+Canonical tag taxonomy for `ai/memory/` epic summaries.
+Used by `x-memory-search --by-tag` and `x-internal-epic-summary` validation.
+
+## Process to Add a New Tag
+
+1. Open a PR adding the entry below with `id`, `description`, and `introduced-by`.
+2. PR requires human tech-lead review (not auto-mergeable).
+3. Update `x-memory-search --help` to include the new tag in the documented list.
+
+Format: `id` must be kebab-case. `description`: 1 sentence max.
+
+## Catalog
+
+```yaml
 schemaVersion: "1.0"
 tags:
   - id: governance
@@ -134,3 +145,4 @@ tags:
   - id: local-first
     description: Epic relates to local-first lifecycle or preventive hooks (EPIC-0061+).
     introduced-by: EPIC-0075
+```
