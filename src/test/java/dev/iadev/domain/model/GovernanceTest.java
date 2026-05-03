@@ -30,7 +30,8 @@ class GovernanceTest {
                             false,
                             DocumentationConfig.DEFAULT,
                             QualityConfig.DEFAULT,
-                            DependencyPolicyConfig.DEFAULT);
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.compliance()).isEqualTo("pci-dss");
             assertThat(gov.platforms()).containsExactly(Platform.CLAUDE_CODE);
@@ -49,7 +50,8 @@ class GovernanceTest {
                             true,
                             DocumentationConfig.DEFAULT,
                             QualityConfig.DEFAULT,
-                            DependencyPolicyConfig.DEFAULT);
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.platforms()).isEmpty();
         }
@@ -65,7 +67,8 @@ class GovernanceTest {
                             true,
                             DocumentationConfig.DEFAULT,
                             QualityConfig.DEFAULT,
-                            DependencyPolicyConfig.DEFAULT);
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.branchingModel()).isEqualTo(BranchingModel.GITFLOW);
         }
@@ -84,7 +87,8 @@ class GovernanceTest {
                             true,
                             DocumentationConfig.DEFAULT,
                             QualityConfig.DEFAULT,
-                            DependencyPolicyConfig.DEFAULT);
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             mutable.add(Platform.SHARED);
 
@@ -102,7 +106,8 @@ class GovernanceTest {
                             true,
                             DocumentationConfig.DEFAULT,
                             QualityConfig.DEFAULT,
-                            DependencyPolicyConfig.DEFAULT);
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThatThrownBy(() -> gov.platforms().add(Platform.SHARED))
                     .isInstanceOf(UnsupportedOperationException.class);

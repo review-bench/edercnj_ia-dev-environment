@@ -31,6 +31,7 @@
 | ADR-0025 | [Comprehensive Test Strategy (EPIC-0072)](ADR-0025-comprehensive-test-strategy.md) | Accepted | 2026-04-30 |
 | ADR-0026 | [Regression Shell + DAST (EPIC-0073)](ADR-0026-regression-shell-and-dast.md) | Accepted | 2026-05-01 |
 | ADR-0027 | [Dependency Policy & SCA Final Gate (EPIC-0074)](ADR-0027-dependency-policy-gate.md) | Accepted | 2026-05-01 |
+| ADR-0028 | [AI Memory Layer (EPIC-0075)](ADR-0028-ai-memory-layer.md) | Accepted | 2026-05-03 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.

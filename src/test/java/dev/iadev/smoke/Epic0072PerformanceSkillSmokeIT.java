@@ -129,7 +129,8 @@ class Epic0072PerformanceSkillSmokeIT {
                                     baseConfig.governance().telemetryEnabled(),
                                     baseConfig.governance().documentation(),
                                     qualityConfig,
-                                    dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT));
+                                    dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT,
+                                    dev.iadev.domain.model.AiMemoryConfig.DEFAULT));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
             assertThat(skills).contains("x-test-performance");
         }

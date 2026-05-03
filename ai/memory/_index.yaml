@@ -1,0 +1,288 @@
+# ai/memory/_index.yaml — schema v1.0
+# Managed by x-internal-epic-summary (EPIC-0075, Rule 33).
+# DO NOT edit manually — regenerate via x-internal-epic-summary.
+#
+# Schema:
+#   schemaVersion: "1.0"
+#   entries:
+#     - epic-id: EPIC-XXXX
+#       slug: epic-slug
+#       summary-path: epic-XXXX-summary.md
+#       summary-version: "1.0"
+#       indexable: true         # false → exclude from /x-memory-search results
+#       archived: false         # true → flagged as archived but file preserved
+#       superseded-by: null     # EPIC-YYYY when superseded
+#       created: "YYYY-MM-DD"
+#       last-updated: "YYYY-MM-DD"
+
+schemaVersion: "1.0"
+entries:
+  - epic-id: EPIC-0040
+    slug: telemetry-capture-ndjson
+    summary-path: epic-0040-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0041
+    slug: file-conflict-aware-parallelism
+    summary-path: epic-0041-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0042
+    slug: merge-train-auto-pr-fix
+    summary-path: epic-0042-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0043
+    slug: interactive-gates-standardization
+    summary-path: epic-0043-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0044
+    slug: deprecated-code-removal
+    summary-path: epic-0044-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0045
+    slug: ci-watch-pr-flow
+    summary-path: epic-0045-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0046
+    slug: lifecycle-integrity-status-propagation
+    summary-path: epic-0046-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0047
+    slug: skill-body-compression
+    summary-path: epic-0047-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0048
+    slug: java-only-generator-bugfixes
+    summary-path: epic-0048-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0049
+    slug: epic-flow-refactor-sequential-default
+    summary-path: epic-0049-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0051
+    slug: knowledge-packs-dedicated-dir
+    summary-path: epic-0051-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0053
+    slug: mandatory-reviews-enforcement
+    summary-path: epic-0053-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0054
+    slug: adr-0012-slim-orchestrators-rollout
+    summary-path: epic-0054-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0055
+    slug: task-hierarchy-phase-gates
+    summary-path: epic-0055-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0056
+    slug: ra9-planning-templates
+    summary-path: epic-0056-summary.md
+    summary-version: "1.0"
+    indexable: false
+    archived: true
+    superseded-by: EPIC-0070
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0057
+    slug: rule24-execution-integrity-extension
+    summary-path: epic-0057-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0058
+    slug: audit-scripts-lifecycle
+    summary-path: epic-0058-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0059
+    slug: zero-bypass-lifecycle-enforcement
+    summary-path: epic-0059-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0060
+    slug: folder-restructure-v4-precursor
+    summary-path: epic-0060-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0061
+    slug: local-first-governance
+    summary-path: epic-0061-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0062
+    slug: folder-migration-v4
+    summary-path: epic-0062-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0063
+    slug: local-first-preflight-gates
+    summary-path: epic-0063-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0064
+    slug: capability-driven-composition
+    summary-path: epic-0064-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0072
+    slug: comprehensive-test-strategy
+    summary-path: epic-0072-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0070
+    slug: value-driven-templates-v2
+    summary-path: epic-0070-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0074
+    slug: dependency-policy-and-sca-gate
+    summary-path: epic-0074-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0075
+    slug: ai-memory-layer
+    summary-path: epic-0075-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
