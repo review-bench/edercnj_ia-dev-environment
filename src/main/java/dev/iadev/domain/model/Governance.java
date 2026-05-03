@@ -26,6 +26,8 @@ import java.util.Set;
  *     {@code quality} block (EPIC-0072, story-0072-0001)
  * @param dependencyPolicy the dependency policy gate configuration (optional, default disabled);
  *     maps to YAML {@code dependencies.policy} block (EPIC-0074, story-0074-0001)
+ * @param aiMemory the AI memory layer configuration (optional, default disabled); maps to YAML
+ *     {@code governance.ai-memory} block (EPIC-0075, story-0075-0001)
  */
 public record Governance(
         String compliance,
@@ -34,12 +36,13 @@ public record Governance(
         boolean telemetryEnabled,
         DocumentationConfig documentation,
         QualityConfig quality,
-        DependencyPolicyConfig dependencyPolicy) {
+        DependencyPolicyConfig dependencyPolicy,
+        AiMemoryConfig aiMemory) {
 
     /**
      * Compact constructor enforcing immutability of the {@code platforms} set and applying defaults
-     * for the {@code branchingModel}, {@code documentation}, {@code quality}, and {@code
-     * dependencyPolicy}.
+     * for the {@code branchingModel}, {@code documentation}, {@code quality}, {@code
+     * dependencyPolicy}, and {@code aiMemory}.
      */
     public Governance {
         platforms = platforms == null ? Set.of() : Set.copyOf(platforms);
@@ -48,6 +51,7 @@ public record Governance(
         quality = quality == null ? QualityConfig.DEFAULT : quality;
         dependencyPolicy =
                 dependencyPolicy == null ? DependencyPolicyConfig.DEFAULT : dependencyPolicy;
+        aiMemory = aiMemory == null ? AiMemoryConfig.DEFAULT : aiMemory;
     }
 
     /**
@@ -68,6 +72,7 @@ public record Governance(
                 ProjectConfig.parseTelemetryEnabled(root),
                 ProjectConfig.parseDocumentation(root),
                 ProjectConfig.parseQuality(root),
-                ProjectConfig.parseDependencyPolicy(root));
+                ProjectConfig.parseDependencyPolicy(root),
+                ProjectConfig.parseAiMemory(root));
     }
 }

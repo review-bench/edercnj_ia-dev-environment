@@ -1,0 +1,19 @@
+# ai/memory/_index.yaml — schema v1.0
+# Managed by x-internal-epic-summary (EPIC-0075, Rule 33).
+# DO NOT edit manually — regenerate via x-internal-epic-summary.
+#
+# Schema:
+#   schemaVersion: "1.0"
+#   entries:
+#     - epic-id: EPIC-XXXX
+#       slug: epic-slug
+#       summary-path: epic-XXXX-summary.md
+#       summary-version: "1.0"
+#       indexable: true         # false → exclude from /x-memory-search results
+#       archived: false         # true → flagged as archived but file preserved
+#       superseded-by: null     # EPIC-YYYY when superseded
+#       created: "YYYY-MM-DD"
+#       last-updated: "YYYY-MM-DD"
+
+schemaVersion: "1.0"
+entries: []

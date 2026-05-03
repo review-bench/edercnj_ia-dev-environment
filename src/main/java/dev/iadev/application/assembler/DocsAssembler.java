@@ -41,8 +41,19 @@ public final class DocsAssembler implements Assembler {
     private static final String OUTPUT_SUBDIR = "steering";
     private static final String OUTPUT_FILENAME = "service-architecture.md";
     private static final String SYSTEM_ARCH_OUTPUT = "docs/architecture/system.md";
+    static final String MEMORY_INDEX_OUTPUT = "ai/memory/_index.yaml";
+    static final String MEMORY_README_OUTPUT = "ai/memory/README.md";
     private static final String FRONTMATTER_DELIMITER = "---";
     private static final String DEFAULT_STACK = "_default";
+    private static final String MEMORY_INDEX_CONTENT =
+            "# ai/memory/_index.yaml — schema v1.0\n"
+                    + "schemaVersion: \"1.0\"\n"
+                    + "entries: []\n";
+    private static final String MEMORY_README_CONTENT =
+            "# AI Memory — Strategic Decision Archive\n\n"
+                    + "Compact summaries of completed epics for retrieval by LLM sessions.\n"
+                    + "Search via `/x-memory-search`. Entries managed by"
+                    + " `x-internal-epic-summary` (Rule 33).\n";
 
     private final Path resourcesDir;
 
@@ -104,6 +115,31 @@ public final class DocsAssembler implements Assembler {
         CopyHelpers.ensureDirectory(destFile.getParent());
         CopyHelpers.writeFile(destFile, rendered);
         return List.of(destFile.toString());
+    }
+
+    /**
+     * Initializes the {@code ai/memory/} directory in the generated project when the AI memory
+     * layer is enabled ({@code governance.ai-memory.enabled: true}).
+     *
+     * <p>Safe no-op when disabled — existing projects are unaffected (Rule 19).
+     *
+     * @param config the project configuration
+     * @param engine unused; kept for assembler interface uniformity
+     * @param outputDir the root output directory for the generated project
+     * @return paths of written files, or empty list when the capability is disabled
+     */
+    public List<String> initializeMemoryDirectory(
+            ProjectConfig config, TemplateEngine engine, Path outputDir) {
+        if (!config.aiMemory().enabled()) {
+            return List.of();
+        }
+        Path memoryDir = outputDir.resolve("ai/memory");
+        CopyHelpers.ensureDirectory(memoryDir);
+        Path indexFile = memoryDir.resolve("_index.yaml");
+        Path readmeFile = memoryDir.resolve("README.md");
+        CopyHelpers.writeFile(indexFile, MEMORY_INDEX_CONTENT);
+        CopyHelpers.writeFile(readmeFile, MEMORY_README_CONTENT);
+        return List.of(indexFile.toString(), readmeFile.toString());
     }
 
     /**
