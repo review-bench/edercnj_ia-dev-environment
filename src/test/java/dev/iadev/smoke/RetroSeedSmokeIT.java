@@ -1,9 +1,6 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("RetroSeedSmokeIT — ai/memory/ retro-seed quality rubric (story-0075-0006)")
 class RetroSeedSmokeIT {
@@ -21,34 +20,34 @@ class RetroSeedSmokeIT {
     private static final Path INDEX_FILE = MEMORY_DIR.resolve("_index.yaml");
     private static final int MAX_LINES = 200;
 
-    private static final List<String> REQUIRED_FRONTMATTER_FIELDS = List.of(
-            "epic-id:",
-            "slug:",
-            "summary-version:",
-            "created:",
-            "last-updated:",
-            "indexable:",
-            "archived:",
-            "superseded-by:",
-            "tags:",
-            "capabilities-affected:",
-            "rules-affected:",
-            "adrs-referenced:",
-            "patterns-introduced:",
-            "antipatterns-rejected:",
-            "dependencies-of:",
-            "dependencies-for:"
-    );
+    private static final List<String> REQUIRED_FRONTMATTER_FIELDS =
+            List.of(
+                    "epic-id:",
+                    "slug:",
+                    "summary-version:",
+                    "created:",
+                    "last-updated:",
+                    "indexable:",
+                    "archived:",
+                    "superseded-by:",
+                    "tags:",
+                    "capabilities-affected:",
+                    "rules-affected:",
+                    "adrs-referenced:",
+                    "patterns-introduced:",
+                    "antipatterns-rejected:",
+                    "dependencies-of:",
+                    "dependencies-for:");
 
-    private static final List<String> REQUIRED_SECTIONS = List.of(
-            "## Why this epic existed",
-            "## Hypothesis tested",
-            "## Decisions taken (with why)",
-            "## Alternatives rejected (with why)",
-            "## Reusable patterns produced",
-            "## Anti-patterns observed",
-            "## Links"
-    );
+    private static final List<String> REQUIRED_SECTIONS =
+            List.of(
+                    "## Why this epic existed",
+                    "## Hypothesis tested",
+                    "## Decisions taken (with why)",
+                    "## Alternatives rejected (with why)",
+                    "## Reusable patterns produced",
+                    "## Anti-patterns observed",
+                    "## Links");
 
     static Stream<Path> summaryFiles() throws IOException {
         assertThat(MEMORY_DIR).as("ai/memory/ directory must exist").isDirectory();
@@ -61,7 +60,8 @@ class RetroSeedSmokeIT {
     @MethodSource("summaryFiles")
     void validateFrontmatter(Path summaryFile) throws IOException {
         String content = Files.readString(summaryFile, StandardCharsets.UTF_8);
-        assertThat(content).as("%s must start with YAML frontmatter", summaryFile)
+        assertThat(content)
+                .as("%s must start with YAML frontmatter", summaryFile)
                 .startsWith("---");
 
         for (String field : REQUIRED_FRONTMATTER_FIELDS) {
@@ -88,7 +88,9 @@ class RetroSeedSmokeIT {
     void validateLineCap(Path summaryFile) throws IOException {
         List<String> lines = Files.readAllLines(summaryFile, StandardCharsets.UTF_8);
         assertThat(lines)
-                .as("%s must not exceed %d lines (got %d)", summaryFile.getFileName(), MAX_LINES, lines.size())
+                .as(
+                        "%s must not exceed %d lines (got %d)",
+                        summaryFile.getFileName(), MAX_LINES, lines.size())
                 .hasSizeLessThanOrEqualTo(MAX_LINES);
     }
 
@@ -97,13 +99,16 @@ class RetroSeedSmokeIT {
     void validateHypothesisNonEmpty(Path summaryFile) throws IOException {
         String content = Files.readString(summaryFile, StandardCharsets.UTF_8);
         int hypothesisIdx = content.indexOf("## Hypothesis tested");
-        assertThat(hypothesisIdx).as("%s must contain ## Hypothesis tested", summaryFile.getFileName())
+        assertThat(hypothesisIdx)
+                .as("%s must contain ## Hypothesis tested", summaryFile.getFileName())
                 .isGreaterThanOrEqualTo(0);
 
         int nextSectionIdx = content.indexOf("## ", hypothesisIdx + 1);
-        String hypothesisBody = nextSectionIdx > 0
-                ? content.substring(hypothesisIdx + "## Hypothesis tested".length(), nextSectionIdx)
-                : content.substring(hypothesisIdx + "## Hypothesis tested".length());
+        String hypothesisBody =
+                nextSectionIdx > 0
+                        ? content.substring(
+                                hypothesisIdx + "## Hypothesis tested".length(), nextSectionIdx)
+                        : content.substring(hypothesisIdx + "## Hypothesis tested".length());
 
         assertThat(hypothesisBody.trim())
                 .as("%s ## Hypothesis tested section must not be empty", summaryFile.getFileName())
@@ -119,12 +124,13 @@ class RetroSeedSmokeIT {
         try (Stream<Path> files = Files.list(MEMORY_DIR)) {
             files.filter(p -> p.getFileName().toString().matches("epic-\\d{4}-summary\\.md"))
                     .sorted()
-                    .forEach(summaryFile -> {
-                        String filename = summaryFile.getFileName().toString();
-                        assertThat(indexContent)
-                                .as("_index.yaml must have entry for %s", filename)
-                                .contains("summary-path: " + filename);
-                    });
+                    .forEach(
+                            summaryFile -> {
+                                String filename = summaryFile.getFileName().toString();
+                                assertThat(indexContent)
+                                        .as("_index.yaml must have entry for %s", filename)
+                                        .contains("summary-path: " + filename);
+                            });
         }
     }
 
@@ -152,28 +158,37 @@ class RetroSeedSmokeIT {
         try (Stream<Path> files = Files.list(MEMORY_DIR)) {
             files.filter(p -> p.getFileName().toString().matches("epic-\\d{4}-summary\\.md"))
                     .sorted()
-                    .forEach(summaryFile -> {
-                        try {
-                            String content = Files.readString(summaryFile, StandardCharsets.UTF_8);
-                            // Extract superseded-by value
-                            for (String line : content.lines().toList()) {
-                                if (line.trim().startsWith("superseded-by:") && !line.contains("null")) {
-                                    String ref = line.replace("superseded-by:", "").trim();
-                                    // ref is EPIC-XXXX format
-                                    if (ref.matches("EPIC-\\d{4}")) {
-                                        String refNum = ref.replace("EPIC-", "").toLowerCase();
-                                        Path refFile = MEMORY_DIR.resolve("epic-" + refNum + "-summary.md");
-                                        assertThat(refFile)
-                                                .as("%s superseded-by %s but %s not found",
-                                                        summaryFile.getFileName(), ref, refFile.getFileName())
-                                                .isRegularFile();
+                    .forEach(
+                            summaryFile -> {
+                                try {
+                                    String content =
+                                            Files.readString(summaryFile, StandardCharsets.UTF_8);
+                                    // Extract superseded-by value
+                                    for (String line : content.lines().toList()) {
+                                        if (line.trim().startsWith("superseded-by:")
+                                                && !line.contains("null")) {
+                                            String ref = line.replace("superseded-by:", "").trim();
+                                            // ref is EPIC-XXXX format
+                                            if (ref.matches("EPIC-\\d{4}")) {
+                                                String refNum =
+                                                        ref.replace("EPIC-", "").toLowerCase();
+                                                Path refFile =
+                                                        MEMORY_DIR.resolve(
+                                                                "epic-" + refNum + "-summary.md");
+                                                assertThat(refFile)
+                                                        .as(
+                                                                "%s superseded-by %s but %s not found",
+                                                                summaryFile.getFileName(),
+                                                                ref,
+                                                                refFile.getFileName())
+                                                        .isRegularFile();
+                                            }
+                                        }
                                     }
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
                                 }
-                            }
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+                            });
         }
     }
 }

@@ -14,16 +14,21 @@ import java.util.regex.Pattern;
  */
 public final class EpicSectionExtractor {
 
-    static final String PLACEHOLDER_NO_DECISIONS = "<no formal decisions recorded — extracted from prose>";
+    static final String PLACEHOLDER_NO_DECISIONS =
+            "<no formal decisions recorded — extracted from prose>";
     static final String OUTCOME_PENDING = "outcome: pending";
 
     private static final Pattern DECISION_LINE = Pattern.compile("^\\*\\*Decisão:\\*\\*.*");
     private static final Pattern MOTIVO_LINE = Pattern.compile("^\\*\\*Motivo:\\*\\*.*");
-    private static final Pattern CONSEQUENCIA_LINE = Pattern.compile("^\\*\\*Consequência:\\*\\*.*");
-    private static final Pattern ALTERNATIVE_LINE = Pattern.compile("^\\*\\*Alternativa descartada:\\*\\*.*");
-    private static final Pattern HYPOTHESIS_LINE = Pattern.compile("^(>\\s*)?[Ss]e .*(então|entao).*");
+    private static final Pattern CONSEQUENCIA_LINE =
+            Pattern.compile("^\\*\\*Consequência:\\*\\*.*");
+    private static final Pattern ALTERNATIVE_LINE =
+            Pattern.compile("^\\*\\*Alternativa descartada:\\*\\*.*");
+    private static final Pattern HYPOTHESIS_LINE =
+            Pattern.compile("^(>\\s*)?[Ss]e .*(então|entao).*");
     private static final Pattern PATTERN_KEYWORD = Pattern.compile("(?iu)padrão|pattern|convenção");
-    private static final Pattern ANTIPATTERN_KEYWORD = Pattern.compile("(?iu)anti-padrão|antipadrão|rejeitado|evitar");
+    private static final Pattern ANTIPATTERN_KEYWORD =
+            Pattern.compile("(?iu)anti-padrão|antipadrão|rejeitado|evitar");
     private static final int MAX_WHY_LINES = 5;
 
     private EpicSectionExtractor() {}
@@ -69,7 +74,8 @@ public final class EpicSectionExtractor {
      */
     public static List<String> extractDecisions(
             Map<String, List<String>> sections, boolean allowLegacyFallback) {
-        List<String> body = findSection(sections, "8. Decision Rationale", "6.", "Decision Rationale");
+        List<String> body =
+                findSection(sections, "8. Decision Rationale", "6.", "Decision Rationale");
         List<String> result = new ArrayList<>();
         for (String line : body) {
             String s = line.strip();
@@ -85,11 +91,10 @@ public final class EpicSectionExtractor {
         return Collections.unmodifiableList(result);
     }
 
-    /**
-     * Extracts rejected alternatives lines.
-     */
+    /** Extracts rejected alternatives lines. */
     public static List<String> extractAlternatives(Map<String, List<String>> sections) {
-        List<String> body = findSection(sections, "8. Decision Rationale", "6.", "Decision Rationale");
+        List<String> body =
+                findSection(sections, "8. Decision Rationale", "6.", "Decision Rationale");
         List<String> result = new ArrayList<>();
         for (String line : body) {
             if (ALTERNATIVE_LINE.matcher(line.strip()).matches()) {
@@ -99,16 +104,12 @@ public final class EpicSectionExtractor {
         return Collections.unmodifiableList(result);
     }
 
-    /**
-     * Scans Decision Rationale and all sections for pattern-keyword lines; deduplicates.
-     */
+    /** Scans Decision Rationale and all sections for pattern-keyword lines; deduplicates. */
     public static List<String> extractPatterns(Map<String, List<String>> sections) {
         return extractByKeyword(sections, PATTERN_KEYWORD);
     }
 
-    /**
-     * Scans Decision Rationale and all sections for anti-pattern-keyword lines; deduplicates.
-     */
+    /** Scans Decision Rationale and all sections for anti-pattern-keyword lines; deduplicates. */
     public static List<String> extractAntiPatterns(Map<String, List<String>> sections) {
         return extractByKeyword(sections, ANTIPATTERN_KEYWORD);
     }
@@ -126,7 +127,8 @@ public final class EpicSectionExtractor {
         return Collections.unmodifiableList(result);
     }
 
-    private static List<String> findSection(Map<String, List<String>> sections, String... candidates) {
+    private static List<String> findSection(
+            Map<String, List<String>> sections, String... candidates) {
         for (String candidate : candidates) {
             for (Map.Entry<String, List<String>> entry : sections.entrySet()) {
                 if (entry.getKey().startsWith(candidate)) {

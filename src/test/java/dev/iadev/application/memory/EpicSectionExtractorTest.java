@@ -1,11 +1,10 @@
 package dev.iadev.application.memory;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class EpicSectionExtractorTest {
 
@@ -13,8 +12,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractWhy_v2Section_returnsFirstParagraph() {
-        Map<String, List<String>> sections = Map.of(
-                "1. Visão & Problema", List.of("Line 1", "Line 2", "Line 3"));
+        Map<String, List<String>> sections =
+                Map.of("1. Visão & Problema", List.of("Line 1", "Line 2", "Line 3"));
 
         List<String> result = EpicSectionExtractor.extractWhy(sections);
 
@@ -23,8 +22,7 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractWhy_fallsBackToContextoHeader() {
-        Map<String, List<String>> sections = Map.of(
-                "Contexto", List.of("Context line"));
+        Map<String, List<String>> sections = Map.of("Contexto", List.of("Context line"));
 
         List<String> result = EpicSectionExtractor.extractWhy(sections);
 
@@ -33,9 +31,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractWhy_capsAtFiveNonBlankLines() {
-        Map<String, List<String>> sections = Map.of(
-                "1. Visão & Problema",
-                List.of("L1", "L2", "L3", "L4", "L5", "L6", "L7"));
+        Map<String, List<String>> sections =
+                Map.of("1. Visão & Problema", List.of("L1", "L2", "L3", "L4", "L5", "L6", "L7"));
 
         List<String> result = EpicSectionExtractor.extractWhy(sections);
 
@@ -44,9 +41,10 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractWhy_skipsBlankLines_countNonBlankOnly() {
-        Map<String, List<String>> sections = Map.of(
-                "1. Visão & Problema",
-                List.of("L1", "", "L2", "", "L3", "", "L4", "L5", "L6"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "1. Visão & Problema",
+                        List.of("L1", "", "L2", "", "L3", "", "L4", "L5", "L6"));
 
         List<String> result = EpicSectionExtractor.extractWhy(sections);
 
@@ -62,8 +60,7 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractWhy_resultIsUnmodifiable() {
-        Map<String, List<String>> sections = Map.of(
-                "1. Visão & Problema", List.of("line"));
+        Map<String, List<String>> sections = Map.of("1. Visão & Problema", List.of("line"));
 
         List<String> result = EpicSectionExtractor.extractWhy(sections);
 
@@ -75,9 +72,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractHypothesis_v2Section_extractsHypothesisLine() {
-        Map<String, List<String>> sections = Map.of(
-                "3. Hipótese & OKRs",
-                List.of("Some preamble", "Se X então Y", "More text"));
+        Map<String, List<String>> sections =
+                Map.of("3. Hipótese & OKRs", List.of("Some preamble", "Se X então Y", "More text"));
 
         List<String> result = EpicSectionExtractor.extractHypothesis(sections);
 
@@ -86,8 +82,7 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractHypothesis_alwaysAppendsOutcomePending() {
-        Map<String, List<String>> sections = Map.of(
-                "3. Hipótese & OKRs", List.of("Se X então Z"));
+        Map<String, List<String>> sections = Map.of("3. Hipótese & OKRs", List.of("Se X então Z"));
 
         List<String> result = EpicSectionExtractor.extractHypothesis(sections);
 
@@ -96,8 +91,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractHypothesis_noHypothesisLine_returnsOnlyOutcomePending() {
-        Map<String, List<String>> sections = Map.of(
-                "3. Hipótese & OKRs", List.of("No hypothesis here"));
+        Map<String, List<String>> sections =
+                Map.of("3. Hipótese & OKRs", List.of("No hypothesis here"));
 
         List<String> result = EpicSectionExtractor.extractHypothesis(sections);
 
@@ -106,9 +101,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractHypothesis_quotedHypothesisLine_matched() {
-        Map<String, List<String>> sections = Map.of(
-                "3. Hipótese & OKRs",
-                List.of("> Se implementarmos X então Y"));
+        Map<String, List<String>> sections =
+                Map.of("3. Hipótese & OKRs", List.of("> Se implementarmos X então Y"));
 
         List<String> result = EpicSectionExtractor.extractHypothesis(sections);
 
@@ -119,17 +113,20 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractDecisions_v2Section_extractsDecisionLines() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale",
-                List.of("**Decisão:** Use hexagonal", "**Motivo:** Testability",
-                        "**Consequência:** More files", "Prose not extracted"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "8. Decision Rationale",
+                        List.of(
+                                "**Decisão:** Use hexagonal", "**Motivo:** Testability",
+                                "**Consequência:** More files", "Prose not extracted"));
 
         List<String> result = EpicSectionExtractor.extractDecisions(sections, false);
 
-        assertThat(result).containsExactly(
-                "**Decisão:** Use hexagonal",
-                "**Motivo:** Testability",
-                "**Consequência:** More files");
+        assertThat(result)
+                .containsExactly(
+                        "**Decisão:** Use hexagonal",
+                        "**Motivo:** Testability",
+                        "**Consequência:** More files");
     }
 
     @Test
@@ -152,8 +149,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractDecisions_resultIsUnmodifiable() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale", List.of("**Decisão:** X"));
+        Map<String, List<String>> sections =
+                Map.of("8. Decision Rationale", List.of("**Decisão:** X"));
 
         List<String> result = EpicSectionExtractor.extractDecisions(sections, false);
 
@@ -165,10 +162,13 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractAlternatives_v2Section_extractsAlternativeLines() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale",
-                List.of("**Alternativa descartada:** Option B", "Prose ignored",
-                        "**Decisão:** Option A"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "8. Decision Rationale",
+                        List.of(
+                                "**Alternativa descartada:** Option B",
+                                "Prose ignored",
+                                "**Decisão:** Option A"));
 
         List<String> result = EpicSectionExtractor.extractAlternatives(sections);
 
@@ -177,8 +177,8 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractAlternatives_noAlternatives_returnsEmpty() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale", List.of("**Decisão:** X"));
+        Map<String, List<String>> sections =
+                Map.of("8. Decision Rationale", List.of("**Decisão:** X"));
 
         assertThat(EpicSectionExtractor.extractAlternatives(sections)).isEmpty();
     }
@@ -187,9 +187,10 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractPatterns_findsPatternKeywordLines() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale",
-                List.of("Use the padrão of hexagonal", "unrelated line"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "8. Decision Rationale",
+                        List.of("Use the padrão of hexagonal", "unrelated line"));
 
         List<String> result = EpicSectionExtractor.extractPatterns(sections);
 
@@ -198,8 +199,7 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractPatterns_englishPatternKeyword_found() {
-        Map<String, List<String>> sections = Map.of(
-                "Patterns", List.of("Apply pattern of CQRS"));
+        Map<String, List<String>> sections = Map.of("Patterns", List.of("Apply pattern of CQRS"));
 
         List<String> result = EpicSectionExtractor.extractPatterns(sections);
 
@@ -209,9 +209,10 @@ class EpicSectionExtractorTest {
     @Test
     void extractPatterns_deduplicatesAcrossSections() {
         String duplicate = "Use the pattern of DDD";
-        Map<String, List<String>> sections = Map.of(
-                "Sec A", List.of(duplicate),
-                "Sec B", List.of(duplicate));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "Sec A", List.of(duplicate),
+                        "Sec B", List.of(duplicate));
 
         List<String> result = EpicSectionExtractor.extractPatterns(sections);
 
@@ -220,9 +221,10 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractPatterns_caseInsensitiveMatch() {
-        Map<String, List<String>> sections = Map.of(
-                "X", List.of("use PADRÃO for this", "use PATTERN there",
-                        "use CONVENÇÃO here"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "X",
+                        List.of("use PADRÃO for this", "use PATTERN there", "use CONVENÇÃO here"));
 
         List<String> result = EpicSectionExtractor.extractPatterns(sections);
 
@@ -233,24 +235,31 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractAntiPatterns_findsAntiPatternKeywordLines() {
-        Map<String, List<String>> sections = Map.of(
-                "X", List.of("This approach is rejeitado", "normal line",
-                        "evitar coupling here", "use anti-padrão never"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "X",
+                        List.of(
+                                "This approach is rejeitado",
+                                "normal line",
+                                "evitar coupling here",
+                                "use anti-padrão never"));
 
         List<String> result = EpicSectionExtractor.extractAntiPatterns(sections);
 
-        assertThat(result).containsExactly(
-                "This approach is rejeitado",
-                "evitar coupling here",
-                "use anti-padrão never");
+        assertThat(result)
+                .containsExactly(
+                        "This approach is rejeitado",
+                        "evitar coupling here",
+                        "use anti-padrão never");
     }
 
     @Test
     void extractAntiPatterns_deduplicatesAcrossSections() {
         String dup = "evitar god classes";
-        Map<String, List<String>> sections = Map.of(
-                "A", List.of(dup),
-                "B", List.of(dup));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "A", List.of(dup),
+                        "B", List.of(dup));
 
         assertThat(EpicSectionExtractor.extractAntiPatterns(sections)).hasSize(1);
     }
@@ -259,9 +268,10 @@ class EpicSectionExtractorTest {
 
     @Test
     void extractDecisions_deterministic_sameInputSameOutput() {
-        Map<String, List<String>> sections = Map.of(
-                "8. Decision Rationale",
-                List.of("**Decisão:** A", "**Motivo:** B", "**Consequência:** C"));
+        Map<String, List<String>> sections =
+                Map.of(
+                        "8. Decision Rationale",
+                        List.of("**Decisão:** A", "**Motivo:** B", "**Consequência:** C"));
 
         List<String> first = EpicSectionExtractor.extractDecisions(sections, false);
         List<String> second = EpicSectionExtractor.extractDecisions(sections, false);

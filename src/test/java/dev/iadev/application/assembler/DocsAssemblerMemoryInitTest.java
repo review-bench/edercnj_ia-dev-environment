@@ -4,19 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadev.domain.model.AiMemoryConfig;
 import dev.iadev.domain.model.BranchingModel;
-import dev.iadev.domain.model.CoreStack;
 import dev.iadev.domain.model.DependencyPolicyConfig;
 import dev.iadev.domain.model.DocumentationConfig;
 import dev.iadev.domain.model.Governance;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.model.QualityConfig;
-import dev.iadev.domain.model.TechStack;
 import dev.iadev.template.TemplateEngine;
 import dev.iadev.testutil.TestConfigBuilder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -83,7 +80,8 @@ class DocsAssemblerMemoryInitTest {
             ProjectConfig config = configWithAiMemory(true);
 
             assembler.initializeMemoryDirectory(config, engine, tempDir);
-            List<String> secondResult = assembler.initializeMemoryDirectory(config, engine, tempDir);
+            List<String> secondResult =
+                    assembler.initializeMemoryDirectory(config, engine, tempDir);
 
             assertThat(secondResult).isEmpty();
         }
@@ -111,8 +109,7 @@ class DocsAssemblerMemoryInitTest {
 
             assembler.initializeMemoryDirectory(config, engine, tempDir);
 
-            String content =
-                    Files.readString(tempDir.resolve(DocsAssembler.MEMORY_INDEX_OUTPUT));
+            String content = Files.readString(tempDir.resolve(DocsAssembler.MEMORY_INDEX_OUTPUT));
             assertThat(content).contains("schemaVersion: \"1.0\"");
             assertThat(content).contains("entries: []");
         }

@@ -1,28 +1,44 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Epic0075MemoryLayerSmokeIT — AI Memory Layer structural invariants")
 class Epic0075MemoryLayerSmokeIT {
 
-    private static final Path SKILL_FILE = Path.of(
-            "src", "main", "resources", "targets", "claude", "skills",
-            "core", "internal", "memory", "x-internal-epic-summary", "SKILL.md");
+    private static final Path SKILL_FILE =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "skills",
+                    "core",
+                    "internal",
+                    "memory",
+                    "x-internal-epic-summary",
+                    "SKILL.md");
 
-    private static final Path KNOWLEDGE_ROOT = Path.of(
-            "src", "main", "resources", "targets", "claude", "knowledge",
-            "governance", "ai-memory-playbook");
+    private static final Path KNOWLEDGE_ROOT =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "ai-memory-playbook");
 
-    private static final Path FIXTURE_DIR = Path.of(
-            "src", "test", "resources", "fixtures", "memory");
+    private static final Path FIXTURE_DIR =
+            Path.of("src", "test", "resources", "fixtures", "memory");
 
     private String readSkill() throws IOException {
         assertThat(SKILL_FILE).as("SKILL.md must exist").exists();
@@ -36,9 +52,12 @@ class Epic0075MemoryLayerSmokeIT {
     void scenario1_skillFrontmatter_declaresInternalVisibility() throws IOException {
         String skill = readSkill();
         assertThat(skill).as("must declare visibility: internal").contains("visibility: internal");
-        assertThat(skill).as("must declare user-invocable: false").contains("user-invocable: false");
+        assertThat(skill)
+                .as("must declare user-invocable: false")
+                .contains("user-invocable: false");
         assertThat(skill).as("must declare model: haiku (Rule 23)").contains("model: haiku");
-        assertThat(skill).as("must require governance.ai-memory capability")
+        assertThat(skill)
+                .as("must require governance.ai-memory capability")
                 .contains("requires-capabilities: [governance.ai-memory]");
     }
 
@@ -48,10 +67,10 @@ class Epic0075MemoryLayerSmokeIT {
     @DisplayName("scenario2_bodyMarker_present")
     void scenario2_bodyMarker_present() throws IOException {
         String skill = readSkill();
-        assertThat(skill).as("must contain 🔒 INTERNAL SKILL marker")
+        assertThat(skill)
+                .as("must contain 🔒 INTERNAL SKILL marker")
                 .contains("🔒 **INTERNAL SKILL**");
-        assertThat(skill).as("must state not user-invocable")
-                .contains("Not user-invocable");
+        assertThat(skill).as("must state not user-invocable").contains("Not user-invocable");
     }
 
     // ── scenario 3: parameters table ────────────────────────────────────────
@@ -62,7 +81,8 @@ class Epic0075MemoryLayerSmokeIT {
         String skill = readSkill();
         assertThat(skill).as("must declare --epic-id flag").contains("--epic-id");
         assertThat(skill).as("must declare --dry-run flag").contains("--dry-run");
-        assertThat(skill).as("must declare --allow-legacy-fallback flag")
+        assertThat(skill)
+                .as("must declare --allow-legacy-fallback flag")
                 .contains("--allow-legacy-fallback");
     }
 
@@ -78,8 +98,12 @@ class Epic0075MemoryLayerSmokeIT {
         assertThat(skill).as("exit 3 MEMORY_SUMMARY_TOO_LONG").contains("MEMORY_SUMMARY_TOO_LONG");
         assertThat(skill).as("exit 4 EXTRACTION_FAILED").contains("EXTRACTION_FAILED");
         assertThat(skill).as("exit 5 INDEX_LOCK_TIMEOUT").contains("INDEX_LOCK_TIMEOUT");
-        assertThat(skill).as("exit 6 TEMPLATE_VERSION_MISMATCH").contains("TEMPLATE_VERSION_MISMATCH");
-        assertThat(skill).as("exit 7 MANUAL_REFINEMENT_PRESENT").contains("MANUAL_REFINEMENT_PRESENT");
+        assertThat(skill)
+                .as("exit 6 TEMPLATE_VERSION_MISMATCH")
+                .contains("TEMPLATE_VERSION_MISMATCH");
+        assertThat(skill)
+                .as("exit 7 MANUAL_REFINEMENT_PRESENT")
+                .contains("MANUAL_REFINEMENT_PRESENT");
     }
 
     // ── scenario 5: extraction rules table ──────────────────────────────────
@@ -102,8 +126,7 @@ class Epic0075MemoryLayerSmokeIT {
     @DisplayName("scenario6_determinismContract_explicitlyStated")
     void scenario6_determinismContract_explicitlyStated() throws IOException {
         String skill = readSkill();
-        assertThat(skill).as("must state determinism contract")
-                .contains("Determinism contract");
+        assertThat(skill).as("must state determinism contract").contains("Determinism contract");
         assertThat(skill).as("must reference bytewise-identical").contains("bytewise-identical");
     }
 
@@ -123,21 +146,27 @@ class Epic0075MemoryLayerSmokeIT {
     @Test
     @DisplayName("scenario8_fixtureSummaries_containRequiredSections")
     void scenario8_fixtureSummaries_containRequiredSections() throws IOException {
-        for (String fixtureName : new String[]{"EPIC-0064-summary.md", "EPIC-0067-summary.md"}) {
+        for (String fixtureName : new String[] {"EPIC-0064-summary.md", "EPIC-0067-summary.md"}) {
             Path fixture = FIXTURE_DIR.resolve(fixtureName);
             assertThat(fixture).as(fixtureName + " must exist").exists();
             String content = Files.readString(fixture, StandardCharsets.UTF_8);
-            assertThat(content).as(fixtureName + ": Why this epic existed")
+            assertThat(content)
+                    .as(fixtureName + ": Why this epic existed")
                     .contains("## Why this epic existed");
-            assertThat(content).as(fixtureName + ": Hypothesis tested")
+            assertThat(content)
+                    .as(fixtureName + ": Hypothesis tested")
                     .contains("## Hypothesis tested");
-            assertThat(content).as(fixtureName + ": Decisions taken")
+            assertThat(content)
+                    .as(fixtureName + ": Decisions taken")
                     .contains("## Decisions taken");
-            assertThat(content).as(fixtureName + ": Alternatives rejected")
+            assertThat(content)
+                    .as(fixtureName + ": Alternatives rejected")
                     .contains("## Alternatives rejected");
-            assertThat(content).as(fixtureName + ": Reusable patterns produced")
+            assertThat(content)
+                    .as(fixtureName + ": Reusable patterns produced")
                     .contains("## Reusable patterns produced");
-            assertThat(content).as(fixtureName + ": Anti-patterns observed")
+            assertThat(content)
+                    .as(fixtureName + ": Anti-patterns observed")
                     .contains("## Anti-patterns observed");
             assertThat(content).as(fixtureName + ": Links").contains("## Links");
         }
@@ -148,7 +177,7 @@ class Epic0075MemoryLayerSmokeIT {
     @Test
     @DisplayName("scenario9_fixtureSummaries_frontmatterContainsMandatoryFields")
     void scenario9_fixtureSummaries_frontmatterContainsMandatoryFields() throws IOException {
-        for (String fixtureName : new String[]{"EPIC-0064-summary.md", "EPIC-0067-summary.md"}) {
+        for (String fixtureName : new String[] {"EPIC-0064-summary.md", "EPIC-0067-summary.md"}) {
             Path fixture = FIXTURE_DIR.resolve(fixtureName);
             String content = Files.readString(fixture, StandardCharsets.UTF_8);
             assertThat(content).as(fixtureName + ": epic-id").contains("epic-id:");
@@ -166,7 +195,6 @@ class Epic0075MemoryLayerSmokeIT {
     void scenario10_integrationNotes_referenceRule33() throws IOException {
         String skill = readSkill();
         assertThat(skill).as("Integration Notes must reference Rule 33").contains("Rule 33");
-        assertThat(skill).as("Must state invoked by x-epic-implement")
-                .contains("x-epic-implement");
+        assertThat(skill).as("Must state invoked by x-epic-implement").contains("x-epic-implement");
     }
 }

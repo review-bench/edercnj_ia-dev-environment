@@ -52,8 +52,7 @@ class PlanTemplatesAssemblerMemoryTest {
 
             List<String> files = assembler.assemble(config, engine, tempDir);
 
-            assertThat(files)
-                    .anyMatch(p -> p.endsWith(MEMORY_TEMPLATE));
+            assertThat(files).anyMatch(p -> p.endsWith(MEMORY_TEMPLATE));
         }
 
         @Test
@@ -85,8 +84,7 @@ class PlanTemplatesAssemblerMemoryTest {
 
             List<String> files = assembler.assemble(config, engine, tempDir);
 
-            assertThat(files)
-                    .noneMatch(p -> p.endsWith(MEMORY_TEMPLATE));
+            assertThat(files).noneMatch(p -> p.endsWith(MEMORY_TEMPLATE));
         }
 
         @Test

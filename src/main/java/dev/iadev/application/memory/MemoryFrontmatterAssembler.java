@@ -9,12 +9,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Assembles {@link MemoryFrontmatter} by grepping deterministic signals from an epic's raw
- * markdown content.
+ * Assembles {@link MemoryFrontmatter} by grepping deterministic signals from an epic's raw markdown
+ * content.
  *
  * <p>Tags and capabilities-affected are runtime-only concerns (they require access to story files
- * and the tags catalog at LLM turn time); this assembler leaves them as empty lists so the
- * {@code x-internal-epic-summary} skill can inject them.
+ * and the tags catalog at LLM turn time); this assembler leaves them as empty lists so the {@code
+ * x-internal-epic-summary} skill can inject them.
  *
  * <p>All extraction is deterministic: same input → same output.
  */
@@ -26,20 +26,19 @@ public final class MemoryFrontmatterAssembler {
     private static final Pattern ADR_PATTERN = Pattern.compile("ADR-(\\d{4})");
     private static final Pattern DEPENDS_ON_PATTERN =
             Pattern.compile("Depende de:\\s*\\[?EPIC-(\\d{4})");
-    private static final Pattern BLOCKS_PATTERN =
-            Pattern.compile("Blocks:\\s*\\[?EPIC-(\\d{4})");
+    private static final Pattern BLOCKS_PATTERN = Pattern.compile("Blocks:\\s*\\[?EPIC-(\\d{4})");
 
     private MemoryFrontmatterAssembler() {}
 
     /**
      * Assembles the frontmatter for an epic memory summary.
      *
-     * @param epicId           e.g. {@code "EPIC-0067"}
-     * @param slug             e.g. {@code "review-yaml-frontmatter"}
-     * @param epicContent      raw markdown of the epic document
-     * @param patternsIntroduced  already-extracted pattern lines (from {@link EpicSectionExtractor})
+     * @param epicId e.g. {@code "EPIC-0067"}
+     * @param slug e.g. {@code "review-yaml-frontmatter"}
+     * @param epicContent raw markdown of the epic document
+     * @param patternsIntroduced already-extracted pattern lines (from {@link EpicSectionExtractor})
      * @param antipatternsRejected already-extracted anti-pattern lines
-     * @param date             ISO-8601 date string for {@code created} and {@code last-updated}
+     * @param date ISO-8601 date string for {@code created} and {@code last-updated}
      * @return assembled frontmatter (tags + capabilities-affected are empty — runtime-only)
      */
     public static MemoryFrontmatter assemble(

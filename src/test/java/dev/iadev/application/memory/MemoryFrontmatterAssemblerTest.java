@@ -1,10 +1,9 @@
 package dev.iadev.application.memory;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class MemoryFrontmatterAssemblerTest {
 
@@ -101,7 +100,8 @@ class MemoryFrontmatterAssemblerTest {
 
         MemoryFrontmatter fm = assemble("", patterns, antiPatterns);
 
-        assertThat(fm.patternsIntroduced()).containsExactly("capability-aware-skill-via-frontmatter");
+        assertThat(fm.patternsIntroduced())
+                .containsExactly("capability-aware-skill-via-frontmatter");
         assertThat(fm.antipatternsRejected()).containsExactly("inline-validation-instead-of-hook");
     }
 
@@ -140,15 +140,8 @@ class MemoryFrontmatterAssemblerTest {
     // ── helpers ─────────────────────────────────────────────────────────────
 
     private static MemoryFrontmatter assemble(
-            String content,
-            List<String> patterns,
-            List<String> antiPatterns) {
+            String content, List<String> patterns, List<String> antiPatterns) {
         return MemoryFrontmatterAssembler.assemble(
-                "EPIC-0067",
-                "review-yaml-frontmatter",
-                content,
-                patterns,
-                antiPatterns,
-                DATE);
+                "EPIC-0067", "review-yaml-frontmatter", content, patterns, antiPatterns, DATE);
     }
 }

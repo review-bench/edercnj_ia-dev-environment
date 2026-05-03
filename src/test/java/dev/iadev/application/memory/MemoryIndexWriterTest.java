@@ -1,13 +1,12 @@
 package dev.iadev.application.memory;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class MemoryIndexWriterTest {
 
@@ -20,7 +19,9 @@ class MemoryIndexWriterTest {
     void upsertInContent_newEntry_appended() {
         String content = "entries:\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).contains("- epic-id: EPIC-0067");
         assertThat(result).contains("slug: " + SLUG);
@@ -35,61 +36,73 @@ class MemoryIndexWriterTest {
 
     @Test
     void upsertInContent_existingEntry_updatesLastUpdated() {
-        String content = "entries:\n"
-                + "  - epic-id: EPIC-0067\n"
-                + "    slug: old-slug\n"
-                + "    summary-path: epic-0067-summary.md\n"
-                + "    summary-version: \"1.0\"\n"
-                + "    indexable: false\n"
-                + "    archived: true\n"
-                + "    superseded-by: null\n"
-                + "    created: \"2026-01-01\"\n"
-                + "    last-updated: \"2026-01-01\"\n";
+        String content =
+                "entries:\n"
+                        + "  - epic-id: EPIC-0067\n"
+                        + "    slug: old-slug\n"
+                        + "    summary-path: epic-0067-summary.md\n"
+                        + "    summary-version: \"1.0\"\n"
+                        + "    indexable: false\n"
+                        + "    archived: true\n"
+                        + "    superseded-by: null\n"
+                        + "    created: \"2026-01-01\"\n"
+                        + "    last-updated: \"2026-01-01\"\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).contains("last-updated: \"2026-05-01\"");
     }
 
     @Test
     void upsertInContent_existingEntry_preservesIndexableFlag() {
-        String content = "entries:\n"
-                + "  - epic-id: EPIC-0067\n"
-                + "    indexable: false\n"
-                + "    archived: false\n"
-                + "    last-updated: \"2026-01-01\"\n";
+        String content =
+                "entries:\n"
+                        + "  - epic-id: EPIC-0067\n"
+                        + "    indexable: false\n"
+                        + "    archived: false\n"
+                        + "    last-updated: \"2026-01-01\"\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).contains("indexable: false");
     }
 
     @Test
     void upsertInContent_existingEntry_preservesArchivedFlag() {
-        String content = "entries:\n"
-                + "  - epic-id: EPIC-0067\n"
-                + "    indexable: true\n"
-                + "    archived: true\n"
-                + "    last-updated: \"2026-01-01\"\n";
+        String content =
+                "entries:\n"
+                        + "  - epic-id: EPIC-0067\n"
+                        + "    indexable: true\n"
+                        + "    archived: true\n"
+                        + "    last-updated: \"2026-01-01\"\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).contains("archived: true");
     }
 
     @Test
     void upsertInContent_multipleEntries_onlyTargetUpdated() {
-        String content = "entries:\n"
-                + "  - epic-id: EPIC-0060\n"
-                + "    indexable: true\n"
-                + "    archived: false\n"
-                + "    last-updated: \"2026-01-01\"\n"
-                + "  - epic-id: EPIC-0067\n"
-                + "    indexable: true\n"
-                + "    archived: false\n"
-                + "    last-updated: \"2026-01-01\"\n";
+        String content =
+                "entries:\n"
+                        + "  - epic-id: EPIC-0060\n"
+                        + "    indexable: true\n"
+                        + "    archived: false\n"
+                        + "    last-updated: \"2026-01-01\"\n"
+                        + "  - epic-id: EPIC-0067\n"
+                        + "    indexable: true\n"
+                        + "    archived: false\n"
+                        + "    last-updated: \"2026-01-01\"\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         int idx0060 = result.indexOf("EPIC-0060");
         int lastUpdatedFor0060 = result.indexOf("last-updated:", idx0060);
@@ -102,7 +115,9 @@ class MemoryIndexWriterTest {
 
     @Test
     void upsertInContent_emptyFile_createsValidEntry() {
-        String result = MemoryIndexWriter.upsertInContent("entries:\n", "EPIC-0010", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        "entries:\n", "EPIC-0010", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).startsWith("entries:\n");
         assertThat(result).contains("- epic-id: EPIC-0010");
@@ -112,8 +127,11 @@ class MemoryIndexWriterTest {
     void upsertInContent_idempotent_sameInputSameOutput() {
         String content = "entries:\n";
 
-        String first = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
-        String second = MemoryIndexWriter.upsertInContent(first, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String first =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String second =
+                MemoryIndexWriter.upsertInContent(first, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(first).isEqualTo(second);
     }
@@ -122,7 +140,9 @@ class MemoryIndexWriterTest {
     void upsertInContent_inlineEmptyList_normalizedBeforeAppend() {
         String content = "schemaVersion: \"1.0\"\nentries: []\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0067", SLUG, CREATED, "2026-05-01");
 
         assertThat(result).contains("schemaVersion: \"1.0\"");
         assertThat(result).contains("- epic-id: EPIC-0067");
@@ -131,13 +151,18 @@ class MemoryIndexWriterTest {
 
     @Test
     void upsertInContent_inlineEmptyList_producesValidYamlStructure() {
-        String content = "# ai/memory/_index.yaml — schema v1.0\nschemaVersion: \"1.0\"\nentries: []\n";
+        String content =
+                "# ai/memory/_index.yaml — schema v1.0\nschemaVersion: \"1.0\"\nentries: []\n";
 
-        String result = MemoryIndexWriter.upsertInContent(content, "EPIC-0042", "my-slug", "2026-05-01", "2026-05-01");
+        String result =
+                MemoryIndexWriter.upsertInContent(
+                        content, "EPIC-0042", "my-slug", "2026-05-01", "2026-05-01");
 
         int entriesIdx = result.indexOf("entries:");
         int entryItemIdx = result.indexOf("  - epic-id:", entriesIdx);
-        assertThat(entryItemIdx).as("entry item must appear after entries: line").isGreaterThan(entriesIdx);
+        assertThat(entryItemIdx)
+                .as("entry item must appear after entries: line")
+                .isGreaterThan(entriesIdx);
     }
 
     // ── upsert (filesystem) ─────────────────────────────────────────────────
@@ -158,12 +183,13 @@ class MemoryIndexWriterTest {
     @Test
     void upsert_fileExists_updatesEntry(@TempDir Path dir) throws IOException {
         Path index = dir.resolve("_index.yaml");
-        Files.writeString(index,
+        Files.writeString(
+                index,
                 "entries:\n"
-                + "  - epic-id: EPIC-0067\n"
-                + "    indexable: true\n"
-                + "    archived: false\n"
-                + "    last-updated: \"2026-01-01\"\n");
+                        + "  - epic-id: EPIC-0067\n"
+                        + "    indexable: true\n"
+                        + "    archived: false\n"
+                        + "    last-updated: \"2026-01-01\"\n");
 
         MemoryIndexWriter.upsert(index, "EPIC-0067", SLUG, CREATED, "2026-05-10");
 

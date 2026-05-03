@@ -1,21 +1,29 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Epic0075MemorySearchSmokeIT — x-memory-search structural invariants")
 class Epic0075MemorySearchSmokeIT {
 
-    private static final Path SKILL_FILE = Path.of(
-            "src", "main", "resources", "targets", "claude", "skills",
-            "core", "ops", "x-memory-search", "SKILL.md");
+    private static final Path SKILL_FILE =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "skills",
+                    "core",
+                    "ops",
+                    "x-memory-search",
+                    "SKILL.md");
 
     private String readSkill() throws IOException {
         assertThat(SKILL_FILE).as("x-memory-search/SKILL.md must exist").exists();
@@ -28,7 +36,8 @@ class Epic0075MemorySearchSmokeIT {
         String skill = readSkill();
         assertThat(skill).as("must be user-invocable: true").contains("user-invocable: true");
         assertThat(skill).as("must declare model: haiku (Rule 23)").contains("model: haiku");
-        assertThat(skill).as("must require governance.ai-memory")
+        assertThat(skill)
+                .as("must require governance.ai-memory")
                 .contains("requires-capabilities: [governance.ai-memory]");
     }
 

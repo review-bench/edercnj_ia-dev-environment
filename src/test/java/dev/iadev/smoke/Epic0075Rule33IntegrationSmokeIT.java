@@ -1,28 +1,42 @@
 package dev.iadev.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Epic0075Rule33IntegrationSmokeIT — Rule 33 + x-epic-implement Phase 5 integration")
 class Epic0075Rule33IntegrationSmokeIT {
 
-    private static final Path RULE_FILE = Path.of(
-            "src", "main", "resources", "targets", "claude", "rules",
-            "33-ai-memory-production.md");
+    private static final Path RULE_FILE =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "rules",
+                    "33-ai-memory-production.md");
 
-    private static final Path X_EPIC_IMPLEMENT_SKILL = Path.of(
-            "src", "main", "resources", "targets", "claude", "skills",
-            "core", "dev", "x-epic-implement", "SKILL.md");
+    private static final Path X_EPIC_IMPLEMENT_SKILL =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "skills",
+                    "core",
+                    "dev",
+                    "x-epic-implement",
+                    "SKILL.md");
 
-    private static final Path CAPABILITY_FILE = Path.of(
-            "capabilities", "governance", "ai-memory.yaml");
+    private static final Path CAPABILITY_FILE =
+            Path.of("capabilities", "governance", "ai-memory.yaml");
 
     private String read(Path p) throws IOException {
         assertThat(p).as(p + " must exist").exists();
@@ -41,9 +55,9 @@ class Epic0075Rule33IntegrationSmokeIT {
     @DisplayName("scenario2_rule33_mandatoryInvocationSection")
     void scenario2_rule33_mandatoryInvocationSection() throws IOException {
         String rule = read(RULE_FILE);
-        assertThat(rule).as("must declare mandatory invocation")
-                .contains("MANDATORY TOOL CALL");
-        assertThat(rule).as("must reference x-internal-epic-summary")
+        assertThat(rule).as("must declare mandatory invocation").contains("MANDATORY TOOL CALL");
+        assertThat(rule)
+                .as("must reference x-internal-epic-summary")
                 .contains("x-internal-epic-summary");
         assertThat(rule).as("must state Rule 24 link").contains("Rule 24");
     }
@@ -52,8 +66,7 @@ class Epic0075Rule33IntegrationSmokeIT {
     @DisplayName("scenario3_rule33_backwardCompatibilitySection")
     void scenario3_rule33_backwardCompatibilitySection() throws IOException {
         String rule = read(RULE_FILE);
-        assertThat(rule).as("must declare backward compatibility with Rule 19")
-                .contains("Rule 19");
+        assertThat(rule).as("must declare backward compatibility with Rule 19").contains("Rule 19");
         assertThat(rule).as("must state safe default (disabled)").contains("disabled");
     }
 
@@ -61,10 +74,12 @@ class Epic0075Rule33IntegrationSmokeIT {
     @DisplayName("scenario4_rule33_auditSelfCheckDeclared")
     void scenario4_rule33_auditSelfCheckDeclared() throws IOException {
         String rule = read(RULE_FILE);
-        assertThat(rule).as("must reference audit-memory-coverage.sh")
+        assertThat(rule)
+                .as("must reference audit-memory-coverage.sh")
                 .contains("audit-memory-coverage.sh");
         assertThat(rule).as("must declare --self-check").contains("--self-check");
-        assertThat(rule).as("must declare RULE_33_ENFORCEMENT_BROKEN")
+        assertThat(rule)
+                .as("must declare RULE_33_ENFORCEMENT_BROKEN")
                 .contains("RULE_33_ENFORCEMENT_BROKEN");
     }
 
@@ -78,12 +93,13 @@ class Epic0075Rule33IntegrationSmokeIT {
         assertThat(phase5Start).as("Phase 5 must exist in x-epic-implement").isGreaterThan(0);
 
         String phase5Body = skill.substring(phase5Start);
-        assertThat(phase5Body).as("Phase 5 must invoke x-internal-epic-summary")
+        assertThat(phase5Body)
+                .as("Phase 5 must invoke x-internal-epic-summary")
                 .contains("x-internal-epic-summary");
-        assertThat(phase5Body).as("Phase 5 must declare MANDATORY TOOL CALL")
+        assertThat(phase5Body)
+                .as("Phase 5 must declare MANDATORY TOOL CALL")
                 .contains("MANDATORY TOOL CALL");
-        assertThat(phase5Body).as("Phase 5 must reference Rule 33")
-                .contains("Rule 33");
+        assertThat(phase5Body).as("Phase 5 must reference Rule 33").contains("Rule 33");
     }
 
     @Test
@@ -93,7 +109,8 @@ class Epic0075Rule33IntegrationSmokeIT {
         int phase5Start = skill.indexOf("## Phase 5");
         String phase5Body = skill.substring(phase5Start);
 
-        assertThat(phase5Body).as("memory call must be conditional on ai_memory_enabled")
+        assertThat(phase5Body)
+                .as("memory call must be conditional on ai_memory_enabled")
                 .containsAnyOf("ai_memory_enabled", "governance.ai-memory", "[conditional:");
     }
 
@@ -104,7 +121,8 @@ class Epic0075Rule33IntegrationSmokeIT {
         int phase5Start = skill.indexOf("## Phase 5");
         String phase5Body = skill.substring(phase5Start);
 
-        assertThat(phase5Body).as("must handle MANUAL_REFINEMENT_PRESENT exit code (7)")
+        assertThat(phase5Body)
+                .as("must handle MANUAL_REFINEMENT_PRESENT exit code (7)")
                 .contains("MANUAL_REFINEMENT_PRESENT");
     }
 
@@ -113,7 +131,8 @@ class Epic0075Rule33IntegrationSmokeIT {
     @Test
     @DisplayName("scenario8_aiMemoryCapabilityFile_exists")
     void scenario8_aiMemoryCapabilityFile_exists() {
-        assertThat(CAPABILITY_FILE).as("capabilities/governance/ai-memory.yaml must exist")
+        assertThat(CAPABILITY_FILE)
+                .as("capabilities/governance/ai-memory.yaml must exist")
                 .exists();
     }
 }

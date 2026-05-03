@@ -1,14 +1,13 @@
 package dev.iadev.application.memory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class EpicMarkdownParserTest {
 
@@ -41,7 +40,8 @@ class EpicMarkdownParserTest {
 
     @Test
     void parse_multipleSections_returnsAllSections() {
-        String content = """
+        String content =
+                """
                 ## 1. Visão & Problema
                 Problem description
                 ## 2. Hipótese
@@ -52,10 +52,8 @@ class EpicMarkdownParserTest {
 
         Map<String, List<String>> sections = EpicMarkdownParser.parse(content);
 
-        assertThat(sections).containsOnlyKeys(
-                "1. Visão & Problema",
-                "2. Hipótese",
-                "8. Decision Rationale");
+        assertThat(sections)
+                .containsOnlyKeys("1. Visão & Problema", "2. Hipótese", "8. Decision Rationale");
         assertThat(sections.get("1. Visão & Problema")).containsExactly("Problem description");
         assertThat(sections.get("2. Hipótese")).containsExactly("Hypothesis text");
         assertThat(sections.get("8. Decision Rationale")).containsExactly("Decision A");
@@ -124,8 +122,7 @@ class EpicMarkdownParserTest {
         Map<String, List<String>> sections = EpicMarkdownParser.parse(content);
 
         org.junit.jupiter.api.Assertions.assertThrows(
-                UnsupportedOperationException.class,
-                () -> sections.put("new", List.of()));
+                UnsupportedOperationException.class, () -> sections.put("new", List.of()));
     }
 
     @Test
@@ -135,8 +132,7 @@ class EpicMarkdownParserTest {
         Map<String, List<String>> sections = EpicMarkdownParser.parse(content);
 
         org.junit.jupiter.api.Assertions.assertThrows(
-                UnsupportedOperationException.class,
-                () -> sections.get("A").add("extra"));
+                UnsupportedOperationException.class, () -> sections.get("A").add("extra"));
     }
 
     @Test

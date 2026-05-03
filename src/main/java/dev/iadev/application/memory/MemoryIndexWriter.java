@@ -13,11 +13,11 @@ import java.util.regex.Pattern;
 /**
  * Upserts an entry in {@code ai/memory/_index.yaml}.
  *
- * <p>Preserves {@code indexable} and {@code archived} flags for existing entries.
- * New entries get {@code indexable: true}, {@code archived: false}.
+ * <p>Preserves {@code indexable} and {@code archived} flags for existing entries. New entries get
+ * {@code indexable: true}, {@code archived: false}.
  *
- * <p>This class does not use file locking (the SKILL.md flock is a shell-level concern);
- * locking is handled by the {@code x-internal-epic-summary} skill at orchestration time.
+ * <p>This class does not use file locking (the SKILL.md flock is a shell-level concern); locking is
+ * handled by the {@code x-internal-epic-summary} skill at orchestration time.
  */
 public final class MemoryIndexWriter {
 
@@ -29,37 +29,43 @@ public final class MemoryIndexWriter {
     /**
      * Upserts the given {@code epicId} entry in {@code indexFile}.
      *
-     * <p>If the file does not exist it is created with a minimal YAML structure.
-     * If the entry already exists, its {@code indexable} and {@code archived} flags are
-     * preserved; only {@code last-updated} is refreshed.
+     * <p>If the file does not exist it is created with a minimal YAML structure. If the entry
+     * already exists, its {@code indexable} and {@code archived} flags are preserved; only {@code
+     * last-updated} is refreshed.
      *
-     * @param indexFile   path to {@code _index.yaml}
-     * @param epicId      e.g. {@code "EPIC-0067"}
-     * @param slug        e.g. {@code "review-yaml-frontmatter"}
-     * @param created     ISO-8601 date string for the {@code created} field (new entries only)
+     * @param indexFile path to {@code _index.yaml}
+     * @param epicId e.g. {@code "EPIC-0067"}
+     * @param slug e.g. {@code "review-yaml-frontmatter"}
+     * @param created ISO-8601 date string for the {@code created} field (new entries only)
      * @param lastUpdated ISO-8601 date string
      * @throws IOException when the file cannot be read or written
      */
-    public static void upsert(Path indexFile, String epicId, String slug, String created,
-            String lastUpdated) throws IOException {
-        String existing = indexFile.toFile().exists()
-                ? Files.readString(indexFile, StandardCharsets.UTF_8)
-                : "entries:\n";
+    public static void upsert(
+            Path indexFile, String epicId, String slug, String created, String lastUpdated)
+            throws IOException {
+        String existing =
+                indexFile.toFile().exists()
+                        ? Files.readString(indexFile, StandardCharsets.UTF_8)
+                        : "entries:\n";
 
         String updated = upsertInContent(existing, epicId, slug, created, lastUpdated);
-        Files.writeString(indexFile, updated, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.writeString(
+                indexFile,
+                updated,
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**
      * Pure function: applies the upsert logic to raw YAML content and returns the updated string.
      * Exposed for unit testing without filesystem I/O.
      *
-     * <p>Normalizes an inline empty list ({@code entries: []}) to block-sequence form
-     * ({@code entries:}) before appending, preserving any {@code schemaVersion} header.
+     * <p>Normalizes an inline empty list ({@code entries: []}) to block-sequence form ({@code
+     * entries:}) before appending, preserving any {@code schemaVersion} header.
      */
-    static String upsertInContent(String content, String epicId, String slug, String created,
-            String lastUpdated) {
+    static String upsertInContent(
+            String content, String epicId, String slug, String created, String lastUpdated) {
         String normalized = ENTRIES_INLINE_EMPTY.matcher(content).replaceFirst("entries:");
         List<String> lines = new ArrayList<>(List.of(normalized.split("\n", -1)));
 
@@ -102,18 +108,29 @@ public final class MemoryIndexWriter {
         return lines.size() - 1;
     }
 
-    private static String appendEntry(String content, String epicId, String slug,
-            String created, String lastUpdated) {
+    private static String appendEntry(
+            String content, String epicId, String slug, String created, String lastUpdated) {
         String summaryPath = "epic-" + epicId.replace("EPIC-", "").toLowerCase() + "-summary.md";
-        String entry = "  - epic-id: " + epicId + "\n"
-                + "    slug: " + slug + "\n"
-                + "    summary-path: " + summaryPath + "\n"
-                + "    summary-version: \"1.0\"\n"
-                + "    indexable: true\n"
-                + "    archived: false\n"
-                + "    superseded-by: null\n"
-                + "    created: \"" + created + "\"\n"
-                + "    last-updated: \"" + lastUpdated + "\"\n";
+        String entry =
+                "  - epic-id: "
+                        + epicId
+                        + "\n"
+                        + "    slug: "
+                        + slug
+                        + "\n"
+                        + "    summary-path: "
+                        + summaryPath
+                        + "\n"
+                        + "    summary-version: \"1.0\"\n"
+                        + "    indexable: true\n"
+                        + "    archived: false\n"
+                        + "    superseded-by: null\n"
+                        + "    created: \""
+                        + created
+                        + "\"\n"
+                        + "    last-updated: \""
+                        + lastUpdated
+                        + "\"\n";
         if (!content.endsWith("\n")) {
             return content + "\n" + entry;
         }
