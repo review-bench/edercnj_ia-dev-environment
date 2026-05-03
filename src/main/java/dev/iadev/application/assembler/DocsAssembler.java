@@ -53,7 +53,9 @@ public final class DocsAssembler implements Assembler {
             "# AI Memory — Strategic Decision Archive\n\n"
                     + "Compact summaries of completed epics for retrieval by LLM sessions.\n"
                     + "Search via `/x-memory-search`. Entries managed by"
-                    + " `x-internal-epic-summary` (Rule 33).\n";
+                    + " `x-internal-epic-summary` (Rule 33).\n\n"
+                    + "For retroactive entries, use `scripts/retro-seed-memory.sh`"
+                    + " (validation/guidance only — `x-internal-epic-summary` generates files).\n";
 
     private final Path resourcesDir;
 
@@ -137,9 +139,16 @@ public final class DocsAssembler implements Assembler {
         CopyHelpers.ensureDirectory(memoryDir);
         Path indexFile = memoryDir.resolve("_index.yaml");
         Path readmeFile = memoryDir.resolve("README.md");
-        CopyHelpers.writeFile(indexFile, MEMORY_INDEX_CONTENT);
-        CopyHelpers.writeFile(readmeFile, MEMORY_README_CONTENT);
-        return List.of(indexFile.toString(), readmeFile.toString());
+        List<String> written = new ArrayList<>();
+        if (!Files.exists(indexFile)) {
+            CopyHelpers.writeFile(indexFile, MEMORY_INDEX_CONTENT);
+            written.add(indexFile.toString());
+        }
+        if (!Files.exists(readmeFile)) {
+            CopyHelpers.writeFile(readmeFile, MEMORY_README_CONTENT);
+            written.add(readmeFile.toString());
+        }
+        return written;
     }
 
     /**

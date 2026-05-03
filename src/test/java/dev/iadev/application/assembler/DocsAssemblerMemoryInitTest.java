@@ -68,13 +68,39 @@ class DocsAssemblerMemoryInitTest {
         }
 
         @Test
-        @DisplayName("returns list of two written paths")
+        @DisplayName("returns list of two written paths on first run")
         void initializeMemoryDirectory_whenEnabled_returnsTwoPaths(@TempDir Path tempDir) {
             ProjectConfig config = configWithAiMemory(true);
 
             List<String> result = assembler.initializeMemoryDirectory(config, engine, tempDir);
 
             assertThat(result).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("is idempotent — returns empty list when files already exist")
+        void initializeMemoryDirectory_whenEnabled_idempotentOnSecondRun(@TempDir Path tempDir) {
+            ProjectConfig config = configWithAiMemory(true);
+
+            assembler.initializeMemoryDirectory(config, engine, tempDir);
+            List<String> secondResult = assembler.initializeMemoryDirectory(config, engine, tempDir);
+
+            assertThat(secondResult).isEmpty();
+        }
+
+        @Test
+        @DisplayName("is idempotent — does not overwrite existing _index.yaml content")
+        void initializeMemoryDirectory_whenEnabled_doesNotOverwriteExistingIndex(
+                @TempDir Path tempDir) throws Exception {
+            ProjectConfig config = configWithAiMemory(true);
+            assembler.initializeMemoryDirectory(config, engine, tempDir);
+            Path indexFile = tempDir.resolve(DocsAssembler.MEMORY_INDEX_OUTPUT);
+            String sentinel = "sentinel-content-must-survive-second-run";
+            Files.writeString(indexFile, sentinel);
+
+            assembler.initializeMemoryDirectory(config, engine, tempDir);
+
+            assertThat(Files.readString(indexFile)).isEqualTo(sentinel);
         }
 
         @Test

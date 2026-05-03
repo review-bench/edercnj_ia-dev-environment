@@ -24,6 +24,7 @@ public final class MemoryIndexWriter {
     private static final Pattern EPIC_ID_LINE = Pattern.compile("^(\\s*)- epic-id:\\s*(\\S+)");
     private static final Pattern INDEXABLE_LINE = Pattern.compile("^(\\s*)indexable:\\s*(true|false)");
     private static final Pattern ARCHIVED_LINE = Pattern.compile("^(\\s*)archived:\\s*(true|false)");
+    private static final Pattern ENTRIES_INLINE_EMPTY = Pattern.compile("entries:\\s*\\[\\s*\\]");
 
     private MemoryIndexWriter() {}
 
@@ -34,18 +35,20 @@ public final class MemoryIndexWriter {
      * If the entry already exists, its {@code indexable} and {@code archived} flags are
      * preserved; only {@code last-updated} is refreshed.
      *
-     * @param indexFile  path to {@code _index.yaml}
-     * @param epicId     e.g. {@code "EPIC-0067"}
+     * @param indexFile   path to {@code _index.yaml}
+     * @param epicId      e.g. {@code "EPIC-0067"}
+     * @param slug        e.g. {@code "review-yaml-frontmatter"}
+     * @param created     ISO-8601 date string for the {@code created} field (new entries only)
      * @param lastUpdated ISO-8601 date string
      * @throws IOException when the file cannot be read or written
      */
-    public static void upsert(Path indexFile, String epicId, String lastUpdated)
-            throws IOException {
+    public static void upsert(Path indexFile, String epicId, String slug, String created,
+            String lastUpdated) throws IOException {
         String existing = indexFile.toFile().exists()
                 ? Files.readString(indexFile, StandardCharsets.UTF_8)
                 : "entries:\n";
 
-        String updated = upsertInContent(existing, epicId, lastUpdated);
+        String updated = upsertInContent(existing, epicId, slug, created, lastUpdated);
         Files.writeString(indexFile, updated, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
@@ -53,15 +56,20 @@ public final class MemoryIndexWriter {
     /**
      * Pure function: applies the upsert logic to raw YAML content and returns the updated string.
      * Exposed for unit testing without filesystem I/O.
+     *
+     * <p>Normalizes an inline empty list ({@code entries: []}) to block-sequence form
+     * ({@code entries:}) before appending, preserving any {@code schemaVersion} header.
      */
-    static String upsertInContent(String content, String epicId, String lastUpdated) {
-        List<String> lines = new ArrayList<>(List.of(content.split("\n", -1)));
+    static String upsertInContent(String content, String epicId, String slug, String created,
+            String lastUpdated) {
+        String normalized = ENTRIES_INLINE_EMPTY.matcher(content).replaceFirst("entries:");
+        List<String> lines = new ArrayList<>(List.of(normalized.split("\n", -1)));
 
         int entryStart = findEntryStart(lines, epicId);
         if (entryStart >= 0) {
             return updateEntry(lines, entryStart, lastUpdated);
         }
-        return appendEntry(content, epicId, lastUpdated);
+        return appendEntry(normalized, epicId, slug, created, lastUpdated);
     }
 
     private static int findEntryStart(List<String> lines, String epicId) {
@@ -96,12 +104,18 @@ public final class MemoryIndexWriter {
         return lines.size() - 1;
     }
 
-    private static String appendEntry(String content, String epicId, String lastUpdated) {
+    private static String appendEntry(String content, String epicId, String slug,
+            String created, String lastUpdated) {
+        String summaryPath = "epic-" + epicId.replace("EPIC-", "").toLowerCase() + "-summary.md";
         String entry = "  - epic-id: " + epicId + "\n"
+                + "    slug: " + slug + "\n"
+                + "    summary-path: " + summaryPath + "\n"
+                + "    summary-version: \"1.0\"\n"
                 + "    indexable: true\n"
                 + "    archived: false\n"
-                + "    last-updated: \"" + lastUpdated + "\"\n"
-                + "    superseded-by: null\n";
+                + "    superseded-by: null\n"
+                + "    created: \"" + created + "\"\n"
+                + "    last-updated: \"" + lastUpdated + "\"\n";
         if (!content.endsWith("\n")) {
             return content + "\n" + entry;
         }

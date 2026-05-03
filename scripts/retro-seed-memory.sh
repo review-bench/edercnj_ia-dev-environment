@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Layer:      2 (CI script / operational utility)
-# Purpose:    Retroactively seed ai/memory/ with summaries for concluded epics
+# Purpose:    Validates which concluded epics in range are missing ai/memory/ summaries.
+#             Reports gaps and guides the operator — does NOT generate summary files.
+#             To generate a summary, invoke x-internal-epic-summary via the Skill tool.
 # Usage:      scripts/retro-seed-memory.sh [--from XXXX] [--to YYYY] [--dry-run] [--continue-on-error]
 # Exit codes: 0=OK, 1=SEED_VIOLATION, 2=OPERATIONAL_ERROR, 3=BASELINE_CORRUPT
 # Part of:    EPIC-0075 (AI Memory Layer) — story-0075-0006
@@ -113,17 +115,18 @@ for entry in "${TARGET_EPICS[@]}"; do
     violation=true
   fi
 
-  if [[ "${DRY_RUN}" == "true" ]]; then
-    echo "  [DRY-RUN] Would create ${summary_file}"
-    continue
-  fi
-
   if [[ "${violation}" == "true" ]]; then
     ((VIOLATIONS++)) || true
     if [[ "${CONTINUE_ON_ERROR}" == "false" ]]; then
       echo "SEED_VIOLATION: epic-${epic_num} failed rubric check" >&2
       exit 1
     fi
+  fi
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "  [SEED-NEEDED] epic-${epic_num}: invoke x-internal-epic-summary --epic-id EPIC-${epic_num}"
+  else
+    echo "  [SEED-NEEDED] epic-${epic_num}: summary missing — invoke x-internal-epic-summary --epic-id EPIC-${epic_num} to generate"
   fi
 done
 

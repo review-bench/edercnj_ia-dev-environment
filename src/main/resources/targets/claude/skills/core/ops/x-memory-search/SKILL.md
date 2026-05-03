@@ -25,7 +25,7 @@ output order is deterministic (alphabetical by epic-id within each relevance tie
 /x-memory-search "auth decisions"
 /x-memory-search --by-pattern capability-aware-skill-via-frontmatter
 /x-memory-search --by-tag governance
-/x-memory-search --epic EPIC-0064
+/x-memory-search --by-epic EPIC-0064
 /x-memory-search "hexagonal" --include-archived
 ```
 
@@ -39,6 +39,7 @@ output order is deterministic (alphabetical by epic-id within each relevance tie
 | `--by-epic EPIC-XXXX` | string | — | Return only the summary for that epic |
 | `--by-rule RULE-NN` | string | — | Filter by `rules-affected` (e.g. `Rule 28`) |
 | `--by-adr ADR-XXXX` | string | — | Filter by `adrs-referenced` |
+| `--by-capability ID` | string | — | Filter by `capabilities-affected` (exact or prefix match) |
 | `--include-archived` | bool | false | Include entries with `archived: true` or `indexable: false` |
 | `--format` | `compact\|full` | `compact` | `compact` = one-line per result; `full` = full summary body |
 | `--limit N` | int | 10 | Maximum results to return |
@@ -71,7 +72,8 @@ Apply filters in order (each narrows the candidate set):
 4. `--by-pattern`: keep if `patterns-introduced` or `antipatterns-rejected` contains the ID.
 5. `--by-rule`: keep if `rules-affected` contains the value.
 6. `--by-adr`: keep if `adrs-referenced` contains the value.
-7. Free-text `QUERY`: grep full body of each candidate summary for the term.
+7. `--by-capability`: keep if `capabilities-affected` contains the value (prefix match supported, e.g. `governance.*`).
+8. Free-text `QUERY`: grep full body of each candidate summary for the term.
 
 ### Step 3 — Rank and limit
 

@@ -29,7 +29,7 @@ Use the `/x-memory-search` skill:
 ```
 /x-memory-search --by-tag governance
 /x-memory-search --by-capability governance.refinement-gate
-/x-memory-search --by-rule 24
+/x-memory-search --by-rule "Rule 24"
 /x-memory-search --by-pattern capability-aware-skill-via-frontmatter
 /x-memory-search --by-epic EPIC-0069
 ```
@@ -40,11 +40,15 @@ Each result shows: epic slug + 1-3 sentence "why" + links.
 
 `x-internal-epic-summary` is invoked **automatically** at Phase 5 of `x-epic-implement` (Rule 33). You do not create entries manually.
 
-For retroactive entries (completed epics pre-dating EPIC-0075), run:
+For retroactive entries (completed epics pre-dating EPIC-0075), use the retro-seed script:
 
+```bash
+scripts/retro-seed-memory.sh --from XXXX --to YYYY
 ```
-/x-internal-epic-summary <EPIC-ID>
-```
+
+This script validates which concluded epics in the range are missing summaries and reports
+them. To generate a summary for a specific epic, invoke `x-internal-epic-summary` via the
+Skill tool (it is internal and not user-invocable directly).
 
 ## Manual Archiving
 
