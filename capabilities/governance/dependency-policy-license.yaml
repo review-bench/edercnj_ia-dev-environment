@@ -1,0 +1,29 @@
+id: governance.dependency-policy.license
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  License whitelist sub-gate for the Dependency Policy gate. Blocks or warns when a
+  dependency's SPDX license identifier is not in the allowed-licenses list. An empty
+  whitelist with block action triggers ConfigValidationException (would block
+  everything). Requires governance.dependency-policy to be active.
+requires-capabilities: [governance.dependency-policy]
+requires: []
+excludes: []
+universal: true
+parameters:
+  allowed-licenses:
+    type: array
+    items:
+      type: string
+    default: []
+    description: >
+      SPDX license identifiers that are whitelisted (e.g. Apache-2.0, MIT,
+      BSD-3-Clause). Empty list disables the whitelist check.
+tags:
+  - governance
+  - dependency-policy
+  - license
+  - spdx
+  - compliance-gate

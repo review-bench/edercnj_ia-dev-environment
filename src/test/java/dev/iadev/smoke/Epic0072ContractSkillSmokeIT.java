@@ -126,7 +126,8 @@ class Epic0072ContractSkillSmokeIT {
                                     baseConfig.governance().branchingModel(),
                                     baseConfig.governance().telemetryEnabled(),
                                     baseConfig.governance().documentation(),
-                                    qualityConfig));
+                                    qualityConfig,
+                                    dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
             assertThat(skills).contains("x-test-contract");
         }

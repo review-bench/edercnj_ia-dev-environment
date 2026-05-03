@@ -1,0 +1,27 @@
+id: governance.dependency-policy.cve
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  CVE severity sub-gate for the Dependency Policy gate. Blocks or warns when a
+  dependency carries a CVE at or above the configured severity threshold (default HIGH,
+  CVSS >= 7.0). Also honours the denied-cves list for hard-block regardless of patch
+  availability (RULE-074-01). Requires governance.dependency-policy to be active.
+requires-capabilities: [governance.dependency-policy]
+requires: []
+excludes: []
+universal: true
+parameters:
+  block-on-severity-cve:
+    type: string
+    default: HIGH
+    description: >
+      Minimum CVE severity that triggers the configured BlockAction (default BLOCK).
+      Accepted: HIGH, MEDIUM, LOW, CRITICAL. Maps to block-on.severity-cve in YAML.
+tags:
+  - governance
+  - dependency-policy
+  - cve
+  - sca
+  - security-gate

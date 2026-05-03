@@ -1,0 +1,21 @@
+id: governance.dependency-policy.version
+category: governance
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Version constraint sub-gate (D-R9) for the Dependency Policy gate. Enforces
+  min-versions and max-versions lists across all stacks — JVM (groupId+artifactId,
+  wildcard * on artifactId), NPM/PyPI (name, no wildcard), Go (module path).
+  Fields groupId/name/module are mutually exclusive per entry. Requires
+  governance.dependency-policy to be active.
+requires-capabilities: [governance.dependency-policy]
+requires: []
+excludes: []
+universal: true
+tags:
+  - governance
+  - dependency-policy
+  - version-constraint
+  - cross-stack
+  - sca

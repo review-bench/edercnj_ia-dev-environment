@@ -24,6 +24,8 @@ import java.util.Set;
  *     YAML {@code documentation} block (EPIC-0071, story-0071-0001)
  * @param quality the quality-gate configuration (optional, default all-disabled); maps to YAML
  *     {@code quality} block (EPIC-0072, story-0072-0001)
+ * @param dependencyPolicy the dependency policy gate configuration (optional, default disabled);
+ *     maps to YAML {@code dependencies.policy} block (EPIC-0074, story-0074-0001)
  */
 public record Governance(
         String compliance,
@@ -31,17 +33,21 @@ public record Governance(
         BranchingModel branchingModel,
         boolean telemetryEnabled,
         DocumentationConfig documentation,
-        QualityConfig quality) {
+        QualityConfig quality,
+        DependencyPolicyConfig dependencyPolicy) {
 
     /**
      * Compact constructor enforcing immutability of the {@code platforms} set and applying defaults
-     * for the {@code branchingModel}, {@code documentation}, and {@code quality}.
+     * for the {@code branchingModel}, {@code documentation}, {@code quality}, and {@code
+     * dependencyPolicy}.
      */
     public Governance {
         platforms = platforms == null ? Set.of() : Set.copyOf(platforms);
         branchingModel = branchingModel == null ? BranchingModel.GITFLOW : branchingModel;
         documentation = documentation == null ? DocumentationConfig.DEFAULT : documentation;
         quality = quality == null ? QualityConfig.DEFAULT : quality;
+        dependencyPolicy =
+                dependencyPolicy == null ? DependencyPolicyConfig.DEFAULT : dependencyPolicy;
     }
 
     /**
@@ -61,6 +67,7 @@ public record Governance(
                 ProjectConfig.parseBranchingModel(root),
                 ProjectConfig.parseTelemetryEnabled(root),
                 ProjectConfig.parseDocumentation(root),
-                ProjectConfig.parseQuality(root));
+                ProjectConfig.parseQuality(root),
+                ProjectConfig.parseDependencyPolicy(root));
     }
 }
