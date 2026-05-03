@@ -12,6 +12,14 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 
 > The `CLAUDE.md` file at the project root provides an executive summary loaded automatically in EVERY conversation.
 
+> **Concluded — EPIC-0075 (AI Memory Layer).** `ai/memory/` estrutura de memória estratégica para épicos concluídos, recuperável em segundos. `x-internal-epic-summary` (haiku, determinístico, exit-7 skip para conteúdo manual) gera `ai/memory/epic-XXXX-summary.md` por épico. `/x-memory-search` com 5 modos: `--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`. Rule 33 (AI Memory Production). `audit-memory-coverage.sh` (Camada 2) bloqueia merges de épicos `Concluída` sem summary. 27 épicos históricos seedados retroativamente (range 0040–0075). Rule 27 surface estendida: `ai/memory/epic-XXXX-summary.md` é evidência obrigatória de conclusão. Tag `ai-memory-layer-frozen` marca closure do epic.
+> - Rule: [`.claude/rules/33-ai-memory-production.md`](.claude/rules/33-ai-memory-production.md)
+> - Skill (internal): [`x-internal-epic-summary`](src/main/resources/targets/claude/skills/core/internal/memory/x-internal-epic-summary/SKILL.md)
+> - Skill (public): [`x-memory-search`](src/main/resources/targets/claude/skills/core/ops/x-memory-search/SKILL.md)
+> - Audit: [`audit-memory-coverage.sh`](scripts/audit-memory-coverage.sh)
+> - Index: [`ai/memory/_index.yaml`](ai/memory/_index.yaml)
+> - Epic index: [`ai/epics/epic-0075-ai-memory-layer/`](ai/epics/epic-0075-ai-memory-layer/)
+
 > **Concluded — EPIC-0074 (Dependency Policy & SCA Final Gate).** Projetos gerados por `ia-dev-env` agora suportam um gate de política de dependências bloqueante via `dependencies.policy` YAML block. Quando `enabled: true`, o skill `x-dep-policy-validate` é invocado como **MANDATORY TOOL CALL** em Phase 3 do `x-story-implement` (após os gates de qualidade EPIC-0072/0073). O gate enforça em 5 dimensões: CVEs hard-block (`denied-cves` — RULE-074-01, ignora scope-policy), severidade CVE (threshold `block-on.severity-cve`, default HIGH), whitelist de licenças SPDX, constraints de versão cross-stack (JVM groupId/artifactId, NPM/PyPI name, Go module), e freshness window (default 365 dias, default WARN_ONLY). Safe default: `enabled: false` — projetos existentes não são afetados (Rule 19). Rule 27 expandida para **13 surfaces** (Surface 13: dependency policy gate). Rule 24 evidence artifact: `dep-policy-validation-report-STORY-ID.md`. Camada 2: `audit-dep-policy.sh`. Tag `dependency-policy-gate-frozen` marca closure do epic.
 > - Rule: [`.claude/rules/32-dependency-policy-gate.md`](.claude/rules/32-dependency-policy-gate.md)
 > - Skill: [`x-dep-policy-validate`](src/main/resources/targets/claude/skills/conditional/security/x-dep-policy-validate/SKILL.md)
