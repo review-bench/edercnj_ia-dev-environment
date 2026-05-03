@@ -1,6 +1,6 @@
 # Multi-Agent Planning Guide
 
-> Reference documentation for the x-story-plan skill. Defines the TASK_PROPOSAL format,
+> Reference documentation for the x-plan-story skill. Defines the TASK_PROPOSAL format,
 > consolidation rules, conflict resolution, and DoR validation checks.
 
 ## TASK_PROPOSAL Format

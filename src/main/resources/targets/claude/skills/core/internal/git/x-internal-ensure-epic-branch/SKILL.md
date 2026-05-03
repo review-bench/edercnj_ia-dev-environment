@@ -1,6 +1,6 @@
 ---
-name: x-internal-epic-branch-ensure
-description: "Single source of truth for the `epic/<ID>` branch convention (RULE-001). Invoked by every epic entry-point (x-epic-create, x-epic-decompose, x-epic-orchestrate, x-epic-implement, x-epic-map) at step 0; ensures the branch exists idempotently both locally and on origin. When the branch is absent, delegates creation to `x-git-branch`; when present locally but not on origin, emits a complementary `git push`. Seventh skill in the x-internal-* convention and the first under internal/git/ (after x-internal-status-update / x-internal-report-write / x-internal-args-normalize at internal/ops/ and x-internal-story-load-context / x-internal-story-build-plan / x-internal-story-verify at internal/plan/)."
+name: x-internal-ensure-epic-branch
+description: "Single source of truth for the `epic/<ID>` branch convention (RULE-001). Invoked by every epic entry-point (x-epic-create, x-epic-decompose, x-orchestrate-epic, x-implement-epic, x-epic-map) at step 0; ensures the branch exists idempotently both locally and on origin. When the branch is absent, delegates creation to `x-create-git-branch`; when present locally but not on origin, emits a complementary `git push`. Seventh skill in the x-internal-* convention and the first under internal/git/ (after x-internal-update-status / x-internal-write-report / x-internal-normalize-args at internal/ops/ and x-internal-load-story-context / x-internal-build-story-plan / x-internal-verify-story at internal/plan/)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,17 +19,17 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Callers principais: x-epic-create, x-epic-decompose, x-epic-orchestrate,
-> x-epic-implement, x-epic-map (story-0049-0018, 0049-0021, 0049-0022).
-> Sétima skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006, x-internal-args-normalize
-> 0049-0007, x-internal-story-load-context 0049-0011, x-internal-story-build-plan
-> 0049-0012, x-internal-story-verify 0049-0014). Primeira skill na subdir
+> Callers principais: x-epic-create, x-epic-decompose, x-orchestrate-epic,
+> x-implement-epic, x-epic-map (story-0049-0018, 0049-0021, 0049-0022).
+> Sétima skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006, x-internal-normalize-args
+> 0049-0007, x-internal-load-story-context 0049-0011, x-internal-build-story-plan
+> 0049-0012, x-internal-verify-story 0049-0014). Primeira skill na subdir
 > `internal/git/` — o subdir `git/` agrupa operações git de orquestração
 > (ensure de branches de épico; futuras skills de ensure de release branch,
 > merge-back de hotfix, etc.).
 
-# Skill: x-internal-epic-branch-ensure
+# Skill: x-internal-ensure-epic-branch
 
 ## Purpose
 
@@ -54,24 +54,24 @@ Responsibilities (single):
 3. Detect local existence (`git rev-parse --verify`).
 4. Detect remote existence (`git ls-remote origin`).
 5. Apply the 3-state decision:
-   - new (neither) ⇒ delegate to `Skill x-git-branch --push`;
+   - new (neither) ⇒ delegate to `Skill x-create-git-branch --push`;
    - local-only ⇒ emit complementary `git push -u origin`;
    - local+remote ⇒ idempotent no-op.
 6. Emit a single-line JSON envelope consumed by the caller.
 
 This skill does NOT create branches directly — all branch creation
-goes through `x-git-branch` (story-0049-0001) to preserve the "one
+goes through `x-create-git-branch` (story-0049-0001) to preserve the "one
 creation path" invariant of RULE-001.
 
 ## Convention Anchors (x-internal-* 7th skill)
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/git/x-internal-epic-branch-ensure/` | `internal/` prefix scopes visibility; `git/` groups orchestration-level git ensure operations (distinct from `internal/ops/` state mutation and `internal/plan/` planning-phase carve-outs). |
+| Path | `internal/git/x-internal-ensure-epic-branch/` | `internal/` prefix scopes visibility; `git/` groups orchestration-level git ensure operations (distinct from `internal/ops/` state mutation and `internal/plan/` planning-phase carve-outs). |
 | Frontmatter `visibility` | `internal` | Generator filters from `/help` menu. |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal`. |
 | Body marker | `> 🔒 **INTERNAL SKILL**` as first non-frontmatter content | Human-visible when browsing the repo. |
-| Allowed tools | `Bash` only | Minimal surface; delegates to `x-git-branch` via Skill tool when needed. |
+| Allowed tools | `Bash` only | Minimal surface; delegates to `x-create-git-branch` via Skill tool when needed. |
 | Naming | `x-internal-{subject}-{action}` | subject = `epic-branch`; action = `ensure`. Mirrors Rule 04 skill taxonomy. |
 
 Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
@@ -81,17 +81,17 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-epic-branch-ensure` in chat. All
+by a human typing `/x-internal-ensure-epic-branch` in chat. All
 invocations follow Rule 13 INLINE-SKILL pattern from a calling
 orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0049")
 ```
 
 ```markdown
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0050 --base main --push true")
 ```
 
@@ -111,9 +111,9 @@ Successful invocations emit a single-line JSON object on stdout:
 | :--- | :--- | :--- | :--- |
 | `branchName` | `String` | yes | Resolved branch name (`epic/<ID>`). |
 | `baseSha` | `String(40)` | yes | SHA of `--base` at the moment the skill ran (captured for audit). |
-| `created` | `Boolean` | yes | `true` when the branch was created in this invocation (delegation to `x-git-branch` succeeded). |
+| `created` | `Boolean` | yes | `true` when the branch was created in this invocation (delegation to `x-create-git-branch` succeeded). |
 | `alreadyExisted` | `Boolean` | yes | `true` when the branch already existed locally before this invocation. |
-| `pushedNow` | `Boolean` | yes | `true` when this invocation issued the `git push -u origin <branch>` (either through `x-git-branch --push` or the complementary-push branch). |
+| `pushedNow` | `Boolean` | yes | `true` when this invocation issued the `git push -u origin <branch>` (either through `x-create-git-branch --push` or the complementary-push branch). |
 
 Invariant: exactly one of (`created`, `alreadyExisted`) is `true`.
 `pushedNow` is independent; it can be `true` with either.
@@ -125,7 +125,7 @@ Invariant: exactly one of (`created`, `alreadyExisted`) is `true`.
 | 0 | SUCCESS | Ensure completed (created, no-op, or complementary push) | — |
 | 1 | INVALID_EPIC_ID | `--epic-id` missing or fails `^\d{4}$` | `Epic ID must be 4 digits` |
 | 2 | BASE_NOT_FOUND | `--base` does not resolve locally | `Base branch '<name>' not found` |
-| 3 | DELEGATION_FAILED | `x-git-branch` returned non-zero | `x-git-branch failed with exit <code>: <stderr>` |
+| 3 | DELEGATION_FAILED | `x-create-git-branch` returned non-zero | `x-create-git-branch failed with exit <code>: <stderr>` |
 | 4 | PUSH_FAILED | Complementary `git push` returned non-zero | `Push to origin failed: <stderr>` |
 
 Exit codes 1 and 2 mirror the story's Section 5.3 error-code table.
@@ -171,7 +171,7 @@ BASE_SHA=$(git rev-parse --verify "$BASE_BRANCH")
 ```
 
 Exits early before touching any network operation. Matches
-`x-git-branch` Step 3 semantics.
+`x-create-git-branch` Step 3 semantics.
 
 ### Step 3 — Compute target branch name
 
@@ -230,16 +230,16 @@ elif [ "$ALREADY_EXISTED" = "true" ] && [ "$REMOTE_EXISTS" = "false" ] && [ "$PU
   fi
   PUSHED_NOW="true"
 elif [ "$ALREADY_EXISTED" = "false" ]; then
-  # State C — delegate creation to x-git-branch
+  # State C — delegate creation to x-create-git-branch
   #
   # Invocation shape (Rule 13 INLINE-SKILL):
   #
-  #   Skill(skill: "x-git-branch",
+  #   Skill(skill: "x-create-git-branch",
   #         args: "--name epic/<ID> --base <BASE_BRANCH> [--push]")
   #
   # The calling orchestrator forwards --push=true/false verbatim. A
   # successful invocation populates baseSha, created=true, pushed=<push>
-  # on the x-git-branch response; this skill re-exports those as
+  # on the x-create-git-branch response; this skill re-exports those as
   # created=true, pushedNow=<push>.
   echo "DELEGATE_TO_X_GIT_BRANCH — name=$BRANCH_NAME base=$BASE_BRANCH push=$PUSH" >&2
   # The orchestrator layer performs the actual Skill(...) call and
@@ -271,7 +271,7 @@ here is paid N times per day on a developer workstation.
 ### Example 1 — New epic, branch absent locally and remotely
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0050")
 ```
 
@@ -285,7 +285,7 @@ epic é novo".
 ### Example 2 — Idempotent no-op, branch present locally + remotely
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0049")
 ```
 
@@ -299,7 +299,7 @@ Exit: 0. Matches "Idempotência — branch já existe local + remoto".
 
 ```bash
 # Branch created manually earlier; never pushed.
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0049 --push true")
 ```
 
@@ -312,7 +312,7 @@ Exit: 0. Matches "Push complementar — branch local mas não remota".
 ### Example 4 — Custom base
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0051 --base main")
 ```
 
@@ -325,7 +325,7 @@ Exit: 0.
 ### Example 5 — Missing base branch
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0052 --base mybase")
 ```
 
@@ -338,7 +338,7 @@ Exit: 2. Matches "Erro — base inexistente".
 ### Example 6 — Malformed epic-id
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 49")
 ```
 
@@ -351,7 +351,7 @@ Exit: 1. Matches "Boundary — epic-id mal formado".
 ### Example 7 — Local-only flow (`--push false`)
 
 ```bash
-Skill(skill: "x-internal-epic-branch-ensure",
+Skill(skill: "x-internal-ensure-epic-branch",
       args: "--epic-id 0053 --push false")
 ```
 
@@ -368,7 +368,7 @@ offline dry-runs.
 | :--- | :--- |
 | `--epic-id` missing or fails regex | Exit 1 (`INVALID_EPIC_ID`); stderr carries the offending value. |
 | `--base` absent locally | Exit 2 (`BASE_NOT_FOUND`); suggest `git fetch origin`. |
-| `x-git-branch` delegation fails (State C) | Exit 3 (`DELEGATION_FAILED`); stderr carries `x-git-branch` stderr verbatim. |
+| `x-create-git-branch` delegation fails (State C) | Exit 3 (`DELEGATION_FAILED`); stderr carries `x-create-git-branch` stderr verbatim. |
 | `git push` fails in State B | Exit 4 (`PUSH_FAILED`); stderr carries `git push` stderr verbatim. |
 | `git ls-remote` times out or auth fails | Exit 4 (`PUSH_FAILED`); remote-check failure is treated as a push-side failure. |
 | Unknown flag | Exit 64 (sysexits EX_USAGE); print `usage:` banner. |
@@ -401,11 +401,11 @@ granularity we need.
 | :--- | :--- |
 | State A (idempotent no-op; no network) | < 1s (two `git rev-parse` calls + `ls-remote`) |
 | State B (complementary push) | < 3s (`ls-remote` + single push round-trip) |
-| State C (delegate to `x-git-branch`) | < 3s (branch create + push; matches `x-git-branch` budget) |
+| State C (delegate to `x-create-git-branch`) | < 3s (branch create + push; matches `x-create-git-branch` budget) |
 
 The "< 1s" ceiling for idempotency is the dominant case in a
-multi-entry-point workflow: `x-epic-implement` followed by
-`x-epic-orchestrate` followed by `x-epic-map` on the same epic will
+multi-entry-point workflow: `x-implement-epic` followed by
+`x-orchestrate-epic` followed by `x-epic-map` on the same epic will
 trigger State A three times; the aggregate overhead must stay sub-3s.
 
 ## Testing
@@ -447,7 +447,7 @@ The `ia-dev-env` generator MUST exclude skills with
 3. User-facing autocomplete in the chat input.
 
 Internal skills ARE still copied into `.claude/skills/` (flat layout)
-so `Skill(skill: "x-internal-epic-branch-ensure")` invocations from
+so `Skill(skill: "x-internal-ensure-epic-branch")` invocations from
 other skills resolve correctly. The invariant: **user cannot see
 them; orchestrators can invoke them.**
 
@@ -482,14 +482,14 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-git-branch` | delegate (State C) | The only skill this one calls. Handles actual `git branch` + optional push. |
+| `x-create-git-branch` | delegate (State C) | The only skill this one calls. Handles actual `git branch` + optional push. |
 | `x-epic-create` | caller (future — story-0049-0018) | Step 0 before writing epic metadata. |
 | `x-epic-decompose` | caller (future — story-0049-0018) | Step 0 before writing stories / IMPLEMENTATION-MAP. |
-| `x-epic-orchestrate` | caller (future — story-0049-0021) | Step 0 before per-story planning loop. |
-| `x-epic-implement` | caller (future — story-0049-0021) | Step 0 before Phase 0 preparation. |
+| `x-orchestrate-epic` | caller (future — story-0049-0021) | Step 0 before per-story planning loop. |
+| `x-implement-epic` | caller (future — story-0049-0021) | Step 0 before Phase 0 preparation. |
 | `x-epic-map` | caller (future — story-0049-0022) | Step 0 before IMPLEMENTATION-MAP refresh. |
-| `x-internal-status-update` | peer (internal/ops/) | Independent — mutates execution-state; this skill mutates git refs. Never co-serialized. |
-| `x-internal-args-normalize` | peer (internal/ops/) | Future refactor may adopt it for flag parsing; current implementation uses inline Bash parsing for minimal surface. |
+| `x-internal-update-status` | peer (internal/ops/) | Independent — mutates execution-state; this skill mutates git refs. Never co-serialized. |
+| `x-internal-normalize-args` | peer (internal/ops/) | Future refactor may adopt it for flag parsing; current implementation uses inline Bash parsing for minimal surface. |
 
 Downstream stories that depend on this skill: story-0049-0018
 (epic-create / epic-decompose refactor), story-0049-0021

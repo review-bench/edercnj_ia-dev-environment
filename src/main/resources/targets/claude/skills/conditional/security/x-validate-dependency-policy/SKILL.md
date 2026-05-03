@@ -1,5 +1,5 @@
 ---
-name: x-dep-policy-validate
+name: x-validate-dependency-policy
 description: "Validates project dependencies against the declared dependency policy (denied CVEs, license whitelist, version constraints, freshness window, scope policy). Produces a structured validation report and exits with BLOCK or WARN based on D-R10/D-R11 enforcement matrix."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
@@ -27,9 +27,9 @@ Produces evidence artifact at `ai/epics/epic-XXXX/reports/dep-policy-validation-
 
 ## Triggers
 
-- `/x-dep-policy-validate` — validate all dependency dimensions
-- `/x-dep-policy-validate --story-id story-0074-0001` — emit evidence artifact for the given story
-- `/x-dep-policy-validate --dry-run` — enumerate violations without applying BLOCK/WARN exits
+- `/x-validate-dependency-policy` — validate all dependency dimensions
+- `/x-validate-dependency-policy --story-id story-0074-0001` — emit evidence artifact for the given story
+- `/x-validate-dependency-policy --dry-run` — enumerate violations without applying BLOCK/WARN exits
 
 ## Parameters
 
@@ -234,8 +234,8 @@ Exit codes:
 
 ## Integration Notes
 
-- Invoked as **MANDATORY TOOL CALL** by `x-story-implement` Phase 3 §3.Q.dep when `quality.dependencyPolicy.enabled=true` (EPIC-0074, Rule 27 Surface 13, Rule 24 §Mandatory Evidence Artifacts).
-- Integrates with `x-dependency-audit` via shared `--policy` flag: `x-dependency-audit --scope all --policy` delegates policy validation to this skill after completing the standard audit.
+- Invoked as **MANDATORY TOOL CALL** by `x-implement-story` Phase 3 §3.Q.dep when `quality.dependencyPolicy.enabled=true` (EPIC-0074, Rule 27 Surface 13, Rule 24 §Mandatory Evidence Artifacts).
+- Integrates with `x-audit-dependencies` via shared `--policy` flag: `x-audit-dependencies --scope all --policy` delegates policy validation to this skill after completing the standard audit.
 - Evidence artifact path follows PathResolver v4: `ai/epics/epic-XXXX-<slug>/reports/dep-policy-validation-report-STORY-ID.md`.
 - `audit-dep-policy.sh` (Camada 2 CI script, Rule 32) checks existence of this artifact for merged PRs when `DEPENDENCY_POLICY_ENABLED=true` in CI env.
 

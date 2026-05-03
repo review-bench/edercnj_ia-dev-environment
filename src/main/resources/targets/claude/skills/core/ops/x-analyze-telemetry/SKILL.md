@@ -1,5 +1,5 @@
 ---
-name: x-telemetry-analyze
+name: x-analyze-telemetry
 description: "Analyze telemetry NDJSON for one or more epics and produce a Markdown report with skill/phase/tool aggregates, Mermaid Gantt timeline, and optional JSON/CSV exports. Use to answer 'which phase is the bottleneck?' and 'is skill X getting slower?' questions for operator visibility."
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "--epic EPIC-XXXX | --epics A,B [--export json|csv --out path] [--since YYYY-MM-DD]"

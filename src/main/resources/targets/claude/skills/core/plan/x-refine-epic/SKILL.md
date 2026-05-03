@@ -1,5 +1,5 @@
 ---
-name: x-epic-refine
+name: x-refine-epic
 description: "Multi-persona 4-phase strategic epic refinement dispatcher. Phase A: 5-6 parallel specialist agents analyse the epic for strategic gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-6 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict with scope=epic and dual-writes to execution-state.json + epic markdown."
 visibility: public
 user-invocable: true
@@ -18,10 +18,10 @@ requires-capabilities: [governance.refinement-gate]
 ## Triggers
 
 ```
-/x-epic-refine epic-0069                        — full 4-phase strategic refinement (interactive)
-/x-epic-refine epic-0069 --non-interactive       — phases A+D only (no operator questions)
-/x-epic-refine epic-0069 --dry-run               — run A-D without writing markdown or state
-/x-epic-refine epic-0069 --legacy-refinement     — skip all phases; return verdict.status="tbd"
+/x-refine-epic epic-0069                        — full 4-phase strategic refinement (interactive)
+/x-refine-epic epic-0069 --non-interactive       — phases A+D only (no operator questions)
+/x-refine-epic epic-0069 --dry-run               — run A-D without writing markdown or state
+/x-refine-epic epic-0069 --legacy-refinement     — skip all phases; return verdict.status="tbd"
 ```
 
 ## Parameters
@@ -52,7 +52,7 @@ requires-capabilities: [governance.refinement-gate]
 | 1 | `EPIC_NOT_FOUND` | Epic markdown not found at expected path |
 | 2 | `EPIC_STATE_MISSING` | `execution-state.json` not found for epic |
 | 3 | `PHASE_A_EMPTY` | All personas returned empty gap-reports |
-| 4 | `VERDICT_WRITE_FAILED` | x-internal-status-update returned non-zero |
+| 4 | `VERDICT_WRITE_FAILED` | x-internal-update-status returned non-zero |
 
 ---
 
@@ -67,9 +67,9 @@ requires-capabilities: [governance.refinement-gate]
 ## Phase A — Parallel Strategic Analysis
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-refine Phase-A-StrategicAnalysis`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-epic Phase-A-StrategicAnalysis`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-refine --phase Phase-A-StrategicAnalysis")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-epic --phase Phase-A-StrategicAnalysis")
 
 Open phase tracker:
 
@@ -93,7 +93,7 @@ Resolve active personas: 5 fixed always active + conditional SRE/DevOps (activat
 Always active (5 core personas):
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine PO`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic PO`
 
 ```
 Agent(
@@ -215,27 +215,27 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 ```
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine PO ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic PO ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine TechLead`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic TechLead`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine TechLead ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic TechLead ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine Architect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic Architect`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine Architect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic Architect ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine Security`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic Security`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine Security ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic Security ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine QA`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic QA`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine QA ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic QA ok`
 
 Collect all gap-reports. Validate each is parseable JSON; discard malformed. If ALL are empty → exit `PHASE_A_EMPTY`.
 
@@ -245,10 +245,10 @@ Separate:
 
     TaskUpdate(id: phaseATaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-refine --phase Phase-A-StrategicAnalysis")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-refine-epic --phase Phase-A-StrategicAnalysis")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-refine Phase-A-StrategicAnalysis ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-epic Phase-A-StrategicAnalysis ok`
 
 >>> Phase A completed. Proceeding to Phase B (Consolidation)...
 
@@ -259,7 +259,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-r
 <!-- phase-no-gate: Phase B is skipped entirely when --non-interactive; gate is inside conditional block -->
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-refine Phase-B-Consolidate`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-epic Phase-B-Consolidate`
 
 **Skip Phase B when `--non-interactive`**: set `answers = {}` and proceed directly to Phase C.
 
@@ -315,7 +315,7 @@ Map each answer back to its originating `{persona, dimension, gap}` entry.
     TaskUpdate(id: phaseBTaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-refine Phase-B-Consolidate ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-epic Phase-B-Consolidate ok`
 
 >>> Phase B completed. Proceeding to Phase C (Strategic Refinement)...
 
@@ -324,9 +324,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-r
 ## Phase C — Parallel Strategic Refinement
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-refine Phase-C-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-epic Phase-C-Refine`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-refine --phase Phase-C-Refine")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-epic --phase Phase-C-Refine")
 
 **Skip Phase C when `--non-interactive`**: set `proposedSections = {}` and proceed to Phase D.
 
@@ -341,7 +341,7 @@ Open phase tracker:
 For each persona that had questions in Phase A, launch a refinement agent with the answers it owns:
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine PO-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic PO-Refine`
 
 ```
 Agent(
@@ -424,36 +424,36 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 ```
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine PO-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic PO-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine TechLead-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic TechLead-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine TechLead-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic TechLead-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine Architect-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic Architect-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine Architect-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic Architect-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine Security-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic Security-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine Security-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic Security-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine QA-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic QA-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine QA-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic QA-Refine ok`
 
 Collect `proposedSections` from each agent. Merge into a single map keyed by section.
 
     TaskUpdate(id: phaseCTaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-refine --phase Phase-C-Refine")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-refine-epic --phase Phase-C-Refine")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-refine Phase-C-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-epic Phase-C-Refine ok`
 
 >>> Phase C completed. Proceeding to Phase D (Architect Consolidation)...
 
@@ -462,9 +462,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-r
 ## Phase D — Architect Consolidation + Dual-Write
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-refine Phase-D-Architect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-epic Phase-D-Architect`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-refine --phase Phase-D-Architect")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-epic --phase Phase-D-Architect")
 
 Open phase tracker:
 
@@ -473,7 +473,7 @@ Open phase tracker:
 ### D.1 Architect consolidation (opus tier)
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-epic-refine Architect-Consolidate`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-epic Architect-Consolidate`
 
 ```
 Agent(
@@ -560,7 +560,7 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 ```
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-epic-refine Architect-Consolidate ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-epic Architect-Consolidate ok`
 
 Parse the Architect's JSON verdict. Validate `status` is one of `approved|rejected|tbd` and `scope` is `"epic"`.
 
@@ -574,9 +574,9 @@ Bash command: `printf '%s' '<verdict JSON>' | sha256sum | awk '{print $1}'`
 
 **`--dry-run` guard**: skip D.3 writes when `--dry-run` is active.
 
-**Write 1 — execution-state.json** (via x-internal-status-update, INLINE-SKILL):
+**Write 1 — execution-state.json** (via x-internal-update-status, INLINE-SKILL):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field refinementVerdict --value {\"status\":\"<status>\",\"scope\":\"epic\",\"checkedAt\":\"<iso>\",\"dimensions\":{...},\"blockers\":[...],\"verdictHash\":\"<hash>\"}")  [required]
+    Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field refinementVerdict --value {\"status\":\"<status>\",\"scope\":\"epic\",\"checkedAt\":\"<iso>\",\"dimensions\":{...},\"blockers\":[...],\"verdictHash\":\"<hash>\"}")  [required]
 
 Non-zero → exit `VERDICT_WRITE_FAILED`.
 
@@ -588,10 +588,10 @@ The Architect agent in D.1 applies the Edit inline. If the Architect did not app
 
     TaskUpdate(id: phaseDTaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-epic-refine --phase Phase-D-Architect --expected-artifacts {epicPath},{epicStatePath}")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode final --skill x-refine-epic --phase Phase-D-Architect --expected-artifacts {epicPath},{epicStatePath}")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-refine Phase-D-Architect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-epic Phase-D-Architect ok`
 
 >>> Phase D completed. Refinement verdict written.
 
@@ -602,7 +602,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-r
 Print a concise summary:
 
 ```
-x-epic-refine completed for epic-XXXX
+x-refine-epic completed for epic-XXXX
   Verdict: <approved|rejected|tbd>
   Blockers: <none | list>
   Verdict hash: <hash>
@@ -614,9 +614,9 @@ x-epic-refine completed for epic-XXXX
 
 ## Integration Notes
 
-- **Consumed by:** `x-epic-implement` (Phase 0: checks `refinementVerdict.status == "approved"` AND `scope == "epic"` via `enforce-refinement-gate.sh` hook).
-- **Parallel with:** `x-story-refine` (distinct write paths; shared `dimensions.md` KP is read-only).
-- **Depends on:** `x-internal-status-update` (INLINE-SKILL, Rule 13 Pattern 1), `knowledge/refinement/dimensions.md` (KP, story-0069-0001).
+- **Consumed by:** `x-implement-epic` (Phase 0: checks `refinementVerdict.status == "approved"` AND `scope == "epic"` via `enforce-refinement-gate.sh` hook).
+- **Parallel with:** `x-refine-story` (distinct write paths; shared `dimensions.md` KP is read-only).
+- **Depends on:** `x-internal-update-status` (INLINE-SKILL, Rule 13 Pattern 1), `knowledge/refinement/dimensions.md` (KP, story-0069-0001).
 - **Verdict drift detection:** `verdictHash` in state file vs `verdictHash` in epic markdown is compared by `audit-refinement-gate.sh` (story-0069-0006). Drift fails CI with `REFINEMENT_VERDICT_DRIFT`.
-- **Re-run idempotency:** Running x-epic-refine again on an `approved` epic replaces the verdict. This is intentional — re-refinement after epic scope changes should update the verdict.
-- **Scope discriminator:** This skill always writes `scope: "epic"`. The gate `enforce-refinement-gate.sh` checks both `status == "approved"` AND `scope == "epic"` to unblock `x-epic-implement`. Story-level `scope: "story"` verdicts do NOT unblock epic-level gates.
+- **Re-run idempotency:** Running x-refine-epic again on an `approved` epic replaces the verdict. This is intentional — re-refinement after epic scope changes should update the verdict.
+- **Scope discriminator:** This skill always writes `scope: "epic"`. The gate `enforce-refinement-gate.sh` checks both `status == "approved"` AND `scope == "epic"` to unblock `x-implement-epic`. Story-level `scope: "story"` verdicts do NOT unblock epic-level gates.

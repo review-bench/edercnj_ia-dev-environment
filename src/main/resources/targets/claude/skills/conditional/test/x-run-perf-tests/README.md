@@ -1,4 +1,4 @@
-# x-test-perf
+# x-run-perf-tests
 
 > Runs performance tests to validate latency SLAs, throughput targets, and resource stability under load. Supports baseline, normal, peak, and sustained scenarios.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | Performance testing requirements configured |
-| **Invocation** | `/x-test-perf [scenario: baseline\|normal\|peak\|sustained\|all]` |
+| **Invocation** | `/x-run-perf-tests [scenario: baseline\|normal\|peak\|sustained\|all]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -21,14 +21,14 @@ Runs or implements performance tests to validate the application meets latency S
 ## Usage
 
 ```
-/x-test-perf
-/x-test-perf baseline
-/x-test-perf peak
-/x-test-perf all
+/x-run-perf-tests
+/x-run-perf-tests baseline
+/x-run-perf-tests peak
+/x-run-perf-tests all
 ```
 
 ## See Also
 
-- [x-test-e2e](../x-test-e2e/) -- End-to-end integration tests
-- [x-test-smoke-api](../x-test-smoke-api/) -- REST API smoke tests
-- [x-obs-instrument](../x-obs-instrument/) -- OpenTelemetry instrumentation for performance metrics
+- [x-execute-e2e-tests](../x-execute-e2e-tests/) -- End-to-end integration tests
+- [x-execute-api-smoke-tests](../x-execute-api-smoke-tests/) -- REST API smoke tests
+- [x-instrument-observability](../x-instrument-observability/) -- OpenTelemetry instrumentation for performance metrics

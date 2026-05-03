@@ -1,5 +1,5 @@
 ---
-name: x-review-db
+name: x-review-database
 description: "Database specialist review: validates schema design, migration safety, query optimization, connection management, transaction boundaries, and data integrity patterns."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
@@ -33,9 +33,9 @@ Include this skill when `database != "none"` in the project configuration.
 
 ## Triggers
 
-- `/x-review-db 42` -- review PR #42 for database patterns
-- `/x-review-db src/main/resources/db/migration/` -- review migration files
-- `/x-review-db` -- review all current database changes
+- `/x-review-database 42` -- review PR #42 for database patterns
+- `/x-review-database src/main/resources/db/migration/` -- review migration files
+- `/x-review-database` -- review all current database changes
 
 ## Parameters
 

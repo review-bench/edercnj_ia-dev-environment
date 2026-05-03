@@ -1,6 +1,6 @@
 ---
-name: x-internal-story-verify
-description: "Executes the story-level verification gate (Phase 3 carve-out of x-story-implement): identifies files touched by the story via the task breakdown, runs the test suite scoped to those files, parses filtered coverage against the story-specific thresholds (default line >=95, branch >=90), performs cross-file consistency checks (constructor patterns, return-type uniformity per role), optionally runs the smoke suite, and validates every Section 7 Gherkin scenario has a matching acceptance test. Emits a single-line JSON envelope {passed, coverageDelta, failures, acCheckResults}. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-story-load-context and x-internal-story-build-plan)."
+name: x-internal-verify-story
+description: "Executes the story-level verification gate (Phase 3 carve-out of x-implement-story): identifies files touched by the story via the task breakdown, runs the test suite scoped to those files, parses filtered coverage against the story-specific thresholds (default line >=95, branch >=90), performs cross-file consistency checks (constructor patterns, return-type uniformity per role), optionally runs the smoke suite, and validates every Section 7 Gherkin scenario has a matching acceptance test. Emits a single-line JSON envelope {passed, coverageDelta, failures, acCheckResults}. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-load-story-context and x-internal-build-story-plan)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,26 +19,26 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-story-implement (Phase 3 carve-out).
-> Sexta skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, x-internal-story-load-context
-> 0049-0011, e x-internal-story-build-plan 0049-0012). Terceira skill
+> Caller principal: x-implement-story (Phase 3 carve-out).
+> Sexta skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, e x-internal-build-story-plan 0049-0012). Terceira skill
 > na subdir `internal/plan/` — o subdir `plan/` agrupa orquestração de
 > planejamento e verificação da story (load → build → verify). Difere
 > de `internal/ops/`, cujas sibling skills mutam estado (execution-state,
 > reports).
 
-# Skill: x-internal-story-verify
+# Skill: x-internal-verify-story
 
 ## Purpose
 
-Carve out Phase 3 (Story-Level Verification) of `x-story-implement`
+Carve out Phase 3 (Story-Level Verification) of `x-implement-story`
 into a single, single-responsibility skill. The ~160 inline lines
-currently inside `x-story-implement` Phase 3 (Step 3.1 coverage, Step
+currently inside `x-implement-story` Phase 3 (Step 3.1 coverage, Step
 3.2 cross-file consistency, Step 3.8 smoke gate, implicit AC → test
 mapping) become a single
-`Skill(skill: "x-internal-story-verify", …)` invocation; the
+`Skill(skill: "x-internal-verify-story", …)` invocation; the
 orchestrator shrinks to a read-the-envelope consumer that drives its
 remediation / tech-lead-review branching off the four response fields.
 
@@ -70,9 +70,9 @@ Responsibilities (single):
 Non-responsibilities (explicit):
 
 - The skill does NOT create branches, run PR operations, or mutate
-  git state — the caller (`x-story-implement` Phase 3) and
-  `x-internal-status-update` handle those.
-- The skill does NOT write reports; `x-internal-report-write` renders
+  git state — the caller (`x-implement-story` Phase 3) and
+  `x-internal-update-status` handle those.
+- The skill does NOT write reports; `x-internal-write-report` renders
   the consolidated dashboard off the envelope this skill emits.
 - The skill does NOT update `execution-state.json`; the caller owns
   the transition to `COMPLETE` / `FAILED` after consuming `passed`.
@@ -83,7 +83,7 @@ Non-responsibilities (explicit):
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-story-verify/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other carve-outs of the story-level planning/verification pipeline (`x-internal-story-load-context`, `x-internal-story-build-plan`) |
+| Path | `internal/plan/x-internal-verify-story/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other carve-outs of the story-level planning/verification pipeline (`x-internal-load-story-context`, `x-internal-build-story-plan`) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -97,17 +97,17 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never
-invoked by a human typing `/x-internal-story-verify` in chat. All
+invoked by a human typing `/x-internal-verify-story` in chat. All
 invocations follow Rule 13 INLINE-SKILL pattern from a calling
 orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
 ```markdown
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049 --coverage-threshold-line 90 --coverage-threshold-branch 85")
 ```
 
@@ -308,7 +308,7 @@ jq -nc \
 ### Example 1 — Happy path: clean story, all gates green
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
@@ -323,7 +323,7 @@ Exit: 0.
 ### Example 2 — AC gap
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
@@ -332,7 +332,7 @@ Envelope includes `"passed":false` and `"ac: 'Boundary — coverage exatamente n
 ### Example 3 — Coverage below threshold
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
@@ -341,7 +341,7 @@ Envelope includes `"passed":false` and `coverageDelta.line=88.2, lineDelta=-6.8`
 ### Example 4 — No story files identified
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
@@ -350,7 +350,7 @@ Stderr: `Could not identify story files`. Exit: 1. No envelope emitted.
 ### Example 5 — Boundary: coverage exactly on threshold
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049")
 ```
 
@@ -359,7 +359,7 @@ Envelope `"coverageDelta":{"line":95.0,"lineThreshold":95,"lineDelta":0.0,…}` 
 ### Example 6 — Custom thresholds (per-story override)
 
 ```bash
-Skill(skill: "x-internal-story-verify",
+Skill(skill: "x-internal-verify-story",
       args: "--story-id story-0049-0014 --epic-id 0049 --coverage-threshold-line 80 --coverage-threshold-branch 75")
 ```
 
@@ -466,13 +466,13 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-story-implement` | caller (primary) | Phase 3 carve-out: the skill's stdout envelope replaces Steps 3.1 (coverage), 3.2 (cross-file consistency), 3.8 (smoke), and the implicit AC → test mapping — ~160 inline lines |
-| `x-epic-implement` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating stories at the epic scope; `passed=false` drives per-story remediation loops |
-| `x-internal-story-load-context` | peer | Sibling `internal/plan/` skill; provides the upstream envelope consumed by Phase 0 (`storyFile`, `taskCount`, `scopeTier`); this skill reads the story file independently for Section 7 scenarios (idempotent mtime-aware) |
-| `x-internal-story-build-plan` | peer | Sibling `internal/plan/` skill; runs the Phase 1 planning dispatch; this skill runs the Phase 3 verification gate at the end of the same story's lifecycle |
-| `x-internal-report-write` | downstream | Consumes this skill's envelope to render the story dashboard `dashboard-story-XXXX-YYYY.md` |
-| `x-internal-status-update` | downstream | Consumes `passed` to transition `execution-state.json` → `COMPLETE` / `FAILED` |
-| `x-test-e2e` | indirect | Project smoke runner invoked in Step 6 when `testing.smoke_tests == true` |
+| `x-implement-story` | caller (primary) | Phase 3 carve-out: the skill's stdout envelope replaces Steps 3.1 (coverage), 3.2 (cross-file consistency), 3.8 (smoke), and the implicit AC → test mapping — ~160 inline lines |
+| `x-implement-epic` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating stories at the epic scope; `passed=false` drives per-story remediation loops |
+| `x-internal-load-story-context` | peer | Sibling `internal/plan/` skill; provides the upstream envelope consumed by Phase 0 (`storyFile`, `taskCount`, `scopeTier`); this skill reads the story file independently for Section 7 scenarios (idempotent mtime-aware) |
+| `x-internal-build-story-plan` | peer | Sibling `internal/plan/` skill; runs the Phase 1 planning dispatch; this skill runs the Phase 3 verification gate at the end of the same story's lifecycle |
+| `x-internal-write-report` | downstream | Consumes this skill's envelope to render the story dashboard `dashboard-story-XXXX-YYYY.md` |
+| `x-internal-update-status` | downstream | Consumes `passed` to transition `execution-state.json` → `COMPLETE` / `FAILED` |
+| `x-execute-e2e-tests` | indirect | Project smoke runner invoked in Step 6 when `testing.smoke_tests == true` |
 
 Downstream stories that depend on this carve-out: story-0049-0019
 (orchestrator consumes the envelope and deletes the inline Phase 3

@@ -1,6 +1,6 @@
-# x-internal-story-report — Full Protocol
+# x-internal-write-story-report — Full Protocol
 
-> Depth reference for `x-internal-story-report`. The SKILL.md body is
+> Depth reference for `x-internal-write-story-report`. The SKILL.md body is
 > the normative contract; this document expands the workflow
 > internals that orchestrators do not need in their working context
 > but that implementers and auditors must be able to consult.
@@ -9,8 +9,8 @@
 
 The parser is a tight single-file loop (`while (($#)); case "$1" in …`)
 to stay inside the SkillSizeLinter 500-line threshold without
-delegating to `x-internal-args-normalize` (that skill is a peer, not
-a dependency — same rationale as `x-internal-story-resume` §1).
+delegating to `x-internal-normalize-args` (that skill is a peer, not
+a dependency — same rationale as `x-internal-resume-story` §1).
 
 | Input | Result | Exit |
 | :--- | :--- | :--- |
@@ -56,9 +56,9 @@ Supported status strings (case-insensitive, trimmed):
 
 Note: `PR_MERGED` intentionally falls outside the DONE bucket — it
 is a transient state between PR merge and the
-`x-internal-status-update` transition to `DONE`. `tasksDone` is a
+`x-internal-update-status` transition to `DONE`. `tasksDone` is a
 *post-transition* metric, matching the contract used by
-`x-internal-story-resume`.
+`x-internal-resume-story`.
 
 ## 3. Render-Payload Schema
 
@@ -92,7 +92,7 @@ interface RenderPayload {
 The template at `.claude/templates/_TEMPLATE-STORY-COMPLETION-REPORT.md`
 MUST reference only fields present in this schema; adding new fields
 is backward-compatible (unused payload keys are silently ignored by
-`x-internal-report-write`), but removing a field is a breaking
+`x-internal-write-report`), but removing a field is a breaking
 change and requires a template version bump.
 
 ## 4. PR-State Normalisation Rules
@@ -150,7 +150,7 @@ evolve the payload schema:
    NOT read the version comment; auditing is manual.
 3. Structural change to an array element (e.g., renaming
    `tasks[].id` to `tasks[].taskId`) — breaking. Follow the same
-   contract-evolution playbook used by `x-internal-report-write`
+   contract-evolution playbook used by `x-internal-write-report`
    template changes (see EPIC-0049 S6 references).
 
 ## 7. Performance Profile (measured on laptop-class)
@@ -165,13 +165,13 @@ array):
 | Summary computation (5× jq pipes) | 85 ms | 200 ms |
 | Payload assembly (single `jq -n`) | 25 ms | 50 ms |
 | Template existence gate | < 1 ms | 10 ms |
-| `x-internal-report-write` invocation | 180 ms | 250 ms |
+| `x-internal-write-report` invocation | 180 ms | 250 ms |
 | Envelope emission | 3 ms | 10 ms |
 | **Total** | **≈ 340 ms** | **500 ms** |
 
 Large stories (20+ tasks, 100+ findings) remain under 800 ms because
 the jq pipeline is O(n) in task count and the payload is built in a
-single pass. The `x-internal-report-write` step dominates latency;
+single pass. The `x-internal-write-report` step dominates latency;
 optimisations there (e.g., template compilation caching) flow
 through to this skill automatically.
 
@@ -191,16 +191,16 @@ fixtures:
 All fixtures are built in-memory by the smoke test to keep the
 test suite hermetic. Goldens lock only the SKILL.md rendering (EPIC-0049
 convention — see
-`src/test/resources/golden/internal/plan/x-internal-story-report/`).
+`src/test/resources/golden/internal/plan/x-internal-write-story-report/`).
 
 ## 9. Consumer Contract (story-0049-0019)
 
 The downstream orchestrator consumer in story-0049-0019
-(`x-story-implement` Phase 3 simplification) reads the envelope as
+(`x-implement-story` Phase 3 simplification) reads the envelope as
 follows:
 
 ```bash
-envelope=$(Skill x-internal-story-report \
+envelope=$(Skill x-internal-write-story-report \
   --story-id "${story_id}" \
   --epic-id "${epic_id}" \
   --output "${report_path}")
@@ -231,5 +231,5 @@ RENAME a `summary` field, follow this playbook:
 5. Remove the old field in release N+2 at the earliest.
 
 This mirrors the deprecation contract used by
-`x-internal-report-write` and avoids lockstep upgrades across the
+`x-internal-write-report` and avoids lockstep upgrades across the
 `x-internal-*` family.

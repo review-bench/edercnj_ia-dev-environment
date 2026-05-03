@@ -1,4 +1,4 @@
-# x-git-commit — Full Protocol
+# x-commit-changes — Full Protocol
 
 > **Slim/Full split** per [ADR-0012 — Skill Body Slim-by-Default](../../../../../../../../../adr/ADR-0012-skill-body-slim-by-default.md).
 > The `SKILL.md` sibling of this file carries the minimum viable contract
@@ -56,7 +56,7 @@ docs(TASK-0029-0005-004): update README with commit format
 ```
 1. VALIDATE    -> Check parameters (task ID, type, subject, tdd tag)
 2. CHECK-STAGE -> Verify staged files exist
-3. PRE-COMMIT  -> Run chain: x-code-format -> x-code-lint -> compile (unless --skip-chain)
+3. PRE-COMMIT  -> Run chain: x-format-code -> x-lint-code -> compile (unless --skip-chain)
 4. BUILD-MSG   -> Construct commit message with task ID and TDD tag
 5. COMMIT      -> Execute git commit (or git commit --amend)
 6. REPORT      -> Output commit summary
@@ -113,13 +113,13 @@ echo "Staged files: $(echo "$STAGED" | wc -l)"
 
 Unless `--skip-chain` is provided, execute the chain sequentially.
 
-#### 3a. Format (x-code-format)
+#### 3a. Format (x-format-code)
 
-Invoke the `x-code-format` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke the `x-format-code` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-code-format", args: "")
+    Skill(skill: "x-format-code", args: "")
 
-If `x-code-format` modifies any files that were staged, **re-stage them automatically**:
+If `x-format-code` modifies any files that were staged, **re-stage them automatically**:
 
 ```bash
 # Record staged files before format (NUL-delimited for safety)
@@ -127,7 +127,7 @@ STAGED_BEFORE=$(git diff --cached --name-only -z)
 
 # Run formatter (language-specific)
 # For {{LANGUAGE}}: {{COMPILE_COMMAND}} equivalent
-# See x-code-format skill for language-specific commands
+# See x-format-code skill for language-specific commands
 
 # Re-stage files that were staged and modified by formatter
 while IFS= read -r -d '' file; do
@@ -138,17 +138,17 @@ while IFS= read -r -d '' file; do
 done <<< "$STAGED_BEFORE"
 ```
 
-If format fails: **ABORT** with message `"Pre-commit chain failed at step 'x-code-format': {error output}"`.
+If format fails: **ABORT** with message `"Pre-commit chain failed at step 'x-format-code': {error output}"`.
 
-#### 3b. Lint (x-code-lint)
+#### 3b. Lint (x-lint-code)
 
-Invoke the `x-code-lint` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke the `x-lint-code` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-code-lint", args: "")
+    Skill(skill: "x-lint-code", args: "")
 
 Only ERROR-level findings block the commit.
 
-If lint finds ERRORs: **ABORT** with message `"Pre-commit chain failed at step 'x-code-lint': {error count} errors found"`.
+If lint finds ERRORs: **ABORT** with message `"Pre-commit chain failed at step 'x-lint-code': {error count} errors found"`.
 
 #### 3c. Compile
 
@@ -201,7 +201,7 @@ If `--body` is provided, append it after a blank line:
 
 ### Step 5 — Execute Commit
 
-Every commit MUST carry the orchestrator-signature trailer (`Co-Authored-By: x-git-commit@<sha>`).
+Every commit MUST carry the orchestrator-signature trailer (`Co-Authored-By: x-commit-changes@<sha>`).
 The SHA is the current HEAD captured before the commit executes — it references the parent commit
 and satisfies the `.githooks/commit-msg` surface-D guard (story-0059-0005).
 
@@ -211,11 +211,11 @@ PARENT_SHA=$(git rev-parse HEAD 2>/dev/null || echo "000000000000000000000000000
 
 # Normal commit with trailer
 git commit -m "{message}" \
-  --trailer "Co-Authored-By: x-git-commit@${PARENT_SHA}"
+  --trailer "Co-Authored-By: x-commit-changes@${PARENT_SHA}"
 
 # Amend commit with trailer
 git commit --amend -m "{message}" \
-  --trailer "Co-Authored-By: x-git-commit@${PARENT_SHA}"
+  --trailer "Co-Authored-By: x-commit-changes@${PARENT_SHA}"
 ```
 
 When `--amend` is used, warn:
@@ -227,7 +227,7 @@ NOTE: Amending last commit. Previous commit message will be replaced.
 ### Step 6 — Report
 
 ```
-x-git-commit complete:
+x-commit-changes complete:
   Task:     {task-id}
   Type:     {type}
   Subject:  {subject}

@@ -1,6 +1,6 @@
-# x-internal-story-build-plan — Full Protocol
+# x-internal-build-story-plan — Full Protocol
 
-> Depth reference for `x-internal-story-build-plan`. The SKILL.md
+> Depth reference for `x-internal-build-story-plan`. The SKILL.md
 > body is the normative contract; this document expands the
 > workflow internals that orchestrators do not need in their
 > working context but that implementers and auditors must be able
@@ -10,8 +10,8 @@
 
 The parser is a tight single-file loop (`while (($#)); case "$1" in …`)
 to keep the SKILL.md within the SkillSizeLinter 500-line threshold
-without delegating to `x-internal-args-normalize` (peer, not a
-dependency — same policy as `x-internal-story-load-context` §1).
+without delegating to `x-internal-normalize-args` (peer, not a
+dependency — same policy as `x-internal-load-story-context` §1).
 
 | Input | Result | Exit |
 | :--- | :--- | :--- |
@@ -54,8 +54,8 @@ dispatch to be a single assistant turn — partitioning SIMPLE into a
 separate sub-message would serialise the remaining 3 and negate the
 parallelism benefit.
 
-When the caller is `x-story-implement` and the scope tier comes from
-`x-internal-story-load-context` (Step 5 — task-count heuristic), the
+When the caller is `x-implement-story` and the scope tier comes from
+`x-internal-load-story-context` (Step 5 — task-count heuristic), the
 contract is that SIMPLE = `taskCount ≤ 4`, STANDARD = `5-7`,
 COMPLEX = `≥ 8`. The gate inside this skill trusts the tier it
 receives and does not re-classify.
@@ -87,27 +87,27 @@ prompt: |
   Return the absolute path of the file you wrote.
 ```
 
-### Step 1C — QA Engineer (test plan) — delegates to `x-test-plan`
+### Step 1C — QA Engineer (test plan) — delegates to `x-plan-tests`
 
 ```
 description: "Test plan for <story_id>"
 prompt: |
-  You are a QA Engineer. Invoke x-test-plan via the Skill tool:
-    Skill(skill: "x-test-plan", args: "--story-id <story_id> --epic-id <epic_id>")
+  You are a QA Engineer. Invoke x-plan-tests via the Skill tool:
+    Skill(skill: "x-plan-tests", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes
     ai/epics/epic-<epic_id>/plans/tests-story-<story_id>.md
   directly. Verify the file exists after the call; return its
   absolute path.
 ```
 
-### Step 1D — Task Decomposer — delegates to `x-lib-task-decomposer`
+### Step 1D — Task Decomposer — delegates to `x-lib-decompose-task`
 
 ```
 description: "Task breakdown + map for <story_id>"
 prompt: |
-  You are a Task Decomposer. Invoke x-lib-task-decomposer via the
+  You are a Task Decomposer. Invoke x-lib-decompose-task via the
   Skill tool:
-    Skill(skill: "x-lib-task-decomposer", args: "--story-id <story_id> --epic-id <epic_id>")
+    Skill(skill: "x-lib-decompose-task", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes TWO artifacts:
     ai/epics/epic-<epic_id>/plans/tasks-story-<story_id>.md
     ai/epics/epic-<epic_id>/plans/task-implementation-map-story-<story_id>.md
@@ -115,14 +115,14 @@ prompt: |
   {"tasks":"…","taskMap":"…"}.
 ```
 
-### Step 1E — Security Engineer — delegates to `x-threat-model`
+### Step 1E — Security Engineer — delegates to `x-model-threats`
 
 ```
 description: "Security assessment for <story_id>"
 prompt: |
-  You are a Security Engineer. Invoke x-threat-model via the Skill
+  You are a Security Engineer. Invoke x-model-threats via the Skill
   tool:
-    Skill(skill: "x-threat-model", args: "--story-id <story_id> --epic-id <epic_id>")
+    Skill(skill: "x-model-threats", args: "--story-id <story_id> --epic-id <epic_id>")
   The called skill writes
     ai/epics/epic-<epic_id>/plans/security-story-<story_id>.md
   directly. Verify the file exists after the call; return its
@@ -166,7 +166,7 @@ deterministically.
 Legacy stories (pre-EPIC-0038) used `map-story-XXXX-YYYY.md`
 instead of the canonical `task-implementation-map-story-XXXX-YYYY.md`.
 Step 1D's subagent writes the canonical name; if the called
-`x-lib-task-decomposer` produces the legacy form, this skill
+`x-lib-decompose-task` produces the legacy form, this skill
 renames it before emitting the envelope. The rename is a safety
 net, not a silent migration path — it logs a single WARNING line to
 stderr: `legacy map name detected: renamed <old> → <new>`.
@@ -176,7 +176,7 @@ stderr: `legacy map name detected: renamed <old> → <new>`.
 Two callers invoking this skill for the same story at the same time
 would step on each other's planning artifacts (both `jq -nc` would
 run against partially-written files). The caller
-(`x-story-implement` Phase 1) serialises invocations per-story via
+(`x-implement-story` Phase 1) serialises invocations per-story via
 the `feat/story-<id>-<slug>` branch check (one PR per story at any
 time). This skill does NOT acquire its own lock — concurrent
 invocation is a misuse and is out of scope.
@@ -188,14 +188,14 @@ envelope MUST still include `scope:"STANDARD"` and `skipped:[]`
 explicitly so downstream consumers never have to distinguish
 "unset" from "set to STANDARD".
 
-## 5. Interaction with `x-internal-story-load-context`
+## 5. Interaction with `x-internal-load-story-context`
 
 This skill is the WRITE counterpart to the READ-only
-`x-internal-story-load-context`. The canonical Phase 1 driver in
-`x-story-implement` (story-0049-0019) looks like:
+`x-internal-load-story-context`. The canonical Phase 1 driver in
+`x-implement-story` (story-0049-0019) looks like:
 
 ```bash
-envelope=$(Skill x-internal-story-load-context …) || exit $?
+envelope=$(Skill x-internal-load-story-context …) || exit $?
 planning_mode=$(echo "$envelope" | jq -r '.planningMode')
 scope=$(echo "$envelope" | jq -r '.scope')
 
@@ -206,7 +206,7 @@ if [[ "$planning_mode" == "PRE_PLANNED" ]]; then
 fi
 
 # HYBRID or INLINE — regen missing / stale artifacts.
-Skill x-internal-story-build-plan --story-id "$id" --epic-id "$epic" \
+Skill x-internal-build-story-plan --story-id "$id" --epic-id "$epic" \
                                   --scope "$scope" || exit $?
 ```
 
@@ -217,13 +217,13 @@ other at the tool level — the caller is the only coupling point.
 ## 6. Fail-Fast and Partial-Artifact Policy
 
 The skill is fail-fast: the FIRST non-zero exit from any delegate
-(`x-arch-plan` in Step 1A, or any of the 5 subagents in Steps 1B-1F)
+(`x-plan-architecture` in Step 1A, or any of the 5 subagents in Steps 1B-1F)
 terminates the run with the matching exit code (1 or 2).
 
 Artifacts produced by successful steps before the failure remain on
 disk. The caller MAY re-invoke with the same arguments — each
 delegate is idempotent with respect to its artifact path
-(`x-arch-plan` overwrites `arch-story-*.md`; `x-test-plan`
+(`x-plan-architecture` overwrites `arch-story-*.md`; `x-plan-tests`
 overwrites `tests-story-*.md`; etc.).
 
 Rationale: rolling back partial artifacts on failure would require a
@@ -263,10 +263,10 @@ TASK-0049-0012-005) asserts:
 5. `references/full-protocol.md` exists and is non-empty.
 
 Goldens (if added) lock the SKILL.md rendering under
-`src/test/resources/golden/internal/plan/x-internal-story-build-plan/`.
+`src/test/resources/golden/internal/plan/x-internal-build-story-plan/`.
 
 ## 9. Changelog
 
 | Version | Change | Story |
 | :--- | :--- | :--- |
-| 1.0 | Initial carve-out — replaces ~250 inline lines in `x-story-implement` Phase 1 | story-0049-0012 |
+| 1.0 | Initial carve-out — replaces ~250 inline lines in `x-implement-story` Phase 1 | story-0049-0012 |

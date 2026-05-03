@@ -1,11 +1,11 @@
-# x-story-plan
+# x-plan-story
 
 > Multi-agent story planning: launches 5 specialized agents (Architect, QA, Security, Tech Lead, Product Owner) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation for a story.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-story-plan [STORY-ID] [--force] [--skip-dor]` |
+| **Invocation** | `/x-plan-story [STORY-ID] [--force] [--skip-dor]` |
 | **Delegates to** | 5 parallel subagents (Architect, QA Engineer, Security Engineer, Tech Lead, Product Owner) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -18,7 +18,7 @@ Launches 5 specialized agents in a single message for true parallelism. Each age
 
 ```mermaid
 flowchart TD
-    START(["/x-story-plan STORY-ID"]) --> P0["Phase 0: Input Resolution"]
+    START(["/x-plan-story STORY-ID"]) --> P0["Phase 0: Input Resolution"]
     P0 --> STALE{Artifacts fresh?}
     STALE -->|Fresh| REUSE["Reuse existing, skip to DoR"]
     STALE -->|Stale/Missing| P1["Phase 1: Context Gathering"]
@@ -96,9 +96,9 @@ flowchart TD
 
 ## See Also
 
-- [x-story-implement](../x-story-implement/) -- Full lifecycle orchestrator that can invoke this skill
-- [x-test-plan](../x-test-plan/) -- Standalone test planning (QA agent provides similar output here)
-- [x-arch-plan](../x-arch-plan/) -- Standalone architecture planning
+- [x-implement-story](../x-implement-story/) -- Full lifecycle orchestrator that can invoke this skill
+- [x-plan-tests](../x-plan-tests/) -- Standalone test planning (QA agent provides similar output here)
+- [x-plan-architecture](../x-plan-architecture/) -- Standalone architecture planning
 - [x-story-create](../x-story-create/) -- Generates story files consumed by this skill
 - [x-epic-map](../x-epic-map/) -- Generates implementation map for dependency context
 - [references/planning-guide.md](./references/planning-guide.md) -- Detailed TASK_PROPOSAL format and consolidation rules

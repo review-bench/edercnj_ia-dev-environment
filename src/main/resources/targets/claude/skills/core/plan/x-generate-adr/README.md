@@ -1,11 +1,11 @@
-# x-adr-generate
+# x-generate-adr
 
 > Automates ADR generation from architecture plan mini-ADRs: extracts inline decisions, expands to full ADR format, assigns sequential numbering, updates the ADR index, and adds cross-references.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-adr-generate [architecture-plan-path] [story-id]` |
+| **Invocation** | `/x-generate-adr [architecture-plan-path] [story-id]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,7 +16,7 @@ Extracts mini-ADRs embedded in architecture plans (marked with `### ADR:`) and e
 ## Usage
 
 ```
-/x-adr-generate ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md story-XXXX-YYYY
+/x-generate-adr ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md story-XXXX-YYYY
 ```
 
 ## Workflow
@@ -37,5 +37,5 @@ Extracts mini-ADRs embedded in architecture plans (marked with `### ADR:`) and e
 
 ## See Also
 
-- [x-arch-plan](../x-arch-plan/) — Generates architecture plans containing mini-ADRs
-- [x-arch-update](../x-arch-update/) — Updates service architecture doc with ADR references
+- [x-plan-architecture](../x-plan-architecture/) — Generates architecture plans containing mini-ADRs
+- [x-update-architecture](../x-update-architecture/) — Updates service architecture doc with ADR references

@@ -9,7 +9,7 @@
 
 ## Context
 
-The `ia-dev-env` generator ships skills for unit testing (`x-test-tdd`), E2E (`x-test-e2e`), integration, and smoke tests. Three critical quality dimensions have no first-class skill support:
+The `ia-dev-env` generator ships skills for unit testing (`x-drive-tdd`), E2E (`x-execute-e2e-tests`), integration, and smoke tests. Three critical quality dimensions have no first-class skill support:
 
 1. **Performance testing** — no standard way to gate on latency SLOs (P50/P95/P99) or throughput. Projects define ad-hoc k6/Gatling/JMeter scripts without integration into the story lifecycle.
 2. **Mutation testing** — coverage metrics (≥ 95% line, Rule 05) can be satisfied by weak assertions. Mutation score exposes assertion quality gaps not visible in coverage reports.
@@ -26,7 +26,7 @@ Without these three skills:
 
 Introduce three stack-aware skills and accompanying governance:
 
-### 1. `/x-test-performance` (story-0072-0002)
+### 1. `/x-execute-performance-tests` (story-0072-0002)
 
 Stack-aware performance gate per `interfaces[].type`:
 - REST → Newman/k6/Artillery
@@ -36,7 +36,7 @@ Stack-aware performance gate per `interfaces[].type`:
 
 Invokes configured tool, compares results against `QualityConfig.performance.slo.*` thresholds, persists baseline JSON for drift detection.
 
-### 2. `/x-test-mutation` (story-0072-0003)
+### 2. `/x-execute-mutation-tests` (story-0072-0003)
 
 Stack-aware mutation gate per `language`:
 - Java → PIT (Pitest)
@@ -46,7 +46,7 @@ Stack-aware mutation gate per `language`:
 
 Enforces `QualityConfig.mutation.threshold` (default 80%). Runtime capped by `runtimeCapMin` to prevent CI stall.
 
-### 3. `/x-test-contract` (story-0072-0004)
+### 3. `/x-execute-contract-tests` (story-0072-0004)
 
 Stack-aware contract gate per `interfaces[].spec` or broker type:
 - OpenAPI → openapi-diff
@@ -95,11 +95,11 @@ Defaults when `quality:` absent: all `enabled: false` (Rule 19 backward-compat �
 
 ### 7. Governance integration
 
-`x-story-implement` Phase 3 gains three **MANDATORY conditional invocations** (story-0072-0008):
+`x-implement-story` Phase 3 gains three **MANDATORY conditional invocations** (story-0072-0008):
 ```
-Skill(x-test-performance) [conditional: flag.performance_enabled]
-Skill(x-test-mutation)    [conditional: flag.mutation_enabled]  
-Skill(x-test-contract)    [conditional: flag.contract_enabled]
+Skill(x-execute-performance-tests) [conditional: flag.performance_enabled]
+Skill(x-execute-mutation-tests)    [conditional: flag.mutation_enabled]  
+Skill(x-execute-contract-tests)    [conditional: flag.contract_enabled]
 ```
 
 Three CI audit scripts (stories 0072-0005/0006/0007) enforce baselines via Rule 26 Camada 2.

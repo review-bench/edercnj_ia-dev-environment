@@ -1,5 +1,5 @@
 ---
-name: x-review-perf
+name: x-review-performance
 description: "Performance specialist review: validates N+1 queries, connection pools, async patterns, pagination, caching, timeouts, circuit breakers, and resource cleanup."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
@@ -29,9 +29,9 @@ Review code changes for performance best practices: N+1 query detection, connect
 
 ## Triggers
 
-- `/x-review-perf 42` -- review PR #42 for performance
-- `/x-review-perf src/main/java/com/example/repository/` -- review specific paths
-- `/x-review-perf` -- review all current changes
+- `/x-review-performance 42` -- review PR #42 for performance
+- `/x-review-performance src/main/java/com/example/repository/` -- review specific paths
+- `/x-review-performance` -- review all current changes
 
 ## Parameters
 

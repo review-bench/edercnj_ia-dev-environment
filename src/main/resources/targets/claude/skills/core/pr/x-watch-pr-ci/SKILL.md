@@ -1,5 +1,5 @@
 ---
-name: x-pr-watch-ci
+name: x-watch-pr-ci
 description: "Polls a PR's CI checks and Copilot review status, blocking until checks complete or timeout. Returns one of 8 stable exit codes (SUCCESS=0, CI_PENDING_PROCEED=10, CI_FAILED=20, TIMEOUT=30, PR_ALREADY_MERGED=40, NO_CI_CONFIGURED=50, PR_CLOSED=60, PR_NOT_FOUND=70). Writes a versioned state-file for session resume."
 user-invocable: true
 allowed-tools: Bash
@@ -13,20 +13,20 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: x-pr-watch-ci — CI Watch for PR Approval Gates
+# Skill: x-watch-pr-ci — CI Watch for PR Approval Gates
 
 ## Purpose
 
 Polls a pull request's CI checks and Copilot review until checks complete (or timeout), producing a stable exit code that orchestrators use to build the interactive gate menu (EPIC-0043).
 
-Solves the gap identified in `spec-ci-watch.md §2`: when `x-pr-fix` is invoked from the `FIX-PR` slot it finds zero comments because Copilot hasn't posted yet (review typically takes 30–180s). `x-pr-watch-ci` encapsulates the wait so every caller receives real feedback before presenting a decision gate.
+Solves the gap identified in `spec-ci-watch.md §2`: when `x-fix-pr` is invoked from the `FIX-PR` slot it finds zero comments because Copilot hasn't posted yet (review typically takes 30–180s). `x-watch-pr-ci` encapsulates the wait so every caller receives real feedback before presenting a decision gate.
 
 ## Triggers
 
-- `/x-pr-watch-ci --pr-number 42` — watch PR #42 with defaults
-- `/x-pr-watch-ci --pr-number 42 --timeout-seconds 600` — custom timeout
-- `/x-pr-watch-ci --pr-number 42 --require-copilot-review false` — skip Copilot wait
-- `/x-pr-watch-ci --pr-number 42 --no-state-file` — fire-and-forget (no state persistence)
+- `/x-watch-pr-ci --pr-number 42` — watch PR #42 with defaults
+- `/x-watch-pr-ci --pr-number 42 --timeout-seconds 600` — custom timeout
+- `/x-watch-pr-ci --pr-number 42 --require-copilot-review false` — skip Copilot wait
+- `/x-watch-pr-ci --pr-number 42 --no-state-file` — fire-and-forget (no state persistence)
 
 ## Parameters
 
@@ -59,10 +59,10 @@ These codes are a **public contract**. Adding a new code = MINOR bump; changing 
 ## Invocation by Orchestrators (Rule 13 INLINE-SKILL)
 
 ```markdown
-Skill(skill: "x-pr-watch-ci", args: "--pr-number 42")
+Skill(skill: "x-watch-pr-ci", args: "--pr-number 42")
 ```
 
-Orchestrators MUST use this Pattern 1 INLINE-SKILL form. Bare-slash (`/x-pr-watch-ci`) is forbidden in delegation contexts (Rule 13 §Forbidden).
+Orchestrators MUST use this Pattern 1 INLINE-SKILL form. Bare-slash (`/x-watch-pr-ci`) is forbidden in delegation contexts (Rule 13 §Forbidden).
 
 ## Workflow
 
@@ -313,7 +313,7 @@ Progress logs go to **stderr**. The final JSON summary is the **last line** on *
 
 ## Rule Compliance
 
-- **Rule 13**: orchestrators invoke via `Skill(skill: "x-pr-watch-ci", args: "...")` — no bare-slash in delegation
+- **Rule 13**: orchestrators invoke via `Skill(skill: "x-watch-pr-ci", args: "...")` — no bare-slash in delegation
 - **Rule 14**: skill does NOT create worktrees (sequential, runs in caller's working tree)
 - **RULE-045-03**: state-file atomic write + resume
 - **RULE-045-04**: Copilot identified by exact login `copilot-pull-request-reviewer[bot]`

@@ -1,6 +1,6 @@
 ---
-name: x-internal-status-update
-description: "Atomic read-modify-write of execution-state.json with flock-based concurrency, schema validation, and idempotency detection. Substitutes inline Edit-based mutations in orchestrator skills (x-epic-implement, x-story-implement, x-pr-fix-epic) that previously suffered race conditions in --parallel mode. PILOT skill for the x-internal-* convention: internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+name: x-internal-update-status
+description: "Atomic read-modify-write of execution-state.json with flock-based concurrency, schema validation, and idempotency detection. Substitutes inline Edit-based mutations in orchestrator skills (x-implement-epic, x-implement-story, x-fix-epic-pr) that previously suffered race conditions in --parallel mode. PILOT skill for the x-internal-* convention: internal visibility, non-user-invocable, subdir scoping under internal/ops/."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,12 +19,12 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-epic-implement, x-story-implement, x-pr-fix-epic.
+> Caller principal: x-implement-epic, x-implement-story, x-fix-epic-pr.
 > Esta é a story PILOTO (story-0049-0005) da convenção `x-internal-*`:
 > frontmatter `visibility: internal`, subdir `internal/ops/`, marker 🔒, e
 > filtragem do menu `/help` via generator.
 
-# Skill: x-internal-status-update
+# Skill: x-internal-update-status
 
 ## Purpose
 
@@ -48,7 +48,7 @@ in EPIC-0042 post-mortems).
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/ops/x-internal-status-update/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
+| Path | `internal/ops/x-internal-update-status/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -62,11 +62,11 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-status-update` in chat. All invocations
+by a human typing `/x-internal-update-status` in chat. All invocations
 follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
@@ -182,7 +182,7 @@ and exits 0.
 ### Example 1 — Happy path: mark a story as MERGED
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
@@ -197,7 +197,7 @@ Exit: 0.
 ### Example 2 — No-op: value already matches
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value MERGED")
@@ -212,7 +212,7 @@ Exit: 0.
 ### Example 3 — Initialize a fresh state file
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type epic --id 0049 \
              --field flowVersion --value 2 \
@@ -228,7 +228,7 @@ Exit: 0.
 ### Example 4 — Task-level update
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type task --id TASK-0049-0005-003 \
              --field prNumber --value 612")
@@ -243,7 +243,7 @@ Exit: 0.
 ### Example 5 — Read-only query
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id story-0049-0005 \
              --field status --value UNUSED \
@@ -260,7 +260,7 @@ ignored under `--read-only`.
 ### Example 6 — Invalid path (schema rejection)
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type story --id unknown-story \
              --field status --value DONE")
@@ -314,7 +314,7 @@ the commit to proceed.
 ### Canonical Trailer Format
 
 ```
-Co-Authored-By: x-internal-status-update@<40-char-git-sha>
+Co-Authored-By: x-internal-update-status@<40-char-git-sha>
 ```
 
 - The `<sha>` is the HEAD commit of the repository at the moment the
@@ -330,14 +330,14 @@ in the staged files, it MUST pass the trailer:
 ```bash
 SKILL_SHA=$(git rev-parse HEAD)
 git commit -m "<subject>" \
-  --trailer "Co-Authored-By: x-internal-status-update@${SKILL_SHA}"
+  --trailer "Co-Authored-By: x-internal-update-status@${SKILL_SHA}"
 ```
 
 This trailer is validated by `.githooks/commit-msg` which checks:
 
 ```bash
 git interpret-trailers --parse < "$COMMIT_MSG_FILE" \
-  | grep -qE '^Co-Authored-By:\s+x-internal-status-update@[0-9a-f]{40}$'
+  | grep -qE '^Co-Authored-By:\s+x-internal-update-status@[0-9a-f]{40}$'
 ```
 
 ### Recovery escape
@@ -364,7 +364,7 @@ skill MUST replicate in its own directory:
 6. **INVALID_PATH** — unknown story ID; exit 3 with path in message.
 
 Goldens under
-`src/test/resources/golden/internal/ops/x-internal-status-update/`
+`src/test/resources/golden/internal/ops/x-internal-update-status/`
 lock the SKILL.md rendering. Coverage requirement: ≥ 95% line /
 ≥ 90% branch across the invoking Bash codepaths.
 
@@ -398,11 +398,11 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-epic-implement` | caller | Phase 2 (per-story status transitions) + Phase 4 (epic finalization) |
-| `x-story-implement` | caller | Phase 2 (per-task status transitions) + Phase 3 (story finalization) |
-| `x-pr-fix-epic` | caller | Records per-PR correction state when fanning out across an epic |
-| `x-status-reconcile` | peer | Reads the same file to diagnose drift against markdown; never mutates concurrently with this skill (Rule 22) |
-| `x-parallel-eval` | consumer | Reads the resulting state file to build the collision matrix |
+| `x-implement-epic` | caller | Phase 2 (per-story status transitions) + Phase 4 (epic finalization) |
+| `x-implement-story` | caller | Phase 2 (per-task status transitions) + Phase 3 (story finalization) |
+| `x-fix-epic-pr` | caller | Records per-PR correction state when fanning out across an epic |
+| `x-reconcile-status` | peer | Reads the same file to diagnose drift against markdown; never mutates concurrently with this skill (Rule 22) |
+| `x-evaluate-parallelism` | consumer | Reads the resulting state file to build the collision matrix |
 
 Downstream stories that depend on this PILOT: story-0049-0013,
 story-0049-0018, story-0049-0019.

@@ -1,5 +1,5 @@
 ---
-name: x-security-secrets
+name: x-scan-secrets
 description: "Scans code and git history for leaked credentials, API keys, tokens, and secrets. Produces SARIF output with scoring and baseline support."
 user-invocable: true
 allowed-tools: Bash, Read, Write, Glob, Grep
@@ -27,10 +27,10 @@ Include this skill when secret scanning is required for the project security pos
 
 ## Triggers
 
-- `/x-security-secrets` -- scan current working tree
-- `/x-security-secrets --scope history` -- scan git history
-- `/x-security-secrets --scope both` -- scan current tree and git history
-- `/x-security-secrets --scope both --baseline .security-baseline.json` -- scan with false positive exclusions
+- `/x-scan-secrets` -- scan current working tree
+- `/x-scan-secrets --scope history` -- scan git history
+- `/x-scan-secrets --scope both` -- scan current tree and git history
+- `/x-scan-secrets --scope both --baseline .security-baseline.json` -- scan with false positive exclusions
 
 ## Parameters
 

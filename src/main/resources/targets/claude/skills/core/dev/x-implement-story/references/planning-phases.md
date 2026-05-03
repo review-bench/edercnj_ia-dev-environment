@@ -1,13 +1,13 @@
 # Planning Phases Reference
 
 > **Context:** This reference details Phase 1A-1F planning subagents.
-> Part of x-story-implement skill.
+> Part of x-implement-story skill.
 
 ## Phase 1 -- Architecture Planning (Skill Invocation + Subagent Fallback)
 
 **If the architecture plan file already exists at `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` (as checked in Phase 0), skip Step 1A and proceed directly to Step 1B, ensuring Step 1B reads the existing plan.**
 
-### Step 1A: Architecture Plan via x-arch-plan
+### Step 1A: Architecture Plan via x-plan-architecture
 
 Evaluate change scope using the decision tree:
 
@@ -25,9 +25,9 @@ Evaluate change scope using the decision tree:
 
 Record the returned integer task ID as `archPlanTaskId` for the closing TaskUpdate.
 
-Invoke `x-arch-plan` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke `x-plan-architecture` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-arch-plan", args: "{STORY_PATH}")
+    Skill(skill: "x-plan-architecture", args: "{STORY_PATH}")
 
 After the skill returns (success, failure, or WARNING fallback), close the tracking task:
 
@@ -91,7 +91,7 @@ Launch a single `general-purpose` subagent via the `Agent` tool (Rule 13 — SUB
 
 ### Fallback: Inline Architecture Planning
 
-If skill `x-arch-plan` is not available, expand Step 1B subagent prompt to also read protocols, security, observability, and resilience references.
+If skill `x-plan-architecture` is not available, expand Step 1B subagent prompt to also read protocols, security, observability, and resilience references.
 
 ## Phases 1B-1F -- Parallel Planning (Subagents via Task -- SINGLE message)
 
@@ -103,7 +103,7 @@ If skill `x-arch-plan` is not available, expand Step 1B subagent prompt to also 
 2. **Wait for all planners to return** (runtime handles this).
 3. **Batch B — Second assistant message:** all orchestrator-managed `TaskUpdate` calls as sibling tool calls. Subagent-managed planners (1B Impl Plan, 1D Event Schema, 1E fallback, 1F Compliance) close their OWN tracking tasks from inside their prompts — the orchestrator does NOT emit TaskUpdate for those.
 
-Read the per-planner sections below as "what goes into Batch A / Batch B for this planner", NOT as "execute sequentially one planner at a time". See the corresponding section in `x-story-implement/SKILL.md` for the full table of orchestrator-managed vs subagent-managed planners.
+Read the per-planner sections below as "what goes into Batch A / Batch B for this planner", NOT as "execute sequentially one planner at a time". See the corresponding section in `x-implement-story/SKILL.md` for the full table of orchestrator-managed vs subagent-managed planners.
 
 ### 1B: Test Planning (MANDATORY DRIVER for Phase 2)
 
@@ -115,9 +115,9 @@ Read the per-planner sections below as "what goes into Batch A / Batch B for thi
 
 Record the returned integer task ID as `testPlanTaskId` for the closing TaskUpdate.
 
-Invoke `x-test-plan` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke `x-plan-tests` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-test-plan", args: "{STORY_PATH}")
+    Skill(skill: "x-plan-tests", args: "{STORY_PATH}")
 
 After the skill returns, close the tracking task:
 
@@ -139,9 +139,9 @@ The test plan produces: Acceptance tests (AT-N) as outer loop, Unit tests (UT-N)
 
 Record the returned integer task ID as `taskDecompTaskId` for the closing TaskUpdate.
 
-Invoke `x-lib-task-decomposer` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke `x-lib-decompose-task` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-lib-task-decomposer", args: "{STORY_PATH}")
+    Skill(skill: "x-lib-decompose-task", args: "{STORY_PATH}")
 
 After the skill returns, close the tracking task:
 
@@ -189,9 +189,9 @@ Launch a `general-purpose` subagent via the `Agent` tool (Rule 13 — SUBAGENT-G
 
 Record the returned integer task ID as `securityTaskId` for the closing TaskUpdate.
 
-Invoke `x-threat-model` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke `x-model-threats` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-threat-model", args: "{STORY_PATH}")
+    Skill(skill: "x-model-threats", args: "{STORY_PATH}")
 
 After the skill returns, close the tracking task:
 
@@ -199,7 +199,7 @@ After the skill returns, close the tracking task:
 
 Output: `ai/epics/epic-XXXX/plans/security-story-XXXX-YYYY.md`
 
-If `x-threat-model` is unavailable, fall back to a `general-purpose` subagent. The orchestrator's `TaskCreate(description: "Planning: Security Assessment — ...")` above **already fired**, so the orchestrator MUST close `securityTaskId` explicitly before launching the fallback (otherwise the original tracking task stays open forever). The fallback subagent then emits its OWN independent TaskCreate/TaskUpdate pair:
+If `x-model-threats` is unavailable, fall back to a `general-purpose` subagent. The orchestrator's `TaskCreate(description: "Planning: Security Assessment — ...")` above **already fired**, so the orchestrator MUST close `securityTaskId` explicitly before launching the fallback (otherwise the original tracking task stays open forever). The fallback subagent then emits its OWN independent TaskCreate/TaskUpdate pair:
 
 **Orchestrator action BEFORE launching the fallback subagent:**
 

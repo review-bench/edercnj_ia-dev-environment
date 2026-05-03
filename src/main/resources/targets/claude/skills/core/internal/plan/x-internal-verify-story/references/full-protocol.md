@@ -1,4 +1,4 @@
-# Full Protocol — x-internal-story-verify
+# Full Protocol — x-internal-verify-story
 
 Detailed reference material carved out of `SKILL.md` per ADR-0011
 (SKILL size budget). Consumed by operators investigating a verify
@@ -28,7 +28,7 @@ TASK-0049-0014-005.
 The banner printed to stderr for cases 5–11:
 
 ```
-usage: x-internal-story-verify --story-id <story-XXXX-YYYY> --epic-id <XXXX>
+usage: x-internal-verify-story --story-id <story-XXXX-YYYY> --epic-id <XXXX>
        [--coverage-threshold-line <N>] [--coverage-threshold-branch <N>]
 ```
 
@@ -36,7 +36,7 @@ usage: x-internal-story-verify --story-id <story-XXXX-YYYY> --epic-id <XXXX>
 
 Step 2 of the skill body resolves the story's file list via the task
 breakdown. The breakdown `Files:` bullet MAY include glob patterns
-(e.g., `src/test/resources/golden/internal/plan/x-internal-story-verify/**`).
+(e.g., `src/test/resources/golden/internal/plan/x-internal-verify-story/**`).
 This section documents how those globs expand per build tool.
 
 ### Maven (default)
@@ -304,7 +304,7 @@ verification passes during iterative debugging.
 
 The skill acquires a shared `flock -s` on
 `ai/epics/epic-${epic_id}/execution-state.json` only to read; it does NOT
-acquire exclusive locks. Multiple `x-internal-story-verify` invocations
+acquire exclusive locks. Multiple `x-internal-verify-story` invocations
 across different stories of the same epic may run in parallel without
 coordination. The build tool invocation itself is the bottleneck — use
 your build tool's own concurrency controls (Maven `--threads`, Gradle
@@ -329,23 +329,23 @@ A future extension (e.g., `--auto-fix-coverage`) that dispatches a
 subagent to write missing tests WOULD expand `allowed-tools` to
 include `Agent`; it is deliberately out of scope for story-0049-0014.
 
-## §11 — Downstream Consumer Contract (x-story-implement Phase 3)
+## §11 — Downstream Consumer Contract (x-implement-story Phase 3)
 
-The orchestrator (`x-story-implement`) consumes this envelope as
+The orchestrator (`x-implement-story`) consumes this envelope as
 follows (pseudo):
 
 ```
-envelope=$(Skill(x-internal-story-verify, --story-id ... --epic-id ...))
+envelope=$(Skill(x-internal-verify-story, --story-id ... --epic-id ...))
 passed=$(jq -r '.passed' <<< "$envelope")
 
 if [[ "$passed" == "false" ]]; then
   # Dispatch remediation subagent per failures[] category:
   for failure in $(jq -r '.failures[]' <<< "$envelope"); do
     case "$failure" in
-      coverage:*)    Skill(x-test-plan, --missing-tests ...) ;;
-      consistency:*) Skill(x-review, --dimension=cross-file) ;;
-      ac:*)          Skill(x-test-plan, --gherkin-gap ...) ;;
-      smoke:*)       Skill(x-ops-troubleshoot, --smoke) ;;
+      coverage:*)    Skill(x-plan-tests, --missing-tests ...) ;;
+      consistency:*) Skill(x-review-codebase, --dimension=cross-file) ;;
+      ac:*)          Skill(x-plan-tests, --gherkin-gap ...) ;;
+      smoke:*)       Skill(x-troubleshoot-operations, --smoke) ;;
     esac
   done
 fi

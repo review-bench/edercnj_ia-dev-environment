@@ -1,5 +1,5 @@
 ---
-name: x-ops-incident
+name: x-handle-incident
 description: "Guides incident response with severity-based checklists, communication templates, and postmortem triggers. Interactive guide for SEV1-SEV4 incidents covering classification, response coordination, and action item tracking."
 user-invocable: true
 argument-hint: "[severity SEV1|SEV2|SEV3|SEV4] [--postmortem] [--notify]"
@@ -21,11 +21,11 @@ Provides an interactive incident response guide for {{PROJECT_NAME}} that walks 
 
 ## Triggers
 
-- `/x-ops-incident` — start interactive severity classification
-- `/x-ops-incident SEV1` — start SEV1 critical incident response
-- `/x-ops-incident SEV2 --postmortem` — SEV2 incident with postmortem generation
-- `/x-ops-incident SEV3 --notify` — SEV3 incident with communication templates
-- `/x-ops-incident SEV1 --postmortem --notify` — full incident response workflow
+- `/x-handle-incident` — start interactive severity classification
+- `/x-handle-incident SEV1` — start SEV1 critical incident response
+- `/x-handle-incident SEV2 --postmortem` — SEV2 incident with postmortem generation
+- `/x-handle-incident SEV3 --notify` — SEV3 incident with communication templates
+- `/x-handle-incident SEV1 --postmortem --notify` — full incident response workflow
 
 ## Parameters
 
@@ -281,7 +281,7 @@ See Step 4 above for complete templates per channel (Status Page, Slack/Teams, E
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-ops-troubleshoot | called-by | Escalates to this skill when an issue becomes a production incident |
+| x-troubleshoot-operations | called-by | Escalates to this skill when an issue becomes a production incident |
 | sre-engineer (agent) | calls | Delegates reliability expertise and checklist validation via Agent tool |
 | sre-practices (KP) | reads | References `knowledge/sre-practices/` for incident management processes |
 

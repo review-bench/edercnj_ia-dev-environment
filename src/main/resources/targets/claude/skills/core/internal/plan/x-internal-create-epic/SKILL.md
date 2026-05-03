@@ -1,6 +1,6 @@
 ---
-name: x-internal-epic-create
-description: "Generate an Epic document from spec analysis: cross-cutting rules, story index, DoR/DoD, optional Jira. Invoked only by x-feature-create (Phase 2). Not user-invocable."
+name: x-internal-create-epic
+description: "Generate an Epic document from spec analysis: cross-cutting rules, story index, DoR/DoD, optional Jira. Invoked only by x-create-feature (Phase 2). Not user-invocable."
 visibility: internal
 user-invocable: false
 model: sonnet
@@ -61,7 +61,7 @@ and must be read fresh from disk every time (never hardcode the structure).
 > ```
 > WARN [legacy-template] --legacy-template-v1 is DEPRECATED.
 >       Templates v1 will be removed in 2 releases.
->       Migrate to v2: /x-template-migrate <epic-id>
+>       Migrate to v2: /x-migrate-templates <epic-id>
 > ```
 
 ## Workflow
@@ -71,9 +71,9 @@ and must be read fresh from disk every time (never hardcode the structure).
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-create Phase-P1-Worktree-Detect`
 
-Invoke `x-git-worktree` in detect-context mode to record whether the current checkout is already inside an epic worktree (`STORY_OWNS_WORKTREE=false`, `EPIC_WORKTREE_DETECTED=true|false`). Result is advisory only — `x-internal-epic-branch-ensure` (Step P2) makes the authoritative decision.
+Invoke `x-manage-worktrees` in detect-context mode to record whether the current checkout is already inside an epic worktree (`STORY_OWNS_WORKTREE=false`, `EPIC_WORKTREE_DETECTED=true|false`). Result is advisory only — `x-internal-ensure-epic-branch` (Step P2) makes the authoritative decision.
 
-    Skill(skill: "x-git-worktree", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", args: "detect-context")
 
 Continue on any detect-context failure (fail-open, RULE-006) — log a WARNING and proceed to Step P2.
 
@@ -90,9 +90,9 @@ Resolve the effective `--epic-id`:
 - If `--epic-id` was provided, use it verbatim (4-digit regex validated by Step 5).
 - Otherwise, scan `plans/` for existing `epic-XXXX` folders and pick the next available number (default `0001` if none). Set this as the effective epic ID for both P2 and P4.
 
-Invoke `x-internal-epic-branch-ensure` so the canonical `epic/<ID>` branch exists locally AND on origin (idempotent). The skill is a no-op when the current checkout is already on `epic/<ID>` or a worktree rooted at that branch.
+Invoke `x-internal-ensure-epic-branch` so the canonical `epic/<ID>` branch exists locally AND on origin (idempotent). The skill is a no-op when the current checkout is already on `epic/<ID>` or a worktree rooted at that branch.
 
-    Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id <XXXX>")
+    Skill(skill: "x-internal-ensure-epic-branch", args: "--epic-id <XXXX>")
 
 On failure (non-zero exit), abort with `EPIC_BRANCH_ENSURE_FAILED` — a clean audit trail cannot be produced without the canonical branch.
 
@@ -319,14 +319,14 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this step entirely.
 
-Otherwise, delegate the commit to `x-planning-commit` so the newly written `ai/epics/epic-XXXX/epic-XXXX.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
+Otherwise, delegate the commit to `x-commit-planning` so the newly written `ai/epics/epic-XXXX/epic-XXXX.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain (format / lint / compile):
 
-    Skill(skill: "x-planning-commit",
+    Skill(skill: "x-commit-planning",
           args: "--scope chore --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/epic-<XXXX>.md --subject \"init epic specification\"")
 
-Idempotency: re-executing the skill with identical inputs produces `commitSha=null` (silent no-op, RULE-007 `--dry-run`-like semantics on diff vazio). The contract is enforced by `x-planning-commit` itself — this step does not perform any additional diff check.
+Idempotency: re-executing the skill with identical inputs produces `commitSha=null` (silent no-op, RULE-007 `--dry-run`-like semantics on diff vazio). The contract is enforced by `x-commit-planning` itself — this step does not perform any additional diff check.
 
-On `COMMIT_FAILED` (exit 4 from `x-planning-commit`), abort the workflow with the same error code so operators receive a single, unambiguous signal.
+On `COMMIT_FAILED` (exit 4 from `x-commit-planning`), abort the workflow with the same error code so operators receive a single, unambiguous signal.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-create Phase-P4-Planning-Commit ok`
@@ -338,9 +338,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 If `--dry-run` is set, log `"dry-run, skipping push"` and skip.
 
-When `x-internal-epic-branch-ensure` (Step P2) already pushed the branch to origin, the P4 commit is not yet on origin. Delegate the push to `x-git-push`:
+When `x-internal-ensure-epic-branch` (Step P2) already pushed the branch to origin, the P4 commit is not yet on origin. Delegate the push to `x-push-branch`:
 
-    Skill(skill: "x-git-push", args: "--branch epic/<XXXX>")
+    Skill(skill: "x-push-branch", args: "--branch epic/<XXXX>")
 
 On push failure (remote rejection, no connectivity), log a WARNING and continue — the local commit is preserved; the operator can re-run Step P5 or `git push` manually. Do NOT abort.
 
@@ -357,10 +357,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 | Story count too low (< 8 for complex spec) | Warn: "Possible over-bundling — review decomposition" |
 | Jira MCP unavailable | Skip Jira integration silently, replace `<CHAVE-JIRA>` with `—` |
 | Jira issue creation fails | Warn user, replace `<CHAVE-JIRA>` with failure message, continue |
-| `x-internal-epic-branch-ensure` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
-| `x-planning-commit` exit 4 (Step P4) | Abort with `COMMIT_FAILED`; file has already been written but not versioned |
-| `x-planning-commit` exit 0 + `noOp=true` (Step P4) | Silent no-op — re-execution idempotency confirmed; continue to Step P5 |
-| `x-git-push` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
+| `x-internal-ensure-epic-branch` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
+| `x-commit-planning` exit 4 (Step P4) | Abort with `COMMIT_FAILED`; file has already been written but not versioned |
+| `x-commit-planning` exit 0 + `noOp=true` (Step P4) | Silent no-op — re-execution idempotency confirmed; continue to Step P5 |
+| `x-push-branch` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
 | `--dry-run` set | Steps P4 and P5 become no-ops with log line `"dry-run, skipping commit"` / `"dry-run, skipping push"` |
 
 ## Common Mistakes
@@ -378,11 +378,11 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 | x-epic-decompose | called-by | Orchestrator invokes x-epic-create in Phase B |
 | x-story-create | calls | Story Creator reads the generated Epic file |
 | x-epic-map | calls | Implementation Map reads the Epic's story index |
-| x-jira-create-epic | calls | Creates Jira Epic from the generated file |
-| x-git-worktree | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
-| x-internal-epic-branch-ensure | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
-| x-planning-commit | calls (Step P4) | Batch-commit epic file without code pre-commit chain (EPIC-0049 / RULE-007) |
-| x-git-push | calls (Step P5) | Push canonical epic branch to origin (optional) |
+| x-create-jira-epic | calls | Creates Jira Epic from the generated file |
+| x-manage-worktrees | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
+| x-internal-ensure-epic-branch | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
+| x-commit-planning | calls (Step P4) | Batch-commit epic file without code pre-commit chain (EPIC-0049 / RULE-007) |
+| x-push-branch | calls (Step P5) | Push canonical epic branch to origin (optional) |
 | story-planning | reads | Reads decomposition guide for layer identification |
 
 ## Knowledge Pack References
@@ -421,20 +421,20 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 
 ```
 # Default — v2 template (EPIC-0070 default)
-Skill(skill: "x-internal-epic-create", args: "specs/my-spec.md")
+Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md")
 
 # Explicit v2 (same as default, for documentation clarity)
-Skill(skill: "x-internal-epic-create", args: "specs/my-spec.md --epic-id 0072")
+Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --epic-id 0072")
 
 # Legacy v1 template during deprecation window (Rule 19)
-Skill(skill: "x-internal-epic-create", args: "specs/my-spec.md --legacy-template-v1")
+Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --legacy-template-v1")
 # → Emits: WARN [legacy-template] --legacy-template-v1 is DEPRECATED...
 
 # Dry-run: write file but skip commit + push
-Skill(skill: "x-internal-epic-create", args: "specs/my-spec.md --dry-run")
+Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --dry-run")
 
 # With Jira integration
-Skill(skill: "x-internal-epic-create", args: "specs/my-spec.md --jira PROJ")
+Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --jira PROJ")
 ```
 
-**Fail-loud:** validation read failure (exit 20) aborts the skill (RULE-046-08). Subsequent transitions out of `Em Refinamento` are owned by `x-epic-decompose` (to `Pendente` when decomposition completes) and `x-story-implement`/`x-epic-implement` (to `Em Andamento`, `Concluída`, etc.).
+**Fail-loud:** validation read failure (exit 20) aborts the skill (RULE-046-08). Subsequent transitions out of `Em Refinamento` are owned by `x-epic-decompose` (to `Pendente` when decomposition completes) and `x-implement-story`/`x-implement-epic` (to `Em Andamento`, `Concluída`, etc.).

@@ -1,5 +1,5 @@
 ---
-name: x-code-audit
+name: x-audit-code
 description: "Full codebase review against all project standards. Launches parallel subagents per audit dimension (Clean Code, SOLID, Architecture, Tests, Security, Cross-file), consolidates findings into a severity-categorized report with score. Use for periodic quality validation."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
@@ -21,10 +21,10 @@ Performs a comprehensive audit of the entire {{PROJECT_NAME}} codebase against p
 
 ## When to Use
 
-- `/x-code-audit` — audit entire codebase (all dimensions)
-- `/x-code-audit --scope rules` — audit coding standards compliance only
-- `/x-code-audit --scope architecture` — audit architecture layer violations only
-- `/x-code-audit --scope security` — audit security patterns only
+- `/x-audit-code` — audit entire codebase (all dimensions)
+- `/x-audit-code --scope rules` — audit coding standards compliance only
+- `/x-audit-code --scope architecture` — audit architecture layer violations only
+- `/x-audit-code --scope security` — audit security patterns only
 
 ## Workflow Overview
 
@@ -196,6 +196,6 @@ Write report to `results/audits/codebase-audit-YYYY-MM-DD.md`:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-review | Complements | x-review targets PR changes; codebase audit targets the entire codebase |
+| x-review-codebase | Complements | x-review-codebase targets PR changes; codebase audit targets the entire codebase |
 | x-review-pr | Complements | Tech Lead review for PRs; codebase audit for periodic whole-project review |
-| x-ops-troubleshoot | Follows up | Audit findings may require troubleshooting to resolve |
+| x-troubleshoot-operations | Follows up | Audit findings may require troubleshooting to resolve |

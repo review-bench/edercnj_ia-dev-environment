@@ -1,14 +1,14 @@
 <!-- Returns to [slim body](../SKILL.md) after reading the required phase. -->
 
-# x-pr-merge-train — Full Protocol
+# x-manage-pr-merge-train — Full Protocol
 
 ## Phase 0 — Preparation
 
 ### Step 0.1 — Detect Worktree Context
 
-Invoke the `x-git-worktree` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke the `x-manage-worktrees` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-git-worktree", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", args: "detect-context")
 
 Returns `{inWorktree, worktreePath, mainRepoPath}`.
 
@@ -96,7 +96,7 @@ For each PR: `gh pr view <pr> --json state,mergeable,isDraft,reviewDecision,base
 
 **Dry-run mode:** regardless of VETOs, emit full audit plan and exit:
 ```
-DRY-RUN PLAN — x-pr-merge-train
+DRY-RUN PLAN — x-manage-pr-merge-train
 trainId: {trainId}
 PR Validation Results:
   PR #374 [feat/task-0042-0001-001]: VALID
@@ -267,7 +267,7 @@ COMPLETED
 
 | Case | Action |
 | :--- | :--- |
-| `TRAIN_OWNS_WORKTREE` and `phase != FAILED` | `Skill(skill: "x-git-worktree", args: "remove --id <trainId>")` |
+| `TRAIN_OWNS_WORKTREE` and `phase != FAILED` | `Skill(skill: "x-manage-worktrees", args: "remove --id <trainId>")` |
 | `phase == FAILED` | Preserve worktree (Rule 14 §4 — failed tasks must not be auto-removed). |
 | `worktreeOwnership == REUSE_PARENT` | Skip cleanup; orchestrator owns the worktree. |
 
@@ -299,7 +299,7 @@ COMPLETED
 
 **Prerequisites:** existing `plans/merge-train/<trainId>/state.json`. Multiple state files → `--train-id` mandatory; missing → `STATE_CONFLICT`.
 
-Example: `/x-pr-merge-train --resume --train-id epic-0042-20260415-143022`
+Example: `/x-manage-pr-merge-train --resume --train-id epic-0042-20260415-143022`
 
 **Behaviour:**
 1. Load `state.json`; determine last completed phase.
@@ -337,7 +337,7 @@ Example: `/x-pr-merge-train --resume --train-id epic-0042-20260415-143022`
 
 | Skill | Relationship | When |
 | :--- | :--- | :--- |
-| `x-git-worktree` | Invoked (INLINE-SKILL, Phase 0.1 + Phase 7.3) | Detect context; cleanup when `TRAIN_OWNS_WORKTREE`. |
-| `x-git-commit` | Not called directly | Commits made by rebase-worker subagents via git CLI. |
-| `x-pr-fix-epic` | Manual invocation by operator | After `--resume` following `CODE_CONFLICT_NEEDS_HUMAN` to fix PR review comments. |
-| `x-story-implement` | Orthogonal | Merge-train operates on already-open PRs; not called and does not call. |
+| `x-manage-worktrees` | Invoked (INLINE-SKILL, Phase 0.1 + Phase 7.3) | Detect context; cleanup when `TRAIN_OWNS_WORKTREE`. |
+| `x-commit-changes` | Not called directly | Commits made by rebase-worker subagents via git CLI. |
+| `x-fix-epic-pr` | Manual invocation by operator | After `--resume` following `CODE_CONFLICT_NEEDS_HUMAN` to fix PR review comments. |
+| `x-implement-story` | Orthogonal | Merge-train operates on already-open PRs; not called and does not call. |

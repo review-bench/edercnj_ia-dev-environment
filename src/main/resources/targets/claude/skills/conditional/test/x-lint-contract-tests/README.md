@@ -1,4 +1,4 @@
-# x-test-contract-lint
+# x-lint-contract-tests
 
 > Validates API contracts (OpenAPI 3.1, AsyncAPI 2.6, Protobuf 3) against their specifications. Reports structural errors, missing fields, and spec violations.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `testing.contract_tests = true` |
-| **Invocation** | `/x-test-contract-lint [contract-file-path]` |
+| **Invocation** | `/x-lint-contract-tests [contract-file-path]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -21,14 +21,14 @@ Validates API contract files against their respective specifications before appr
 ## Usage
 
 ```
-/x-test-contract-lint
-/x-test-contract-lint docs/api-openapi.yaml
-/x-test-contract-lint proto/service.proto
-/x-test-contract-lint docs/events-asyncapi.yaml
+/x-lint-contract-tests
+/x-lint-contract-tests docs/api-openapi.yaml
+/x-lint-contract-tests proto/service.proto
+/x-lint-contract-tests docs/events-asyncapi.yaml
 ```
 
 ## See Also
 
-- [x-test-contract](../x-test-contract/) -- Consumer-driven contract test execution
+- [x-execute-contract-tests](../x-execute-contract-tests/) -- Consumer-driven contract test execution
 - [x-review-api](../x-review-api/) -- REST API design review
 - [x-review-grpc](../x-review-grpc/) -- gRPC service definition review

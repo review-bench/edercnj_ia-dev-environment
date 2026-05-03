@@ -1,6 +1,6 @@
 <!-- Returns to [slim body](../SKILL.md) after reading the required phase. -->
 
-# x-pr-fix-epic — Full Protocol
+# x-fix-epic-pr — Full Protocol
 
 ## Step 1 — Input Parsing
 
@@ -290,7 +290,7 @@ PR output shows `Base: develop`. PR body MUST reference all source PRs for trace
 | Rule | How This Skill Implements It |
 |------|------------------------------|
 | RULE-001 | Reads `execution-state.json` to discover PRs |
-| RULE-002 | Reuses `x-pr-fix` classification heuristics with priority-ordered matching (Step 6) |
+| RULE-002 | Reuses `x-fix-pr` classification heuristics with priority-ordered matching (Step 6) |
 | RULE-003 | Single correction PR referencing all source PRs (Step 11) |
 | RULE-004 | Report persisted BEFORE fixes begin (Step 7.3) |
 | RULE-005 | SHA-256 fingerprint deduplication cross-PR (Step 6B) |
@@ -305,6 +305,6 @@ PR output shows `Base: develop`. PR body MUST reference all source PRs for trace
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-pr-fix` | reads | Reuses classification heuristics (RULE-002) |
-| `x-epic-implement` | called-after | Processes review comments from PRs created by epic implementation |
+| `x-fix-pr` | reads | Reuses classification heuristics (RULE-002) |
+| `x-implement-epic` | called-after | Processes review comments from PRs created by epic implementation |
 | `x-epic-decompose` | depends-on | Requires epic directory and story files to exist |

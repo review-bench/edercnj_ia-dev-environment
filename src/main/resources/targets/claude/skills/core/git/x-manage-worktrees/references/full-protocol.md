@@ -1,6 +1,6 @@
 <!-- Returns to [slim body](../SKILL.md) after reading the required operation. -->
 
-# x-git-worktree — Full Protocol
+# x-manage-worktrees — Full Protocol
 
 ## Operation 1: create
 
@@ -200,10 +200,10 @@ Protected branches (`main`, `develop`) cannot host worktrees.
 
 | Who created | Who may remove |
 |-------------|----------------|
-| `x-story-implement` (standalone `--worktree`) | `x-story-implement` Phase 3 |
-| `x-task-implement` (standalone `--worktree`) | `x-task-implement` Step 5 |
-| `x-epic-implement` (parallel story dispatch) | `x-epic-implement` post-merge |
-| Human operator | Human operator or `x-git-cleanup-branches` |
+| `x-implement-story` (standalone `--worktree`) | `x-implement-story` Phase 3 |
+| `x-implement-task` (standalone `--worktree`) | `x-implement-task` Step 5 |
+| `x-implement-epic` (parallel story dispatch) | `x-implement-epic` post-merge |
+| Human operator | Human operator or `x-cleanup-git-branches` |
 
 Nested worktree creation is forbidden — `detect-context` must return `inWorktree=false` before any `create` call. Failure to preserve this invariant causes `.git` resolution failures.
 
@@ -213,7 +213,7 @@ Nested worktree creation is forbidden — `detect-context` must return `inWorktr
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-epic-implement` | caller | Parallel story dispatch: explicit create/remove per story (ADR-0004 §D2). |
-| `x-story-implement` | caller | Phase 0 detect-context + three-way REUSE/CREATE/LEGACY mode; Phase 3 optional cleanup. |
-| `x-task-implement` | caller | Step 0.5 detect-context + three-way mode; Step 5 optional cleanup. |
-| `x-git-cleanup-branches` | peer | Cleans ALL non-main worktrees in one pass; designed for full repo reset, not task-level lifecycle. |
+| `x-implement-epic` | caller | Parallel story dispatch: explicit create/remove per story (ADR-0004 §D2). |
+| `x-implement-story` | caller | Phase 0 detect-context + three-way REUSE/CREATE/LEGACY mode; Phase 3 optional cleanup. |
+| `x-implement-task` | caller | Step 0.5 detect-context + three-way mode; Step 5 optional cleanup. |
+| `x-cleanup-git-branches` | peer | Cleans ALL non-main worktrees in one pass; designed for full repo reset, not task-level lifecycle. |

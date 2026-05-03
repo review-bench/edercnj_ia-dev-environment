@@ -1,6 +1,6 @@
 ---
-name: x-internal-phase-gate
-description: "Validates phase transitions for orchestrators under Rule 25. Four modes: --mode pre (assert predecessor phases completed before entering phase N), --mode post (assert all child tasks of phase N are completed AND all expected artifacts exist on disk), --mode wave (post-Batch-B verification of parallel wave completeness: N child TaskUpdate completed + N artifacts exist), --mode final (terminal gate composing with x-internal-epic-integrity-gate). Reads execution-state.json.taskTracking.phaseGateResults and TaskList task state; writes back the gate result. Emits a single-line JSON envelope {passed, mode, skill, phase, expectedTasks, completedTasks, missingTasks, expectedArtifacts, missingArtifacts, wallclockMs, timestamp}. Exit 0 on passed, 12 on failure, 13 on malformed args, 14 on task-resolution timeout. First skill in the x-internal-* convention authored by EPIC-0055; eighth overall (after status-update, report-write, args-normalize, story-load-context, story-build-plan, story-verify, story-resume, epic-build-plan, epic-integrity-gate, epic-branch-ensure, story-report) and the eighth under internal/plan/."
+name: x-internal-verify-phase-gates
+description: "Validates phase transitions for orchestrators under Rule 25. Four modes: --mode pre (assert predecessor phases completed before entering phase N), --mode post (assert all child tasks of phase N are completed AND all expected artifacts exist on disk), --mode wave (post-Batch-B verification of parallel wave completeness: N child TaskUpdate completed + N artifacts exist), --mode final (terminal gate composing with x-internal-verify-epic-integrity). Reads execution-state.json.taskTracking.phaseGateResults and TaskList task state; writes back the gate result. Emits a single-line JSON envelope {passed, mode, skill, phase, expectedTasks, completedTasks, missingTasks, expectedArtifacts, missingArtifacts, wallclockMs, timestamp}. Exit 0 on passed, 12 on failure, 13 on malformed args, 14 on task-resolution timeout. First skill in the x-internal-* convention authored by EPIC-0055; eighth overall (after status-update, report-write, args-normalize, story-load-context, story-build-plan, story-verify, story-resume, epic-build-plan, epic-integrity-gate, epic-branch-ensure, story-report) and the eighth under internal/plan/."
 model: haiku
 visibility: internal
 user-invocable: false
@@ -20,16 +20,16 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Callers principais: `x-epic-implement`, `x-story-implement`,
-> `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`,
-> `x-review-pr`, `x-pr-merge-train` (após retrofits em stories
+> Callers principais: `x-implement-epic`, `x-implement-story`,
+> `x-implement-task`, `x-release`, `x-orchestrate-epic`, `x-review-codebase`,
+> `x-review-pr`, `x-manage-pr-merge-train` (após retrofits em stories
 > 0055-0003 a 0055-0010). Oitava skill no subdir `internal/plan/`
-> (após `x-internal-story-load-context`, `x-internal-story-build-plan`,
-> `x-internal-story-verify`, `x-internal-story-resume`,
-> `x-internal-epic-build-plan`, `x-internal-epic-integrity-gate`,
-> `x-internal-story-report`). Primeira skill introduzida por EPIC-0055.
+> (após `x-internal-load-story-context`, `x-internal-build-story-plan`,
+> `x-internal-verify-story`, `x-internal-resume-story`,
+> `x-internal-build-epic-plan`, `x-internal-verify-epic-integrity`,
+> `x-internal-write-story-report`). Primeira skill introduzida por EPIC-0055.
 
-# Skill: x-internal-phase-gate
+# Skill: x-internal-verify-phase-gates
 
 ## Purpose
 
@@ -40,7 +40,7 @@ Responsibilities (single):
 1. Parse arguments against the 4-mode matrix (`pre` / `post` / `wave` / `final`).
 2. For PRE mode: scan predecessor phases' `phaseGateResults` in `execution-state.json` and `TaskList` for any non-`completed` sibling task.
 3. For POST / WAVE / FINAL mode: intersect `--expected-tasks` against `TaskList` looking for `completed` status on each, AND `stat`-check every path in `--expected-artifacts`.
-4. Atomically append a `phaseGateResults[]` entry to `execution-state.json.taskTracking` via `x-internal-status-update` (delegated).
+4. Atomically append a `phaseGateResults[]` entry to `execution-state.json.taskTracking` via `x-internal-update-status` (delegated).
 5. Emit a single-line JSON envelope on stdout.
 6. Translate every failure class to the exit-code catalogue.
 
@@ -49,36 +49,36 @@ Non-responsibilities (explicit):
 - Does NOT mutate task state (no `TaskUpdate(status: ...)`). The caller owns task state transitions.
 - Does NOT run the PostToolUse hook. The hook (`verify-phase-gates.sh`, story-0055-0002) reads `phaseGateResults[]` this skill writes.
 - Does NOT emit `TaskCreate` unless `--mode wave --emit-tracker true` is set (Rule 25 Invariant 6 exception — one tracker task to surface wave wall-clock).
-- Does NOT run tests, build, or any project-level validation. `x-internal-story-verify` / `x-internal-epic-integrity-gate` own those — this gate composes with them via `--mode final`.
+- Does NOT run tests, build, or any project-level validation. `x-internal-verify-story` / `x-internal-verify-epic-integrity` own those — this gate composes with them via `--mode final`.
 
 ## Convention Anchors (x-internal-* — EPIC-0055)
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-phase-gate/` | Read-and-compute carve-out, co-located with other story/epic gate skills. |
+| Path | `internal/plan/x-internal-verify-phase-gates/` | Read-and-compute carve-out, co-located with other story/epic gate skills. |
 | Frontmatter `visibility` | `internal` | Generator filters from `/help` menu. |
 | Frontmatter `user-invocable` | `false` | Declarative complement. |
 | Frontmatter `model` | `haiku` | Zero-reasoning lookup (RULE-023 utility tier). |
 | Body marker | `> 🔒 **INTERNAL SKILL**` | Rule 22 §Body marker. |
-| Allowed tools | `Read, Bash` | Read for artifact stat; Bash for jq + state-file I/O via `x-internal-status-update`. |
+| Allowed tools | `Read, Bash` | Read for artifact stat; Bash for jq + state-file I/O via `x-internal-update-status`. |
 
 ## Triggers
 
 Bare-slash form intentionally omitted — never invoked by a user. All invocations follow Rule 13 Pattern 1 (INLINE-SKILL):
 
 ```markdown
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode pre --skill x-story-implement --phase Phase-1 --state-file ai/epics/epic-XXXX/execution-state.json")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode pre --skill x-implement-story --phase Phase-1 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ```markdown
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md --state-file ai/epics/epic-XXXX/execution-state.json")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode post --skill x-implement-story --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ```markdown
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode wave --skill x-review --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --state-file ai/epics/epic-XXXX/execution-state.json")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode wave --skill x-review-codebase --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 ## Parameters
@@ -177,14 +177,14 @@ Same as POST, but:
 
 #### 4d. `--mode final`
 
-Superset of POST. Additionally scans the Rule-24 mandatory artifact set (when `--skill = x-story-implement`): verify-envelope, review-story, techlead-review, story-completion-report. Acts as the synchronous Rule-24 gate the Stop-hook normally enforces asynchronously.
+Superset of POST. Additionally scans the Rule-24 mandatory artifact set (when `--skill = x-implement-story`): verify-envelope, review-story, techlead-review, story-completion-report. Acts as the synchronous Rule-24 gate the Stop-hook normally enforces asynchronously.
 
 ### Step 5 — Write `phaseGateResults[]` entry
 
 Atomically append to `execution-state.json.taskTracking.phaseGateResults[]` via:
 
 ```markdown
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file <state-file> --type phase-gate --phase <phase> --mode <mode> --passed <true|false> --missing-artifacts <comma-list> --missing-tasks <comma-list>")
 ```
 
@@ -199,7 +199,7 @@ Single-line JSON via `jq -nc` with all fields. Exit 0 on success, 12 on failure.
 The skill is idempotent by design:
 
 - Re-invoking the same gate (same `--mode`, `--skill`, `--phase`) is a replay: it re-reads task state + artifact state, writes a fresh `phaseGateResults[]` entry, and returns the current result. Previous entries remain for audit history.
-- Concurrent invocations serialize on `x-internal-status-update`'s flock (file-level).
+- Concurrent invocations serialize on `x-internal-update-status`'s flock (file-level).
 
 ## Performance Contract
 
@@ -217,39 +217,39 @@ Target global overhead across an epic with ~30 gates: < 5 seconds, i.e., well be
 ### Example 1 — Happy path, PRE mode
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode pre --skill x-story-implement --phase Phase-2 --state-file ai/epics/epic-XXXX/execution-state.json")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode pre --skill x-implement-story --phase Phase-2 --state-file ai/epics/epic-XXXX/execution-state.json")
 ```
 
 Output:
 ```json
-{"passed":true,"mode":"pre","skill":"x-story-implement","phase":"Phase-2","expectedTasks":[],"completedTasks":[],"missingTasks":[],"expectedArtifacts":[],"missingArtifacts":[],"wallclockMs":12,"timestamp":"2026-04-24T10:30:00Z"}
+{"passed":true,"mode":"pre","skill":"x-implement-story","phase":"Phase-2","expectedTasks":[],"completedTasks":[],"missingTasks":[],"expectedArtifacts":[],"missingArtifacts":[],"wallclockMs":12,"timestamp":"2026-04-24T10:30:00Z"}
 ```
 Exit: 0.
 
 ### Example 2 — POST mode all green
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode post --skill x-implement-story --phase Phase-1 --expected-tasks 101,102,103,104,105,106 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/plan-story-0060-0001.md")
 ```
 
 Output:
 ```json
-{"passed":true,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102,103,104,105,106],"completedTasks":[101,102,103,104,105,106],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/plan-story-0060-0001.md"],"missingArtifacts":[],"wallclockMs":47,"timestamp":"2026-04-24T10:35:00Z"}
+{"passed":true,"mode":"post","skill":"x-implement-story","phase":"Phase-1","expectedTasks":[101,102,103,104,105,106],"completedTasks":[101,102,103,104,105,106],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/plan-story-0060-0001.md"],"missingArtifacts":[],"wallclockMs":47,"timestamp":"2026-04-24T10:35:00Z"}
 ```
 Exit: 0.
 
 ### Example 3 — POST mode, missing artifacts
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101,102 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/missing.md")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode post --skill x-implement-story --phase Phase-1 --expected-tasks 101,102 --expected-artifacts ai/epics/epic-XXXX/plans/arch-story-0060-0001.md,ai/epics/epic-XXXX/plans/missing.md")
 ```
 
 Output:
 ```json
-{"passed":false,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[101,102],"completedTasks":[101,102],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/missing.md"],"missingArtifacts":["ai/epics/epic-XXXX/plans/missing.md"],"wallclockMs":38,"timestamp":"2026-04-24T10:40:00Z"}
+{"passed":false,"mode":"post","skill":"x-implement-story","phase":"Phase-1","expectedTasks":[101,102],"completedTasks":[101,102],"missingTasks":[],"expectedArtifacts":["ai/epics/epic-XXXX/plans/arch-story-0060-0001.md","ai/epics/epic-XXXX/plans/missing.md"],"missingArtifacts":["ai/epics/epic-XXXX/plans/missing.md"],"wallclockMs":38,"timestamp":"2026-04-24T10:40:00Z"}
 ```
 Exit: 12.
 
@@ -258,8 +258,8 @@ Exit: 12.
 With `--timeout-s 2` and task 203 in `in_progress`:
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode wave --skill x-review --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --timeout-s 2")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode wave --skill x-review-codebase --phase Phase-2 --expected-tasks 201,202,203,204,205,206,207,208,209 --timeout-s 2")
 ```
 
 Stderr:
@@ -271,8 +271,8 @@ Exit: 14.
 ### Example 5 — Malformed: wave without expected-tasks
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode wave --skill x-review --phase Phase-2")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode wave --skill x-review-codebase --phase Phase-2")
 ```
 
 Stderr:
@@ -286,13 +286,13 @@ Exit: 13.
 When `execution-state.json.taskTracking.enabled = false`:
 
 ```bash
-Skill(skill: "x-internal-phase-gate",
-      args: "--mode post --skill x-story-implement --phase Phase-1 --expected-tasks 101 --expected-artifacts foo.md")
+Skill(skill: "x-internal-verify-phase-gates",
+      args: "--mode post --skill x-implement-story --phase Phase-1 --expected-tasks 101 --expected-artifacts foo.md")
 ```
 
 Output:
 ```json
-{"passed":true,"mode":"post","skill":"x-story-implement","phase":"Phase-1","expectedTasks":[],"completedTasks":[],"missingTasks":[],"expectedArtifacts":[],"missingArtifacts":[],"wallclockMs":3,"timestamp":"2026-04-24T10:45:00Z","note":"taskTracking disabled (legacy mode)"}
+{"passed":true,"mode":"post","skill":"x-implement-story","phase":"Phase-1","expectedTasks":[],"completedTasks":[],"missingTasks":[],"expectedArtifacts":[],"missingArtifacts":[],"wallclockMs":3,"timestamp":"2026-04-24T10:45:00Z","note":"taskTracking disabled (legacy mode)"}
 ```
 Exit: 0.
 
@@ -308,7 +308,7 @@ Exit: 0.
 | Expected task `in_progress` beyond timeout | `PHASE_GATE_TIMEOUT`; exit 14 |
 | At least one expected task missing / non-completed | `PHASE_GATE_FAILED`; exit 12 |
 | At least one expected artifact absent | `PHASE_GATE_FAILED`; exit 12 |
-| `x-internal-status-update` delegation fails | Propagate stderr; exit 13 with `STATE_UPDATE_FAILED` |
+| `x-internal-update-status` delegation fails | Propagate stderr; exit 13 with `STATE_UPDATE_FAILED` |
 
 ## Generator Filter Contract
 
@@ -328,10 +328,10 @@ Internal skills DO NOT emit `phase.start` / `phase.end` markers — the calling 
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-internal-status-update` | delegate | Atomic flock-protected write of `phaseGateResults[]` entry. |
-| `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train` | callers | Retrofit in stories 0055-0003 → 0055-0010. |
-| `x-internal-epic-integrity-gate` | composition | `--mode final` of `x-epic-implement` Phase 4 composes with integrity gate (gate runs first; integrity-gate is subsequent). |
-| `x-internal-story-verify` | composition | `--mode final` of `x-story-implement` Phase 3 composes with story-verify (verify runs first; gate confirms its outputs). |
+| `x-internal-update-status` | delegate | Atomic flock-protected write of `phaseGateResults[]` entry. |
+| `x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-release`, `x-orchestrate-epic`, `x-review-codebase`, `x-review-pr`, `x-manage-pr-merge-train` | callers | Retrofit in stories 0055-0003 → 0055-0010. |
+| `x-internal-verify-epic-integrity` | composition | `--mode final` of `x-implement-epic` Phase 4 composes with integrity gate (gate runs first; integrity-gate is subsequent). |
+| `x-internal-verify-story` | composition | `--mode final` of `x-implement-story` Phase 3 composes with story-verify (verify runs first; gate confirms its outputs). |
 | `.claude/hooks/verify-phase-gates.sh` | consumer (Stop hook) | Reads `phaseGateResults[]` this skill writes; emits WARNING + exit 2 on gate failure at end of LLM turn. |
 | `.claude/hooks/enforce-phase-sequence.sh` | consumer (PreToolUse hook) | Reads `phaseGateResults[]` to block `Skill(...)` of an orchestrator whose predecessor phase has no `passed=true` entry. |
 
@@ -346,4 +346,4 @@ Internal skills DO NOT emit `phase.start` / `phase.end` markers — the calling 
 
 ## Full Protocol
 
-Per-mode state-file schema, full flock + `x-internal-status-update` interaction pseudocode, polling algorithm for `in_progress` tasks, and the `phaseGateResults[]` append-only invariant live in [`references/full-protocol.md`](references/full-protocol.md).
+Per-mode state-file schema, full flock + `x-internal-update-status` interaction pseudocode, polling algorithm for `in_progress` tasks, and the `phaseGateResults[]` append-only invariant live in [`references/full-protocol.md`](references/full-protocol.md).

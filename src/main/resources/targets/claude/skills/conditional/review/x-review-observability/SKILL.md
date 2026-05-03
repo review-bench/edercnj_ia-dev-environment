@@ -1,5 +1,5 @@
 ---
-name: x-review-obs
+name: x-review-observability
 description: "Observability specialist review: validates distributed tracing, metrics naming, structured logging, health checks, correlation IDs, and alerting configuration."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
@@ -33,9 +33,9 @@ Include this skill when `observability.tool != "none"` in the project configurat
 
 ## Triggers
 
-- `/x-review-obs 42` -- review PR #42 for observability
-- `/x-review-obs src/main/java/com/example/config/` -- review specific paths
-- `/x-review-obs` -- review all current observability changes
+- `/x-review-observability 42` -- review PR #42 for observability
+- `/x-review-observability src/main/java/com/example/config/` -- review specific paths
+- `/x-review-observability` -- review all current observability changes
 
 ## Parameters
 

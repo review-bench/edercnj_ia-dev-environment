@@ -1,5 +1,5 @@
 ---
-name: x-security-dast
+name: x-run-dast
 description: "Dynamic Application Security Testing -- tests the running application for XSS, injection, misconfiguration, and information disclosure using OWASP ZAP or Nuclei."
 user-invocable: true
 allowed-tools: Read, Bash
@@ -25,10 +25,10 @@ Include this skill when `security.scanning.dast = true` in the project configura
 
 ## Triggers
 
-- `/x-security-dast --target http://localhost:8080` -- scan local app with default passive mode
-- `/x-security-dast --target http://localhost:8080 --mode active` -- active scan in local
-- `/x-security-dast --target https://app.staging.com --env homolog` -- scan homolog (auto-downgrades)
-- `/x-security-dast --target https://app.example.com --env prod --confirm-prod` -- production passive scan
+- `/x-run-dast --target http://localhost:8080` -- scan local app with default passive mode
+- `/x-run-dast --target http://localhost:8080 --mode active` -- active scan in local
+- `/x-run-dast --target https://app.staging.com --env homolog` -- scan homolog (auto-downgrades)
+- `/x-run-dast --target https://app.example.com --env prod --confirm-prod` -- production passive scan
 
 ## Parameters
 
@@ -146,7 +146,7 @@ Produce Markdown summary report with configuration, environment guard, findings 
 # GitHub Actions example
 - name: DAST Scan
   run: |
-    /x-security-dast \
+    /x-run-dast \
       --target ${{ env.APP_URL }} \
       --env ${{ env.ENVIRONMENT }} \
       --mode passive \

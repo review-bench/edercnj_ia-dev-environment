@@ -1,11 +1,11 @@
-# x-runtime-eval
+# x-evaluate-runtime
 
 > Evaluates runtime protection controls: rate limiting, WAF rules, bot protection, DDoS mitigation, account lockout, brute force protection, CSP enforcement, and permissions policy. Uses SARIF output and ASVS compliance mapping.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-runtime-eval --target <url> [--scope all\|rate-limit\|waf\|bot-protection\|account-lockout\|brute-force\|csp\|permissions] [--intensity passive\|moderate\|aggressive] [--login-endpoint /path]` |
+| **Invocation** | `/x-evaluate-runtime --target <url> [--scope all\|rate-limit\|waf\|bot-protection\|account-lockout\|brute-force\|csp\|permissions] [--intensity passive\|moderate\|aggressive] [--login-endpoint /path]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,10 +16,10 @@ Evaluates active runtime defense mechanisms of a running application across 7 di
 ## Usage
 
 ```
-/x-runtime-eval --target https://app.example.com
-/x-runtime-eval --target https://app.example.com --scope rate-limit
-/x-runtime-eval --target https://app.example.com --intensity passive
-/x-runtime-eval --target https://app.example.com --scope account-lockout --login-endpoint /api/auth/login
+/x-evaluate-runtime --target https://app.example.com
+/x-evaluate-runtime --target https://app.example.com --scope rate-limit
+/x-evaluate-runtime --target https://app.example.com --intensity passive
+/x-evaluate-runtime --target https://app.example.com --scope account-lockout --login-endpoint /api/auth/login
 ```
 
 ## Workflow
@@ -40,6 +40,6 @@ Evaluates active runtime defense mechanisms of a running application across 7 di
 
 ## See Also
 
-- [x-hardening-eval](../x-hardening-eval/) -- Static hardening posture evaluation (headers, TLS, CORS, cookies)
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification with ASVS mapping
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from all scanning skills
+- [x-evaluate-hardening](../x-evaluate-hardening/) -- Static hardening posture evaluation (headers, TLS, CORS, cookies)
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification with ASVS mapping
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from all scanning skills

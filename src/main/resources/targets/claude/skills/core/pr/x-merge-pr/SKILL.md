@@ -1,6 +1,6 @@
 ---
-name: x-pr-merge
-description: "Merges a single PR via gh CLI with configurable strategy (merge/squash/rebase), idempotency for already-merged PRs, pre-checks for CI and approvals in synchronous mode, GitHub native auto-merge in --auto mode, and structured error codes. Extracted from x-epic-implement Phase 1.3b to provide a testable, reusable merge primitive callable from x-pr-create --auto-merge and x-epic-implement."
+name: x-merge-pr
+description: "Merges a single PR via gh CLI with configurable strategy (merge/squash/rebase), idempotency for already-merged PRs, pre-checks for CI and approvals in synchronous mode, GitHub native auto-merge in --auto mode, and structured error codes. Extracted from x-implement-epic Phase 1.3b to provide a testable, reusable merge primitive callable from x-create-pr --auto-merge and x-implement-epic."
 user-invocable: true
 allowed-tools: Bash, Read, Write
 argument-hint: "--pr N [--strategy merge|squash|rebase] [--delete-branch true|false] [--auto] [--wait-timeout-min N]"
@@ -21,16 +21,16 @@ Merge a single pull request through the GitHub CLI with three orthogonal strateg
 - **Synchronous mode (default)** — the skill validates pre-conditions (`mergeable`, `reviewDecision`, `statusCheckRollup`) before invoking `gh pr merge`. On success, it returns the merge SHA immediately.
 - **Auto-merge mode (`--auto`)** — the skill delegates waiting to GitHub's native auto-merge feature (`gh pr merge --auto`). It returns in under 5 seconds; GitHub will merge the PR asynchronously once CI and approvals are green.
 
-The skill is idempotent: a second invocation on an already-merged PR returns `merged=true` without error. It replaces the ~80 lines of ad-hoc `gh pr merge` + polling logic previously embedded in `x-epic-implement` Phase 1.3b (ADR reference: story-0049-0003, epic-0049 "x-pr-merge extraction").
+The skill is idempotent: a second invocation on an already-merged PR returns `merged=true` without error. It replaces the ~80 lines of ad-hoc `gh pr merge` + polling logic previously embedded in `x-implement-epic` Phase 1.3b (ADR reference: story-0049-0003, epic-0049 "x-merge-pr extraction").
 
 ## Triggers
 
 ```
-/x-pr-merge --pr 123
-/x-pr-merge --pr 123 --strategy squash
-/x-pr-merge --pr 123 --strategy rebase --delete-branch false
-/x-pr-merge --pr 123 --strategy merge --auto
-/x-pr-merge --pr 123 --wait-timeout-min 30
+/x-merge-pr --pr 123
+/x-merge-pr --pr 123 --strategy squash
+/x-merge-pr --pr 123 --strategy rebase --delete-branch false
+/x-merge-pr --pr 123 --strategy merge --auto
+/x-merge-pr --pr 123 --wait-timeout-min 30
 ```
 
 ## Parameters
@@ -92,7 +92,7 @@ Example idempotent (already merged):
 | 5 | `MERGE_CONFLICT` | `mergeable == CONFLICTING` | `"PR #{N} has merge conflicts"` |
 | 6 | `TIMEOUT` | Synchronous mode: `mergeable == UNKNOWN` persisted past `--wait-timeout-min` | `"Wait timeout after {N} min"` |
 
-Exit codes are stable contract — consumers (e.g., `x-epic-implement`, `x-pr-create --auto-merge`) MAY switch on them.
+Exit codes are stable contract — consumers (e.g., `x-implement-epic`, `x-create-pr --auto-merge`) MAY switch on them.
 
 ## Workflow Overview
 
@@ -283,7 +283,7 @@ Stderr SHOULD carry the `[Phase N] ...` log lines; stdout MUST carry only the si
 ### Example 1 — Happy Path (Synchronous, merge strategy)
 
 ```bash
-/x-pr-merge --pr 123
+/x-merge-pr --pr 123
 ```
 
 Result (stdout):
@@ -295,7 +295,7 @@ Result (stdout):
 ### Example 2 — Squash Strategy with Auto-Merge
 
 ```bash
-/x-pr-merge --pr 456 --strategy squash --auto
+/x-merge-pr --pr 456 --strategy squash --auto
 ```
 
 Result (returns in <5s):
@@ -309,7 +309,7 @@ GitHub will merge asynchronously when CI + approvals pass.
 ### Example 3 — Rebase Strategy, Preserve Branch
 
 ```bash
-/x-pr-merge --pr 789 --strategy rebase --delete-branch false
+/x-merge-pr --pr 789 --strategy rebase --delete-branch false
 ```
 
 Result (stdout):
@@ -321,7 +321,7 @@ Result (stdout):
 ### Example 4 — Idempotent Re-Invocation
 
 ```bash
-/x-pr-merge --pr 123     # already merged by previous run
+/x-merge-pr --pr 123     # already merged by previous run
 ```
 
 Result (exits 0 immediately, no gh pr merge call):
@@ -333,7 +333,7 @@ Result (exits 0 immediately, no gh pr merge call):
 ### Example 5 — Error: Not Approved
 
 ```bash
-/x-pr-merge --pr 123
+/x-merge-pr --pr 123
 ```
 
 Result (exit 3):
@@ -360,9 +360,9 @@ Result (exit 3):
 
 | Consumer | Relationship | Usage |
 | :--- | :--- | :--- |
-| `x-pr-create` | Invokes this skill when `--auto-merge <strategy>` is passed (RULE-002 auto-merge default ON) | After creating the PR, forwards `--strategy` + `--auto` to `x-pr-merge` to enable native GitHub auto-merge. |
-| `x-epic-implement` | Invokes this skill in Phase 1.3b (merge of epic PRs to `epic/XXXX` or `develop`) | Replaces the previous ~80 lines of inline `gh pr merge` + polling. Calls with `--strategy merge --auto` by default. |
-| `x-pr-merge-train` | Does NOT call this skill directly | Uses its own train-specific merge orchestration; however, both skills share the same exit-code semantics for consistency across the `/x-pr-*` family. |
+| `x-create-pr` | Invokes this skill when `--auto-merge <strategy>` is passed (RULE-002 auto-merge default ON) | After creating the PR, forwards `--strategy` + `--auto` to `x-merge-pr` to enable native GitHub auto-merge. |
+| `x-implement-epic` | Invokes this skill in Phase 1.3b (merge of epic PRs to `epic/XXXX` or `develop`) | Replaces the previous ~80 lines of inline `gh pr merge` + polling. Calls with `--strategy merge --auto` by default. |
+| `x-manage-pr-merge-train` | Does NOT call this skill directly | Uses its own train-specific merge orchestration; however, both skills share the same exit-code semantics for consistency across the `/x-pr-*` family. |
 
 ### Called Tools
 
@@ -397,7 +397,7 @@ No git operations are performed by this skill — branch deletion is delegated t
 Single end-to-end test (`PrMergeSmokeTest`) that:
 
 1. Creates a disposable PR on a fixture repository branch.
-2. Invokes `/x-pr-merge --pr {N} --auto`.
+2. Invokes `/x-merge-pr --pr {N} --auto`.
 3. Verifies `autoEnabled=true` and exit 0.
 4. Waits up to 60s for GitHub to merge asynchronously.
 5. Cleans up the test branch.
@@ -419,7 +419,7 @@ Skipped when `GITHUB_TOKEN` is absent; reported as `SKIPPED` to avoid failing CI
 
 ## Status
 
-- **Story**: story-0049-0003 (epic-0049, "x-pr-merge extraction from x-epic-implement Phase 1.3b")
+- **Story**: story-0049-0003 (epic-0049, "x-merge-pr extraction from x-implement-epic Phase 1.3b")
 - **Parent Contract**: RULE-002 (auto-merge default ON), RULE-004 (preserve history), RULE-005 (thin orchestrator)
 - **Dependencies**: none (first skill in its sub-tree of epic-0049)
-- **Downstream**: story-0049-0016 (`x-pr-create --auto-merge` propagation), story-0049-0018 (`x-epic-implement` refactor)
+- **Downstream**: story-0049-0016 (`x-create-pr --auto-merge` propagation), story-0049-0018 (`x-implement-epic` refactor)

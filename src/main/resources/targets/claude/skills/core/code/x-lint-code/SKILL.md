@@ -1,5 +1,5 @@
 ---
-name: x-code-lint
+name: x-lint-code
 model: haiku
 description: "Analyzes source code with the appropriate linter for {{LANGUAGE}}. Second step in the pre-commit chain (RULE-007: format -> lint -> compile -> commit). Supports --fix, --changed-only, and --strict modes."
 user-invocable: true
@@ -20,11 +20,11 @@ Runs static analysis on {{PROJECT_NAME}} source code using the appropriate linte
 
 ## Triggers
 
-- `/x-code-lint` -- lint entire project, report errors and warnings
-- `/x-code-lint --fix` -- auto-fix violations where supported; re-stage corrected files
-- `/x-code-lint --changed-only` -- lint only modified files (staged + unstaged)
-- `/x-code-lint --strict` -- treat warnings as errors (exit 1 on any warning)
-- `/x-code-lint --fix --changed-only` -- auto-fix only changed files
+- `/x-lint-code` -- lint entire project, report errors and warnings
+- `/x-lint-code --fix` -- auto-fix violations where supported; re-stage corrected files
+- `/x-lint-code --changed-only` -- lint only modified files (staged + unstaged)
+- `/x-lint-code --strict` -- treat warnings as errors (exit 1 on any warning)
+- `/x-lint-code --fix --changed-only` -- auto-fix only changed files
 
 ## Parameters
 
@@ -43,7 +43,7 @@ Runs static analysis on {{PROJECT_NAME}} source code using the appropriate linte
 
 ## Error Envelope
 
-> **Chain-wide error matrix.** Canonical `format -> lint -> compile -> commit` rows live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). Rows below are `x-code-lint`-specific.
+> **Chain-wide error matrix.** Canonical `format -> lint -> compile -> commit` rows live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). Rows below are `x-lint-code`-specific.
 
 | Scenario | Exit | Behavior |
 |----------|------|----------|
@@ -66,10 +66,10 @@ Minimum viable contract above. The 7-step workflow (detect → scope → primary
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-code-format` | precedes | Format runs before lint in pre-commit chain |
-| `x-git-commit` | orchestrator | Invokes this skill as step 3b of its chain |
-| `x-review` | complementary | Review provides deeper analysis; lint catches basics |
-| `x-code-audit` | complementary | Audit runs lint as part of full codebase check |
+| `x-format-code` | precedes | Format runs before lint in pre-commit chain |
+| `x-commit-changes` | orchestrator | Invokes this skill as step 3b of its chain |
+| `x-review-codebase` | complementary | Review provides deeper analysis; lint catches basics |
+| `x-audit-code` | complementary | Audit runs lint as part of full codebase check |
 
 ## Template Variables
 

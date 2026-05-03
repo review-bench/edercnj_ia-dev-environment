@@ -6,11 +6,11 @@
 **Superseded by:** —
 **Related:** ADR-0010 (Interactive Gates Convention), Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility), Rule 24 (Execution Integrity), Rule 19 (Backward Compatibility)
 
-> **Note on numbering:** The parent story (`story-0055-0001`) originally specified `ADR-0013`. That number was already taken by `ADR-0013-knowledge-packs-dedicated-directory.md` (pre-existing, unrelated). ADR-0014 is the next available sequential number and supersedes the story's numbering reference. Rule 25 and `x-internal-phase-gate` SKILL.md have been updated to reference ADR-0014.
+> **Note on numbering:** The parent story (`story-0055-0001`) originally specified `ADR-0013`. That number was already taken by `ADR-0013-knowledge-packs-dedicated-directory.md` (pre-existing, unrelated). ADR-0014 is the next available sequential number and supersedes the story's numbering reference. Rule 25 and `x-internal-verify-phase-gates` SKILL.md have been updated to reference ADR-0014.
 
 ## Context
 
-Before EPIC-0055, the orchestrator skills in this repository — `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train` — silently delegated sub-work via the `Skill(...)` tool. Only `x-review` emitted structured `TaskCreate` / `TaskUpdate` calls. Every other orchestrator was a black box to the operator:
+Before EPIC-0055, the orchestrator skills in this repository — `x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-release`, `x-orchestrate-epic`, `x-review-codebase`, `x-review-pr`, `x-manage-pr-merge-train` — silently delegated sub-work via the `Skill(...)` tool. Only `x-review-codebase` emitted structured `TaskCreate` / `TaskUpdate` calls. Every other orchestrator was a black box to the operator:
 
 - No visibility into which phase was running.
 - No visibility into which member of a parallel wave (6 planning subagents, 9 specialist reviewers) had completed.
@@ -33,11 +33,11 @@ Introduce **4-level hierarchical task tracking** with **synchronous phase gates*
    - `metadata` convention carrying `expectedArtifacts` consumed by the gate.
    - `execution-state.json.taskTracking.{enabled, phaseGateResults[]}` extension.
 
-2. **`x-internal-phase-gate`** (new skill, `internal/plan/`, model `haiku`) provides four modes:
+2. **`x-internal-verify-phase-gates`** (new skill, `internal/plan/`, model `haiku`) provides four modes:
    - `--mode pre` — predecessor phases cleanly `completed`.
    - `--mode post` — all child tasks `completed` AND all `--expected-artifacts` exist on disk.
    - `--mode wave` — post-Batch-B parallel wave completeness.
-   - `--mode final` — terminal gate composing with `x-internal-story-verify` and `x-internal-epic-integrity-gate`, adds Rule-24 mandatory-artifact scan.
+   - `--mode final` — terminal gate composing with `x-internal-verify-story` and `x-internal-verify-epic-integrity`, adds Rule-24 mandatory-artifact scan.
 
 3. **Four enforcement layers** (paralleling Rule 24):
    - **1 — Normative.** Rule 25 + CLAUDE.md top-level block guides LLM behavior.
@@ -51,14 +51,14 @@ Introduce **4-level hierarchical task tracking** with **synchronous phase gates*
 
 | Orchestrator | Retrofit story |
 | :--- | :--- |
-| `x-task-implement` | story-0055-0003 |
-| `x-story-implement` | story-0055-0004 |
-| `x-epic-implement` | story-0055-0005 |
-| `x-review` | story-0055-0006 |
+| `x-implement-task` | story-0055-0003 |
+| `x-implement-story` | story-0055-0004 |
+| `x-implement-epic` | story-0055-0005 |
+| `x-review-codebase` | story-0055-0006 |
 | `x-review-pr` | story-0055-0007 |
 | `x-release` | story-0055-0008 |
-| `x-epic-orchestrate` | story-0055-0009 |
-| `x-pr-merge-train` | story-0055-0010 |
+| `x-orchestrate-epic` | story-0055-0009 |
+| `x-manage-pr-merge-train` | story-0055-0010 |
 
 Internal skills (`x-internal-*`) are exempt — their calling orchestrator owns the task boundary.
 
@@ -66,7 +66,7 @@ Internal skills (`x-internal-*`) are exempt — their calling orchestrator owns 
 
 ### Positive
 
-- **4-level visibility during execution.** Operator sees `EPIC-0061 › Phase 3 › story-0061-0001 › Phase 1 › wave of 6 planners · 8m 17s` during `/x-epic-implement` — a change of category, not degree, over the current opacity.
+- **4-level visibility during execution.** Operator sees `EPIC-0061 › Phase 3 › story-0061-0001 › Phase 1 › wave of 6 planners · 8m 17s` during `/x-implement-epic` — a change of category, not degree, over the current opacity.
 - **Synchronous Rule-24 enforcement.** `--mode final` moves mandatory-artifact verification from "Stop hook after the fact" to "gate before the phase is marked completed". Reduces the window where a missing review or missing verify-envelope goes undetected.
 - **Composable primitives.** The gate is a thin wrapper (~150 lines of bash + JSON envelope). Future orchestrators inherit the contract by construction.
 - **Debugging time reduction.** Epic failures resolve from ~30min of `grep`-ing logs to < 2min of reading the task list.
@@ -75,12 +75,12 @@ Internal skills (`x-internal-*`) are exempt — their calling orchestrator owns 
 
 - **Maintenance surface.** Rule 25, one new skill, two new hooks, two new CI scripts, one new audit baseline. Every new orchestrator added post-EPIC-0055 must follow the contract or justify a `<!-- phase-no-gate -->` exemption.
 - **Overhead.** ~47ms per gate invocation. Across an epic with ~30 gates, aggregate cost is ~1.4 seconds — well below the 2% wall-clock DoD threshold, but not zero.
-- **Retrofit scope.** 8 orchestrator SKILL.md files touched (stories 0055-0003 to 0055-0010). Each retrofit is bounded, but they're sequential for the critical path (`x-task-implement` → `x-story-implement` → `x-epic-implement` must complete before the extension retrofits can parallelize).
+- **Retrofit scope.** 8 orchestrator SKILL.md files touched (stories 0055-0003 to 0055-0010). Each retrofit is bounded, but they're sequential for the critical path (`x-implement-task` → `x-implement-story` → `x-implement-epic` must complete before the extension retrofits can parallelize).
 - **Deprecation window management.** The `taskTracking` field default-absent fallback lasts 2 releases. CI needs to track the counter and fail closed after the window.
 
 ### Neutral
 
-- Rule 25 REGRA-006 carves an exception for `x-internal-phase-gate --mode wave --emit-tracker true`. This is the single place where an internal skill emits a task of its own — intentional, tracked in the audit.
+- Rule 25 REGRA-006 carves an exception for `x-internal-verify-phase-gates --mode wave --emit-tracker true`. This is the single place where an internal skill emits a task of its own — intentional, tracked in the audit.
 
 ## Alternatives considered
 
@@ -96,9 +96,9 @@ Expand hierarchy depth beyond 4 (e.g., cycle-level sub-tasks per UT within Red p
 
 **Rejected:** Cost-benefit inverts past depth 4. `TASK-... › Step 2 › Cycle 1 › Red` already carries enough information. A fifth level fragments the CLI rendering without proportional gain.
 
-### (c) Retrofit only `x-epic-implement` and `x-story-implement`
+### (c) Retrofit only `x-implement-epic` and `x-implement-story`
 
-Skip the extension orchestrators (`x-release`, `x-review`, `x-review-pr`, `x-epic-orchestrate`, `x-pr-merge-train`).
+Skip the extension orchestrators (`x-release`, `x-review-codebase`, `x-review-pr`, `x-orchestrate-epic`, `x-manage-pr-merge-train`).
 
 **Rejected:** The black-box problem applies uniformly. Partial coverage would create "silent" phases that appear skipped in the task list, confusing the contract. Better to cover all 8 or none.
 
@@ -117,8 +117,8 @@ Tap into the legacy todo API instead of introducing the new task hierarchy.
 ## Implementation notes
 
 - **Skill model tier:** `haiku` — zero-reasoning lookup + file stats.
-- **Skill path:** `java/src/main/resources/targets/claude/skills/core/internal/plan/x-internal-phase-gate/`.
-- **Delegation:** All `phaseGateResults[]` writes go through `x-internal-status-update` (flock-protected). The gate itself NEVER writes `execution-state.json` directly.
+- **Skill path:** `java/src/main/resources/targets/claude/skills/core/internal/plan/x-internal-verify-phase-gates/`.
+- **Delegation:** All `phaseGateResults[]` writes go through `x-internal-update-status` (flock-protected). The gate itself NEVER writes `execution-state.json` directly.
 - **Baseline file:** `audits/task-hierarchy-baseline.txt` seeds with the current orchestrators during the deprecation window. Immutable after EPIC-0055 merges.
 - **Telemetry:** Internal skills do NOT emit `phase.start` / `phase.end`; the calling orchestrator owns the telemetry wrapper. Passive hooks still capture `tool.call`.
 

@@ -1,6 +1,6 @@
 <!-- Returns to [slim body](../SKILL.md) after reading the required phase. -->
 
-# x-task-implement — Full Protocol
+# x-implement-task — Full Protocol
 
 ## Step 0 — Pre-Check: Plan Reuse (RULE-002)
 
@@ -30,7 +30,7 @@
 
 **Step 0.5a — Detect context:**
 
-    Skill(skill: "x-git-worktree", model: "haiku", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", model: "haiku", args: "detect-context")
 
 Returns `{inWorktree, worktreePath, mainRepoPath}`.
 
@@ -44,7 +44,7 @@ Returns `{inWorktree, worktreePath, mainRepoPath}`.
 
 **Mode 2 creation:**
 
-    Skill(skill: "x-git-worktree", model: "haiku", args: "create --branch feat/task-XXXX-YYYY-NNN-desc --base develop --id task-XXXX-YYYY-NNN")
+    Skill(skill: "x-manage-worktrees", model: "haiku", args: "create --branch feat/task-XXXX-YYYY-NNN-desc --base develop --id task-XXXX-YYYY-NNN")
 
 Step 0.5e records `TASK_OWNS_WORKTREE` for Step 5 cleanup decision.
 
@@ -113,7 +113,7 @@ test(scope): update acceptance test for [AT-N scenario] (GREEN)  # if AT content
 
 Invoke via Skill tool (Rule 13 Pattern 1):
 
-    Skill(skill: "x-git-commit", model: "haiku", args: "--type feat --scope task-XXXX-YYYY-NNN --subject \"implement [scenario]\"")
+    Skill(skill: "x-commit-changes", model: "haiku", args: "--type feat --scope task-XXXX-YYYY-NNN --subject \"implement [scenario]\"")
 
 Pre-commit chain (RULE-007): format → lint → compile → commit.
 
@@ -129,7 +129,7 @@ Pre-commit chain (RULE-007): format → lint → compile → commit.
 | `false` | present (Mode 2) | absent | v1 | No — `"CI-Watch skipped: schema v1"` |
 | `false` | present (Mode 2) | absent | v2 | **Yes** |
 
-When firing: invoke `Skill(skill: "x-pr-watch-ci", args: "--pr-number {N} --poll-interval-seconds 60 --timeout-minutes 30 --require-copilot-review=false")`.
+When firing: invoke `Skill(skill: "x-watch-pr-ci", args: "--pr-number {N} --poll-interval-seconds 60 --timeout-minutes 30 --require-copilot-review=false")`.
 
 **State-file schema:** `.claude/state/task-watch-{TASK-ID}.json`
 ```json
@@ -144,7 +144,7 @@ Write protocol: write to `{path}.tmp` → rename atomically.
 | Mode | Task Result | Action |
 |------|------------|--------|
 | Mode 1 (REUSE) | any | Do NOT remove (parent orchestrator owns). Do NOT `git checkout develop` (Rule 14 §2). |
-| Mode 2 (CREATE) | success | `Skill(skill: "x-git-worktree", model: "haiku", args: "remove --id task-XXXX-YYYY-NNN")` → then `git checkout develop && git pull origin develop` in mainRepoPath. |
+| Mode 2 (CREATE) | success | `Skill(skill: "x-manage-worktrees", model: "haiku", args: "remove --id task-XXXX-YYYY-NNN")` → then `git checkout develop && git pull origin develop` in mainRepoPath. |
 | Mode 2 (CREATE) | failed | Preserve worktree for diagnosis (Rule 14 §4). Log path for operator triage. |
 | Mode 3 (LEGACY) | any | `git checkout develop && git pull origin develop`. |
 
@@ -241,9 +241,9 @@ Updates `execution-state.json`:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-test-plan` | reads | Consumes test plan for AT-N/UT-N ordering |
-| `x-story-implement` | called-by | Phase 2 of full lifecycle |
-| `x-git-commit` | calls (Step 4) | Atomic TDD commits |
-| `x-git-worktree` | invokes (Steps 0.5 + 5) | Context detection, worktree create/remove |
-| `x-pr-watch-ci` | calls (Step 4.5) | CI polling in standalone v2 mode |
-| `x-pr-create` | calls (after Step 4) | PR creation targeting parent branch |
+| `x-plan-tests` | reads | Consumes test plan for AT-N/UT-N ordering |
+| `x-implement-story` | called-by | Phase 2 of full lifecycle |
+| `x-commit-changes` | calls (Step 4) | Atomic TDD commits |
+| `x-manage-worktrees` | invokes (Steps 0.5 + 5) | Context detection, worktree create/remove |
+| `x-watch-pr-ci` | calls (Step 4.5) | CI polling in standalone v2 mode |
+| `x-create-pr` | calls (after Step 4) | PR creation targeting parent branch |

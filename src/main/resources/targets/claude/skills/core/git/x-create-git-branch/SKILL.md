@@ -1,6 +1,6 @@
 ---
-name: x-git-branch
-description: "Creates a bare git branch (no worktree) from a configurable base with naming validation and idempotency. Single source of truth for branch creation logic consumed by orchestrators (x-internal-epic-branch-ensure, x-story-implement) and users."
+name: x-create-git-branch
+description: "Creates a bare git branch (no worktree) from a configurable base with naming validation and idempotency. Single source of truth for branch creation logic consumed by orchestrators (x-internal-ensure-epic-branch, x-implement-story) and users."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--name <branch> [--base <branch>] [--push] [--dry-run]"
@@ -13,18 +13,18 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Create Bare Git Branch (x-git-branch)
+# Skill: Create Bare Git Branch (x-create-git-branch)
 
 ## Purpose
 
-Single, idempotent entry point for creating a bare git branch (no worktree) from a configurable base. Centralizes three concerns previously duplicated across orchestrators: naming validation (Rule 09), idempotency (same-SHA no-op), and structured error codes. Replaces ad-hoc `git checkout -b` blocks. `x-git-worktree create` is the only other place branch creation is allowed (it additionally runs `git worktree add`).
+Single, idempotent entry point for creating a bare git branch (no worktree) from a configurable base. Centralizes three concerns previously duplicated across orchestrators: naming validation (Rule 09), idempotency (same-SHA no-op), and structured error codes. Replaces ad-hoc `git checkout -b` blocks. `x-manage-worktrees create` is the only other place branch creation is allowed (it additionally runs `git worktree add`).
 
 ## Triggers
 
-- `/x-git-branch --name feat/my-feature` — create branch from `develop` (default)
-- `/x-git-branch --name epic/0049 --base main` — create epic branch from `main`
-- `/x-git-branch --name feat/my-feature --push` — create and push with upstream tracking
-- `/x-git-branch --name feat/my-feature --dry-run` — preview without executing
+- `/x-create-git-branch --name feat/my-feature` — create branch from `develop` (default)
+- `/x-create-git-branch --name epic/0049 --base main` — create epic branch from `main`
+- `/x-create-git-branch --name feat/my-feature --push` — create and push with upstream tracking
+- `/x-create-git-branch --name feat/my-feature --dry-run` — preview without executing
 
 ## Parameters
 
@@ -138,7 +138,7 @@ elif [ "$CREATED" = "true" ]; then
 fi
 ```
 
-Branch is created **without checkout** (bare). Callers that need a checked-out working tree must use `x-git-worktree create` instead.
+Branch is created **without checkout** (bare). Callers that need a checked-out working tree must use `x-manage-worktrees create` instead.
 
 ### Step 6 — Optional Push
 
@@ -198,21 +198,21 @@ printf '{"branchName":"%s","baseSha":"%s","created":%s,"alreadyExisted":%s,"push
 
 ```
 # Feature branch from develop (default base)
-/x-git-branch --name feat/auth-refresh
+/x-create-git-branch --name feat/auth-refresh
 # -> {"branchName":"feat/auth-refresh","baseSha":"<sha>","created":true,"alreadyExisted":false,"pushed":false}
 
 # Epic branch from main
-/x-git-branch --name epic/0049 --base main
+/x-create-git-branch --name epic/0049 --base main
 
 # Idempotent re-creation (exit 0, created=false)
-/x-git-branch --name feat/auth-refresh
+/x-create-git-branch --name feat/auth-refresh
 
 # Dry-run
-/x-git-branch --name feat/my-branch --dry-run
+/x-create-git-branch --name feat/my-branch --dry-run
 # [dry-run] git branch feat/my-branch develop
 
 # Create + push
-/x-git-branch --name feat/my-branch --push
+/x-create-git-branch --name feat/my-branch --push
 ```
 
 ## Rule References
@@ -225,8 +225,8 @@ printf '{"branchName":"%s","baseSha":"%s","created":%s,"alreadyExisted":%s,"push
 
 | Skill | Relationship | Context |
 |-------|--------------|---------|
-| `x-internal-epic-branch-ensure` | caller (story-0049-0008) | Idempotent ensure of `epic/XXXX`; delegates creation here |
-| `x-story-implement` | caller (future refactor — story-0049-0019) | Phase 0 branch creation for standalone stories |
-| `x-epic-implement` | caller (future refactor — story-0049-0018) | Epic/planning branch creation |
-| `x-git-worktree` | related | `create` operation wraps branch creation + `git worktree add`; uses its own inline logic because worktree add requires non-checkout-conflicting branch state |
-| `x-git-push` | related | Pushes an existing branch; this skill optionally invokes `git push` directly for the single-shot create+push case |
+| `x-internal-ensure-epic-branch` | caller (story-0049-0008) | Idempotent ensure of `epic/XXXX`; delegates creation here |
+| `x-implement-story` | caller (future refactor — story-0049-0019) | Phase 0 branch creation for standalone stories |
+| `x-implement-epic` | caller (future refactor — story-0049-0018) | Epic/planning branch creation |
+| `x-manage-worktrees` | related | `create` operation wraps branch creation + `git worktree add`; uses its own inline logic because worktree add requires non-checkout-conflicting branch state |
+| `x-push-branch` | related | Pushes an existing branch; this skill optionally invokes `git push` directly for the single-shot create+push case |

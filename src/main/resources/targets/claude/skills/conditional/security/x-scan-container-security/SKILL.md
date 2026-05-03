@@ -1,5 +1,5 @@
 ---
-name: x-security-container
+name: x-scan-container-security
 description: "Scans Docker images for CVEs and Dockerfile best practices violations. Uses Trivy, Grype, or Snyk Container. Produces SARIF output with scoring."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
@@ -25,10 +25,10 @@ Include this skill when container security scanning is required for the project.
 
 ## Triggers
 
-- `/x-security-container --image myapp:1.0` -- scan image for vulnerabilities
-- `/x-security-container --dockerfile ./Dockerfile` -- lint Dockerfile for best practices
-- `/x-security-container --image myapp:1.0 --dockerfile ./Dockerfile` -- combined scan
-- `/x-security-container --image myapp:1.0 --ignore-unfixed` -- exclude CVEs without available fix
+- `/x-scan-container-security --image myapp:1.0` -- scan image for vulnerabilities
+- `/x-scan-container-security --dockerfile ./Dockerfile` -- lint Dockerfile for best practices
+- `/x-scan-container-security --image myapp:1.0 --dockerfile ./Dockerfile` -- combined scan
+- `/x-scan-container-security --image myapp:1.0 --ignore-unfixed` -- exclude CVEs without available fix
 
 ## Parameters
 

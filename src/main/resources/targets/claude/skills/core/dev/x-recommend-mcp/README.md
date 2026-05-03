@@ -1,11 +1,11 @@
-# x-mcp-recommend
+# x-recommend-mcp
 
 > Analyzes project tech stack and recommends relevant MCP (Model Context Protocol) servers. Auto-detects language, framework, database, cache, and message broker from project config, then matches against a built-in catalog of MCP servers with installation instructions.
 
 | | |
 |---|---|
 | **Category** | Operations |
-| **Invocation** | `/x-mcp-recommend` |
+| **Invocation** | `/x-recommend-mcp` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,8 +16,8 @@ Analyzes the project tech stack by reading project configuration and identity fi
 ## Usage
 
 ```
-/x-mcp-recommend
-/x-mcp-recommend --install
+/x-recommend-mcp
+/x-recommend-mcp --install
 ```
 
 ## Workflow

@@ -1,6 +1,6 @@
-# x-internal-story-load-context — Full Protocol
+# x-internal-load-story-context — Full Protocol
 
-> Depth reference for `x-internal-story-load-context`. The SKILL.md
+> Depth reference for `x-internal-load-story-context`. The SKILL.md
 > body is the normative contract; this document expands the
 > workflow internals that orchestrators do not need in their
 > working context but that implementers and auditors must be able
@@ -10,7 +10,7 @@
 
 The parser is a tight single-file loop (`while (($#)); case "$1" in ...`)
 to keep the SKILL.md within the SkillSizeLinter 500-line threshold
-without delegating to `x-internal-args-normalize` (that skill is a
+without delegating to `x-internal-normalize-args` (that skill is a
 peer, not a dependency — see Rule 14).
 
 | Input | Result | Exit |
@@ -107,9 +107,9 @@ synonym would hide lifecycle drift (Rule 22 precedent).
 
 - The skill opens `<state_file>.lock` with a shared lock
   (`flock -s`) so it can run in parallel with other read-only
-  consumers (e.g., `x-status-reconcile` in diagnose mode) and
+  consumers (e.g., `x-reconcile-status` in diagnose mode) and
   serialises only behind the exclusive writer
-  (`x-internal-status-update`).
+  (`x-internal-update-status`).
 - The shared lock is released on process exit via file-descriptor
   closure; no `trap`-based cleanup is required.
 - The skill holds the shared lock for the duration of Step 3 only
@@ -161,14 +161,14 @@ Epic dir not found: ai/epics/epic-XXXX
 Envelope for exit 64 (usage error):
 
 ```text
-usage: x-internal-story-load-context --story-id <id> --epic-id <id>
+usage: x-internal-load-story-context --story-id <id> --epic-id <id>
 ```
 
 No JSON is written to stdout on any non-zero exit — callers
 distinguish success from failure by exit code, not by parsing
 stdout.
 
-## 8. Why Not Delegate Parsing to x-internal-args-normalize?
+## 8. Why Not Delegate Parsing to x-internal-normalize-args?
 
 A direct delegation would save ~30 lines in this SKILL.md but
 would introduce a circular-dependency hazard during the
@@ -184,6 +184,6 @@ a breaking refactor.
 The inline parser also documents the parameter contract at the
 point of use, which is the convention the three prior pilot
 skills adopted — staying consistent with
-`x-internal-status-update`, `x-internal-report-write`, and
-`x-internal-args-normalize` themselves (each defines its own
+`x-internal-update-status`, `x-internal-write-report`, and
+`x-internal-normalize-args` themselves (each defines its own
 parser inline).

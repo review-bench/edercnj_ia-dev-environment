@@ -1,6 +1,6 @@
 ---
-name: x-task-plan
-description: "Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-story-plan (future)."
+name: x-plan-task
+description: "Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-plan-story (future)."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--task-file <path> [--output-dir <dir>] [--no-commit] [--dry-run]  |  [STORY-ID] --task [TASK-ID] [--force] [--no-commit] [--dry-run]"
@@ -21,15 +21,15 @@ Produces a detailed implementation plan for a single task extracted from a story
 
 ## Triggers
 
-- `/x-task-plan --task-file <path>` -- **task-file-first** (EPIC-0038): consume a standalone `task-TASK-XXXX-YYYY-NNN.md` contract, write the plan next to it.
-- `/x-task-plan --task-file <path> --output-dir <dir>` -- override output directory.
-- `/x-task-plan --task-file <path> --no-commit` -- **batch mode** (EPIC-0049 story-0049-0017): write the plan file but SKIP the individual planning-commit. Callers (e.g., `x-story-plan`) aggregate N plans and issue ONE batched commit.
-- `/x-task-plan STORY-ID --task TASK-ID` -- **story-scoped (legacy)**: read task from story Section 8.
-- `/x-task-plan STORY-ID --task TASK-ID --force` -- regenerate even if plan exists.
-- `/x-task-plan STORY-ID --task TASK-ID --no-commit` -- **batch mode (story-scoped)**: write plan but skip commit.
+- `/x-plan-task --task-file <path>` -- **task-file-first** (EPIC-0038): consume a standalone `task-TASK-XXXX-YYYY-NNN.md` contract, write the plan next to it.
+- `/x-plan-task --task-file <path> --output-dir <dir>` -- override output directory.
+- `/x-plan-task --task-file <path> --no-commit` -- **batch mode** (EPIC-0049 story-0049-0017): write the plan file but SKIP the individual planning-commit. Callers (e.g., `x-plan-story`) aggregate N plans and issue ONE batched commit.
+- `/x-plan-task STORY-ID --task TASK-ID` -- **story-scoped (legacy)**: read task from story Section 8.
+- `/x-plan-task STORY-ID --task TASK-ID --force` -- regenerate even if plan exists.
+- `/x-plan-task STORY-ID --task TASK-ID --no-commit` -- **batch mode (story-scoped)**: write plan but skip commit.
 
 > **Invocation modes.** Task-file-first is the canonical path post-EPIC-0038: an
-> orchestrator (human or `x-story-plan` in the future) generates `task-TASK-NNN.md`
+> orchestrator (human or `x-plan-story` in the future) generates `task-TASK-NNN.md`
 > files and pipes each one through this skill. Story-scoped mode is retained for
 > backward compatibility with epics 0025-0037 that still declare tasks as sub-sections
 > of the story file.
@@ -43,7 +43,7 @@ Produces a detailed implementation plan for a single task extracted from a story
 | `--task-file` | Yes | Path to a `task-TASK-XXXX-YYYY-NNN.md` file (schema: story-0038-0001). MUST pass `TaskFileParser` validation. |
 | `--output-dir` | No (default: same dir as `--task-file`) | Directory to write `plan-task-TASK-XXXX-YYYY-NNN.md`. |
 | `--force` | No | Regenerate plan even if a fresh one already exists. |
-| `--no-commit` | No (default: `false`) | When `true`, skip the Planning Status Propagation commit (Phase 5.4). Plan file is still written to disk and status is still flipped `Pendente -> Planejada`, but the commit step is deferred to the caller. Used by `x-story-plan` to batch-commit N plans in a single commit (EPIC-0049 story-0049-0017). |
+| `--no-commit` | No (default: `false`) | When `true`, skip the Planning Status Propagation commit (Phase 5.4). Plan file is still written to disk and status is still flipped `Pendente -> Planejada`, but the commit step is deferred to the caller. Used by `x-plan-story` to batch-commit N plans in a single commit (EPIC-0049 story-0049-0017). |
 | `--dry-run` | No (default: `false`) | When `true`, plan file is written to disk but Steps P2 / P4 / P5 (branch-ensure / planning-commit / push) become no-ops (EPIC-0049 / RULE-007). |
 
 ### Story-scoped mode (legacy — epics 0025-0037)
@@ -75,39 +75,39 @@ Produces a detailed implementation plan for a single task extracted from a story
 ### Step P1 — Detect Worktree Context (EPIC-0049 / RULE-001)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-P1-Worktree-Detect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-P1-Worktree-Detect`
 
-Invoke `x-git-worktree` in detect-context mode to record whether the current checkout is already inside an epic worktree. Result is advisory only — `x-internal-epic-branch-ensure` (Step P2) makes the authoritative decision.
+Invoke `x-manage-worktrees` in detect-context mode to record whether the current checkout is already inside an epic worktree. Result is advisory only — `x-internal-ensure-epic-branch` (Step P2) makes the authoritative decision.
 
-    Skill(skill: "x-git-worktree", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", args: "detect-context")
 
 Continue on any detect-context failure (fail-open, RULE-006) — log a WARNING and proceed to Step P2.
 
-When `--no-commit` is set (orchestrator mode, e.g., called by `x-story-plan`), skip this step — the parent owns branch lifecycle.
+When `--no-commit` is set (orchestrator mode, e.g., called by `x-plan-story`), skip this step — the parent owns branch lifecycle.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-P1-Worktree-Detect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-P1-Worktree-Detect ok`
 
 ### Step P2 — Ensure `epic/<ID>` Branch (EPIC-0049 / RULE-001)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-P2-Epic-Branch-Ensure`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-P2-Epic-Branch-Ensure`
 
 Resolve the effective epic ID from the task source:
 
 - **Task-file mode (`--task-file`):** extract `XXXX` from the task-file path (`ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md`) or from the task's `**Task ID:**` header.
 - **Story-scoped mode:** extract `XXXX` from the `STORY-ID` argument (e.g., `story-0049-0001` → `0049`).
 
-Invoke `x-internal-epic-branch-ensure` so the canonical `epic/<ID>` branch exists locally AND on origin (idempotent). The skill is a no-op when the current checkout is already on `epic/<ID>` or a worktree rooted at that branch.
+Invoke `x-internal-ensure-epic-branch` so the canonical `epic/<ID>` branch exists locally AND on origin (idempotent). The skill is a no-op when the current checkout is already on `epic/<ID>` or a worktree rooted at that branch.
 
-    Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id <XXXX>")
+    Skill(skill: "x-internal-ensure-epic-branch", args: "--epic-id <XXXX>")
 
 On failure (non-zero exit), abort with `EPIC_BRANCH_ENSURE_FAILED` — a clean audit trail cannot be produced without the canonical branch.
 
 When `--no-commit` or `--dry-run` is set, skip this step.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-P2-Epic-Branch-Ensure ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-P2-Epic-Branch-Ensure ok`
 
 ### Phase 0 -- Validate and Pre-Check
 
@@ -162,7 +162,7 @@ Before generating, verify whether a valid plan already exists:
 > and Section 8 (Decision Rationale — N/A accepted for tasks) to the plan output.
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-1-Context-Gathering`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-1-Context-Gathering`
 
 #### 1A. Task-file-first branch (EPIC-0038 — `--task-file` present)
 
@@ -201,12 +201,12 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task
 5. If the task ID is NOT found in Section 8, abort: `"Task TASK-XXXX-YYYY-NNN not found in story-XXXX-YYYY Section 8"`
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-1-Context-Gathering ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-1-Context-Gathering ok`
 
 ### Phase 2 -- Map TDD Cycles (TPP Order)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-2-Task-Breakdown`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-2-Task-Breakdown`
 
 Generate TDD cycles based on the task's layer, test type, and acceptance criteria. Cycles MUST follow strict **Transformation Priority Premise** order:
 
@@ -255,7 +255,7 @@ Each TDD cycle MUST contain:
 Every task plan MUST contain at least 3 TDD cycles. The first cycle MUST always be a degenerate case (TPP Level 1). For domain logic tasks, target 4-6 cycles. For simple config/doc tasks, 3 cycles suffice.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-2-Task-Breakdown ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-2-Task-Breakdown ok`
 
 ### Phase 3 -- Analyze Affected Files by Layer
 
@@ -305,7 +305,7 @@ For each applicable security item, generate a checklist entry with:
 
 ### Phase 4.5 -- Compute File Footprint
 
-Emit a structured machine-readable footprint so downstream tooling (e.g., `/x-parallel-eval`) can detect write-conflicts deterministically, without relying on prose parsing of "Affected Files".
+Emit a structured machine-readable footprint so downstream tooling (e.g., `/x-evaluate-parallelism`) can detect write-conflicts deterministically, without relying on prose parsing of "Affected Files".
 
 #### Inference Rules
 
@@ -346,7 +346,7 @@ The inference rules above are the working contract documented in the `parallelis
 ### Phase 5 -- Write Plan
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-3-Validation`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-3-Validation`
 
 #### 5.1 Ensure Output Directory
 
@@ -362,7 +362,7 @@ Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` with the fo
 
 ```yaml
 ---
-generated-by: x-task-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-by: x-plan-task@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 story-id: story-XXXX-YYYY
 ---
@@ -447,7 +447,7 @@ Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
 After writing, log: `"Task plan generated: task-plan-XXXX-YYYY-NNN.md (N TDD cycles, M affected files)"`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-3-Validation ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-3-Validation ok`
 
 ## Anti-Patterns
 
@@ -476,7 +476,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-p
 
 | Scenario | Action |
 |----------|--------|
-| No story ID provided | Prompt: `"Usage: /x-task-plan [STORY-ID] --task [TASK-ID] [--force]"` |
+| No story ID provided | Prompt: `"Usage: /x-plan-task [STORY-ID] --task [TASK-ID] [--force]"` |
 | No task ID provided | Abort: `"--task flag is required. Provide a TASK-XXXX-YYYY-NNN identifier."` |
 | Story file not found | Abort: `"Story file not found at {path}"` |
 | Section 8 not found | Abort: `"Section 8 (Tasks) not found in story {story-id}"` |
@@ -484,8 +484,8 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-p
 | Plan exists and fresh | Return existing: `"Task plan already exists and is up-to-date"` |
 | Plan exists with --force | Regenerate: `"Regenerating task plan (--force)"` |
 | Epic directory not found | Abort: `"Epic directory not found for epic-XXXX"` |
-| `x-internal-epic-branch-ensure` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
-| `x-git-push` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
+| `x-internal-ensure-epic-branch` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
+| `x-push-branch` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
 | `--dry-run` set | Steps P2, P4 (Phase 5.4) and P5 become no-ops |
 | `--no-commit` set | Steps P2, P4 (Phase 5.4) and P5 become no-ops — orchestrator owns branch + commit lifecycle |
 
@@ -493,14 +493,14 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-p
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-plan` | complementary | x-story-plan generates task breakdown; x-task-plan generates per-task execution plans |
-| `x-story-implement` | called-by | Phase 2 (PRE_PLANNED mode) reads task plans to drive implementation |
-| `x-task-implement` | consumed-by | Task plans serve as implementation guides for the developer |
-| `x-test-plan` | complementary | x-test-plan covers story-level tests; x-task-plan maps per-task TDD cycles |
-| `x-git-worktree` | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
-| `x-internal-epic-branch-ensure` | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
-| `x-git-commit` | calls (Phase 5.4 / Step P4) | Commit plan + status flip in standalone mode |
-| `x-git-push` | calls (Step P5) | Push canonical epic branch to origin (optional) |
+| `x-plan-story` | complementary | x-plan-story generates task breakdown; x-plan-task generates per-task execution plans |
+| `x-implement-story` | called-by | Phase 2 (PRE_PLANNED mode) reads task plans to drive implementation |
+| `x-implement-task` | consumed-by | Task plans serve as implementation guides for the developer |
+| `x-plan-tests` | complementary | x-plan-tests covers story-level tests; x-plan-task maps per-task TDD cycles |
+| `x-manage-worktrees` | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
+| `x-internal-ensure-epic-branch` | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
+| `x-commit-changes` | calls (Phase 5.4 / Step P4) | Commit plan + status flip in standalone mode |
+| `x-push-branch` | calls (Step P5) | Push canonical epic branch to origin (optional) |
 
 ## Knowledge Pack References
 
@@ -539,9 +539,9 @@ After writing `plan-task-TASK-XXXX-YYYY-NNN.md`, propagate the lifecycle status 
    git add ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md
    ```
 5. **Commit gate (`--no-commit` aware):**
-   - If `--no-commit=false` (default): commit via `x-git-commit` (Rule 13 Pattern 1 INLINE-SKILL):
+   - If `--no-commit=false` (default): commit via `x-commit-changes` (Rule 13 Pattern 1 INLINE-SKILL):
 
-         Skill(skill: "x-git-commit", args: "docs(task-TASK-XXXX-YYYY-NNN): add plan + update status to Planejada")
+         Skill(skill: "x-commit-changes", args: "docs(task-TASK-XXXX-YYYY-NNN): add plan + update status to Planejada")
 
    - If `--no-commit=true` (EPIC-0049 batch mode): **SKIP the commit step**. The plan file and status write remain on disk (staged) but no commit is produced. Log: `"[no-commit] Plan written; commit deferred to caller"`. Return response with `commitSha: null`.
 
@@ -554,30 +554,30 @@ After writing `plan-task-TASK-XXXX-YYYY-NNN.md`, propagate the lifecycle status 
 | Plan file written to disk | Yes | Yes |
 | Status flipped `Pendente -> Planejada` | Yes | Yes |
 | `git add` of plan + task file | Yes | Yes |
-| `x-git-commit` invoked | Yes | **NO** (deferred to caller) |
+| `x-commit-changes` invoked | Yes | **NO** (deferred to caller) |
 | Response `commitSha` | non-null SHA | `null` |
 | Re-invocation semantics | Idempotent (staleness check) | Idempotent; flipping the flag between runs alternates commit behavior |
 
-**Caller contract (e.g., `x-story-plan`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-planning-commit` call covering every plan + status update — producing a single commit per story instead of N commits.
+**Caller contract (e.g., `x-plan-story`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-commit-planning` call covering every plan + status update — producing a single commit per story instead of N commits.
 
 **Backward compat:** absence of `--no-commit` (or explicit `--no-commit=false`) preserves pre-EPIC-0049 behavior byte-for-byte.
 
 ### Step P4 — Planning Status Commit (alias of Phase 5.4)
 
-The planning-commit step for `x-task-plan` is performed by **Phase 5.4 — Planning Status Propagation** (above). When `--no-commit=true` or `--dry-run=true`, that step becomes a no-op (logged as `"[no-commit] Plan written; commit deferred to caller"` or `"dry-run, skipping commit"` respectively). No additional P4 invocation is issued; this alias exists solely so the P1-P5 convention is readable end-to-end in the skill body (EPIC-0049 / RULE-007).
+The planning-commit step for `x-plan-task` is performed by **Phase 5.4 — Planning Status Propagation** (above). When `--no-commit=true` or `--dry-run=true`, that step becomes a no-op (logged as `"[no-commit] Plan written; commit deferred to caller"` or `"dry-run, skipping commit"` respectively). No additional P4 invocation is issued; this alias exists solely so the P1-P5 convention is readable end-to-end in the skill body (EPIC-0049 / RULE-007).
 
 ### Step P5 — Push to Origin (optional, EPIC-0049)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-task-plan Phase-P5-Push`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-task Phase-P5-Push`
 
 If `--dry-run` or `--no-commit` is set, log `"dry-run, skipping push"` / `"orchestrated mode, skipping push"` and skip.
 
-Delegate the push to `x-git-push` so the canonical `epic/<ID>` branch is synchronized with origin:
+Delegate the push to `x-push-branch` so the canonical `epic/<ID>` branch is synchronized with origin:
 
-    Skill(skill: "x-git-push", args: "--branch epic/<XXXX>")
+    Skill(skill: "x-push-branch", args: "--branch epic/<XXXX>")
 
 On push failure (remote rejection, no connectivity), log a WARNING and continue — the local commit is preserved; the operator can re-run Step P5 or `git push` manually. Do NOT abort.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-task-plan Phase-P5-Push ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-task Phase-P5-Push ok`

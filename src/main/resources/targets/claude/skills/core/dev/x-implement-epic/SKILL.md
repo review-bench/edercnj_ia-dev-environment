@@ -1,7 +1,7 @@
 ---
-name: x-epic-implement
+name: x-implement-epic
 model: sonnet
-description: "Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-args-normalize), Phase 1 (load+plan via x-internal-epic-build-plan), Phase 2 (epic branch via x-internal-epic-branch-ensure), Phase 3 (sequential-by-default story loop via x-story-implement), Phase 4 (integrity gate + report via x-internal-epic-integrity-gate + x-internal-report-write), Phase 5 (final PR epic/XXXX → develop via x-git-merge + x-pr-create). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill."
+description: "Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-normalize-args), Phase 1 (load+plan via x-internal-build-epic-plan), Phase 2 (epic branch via x-internal-ensure-epic-branch), Phase 3 (sequential-by-default story loop via x-implement-story), Phase 4 (integrity gate + report via x-internal-verify-epic-integrity + x-internal-write-report), Phase 5 (final PR epic/XXXX → develop via x-merge-branches + x-create-pr). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill."
 user-invocable: true
 allowed-tools: Read, Write, Glob, Skill, Agent, AskUserQuestion, TaskCreate, TaskUpdate
 argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--non-interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"
@@ -17,12 +17,12 @@ requires-capabilities: []
 ## Triggers
 
 ```
-/x-epic-implement 0049                  — full run (sequential + auto-merge into epic/0049)
-/x-epic-implement 0049 --parallel       — parallel story execution via worktrees
-/x-epic-implement 0049 --legacy-flow    — EPIC-0042 behavior (stories → develop, no final PR)
-/x-epic-implement 0049 --resume         — continue from execution-state.json
-/x-epic-implement 0049 --story story-0049-0007  — single story in isolation
-/x-epic-implement 0049 --dry-run        — generate execution plan only, no dispatch
+/x-implement-epic 0049                  — full run (sequential + auto-merge into epic/0049)
+/x-implement-epic 0049 --parallel       — parallel story execution via worktrees
+/x-implement-epic 0049 --legacy-flow    — EPIC-0042 behavior (stories → develop, no final PR)
+/x-implement-epic 0049 --resume         — continue from execution-state.json
+/x-implement-epic 0049 --story story-0049-0007  — single story in isolation
+/x-implement-epic 0049 --dry-run        — generate execution plan only, no dispatch
 ```
 
 ## Parameters
@@ -36,7 +36,7 @@ requires-capabilities: []
 | `--story ID` | String | — | Execute a single story. Mutually exclusive with `--phase`. |
 | `--resume` | Boolean | `false` | Continue from checkpoint. Auto-detects `flowVersion`. |
 | `--dry-run` | Boolean | `false` | Generate execution plan; exit after Phase 1. |
-| `--skip-review` | Boolean | `false` | Propagated to `x-story-implement` — skips specialist/TL reviews. |
+| `--skip-review` | Boolean | `false` | Propagated to `x-implement-story` — skips specialist/TL reviews. |
 | `--auto-merge-strategy` | Enum | `merge` | Story-PR auto-merge strategy: `merge\|squash\|rebase`. |
 | `--interactive` | Boolean | `false` | Opt-in to 3-option menus (PROCEED/FIX-PR/ABORT) at each gate. Default: non-interactive (Rule 20 EPIC-0061). |
 | `--non-interactive` | Boolean | **DEPRECATED** | Was opt-in; now equals default. Emits deprecation WARN. Removed in 2 releases. |
@@ -64,23 +64,23 @@ Deprecated (still parsed, warn-once): `--sequential`, `--auto-merge`, `--interac
 
 | Concern | Skill | Phase |
 |---------|-------|-------|
-| Args parsing | `x-internal-args-normalize` | 0 |
-| DAG + execution plan | `x-internal-epic-build-plan` | 1 |
-| `epic/<ID>` branch | `x-internal-epic-branch-ensure` | 2 |
-| Per-story TDD + PR | `x-story-implement` | 3 |
-| Integrity gate + report | `x-internal-epic-integrity-gate` + `x-internal-report-write` | 4 |
-| Develop sync + final PR | `x-git-merge` + `x-pr-create` | 5 |
-| Status mutations | `x-internal-status-update` | all |
-| Post-gate remediation | `x-pr-fix-epic` | 4b (optional) |
+| Args parsing | `x-internal-normalize-args` | 0 |
+| DAG + execution plan | `x-internal-build-epic-plan` | 1 |
+| `epic/<ID>` branch | `x-internal-ensure-epic-branch` | 2 |
+| Per-story TDD + PR | `x-implement-story` | 3 |
+| Integrity gate + report | `x-internal-verify-epic-integrity` + `x-internal-write-report` | 4 |
+| Develop sync + final PR | `x-merge-branches` + `x-create-pr` | 5 |
+| Status mutations | `x-internal-update-status` | all |
+| Post-gate remediation | `x-fix-epic-pr` | 4b (optional) |
 
 **Workflow:** Phase 0 (Args) → Phase 1 (Load & Plan) → Phase 2 (Branch Setup, skipped for legacy) → Phase 3 (Story Loop) → Phase 4 (Integrity Gate) → Phase 5 (Final PR, skipped for legacy).
 
 ## Phase 0 — Args
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-0-Args`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-0-Args`
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-implement --phase Phase-0-Args")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-implement-epic --phase Phase-0-Args")
 
 Open phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "completed")` after args normalization):
 
@@ -88,27 +88,27 @@ Open phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "completed"
 
 Invoke args normalizer and resolve epicId, flowVersion, flags:
 
-    Skill(skill: "x-internal-args-normalize", args: "--schema @references/args-schema.json --argv \"{raw argv}\"")
+    Skill(skill: "x-internal-normalize-args", args: "--schema @references/args-schema.json --argv \"{raw argv}\"")
 
 Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field interactiveMode --value <interactive|non-interactive>")
+    Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field interactiveMode --value <interactive|non-interactive>")
 
 Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-0-Args")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-epic --phase Phase-0-Args")
 
 TaskUpdate(id: phase0TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-0-Args ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-0-Args ok`
 
 ## Phase 1 — Load and Plan
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-1-Plan`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-1-Plan`
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-implement --phase Phase-1-Plan")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-implement-epic --phase Phase-1-Plan")
 
 Open phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed")` after plan build):
 
@@ -116,22 +116,22 @@ Open phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed"
 
 Build DAG + execution plan:
 
-    Skill(skill: "x-internal-epic-build-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
+    Skill(skill: "x-internal-build-epic-plan", args: "--epic-id <ID> --mode <sequential|parallel> --output ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md [--strict-overlap]")
 
 Consume `{phases, criticalPath, planPath}`. If `--dry-run=true` → print plan path and stop.
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-1-Plan --expected-artifacts ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-epic --phase Phase-1-Plan --expected-artifacts ai/epics/epic-XXXX/reports/epic-execution-plan-XXXX.md")
 
 TaskUpdate(id: phase1TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-1-Plan ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-1-Plan ok`
 
 <!-- phase-no-gate: Phase 2 is skipped for legacy flow; gate lives inside the conditional block -->
 ## Phase 2 — Branch Setup (skipped for legacy)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-2-Branch`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-2-Branch`
 
 Open phase tracker (close after branch ensure):
 
@@ -139,52 +139,52 @@ Open phase tracker (close after branch ensure):
 
 Ensure `epic/<ID>` branch exists:
 
-    Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id <ID> --base develop --push true")
+    Skill(skill: "x-internal-ensure-epic-branch", args: "--epic-id <ID> --base develop --push true")
 
 On non-zero exit → `BRANCH_ENSURE_FAILED`.
 
     TaskUpdate(id: phase2TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-2-Branch ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-2-Branch ok`
 
 ## Phase 3 — Story Loop
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-3-Execute`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-3-Execute`
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-implement --phase Phase-3-Stories")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-implement-epic --phase Phase-3-Stories")
 
 Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed")` after all stories complete):
 
     TaskCreate(subject: "EPIC-XXXX › Phase 3 - Stories", activeForm: "Executing story loop")
 
-> 🔒 **EXECUTION INTEGRITY (Rule 24):** Each `x-story-implement` call below is a **MANDATORY TOOL CALL**.
+> 🔒 **EXECUTION INTEGRITY (Rule 24):** Each `x-implement-story` call below is a **MANDATORY TOOL CALL**.
 
 **Per-story tracking (sequential, chained via `addBlockedBy`):**
 
     currentStoryId = TaskCreate(subject: "EPIC-XXXX › Phase 3 › story-XXXX-YYYY", activeForm: "Implementing story-XXXX-YYYY")
     [if previous story exists]: TaskUpdate(id: previousStoryId, addBlockedBy: [currentStoryId])
 
-    Skill(skill: "x-story-implement", model: "sonnet", args: "<STORY-ID> --target-branch <epicBranch> --auto-merge <strategy> [--skip-review] [--non-interactive] [--auto-approve-pr]")
+    Skill(skill: "x-implement-story", model: "sonnet", args: "<STORY-ID> --target-branch <epicBranch> --auto-merge <strategy> [--skip-review] [--non-interactive] [--auto-approve-pr]")
 
     TaskUpdate(id: currentStoryId, status: "completed")
 
 Phase gate: all stories in phase N must be `status=SUCCESS` AND `prMergeStatus=MERGED` before phase N+1. Failed story → block-propagation → `STORY_FAILED` (unless `--revert-on-failure`). Resume: Phase 1 envelope `resumeProjection` provides reclassified story statuses.
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-3-Stories")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-epic --phase Phase-3-Stories")
 
 TaskUpdate(id: phase3TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-3-Execute ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-3-Execute ok`
 
 ## Phase 4 — Integrity Gate
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-4-Gate`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-4-Gate`
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-epic-implement --phase Phase-4-Gate")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-implement-epic --phase Phase-4-Gate")
 
 Open phase tracker (close with `TaskUpdate(id: phase4TaskId, status: "completed")` after report):
 
@@ -192,28 +192,28 @@ Open phase tracker (close with `TaskUpdate(id: phase4TaskId, status: "completed"
 
 Run integrity gate:
 
-    Skill(skill: "x-internal-epic-integrity-gate", args: "--epic-id <ID> --branch <epicBranch>")
+    Skill(skill: "x-internal-verify-epic-integrity", args: "--epic-id <ID> --branch <epicBranch>")
 
 On `passed=false`: remediation agent (or `--revert-on-failure` revert) + one retry → `INTEGRITY_GATE_FAILED`. Then write report:
 
-    Skill(skill: "x-internal-report-write", args: "...")
+    Skill(skill: "x-internal-write-report", args: "...")
 
-Post-gate PR-comment remediation (unless `--skip-pr-comments`). **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** Invoke the `x-pr-fix-epic` skill via the Skill tool whenever the gate would otherwise leave actionable Copilot comments unaddressed:
+Post-gate PR-comment remediation (unless `--skip-pr-comments`). **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** Invoke the `x-fix-epic-pr` skill via the Skill tool whenever the gate would otherwise leave actionable Copilot comments unaddressed:
 
-    Skill(skill: "x-pr-fix-epic", model: "sonnet", args: "<EPIC-ID>")
+    Skill(skill: "x-fix-epic-pr", model: "sonnet", args: "<EPIC-ID>")
 
-Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-epic-implement --phase Phase-4-Gate")
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-epic --phase Phase-4-Gate")
 
 TaskUpdate(id: phase4TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-4-Gate ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-4-Gate ok`
 
 <!-- phase-no-gate: Phase 5 is skipped for legacy flow; gate lives inside the conditional block -->
 ## Phase 5 — Final PR (skipped for legacy)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-implement Phase-5-Final-PR`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-5-Final-PR`
 
 Open phase tracker (close after PR creation):
 
@@ -221,17 +221,17 @@ Open phase tracker (close after PR creation):
 
 Sync develop into epic branch:
 
-    Skill(skill: "x-git-merge", model: "haiku", args: "--source develop --target epic/<ID> --strategy merge")
+    Skill(skill: "x-merge-branches", model: "haiku", args: "--source develop --target epic/<ID> --strategy merge")
 
 On conflict → `FINAL_PR_CONFLICTS`. Then create final PR:
 
-    Skill(skill: "x-pr-create", model: "haiku", args: "--epic-id <ID> --head epic/<ID> --target-branch develop --auto-merge none --label epic-integration")
+    Skill(skill: "x-create-pr", model: "haiku", args: "--epic-id <ID> --head epic/<ID> --target-branch develop --auto-merge none --label epic-integration")
 
 Interactive menu (only when `--interactive`): PROCEED / FIX-PR / ABORT. Default is non-interactive (Rule 20, EPIC-0061).
 
 **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24 + Rule 33):** Generate epic memory summary when `governance.ai-memory` capability is active:
 
-    Skill(skill: "x-internal-epic-summary", model: "haiku", args: "--epic-id <ID>")
+    Skill(skill: "x-internal-summarize-epic", model: "haiku", args: "--epic-id <ID>")
     [conditional: flag.ai_memory_enabled]
 
 Exit code handling: 0 = proceed; 7 `MANUAL_REFINEMENT_PRESENT` = proceed (human override preserved); any other non-zero → log warning, proceed (memory is best-effort; does not block PR creation).
@@ -239,7 +239,7 @@ Exit code handling: 0 = proceed; 7 `MANUAL_REFINEMENT_PRESENT` = proceed (human 
     TaskUpdate(id: phase5TaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-implement Phase-5-Final-PR ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-5-Final-PR ok`
 
 ## Recovery
 
@@ -247,12 +247,12 @@ When resuming an epic that partially executed (e.g., some stories completed, CI 
 
 ```bash
 export CLAUDE_RECOVERY_MODE=1
-/x-epic-implement EPIC-XXXX --resume --skip-review
+/x-implement-epic EPIC-XXXX --resume --skip-review
 ```
 
 ### `CLAUDE_RECOVERY_MODE=1`
 
-When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-review` and `--no-ci-watch` flags on this skill without blocking. A WARNING is emitted to stderr for audit trail. The variable is propagated automatically by `x-internal-story-resume` when `staleWarnings != []`.
+When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPIC-0059, Rule 45) allows `--skip-review` and `--no-ci-watch` flags on this skill without blocking. A WARNING is emitted to stderr for audit trail. The variable is propagated automatically by `x-internal-resume-story` when `staleWarnings != []`.
 
 **RULE-059-07:** `CLAUDE_RECOVERY_MODE=1` is the only accepted bypass variable. No other env var bypasses the enforcement hook.
 

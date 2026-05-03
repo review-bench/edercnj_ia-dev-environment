@@ -1,11 +1,11 @@
-# x-test-e2e
+# x-execute-e2e-tests
 
 > Runs integration tests that validate the complete flow from request through all application layers to response, using a real database.
 
 | | |
 |---|---|
 | **Category** | Testing |
-| **Invocation** | `/x-test-e2e [scenario: happy-path\|error\|timeout\|persistent\|all]` |
+| **Invocation** | `/x-execute-e2e-tests [scenario: happy-path\|error\|timeout\|persistent\|all]` |
 | **Reads** | testing |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -19,10 +19,10 @@ Runs or implements end-to-end tests that exercise the complete application flow:
 ## Usage
 
 ```
-/x-test-e2e
-/x-test-e2e happy-path
-/x-test-e2e persistent
-/x-test-e2e all
+/x-execute-e2e-tests
+/x-execute-e2e-tests happy-path
+/x-execute-e2e-tests persistent
+/x-execute-e2e-tests all
 ```
 
 ## Workflow
@@ -34,5 +34,5 @@ Runs or implements end-to-end tests that exercise the complete application flow:
 
 ## See Also
 
-- [x-test-run](../../../core/test/x-test-run/) -- General test execution with coverage thresholds
-- [x-spec-drift](../../../core/dev/x-spec-drift/) -- Validates spec-code alignment before E2E runs
+- [x-execute-tests](../../../core/test/x-execute-tests/) -- General test execution with coverage thresholds
+- [x-detect-spec-drift](../../../core/dev/x-detect-spec-drift/) -- Validates spec-code alignment before E2E runs

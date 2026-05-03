@@ -1,5 +1,5 @@
 ---
-name: x-security-sonar
+name: x-run-sonar-security
 description: "Integrates with SonarQube/SonarCloud for security hotspot tracking, quality gate enforcement, and SARIF output from findings."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -25,9 +25,9 @@ Include this skill when `security.qualityGate.provider` is not "none" in the pro
 
 ## Triggers
 
-- `/x-security-sonar --server https://sonar.example.com --token squ_abc123...` -- default quality gate
-- `/x-security-sonar --server https://sonar.example.com --token squ_abc123... --quality-gate strict` -- strict mode for release pipeline
-- `/x-security-sonar --server https://sonar.example.com --token squ_abc123... --project-key my-service --branch release/1.0` -- custom project key and branch
+- `/x-run-sonar-security --server https://sonar.example.com --token squ_abc123...` -- default quality gate
+- `/x-run-sonar-security --server https://sonar.example.com --token squ_abc123... --quality-gate strict` -- strict mode for release pipeline
+- `/x-run-sonar-security --server https://sonar.example.com --token squ_abc123... --project-key my-service --branch release/1.0` -- custom project key and branch
 
 ## Parameters
 

@@ -1,11 +1,11 @@
-# x-git-push
+# x-push-branch
 
 > Git operations: branch creation, atomic commits (Conventional Commits), push, and PR creation. Use for any git workflow task including branching, committing, pushing, creating PRs, or managing version control.
 
 | | |
 |---|---|
 | **Category** | Git/Release |
-| **Invocation** | `/x-git-push [branch-name or commit-message]` |
+| **Invocation** | `/x-push-branch [branch-name or commit-message]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,9 +16,9 @@ Standardizes the entire Git workflow following Git Flow conventions. Handles bra
 ## Usage
 
 ```
-/x-git-push
-/x-git-push feat/story-0001-0002-add-validation
-/x-git-push "feat(domain): add transaction validation"
+/x-push-branch
+/x-push-branch feat/story-0001-0002-add-validation
+/x-push-branch "feat(domain): add transaction validation"
 ```
 
 ## Workflow
@@ -32,4 +32,4 @@ Standardizes the entire Git workflow following Git Flow conventions. Handles bra
 ## See Also
 
 - [x-release](../x-release/) -- Uses the same Conventional Commits format for release commits
-- [x-release-changelog](../x-release-changelog/) -- Parses commits created by this skill to generate changelogs
+- [x-generate-release-changelog](../x-generate-release-changelog/) -- Parses commits created by this skill to generate changelogs

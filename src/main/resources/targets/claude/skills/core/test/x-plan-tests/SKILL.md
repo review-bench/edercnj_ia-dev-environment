@@ -1,5 +1,5 @@
 ---
-name: x-test-plan
+name: x-plan-tests
 description: "Generates a Double-Loop TDD test plan with TPP-ordered scenarios before implementation. Delegates KP reading to a context-gathering subagent, then produces structured Acceptance Tests (outer loop) and Unit Tests in Transformation Priority Premise order (inner loop)."
 user-invocable: true
 allowed-tools: Read, Grep, Glob
@@ -21,7 +21,7 @@ Produces a Double-Loop TDD test plan that drives implementation order. With 95% 
 
 ## Triggers
 
-- `/x-test-plan STORY-ID` — generate test plan for a specific story
+- `/x-plan-tests STORY-ID` — generate test plan for a specific story
 
 ## Parameters
 
@@ -57,7 +57,7 @@ Before generating a test plan, verify whether a valid plan already exists:
 ### Step 1 — Gather Context (Subagent via Task, model: opus)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-plan Phase-1-KP-Read`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-tests Phase-1-KP-Read`
 
 Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Rule 23 RULE-002 — deep test planning quality for Double-Loop TDD + TPP):
 
@@ -104,7 +104,7 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 > 12. **Template sections** — if template was found, list the 8 mandatory sections to populate
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-plan Phase-1-KP-Read ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-tests Phase-1-KP-Read ok`
 
 ### Step 2 — Generate Test Scenarios (Inline)
 
@@ -112,7 +112,7 @@ Using the context returned by the subagent, generate a Double-Loop TDD test plan
 Organize scenarios by implementation order (TPP), NOT by test category.
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-plan Phase-2-Acceptance-Tests`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-tests Phase-2-Acceptance-Tests`
 
 #### 2.1 — Acceptance Tests (Outer Loop)
 
@@ -129,12 +129,12 @@ For each Gherkin scenario in the story, generate an acceptance test entry:
 | Parallel | `yes` if independent of other ATs |
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-plan Phase-2-Acceptance-Tests ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-tests Phase-2-Acceptance-Tests ok`
 
 #### 2.2 — Unit Tests (Inner Loop, TPP Order)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-plan Phase-3-Unit-Tests-TPP`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-tests Phase-3-Unit-Tests-TPP`
 
 Generate unit test scenarios in strict TPP order. Each scenario represents one
 Red-Green-Refactor cycle.
@@ -197,12 +197,12 @@ When a story describes a purely CRUD operation without branching logic:
 - Acceptance tests should focus on the full CRUD flow
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-plan Phase-3-Unit-Tests-TPP ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-tests Phase-3-Unit-Tests-TPP ok`
 
 ### Step 3 — Estimate and Validate (Inline)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-plan Phase-4-Report`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-tests Phase-4-Report`
 
 #### 3.1 — Coverage Estimation Table
 
@@ -226,7 +226,7 @@ Flag any class where estimated coverage < 95% line / 90% branch.
 10. No unnecessary UTs for CRUD-only stories (max Level 3 unless justified)
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-plan Phase-4-Report ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-tests Phase-4-Report ok`
 
 ### Output
 
@@ -238,7 +238,7 @@ Before writing the test plan file, prepend the YAML frontmatter block at the ver
 
 ```yaml
 ---
-generated-by: x-test-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-by: x-plan-tests@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 story-id: ${STORY_ID}
 ---
@@ -348,8 +348,8 @@ This ensures backward compatibility with projects that have not yet adopted temp
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | called-by | Invoked during Phase 1B |
-| `x-task-implement` | reads | Output consumed as TDD roadmap |
+| `x-implement-story` | called-by | Invoked during Phase 1B |
+| `x-implement-task` | reads | Output consumed as TDD roadmap |
 
 - Pre-check (RULE-002) prevents redundant regeneration when story has not changed
 - Template reference (RULE-007) ensures consistent 8-section output format when available
@@ -362,7 +362,7 @@ This ensures backward compatibility with projects that have not yet adopted temp
 
 > V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
 
-After writing `tests-story-XXXX-YYYY.md`, check the associated story's lifecycle status. The test plan, like the architecture plan, is a secondary writer — the primary transition `Pendente → Planejada` is owned by `x-story-plan`. When `x-test-plan` runs standalone (without `x-story-plan`), it promotes the story from `Pendente` to `Planejada` so the source artifact reflects that the test plan is in place.
+After writing `tests-story-XXXX-YYYY.md`, check the associated story's lifecycle status. The test plan, like the architecture plan, is a secondary writer — the primary transition `Pendente → Planejada` is owned by `x-plan-story`. When `x-plan-tests` runs standalone (without `x-plan-story`), it promotes the story from `Pendente` to `Planejada` so the source artifact reflects that the test plan is in place.
 
 **Steps (end of test-plan generation, BEFORE the final commit):**
 
@@ -379,6 +379,6 @@ After writing `tests-story-XXXX-YYYY.md`, check the associated story's lifecycle
    git add ai/epics/epic-XXXX/story-XXXX-YYYY.md ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md
    ```
 
-       Skill(skill: "x-git-commit", args: "docs(story-XXXX-YYYY): add test plan + update status to Planejada")
+       Skill(skill: "x-commit-changes", args: "docs(story-XXXX-YYYY): add test plan + update status to Planejada")
 
 **Fail-loud:** non-zero CLI exit aborts the skill (RULE-046-08).

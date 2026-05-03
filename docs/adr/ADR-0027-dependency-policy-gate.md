@@ -28,12 +28,12 @@ Introduce a **Dependency Policy & SCA Final Gate** across 6 stories:
 1. **story-0074-0001** — Domain model foundation: `DependencyPolicyConfig`, `BlockAction`,
    `VersionConstraint` (sealed), `LicenseWhitelist`, `BlockOnPolicy`, `ScopePolicy`;
    `Governance` extended; Rule 32; ADR-0027; KP `dependency-policy-playbook`.
-2. **story-0074-0002** — Skill `x-dep-policy-validate` + `_TEMPLATE-DEP-POLICY-REPORT.md`
-   + `x-dependency-audit --policy` flag integration.
+2. **story-0074-0002** — Skill `x-validate-dependency-policy` + `_TEMPLATE-DEP-POLICY-REPORT.md`
+   + `x-audit-dependencies --policy` flag integration.
 3. **story-0074-0003** — Template `_TEMPLATE-DEP-POLICY-DECLARATION.md` + DocsAssembler
    integration.
 4. **story-0074-0004** — CI audit `audit-dep-policy.sh` (Rule 26, Rule 32).
-5. **story-0074-0005** — `x-story-implement` Phase 3 conditional gate + Rule 27 Surface 13.
+5. **story-0074-0005** — `x-implement-story` Phase 3 conditional gate + Rule 27 Surface 13.
 6. **story-0074-0006** — `Epic0074DepPolicySmokeIT` + CHANGELOG + CLAUDE.md "Concluded".
 
 ## Key Design Choices
@@ -95,7 +95,7 @@ preserving all existing call sites.
   ADR-0009 (Wide Records Bound to External Schemas) already covers this exception pattern
   for `ProjectConfig`; `Governance` is treated under the same exemption — it is a
   structural mirror of the YAML root, not a business object.
-- Actual CVE lookups (database queries) are deferred to story-0074-0002 (`x-dep-policy-validate`);
+- Actual CVE lookups (database queries) are deferred to story-0074-0002 (`x-validate-dependency-policy`);
   this ADR covers the domain model and configuration parsing only.
 
 ## Alternatives Considered

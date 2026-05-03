@@ -1,10 +1,10 @@
 <!-- Returns to [slim body](../SKILL.md) after reading. -->
 
-# x-review — Composition Architecture (RULE-007 — EPIC-0064)
+# x-review-codebase — Composition Architecture (RULE-007 — EPIC-0064)
 
-`x-review` is the **canonical composite skill** — it uses fragment-slot composition to include only the specialists relevant to the project's active capabilities.
+`x-review-codebase` is the **canonical composite skill** — it uses fragment-slot composition to include only the specialists relevant to the project's active capabilities.
 
-**Canonical 8 fragments** (under `x-review/fragments/`):
+**Canonical 8 fragments** (under `x-review-codebase/fragments/`):
 
 | Fragment | Requires | Order |
 |----------|----------|-------|
@@ -19,7 +19,7 @@
 
 **Contributing a new specialist fragment:**
 
-1. Create `x-review/fragments/<name>.md` with frontmatter:
+1. Create `x-review-codebase/fragments/<name>.md` with frontmatter:
    ```yaml
    ---
    name: x-review-fragment-<name>

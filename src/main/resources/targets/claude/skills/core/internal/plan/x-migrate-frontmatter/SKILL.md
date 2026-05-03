@@ -1,5 +1,5 @@
 ---
-name: x-frontmatter-migrate
+name: x-migrate-frontmatter
 description: Migrates artifact frontmatter from v2 to v3.0 (requires-capabilities) using path heuristics, keyword scan, and AI fallback
 visibility: public
 user-invocable: true
@@ -8,7 +8,7 @@ allowed-tools: [Read, Edit, Write, Bash, Skill]
 requires-capabilities: [governance.capability.frontmatter]
 ---
 
-# Skill: x-frontmatter-migrate
+# Skill: x-migrate-frontmatter
 
 Migrates one file or a directory of markdown artifacts from frontmatter v2 to schema v3.0,
 adding `requires-capabilities` via a 4-stage hybrid pipeline.
@@ -16,10 +16,10 @@ adding `requires-capabilities` via a 4-stage hybrid pipeline.
 ## Triggers
 
 ```
-/x-frontmatter-migrate <file>                    — migrate single file
-/x-frontmatter-migrate <dir>                     — migrate all .md under dir
-/x-frontmatter-migrate <file> --dry-run          — show diff without writing
-/x-frontmatter-migrate <file> --force-ai         — skip heuristics, go straight to AI inference
+/x-migrate-frontmatter <file>                    — migrate single file
+/x-migrate-frontmatter <dir>                     — migrate all .md under dir
+/x-migrate-frontmatter <file> --dry-run          — show diff without writing
+/x-migrate-frontmatter <file> --force-ai         — skip heuristics, go straight to AI inference
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ adding `requires-capabilities` via a 4-stage hybrid pipeline.
 | `target` | Path | — | Positional. File or directory to migrate. |
 | `--dry-run` | Boolean | `false` | Show diff; do not write or commit. |
 | `--force-ai` | Boolean | `false` | Skip heuristic stages; use AI inference directly. |
-| `--commit` | Boolean | `true` | Commit via `x-planning-commit` after writing. |
+| `--commit` | Boolean | `true` | Commit via `x-commit-planning` after writing. |
 | `--catalog-root` | Path | `capabilities/` | Catalog root for capability ID lookup. |
 
 ## Pipeline (4 stages per file)
@@ -84,7 +84,7 @@ After AI inference: emit `WARNING: AI inference used for {file} — manual revie
 5. Write back to file.
 6. When `--commit=true`, commit via:
 
-    Skill(skill: "x-planning-commit", args: "--files <file> --message 'migrate(frontmatter): {file} → v3.0'")
+    Skill(skill: "x-commit-planning", args: "--files <file> --message 'migrate(frontmatter): {file} → v3.0'")
 
 ## Output Contract
 
@@ -113,4 +113,4 @@ Re-run with `--force-ai` to use AI inference instead of heuristics.
 
 Consumed by stories 0203-0214 (batch migration of 182 artifacts).
 `FrontmatterValidator` (story-0064-0201) validates every output before writing.
-`x-planning-commit` handles commit if `--commit=true`.
+`x-commit-planning` handles commit if `--commit=true`.

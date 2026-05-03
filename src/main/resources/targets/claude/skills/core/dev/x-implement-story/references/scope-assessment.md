@@ -1,7 +1,7 @@
 # Scope Assessment Reference
 
 > **Context:** This reference details SIMPLE/STANDARD/COMPLEX classification.
-> Part of x-story-implement skill.
+> Part of x-implement-story skill.
 
 ## Scope Assessment
 

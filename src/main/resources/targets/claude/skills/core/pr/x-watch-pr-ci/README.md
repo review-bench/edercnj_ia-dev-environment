@@ -1,4 +1,4 @@
-# x-pr-watch-ci
+# x-watch-pr-ci
 
 **Category:** `core/pr/` | **User-invocable:** yes
 
@@ -8,22 +8,22 @@ Polls a PR's CI checks and Copilot review, blocking until checks complete or the
 
 ```bash
 # Watch PR #42 with defaults (timeout=1800s, require Copilot review)
-/x-pr-watch-ci --pr-number 42
+/x-watch-pr-ci --pr-number 42
 
 # Skip Copilot wait
-/x-pr-watch-ci --pr-number 42 --require-copilot-review false
+/x-watch-pr-ci --pr-number 42 --require-copilot-review false
 
 # Short timeout for automation
-/x-pr-watch-ci --pr-number 42 --timeout-seconds 300 --poll-interval-seconds 30
+/x-watch-pr-ci --pr-number 42 --timeout-seconds 300 --poll-interval-seconds 30
 ```
 
 ## Invocation by Orchestrators (Rule 13 Pattern 1 INLINE-SKILL)
 
 ```markdown
-Skill(skill: "x-pr-watch-ci", args: "--pr-number 42")
+Skill(skill: "x-watch-pr-ci", args: "--pr-number 42")
 ```
 
-Bare-slash (`/x-pr-watch-ci`) is forbidden in delegation contexts (Rule 13 §Forbidden).
+Bare-slash (`/x-watch-pr-ci`) is forbidden in delegation contexts (Rule 13 §Forbidden).
 
 ## Exit Codes (Stable Public Contract — RULE-045-05)
 

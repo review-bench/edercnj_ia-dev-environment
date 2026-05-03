@@ -1,11 +1,11 @@
-# x-lib-group-verifier
+# x-lib-verify-group
 
 > Build gate verification between parallelism groups. Compiles code, classifies errors, decides retry vs escalate, extracts outputs for next group. Used between each implementation group in Phase 2.
 
 | | |
 |---|---|
 | **Category** | Library (internal) |
-| **Called by** | x-story-implement |
+| **Called by** | x-implement-story |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -17,7 +17,7 @@ Acts as a build gate between parallelism groups (G1-G7) during implementation. C
 
 | Caller | Context | Input | Output |
 |--------|---------|-------|--------|
-| x-story-implement | Phase 2, after each group completes | Group ID (G1-G7), files created/modified by the group | Verification report (PASS/FAIL), extracted file contents for next group, atomic git commit |
+| x-implement-story | Phase 2, after each group completes | Group ID (G1-G7), files created/modified by the group | Verification report (PASS/FAIL), extracted file contents for next group, atomic git commit |
 
 ## Procedure
 
@@ -30,5 +30,5 @@ Acts as a build gate between parallelism groups (G1-G7) during implementation. C
 
 ## See Also
 
-- [x-lib-task-decomposer](../x-lib-task-decomposer/) -- produces the task breakdown and parallelism groups verified by this skill
-- [x-story-implement](../../x-story-implement/) -- orchestrator that invokes this skill after each implementation group
+- [x-lib-decompose-task](../x-lib-decompose-task/) -- produces the task breakdown and parallelism groups verified by this skill
+- [x-implement-story](../../x-implement-story/) -- orchestrator that invokes this skill after each implementation group

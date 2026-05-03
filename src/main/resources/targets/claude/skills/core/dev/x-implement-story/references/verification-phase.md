@@ -1,7 +1,7 @@
 # Verification Phase Reference
 
 > **Context:** This reference details Phase 8 (Final Verification).
-> Part of x-story-implement skill.
+> Part of x-implement-story skill.
 
 ## Phase 8 -- Final Verification
 
@@ -45,19 +45,19 @@ If no documentable interfaces configured: skip interface generators with log `"N
 
 **Architecture Document Update (Recommended):**
 If an architecture plan exists at `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`:
-1. Invoke `x-arch-update` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+1. Invoke `x-update-architecture` via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-       Skill(skill: "x-arch-update", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")
+       Skill(skill: "x-update-architecture", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")
 
    This incrementally updates `steering/service-architecture.md`.
 2. New components, integrations, flows, and ADR references are added to the appropriate sections
 3. If `steering/service-architecture.md` does not exist, create it from the template
 
-### Step 8.4 -- Review (invoke x-review via Skill tool)
+### Step 8.4 -- Review (invoke x-review-codebase via Skill tool)
 
-Invoke the `x-review` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
+Invoke the `x-review-codebase` skill via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-review", args: "{STORY_ID}")
+    Skill(skill: "x-review-codebase", args: "{STORY_ID}")
 
 The review skill launches its own parallel subagents (one per specialist engineer), each reading their own knowledge pack.
 
@@ -82,7 +82,7 @@ After collecting all specialist review results, generate a consolidated dashboar
    - Save to `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
 2. Fix ALL failed items from review (every specialist must reach STATUS: Approved)
 3. For each fix, follow TDD discipline: write/update the test FIRST, then apply the fix
-4. Use atomic commits via `/x-git-commit` for fixes
+4. Use atomic commits via `/x-commit-changes` for fixes
 5. Run `{{COMPILE_COMMAND}}` + `{{TEST_COMMAND}}`
 6. Update remediation tracking: mark fixed items as "Fixed" with commit reference.
 

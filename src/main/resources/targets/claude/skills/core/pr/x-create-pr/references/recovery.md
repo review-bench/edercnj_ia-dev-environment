@@ -1,11 +1,11 @@
-# x-pr-create — Recovery (Render Skill Fallback)
+# x-create-pr — Recovery (Render Skill Fallback)
 
-> **Scope:** EPIC-0066 / story-0066-0005 — fail-open contract for `x-internal-pr-body-render`.
+> **Scope:** EPIC-0066 / story-0066-0005 — fail-open contract for `x-internal-render-pr-body`.
 > **Referenced by:** `SKILL.md` `## Recovery` section (link only — full detail lives here per ADR-0007).
 
 ## When the Fallback Triggers
 
-When `x-internal-pr-body-render` returns exit ≠ 0 in Phase 3, this skill **falls back to the legacy inline body generator** to ensure PR creation never aborts. The fallback body does NOT contain the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will report `PR_TEMPLATE_VIOLATION` for PRs created via this fallback path. This is intentional fail-open behavior (RULE-004) — the audit gate downstream will block the merge if the marker is missing.
+When `x-internal-render-pr-body` returns exit ≠ 0 in Phase 3, this skill **falls back to the legacy inline body generator** to ensure PR creation never aborts. The fallback body does NOT contain the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will report `PR_TEMPLATE_VIOLATION` for PRs created via this fallback path. This is intentional fail-open behavior (RULE-004) — the audit gate downstream will block the merge if the marker is missing.
 
 ## Fallback Inline Body (legacy generator — preserved verbatim from pre-EPIC-0066)
 
@@ -42,7 +42,7 @@ The fallback body lacks `## Orchestrator Evidence` — Phase 3.5 dedup logic det
 
 | Render exit code | Cause | Fallback action |
 | :--- | :--- | :--- |
-| 1 (`INVALID_KIND`) | Bug in x-pr-create — should never happen | Use fallback + emit WARN |
+| 1 (`INVALID_KIND`) | Bug in x-create-pr — should never happen | Use fallback + emit WARN |
 | 2 (`OPERATIONAL_ERROR`) | Template missing, write permission denied | Use fallback + emit WARN |
 | 3 (`INVALID_SCOPE`) | story-id derivation failed | Use fallback + emit WARN |
 

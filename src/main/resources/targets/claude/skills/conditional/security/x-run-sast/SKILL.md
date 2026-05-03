@@ -1,5 +1,5 @@
 ---
-name: x-security-sast
+name: x-run-sast
 description: "Static Application Security Testing -- scans source code for security vulnerabilities without executing the application. Produces SARIF output with OWASP mapping."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -27,10 +27,10 @@ Include this skill when `security.scanning.sast = true` in the project configura
 
 ## Triggers
 
-- `/x-security-sast` -- full scan with all rules
-- `/x-security-sast --scope owasp` -- OWASP Top 10 focused scan
-- `/x-security-sast --scope custom-rules` -- project-specific rules only
-- `/x-security-sast --severity-threshold HIGH` -- filter findings by severity
+- `/x-run-sast` -- full scan with all rules
+- `/x-run-sast --scope owasp` -- OWASP Top 10 focused scan
+- `/x-run-sast --scope custom-rules` -- project-specific rules only
+- `/x-run-sast --severity-threshold HIGH` -- filter findings by severity
 
 ## Parameters
 
@@ -82,7 +82,7 @@ Map each finding to OWASP Top 10 category and CWE:
 | A03 | Injection | SQL injection, XSS, command injection |
 | A04 | Insecure Design | Missing input validation |
 | A05 | Security Misconfiguration | Debug enabled, verbose errors |
-| A06 | Vulnerable Components | Outdated dependencies (delegate to x-dependency-audit) |
+| A06 | Vulnerable Components | Outdated dependencies (delegate to x-audit-dependencies) |
 | A07 | Auth Failures | Weak passwords, missing MFA |
 | A08 | Data Integrity Failures | Insecure deserialization |
 | A09 | Logging Failures | Missing audit logs, sensitive data in logs |

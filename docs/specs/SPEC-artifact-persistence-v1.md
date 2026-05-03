@@ -39,7 +39,7 @@ Atualmente, várias skills **definem** que artefatos devem ser salvos em
 1. **Sem templates padronizados** — Os outputs de planos e reviews variam entre execuções porque
    não existem templates de referência que as LLMs sigam. O formato depende da sessão e do contexto.
 
-2. **Sem verificação de idempotência** — Skills como `x-test-plan` e `x-dev-architecture-plan`
+2. **Sem verificação de idempotência** — Skills como `x-plan-tests` e `x-dev-architecture-plan`
    não verificam se um plano já existe antes de regenerar, desperdiçando tokens e contexto.
 
 3. **Planos de implementação rasos** — O `plan-story-XXXX-YYYY.md` produzido pela Phase 1B do
@@ -103,12 +103,12 @@ seções obrigatórias definidas para seu tipo antes de copiar.
 formato numérico padronizado (`XX/YY`) e status padronizado (`Approved`/`Rejected`/`Partial`),
 permitindo parsing automático por skills de consolidação.
 
-**RULE-006**: O dashboard consolidado de reviews DEVE ser cumulativo: criado pelo `x-review`
+**RULE-006**: O dashboard consolidado de reviews DEVE ser cumulativo: criado pelo `x-review-codebase`
 após reviews de especialistas, e atualizado pelo `x-review-pr` após review do Tech Lead. O
 histórico de rounds de review é preservado.
 
 **RULE-007**: Skills que produzem planos para subagentes (x-dev-lifecycle delegando a
-x-test-plan, x-dev-architecture-plan, etc.) DEVEM instruir o subagente a ler o template
+x-plan-tests, x-dev-architecture-plan, etc.) DEVEM instruir o subagente a ler o template
 correspondente ANTES de produzir o output. A instrução deve ser explícita: "Read template at
 `.claude/templates/_TEMPLATE-{TYPE}.md` for required output format".
 
@@ -155,8 +155,8 @@ O gerador já possui 19 templates em `java/src/main/resources/shared/templates/`
 `_TEMPLATE-EPIC-EXECUTION-REPORT.md`). Porém, nenhum template existe para os artefatos produzidos durante
 o planejamento de cada story: implementation plan, test plan, architecture plan, e task breakdown.
 
-Estes artefatos são produzidos pelas skills `x-dev-lifecycle` (Phase 1B), `x-test-plan`,
-`x-dev-architecture-plan`, e `x-lib-task-decomposer` respectivamente. Atualmente, o formato do
+Estes artefatos são produzidos pelas skills `x-dev-lifecycle` (Phase 1B), `x-plan-tests`,
+`x-dev-architecture-plan`, e `x-lib-decompose-task` respectivamente. Atualmente, o formato do
 output está embutido inline no SKILL.md de cada skill, resultando em variação entre execuções.
 
 **Escopo de implementação**:
@@ -186,7 +186,7 @@ Seções obrigatórias:
 
 #### Template 2: `_TEMPLATE-TEST-PLAN.md`
 
-Extrair e padronizar o formato que hoje está inline no `x-test-plan/SKILL.md`:
+Extrair e padronizar o formato que hoje está inline no `x-plan-tests/SKILL.md`:
 1. **Header** — Story ID, Date, Test Framework (`{{TEST_FRAMEWORK}}`), Language (`{{LANGUAGE}}`), Template Version
 2. **Summary** — AT count, UT count, IT count, estimated coverage
 3. **Acceptance Tests (Outer Loop)** — Por AT-N: Gherkin ref, status (Pending/Green), components, depends-on, parallel
@@ -215,7 +215,7 @@ Extrair o formato que hoje está inline no `x-dev-architecture-plan/SKILL.md`:
 
 #### Template 4: `_TEMPLATE-TASK-BREAKDOWN.md`
 
-Extrair o formato do `x-lib-task-decomposer`:
+Extrair o formato do `x-lib-decompose-task`:
 1. **Header** — Story ID, Mode (TDD-Driven/Layer-Based), Date, Template Version
 2. **Summary** — Total tasks, parallelizable tasks, estimated effort
 3. **Dependency Graph** — Mermaid graph de dependências entre tasks
@@ -343,7 +343,7 @@ Feature: Templates de avaliação de segurança e compliance
 **Dependências**: Nenhuma. Paralela com STORY-0001 e STORY-0002.
 
 **Contexto técnico**:
-O `x-review` lança até 8 subagentes especialistas em paralelo, cada um produzindo um relatório.
+O `x-review-codebase` lança até 8 subagentes especialistas em paralelo, cada um produzindo um relatório.
 O formato atual está embutido inline no SKILL.md e é simples (ENGINEER/STORY/SCORE/STATUS +
 PASSED/FAILED/PARTIAL). Não há template para o dashboard consolidado nem para tracking de
 remediação. O `x-review-pr` (Tech Lead) tem checklist de 45 pontos mas sem template padronizado.
@@ -371,7 +371,7 @@ remediação. O `x-review-pr` (Tech Lead) tem checklist de 45 pontos mas sem tem
 6. **Medium Issues** — Should fix, negociável
 7. **Low Issues** — Recomendações
 8. **TDD Compliance Assessment** — Test-first pattern, TPP progression, Double-Loop adherence
-9. **Specialist Review Validation** — Issues críticos do x-review foram corrigidos?
+9. **Specialist Review Validation** — Issues críticos do x-review-codebase foram corrigidos?
 10. **Verdict** — GO/NO-GO final com rationale
 
 #### Template 9: `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`
@@ -619,7 +619,7 @@ Modificar `java/src/main/resources/targets/claude/skills/core/x-dev-lifecycle/SK
   `_TEMPLATE-COMPLIANCE-ASSESSMENT.md`
 
 **Phase 4 — Referência a review templates**:
-- Instruir x-review a usar `_TEMPLATE-SPECIALIST-REVIEW.md`
+- Instruir x-review-codebase a usar `_TEMPLATE-SPECIALIST-REVIEW.md`
 - Após consolidação, gerar dashboard: `plans/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
 
 **Phase 5 — Tracking de remediação**:
@@ -667,7 +667,7 @@ Feature: Idempotência e templates no x-dev-lifecycle
 
 ---
 
-### STORY-0007: Pre-Check e Template Reference no x-test-plan
+### STORY-0007: Pre-Check e Template Reference no x-plan-tests
 
 **Título**: Adicionar idempotência e referência a template no gerador de test plans
 
@@ -678,12 +678,12 @@ Feature: Idempotência e templates no x-dev-lifecycle
 **Dependências**: STORY-0005
 
 **Contexto técnico**:
-O `x-test-plan` sempre regenera o test plan do zero. Quando invocado repetidamente (por retry
+O `x-plan-tests` sempre regenera o test plan do zero. Quando invocado repetidamente (por retry
 ou nova sessão), desperdiça tokens sem benefício se a story não mudou.
 
 **Escopo de implementação**:
 
-Modificar `java/src/main/resources/targets/claude/skills/core/x-test-plan/SKILL.md`:
+Modificar `java/src/main/resources/targets/claude/skills/core/x-plan-tests/SKILL.md`:
 
 1. **Pre-check**: No início, verificar se `plans/epic-XXXX/plans/tests-story-XXXX-YYYY.md` existe
    e se story_mtime <= plan_mtime. Se sim, log e retornar o conteúdo existente.
@@ -703,18 +703,18 @@ Modificar `java/src/main/resources/targets/claude/skills/core/x-test-plan/SKILL.
 **Gherkin**:
 
 ```gherkin
-Feature: Idempotência no x-test-plan
+Feature: Idempotência no x-plan-tests
 
   Cenario: Test plan existente é reutilizado
     DADO um test plan existente para a story
     E a story NÃO foi modificada desde o plano
-    QUANDO x-test-plan é invocado
+    QUANDO x-plan-tests é invocado
     ENTÃO o plano existente é retornado sem regeneração
     E o log contém "Reusing existing test plan"
 
   Cenario: Test plan segue template quando disponível
     DADO o template "_TEMPLATE-TEST-PLAN.md" existe em .claude/templates/
-    QUANDO x-test-plan gera um novo plano
+    QUANDO x-plan-tests gera um novo plano
     ENTÃO o output segue a estrutura do template
     E todas as 8 seções obrigatórias estão presentes
 ```
@@ -771,7 +771,7 @@ Feature: Idempotência no x-dev-architecture-plan
 
 ---
 
-### STORY-0009: Pre-Check e Template Reference no x-lib-task-decomposer
+### STORY-0009: Pre-Check e Template Reference no x-lib-decompose-task
 
 **Título**: Adicionar idempotência e referência a template no decompositor de tarefas
 
@@ -782,7 +782,7 @@ Feature: Idempotência no x-dev-architecture-plan
 **Dependências**: STORY-0005
 
 **Contexto técnico**:
-O `x-lib-task-decomposer` é uma lib interna chamada pelo `x-dev-lifecycle` na decomposição
+O `x-lib-decompose-task` é uma lib interna chamada pelo `x-dev-lifecycle` na decomposição
 de tasks. Não tem pre-check nem template externo.
 
 **Escopo de implementação**:
@@ -813,7 +813,7 @@ Feature: Idempotência no task decomposer
 
 ---
 
-### STORY-0010: Templates e Dashboard Consolidado no x-review
+### STORY-0010: Templates e Dashboard Consolidado no x-review-codebase
 
 **Título**: Padronizar output de reviews de especialistas e gerar dashboard consolidado
 
@@ -824,13 +824,13 @@ Feature: Idempotência no task decomposer
 **Dependências**: STORY-0005
 
 **Contexto técnico**:
-O `x-review` lança 8 subagentes especialistas em paralelo. Cada subagente recebe o formato
+O `x-review-codebase` lança 8 subagentes especialistas em paralelo. Cada subagente recebe o formato
 de output inline no prompt. Após receber os resultados, não há consolidação em dashboard
 nem tracking de remediação. O formato dos reports varia entre subagentes.
 
 **Escopo de implementação**:
 
-Modificar `java/src/main/resources/targets/claude/skills/core/x-review/SKILL.md`:
+Modificar `java/src/main/resources/targets/claude/skills/core/x-review-codebase/SKILL.md`:
 
 **Phase 2 — Subagent prompts**:
 - Adicionar ao prompt de cada subagente: "Read template at
@@ -865,7 +865,7 @@ Feature: Reviews padronizados e dashboard consolidado
 
   Cenario: Subagentes produzem reports com formato padronizado
     DADO os templates de review existem em .claude/templates/
-    QUANDO x-review executa com 8 especialistas
+    QUANDO x-review-codebase executa com 8 especialistas
     ENTÃO cada report segue o formato de _TEMPLATE-SPECIALIST-REVIEW.md
     E cada report tem score no formato "XX/YY"
 
@@ -896,9 +896,9 @@ Feature: Reviews padronizados e dashboard consolidado
 **Dependências**: STORY-0005, STORY-0010
 
 **Contexto técnico**:
-O `x-review-pr` (Tech Lead) é executado após o `x-review` (especialistas). Precisa ler os
+O `x-review-pr` (Tech Lead) é executado após o `x-review-codebase` (especialistas). Precisa ler os
 reports de especialistas, produzir seu próprio report padronizado, e atualizar o dashboard
-consolidado criado pelo `x-review`.
+consolidado criado pelo `x-review-codebase`.
 
 **Escopo de implementação**:
 

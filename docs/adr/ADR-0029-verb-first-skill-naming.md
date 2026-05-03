@@ -14,14 +14,14 @@ Accepted | 2026-05-03
 
 ## Context
 
-The skill catalog has undergone two previous naming waves (EPIC-0033, EPIC-0036), both of which produced a mostly `x-<noun>-<verb>` or `x-<noun>-<noun>` pattern (e.g., `x-epic-implement`, `x-story-plan`, `x-pr-fix`). This pattern places the domain object first, which means an operator must know the object category before discovering the action.
+The skill catalog has undergone two previous naming waves (EPIC-0033, EPIC-0036), both of which produced a mostly `x-<noun>-<verb>` or `x-<noun>-<noun>` pattern (e.g., `x-implement-epic`, `x-plan-story`, `x-fix-pr`). This pattern places the domain object first, which means an operator must know the object category before discovering the action.
 
 Additionally, skills introduced by later epics (EPIC-0065, EPIC-0069, EPIC-0075) followed the same noun-first pattern. The catalog now has three layers of inconsistency:
-- Original skills: `x-epic-implement`, `x-pr-fix`
-- Second-wave refactor: `x-feature-create`, `x-memory-search`
-- Legacy holdovers: `x-git-commit`, `x-git-branch`
+- Original skills: `x-implement-epic`, `x-fix-pr`
+- Second-wave refactor: `x-create-feature`, `x-search-memory`
+- Legacy holdovers: `x-commit-changes`, `x-create-git-branch`
 
-The root problem is discoverability: an operator wanting to "implement a story" must know to type `x-story-implement` rather than the more natural `x-implement-story`. The verb-first pattern solves this by putting the action — the first thing an operator knows — at the front.
+The root problem is discoverability: an operator wanting to "implement a story" must know to type `x-implement-story` rather than the more natural `x-implement-story`. The verb-first pattern solves this by putting the action — the first thing an operator knows — at the front.
 
 EPIC-0076 performs the second (and final) naming wave, establishing verb-first as the canonical grammar for all public, internal, and lib skills.
 

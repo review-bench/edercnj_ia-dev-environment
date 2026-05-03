@@ -1,4 +1,4 @@
-# x-test-smoke-socket
+# x-execute-socket-smoke-tests
 
 > TCP Socket Smoke Tests -- runs automated smoke tests against the TCP socket server using a standalone Java client with message framing and protocol validation.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `smoke_tests = true` AND `protocols` contains `tcp-custom` |
-| **Invocation** | `/x-test-smoke-socket [--scenario echo\|all] [--k8s] [--host <host>] [--port <port>]` |
+| **Invocation** | `/x-execute-socket-smoke-tests [--scenario echo\|all] [--k8s] [--host <host>] [--port <port>]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -21,14 +21,14 @@ Orchestrates black-box smoke tests against the application's TCP socket server u
 ## Usage
 
 ```
-/x-test-smoke-socket
-/x-test-smoke-socket --scenario echo
-/x-test-smoke-socket --scenario all --k8s
-/x-test-smoke-socket --host 192.168.1.10 --port 9090
+/x-execute-socket-smoke-tests
+/x-execute-socket-smoke-tests --scenario echo
+/x-execute-socket-smoke-tests --scenario all --k8s
+/x-execute-socket-smoke-tests --host 192.168.1.10 --port 9090
 ```
 
 ## See Also
 
-- [x-test-smoke-api](../x-test-smoke-api/) -- REST API smoke tests
-- [x-test-e2e](../x-test-e2e/) -- End-to-end integration tests
+- [x-execute-api-smoke-tests](../x-execute-api-smoke-tests/) -- REST API smoke tests
+- [x-execute-e2e-tests](../x-execute-e2e-tests/) -- End-to-end integration tests
 - [setup-environment](../setup-environment/) -- Dev environment setup with orchestrator

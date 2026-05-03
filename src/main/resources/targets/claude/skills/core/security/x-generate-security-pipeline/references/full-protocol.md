@@ -1,6 +1,6 @@
 <!-- Returns to [slim body](../SKILL.md) after reading the required platform or stage. -->
 
-# x-security-pipeline — Full Protocol
+# x-generate-security-pipeline — Full Protocol
 
 ## Template Variables
 
@@ -93,15 +93,15 @@ Cross-reference `.claude/rules/01-project-identity.md` for authoritative stack i
 
 | Order | Stage | Skill | Phase | Condition | In minimal? |
 |-------|-------|-------|-------|-----------|-------------|
-| 1 | Secret Scan | x-security-secrets | pre-commit | `security.scanning.secrets=true` | Yes |
-| 2 | SAST | x-security-sast | build | `security.scanning.sast=true` | Yes |
-| 3 | Dependency Audit | x-dependency-audit | build | Always | Yes |
-| 4 | SonarQube | x-security-sonar | build | `security.scanning.sonar=true` | No |
-| 5 | Container Scan | x-security-container | build | `container != none` | No |
-| 6 | DAST Passive | x-security-dast | deploy-staging | `security.scanning.dast=true` | No |
-| 7 | OWASP Scan | x-owasp-scan | deploy-staging | `frameworks contains "owasp"` | No |
-| 8 | Hardening Eval | x-hardening-eval | deploy-staging | `security.scanning.hardening=true` | No |
-| 9 | Quality Gate | x-security-sonar | gate | `security.scanning.sonar=true` | No |
+| 1 | Secret Scan | x-scan-secrets | pre-commit | `security.scanning.secrets=true` | Yes |
+| 2 | SAST | x-run-sast | build | `security.scanning.sast=true` | Yes |
+| 3 | Dependency Audit | x-audit-dependencies | build | Always | Yes |
+| 4 | SonarQube | x-run-sonar-security | build | `security.scanning.sonar=true` | No |
+| 5 | Container Scan | x-scan-container-security | build | `container != none` | No |
+| 6 | DAST Passive | x-run-dast | deploy-staging | `security.scanning.dast=true` | No |
+| 7 | OWASP Scan | x-scan-owasp | deploy-staging | `frameworks contains "owasp"` | No |
+| 8 | Hardening Eval | x-evaluate-hardening | deploy-staging | `security.scanning.hardening=true` | No |
+| 9 | Quality Gate | x-run-sonar-security | gate | `security.scanning.sonar=true` | No |
 
 ### Step 3 — Select Stages
 
@@ -340,8 +340,8 @@ Threshold passed to each scanning stage via `SEVERITY_THRESHOLD` environment var
 | Container Scan | Trivy | Vuln + misconfig databases |
 | SonarQube | SonarCloud/Server | `sonar-project.properties` |
 | DAST | OWASP ZAP | Passive scan rules |
-| OWASP Scan | x-owasp-scan | ASVS checklist |
-| Hardening Eval | x-hardening-eval | CIS benchmarks |
+| OWASP Scan | x-scan-owasp | ASVS checklist |
+| Hardening Eval | x-evaluate-hardening | CIS benchmarks |
 
 ---
 
@@ -351,15 +351,15 @@ This skill **references** atomic scanning skills — never duplicates their logi
 
 | Stage | References Skill | This Skill Provides |
 |-------|-----------------|---------------------|
-| Secret Scan | x-security-secrets | CI stage wrapper (triggers, artifacts, caching) |
-| SAST | x-security-sast | CI stage wrapper |
-| Dependency Audit | x-dependency-audit | CI stage wrapper |
-| SonarQube | x-security-sonar | CI stage wrapper |
-| Container Scan | x-security-container | CI stage wrapper |
-| DAST Passive | x-security-dast | CI stage wrapper |
-| OWASP Scan | x-owasp-scan | CI stage wrapper |
-| Hardening Eval | x-hardening-eval | CI stage wrapper |
-| Quality Gate | x-security-sonar | CI stage wrapper (gate polling) |
+| Secret Scan | x-scan-secrets | CI stage wrapper (triggers, artifacts, caching) |
+| SAST | x-run-sast | CI stage wrapper |
+| Dependency Audit | x-audit-dependencies | CI stage wrapper |
+| SonarQube | x-run-sonar-security | CI stage wrapper |
+| Container Scan | x-scan-container-security | CI stage wrapper |
+| DAST Passive | x-run-dast | CI stage wrapper |
+| OWASP Scan | x-scan-owasp | CI stage wrapper |
+| Hardening Eval | x-evaluate-hardening | CI stage wrapper |
+| Quality Gate | x-run-sonar-security | CI stage wrapper (gate polling) |
 
 ---
 
@@ -367,12 +367,12 @@ This skill **references** atomic scanning skills — never duplicates their logi
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-security-secrets | references | Scan logic for Secret Scan stage |
-| x-security-sast | references | Scan logic for SAST stage |
-| x-dependency-audit | references | Scan logic for Dependency Audit stage |
-| x-security-sonar | references | SonarQube + Quality Gate stages |
-| x-security-container | references | Container Scan stage |
-| x-security-dast | references | DAST Passive stage |
-| x-owasp-scan | references | OWASP Scan stage |
-| x-hardening-eval | references | Hardening Eval stage |
-| x-ci-generate | complements | Generates general CI/CD; this skill adds security stages |
+| x-scan-secrets | references | Scan logic for Secret Scan stage |
+| x-run-sast | references | Scan logic for SAST stage |
+| x-audit-dependencies | references | Scan logic for Dependency Audit stage |
+| x-run-sonar-security | references | SonarQube + Quality Gate stages |
+| x-scan-container-security | references | Container Scan stage |
+| x-run-dast | references | DAST Passive stage |
+| x-scan-owasp | references | OWASP Scan stage |
+| x-evaluate-hardening | references | Hardening Eval stage |
+| x-generate-ci | complements | Generates general CI/CD; this skill adds security stages |

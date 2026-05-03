@@ -1,5 +1,5 @@
 ---
-name: x-test-contract-lint
+name: x-lint-contract-tests
 description: "Validates API contracts (OpenAPI 3.1, AsyncAPI 2.6, Protobuf 3) against their specifications. Reports structural errors, missing fields, and spec violations."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
@@ -25,9 +25,9 @@ Include this skill when the project uses API contracts (OpenAPI, AsyncAPI, or Pr
 
 ## Triggers
 
-- `/x-test-contract-lint path/to/contract-openapi.yaml` -- validate an OpenAPI contract
-- `/x-test-contract-lint path/to/service.proto` -- validate a Protobuf contract
-- `/x-test-contract-lint path/to/events-asyncapi.yaml` -- validate an AsyncAPI contract
+- `/x-lint-contract-tests path/to/contract-openapi.yaml` -- validate an OpenAPI contract
+- `/x-lint-contract-tests path/to/service.proto` -- validate a Protobuf contract
+- `/x-lint-contract-tests path/to/events-asyncapi.yaml` -- validate an AsyncAPI contract
 
 ## Parameters
 
@@ -111,4 +111,4 @@ Summary: {count} errors, {count} warnings
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-story-implement | called-by | Invoked by Phase 0.5 (Step 0.5.3) for contract validation before approval |
+| x-implement-story | called-by | Invoked by Phase 0.5 (Step 0.5.3) for contract validation before approval |

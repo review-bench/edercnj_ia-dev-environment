@@ -1,11 +1,11 @@
-# x-ci-generate
+# x-generate-ci
 
 > Generate or update CI/CD pipelines based on project stack: detect language, analyze existing workflows, generate CI/CD/release/security pipelines, validate with actionlint, support monorepo triggers.
 
 | | |
 |---|---|
 | **Category** | Git/Release |
-| **Invocation** | `/x-ci-generate [ci\|cd\|release\|security\|all] [--monorepo] [--force]` |
+| **Invocation** | `/x-generate-ci [ci\|cd\|release\|security\|all] [--monorepo] [--force]` |
 | **Reads** | ci-cd-patterns |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,10 +17,10 @@ Auto-detects the project language and framework from config files, then generate
 ## Usage
 
 ```
-/x-ci-generate
-/x-ci-generate ci
-/x-ci-generate all --monorepo
-/x-ci-generate ci --force
+/x-generate-ci
+/x-generate-ci ci
+/x-generate-ci all --monorepo
+/x-generate-ci ci --force
 ```
 
 ## Workflow
@@ -46,4 +46,4 @@ Auto-detects the project language and framework from config files, then generate
 ## See Also
 
 - [x-release](../x-release/) -- Release flow that triggers the generated release pipeline
-- [x-git-push](../x-git-push/) -- Branch strategy aligned with CI trigger configuration
+- [x-push-branch](../x-push-branch/) -- Branch strategy aligned with CI trigger configuration

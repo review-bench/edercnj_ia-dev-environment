@@ -1,4 +1,4 @@
-# x-security-sast
+# x-run-sast
 
 > Static Application Security Testing -- scans source code for security vulnerabilities without executing the application.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `security.scanning.sast = true` |
-| **Invocation** | `/x-security-sast [--scope all\|owasp\|custom-rules] [--severity-threshold CRITICAL\|HIGH\|MEDIUM\|LOW\|INFO]` |
+| **Invocation** | `/x-run-sast [--scope all\|owasp\|custom-rules] [--severity-threshold CRITICAL\|HIGH\|MEDIUM\|LOW\|INFO]` |
 | **Reads** | security (references: security-skill-template, sarif-template, security-scoring, security-principles) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -22,15 +22,15 @@ Analyzes source code to identify security vulnerabilities, coding errors, and co
 ## Usage
 
 ```
-/x-security-sast
-/x-security-sast --scope owasp
-/x-security-sast --severity-threshold HIGH
-/x-security-sast --scope custom-rules --fix suggest
+/x-run-sast
+/x-run-sast --scope owasp
+/x-run-sast --severity-threshold HIGH
+/x-run-sast --scope custom-rules --fix suggest
 ```
 
 ## See Also
 
-- [x-security-dast](../x-security-dast/) -- Dynamic testing against a running application
-- [x-security-secrets](../x-security-secrets/) -- Scans for leaked credentials and API keys
-- [x-security-sonar](../x-security-sonar/) -- SonarQube quality gate enforcement
-- [x-security-pentest](../x-security-pentest/) -- Multi-phase penetration test orchestrator
+- [x-run-dast](../x-run-dast/) -- Dynamic testing against a running application
+- [x-scan-secrets](../x-scan-secrets/) -- Scans for leaked credentials and API keys
+- [x-run-sonar-security](../x-run-sonar-security/) -- SonarQube quality gate enforcement
+- [x-run-pentest](../x-run-pentest/) -- Multi-phase penetration test orchestrator

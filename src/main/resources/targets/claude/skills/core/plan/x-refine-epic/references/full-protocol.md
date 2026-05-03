@@ -1,4 +1,4 @@
-# x-epic-refine — Full Protocol Reference
+# x-refine-epic — Full Protocol Reference
 
 > This file extends `SKILL.md` (body-slim pattern, ADR-0012). Reading this file is only required
 > for atypical scenarios or when extending the persona set. Happy-path invocations need only
@@ -142,16 +142,16 @@ verdict_hash=$(echo -n "$verdict_block" | sha256sum | awk '{print $1}')
 
 | Code | Condition | Recovery |
 | :--- | :--- | :--- |
-| `EPIC_NOT_FOUND` | `ai/epics/epic-XXXX*/epic-XXXX.md` absent on disk | Run `x-feature-create` or create epic manually |
+| `EPIC_NOT_FOUND` | `ai/epics/epic-XXXX*/epic-XXXX.md` absent on disk | Run `x-create-feature` or create epic manually |
 | `EPIC_STATE_MISSING` | `execution-state.json` absent for the epic | Create with `flowVersion: "4"` and retry |
 | `PHASE_A_EMPTY` | All persona agents returned `gaps: []` with no questions and no NO-GOs but status remains tbd | Diagnostic: verify persona prompts include the `dimensions.md` KP |
-| `VERDICT_WRITE_FAILED` | `x-internal-status-update` returned non-zero | Check `execution-state.json` permissions; verify `--file` path is correct |
+| `VERDICT_WRITE_FAILED` | `x-internal-update-status` returned non-zero | Check `execution-state.json` permissions; verify `--file` path is correct |
 
 ---
 
-## §6 — Integration with x-epic-implement Phase 0 Gate
+## §6 — Integration with x-implement-epic Phase 0 Gate
 
-`x-epic-implement` reads `execution-state.json` in Phase 0 to detect `refinementVerdict`:
+`x-implement-epic` reads `execution-state.json` in Phase 0 to detect `refinementVerdict`:
 
 ```json
 {
@@ -163,7 +163,7 @@ verdict_hash=$(echo -n "$verdict_block" | sha256sum | awk '{print $1}')
 ```
 
 Gate check: `status == "approved" AND scope == "epic"`. Both conditions required. A story-scoped
-verdict (`scope: "story"`) does NOT unblock `x-epic-implement` — the scope discriminator prevents
+verdict (`scope: "story"`) does NOT unblock `x-implement-epic` — the scope discriminator prevents
 confusing story-level refinement with epic-level refinement.
 
 If the gate fails, `enforce-refinement-gate.sh` (Camada 0 PreToolUse hook) exits 33

@@ -1,5 +1,5 @@
 ---
-name: x-arch-update
+name: x-update-architecture
 description: "Incrementally updates the service architecture document with changes from architecture plans. Adds new components, integrations, flows, and ADR references without rewriting existing content. Use after implementation to keep architecture documentation current."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -21,10 +21,10 @@ Incrementally updates the service architecture document (`steering/service-archi
 
 ## Triggers
 
-- `/x-arch-update [STORY-ID]` — update architecture doc from the architecture plan for the given story
-- `/x-arch-update [architecture-plan-path]` — update architecture doc from the specified plan file
+- `/x-update-architecture [STORY-ID]` — update architecture doc from the architecture plan for the given story
+- `/x-update-architecture [architecture-plan-path]` — update architecture doc from the specified plan file
 - After a feature is implemented and an architecture plan exists
-- When Phase 3 (Documentation) of `x-story-implement` is executing
+- When Phase 3 (Documentation) of `x-implement-story` is executing
 - SKIP when no architecture plan exists for the feature
 
 ## Parameters
@@ -156,9 +156,9 @@ Launch a **single** `general-purpose` subagent:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | called-by | Invoked during Phase 3 (Documentation) to update architecture doc |
-| `x-arch-plan` | reads | Generates the input architecture plans consumed by this skill |
-| `x-adr-generate` | calls | May trigger ADR generation for new architectural decisions |
+| `x-implement-story` | called-by | Invoked during Phase 3 (Documentation) to update architecture doc |
+| `x-plan-architecture` | reads | Generates the input architecture plans consumed by this skill |
+| `x-generate-adr` | calls | May trigger ADR generation for new architectural decisions |
 | `architecture` | reads | References architecture principles and patterns KP |
 
 ## Knowledge Pack References

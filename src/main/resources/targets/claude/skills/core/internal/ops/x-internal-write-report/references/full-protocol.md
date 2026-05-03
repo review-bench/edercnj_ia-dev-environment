@@ -1,4 +1,4 @@
-# x-internal-report-write — Full Protocol
+# x-internal-write-report — Full Protocol
 
 Carve-out companion for [`../SKILL.md`](../SKILL.md) per ADR-0007. The
 main SKILL.md is the normative contract; this file is reserved for
@@ -29,8 +29,8 @@ troubleshooting matrix.
 
 | Skill | Shared behaviour | Distinct behaviour |
 | :--- | :--- | :--- |
-| `x-internal-status-update` (pilot, 0049-0005) | Convention anchors, `visibility: internal`, Bash-only toolset | Mutates markdown Status fields; no template rendering |
-| `x-internal-args-normalize` (0049-0007) | Convention anchors, stdout JSON envelope, no file writes (this one DOES write files) | Parses argv against schema; no template rendering |
+| `x-internal-update-status` (pilot, 0049-0005) | Convention anchors, `visibility: internal`, Bash-only toolset | Mutates markdown Status fields; no template rendering |
+| `x-internal-normalize-args` (0049-0007) | Convention anchors, stdout JSON envelope, no file writes (this one DOES write files) | Parses argv against schema; no template rendering |
 
 ## §3 — Follow-up carve-out opportunities
 

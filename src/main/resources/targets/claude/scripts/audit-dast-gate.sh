@@ -23,7 +23,7 @@
 #   audit-dast-gate.sh --check-config-only    # validate YAML fields only (no evidence check)
 #
 # Rule: .claude/rules/26-audit-gate-lifecycle.md (Camada 2)
-# Skill: .claude/skills/x-pentest-dynamic/SKILL.md
+# Skill: .claude/skills/x-run-dynamic-pentest/SKILL.md
 # Catalog: docs/audit-gates-catalog.md (Rule 26 §Catalog-before-Add)
 
 set -u
@@ -165,7 +165,7 @@ has_dast_evidence() {
     local ndjson
     ndjson="$(find ai/epics -name "events.ndjson" 2>/dev/null | head -5)"
     for f in ${ndjson}; do
-        if grep -q "x-pentest-dynamic" "${f}" 2>/dev/null; then
+        if grep -q "x-run-dynamic-pentest" "${f}" 2>/dev/null; then
             return 0
         fi
     done
@@ -223,7 +223,7 @@ main() {
 
         if ! has_dast_evidence "${story_id}"; then
             echo "DAST_GATE_VIOLATION: story ${story_id} — quality.dast.enabled=true but no DAST evidence found." >&2
-            echo "  Invoke: /x-pentest-dynamic ${story_id} --tier smoke" >&2
+            echo "  Invoke: /x-run-dynamic-pentest ${story_id} --tier smoke" >&2
             violations=$((violations + 1))
         fi
     done

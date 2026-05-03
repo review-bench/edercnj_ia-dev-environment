@@ -1,37 +1,37 @@
-# x-epic-orchestrate
+# x-orchestrate-epic
 
 > Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-epic-orchestrate [EPIC-ID] [--resume] [--story story-XXXX-YYYY]` |
-| **Delegates to** | `/x-story-plan` per story (which spawns 5 parallel subagents each) |
+| **Invocation** | `/x-orchestrate-epic [EPIC-ID] [--resume] [--story story-XXXX-YYYY]` |
+| **Delegates to** | `/x-plan-story` per story (which spawns 5 parallel subagents each) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
 ## Overview
 
-Reads the implementation map to determine story dependencies and phase ordering, then invokes `/x-story-plan` for each story in dependency order. Stories within the same phase are dispatched in parallel (batches of 3). Tracks planning status in `execution-state.json` for checkpoint/resume support. Generates a readiness summary and updates the epic file with a `Planning` column.
+Reads the implementation map to determine story dependencies and phase ordering, then invokes `/x-plan-story` for each story in dependency order. Stories within the same phase are dispatched in parallel (batches of 3). Tracks planning status in `execution-state.json` for checkpoint/resume support. Generates a readiness summary and updates the epic file with a `Planning` column.
 
 ## Usage Examples
 
 ```bash
 # Plan all stories in epic 0028
-/x-epic-orchestrate 0028
+/x-orchestrate-epic 0028
 
 # Resume planning after interruption (skip already-READY stories)
-/x-epic-orchestrate 0028 --resume
+/x-orchestrate-epic 0028 --resume
 
 # Plan only a specific story (validates dependencies are satisfied)
-/x-epic-orchestrate 0028 --story story-0028-0004
+/x-orchestrate-epic 0028 --story story-0028-0004
 ```
 
 ## Execution Flow
 
 ```mermaid
 flowchart TD
-    START(["/x-epic-orchestrate EPIC-ID"]) --> P0["Phase 0: Prerequisites"]
+    START(["/x-orchestrate-epic EPIC-ID"]) --> P0["Phase 0: Prerequisites"]
     P0 --> VALID{Valid?}
     VALID -->|No| ABORT(["ERROR + abort"])
     VALID -->|Yes| P1["Phase 1: Dependency Order"]
@@ -44,7 +44,7 @@ flowchart TD
         direction TB
         PHASE["For each phase 0..N"]
         PHASE --> BATCH["Batch stories (max 3)"]
-        BATCH --> DISPATCH["Agent: /x-story-plan per story"]
+        BATCH --> DISPATCH["Agent: /x-plan-story per story"]
         DISPATCH --> COLLECT["Collect DoR verdict"]
         COLLECT --> CHECKPOINT["Update execution-state.json"]
         CHECKPOINT --> NEXT{More phases?}
@@ -65,7 +65,7 @@ flowchart TD
 |---|-------|-------------|------|
 | 0 | Prerequisites | Parse args, validate epic dir, map, story files | Inline |
 | 1 | Dependency Order | Read implementation map, extract phase graph, order stories | Inline |
-| 2 | Plan Loop | Invoke `/x-story-plan` per story in dependency order | Subagents (batches of 3) |
+| 2 | Plan Loop | Invoke `/x-plan-story` per story in dependency order | Subagents (batches of 3) |
 | 3 | Report | Generate readiness summary, update epic file | Inline |
 
 ## Flags
@@ -81,13 +81,13 @@ flowchart TD
 
 | Artifact | Path | Producer |
 |----------|------|----------|
-| Execution state (checkpoint) | `ai/epics/epic-XXXX/execution-state.json` | x-epic-orchestrate |
-| Epic planning report | `ai/epics/epic-XXXX/reports/epic-planning-report-XXXX.md` | x-epic-orchestrate |
-| Epic file update (Planning column) | `ai/epics/epic-XXXX/EPIC-XXXX.md` | x-epic-orchestrate |
-| Task breakdown (per story) | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | x-story-plan |
-| Task plans (per task) | `ai/epics/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | x-story-plan |
-| Planning report (per story) | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | x-story-plan |
-| DoR checklist (per story) | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | x-story-plan |
+| Execution state (checkpoint) | `ai/epics/epic-XXXX/execution-state.json` | x-orchestrate-epic |
+| Epic planning report | `ai/epics/epic-XXXX/reports/epic-planning-report-XXXX.md` | x-orchestrate-epic |
+| Epic file update (Planning column) | `ai/epics/epic-XXXX/EPIC-XXXX.md` | x-orchestrate-epic |
+| Task breakdown (per story) | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` | x-plan-story |
+| Task plans (per task) | `ai/epics/epic-XXXX/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | x-plan-story |
+| Planning report (per story) | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` | x-plan-story |
+| DoR checklist (per story) | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` | x-plan-story |
 
 ## Checkpoint / Resume
 
@@ -104,7 +104,7 @@ flowchart TD
 
 ## See Also
 
-- [x-story-plan](../x-story-plan/) -- Per-story multi-agent planning (invoked as subagent)
-- [x-epic-implement](../x-epic-implement/) -- Epic implementation orchestrator (consumes `execution-state.json`)
+- [x-plan-story](../x-plan-story/) -- Per-story multi-agent planning (invoked as subagent)
+- [x-implement-epic](../x-implement-epic/) -- Epic implementation orchestrator (consumes `execution-state.json`)
 - [x-epic-decompose](../x-epic-decompose/) -- Generates epic, stories, and implementation map
 - [x-epic-map](../x-epic-map/) -- Generates implementation map with dependency graph

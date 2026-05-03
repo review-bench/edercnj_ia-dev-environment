@@ -1,6 +1,6 @@
 ---
-name: x-telemetry-trend
-description: "Detect cross-epic P95 regressions (>= threshold %) and rank top-10 slowest skills from the global telemetry index. Single-responsibility partner of /x-telemetry-analyze focused on trend detection, not point-in-time reporting. Use to answer 'is skill X getting slower over the last N epics?' with evidence."
+name: x-analyze-telemetry-trends
+description: "Detect cross-epic P95 regressions (>= threshold %) and rank top-10 slowest skills from the global telemetry index. Single-responsibility partner of /x-analyze-telemetry focused on trend detection, not point-in-time reporting. Use to answer 'is skill X getting slower over the last N epics?' with evidence."
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--last N] [--threshold-pct P] [--baseline mean|median] [--format md|json] [--out path]"
 context-budget: light
@@ -18,7 +18,7 @@ requires-capabilities: []
 ## Purpose
 
 Detect performance regressions across multiple epics using the append-only
-NDJSON telemetry logs. `/x-telemetry-trend` complements `/x-telemetry-analyze`:
+NDJSON telemetry logs. `/x-analyze-telemetry-trends` complements `/x-analyze-telemetry`:
 analyze answers "which phase is the bottleneck in epic X"; trend answers
 "is skill X getting slower over the last N epics?".
 
@@ -97,12 +97,12 @@ stays bounded in the per-skill duration arrays.
 
 ```bash
 # Default: last 5 epics, threshold 20 %, baseline median → stdout
-/x-telemetry-trend
+/x-analyze-telemetry-trends
 
 # Strict: threshold 10 %, mean baseline, write JSON to disk
-/x-telemetry-trend --threshold-pct 10 --baseline mean --format json \
+/x-analyze-telemetry-trends --threshold-pct 10 --baseline mean --format json \
     --out ai/epics/epic-XXXX/reports/trends.json
 
 # Historical deep dive: last 10 epics, report to a custom path
-/x-telemetry-trend --last 10 --out reports/quarterly-trends.md
+/x-analyze-telemetry-trends --last 10 --out reports/quarterly-trends.md
 ```

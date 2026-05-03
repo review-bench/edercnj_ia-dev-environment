@@ -3,7 +3,7 @@ Returns to [slim body](../SKILL.md) after reading the required phase.
 TASK_PROPOSAL format and consolidation rules: see `planning-guide.md`.
 -->
 
-# x-story-plan — Full Protocol
+# x-plan-story — Full Protocol
 
 ## Phase 0 — Input Resolution
 
@@ -101,19 +101,19 @@ Apply deterministic merge rules from [`planning-guide.md §Consolidation Rules`]
 
 1. Write `tasks-story-XXXX-YYYY.md` from consolidated task list.
 2. Write `planning-report-story-XXXX-YYYY.md` with per-agent summary and conflict resolution log.
-3. Commit via `Skill(skill: "x-planning-commit", ...)` unless `--no-commit`.
+3. Commit via `Skill(skill: "x-commit-planning", ...)` unless `--no-commit`.
 
 ### Phase 4a-4c (v2 only — `planningSchemaVersion == "2.0"`)
 
 **Phase 4a — Task files:** For each TASK-XXXX-YYYY-NNN, emit `task-TASK-XXXX-YYYY-NNN.md` with I/O contract, testability, dependencies.
 
-**Phase 4b — Parallel task plans:** Invoke `x-task-plan` per task in parallel (batch size ≤ 4):
+**Phase 4b — Parallel task plans:** Invoke `x-plan-task` per task in parallel (batch size ≤ 4):
 ```
-Agent(subagent_type: "general-purpose", model: "sonnet", description: "x-task-plan for {TASK-ID}",
-      prompt: "Invoke x-task-plan via Skill(skill: 'x-task-plan', args: '--task-file ai/epics/epic-XXXX/plans/task-{TASK-ID}.md')")
+Agent(subagent_type: "general-purpose", model: "sonnet", description: "x-plan-task for {TASK-ID}",
+      prompt: "Invoke x-plan-task via Skill(skill: 'x-plan-task', args: '--task-file ai/epics/epic-XXXX/plans/task-{TASK-ID}.md')")
 ```
 
-**Phase 4c — Task map:** Generate `task-implementation-map-STORY-XXXX-YYYY.md` with topological sort + parallelism analysis via `x-parallel-eval`.
+**Phase 4c — Task map:** Generate `task-implementation-map-STORY-XXXX-YYYY.md` with topological sort + parallelism analysis via `x-evaluate-parallelism`.
 
 ---
 
@@ -146,9 +146,9 @@ DoR not met → emit checklist diff + `DOR_NOT_MET` (non-blocking warning; story
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | caller | Delegates Phase 1 planning to this skill |
-| `x-task-plan` | calls (Phase 4b, v2) | Per-task implementation plan generation |
-| `x-parallel-eval` | calls (Phase 4c, v2) | File-overlap collision detection |
-| `x-planning-commit` | calls (Phase 4) | Atomic commit of planning artifacts |
-| `x-internal-epic-branch-ensure` | calls (Step P2) | Idempotent epic branch creation |
-| `x-git-worktree` | calls (Step P1) | Detect worktree context (advisory) |
+| `x-implement-story` | caller | Delegates Phase 1 planning to this skill |
+| `x-plan-task` | calls (Phase 4b, v2) | Per-task implementation plan generation |
+| `x-evaluate-parallelism` | calls (Phase 4c, v2) | File-overlap collision detection |
+| `x-commit-planning` | calls (Phase 4) | Atomic commit of planning artifacts |
+| `x-internal-ensure-epic-branch` | calls (Step P2) | Idempotent epic branch creation |
+| `x-manage-worktrees` | calls (Step P1) | Detect worktree context (advisory) |

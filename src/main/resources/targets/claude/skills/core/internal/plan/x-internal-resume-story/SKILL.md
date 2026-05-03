@@ -1,6 +1,6 @@
 ---
-name: x-internal-story-resume
-description: "Detects the resumable state of an in-flight story: reads ai/epics/epic-XXXX/execution-state.json via x-internal-status-update --read-only, identifies the first PENDING or IN_PROGRESS task (the resume point), catalogues DONE tasks with their commitSha, extracts the last committed SHA, and flags staleness when the story file's mtime is newer than any DONE task's completion timestamp. Emits a single-line JSON envelope {resumePoint, tasksCompleted, tasksPending, lastCommitSha, staleWarnings}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify). Read-only by construction — never mutates state."
+name: x-internal-resume-story
+description: "Detects the resumable state of an in-flight story: reads ai/epics/epic-XXXX/execution-state.json via x-internal-update-status --read-only, identifies the first PENDING or IN_PROGRESS task (the resume point), catalogues DONE tasks with their commitSha, extracts the last committed SHA, and flags staleness when the story file's mtime is newer than any DONE task's completion timestamp. Emits a single-line JSON envelope {resumePoint, tasksCompleted, tasksPending, lastCommitSha, staleWarnings}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, x-internal-verify-story). Read-only by construction — never mutates state."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,35 +19,35 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-story-implement (Phase 0 resume detection carve-out).
-> Sétima skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, x-internal-story-load-context
-> 0049-0011, x-internal-story-build-plan 0049-0012, e
-> x-internal-story-verify 0049-0014). Quarta skill em `internal/plan/`:
+> Caller principal: x-implement-story (Phase 0 resume detection carve-out).
+> Sétima skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, x-internal-build-story-plan 0049-0012, e
+> x-internal-verify-story 0049-0014). Quarta skill em `internal/plan/`:
 > o subdir `plan/` agrupa orquestração de load → build → verify → resume
 > da story. Difere de `internal/ops/`, cujas sibling skills mutam estado
 > (execution-state, reports) — esta skill é **strict read-only**.
 
-# Skill: x-internal-story-resume
+# Skill: x-internal-resume-story
 
 ## Purpose
 
 Carve out the story-resume detection logic currently duplicated across
-`x-story-implement` Phase 0 (step 8, "Resume detection") into a single,
+`x-implement-story` Phase 0 (step 8, "Resume detection") into a single,
 single-responsibility skill. The ~120 inline lines the orchestrator
 previously used to classify in-flight task state become a single
-`Skill(skill: "x-internal-story-resume", …)` invocation; the orchestrator
+`Skill(skill: "x-internal-resume-story", …)` invocation; the orchestrator
 shrinks to a read-the-envelope consumer that drives its branch-creation
 and task-dispatch decisions off the four response fields.
 
 Responsibilities (single):
 
 1. Resolve and read `ai/epics/epic-XXXX/execution-state.json` via
-   `x-internal-status-update --read-only` so the concurrency contract
+   `x-internal-update-status --read-only` so the concurrency contract
    (shared `flock -s`) is honoured identically to every other
-   read consumer (`x-internal-story-load-context`,
-   `x-status-reconcile` diagnose mode).
+   read consumer (`x-internal-load-story-context`,
+   `x-reconcile-status` diagnose mode).
 2. Locate the `stories.<id>` node and its `tasks.*` sub-nodes; when the
    story is absent from the state file, exit `2`
    (`STORY_NOT_IN_STATE`).
@@ -78,9 +78,9 @@ Non-responsibilities (explicit):
 
 - The skill does NOT mutate the state file, the story markdown, or
   any commit metadata. It does NOT invoke `git` beyond what its
-  upstream `x-internal-status-update --read-only` may do internally.
+  upstream `x-internal-update-status --read-only` may do internally.
 - The skill does NOT create branches, run PR operations, or dispatch
-  tasks — the caller (`x-story-implement` Phase 0 → Phase 2 wiring)
+  tasks — the caller (`x-implement-story` Phase 0 → Phase 2 wiring)
   owns those transitions.
 - The skill does NOT resolve unknown task statuses to a default — any
   status not in the recognised success/pending synonym sets is
@@ -91,7 +91,7 @@ Non-responsibilities (explicit):
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-story-resume/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other carve-outs of the story-level planning/verification pipeline (`x-internal-story-load-context`, `x-internal-story-build-plan`, `x-internal-story-verify`) |
+| Path | `internal/plan/x-internal-resume-story/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other carve-outs of the story-level planning/verification pipeline (`x-internal-load-story-context`, `x-internal-build-story-plan`, `x-internal-verify-story`) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -105,11 +105,11 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-story-resume` in chat. All invocations
+by a human typing `/x-internal-resume-story` in chat. All invocations
 follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -195,7 +195,7 @@ Invoke the pilot skill in read-only mode to leverage its
 `flock -s`-based shared lock and schema validation:
 
 ```bash
-envelope=$(Skill(skill: "x-internal-status-update",
+envelope=$(Skill(skill: "x-internal-update-status",
                  args: "--file ${state_file} --type story \
                         --id ${story_id} --read-only"))
 ```
@@ -205,7 +205,7 @@ verbatim. When the response envelope's `previousValue` is `null`
 (the id is absent from the schema), exit `2`
 (`STORY_NOT_IN_STATE`).
 
-Fallback (degraded mode): if `x-internal-status-update` is unavailable
+Fallback (degraded mode): if `x-internal-update-status` is unavailable
 (e.g., during bootstrap when the pilot skill itself is being
 generated), fall back to a direct `jq` read:
 
@@ -236,7 +236,7 @@ Classify:
 
 `PR_MERGED` — note: treated as pending when `commitSha` is absent, but
 the caller may observe `lastCommitSha` separately. The convention
-mirrors `x-internal-story-verify`: the envelope is structural, the
+mirrors `x-internal-verify-story`: the envelope is structural, the
 caller maps to lifecycle semantics.
 
 Unknown-status tasks emit a single stderr line
@@ -258,7 +258,7 @@ fi
 ```
 
 The `first_pending_index` assumes DONE tasks precede PENDING tasks in
-task-order (the invariant upheld by `x-story-implement` Phase 2 wave
+task-order (the invariant upheld by `x-implement-story` Phase 2 wave
 dispatch). When the invariant is violated — e.g., TASK-001 PENDING,
 TASK-002 DONE, TASK-003 PENDING — the index is recomputed as the
 1-based position of the first non-DONE task regardless of prior
@@ -315,7 +315,7 @@ Exit `0`.
 ### Example 1 — Happy path: fresh start (nothing DONE)
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -330,7 +330,7 @@ Exit: 0.
 ### Example 2 — Resume mid-story (3 DONE of 5)
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -341,7 +341,7 @@ Envelope includes `"resumePoint":"phase-2-task-4"`, three entries in
 ### Example 3 — Stale warning: story edited after DONE
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -351,7 +351,7 @@ TASK-0049-0013-001 DONE"]`. Exit: 0.
 ### Example 4 — Error: state file missing
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -360,7 +360,7 @@ Stderr: `execution-state.json not found`. Exit: 1.
 ### Example 5 — Error: story not registered
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-9999-9999 --epic-id 0049")
 ```
 
@@ -369,7 +369,7 @@ Stderr: `Story not in execution-state.json`. Exit: 2.
 ### Example 6 — Boundary: all tasks DONE
 
 ```bash
-Skill(skill: "x-internal-story-resume",
+Skill(skill: "x-internal-resume-story",
       args: "--story-id story-0049-0013 --epic-id 0049")
 ```
 
@@ -386,7 +386,7 @@ Envelope `"resumePoint":"all-done"`, `tasksPending=[]`,
 No file is created or modified. The skill is **strictly read-only**
 (enforced by convention and by the `allowed-tools: Bash` frontmatter —
 no `Write` / `Edit` tool is available). Even the delegated
-`x-internal-status-update` invocation is explicit read-only mode
+`x-internal-update-status` invocation is explicit read-only mode
 (`--read-only`), which takes a shared `flock -s` lock and never opens
 the file for write.
 
@@ -400,7 +400,7 @@ the file for write.
 | `stat` flavour mismatch (GNU vs BSD) | Try `stat -f %m` (BSD) first, fall back to `stat -c %Y` (GNU); any failure treats story mtime as 0 and short-circuits Step 5 |
 | `execution-state.json` absent | Exit 1 with `execution-state.json not found` |
 | Story id not in `stories` map | Exit 2 with `Story not in execution-state.json` |
-| `x-internal-status-update` unavailable (bootstrap) | Fall back to direct `jq -c '.stories[<id>]'` on the state file; schema validation is then best-effort |
+| `x-internal-update-status` unavailable (bootstrap) | Fall back to direct `jq -c '.stories[<id>]'` on the state file; schema validation is then best-effort |
 | `completedAt` malformed on a DONE task | Skip that task in Step 5; do not emit a stale warning for it; continue |
 | Story file absent (mtime unknown) | `staleWarnings=[]`; no error |
 | Unknown task status | Emit stderr `warn: unknown status …`; bucket to `tasksPending`; envelope stays well-formed |
@@ -449,7 +449,7 @@ Section 7 of story-0049-0013:
    the state file has no matching entry → exit 2.
 
 Goldens live under
-`src/test/resources/golden/internal/plan/x-internal-story-resume/`.
+`src/test/resources/golden/internal/plan/x-internal-resume-story/`.
 Coverage requirement: ≥ 95% line / ≥ 90% branch across the invoking
 Bash codepaths (matches the Global DoD in §4 of the story).
 
@@ -483,12 +483,12 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-story-implement` | caller (primary) | Phase 0 carve-out: the skill's stdout envelope replaces the ~120-line inline "Resume detection" block previously executed by the orchestrator before entering Phase 1 |
-| `x-epic-implement` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating in-flight stories at the epic scope to decide per-story branch reuse |
-| `x-internal-status-update` | delegate (primary, `--read-only`) | Sibling `x-internal-*` skill; provides the shared-lock read path into `execution-state.json`. This skill is the canonical read-only consumer — it never writes |
-| `x-internal-story-load-context` | peer | Sibling `internal/plan/` skill; runs at Phase 0 preparation alongside this skill — both are idempotent and may be invoked in either order |
-| `x-internal-story-verify` | peer | Sibling `internal/plan/` skill; runs at Phase 3 at the END of the story lifecycle, whereas this skill runs at Phase 0 BEFORE task dispatch |
-| `x-status-reconcile` | consumer (peer) | Reads the same `stories.<id>.tasks.*` nodes this skill inspects in diagnose mode; no shared mutation — both take `flock -s` |
+| `x-implement-story` | caller (primary) | Phase 0 carve-out: the skill's stdout envelope replaces the ~120-line inline "Resume detection" block previously executed by the orchestrator before entering Phase 1 |
+| `x-implement-epic` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating in-flight stories at the epic scope to decide per-story branch reuse |
+| `x-internal-update-status` | delegate (primary, `--read-only`) | Sibling `x-internal-*` skill; provides the shared-lock read path into `execution-state.json`. This skill is the canonical read-only consumer — it never writes |
+| `x-internal-load-story-context` | peer | Sibling `internal/plan/` skill; runs at Phase 0 preparation alongside this skill — both are idempotent and may be invoked in either order |
+| `x-internal-verify-story` | peer | Sibling `internal/plan/` skill; runs at Phase 3 at the END of the story lifecycle, whereas this skill runs at Phase 0 BEFORE task dispatch |
+| `x-reconcile-status` | consumer (peer) | Reads the same `stories.<id>.tasks.*` nodes this skill inspects in diagnose mode; no shared mutation — both take `flock -s` |
 
 Downstream stories that depend on this carve-out: story-0049-0019
 (orchestrator consumes the envelope and deletes the inline Phase 0
@@ -497,7 +497,7 @@ resume-detection block).
 Full workflow detail (argument-parser rejection matrix, state-file
 schema contract, task-order invariant edge cases, ISO-8601 timestamp
 parser portability matrix, concurrency contract with
-`x-internal-status-update`, failure-envelope examples, and rationale
+`x-internal-update-status`, failure-envelope examples, and rationale
 for delegating the state read instead of re-implementing the locked
 read inline) lives in [`references/full-protocol.md`](references/full-protocol.md)
 per ADR-0011.

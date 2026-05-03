@@ -1,5 +1,5 @@
 ---
-name: x-git-cleanup-branches
+name: x-cleanup-git-branches
 description: "Cleans local git state in one pass: fetches origin with prune, removes all non-main worktrees (any path), and deletes all local branches except main/master/develop. Destructive by default with an interactive y/N confirmation gate; supports --dry-run (preview) and --yes (non-interactive)."
 user-invocable: true
 allowed-tools: Bash, Read
@@ -26,13 +26,13 @@ Destructive by design (the user explicitly asked for a sweep). Safety comes from
 - After merging a batch of feature PRs — flush remote-tracking refs and delete the merged locals.
 - Before starting a large refactor — clean slate local branches / worktrees.
 - When `git worktree list` or `git branch -l` gets noisy.
-- NOT for surgical removal — use `/x-git-worktree remove --id <id>` or `git branch -D <name>` directly.
+- NOT for surgical removal — use `/x-manage-worktrees remove --id <id>` or `git branch -D <name>` directly.
 
 ## Triggers
 
-- `/x-git-cleanup-branches` — execute with interactive confirmation
-- `/x-git-cleanup-branches --dry-run` — preview candidates, no changes
-- `/x-git-cleanup-branches --yes` — execute, skip confirmation (CI / scripted use)
+- `/x-cleanup-git-branches` — execute with interactive confirmation
+- `/x-cleanup-git-branches --dry-run` — preview candidates, no changes
+- `/x-cleanup-git-branches --yes` — execute, skip confirmation (CI / scripted use)
 
 ## Protected Set (Hard-Coded)
 
@@ -70,7 +70,7 @@ for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY_RUN=true ;;
     --yes|-y)  ASSUME_YES=true ;;
-    -h|--help) echo "Usage: x-git-cleanup-branches [--dry-run] [--yes]"; exit 0 ;;
+    -h|--help) echo "Usage: x-cleanup-git-branches [--dry-run] [--yes]"; exit 0 ;;
     *) echo "ERROR: unknown flag: $arg" >&2; exit 2 ;;
   esac
 done
@@ -85,7 +85,7 @@ fi
 
 This skill MUST run from the main repository. Running from inside a worktree would attempt to remove the host worktree while executing — unsafe.
 
-This skill extends the canonical `detect_worktree_context()` check from `x-git-worktree` (Rule 14, non-nesting invariant). The canonical snippet only recognises worktrees under `.claude/worktrees/*`; because this skill enumerates and removes **all** non-main worktrees via `git worktree list --porcelain` (any path), the guard also compares `git rev-parse --show-toplevel` to the main worktree path and inspects `git rev-parse --git-dir` for a `worktrees/` suffix, so a linked worktree in any location triggers the abort.
+This skill extends the canonical `detect_worktree_context()` check from `x-manage-worktrees` (Rule 14, non-nesting invariant). The canonical snippet only recognises worktrees under `.claude/worktrees/*`; because this skill enumerates and removes **all** non-main worktrees via `git worktree list --porcelain` (any path), the guard also compares `git rev-parse --show-toplevel` to the main worktree path and inspects `git rev-parse --git-dir` for a `worktrees/` suffix, so a linked worktree in any location triggers the abort.
 
 ```bash
 detect_worktree_context() {
@@ -368,12 +368,12 @@ exit 0
 
 | Skill | Relationship |
 |-------|-------------|
-| `x-git-worktree` | `cleanup` operation is scoped to `.claude/worktrees/*` with MERGED/STALE/ORPHAN criteria; this skill is broader and unconditional. |
-| `x-git-push` | Typical upstream action after cleanup (push a fresh branch). |
-| `x-git-commit` | Used to author commits — unrelated to cleanup, referenced here only for context. |
+| `x-manage-worktrees` | `cleanup` operation is scoped to `.claude/worktrees/*` with MERGED/STALE/ORPHAN criteria; this skill is broader and unconditional. |
+| `x-push-branch` | Typical upstream action after cleanup (push a fresh branch). |
+| `x-commit-changes` | Used to author commits — unrelated to cleanup, referenced here only for context. |
 
 ## References
 
 - [Rule 09 — Branching Model](../../../rules/09-branching-model.md): protected branches policy
 - [Rule 14 — Worktree Lifecycle](../../../rules/14-worktree-lifecycle.md): non-nesting invariant driving step 2
-- [x-git-worktree/SKILL.md](../x-git-worktree/SKILL.md): source of the canonical `detect_worktree_context()` snippet
+- [x-manage-worktrees/SKILL.md](../x-manage-worktrees/SKILL.md): source of the canonical `detect_worktree_context()` snippet

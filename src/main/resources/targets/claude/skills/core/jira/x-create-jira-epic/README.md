@@ -1,11 +1,11 @@
-# x-jira-create-epic
+# x-create-jira-epic
 
 > Creates a Jira Epic from an existing local epic markdown file. Reads the epic file, maps fields to Jira, creates the issue, and syncs the Jira key back to the local file.
 
 | | |
 |---|---|
 | **Category** | Jira Integration |
-| **Invocation** | `/x-jira-create-epic [EPIC_FILE_PATH]` |
+| **Invocation** | `/x-create-jira-epic [EPIC_FILE_PATH]` |
 | **Reads** | jira-field-mapping |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Creates a Jira Epic from an existing local `epic-XXXX.md` file by extracting the
 ## Usage
 
 ```
-/x-jira-create-epic ai/epics/epic-XXXX/epic-XXXX.md
-/x-jira-create-epic
+/x-create-jira-epic ai/epics/epic-XXXX/epic-XXXX.md
+/x-create-jira-epic
 ```
 
 ## Workflow
@@ -32,6 +32,6 @@ Creates a Jira Epic from an existing local `epic-XXXX.md` file by extracting the
 
 ## See Also
 
-- [x-jira-create-stories](../x-jira-create-stories/) -- Creates Jira Stories linked to the epic
+- [x-create-jira-stories](../x-create-jira-stories/) -- Creates Jira Stories linked to the epic
 - [x-epic-create](../x-epic-create/) -- Generates the local epic file from a spec
 - [x-epic-decompose](../x-epic-decompose/) -- Full decomposition including epic and stories

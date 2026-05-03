@@ -1,5 +1,5 @@
 ---
-name: x-arch-plan
+name: x-plan-architecture
 description: "Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -21,9 +21,9 @@ Generates a comprehensive architecture plan for {{PROJECT_NAME}} with component 
 
 ## Triggers
 
-- `/x-arch-plan STORY-ID` — generate architecture plan from story
-- `/x-arch-plan "Feature Name"` — generate from feature description
-- `/x-arch-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md` — generate from story file path
+- `/x-plan-architecture STORY-ID` — generate architecture plan from story
+- `/x-plan-architecture "Feature Name"` — generate from feature description
+- `/x-plan-architecture ai/epics/epic-XXXX/story-XXXX-YYYY.md` — generate from story file path
 
 ## Parameters
 
@@ -141,29 +141,29 @@ Determine if this requires a Full Plan, Simplified Plan, or Skip:
 ### Step 5 — Read Knowledge Packs
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-arch-plan Phase-1-KP-Read`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-architecture Phase-1-KP-Read`
 
 Read knowledge packs **in order** before generating the architecture plan. For Simplified Plan, read only Architecture KP + KPs relevant to affected sections.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-plan Phase-1-KP-Read ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-architecture Phase-1-KP-Read ok`
 
 ### Step 6 — Review Existing Architecture
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-arch-plan Phase-2-Component-Diagram`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-architecture Phase-2-Component-Diagram`
 
 - Check for existing architecture documents in `steering/`
 - Review current codebase structure to understand the baseline
 - Identify what is new vs. what is changing
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-plan Phase-2-Component-Diagram ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-architecture Phase-2-Component-Diagram ok`
 
 ### Step 7 — Generate Architecture Plan
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-arch-plan Phase-3-Sequence-Diagrams`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-architecture Phase-3-Sequence-Diagrams`
 
 Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Rule 23 RULE-002 — deep architectural reasoning justifies Opus). Generate ALL mandatory sections.
 
@@ -175,12 +175,12 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
     )
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-plan Phase-3-Sequence-Diagrams ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-architecture Phase-3-Sequence-Diagrams ok`
 
 ### Step 8 — Validate Sections Post-Generation
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-arch-plan Phase-4-ADR-Mini`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-architecture Phase-4-ADR-Mini`
 
 ```
 1. Parse the generated document for H2 headings (## Section Name)
@@ -196,7 +196,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-arch
 ```
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-arch-plan Phase-4-ADR-Mini ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-architecture Phase-4-ADR-Mini ok`
 
 ## Mandatory Sections (13)
 
@@ -256,7 +256,7 @@ Every generated architecture plan MUST start with a YAML frontmatter block:
 
 ```yaml
 ---
-generated-by: x-arch-plan@<40-char-git-sha>
+generated-by: x-plan-architecture@<40-char-git-sha>
 generated-at: <ISO-8601-UTC>
 story-id: <story-id>
 ---
@@ -364,7 +364,7 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 >
 > ```yaml
 > ---
-> generated-by: x-arch-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+> generated-by: x-plan-architecture@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 > generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 > story-id: ${STORY_ID}
 > ---
@@ -420,10 +420,10 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-story-implement | Called by | Invoked during Phase 1 for architecture planning; pre-check ensures idempotency |
-| x-threat-model | Complements | Architecture plan feeds threat model generation |
-| x-task-implement | Consumed by | Implementation phase reads architecture plan alongside implementation plan |
-| x-arch-update | Followed by | After implementation, architecture document is updated incrementally |
+| x-implement-story | Called by | Invoked during Phase 1 for architecture planning; pre-check ensures idempotency |
+| x-model-threats | Complements | Architecture plan feeds threat model generation |
+| x-implement-task | Consumed by | Implementation phase reads architecture plan alongside implementation plan |
+| x-update-architecture | Followed by | After implementation, architecture document is updated incrementally |
 
 ## Detailed References
 
@@ -439,7 +439,7 @@ For in-depth guidance on architecture patterns, consult:
 
 > V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).
 
-After writing `arch-story-XXXX-YYYY.md`, this skill checks the associated story's lifecycle status. The architecture plan does NOT itself drive the `Pendente → Planejada` transition — that is owned by `x-story-plan` (Rule 22 single-writer invariant). If the story is still `Pendente` when the architecture plan is generated standalone (i.e. `x-arch-plan` invoked directly without `x-story-plan`), transition it to `Planejada` here (idempotent if already `Planejada`).
+After writing `arch-story-XXXX-YYYY.md`, this skill checks the associated story's lifecycle status. The architecture plan does NOT itself drive the `Pendente → Planejada` transition — that is owned by `x-plan-story` (Rule 22 single-writer invariant). If the story is still `Pendente` when the architecture plan is generated standalone (i.e. `x-plan-architecture` invoked directly without `x-plan-story`), transition it to `Planejada` here (idempotent if already `Planejada`).
 
 **Steps (end of architecture-plan generation, BEFORE the final commit):**
 
@@ -457,12 +457,12 @@ After writing `arch-story-XXXX-YYYY.md`, this skill checks the associated story'
        write ai/epics/epic-XXXX/story-XXXX-YYYY.md Planejada
    ```
    If `CURRENT == "Planejada"`: idempotent no-op.
-4. Stage both files and commit via `x-git-commit`:
+4. Stage both files and commit via `x-commit-changes`:
    ```bash
    git add ai/epics/epic-XXXX/story-XXXX-YYYY.md ai/epics/epic-XXXX/plans/arch-story-XXXX-YYYY.md
    ```
    Then:
 
-       Skill(skill: "x-git-commit", args: "docs(story-XXXX-YYYY): add architecture plan + update status to Planejada")
+       Skill(skill: "x-commit-changes", args: "docs(story-XXXX-YYYY): add architecture plan + update status to Planejada")
 
 **Fail-loud:** non-zero exit from CLI → abort skill (RULE-046-08).

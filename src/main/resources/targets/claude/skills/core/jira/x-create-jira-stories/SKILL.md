@@ -1,5 +1,5 @@
 ---
-name: x-jira-create-stories
+name: x-create-jira-stories
 description: "Create Jira Stories from existing local story markdown files. Read all story files in an epic directory, map fields to Jira, create issues with parent epic link, create dependency links between stories, and sync Jira keys back to local files."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
@@ -21,8 +21,8 @@ Create Jira Story issues from existing local `story-XXXX-YYYY.md` files. Parse a
 
 ## Triggers
 
-- `/x-jira-create-stories <epic_dir_path>` — create Jira stories from the specified directory
-- `/x-jira-create-stories <epic_id>` — create stories using epic ID (e.g., `0012`)
+- `/x-create-jira-stories <epic_dir_path>` — create Jira stories from the specified directory
+- `/x-create-jira-stories <epic_id>` — create stories using epic ID (e.g., `0012`)
 - User says "create stories in Jira", "sync stories to Jira", or "push stories to Jira"
 - After running `/x-story-create` or `/x-epic-decompose` without Jira integration
 
@@ -35,14 +35,14 @@ Create Jira Story issues from existing local `story-XXXX-YYYY.md` files. Parse a
 ## Prerequisites
 
 Read the field mapping reference before creating issues:
-- `.claude/skills/x-jira-create-epic/references/jira-field-mapping.md`
+- `.claude/skills/x-create-jira-epic/references/jira-field-mapping.md`
 
 ## Workflow
 
 ### Step 1 — Input and Discovery
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira-create-stories Phase-1-Read-Markdowns`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-create-jira-stories Phase-1-Read-Markdowns`
 
 1. Accept the epic directory path or epic ID as argument. If not provided, ask:
    ```
@@ -116,7 +116,7 @@ For each story file, extract:
      - label: "Informar chave do epico manualmente"
        description: "Informe a chave do epico no Jira (ex: PROJ-123)"
      - label: "Cancelar — criar epico primeiro"
-       description: "Execute /x-jira-create-epic antes"
+       description: "Execute /x-create-jira-epic antes"
    ```
    - If "Criar sem vinculo": proceed without `parent` field
    - If "Informar chave": ask for the key and use it as `parent`
@@ -144,12 +144,12 @@ For each story file, extract:
 5. Capture the selected `projectKey`
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-jira-create-stories Phase-1-Read-Markdowns ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-create-jira-stories Phase-1-Read-Markdowns ok`
 
 ### Step 6 — Create Stories in Jira
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira-create-stories Phase-2-MCP-Loop`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-create-jira-stories Phase-2-MCP-Loop`
 
 Process stories in dependency order (stories with no dependencies first, then those that depend
 on already-created stories). This ensures parent epic links and dependency links can be created.
@@ -181,7 +181,7 @@ and a measured `durationMs` — yielding N tool.call events for N stories and
 enabling per-skill aggregation of "tempo gasto no Jira" vs "tempo local":
 
 <!-- TELEMETRY: tool.call mcp-start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-start x-jira-create-stories createJiraIssue`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-start x-create-jira-stories createJiraIssue`
 
 Call `mcp__atlassian__createJiraIssue`:
 - `cloudId`: discovered cloudId
@@ -202,7 +202,7 @@ Call `mcp__atlassian__createJiraIssue`:
   ```
 
 <!-- TELEMETRY: tool.call mcp-end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-end x-jira-create-stories createJiraIssue ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-end x-create-jira-stories createJiraIssue ok`
 
 (On MCP failure in 6.5, pass status `failed` instead of `ok` to the mcp-end
 marker so the telemetry record reflects the real outcome.)
@@ -220,12 +220,12 @@ Replace `**Chave Jira:** <CHAVE-JIRA>` or `**Chave Jira:** —` with `**Chave Ji
 Log warning, set `<CHAVE-JIRA>` to `—`, continue with next story.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-jira-create-stories Phase-2-MCP-Loop ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-create-jira-stories Phase-2-MCP-Loop ok`
 
 ### Step 7 — Dependency Linking (Second Pass)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-jira-create-stories Phase-3-Dependency-Links`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-create-jira-stories Phase-3-Dependency-Links`
 
 After ALL stories are created and have Jira keys, perform a second pass to create
 dependency links:
@@ -238,7 +238,7 @@ For each story's "Blocked By" list:
      `tool=mcp__atlassian__createIssueLink`:
 
      <!-- TELEMETRY: tool.call mcp-start -->
-     Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-start x-jira-create-stories createIssueLink`
+     Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-start x-create-jira-stories createIssueLink`
 
    - Call `mcp__atlassian__createIssueLink`:
      - `cloudId`: discovered cloudId
@@ -247,7 +247,7 @@ For each story's "Blocked By" list:
      - `outwardIssue`: current story's Jira key (the issue that is blocked)
 
      <!-- TELEMETRY: tool.call mcp-end -->
-     Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-end x-jira-create-stories createIssueLink ok`
+     Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh mcp-end x-create-jira-stories createIssueLink ok`
 
 3. If linking fails: log warning, continue (non-blocking, best-effort). Pass
    status `failed` to the mcp-end marker on such failures.
@@ -280,7 +280,7 @@ Output summary:
 ```
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-jira-create-stories Phase-3-Dependency-Links ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-create-jira-stories Phase-3-Dependency-Links ok`
 
 ## Error Handling
 
@@ -300,7 +300,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-jira-c
 |-------|-------------|---------|
 | x-story-create | reads | Reads story files generated by this skill |
 | x-epic-decompose | called-by | Orchestrator may invoke this after story generation |
-| x-jira-create-epic | calls | Creates the parent epic before stories |
+| x-create-jira-epic | calls | Creates the parent epic before stories |
 | x-epic-map | reads | Implementation Map updated with Jira keys |
 
 ## ID Synchronization Strategy

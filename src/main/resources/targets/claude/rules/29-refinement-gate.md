@@ -7,12 +7,12 @@
 
 ## Purpose
 
-Stories and epics arrive at `x-story-implement` / `x-epic-implement` **without proof of refinement**. The seven planning artifacts (arch, impl, tests, tasks, security, compliance + story file) validate that the implementation is coherent — but they do not validate that the story itself is well-formed: clear persona, measurable acceptance criteria, typed contracts, defined metrics, considered alternatives, and identified risks.
+Stories and epics arrive at `x-implement-story` / `x-implement-epic` **without proof of refinement**. The seven planning artifacts (arch, impl, tests, tasks, security, compliance + story file) validate that the implementation is coherent — but they do not validate that the story itself is well-formed: clear persona, measurable acceptance criteria, typed contracts, defined metrics, considered alternatives, and identified risks.
 
 Rule 29 introduces a **blocking refinement gate** that enforces:
 
-1. Every story and epic has a `refinementVerdict.status = "approved"` entry in `execution-state.json` before `x-story-implement`, `x-epic-implement`, `x-task-implement`, or `x-epic-orchestrate` may be invoked.
-2. The `refinementVerdict` is produced exclusively by `/x-story-refine` (for stories) or `/x-epic-refine` (for epics) — multi-persona dispatcher skills that apply NO-GO rules from specialist personas and consolidate via the Architect agent.
+1. Every story and epic has a `refinementVerdict.status = "approved"` entry in `execution-state.json` before `x-implement-story`, `x-implement-epic`, `x-implement-task`, or `x-orchestrate-epic` may be invoked.
+2. The `refinementVerdict` is produced exclusively by `/x-refine-story` (for stories) or `/x-refine-epic` (for epics) — multi-persona dispatcher skills that apply NO-GO rules from specialist personas and consolidate via the Architect agent.
 3. The gate is enforced at Camada 0 (PreToolUse hook `enforce-refinement-gate.sh`, exit code `33`) and at Camada 2 (CI script `audit-refinement-gate.sh`, exit code `REFINEMENT_GATE_VIOLATION`).
 
 ## State Machine Extension
@@ -34,9 +34,9 @@ Rule 29 extends the canonical story/task status enum with the state `Refinada`:
 ### Transitions (Extended)
 
 ```
-Pendente ──→ Refinada    — via /x-story-refine (story) or /x-epic-refine (epic)
-Refinada ──→ Planejada   — via x-story-plan or x-epic-decompose
-Refinada ──→ Em Andamento — via x-story-implement or x-epic-implement (gate passed)
+Pendente ──→ Refinada    — via /x-refine-story (story) or /x-refine-epic (epic)
+Refinada ──→ Planejada   — via x-plan-story or x-epic-decompose
+Refinada ──→ Em Andamento — via x-implement-story or x-implement-epic (gate passed)
 Refinada ──→ Bloqueada   — dependency unresolved before planning
 Em Andamento ──→ Concluída
 Em Andamento ──→ Falha
@@ -46,7 +46,7 @@ Em Andamento ──→ Falha
 
 ## `refinementVerdict` Field
 
-Added to `execution-state.json` by `/x-story-refine` or `/x-epic-refine` via `x-internal-status-update`:
+Added to `execution-state.json` by `/x-refine-story` or `/x-refine-epic` via `x-internal-update-status`:
 
 ```json
 {
@@ -82,7 +82,7 @@ Added to `execution-state.json` by `/x-story-refine` or `/x-epic-refine` via `x-
 
 ## Personas and Dimensions
 
-### Story Refinement Personas (`/x-story-refine`)
+### Story Refinement Personas (`/x-refine-story`)
 
 | Persona | Dimensions owned | Conditional on |
 | :--- | :--- | :--- |
@@ -96,7 +96,7 @@ Added to `execution-state.json` by `/x-story-refine` or `/x-epic-refine` via `x-
 
 **Minimum for `approved`:** PO + Tech Lead + Architect + Security + QA must all pass (no blockers). Conditional personas' verdicts are advisory unless the story explicitly touches their domain.
 
-### Epic Refinement Personas (`/x-epic-refine`)
+### Epic Refinement Personas (`/x-refine-epic`)
 
 | Persona | Dimensions owned | Conditional on |
 | :--- | :--- | :--- |
@@ -144,14 +144,14 @@ There is no interactive `--skip-refinement` flag. `CLAUDE_RECOVERY_MODE=1` (Rule
 
 | Camada | Mechanism | Trigger | Exit |
 | :--- | :--- | :--- | :--- |
-| **0 — PreToolUse** | `enforce-refinement-gate.sh` | PreToolUse on `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate` | 33 `REFINEMENT_REQUIRED` |
+| **0 — PreToolUse** | `enforce-refinement-gate.sh` | PreToolUse on `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-orchestrate-epic` | 33 `REFINEMENT_REQUIRED` |
 | **1 — Normative** | This rule + CLAUDE.md block `REFINEMENT GATE — INEGOCIÁVEL` | Every conversation | — |
 | **2 — CI Script** | `audit-refinement-gate.sh` | PR open/sync to `develop` or `epic/*` | 1 `REFINEMENT_GATE_VIOLATION` |
 | **3 — Java Test** | `Epic0069RefinementGateSmokeIT` | `mvn verify` | JUnit assertion failure |
 
 ## Forbidden
 
-- Invoking `x-story-implement`, `x-epic-implement`, `x-task-implement`, or `x-epic-orchestrate` on a story/epic whose `refinementVerdict.status` is not `"approved"` — blocked at Camada 0.
+- Invoking `x-implement-story`, `x-implement-epic`, `x-implement-task`, or `x-orchestrate-epic` on a story/epic whose `refinementVerdict.status` is not `"approved"` — blocked at Camada 0.
 - Manually editing the `## Refinement Verdict` block in a markdown file without re-running the skill — `audit-refinement-gate.sh` detects `verdictHash` divergence.
 - Introducing a new bypass env var for the refinement gate — the only accepted mechanism is `CLAUDE_RECOVERY_MODE=1` for `--skip-review`/`--no-ci-watch` (not for refinement bypass).
 - Adding entries to `governance/baselines/refinement-gate-baseline.txt` after EPIC-0069 merges — baseline is immutable.

@@ -1,5 +1,5 @@
 ---
-name: x-internal-worktree-precheck
+name: x-internal-precheck-worktree
 description: "Classifies the git working tree state (CLEAN/DIRTY/DIVERGENT/AMBIGUOUS) and returns a stable exit code. Invoked by orchestrators before starting story/task execution to detect dirty or divergent states early. Exit 0 = CLEAN or DIRTY; exit 15 (WORKTREE_AMBIGUOUS) = DIVERGENT or AMBIGUOUS (unless --allow-dirty)."
 visibility: internal
 user-invocable: false
@@ -27,8 +27,8 @@ Exit code 15 is the stable contract for orchestrators to dispatch on (RULE-010, 
 
 ## Usage
 
-    Skill(skill: "x-internal-worktree-precheck", args: "--repo-path <path>")
-    Skill(skill: "x-internal-worktree-precheck", args: "--allow-dirty --repo-path <path>")
+    Skill(skill: "x-internal-precheck-worktree", args: "--repo-path <path>")
+    Skill(skill: "x-internal-precheck-worktree", args: "--allow-dirty --repo-path <path>")
 
 ## Parameters
 
@@ -58,10 +58,10 @@ Stderr carries a human-readable summary for operator visibility.
 ## Telemetry
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-internal-worktree-precheck worktree-precheck`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-internal-precheck-worktree worktree-precheck`
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-internal-worktree-precheck worktree-precheck ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-internal-precheck-worktree worktree-precheck ok`
 
 ## Implementation
 
@@ -120,6 +120,6 @@ exit 0
 
 ## Integration Notes
 
-- Invoked by: `x-story-implement` (Phase 0.3 worktree-first branch decision), `x-task-implement` (Step 0), `x-epic-implement` (Phase 2 pre-guard).
+- Invoked by: `x-implement-story` (Phase 0.3 worktree-first branch decision), `x-implement-task` (Step 0), `x-implement-epic` (Phase 2 pre-guard).
 - Dispatching on exit 15 (`WORKTREE_AMBIGUOUS`) is the canonical non-interactive response; orchestrators MUST NOT call `AskUserQuestion` in response — they emit `WORKTREE_AMBIGUOUS` to the operator and halt.
 - Java implementation: `dev.iadev.cli.skill.WorktreePrecheck` (EPIC-0061, TASK-0061-0001-001) provides the same classification logic for generator-internal use.

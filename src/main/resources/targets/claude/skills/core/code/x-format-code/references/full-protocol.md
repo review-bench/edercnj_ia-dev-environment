@@ -1,4 +1,4 @@
-# x-code-format — Full Protocol
+# x-format-code — Full Protocol
 
 > **Slim/Full split** per [ADR-0012 — Skill Body Slim-by-Default](../../../../../../../../../adr/ADR-0012-skill-body-slim-by-default.md).
 > The `SKILL.md` sibling carries the minimum viable contract; this file
@@ -123,7 +123,7 @@ rm -f "$STAGED_BEFORE"
 Output a summary:
 
 ```
-x-code-format complete:
+x-format-code complete:
   Language:    {{LANGUAGE}}
   Formatter:   <formatter-used>
   Files checked: <count>
@@ -136,11 +136,11 @@ x-code-format complete:
 This skill is the first step in the chain:
 
 ```
-x-code-format -> x-code-lint -> compile -> commit
+x-format-code -> x-lint-code -> compile -> commit
 ```
 
-- If `x-code-format` succeeds (exit 0), the chain continues with reformatted files.
-- If `x-code-format --check` fails (exit 1), the chain stops with an error listing files that need formatting.
+- If `x-format-code` succeeds (exit 0), the chain continues with reformatted files.
+- If `x-format-code --check` fails (exit 1), the chain stops with an error listing files that need formatting.
 - The `--check` flag is used in CI/CD pipelines to enforce formatting without modifying files.
 
 ## 4. Build-Tool Integration
@@ -211,7 +211,7 @@ max_width = 120
 
 The slim `SKILL.md` intentionally omits the language-extension table, the
 6-step workflow prose, and the build-tool XML/TOML/JSON snippets. A runtime
-invocation from `x-git-commit`'s pre-commit chain needs to know only the
+invocation from `x-commit-changes`'s pre-commit chain needs to know only the
 command to run (slim §Output Contract points at this table) and the exit
 semantics. Build-tool wiring is a one-time project bootstrap concern,
 consulted by humans during project setup.

@@ -1,5 +1,5 @@
 ---
-name: x-runtime-eval
+name: x-evaluate-runtime
 description: "Evaluate runtime protection controls: rate limiting, WAF rules, bot protection, DDoS mitigation, account lockout, brute force protection, CSP enforcement, and permissions policy. Produce SARIF 2.1.0 output with ASVS compliance mapping and scored Markdown report."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -21,12 +21,12 @@ Evaluate runtime protection controls for {{PROJECT_NAME}} by analyzing active de
 
 ## Triggers
 
-- `/x-runtime-eval --target https://app.example.com` — evaluate all dimensions
-- `/x-runtime-eval --target https://app.example.com --scope rate-limit` — rate limiting only
-- `/x-runtime-eval --target https://app.example.com --scope waf` — WAF rules only
-- `/x-runtime-eval --target https://app.example.com --scope account-lockout --login-endpoint /api/auth/login` — account lockout
-- `/x-runtime-eval --target https://app.example.com --intensity passive` — observe headers only
-- `/x-runtime-eval --target https://app.example.com --intensity aggressive` — full volume testing (local/dev only)
+- `/x-evaluate-runtime --target https://app.example.com` — evaluate all dimensions
+- `/x-evaluate-runtime --target https://app.example.com --scope rate-limit` — rate limiting only
+- `/x-evaluate-runtime --target https://app.example.com --scope waf` — WAF rules only
+- `/x-evaluate-runtime --target https://app.example.com --scope account-lockout --login-endpoint /api/auth/login` — account lockout
+- `/x-evaluate-runtime --target https://app.example.com --intensity passive` — observe headers only
+- `/x-evaluate-runtime --target https://app.example.com --intensity aggressive` — full volume testing (local/dev only)
 
 ## Parameters
 
@@ -289,7 +289,7 @@ Write to `results/security/runtime-protection-{timestamp}.sarif.json`:
   "runs": [{
     "tool": {
       "driver": {
-        "name": "x-runtime-eval",
+        "name": "x-evaluate-runtime",
         "version": "1.0.0",
         "informationUri": "https://owasp.org/www-project-application-security-verification-standard/",
         "rules": [
@@ -394,9 +394,9 @@ Write to `results/security/runtime-protection-{timestamp}-report.md`:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-security-dashboard | called-by | Dashboard aggregates runtime protection results |
-| x-hardening-eval | complements | Hardening evaluates static config; runtime evaluates live behavior |
-| x-security-dast | complements | DAST tests vulnerabilities; runtime tests defensive controls |
+| x-generate-security-dashboard | called-by | Dashboard aggregates runtime protection results |
+| x-evaluate-hardening | complements | Hardening evaluates static config; runtime evaluates live behavior |
+| x-run-dast | complements | DAST tests vulnerabilities; runtime tests defensive controls |
 
 ## Knowledge Pack References
 

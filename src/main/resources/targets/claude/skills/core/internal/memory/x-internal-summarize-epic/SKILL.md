@@ -1,5 +1,5 @@
 ---
-name: x-internal-epic-summary
+name: x-internal-summarize-epic
 description: Generates ai/memory/epic-XXXX-summary.md from a completed epic's artifacts using structured header parsing
 visibility: internal
 user-invocable: false
@@ -10,7 +10,7 @@ allowed-tools: [Read, Write, Bash, Grep, Glob]
 
 > 🔒 **INTERNAL SKILL** — Invoked only by other skills via the Skill tool. Not user-invocable.
 
-# x-internal-epic-summary
+# x-internal-summarize-epic
 
 Deterministic memory summary generator for completed epics. Parses epic markdown with structured
 header extraction (not free-form regex), composes `_TEMPLATE-EPIC-MEMORY-SUMMARY.md`, and writes
@@ -21,9 +21,9 @@ Use explicit extraction rules; never introduce creative variance.
 
 ## Triggers
 
-Invoked by `x-epic-implement` Phase 5 (Rule 33):
+Invoked by `x-implement-epic` Phase 5 (Rule 33):
 
-    Skill(skill: "x-internal-epic-summary", args: "--epic-id EPIC-XXXX")
+    Skill(skill: "x-internal-summarize-epic", args: "--epic-id EPIC-XXXX")
 
 ## Parameters
 
@@ -99,8 +99,8 @@ Extract deterministically:
 
 ## Integration Notes
 
-- Invoked by `x-epic-implement` Phase 5 (Rule 33 — MANDATORY TOOL CALL).
-- `--allow-legacy-fallback` is for `x-internal-epic-summary` called from retro-seed (story-0075-0006);
+- Invoked by `x-implement-epic` Phase 5 (Rule 33 — MANDATORY TOOL CALL).
+- `--allow-legacy-fallback` is for `x-internal-summarize-epic` called from retro-seed (story-0075-0006);
   normal Phase 5 invocations MUST NOT pass this flag.
 - Idempotent: re-execution regenerates the summary completely (no append).
 - Uses `_TEMPLATE-EPIC-MEMORY-SUMMARY.md` from `.claude/templates/` (present when `governance.ai-memory` active).

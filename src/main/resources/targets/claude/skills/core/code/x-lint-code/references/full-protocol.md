@@ -1,4 +1,4 @@
-# x-code-lint — Full Protocol
+# x-lint-code — Full Protocol
 
 > **Slim/Full split** per [ADR-0012 — Skill Body Slim-by-Default](../../../../../../../../../adr/ADR-0012-skill-body-slim-by-default.md).
 > The `SKILL.md` sibling carries the minimum viable contract; this file
@@ -113,7 +113,7 @@ Classify each finding into one of three severity levels:
 **Output format:**
 
 ```
-== x-code-lint Report ==
+== x-lint-code Report ==
 
 Language:  {{LANGUAGE}}
 Linter(s): {primary} [+ {secondary}]
@@ -150,10 +150,10 @@ Result: {PASS | FAIL}
 This skill is the **second step** in the pre-commit chain:
 
 ```
-x-code-format --> x-code-lint --> compile --> commit
+x-format-code --> x-lint-code --> compile --> commit
 ```
 
-- **Precondition:** `x-code-format` has already ensured code style compliance.
+- **Precondition:** `x-format-code` has already ensured code style compliance.
 - **On FAIL (exit 1):** Chain is interrupted; commit is blocked with the violation list.
 - **On PASS (exit 0):** Chain continues to the compile step.
 - **With `--fix`:** Corrected files are re-staged and chain continues.

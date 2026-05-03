@@ -1,5 +1,5 @@
 ---
-name: x-ci-generate
+name: x-generate-ci
 description: "Generate or update CI/CD pipelines based on project stack: detect language, analyze existing workflows, generate CI/CD/release/security pipelines, validate with actionlint, support monorepo triggers."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
@@ -21,14 +21,14 @@ Generates or updates CI/CD pipeline configurations for {{PROJECT_NAME}} based on
 
 ## Triggers
 
-- `/x-ci-generate` — generate all pipelines (default: all)
-- `/x-ci-generate ci` — generate CI pipeline (build + test + security scan)
-- `/x-ci-generate cd` — generate CD pipeline (deploy staging + production + rollback)
-- `/x-ci-generate release` — generate release pipeline (semantic versioning + changelog)
-- `/x-ci-generate security` — generate security scan pipeline (scheduled SAST + dependency audit)
-- `/x-ci-generate all` — generate all pipeline types
-- `/x-ci-generate ci --monorepo` — generate with path-based triggers for monorepo
-- `/x-ci-generate ci --force` — overwrite existing workflows
+- `/x-generate-ci` — generate all pipelines (default: all)
+- `/x-generate-ci ci` — generate CI pipeline (build + test + security scan)
+- `/x-generate-ci cd` — generate CD pipeline (deploy staging + production + rollback)
+- `/x-generate-ci release` — generate release pipeline (semantic versioning + changelog)
+- `/x-generate-ci security` — generate security scan pipeline (scheduled SAST + dependency audit)
+- `/x-generate-ci all` — generate all pipeline types
+- `/x-generate-ci ci --monorepo` — generate with path-based triggers for monorepo
+- `/x-generate-ci ci --force` — overwrite existing workflows
 
 ## Parameters
 
@@ -286,8 +286,8 @@ Path detection strategy:
 |-------|-------------|---------|
 | `devops-engineer` agent | calls | Used for advanced pipeline customization via Agent tool |
 | `ci-cd-patterns` KP | reads | Pipeline templates and best practices |
-| `x-dependency-audit` | reads | Dependency audit pipeline references audit commands |
-| `x-security-pipeline` | reads | Security pipeline references scanning configurations |
+| `x-audit-dependencies` | reads | Dependency audit pipeline references audit commands |
+| `x-generate-security-pipeline` | reads | Security pipeline references scanning configurations |
 
 ## Knowledge Pack References
 

@@ -1,5 +1,5 @@
 ---
-name: x-pr-fix-epic
+name: x-fix-epic-pr
 model: sonnet
 description: "Discovers all PRs from an epic via execution-state.json, fetches and classifies review comments in batch, generates a consolidated findings report, applies fixes, and creates a single correction PR. Supports dry-run, explicit PR list fallback, and idempotent re-execution."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
@@ -17,11 +17,11 @@ requires-capabilities: []
 ## Triggers
 
 ```
-/x-pr-fix-epic 0024
-/x-pr-fix-epic 0024 --dry-run
-/x-pr-fix-epic 0024 --prs 143,144,145
-/x-pr-fix-epic 0024 --skip-replies
-/x-pr-fix-epic 0024 --include-suggestions
+/x-fix-epic-pr 0024
+/x-fix-epic-pr 0024 --dry-run
+/x-fix-epic-pr 0024 --prs 143,144,145
+/x-fix-epic-pr 0024 --skip-replies
+/x-fix-epic-pr 0024 --include-suggestions
 ```
 
 ## Parameters

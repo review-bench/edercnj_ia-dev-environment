@@ -1,6 +1,6 @@
 ---
-name: x-internal-report-write
-description: "Renders _TEMPLATE-*.md templates by substituting {{KEY}} placeholders (simple and nested, dot-path) and resolving {{#each}} loops against a structured JSON data payload, then writes the result atomically to an output path. Supports an --append mode with per-section deduplication keyed by `## ID: <value>` markers. Centralises phase reports, epic execution reports and planning reports so orchestrators (x-epic-implement, x-epic-orchestrate, x-story-implement) stop duplicating `Read template + inline Edit/Write` logic. Second skill in the x-internal-* convention (after x-internal-status-update pilot): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+name: x-internal-write-report
+description: "Renders _TEMPLATE-*.md templates by substituting {{KEY}} placeholders (simple and nested, dot-path) and resolving {{#each}} loops against a structured JSON data payload, then writes the result atomically to an output path. Supports an --append mode with per-section deduplication keyed by `## ID: <value>` markers. Centralises phase reports, epic execution reports and planning reports so orchestrators (x-implement-epic, x-orchestrate-epic, x-implement-story) stop duplicating `Read template + inline Edit/Write` logic. Second skill in the x-internal-* convention (after x-internal-update-status pilot): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,12 +19,12 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-epic-implement, x-epic-orchestrate, x-story-implement.
-> Segunda skill da convenção `x-internal-*` (após x-internal-status-update,
+> Caller principal: x-implement-epic, x-orchestrate-epic, x-implement-story.
+> Segunda skill da convenção `x-internal-*` (após x-internal-update-status,
 > a story PILOTO 0049-0005): frontmatter `visibility: internal`, subdir
 > `internal/ops/`, marker 🔒 e filtragem do menu `/help` via generator.
 
-# Skill: x-internal-report-write
+# Skill: x-internal-write-report
 
 ## Purpose
 
@@ -40,7 +40,7 @@ Render a template file under `.claude/templates/` (or an explicit path) by:
    or appending with per-ID deduplication when `--append=true`.
 
 This replaces the ad-hoc `Read template + Write output` pattern currently
-inlined in `x-epic-implement`, `x-epic-orchestrate`, and `x-story-implement`
+inlined in `x-implement-epic`, `x-orchestrate-epic`, and `x-implement-story`
 (documented in EPIC-0049 S9, S10, S15 analyses), centralising report
 rendering so templates can evolve without editing N orchestrator skills.
 
@@ -48,7 +48,7 @@ rendering so templates can evolve without editing N orchestrator skills.
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/ops/x-internal-report-write/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
+| Path | `internal/ops/x-internal-write-report/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -62,11 +62,11 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-report-write` in chat. All invocations
+by a human typing `/x-internal-write-report` in chat. All invocations
 follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-EPIC-EXECUTION-PLAN.md \
              --output ai/epics/epic-XXXX/reports/exec-plan.md \
              --data @ai/epics/epic-XXXX/reports/exec-plan.data.json")
@@ -265,7 +265,7 @@ Status: {{status}}
 Invocation:
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-EPIC-HEADER.md \
              --output ai/epics/epic-XXXX/reports/header.md \
              --data '{\"epicId\":\"XXXX\",\"title\":\"Skill hygiene\",\"status\":\"IN_PROGRESS\"}'")
@@ -324,7 +324,7 @@ Invocation with data `{"id":"story-XXXX-0001","status":"DONE"}` and a
 template producing the two-line `## ID: ... / status: ...` block:
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-STATUS-ENTRY.md \
              --output ai/epics/epic-XXXX/reports/status.md \
              --data '{\"id\":\"story-XXXX-0001\",\"status\":\"DONE\"}' \
@@ -376,7 +376,7 @@ Stdout: `"entriesAppended":1`.
 ### Example 5 — Error: template not found
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-NONEXISTENT.md \
              --output /tmp/out.md \
              --data '{}'")
@@ -449,7 +449,7 @@ Exit: 2.
 ## Testing
 
 Story-0049-0006 ships acceptance test scenarios that every future
-`x-internal-report-write` consumer MUST be able to rely on:
+`x-internal-write-report` consumer MUST be able to rely on:
 
 1. **Simple render** — `{{epicId}}` substituted; `placeholdersReplaced=1`.
 2. **Nested placeholder** — `{{stories.story-0049-0001.status}}` resolves.
@@ -465,7 +465,7 @@ Story-0049-0006 ships acceptance test scenarios that every future
 10. **WRITE_FAILED** — output directory read-only; exit 4; tmp cleaned up.
 
 Goldens under
-`src/test/resources/golden/internal/ops/x-internal-report-write/` lock
+`src/test/resources/golden/internal/ops/x-internal-write-report/` lock
 the SKILL.md rendering. Coverage requirement: ≥ 95% line / ≥ 90%
 branch across the invoking Bash codepaths.
 
@@ -479,7 +479,7 @@ The `ia-dev-env` generator MUST exclude skills with
 3. User-facing autocomplete in the chat input.
 
 Internal skills are still copied into `.claude/skills/` (flat layout)
-so `Skill(skill: "x-internal-report-write")` invocations from other
+so `Skill(skill: "x-internal-write-report")` invocations from other
 skills resolve correctly. The invariant — set by the pilot story
 (0049-0005) — holds here: **user cannot see it; orchestrators can
 invoke it.**
@@ -500,12 +500,12 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-epic-implement` | caller | Phase-completion reports, epic execution plan rendering |
-| `x-epic-orchestrate` | caller | Per-story planning report rendering |
-| `x-story-implement` | caller | Story-level remediation / review dashboard rendering |
-| `x-internal-status-update` | peer | Sibling `x-internal-*` skill; both scoped under `internal/ops/`; no shared runtime state |
-| `x-status-reconcile` | consumer | Downstream reader of reports produced here; never mutates concurrently (Rule 22) |
+| `x-implement-epic` | caller | Phase-completion reports, epic execution plan rendering |
+| `x-orchestrate-epic` | caller | Per-story planning report rendering |
+| `x-implement-story` | caller | Story-level remediation / review dashboard rendering |
+| `x-internal-update-status` | peer | Sibling `x-internal-*` skill; both scoped under `internal/ops/`; no shared runtime state |
+| `x-reconcile-status` | consumer | Downstream reader of reports produced here; never mutates concurrently (Rule 22) |
 
 Downstream stories that depend on this skill: story-0049-0009
-(x-epic-implement consumes it), story-0049-0010 (x-epic-orchestrate
-consumes it), story-0049-0015 (x-story-implement consumes it).
+(x-implement-epic consumes it), story-0049-0010 (x-orchestrate-epic
+consumes it), story-0049-0015 (x-implement-story consumes it).

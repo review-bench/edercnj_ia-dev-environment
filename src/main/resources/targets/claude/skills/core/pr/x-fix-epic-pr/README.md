@@ -1,11 +1,11 @@
-# x-pr-fix-epic
+# x-fix-epic-pr
 
 > Discovers all PRs from an epic via execution-state.json, fetches and classifies review comments in batch, generates a consolidated findings report, applies fixes, and creates a single correction PR. Supports dry-run, explicit PR list fallback, and idempotent re-execution.
 
 | | |
 |---|---|
 | **Category** | Review |
-| **Invocation** | `/x-pr-fix-epic [EPIC-ID] [--dry-run] [--prs N,M,...] [--skip-replies] [--include-suggestions]` |
+| **Invocation** | `/x-fix-epic-pr [EPIC-ID] [--dry-run] [--prs N,M,...] [--skip-replies] [--include-suggestions]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,10 +16,10 @@ Automates addressing PR review comments across an entire epic in batch. Instead 
 ## Usage
 
 ```
-/x-pr-fix-epic 0024
-/x-pr-fix-epic 0024 --dry-run
-/x-pr-fix-epic 0024 --prs 143,144,145
-/x-pr-fix-epic 0024 --include-suggestions
+/x-fix-epic-pr 0024
+/x-fix-epic-pr 0024 --dry-run
+/x-fix-epic-pr 0024 --prs 143,144,145
+/x-fix-epic-pr 0024 --include-suggestions
 ```
 
 ## Workflow
@@ -41,6 +41,6 @@ Automates addressing PR review comments across an entire epic in batch. Instead 
 
 ## See Also
 
-- [x-pr-fix](../x-pr-fix/) -- Single-PR version of this skill
-- [x-epic-implement](../x-epic-implement/) -- Epic orchestrator that produces the PRs this skill processes
-- [x-review](../x-review/) -- Specialist reviews that generate findings to fix
+- [x-fix-pr](../x-fix-pr/) -- Single-PR version of this skill
+- [x-implement-epic](../x-implement-epic/) -- Epic orchestrator that produces the PRs this skill processes
+- [x-review-codebase](../x-review-codebase/) -- Specialist reviews that generate findings to fix

@@ -1,6 +1,6 @@
 ---
-name: x-owasp-scan
-description: "Automated OWASP Top 10 (2021) verification mapped to ASVS levels (L1/L2/L3). Checks all 10 categories (A01-A10) with per-category pass/fail, ASVS coverage percentage, score grading, SARIF 2.1.0 output, and CI integration. Delegates A06 to x-dependency-audit."
+name: x-scan-owasp
+description: "Automated OWASP Top 10 (2021) verification mapped to ASVS levels (L1/L2/L3). Checks all 10 categories (A01-A10) with per-category pass/fail, ASVS coverage percentage, score grading, SARIF 2.1.0 output, and CI integration. Delegates A06 to x-audit-dependencies."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 argument-hint: "[--level L1|L2|L3] [--category A01-A10|all] [--report-format markdown|sarif|both]"
@@ -21,13 +21,13 @@ Verifies {{PROJECT_NAME}} against the OWASP Top 10 (2021) with verification item
 
 ## Triggers
 
-- `/x-owasp-scan` — full L1 scan, all categories
-- `/x-owasp-scan --level L2` — L2 scan (standard defense)
-- `/x-owasp-scan --level L3` — L3 scan (advanced/critical apps)
-- `/x-owasp-scan --category A03` — single category scan
-- `/x-owasp-scan --report-format sarif` — SARIF output only
-- `/x-owasp-scan --report-format markdown` — Markdown only
-- `/x-owasp-scan --report-format both` — both formats (default)
+- `/x-scan-owasp` — full L1 scan, all categories
+- `/x-scan-owasp --level L2` — L2 scan (standard defense)
+- `/x-scan-owasp --level L3` — L3 scan (advanced/critical apps)
+- `/x-scan-owasp --category A03` — single category scan
+- `/x-scan-owasp --report-format sarif` — SARIF output only
+- `/x-scan-owasp --report-format markdown` — Markdown only
+- `/x-scan-owasp --report-format both` — both formats (default)
 
 ## Parameters
 
@@ -52,7 +52,7 @@ Verifies {{PROJECT_NAME}} against the OWASP Top 10 (2021) with verification item
 2. LOAD       -> Load ASVS verification items from knowledge pack
 3. MAP        -> Map OWASP Top 10 categories to ASVS chapters
 4. VERIFY     -> Execute verification checks per category
-5. DELEGATE   -> Delegate A06 to x-dependency-audit (RULE-011)
+5. DELEGATE   -> Delegate A06 to x-audit-dependencies (RULE-011)
 6. SCORE      -> Calculate per-category and overall scores
 7. REPORT     -> Generate SARIF 2.1.0 + Markdown reports
 ```
@@ -88,7 +88,7 @@ Each verification item has:
 | Injection | A03 | V5 | Input validation, output encoding, parameterized queries, XSS |
 | Insecure Design | A04 | V1 | Threat modeling, secure architecture patterns, trust boundaries |
 | Security Misconfiguration | A05 | V14 | Default configs, error handling, hardening, unnecessary features |
-| Vulnerable Components | A06 | N/A | **DELEGATED** to `x-dependency-audit` (RULE-011 — Skill Composability) |
+| Vulnerable Components | A06 | N/A | **DELEGATED** to `x-audit-dependencies` (RULE-011 — Skill Composability) |
 | Auth Failures | A07 | V2, V3 | Authentication mechanisms, session management, credential storage |
 | Software/Data Integrity | A08 | V10 | Code integrity, deserialization safety, CI/CD security |
 | Logging Failures | A09 | V7 | Logging completeness, monitoring, alerting, log injection |
@@ -266,11 +266,11 @@ For each category (except A06), execute verification checks at the requested ASV
 - URL canonicalization before validation
 - Cloud metadata endpoint protection (169.254.169.254)
 
-### Step 5 — Delegate A06 to x-dependency-audit
+### Step 5 — Delegate A06 to x-audit-dependencies
 
-Per RULE-011 (Skill Composability), A06 (Vulnerable and Outdated Components) is delegated to `x-dependency-audit` via the Skill tool (Rule 13 — INLINE-SKILL pattern). **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** silent omission leaves the A06 row blank and fails Camada 3 audit when the dependency-audit evidence file is absent for the story:
+Per RULE-011 (Skill Composability), A06 (Vulnerable and Outdated Components) is delegated to `x-audit-dependencies` via the Skill tool (Rule 13 — INLINE-SKILL pattern). **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** silent omission leaves the A06 row blank and fails Camada 3 audit when the dependency-audit evidence file is absent for the story:
 
-    Skill(skill: "x-dependency-audit", args: "--scope vulnerabilities")
+    Skill(skill: "x-audit-dependencies", args: "--scope vulnerabilities")
 
 The delegation result is recorded as:
 ```json
@@ -278,7 +278,7 @@ The delegation result is recorded as:
   "category": "A06",
   "categoryName": "Vulnerable and Outdated Components",
   "status": "DELEGATED",
-  "delegatedTo": "x-dependency-audit",
+  "delegatedTo": "x-audit-dependencies",
   "totalChecks": 0,
   "passedChecks": 0,
   "failedChecks": 0
@@ -332,7 +332,7 @@ Write to `results/security/owasp-scan-YYYY-MM-DD.sarif.json`:
   "runs": [{
     "tool": {
       "driver": {
-        "name": "x-owasp-scan",
+        "name": "x-scan-owasp",
         "version": "1.0.0",
         "informationUri": "https://owasp.org/Top10/",
         "rules": [
@@ -422,9 +422,9 @@ Write to `results/security/owasp-scan-YYYY-MM-DD.md`:
 
 ### A06 — Vulnerable Components (DELEGATED)
 
-**Status:** DELEGATED to `x-dependency-audit`
+**Status:** DELEGATED to `x-audit-dependencies`
 
-> Run `/x-dependency-audit --scope vulnerabilities` for component analysis.
+> Run `/x-audit-dependencies --scope vulnerabilities` for component analysis.
 
 ## Scoring
 
@@ -455,7 +455,7 @@ When run in CI mode, the skill:
 | Invalid --level value | Error with valid options list |
 | Invalid --category value | Error with valid options list |
 | Knowledge pack not found | Warn, continue with built-in checks |
-| x-dependency-audit unavailable | Mark A06 as SKIPPED, note in report |
+| x-audit-dependencies unavailable | Mark A06 as SKIPPED, note in report |
 | Partial scan (some categories fail to verify) | Report verified categories, mark others SKIPPED |
 | No source files found | Report "No source files found for verification" |
 
@@ -470,6 +470,6 @@ When run in CI mode, the skill:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-dependency-audit | Delegates to | A06 (Vulnerable Components) delegated per RULE-011 |
-| x-security-dashboard | Consumed by | SARIF output aggregated into security posture dashboard |
-| x-threat-model | Complements | Threat model informs A04 (Insecure Design) checks |
+| x-audit-dependencies | Delegates to | A06 (Vulnerable Components) delegated per RULE-011 |
+| x-generate-security-dashboard | Consumed by | SARIF output aggregated into security posture dashboard |
+| x-model-threats | Complements | Threat model informs A04 (Insecure Design) checks |

@@ -1,5 +1,5 @@
 ---
-name: x-mcp-recommend
+name: x-recommend-mcp
 description: "Analyzes project tech stack and recommends relevant MCP (Model Context Protocol) servers. Auto-detects language, framework, database, cache, and message broker from project config, then matches against a built-in catalog of MCP servers with installation instructions."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -21,8 +21,8 @@ Analyzes the {{PROJECT_NAME}} tech stack and recommends MCP (Model Context Proto
 
 ## Triggers
 
-- `/x-mcp-recommend` — analyze and recommend MCP servers
-- `/x-mcp-recommend --install` — recommend and auto-configure
+- `/x-recommend-mcp` — analyze and recommend MCP servers
+- `/x-recommend-mcp --install` — recommend and auto-configure
 
 ## Parameters
 

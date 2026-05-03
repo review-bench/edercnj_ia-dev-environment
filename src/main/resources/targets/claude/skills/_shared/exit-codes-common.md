@@ -1,7 +1,7 @@
 ## Common Exit Codes — Shared Families
 
 This snippet documents the three exit-code families that recur across
-orchestrating skills (`x-release`, `x-epic-implement`, `x-story-implement`, and
+orchestrating skills (`x-release`, `x-implement-epic`, `x-implement-story`, and
 downstream dispatchers). Per-skill codes are documented in each skill's own
 `SKILL.md`; this file owns the cross-skill families.
 

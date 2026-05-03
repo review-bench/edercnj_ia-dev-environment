@@ -1,6 +1,6 @@
 ---
-name: x-internal-pr-body-render
-description: "Renders PR body Markdown from existing disk artifacts using one of two templates. --kind=implementation: reads review/verify/telemetry artifacts for a story and emits a structured implementation PR body. --kind=backlog: reads epic/map artifacts and emits a scaffolding PR body. Fail-open: absent artifacts produce human-readable placeholders, never audit-sentinel strings. Internal — invoked only by x-pr-create and x-feature-create."
+name: x-internal-render-pr-body
+description: "Renders PR body Markdown from existing disk artifacts using one of two templates. --kind=implementation: reads review/verify/telemetry artifacts for a story and emits a structured implementation PR body. --kind=backlog: reads epic/map artifacts and emits a scaffolding PR body. Fail-open: absent artifacts produce human-readable placeholders, never audit-sentinel strings. Internal — invoked only by x-create-pr and x-create-feature."
 visibility: internal
 user-invocable: false
 model: haiku
@@ -19,13 +19,13 @@ requires-capabilities: []
 
 > 🔒 **INTERNAL SKILL** — Invoked only by other skills via the Skill tool. Not user-invocable.
 
-# Skill: x-internal-pr-body-render
+# Skill: x-internal-render-pr-body
 
 ## Purpose
 
 Renders a PR body Markdown file from existing on-disk artifacts (review, verify, telemetry,
-commits) and writes it to `--out`. Consumed by `x-pr-create` (kind=implementation) and
-`x-feature-create` (kind=backlog). Fail-open: any missing source produces a human-readable
+commits) and writes it to `--out`. Consumed by `x-create-pr` (kind=implementation) and
+`x-create-feature` (kind=backlog). Fail-open: any missing source produces a human-readable
 placeholder — never an audit-sentinel string recognized by `audit-pr-evidence.sh`.
 
 ## Parameters
@@ -63,13 +63,13 @@ Every absent artifact produces a human-readable placeholder. Permitted placehold
 This skill is internal — never typed by a user. Callers use Rule 13 INLINE-SKILL pattern:
 
 ```markdown
-Skill(skill: "x-internal-pr-body-render", args: "--kind=implementation --story-id story-XXXX-YYYY --out /abs/path/body.md")
+Skill(skill: "x-internal-render-pr-body", args: "--kind=implementation --story-id story-XXXX-YYYY --out /abs/path/body.md")
 ```
 
 ## Phase 0 — ARGS
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-pr-body-render Phase-0-Args`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-render-pr-body Phase-0-Args`
 
 Parse and validate all arguments:
 
@@ -101,12 +101,12 @@ Parse and validate all arguments:
    ```
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-0-Args ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-render-pr-body Phase-0-Args ok`
 
 ## Phase 1 — GATHER
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-pr-body-render Phase-1-Gather`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-render-pr-body Phase-1-Gather`
 
 Read 7 data sources (kind=implementation only; backlog uses a different set — see Phase 1b in §Backlog extension). Build intermediate JSON envelope. Apply fail-open fallbacks.
 
@@ -158,19 +158,19 @@ Fallback: `commitsList: "(no commits)"`.
 
 Capture:
 - `orchSha`: `git rev-parse HEAD`
-- `invocationSkill`: `x-story-implement`
+- `invocationSkill`: `x-implement-story`
 - `phase1Artifacts`: list files matching `ai/epics/*/plans/*-{storyId}.md`
 - `phase3Artifacts`: list files matching `ai/epics/*/reports/*-{storyId}.*`
 
 Escape all string values: replace `|` with `\|`, backticks with `\``, newlines with space.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-1-Gather ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-render-pr-body Phase-1-Gather ok`
 
 ## Phase 2 — TELEMETRY
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-pr-body-render Phase-2-Telemetry`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-render-pr-body Phase-2-Telemetry`
 
 Invoke `scripts/telemetry-consolidate.sh` (story-0066-0002) for the story scope:
 
@@ -186,12 +186,12 @@ TEL_EXIT=$?
 Convert activeMs/elapsedMs to minutes: `floor(ms / 60000)`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-2-Telemetry ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-render-pr-body Phase-2-Telemetry ok`
 
 ## Phase 3 — RENDER
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-pr-body-render Phase-3-Render`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-render-pr-body Phase-3-Render`
 
 Select template based on `--kind`:
 
@@ -205,21 +205,21 @@ TEMPLATE_PATH="$CLAUDE_PROJECT_DIR/.claude/templates/$TEMPLATE_NAME"
 
 If `$TEMPLATE_PATH` not found → emit `OPERATIONAL_ERROR: template missing: $TEMPLATE_PATH` and exit 2.
 
-Invoke `x-internal-report-write` via Rule 13 Pattern 1 (INLINE-SKILL):
+Invoke `x-internal-write-report` via Rule 13 Pattern 1 (INLINE-SKILL):
 
 ```
-Skill(skill: "x-internal-report-write", args: "--template $TEMPLATE_PATH --data <json-envelope> --output $TEMP_OUT")
+Skill(skill: "x-internal-write-report", args: "--template $TEMPLATE_PATH --data <json-envelope> --output $TEMP_OUT")
 ```
 
 `$TEMP_OUT` is a temp file under `${REPO_ROOT}/.claude/tmp/pr-render-$STORY_ID.md`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-3-Render ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-render-pr-body Phase-3-Render ok`
 
 ## Phase 4 — WRITE
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-pr-body-render Phase-4-Write`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-render-pr-body Phase-4-Write`
 
 Atomic write: move temp file to final `--out` path:
 
@@ -234,7 +234,7 @@ echo "$OUT_CANONICAL"
 On success, emit the final path to stdout and exit 0.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-pr-body-render Phase-4-Write ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-render-pr-body Phase-4-Write ok`
 
 <!-- phase-no-gate: Phase 1.5 is a conditional sub-phase inside Phase 1 — no independent gate -->
 ## Phase 1.5 — BACKLOG-GATHER (conditional on --kind=backlog)
@@ -309,9 +309,9 @@ Fallback if none: `coordinations: [{"epicId":"(none)","status":"none","hotFiles"
 
 | Skill | Relationship |
 | :--- | :--- |
-| `x-pr-create` | Primary caller for `--kind=implementation` |
-| `x-feature-create` | Caller for `--kind=backlog` (story-0066-0006) — RULE-007: backlog PR `## Orchestrator Evidence` is reduced (no Story IDs; accrues in subsequent story PRs) |
-| `x-internal-report-write` | Delegate for template rendering (Phase 3) |
+| `x-create-pr` | Primary caller for `--kind=implementation` |
+| `x-create-feature` | Caller for `--kind=backlog` (story-0066-0006) — RULE-007: backlog PR `## Orchestrator Evidence` is reduced (no Story IDs; accrues in subsequent story PRs) |
+| `x-internal-write-report` | Delegate for template rendering (Phase 3) |
 | `scripts/telemetry-consolidate.sh` | Telemetry aggregator (Phase 2, story-0066-0002) |
 | `_TEMPLATE-PR-IMPLEMENTATION.md` | Template consumed by Phase 3 (story-0066-0001) |
 | `_TEMPLATE-PR-BACKLOG.md` | Template for backlog kind (story-0066-0001) |

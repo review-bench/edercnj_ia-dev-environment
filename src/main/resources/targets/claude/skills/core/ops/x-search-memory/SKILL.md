@@ -1,5 +1,5 @@
 ---
-name: x-memory-search
+name: x-search-memory
 description: Queries ai/memory/ for decisions, patterns, and anti-patterns across past epics
 visibility: public
 user-invocable: true
@@ -8,7 +8,7 @@ requires-capabilities: [governance.ai-memory]
 allowed-tools: [Read, Bash, Grep, Glob]
 ---
 
-# x-memory-search
+# x-search-memory
 
 Searches `ai/memory/_index.yaml` and the indexed summary files for decisions, patterns,
 anti-patterns, or epic context matching the given query.
@@ -22,11 +22,11 @@ output order is deterministic (alphabetical by epic-id within each relevance tie
 ## Triggers
 
 ```
-/x-memory-search "auth decisions"
-/x-memory-search --by-pattern capability-aware-skill-via-frontmatter
-/x-memory-search --by-tag governance
-/x-memory-search --by-epic EPIC-0064
-/x-memory-search "hexagonal" --include-archived
+/x-search-memory "auth decisions"
+/x-search-memory --by-pattern capability-aware-skill-via-frontmatter
+/x-search-memory --by-tag governance
+/x-search-memory --by-epic EPIC-0064
+/x-search-memory "hexagonal" --include-archived
 ```
 
 ## Parameters
@@ -94,7 +94,7 @@ Print the complete `ai/memory/epic-XXXX-summary.md` body for each result.
 ## Integration Notes
 
 - Called interactively by operators during epic planning to surface prior decisions.
-- Called by `x-arch-plan` to auto-inject relevant memory context into architecture plans
+- Called by `x-plan-architecture` to auto-inject relevant memory context into architecture plans
   (conditional: `governance.ai-memory` active).
 - Output is read-only; does not modify `_index.yaml` or any summary file.
 - Empty result set is a valid response (exit 0, no output).
@@ -103,14 +103,14 @@ Print the complete `ai/memory/epic-XXXX-summary.md` body for each result.
 
 ```
 # Find all governance decisions
-/x-memory-search --by-tag governance
+/x-search-memory --by-tag governance
 
 # Find who rejected inline-validation
-/x-memory-search --by-pattern inline-validation-instead-of-hook
+/x-search-memory --by-pattern inline-validation-instead-of-hook
 
 # Find all epics that reference Rule 28
-/x-memory-search --by-rule "Rule 28"
+/x-search-memory --by-rule "Rule 28"
 
 # Full body for one epic
-/x-memory-search --by-epic EPIC-0064 --format full
+/x-search-memory --by-epic EPIC-0064 --format full
 ```

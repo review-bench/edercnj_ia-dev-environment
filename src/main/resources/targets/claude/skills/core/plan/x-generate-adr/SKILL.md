@@ -1,5 +1,5 @@
 ---
-name: x-adr-generate
+name: x-generate-adr
 description: "Automates ADR generation from architecture plan mini-ADRs: extracts inline decisions, expands to full ADR format, assigns sequential numbering, updates the ADR index, and adds cross-references."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -21,9 +21,9 @@ Automates the generation of Architecture Decision Records (ADRs) from mini-ADRs 
 
 ## Triggers
 
-- `/x-adr-generate [architecture-plan-path] [story-id]` — extract mini-ADRs from the specified architecture plan and generate full ADR files
+- `/x-generate-adr [architecture-plan-path] [story-id]` — extract mini-ADRs from the specified architecture plan and generate full ADR files
 - After the architecture plan phase, when mini-ADRs exist inline in the plan document
-- When `x-arch-plan` has produced an architecture plan containing `### ADR:` markers
+- When `x-plan-architecture` has produced an architecture plan containing `### ADR:` markers
 - When architectural decisions need formal documentation as standalone ADR files
 - When the `docs/adr/` directory needs to be populated or updated with new decisions
 - Do NOT use if ADRs have already been manually created for the same decisions
@@ -64,7 +64,7 @@ Each mini-ADR is expanded into a full ADR file with YAML frontmatter and structu
 status: Accepted
 date: YYYY-MM-DD
 story-ref: story-XXXX-YYYY
-deciders: AI-assisted (via x-adr-generate)
+deciders: AI-assisted (via x-generate-adr)
 ---
 
 # ADR-NNNN: Title of the Decision
@@ -103,7 +103,7 @@ The output ADR frontmatter fields are:
 | `status` | `Accepted` | Initial status for auto-generated ADRs |
 | `date` | Current date (`YYYY-MM-DD`) | Date of ADR generation |
 | `story-ref` | Story ID from argument | Cross-reference to originating story |
-| `deciders` | `AI-assisted (via x-adr-generate)` | Attribution |
+| `deciders` | `AI-assisted (via x-generate-adr)` | Attribution |
 
 The output ADR sections are:
 
@@ -303,7 +303,7 @@ File: `docs/adr/ADR-0004-use-postgresql-for-persistence.md`
 status: Accepted
 date: 2024-01-15
 story-ref: story-0004-0006
-deciders: AI-assisted (via x-adr-generate)
+deciders: AI-assisted (via x-generate-adr)
 ---
 
 # ADR-0004: Use PostgreSQL for Persistence
@@ -371,6 +371,6 @@ Use PostgreSQL 15+ as the primary relational database for all transactional pers
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-arch-plan` | called-by | Prerequisite: generates the architecture plan with inline mini-ADRs |
-| `x-arch-update` | calls | Updates service architecture document Section 7 with new ADR references |
-| `x-story-implement` | called-by | Invoked during documentation phase to formalize architectural decisions |
+| `x-plan-architecture` | called-by | Prerequisite: generates the architecture plan with inline mini-ADRs |
+| `x-update-architecture` | calls | Updates service architecture document Section 7 with new ADR references |
+| `x-implement-story` | called-by | Invoked during documentation phase to formalize architectural decisions |

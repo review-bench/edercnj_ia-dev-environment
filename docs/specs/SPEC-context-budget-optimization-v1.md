@@ -36,7 +36,7 @@ Meta quantitativa: contexto sempre-carregado de **~52k → ~22k tokens (–58%)*
 
 - **Baseline e instrumentação:** novo `scripts/measure-context-budget.sh` (SoT em `src/main/resources/targets/claude/scripts/measure-context-budget.sh`; output JSON `{alwaysLoaded, perSkill}`), baseline commitado em `governance/baselines/context-budget.json`, audit `scripts/audit-context-budget.sh` (advisory primeiro, hard-fail depois).
 - **Limpeza imediata (sem refactor):** remoção de `02-domain.md` do pipeline de geração (hoje gerado via `CoreRulesWriter.copyDomainTemplate(...)`; template não-preenchido com `{DOMAIN_NAME}`/`{ENTITIES_TABLE}`), com atualização **no mesmo conjunto de mudanças** de todas as referências diretas a `rules/02-domain.md` nas rules core (ex.: Rule 01 linha 35: `> Detailed domain rules are in \`rules/02-domain.md\`...`), no README/tabelas de rules e nos testes/goldens; renumeração da rule duplicada `28-tool-call-grammar.md` → `30-tool-call-grammar.md`, extração do histórico de epics concluídos do CLAUDE.md raiz para `docs/epics-history.md` (substituído por link).
-- **Promoção de Rule 12 para KP:** os 8 exemplos Java vulneráveis/fixed (262 linhas) saem para `knowledge/security/anti-patterns/<j1..j8>.md`. Rule 12 reduz para ~30 linhas (lista CWE+severity+1-line + link). `KnowledgePacksAssembler` ganha categoria `security/anti-patterns`. Skills consumidoras (`x-review-security`, `x-owasp-scan`, `x-threat-model`) atualizadas para `Read` o KP.
+- **Promoção de Rule 12 para KP:** os 8 exemplos Java vulneráveis/fixed (262 linhas) saem para `knowledge/security/anti-patterns/<j1..j8>.md`. Rule 12 reduz para ~30 linhas (lista CWE+severity+1-line + link). `KnowledgePacksAssembler` ganha categoria `security/anti-patterns`. Skills consumidoras (`x-review-security`, `x-scan-owasp`, `x-model-threats`) atualizadas para `Read` o KP.
 - **Slim Rule 25 (task-hierarchy):** regex BNF do `subject`, tabelas `metadata`/`activeForm`, exemplos válidos/inválidos vão para `knowledge/lifecycle/task-hierarchy.md`. Rule 25 fica com Invariantes + tabela Enforcement + link. Alvo ≤60 linhas (de 179).
 - **Slim Rule 26 (audit-gate-lifecycle):** decision tree, descrição extensa de Camada 0, naming completo vão para `knowledge/governance/audit-gate-lifecycle.md`. Rule mantém tabela das 5 camadas, naming convention e exit codes. Alvo ≤50 linhas (de 201).
 - **Slim Rule 28-capability + Rule 30-tool-call-grammar:** YAML examples extensos de capability composition vão para `knowledge/governance/capability-composition.md`; BNF + exemplos longos de tool-call grammar vão para `knowledge/governance/tool-call-grammar.md`. Cada rule alvo ≤60 linhas.
@@ -51,7 +51,7 @@ Meta quantitativa: contexto sempre-carregado de **~52k → ~22k tokens (–58%)*
 - **Remoção, simplificação ou desativação de qualquer gate, hook, audit, fase ou política existente.** Todos os 4 layers de enforcement permanecem operacionais; apenas o conteúdo de referência migra de localização.
 - **Reescrita do `CapabilityResolver` ou do `CompositionEngine`** (EPIC-0064) — esta epic apenas anota artefatos, não muda o composer.
 - **Migração de skills/agents para frontmatter v3.0** — escopo de EPIC-0064 Phase 2.
-- **Mudança no fluxo de execução de orquestradores** (`x-epic-implement`, `x-story-implement`, `x-task-implement` continuam idênticos).
+- **Mudança no fluxo de execução de orquestradores** (`x-implement-epic`, `x-implement-story`, `x-implement-task` continuam idênticos).
 - **Otimização de hooks Bash** (latência de Stop/PreToolUse/PostToolUse não é alvo desta epic).
 - **Reformulação de CLAUDE.md raiz além da extração de histórico de epics** — texto operacional permanece.
 - **Suporte a outros idiomas ou stacks não-Java na Rule 12 KP** (apenas anti-patterns Java existentes são migrados; novas linguagens ficam para epic futura).
@@ -73,7 +73,7 @@ Meta quantitativa: contexto sempre-carregado de **~52k → ~22k tokens (–58%)*
 
 ## Histórias
 
-Índice preliminar (a ser refinado por `/x-feature-create`):
+Índice preliminar (a ser refinado por `/x-create-feature`):
 
 | # | Título | Stakeholder | Justificativa |
 |---|--------|-------------|---------------|
@@ -114,13 +114,13 @@ Meta quantitativa: contexto sempre-carregado de **~52k → ~22k tokens (–58%)*
 - [ ] `02-domain.md` removido de `RulesAssembler`; profile YAMLs marcam `domain: skip` ou equivalente; golden files regenerados; `GoldenFileTest` verde.
 - [ ] Renumeração `28-tool-call-grammar.md` → `30-tool-call-grammar.md` aplicada em commit atômico; `grep -r "28-tool-call-grammar"` em todo o repo retorna zero matches; ADRs/baselines/hooks atualizados.
 - [ ] Histórico de epics concluídos extraído de CLAUDE.md raiz para `docs/epics-history.md`; CLAUDE.md mantém apenas link; tamanho de CLAUDE.md cai para ≤200 linhas.
-- [ ] Rule 12 reduzida para ≤30 linhas; KP `knowledge/security/anti-patterns/<j1..j8>.md` criado; `x-review-security`, `x-owasp-scan`, `x-threat-model` lêem o KP via `Read` explícito; smoke test valida.
+- [ ] Rule 12 reduzida para ≤30 linhas; KP `knowledge/security/anti-patterns/<j1..j8>.md` criado; `x-review-security`, `x-scan-owasp`, `x-model-threats` lêem o KP via `Read` explícito; smoke test valida.
 - [ ] Rules 25, 26, 28-capability, 30-tool-call-grammar reduzidas para ≤60 linhas cada; KPs correspondentes em `knowledge/lifecycle/` e `knowledge/governance/` criados; audits associados (`audit-task-hierarchy.sh`, `audit-tool-call-grammar.sh`, `audit-capability-graph.sh`) continuam green.
 - [ ] Rule 19 reescrita como "Lifecycle Integrity Contract" canônico; 5 KPs lifecycle criados; Rules 24/27/29/45 reduzidas a stubs de 10 linhas apontando Rule 19 + KP; `LifecycleIntegrityAuditTest`, `audit-execution-integrity.sh`, `audit-bypass-flags.sh`, `audit-refinement-gate.sh` continuam green.
 - [ ] Todas rules restantes anotadas com `requires-capabilities`; pruning advisory em release atual; `audit-capability-graph.sh --self-check` green.
 - [ ] `audit-kp-references.sh` implementado; zero KPs órfãos detectados.
 - [ ] `_TEMPLATE-RULE.md` documenta os 4 blocos canônicos (Purpose / Invariants / Enforcement / Reference); ADR-NNNN publicado.
-- [ ] Métrica final: `scripts/measure-context-budget.sh` reporta always-loaded ≤25.000 tokens (alvo interno: 22.000); telemetria confirma redução em runs reais de `/x-epic-implement`.
+- [ ] Métrica final: `scripts/measure-context-budget.sh` reporta always-loaded ≤25.000 tokens (alvo interno: 22.000); telemetria confirma redução em runs reais de `/x-implement-epic`.
 - [ ] CHANGELOG.md sob `## Changed` documenta consolidação de rules + criação de KPs; sob `## Deprecated` lista Rules 24/27/29/45 com sunset date (release n+2).
 - [ ] Cobertura: line ≥95%, branch ≥90% no projeto Java do gerador (Rule 05); todos os assemblers afetados (`RulesAssembler`, `KnowledgePacksAssembler`, `PlanTemplatesAssembler`) com testes atualizados.
 
@@ -144,8 +144,8 @@ Meta quantitativa: contexto sempre-carregado de **~52k → ~22k tokens (–58%)*
 ## Próximos passos (após revisão humana)
 
 1. Revisar o spec e iterar conforme necessário via PR (`docs/feature-context-budget-optimization` → `develop`).
-2. Invocar `/x-feature-create docs/specs/SPEC-context-budget-optimization-v1.md --epic-id <NNNN>` para gerar Epic + Stories + Implementation Map.
-3. Executar `/x-epic-implement epic-NNNN` para iniciar Phase 1 (planning) das 17 stories propostas.
+2. Invocar `/x-create-feature docs/specs/SPEC-context-budget-optimization-v1.md --epic-id <NNNN>` para gerar Epic + Stories + Implementation Map.
+3. Executar `/x-implement-epic epic-NNNN` para iniciar Phase 1 (planning) das 17 stories propostas.
 4. Após release n+2 (deprecation window cumprida), executar story 17 (remoção dos stubs) como follow-up isolado.
 
 ---

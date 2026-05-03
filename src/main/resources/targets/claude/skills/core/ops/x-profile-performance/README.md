@@ -1,11 +1,11 @@
-# x-perf-profile
+# x-profile-performance
 
 > Automated profiling: detect language, select profiler, execute session, generate flamegraph, identify hotspots, suggest optimizations.
 
 | | |
 |---|---|
 | **Category** | Operations |
-| **Invocation** | `/x-perf-profile [cpu\|memory\|io\|all] [--duration 30s] [--output flamegraph]` |
+| **Invocation** | `/x-profile-performance [cpu\|memory\|io\|all] [--duration 30s] [--output flamegraph]` |
 | **Reads** | performance-engineering |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,9 +17,9 @@ Executes automated profiling sessions by detecting the project language and runt
 ## Usage
 
 ```
-/x-perf-profile cpu
-/x-perf-profile memory --duration 60s
-/x-perf-profile all --output report
+/x-profile-performance cpu
+/x-profile-performance memory --duration 60s
+/x-profile-performance all --output report
 ```
 
 ## Workflow
@@ -42,5 +42,5 @@ Executes automated profiling sessions by detecting the project language and runt
 
 ## See Also
 
-- [x-ops-troubleshoot](../x-ops-troubleshoot/) -- Diagnoses performance issues and other failures
-- [x-test-run](../x-test-run/) -- Coverage and test execution with threshold validation
+- [x-troubleshoot-operations](../x-troubleshoot-operations/) -- Diagnoses performance issues and other failures
+- [x-execute-tests](../x-execute-tests/) -- Coverage and test execution with threshold validation

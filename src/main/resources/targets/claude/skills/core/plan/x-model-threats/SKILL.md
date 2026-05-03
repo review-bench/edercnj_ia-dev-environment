@@ -1,5 +1,5 @@
 ---
-name: x-threat-model
+name: x-model-threats
 description: "Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document."
 user-invocable: true
 allowed-tools: Read, Write, Glob, Grep, Agent
@@ -21,12 +21,12 @@ Generates automated threat models for {{PROJECT_NAME}} using STRIDE analysis. Id
 
 ## Triggers
 
-- `/x-threat-model` — analyze codebase and generate STRIDE threat model
-- `/x-threat-model steering/plan.md` — generate from architecture plan
-- `/x-threat-model --format stride` — STRIDE analysis (default)
-- `/x-threat-model --format pasta` — PASTA analysis (risk-centric)
-- `/x-threat-model --format linddun` — LINDDUN analysis (privacy-focused)
-- `/x-threat-model --output results/security/` — specify output directory
+- `/x-model-threats` — analyze codebase and generate STRIDE threat model
+- `/x-model-threats steering/plan.md` — generate from architecture plan
+- `/x-model-threats --format stride` — STRIDE analysis (default)
+- `/x-model-threats --format pasta` — PASTA analysis (risk-centric)
+- `/x-model-threats --format linddun` — LINDDUN analysis (privacy-focused)
+- `/x-model-threats --output results/security/` — specify output directory
 
 ## Parameters
 
@@ -315,6 +315,6 @@ Privacy threat modeling covering:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-arch-plan | Invoked from | Threat model can be generated as part of architecture planning |
+| x-plan-architecture | Invoked from | Threat model can be generated as part of architecture planning |
 | security-engineer agent | Delegates to | Uses security-engineer agent for in-depth analysis via Agent tool |
-| x-owasp-scan | Complements | Threat model informs A04 (Insecure Design) verification in OWASP scan |
+| x-scan-owasp | Complements | Threat model informs A04 (Insecure Design) verification in OWASP scan |

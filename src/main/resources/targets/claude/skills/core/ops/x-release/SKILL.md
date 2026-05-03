@@ -40,7 +40,7 @@ requires-capabilities: []
 | `--interactive` | Opt-in to gate menus (PROCEED/FIX-PR/ABORT) at Phase 8. With `--dry-run`: pauses before each phase. Default: non-interactive (Rule 20, EPIC-0061). |
 | `--non-interactive` | **DEPRECATED** — was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--skip-review` | Skip `x-review-pr` fire-and-forget in OPEN-RELEASE-PR |
-| `--ci-watch` | Opt-in: poll CI on release PR via `x-pr-watch-ci`; abort on CI failure |
+| `--ci-watch` | Opt-in: poll CI on release PR via `x-watch-pr-ci`; abort on CI failure |
 | `--signed-tag` | Create GPG-signed tag (`git tag -s`) instead of annotated |
 | `--skip-tests` | Skip VALIDATE-DEEP test execution (warning emitted) |
 | `--no-publish` | Create release locally without pushing |
@@ -88,7 +88,7 @@ Check for existing `state.json` (`--state-file` override or default `ai/releases
 
 Persist interactiveMode to release state (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/releases/release-state-{version}.json --type release --id <VERSION> --field interactiveMode --value <interactive|non-interactive>")
+    Skill(skill: "x-internal-update-status", args: "--file ai/releases/release-state-{version}.json --type release --id <VERSION> --field interactiveMode --value <interactive|non-interactive>")
 
 Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
 
@@ -96,12 +96,12 @@ Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE
 
 ## Phase 1 - Determine
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-1-Determine")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-1-Determine")
     TaskCreate(subject: "RELEASE › Phase 1 - Determine", activeForm: "Determining release version")
 
 Detect bump type from Conventional Commits (`feat:`→MINOR, `fix:`→PATCH, `!:`→MAJOR) or apply explicit argument. Validate `X.Y.Z` format. Emit `VERSION_NO_BUMP_SIGNAL` when no qualifying commits. Write initial `state.json` with `version`, `bumpType`, `phase: DETERMINED`. See `references/auto-version-detection.md`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-1-Determine --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-1-Determine --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase1TaskId, status: "completed")
 
 <!-- phase-no-gate: pre-flight is a lightweight advisory check with no artifact output -->
@@ -117,62 +117,62 @@ Advisory checks: git remote reachable, no active release branch of same version,
 
 ## Phase 2 - Validate Deep
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-2-ValidateDeep")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-2-ValidateDeep")
     TaskCreate(subject: "RELEASE › Phase 2 - Validate Deep", activeForm: "Running deep validation checks")
 
 Run the 10-check VALIDATE-DEEP matrix (see table above). Advance state to `phase: VALIDATED`. Errors: `VALIDATE_DIRTY_WORKDIR`, `VALIDATE_BUILD_FAILED`, `VALIDATE_COVERAGE_LINE`, `VALIDATE_COVERAGE_BRANCH`, `VALIDATE_GOLDEN_DRIFT`, `VALIDATE_EMPTY_UNRELEASED`, `VALIDATE_HARDCODED_VERSION`, `VALIDATE_VERSION_MISMATCH`, `VALIDATE_GENERATION_DRIFT`, `INTEGRITY_DRIFT`. See `references/full-protocol.md §Phase 2`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-2-ValidateDeep --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-2-ValidateDeep --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase2TaskId, status: "completed")
 
 ## Phase 3 - Branch
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-3-Branch")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-3-Branch")
     TaskCreate(subject: "RELEASE › Phase 3 - Branch", activeForm: "Creating release branch")
 
-Invoke `x-git-branch` to create `release/X.Y.Z` from `develop` (or `hotfix/X.Y.Z` from `main` when `--hotfix`). Idempotent: no-op if branch already exists. Advance state to `phase: BRANCHED`. See `references/full-protocol.md §Phase 3`.
+Invoke `x-create-git-branch` to create `release/X.Y.Z` from `develop` (or `hotfix/X.Y.Z` from `main` when `--hotfix`). Idempotent: no-op if branch already exists. Advance state to `phase: BRANCHED`. See `references/full-protocol.md §Phase 3`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-3-Branch --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-3-Branch --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase3TaskId, status: "completed")
 
 ## Phase 4 - Update
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-4-Update")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-4-Update")
     TaskCreate(subject: "RELEASE › Phase 4 - Update", activeForm: "Updating version files")
 
 Bump version in all version-bearing files (`pom.xml`, version constants, etc.) to `X.Y.Z`. Cross-validate all files agree. Advance state to `phase: UPDATED`. See `references/full-protocol.md §Phase 4`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-4-Update --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-4-Update --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase4TaskId, status: "completed")
 
 ## Phase 5 - Changelog
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-5-Changelog")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-5-Changelog")
     TaskCreate(subject: "RELEASE › Phase 5 - Changelog", activeForm: "Generating changelog entry")
 
-Invoke `x-release-changelog` to promote `[Unreleased]` section to `[X.Y.Z] - DATE`. Advance state to `phase: CHANGELOG_UPDATED`. See `references/full-protocol.md §Phase 5`.
+Invoke `x-generate-release-changelog` to promote `[Unreleased]` section to `[X.Y.Z] - DATE`. Advance state to `phase: CHANGELOG_UPDATED`. See `references/full-protocol.md §Phase 5`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-5-Changelog --expected-artifacts CHANGELOG.md")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-5-Changelog --expected-artifacts CHANGELOG.md")
     TaskUpdate(id: phase5TaskId, status: "completed")
 
 ## Phase 6 - Commit
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-6-Commit")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-6-Commit")
     TaskCreate(subject: "RELEASE › Phase 6 - Commit", activeForm: "Committing release artifacts")
 
-Commit version bumps + CHANGELOG via `x-git-commit` with message `chore(release): X.Y.Z`. Push `release/X.Y.Z` to origin. Advance state to `phase: COMMITTED`. See `references/full-protocol.md §Phase 6`.
+Commit version bumps + CHANGELOG via `x-commit-changes` with message `chore(release): X.Y.Z`. Push `release/X.Y.Z` to origin. Advance state to `phase: COMMITTED`. See `references/full-protocol.md §Phase 6`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-6-Commit --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-6-Commit --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase6TaskId, status: "completed")
 
 ## Phase 7 - Open Release PR
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-7-OpenReleasePR")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-7-OpenReleasePR")
     TaskCreate(subject: "RELEASE › Phase 7 - Open Release PR", activeForm: "Opening release PR to main")
 
 Create PR `release/X.Y.Z → main` via `gh pr create`. If `--skip-review` absent: fire `x-review-pr` in background (fire-and-forget). Advance state to `phase: PR_OPEN`. Record `prNumber` in state. See `references/full-protocol.md §Phase 7`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-7-OpenReleasePR --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-7-OpenReleasePR --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase7TaskId, status: "completed")
 
 <!-- phase-no-gate: optional CI-watch poll loop; skipped unless --ci-watch flag present -->
@@ -182,9 +182,9 @@ Open a phase tracker only when `--ci-watch` is set (close with `TaskUpdate` afte
 
     TaskCreate(subject: "RELEASE › Phase 7.5 - CI Watch", activeForm: "Polling CI on release PR")
 
-**MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24 + Rule 45):** Invoke the `x-pr-watch-ci` skill via the Skill tool on `prNumber`. On `CI_FAILED` (exit 20) or `TIMEOUT` (exit 30): abort release with corresponding error. On success (exit 0): advance to Phase 8. See `references/full-protocol.md §Phase 7.5`.
+**MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24 + Rule 45):** Invoke the `x-watch-pr-ci` skill via the Skill tool on `prNumber`. On `CI_FAILED` (exit 20) or `TIMEOUT` (exit 30): abort release with corresponding error. On success (exit 0): advance to Phase 8. See `references/full-protocol.md §Phase 7.5`.
 
-    Skill(skill: "x-pr-watch-ci", args: "--pr-number {prNumber}")
+    Skill(skill: "x-watch-pr-ci", args: "--pr-number {prNumber}")
 
     TaskUpdate(id: phase75TaskId, status: "completed")
 
@@ -193,65 +193,65 @@ Open a phase tracker only when `--ci-watch` is set (close with `TaskUpdate` afte
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-release Phase-Approval-Gate`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-8-ApprovalGate")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-8-ApprovalGate")
     TaskCreate(subject: "RELEASE › Phase 8 - Approval Gate", activeForm: "Awaiting release approval")
 
-Persist state with `phase: APPROVAL_PENDING`. Present EPIC-0043 gate menu (PROCEED / FIX-PR / ABORT) unless `--non-interactive`. On PROCEED: advance to Phase 9 (TAG). On FIX-PR: `Skill(skill: "x-pr-fix", args: "<prNumber>")` then loop (max 3 cycles). See `references/approval-gate-workflow.md`.
+Persist state with `phase: APPROVAL_PENDING`. Present EPIC-0043 gate menu (PROCEED / FIX-PR / ABORT) unless `--non-interactive`. On PROCEED: advance to Phase 9 (TAG). On FIX-PR: `Skill(skill: "x-fix-pr", args: "<prNumber>")` then loop (max 3 cycles). See `references/approval-gate-workflow.md`.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-release Phase-Approval-Gate ok`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-8-ApprovalGate --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-8-ApprovalGate --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase8TaskId, status: "completed")
 
 ## Phase 9 - Tag
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-9-Tag")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-9-Tag")
     TaskCreate(subject: "RELEASE › Phase 9 - Tag", activeForm: "Tagging release on main")
 
 After PR merged: tag `main` HEAD as `vX.Y.Z` (annotated, or GPG-signed with `--signed-tag`). Push tag. Error: `TAG_EXISTS`. Advance state to `phase: TAGGED`. See `references/full-protocol.md §Phase 9`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-9-Tag --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-9-Tag --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase9TaskId, status: "completed")
 
 ## Phase 10 - Back Merge Develop
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-10-BackMerge")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-10-BackMerge")
     TaskCreate(subject: "RELEASE › Phase 10 - Back Merge Develop", activeForm: "Back-merging release into develop")
 
 Create PR `release/X.Y.Z → develop` via `gh pr create --auto-merge`. On conflict: emit `BACK_MERGE_CONFLICT`; see `references/backmerge-strategies.md` for resolution flow. Advance state to `phase: BACK_MERGED`. See `references/full-protocol.md §Phase 10`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-10-BackMerge --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-10-BackMerge --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase10TaskId, status: "completed")
 
 ## Phase 11 - Publish
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-11-Publish")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-11-Publish")
     TaskCreate(subject: "RELEASE › Phase 11 - Publish", activeForm: "Publishing GitHub release")
 
 Unless `--no-github-release`: create GitHub Release via `gh release create vX.Y.Z --notes-from-tag`. Unless `--no-publish`: push any remaining artifacts. Advance state to `phase: PUBLISHED`. See `references/full-protocol.md §Phase 11`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-11-Publish --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-11-Publish --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase11TaskId, status: "completed")
 
 ## Phase 12 - Cleanup
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-12-Cleanup")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-12-Cleanup")
     TaskCreate(subject: "RELEASE › Phase 12 - Cleanup", activeForm: "Cleaning up release branch")
 
 Delete `release/X.Y.Z` branch locally and on origin. Remove state file. Advance state to `phase: COMPLETED`. See `references/full-protocol.md §Phase 12`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-release --phase Phase-12-Cleanup --expected-artifacts ai/releases/release-state-{version}.json")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-release --phase Phase-12-Cleanup --expected-artifacts ai/releases/release-state-{version}.json")
     TaskUpdate(id: phase12TaskId, status: "completed")
 
 ## Phase 13 - Summary
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-release --phase Phase-13-Summary")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-13-Summary")
     TaskCreate(subject: "RELEASE › Phase 13 - Summary", activeForm: "Generating release summary")
 
 Print Git Flow cycle explainer (see `references/git-flow-cycle-explainer.md`). Emit final release summary: version, tag, PR numbers, durations. Advance state to `COMPLETED`.
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-release --phase Phase-13-Summary --expected-artifacts CHANGELOG.md")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode final --skill x-release --phase Phase-13-Summary --expected-artifacts CHANGELOG.md")
     TaskUpdate(id: phase13TaskId, status: "completed")
 
 ## Output Contract
@@ -263,7 +263,7 @@ Print Git Flow cycle explainer (see `references/git-flow-cycle-explainer.md`). E
 | Back-merge PR | `release/X.Y.Z → develop` via `BACK-MERGE-DEVELOP` phase; conflict-aware flow in `references/backmerge-strategies.md` |
 | Git tag | `vX.Y.Z` on `main` HEAD after `RESUME-AND-TAG` via `OPEN-RELEASE-PR` → `APPROVAL-GATE` → `APPROVAL_PENDING` (annotated or GPG-signed) |
 | State file | `ai/releases/release-state-X.Y.Z.json`; schema in `references/state-file-schema.md`; initialized with `schemaVersion: 2` (`.schemaVersion != 2` emits `Expected: 2` error) |
-| CHANGELOG | Updated `CHANGELOG.md` via `x-release-changelog` |
+| CHANGELOG | Updated `CHANGELOG.md` via `x-generate-release-changelog` |
 
 ## Error Envelope
 

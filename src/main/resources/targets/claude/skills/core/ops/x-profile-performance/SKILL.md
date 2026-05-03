@@ -1,5 +1,5 @@
 ---
-name: x-perf-profile
+name: x-profile-performance
 description: "Automated profiling: detect language/runtime, select appropriate profiler, execute session, generate flamegraph, identify hotspots, and suggest optimizations referencing the performance-engineering knowledge pack."
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Agent
@@ -21,14 +21,14 @@ Execute automated profiling sessions for {{PROJECT_NAME}}. Detect the project la
 
 ## Triggers
 
-- `/x-perf-profile cpu` — CPU profiling with default duration
-- `/x-perf-profile memory` — memory/heap profiling
-- `/x-perf-profile io` — I/O profiling (disk, network)
-- `/x-perf-profile all` — combined profiling (CPU + memory + I/O)
-- `/x-perf-profile cpu --duration 60s` — CPU profiling for 60 seconds
-- `/x-perf-profile cpu --output flamegraph` — generate flamegraph SVG
-- `/x-perf-profile cpu --output report` — generate Markdown report
-- `/x-perf-profile cpu --output raw` — output native profiler format
+- `/x-profile-performance cpu` — CPU profiling with default duration
+- `/x-profile-performance memory` — memory/heap profiling
+- `/x-profile-performance io` — I/O profiling (disk, network)
+- `/x-profile-performance all` — combined profiling (CPU + memory + I/O)
+- `/x-profile-performance cpu --duration 60s` — CPU profiling for 60 seconds
+- `/x-profile-performance cpu --output flamegraph` — generate flamegraph SVG
+- `/x-profile-performance cpu --output report` — generate Markdown report
+- `/x-profile-performance cpu --output raw` — output native profiler format
 
 ## Parameters
 
@@ -233,9 +233,9 @@ Reference the performance-engineering knowledge pack for contextualized optimiza
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-test-perf | complements | Performance tests generate load; profiling captures behavior |
-| x-ops-troubleshoot | calls | Troubleshooting may invoke profiling for performance issues |
-| x-review | called-by | Performance review specialist may reference profiling results |
+| x-run-perf-tests | complements | Performance tests generate load; profiling captures behavior |
+| x-troubleshoot-operations | calls | Troubleshooting may invoke profiling for performance issues |
+| x-review-codebase | called-by | Performance review specialist may reference profiling results |
 
 ## Knowledge Pack References
 

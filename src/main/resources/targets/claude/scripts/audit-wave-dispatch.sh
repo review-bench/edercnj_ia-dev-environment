@@ -5,7 +5,7 @@
 #
 # audit-wave-dispatch.sh — Sub-Skill Wave Dispatch Audit
 #
-# Validates that when x-story-implement Phase 1 dispatches parallel planning agents
+# Validates that when x-implement-story Phase 1 dispatches parallel planning agents
 # (Batch A), the telemetry NDJSON shows subagent.start events for the expected wave
 # members. Detects cases where agents were supposed to run in parallel but were
 # instead run serially or skipped.

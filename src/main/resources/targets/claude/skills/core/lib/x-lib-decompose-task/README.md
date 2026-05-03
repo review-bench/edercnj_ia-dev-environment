@@ -1,23 +1,23 @@
-# x-lib-task-decomposer
+# x-lib-decompose-task
 
-> Decomposes an implementation plan into tasks. Primary mode: derives tasks from test scenarios (x-test-plan output) using TDD structure (RED/GREEN/REFACTOR). Fallback mode: uses Layer Task Catalog (G1-G7) when no test plan exists.
+> Decomposes an implementation plan into tasks. Primary mode: derives tasks from test scenarios (x-plan-tests output) using TDD structure (RED/GREEN/REFACTOR). Fallback mode: uses Layer Task Catalog (G1-G7) when no test plan exists.
 
 | | |
 |---|---|
 | **Category** | Library (internal) |
-| **Called by** | x-story-implement |
+| **Called by** | x-implement-story |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
 ## Purpose
 
-Breaks down an Architect's implementation plan into granular, implementable tasks with tier assignments (Junior/Mid/Senior) and context budgets. When a test plan from `x-test-plan` exists, it produces TDD-structured tasks with RED/GREEN/REFACTOR steps; otherwise it falls back to the Layer Task Catalog (G1-G7) with parallelism groups.
+Breaks down an Architect's implementation plan into granular, implementable tasks with tier assignments (Junior/Mid/Senior) and context budgets. When a test plan from `x-plan-tests` exists, it produces TDD-structured tasks with RED/GREEN/REFACTOR steps; otherwise it falls back to the Layer Task Catalog (G1-G7) with parallelism groups.
 
 ## Integration Points
 
 | Caller | Context | Input | Output |
 |--------|---------|-------|--------|
-| x-story-implement | Phase 1C, after Architect plan and before implementation | Architect plan (`plan-story-*.md`), story file, test plan (`tests-story-*.md`, optional) | Task breakdown file (`tasks-story-*.md`) with ordered tasks, tiers, budgets, and dependencies |
+| x-implement-story | Phase 1C, after Architect plan and before implementation | Architect plan (`plan-story-*.md`), story file, test plan (`tests-story-*.md`, optional) | Task breakdown file (`tasks-story-*.md`) with ordered tasks, tiers, budgets, and dependencies |
 
 ## Procedure
 
@@ -29,6 +29,6 @@ Breaks down an Architect's implementation plan into granular, implementable task
 
 ## See Also
 
-- [x-test-plan](../../x-test-plan/) -- generates the test plan consumed as primary input
-- [x-story-implement](../../x-story-implement/) -- orchestrator that invokes this skill during Phase 1C
-- [x-lib-group-verifier](../x-lib-group-verifier/) -- verifies build gates between the parallelism groups this skill defines
+- [x-plan-tests](../../x-plan-tests/) -- generates the test plan consumed as primary input
+- [x-implement-story](../../x-implement-story/) -- orchestrator that invokes this skill during Phase 1C
+- [x-lib-verify-group](../x-lib-verify-group/) -- verifies build gates between the parallelism groups this skill defines

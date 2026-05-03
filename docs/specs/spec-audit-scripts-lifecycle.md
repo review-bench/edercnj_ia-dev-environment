@@ -121,4 +121,4 @@ Impacto secundário: redução de friction em code review — reviewers ganham 1
 - NÃO introduzir classes Java runtime para análise (Rule 14 scope guard).
 - NÃO migrar baselines (`audits/execution-integrity-baseline.txt`, `audits/lifecycle-integrity-baseline.txt`).
 - NÃO substituir `LifecycleIntegrityAuditTest.java` ou `TelemetryMarkerLint.java` por scripts bash — estes permanecem como Java tests conforme sua decisão original; Rule 25 apenas os catalogará como "Java test tier".
-- NÃO implementar `/x-epic-implement` — esta decomposição produz apenas os artefatos de planejamento.
+- NÃO implementar `/x-implement-epic` — esta decomposição produz apenas os artefatos de planejamento.

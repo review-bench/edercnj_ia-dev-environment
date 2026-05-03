@@ -1,4 +1,4 @@
-# x-epic-implement — Full Protocol
+# x-implement-epic — Full Protocol
 
 > Companion reference to `SKILL.md` (thin orchestrator, ~460 lines).
 > This file collects everything that would bloat the main skill body:
@@ -9,7 +9,7 @@
 
 ## §1 — `args-schema.json`
 
-The schema consumed by `x-internal-args-normalize` in Phase 0. Stored as a
+The schema consumed by `x-internal-normalize-args` in Phase 0. Stored as a
 sibling file at [`references/args-schema.json`](args-schema.json) so the
 normalizer can load it via `@` syntax. The schema declares every flag
 listed in `SKILL.md` §Parameters — including the deprecated flags that
@@ -39,7 +39,7 @@ When priority 2 forces `flowVersion="1"` despite the operator omitting
 [flow-detect] execution-state.json flowVersion=1 — forcing --legacy-flow. Run without --resume to start fresh with flowVersion=2.
 ```
 
-`x-internal-epic-build-plan` receives `flowVersion` as an explicit `--flow-version` argument and writes it into the state file during its first write so subsequent `--resume` calls stay deterministic.
+`x-internal-build-epic-plan` receives `flowVersion` as an explicit `--flow-version` argument and writes it into the state file during its first write so subsequent `--resume` calls stay deterministic.
 
 ## §3 — Phase 3: retry / backoff / circuit-breaker
 
@@ -75,7 +75,7 @@ orchestrator truncates the story's prior artifacts to their headers.
 When a story transitions to `FAILED` and `--revert-on-failure=false`:
 
 1. Every story whose `blockedBy` transitively includes the failed story's
-   ID is marked `BLOCKED` via `x-internal-status-update` (atomic).
+   ID is marked `BLOCKED` via `x-internal-update-status` (atomic).
 2. The orchestrator emits a human-readable block:
    ```
    [block-propagation] story-XXXX-YYYY FAILED — propagating BLOCKED to: story-XXXX-ZZZZ, story-XXXX-WWWW
@@ -105,17 +105,17 @@ With `--non-interactive=true`, circuit-breaker trip = automatic
 
 ## §4 — Phase 4: integrity-gate failure recovery
 
-When `x-internal-epic-integrity-gate` returns `passed=false`:
+When `x-internal-verify-epic-integrity` returns `passed=false`:
 
 ### 4.1 `--revert-on-failure=true` path
 
 1. Identify the last story whose merge commit to `epic/<EPIC-ID>` precedes
    the failure (read from `execution-state.json` — most recent
-   `prMergeStatus=MERGED` story). Use `x-internal-status-update
+   `prMergeStatus=MERGED` story). Use `x-internal-update-status
    --read-only` to fetch without locking.
 2. Revert via:
    ```
-   Skill(skill: "x-git-merge", args: "--source <prior-HEAD-sha> --target epic/<EPIC-ID> --strategy merge --message \"revert: integrity-gate failure on story-XXXX-YYYY\"")
+   Skill(skill: "x-merge-branches", args: "--source <prior-HEAD-sha> --target epic/<EPIC-ID> --strategy merge --message \"revert: integrity-gate failure on story-XXXX-YYYY\"")
    ```
 3. Mark the story `REVERTED` in execution-state (status update delegate).
 4. Re-run the gate exactly once. If `passed=true` → continue to Phase 5
@@ -159,7 +159,7 @@ relies on `--non-interactive`:
 Three fixed options (EPIC-0043 / RULE-020):
 
 - **PROCEED** — leave the PR open; log `[final-pr-gate] PR #<N> left open for human review.`
-- **FIX-PR** — invoke `Skill(skill: "x-pr-fix", args: "<prNumber>")`; on return, loop back to the menu. Guard-rail: max 3 consecutive FIX-PR before auto-exit with `GATE_FIX_LOOP_EXCEEDED` (EPIC-0043).
+- **FIX-PR** — invoke `Skill(skill: "x-fix-pr", args: "<prNumber>")`; on return, loop back to the menu. Guard-rail: max 3 consecutive FIX-PR before auto-exit with `GATE_FIX_LOOP_EXCEEDED` (EPIC-0043).
 - **ABORT** — exit 0 without further action; PR remains open.
 
 Do NOT offer a MERGE option. The final PR is the last human review point
@@ -202,10 +202,10 @@ The envelope shape is unchanged, but:
 
 ### 7.1 v2 resume
 
-1. Read `execution-state.json` via `x-internal-status-update --read-only`.
+1. Read `execution-state.json` via `x-internal-update-status --read-only`.
 2. For each story whose `status` is IN_PROGRESS / PR_CREATED /
    PR_PENDING_REVIEW, the resume projection inside
-   `x-internal-epic-build-plan`'s envelope already includes the
+   `x-internal-build-epic-plan`'s envelope already includes the
    reclassified status (the sub-skill handles `gh pr view`
    cross-validation — orchestrator never calls `gh` directly).
 3. Stories already in `SUCCESS` skip the Phase 3 loop.
@@ -243,7 +243,7 @@ following shape:
 
 The orchestrator records the full envelope in its in-memory per-story
 map but only persists `status`, `prNumber`, `prUrl`, and `commitSha` via
-`x-internal-status-update`. The other fields stay in the subagent's
+`x-internal-update-status`. The other fields stay in the subagent's
 context and are surfaced only when needed for the retry/circuit-breaker
 logic.
 
@@ -253,7 +253,7 @@ The flag is **orthogonal** to `flowVersion`. It controls only the
 task-PR-into-parent-branch flow inside each story (RULE-004 task-level
 parent-branch mode). Propagation:
 
-- Phase 3 dispatches `x-story-implement <STORY-ID> --auto-approve-pr
+- Phase 3 dispatches `x-implement-story <STORY-ID> --auto-approve-pr
   [...]` unchanged.
 - Each story creates its own `feat/story-XXXX-YYYY-<desc>` parent branch
   **off the epic branch** (not off `develop` as in EPIC-0042 when
@@ -261,7 +261,7 @@ parent-branch mode). Propagation:
   branch.
 - When the story finishes, the parent branch is merged into
   `epic/<EPIC-ID>` (when `flowVersion="2"`) or into `develop` (when
-  `flowVersion="1"`) via `x-story-implement`'s own Phase 3.7 (story-level
+  `flowVersion="1"`) via `x-implement-story`'s own Phase 3.7 (story-level
   PR). The orchestrator sees this as a single story PR per usual.
 
 ## §10 — Known limitations

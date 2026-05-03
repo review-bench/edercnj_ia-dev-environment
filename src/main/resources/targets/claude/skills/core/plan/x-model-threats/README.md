@@ -1,11 +1,11 @@
-# x-threat-model
+# x-model-threats
 
 > Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-threat-model [architecture-plan-path] [--format stride\|pasta\|linddun] [--output results/security/]` |
+| **Invocation** | `/x-model-threats [architecture-plan-path] [--format stride\|pasta\|linddun] [--output results/security/]` |
 | **Reads** | `knowledge/security/` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,10 +17,10 @@ Generates automated threat models by analyzing the project architecture using ST
 ## Usage
 
 ```
-/x-threat-model
-/x-threat-model steering/plan.md
-/x-threat-model --format pasta
-/x-threat-model --output results/security/
+/x-model-threats
+/x-model-threats steering/plan.md
+/x-model-threats --format pasta
+/x-model-threats --output results/security/
 ```
 
 ## Workflow
@@ -41,6 +41,6 @@ Generates automated threat models by analyzing the project architecture using ST
 
 ## See Also
 
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification with ASVS mapping
-- [x-hardening-eval](../x-hardening-eval/) -- Application hardening posture evaluation
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from all scanning skills
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification with ASVS mapping
+- [x-evaluate-hardening](../x-evaluate-hardening/) -- Application hardening posture evaluation
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from all scanning skills

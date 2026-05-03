@@ -1,5 +1,5 @@
 ---
-name: x-test-perf
+name: x-run-perf-tests
 description: "Runs performance tests to validate latency SLAs, throughput targets, and resource stability under load. Supports baseline, normal, peak, and sustained scenarios."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -25,13 +25,13 @@ Include this skill for projects with performance testing requirements.
 
 ## Triggers
 
-- `/x-test-perf baseline` -- single user, sequential requests
-- `/x-test-perf normal` -- expected daily load
-- `/x-test-perf peak` -- maximum expected concurrent load
-- `/x-test-perf sustained` -- constant load over extended period (30 min+)
-- `/x-test-perf all` -- run all scenarios
-- `/x-test-perf normal --save-baseline` -- save results as baseline
-- `/x-test-perf normal --compare-baseline` -- compare against stored baseline
+- `/x-run-perf-tests baseline` -- single user, sequential requests
+- `/x-run-perf-tests normal` -- expected daily load
+- `/x-run-perf-tests peak` -- maximum expected concurrent load
+- `/x-run-perf-tests sustained` -- constant load over extended period (30 min+)
+- `/x-run-perf-tests all` -- run all scenarios
+- `/x-run-perf-tests normal --save-baseline` -- save results as baseline
+- `/x-run-perf-tests normal --compare-baseline` -- compare against stored baseline
 
 ## Parameters
 
@@ -173,7 +173,7 @@ When `--save-baseline` is specified:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-perf-profile | calls | Use `/x-perf-profile cpu` for latency regressions, `memory` for throughput regressions |
+| x-profile-performance | calls | Use `/x-profile-performance cpu` for latency regressions, `memory` for throughput regressions |
 
 ## Review Checklist
 

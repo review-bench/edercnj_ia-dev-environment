@@ -1,5 +1,5 @@
 ---
-name: x-ops-troubleshoot
+name: x-troubleshoot-operations
 description: "Diagnoses errors, stacktraces, build failures, and unexpected behavior. Systematic approach: reproduce, locate, understand, fix, verify. Use whenever something fails: compilation errors, test failures, runtime exceptions, coverage gaps, or performance issues."
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
@@ -21,9 +21,9 @@ Provides a systematic approach to diagnose and fix issues in {{PROJECT_NAME}}. C
 
 ## Triggers
 
-- `/x-ops-troubleshoot` — diagnose issues using the full debug workflow
-- `/x-ops-troubleshoot "NullPointerException in PaymentService"` — diagnose a specific error
-- `/x-ops-troubleshoot testMethodName` — diagnose a specific test failure
+- `/x-troubleshoot-operations` — diagnose issues using the full debug workflow
+- `/x-troubleshoot-operations "NullPointerException in PaymentService"` — diagnose a specific error
+- `/x-troubleshoot-operations testMethodName` — diagnose a specific test failure
 
 ## Workflow
 
@@ -140,7 +140,7 @@ When something fails, check in this order:
 
 ## Error Classification for Group Verifier
 
-When troubleshooting within the feature lifecycle, classify errors for `x-lib-group-verifier`:
+When troubleshooting within the feature lifecycle, classify errors for `x-lib-verify-group`:
 
 | Classification | When | Action |
 |----------------|------|--------|
@@ -162,6 +162,6 @@ When troubleshooting within the feature lifecycle, classify errors for `x-lib-gr
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-lib-group-verifier | Referenced by | Invokes troubleshoot when compilation fails during group verification |
-| x-story-implement | Referenced by | Used during Phase 4 (fixes) for diagnosing test and build failures |
-| x-test-run | Complements | Troubleshoot diagnoses failures that x-test-run reports |
+| x-lib-verify-group | Referenced by | Invokes troubleshoot when compilation fails during group verification |
+| x-implement-story | Referenced by | Used during Phase 4 (fixes) for diagnosing test and build failures |
+| x-execute-tests | Complements | Troubleshoot diagnoses failures that x-execute-tests reports |

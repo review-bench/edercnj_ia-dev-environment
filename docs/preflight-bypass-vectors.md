@@ -21,7 +21,7 @@ Vectors added by v2 (`enforce-preflight-gates-v2.sh`) are listed in §2.
 | `gh-pr-create-develop-base` | pr | `gh pr create --base develop` | v1 |
 | `git-commit-no-verify` | commit | `git commit -n` / `git commit --no-verify` | v1 |
 | `gh-pr-merge-admin` | merge | `gh pr merge --admin` | v1 |
-| `skill-x-pr-create` | skill | `Skill(skill: "x-pr-create")` | v1 |
+| `skill-x-pr-create` | skill | `Skill(skill: "x-create-pr")` | v1 |
 
 ---
 
@@ -31,17 +31,17 @@ Vectors added by v2 (`enforce-preflight-gates-v2.sh`) are listed in §2.
 
 | Vector | Pattern | Exit | Alternative |
 | :--- | :--- | :--- | :--- |
-| `mvn-skipTests` | `mvn .*-DskipTests` | 2 (BLOCKED) | `/x-test-run` for scoped test execution |
-| `mvn-skipITs` | `mvn .*-DskipITs` | 2 (BLOCKED) | `/x-test-e2e` for integration tests |
-| `mvn-spotlessSkip` | `mvn .*-Dspotless.check.skip=true` | 2 (BLOCKED) | `/x-code-format` before committing |
-| `mvn-testSkip` | `mvn .*-Dmaven.test.skip=true` | 2 (BLOCKED) | `/x-test-run` for scoped test execution |
-| `mvn-noTestsProfile` | `mvn .*-Pno-tests` | 2 (BLOCKED) | Remove `-Pno-tests` and run `/x-test-run` |
+| `mvn-skipTests` | `mvn .*-DskipTests` | 2 (BLOCKED) | `/x-execute-tests` for scoped test execution |
+| `mvn-skipITs` | `mvn .*-DskipITs` | 2 (BLOCKED) | `/x-execute-e2e-tests` for integration tests |
+| `mvn-spotlessSkip` | `mvn .*-Dspotless.check.skip=true` | 2 (BLOCKED) | `/x-format-code` before committing |
+| `mvn-testSkip` | `mvn .*-Dmaven.test.skip=true` | 2 (BLOCKED) | `/x-execute-tests` for scoped test execution |
+| `mvn-noTestsProfile` | `mvn .*-Pno-tests` | 2 (BLOCKED) | Remove `-Pno-tests` and run `/x-execute-tests` |
 
 ### Commit Bypass Vectors
 
 | Vector | Pattern | Exit | Alternative |
 | :--- | :--- | :--- | :--- |
-| `git-amend-pushed` | `git commit --amend` | 2 (BLOCKED) | New commit via `/x-git-commit` |
+| `git-amend-pushed` | `git commit --amend` | 2 (BLOCKED) | New commit via `/x-commit-changes` |
 | `git-rebase-skip` | `git rebase --skip` | 2 (BLOCKED) | Resolve conflict then `git rebase --continue` |
 
 ### Release Bypass Vectors
@@ -58,9 +58,9 @@ Vectors added by v2 (`enforce-preflight-gates-v2.sh`) are listed in §2.
 
 | Vector | Pattern | Exit | Alternative |
 | :--- | :--- | :--- | :--- |
-| `gh-pr-merge-rebase-admin` | `gh pr merge --rebase --admin` | 2 (BLOCKED) | Standard PR merge via `/x-pr-merge` |
-| `skill-x-pr-merge` | `Skill(skill: "x-pr-merge")` | 2 (BLOCKED) | Use orchestrators that enforce CI-watch |
-| `skill-x-pr-merge-train` | `Skill(skill: "x-pr-merge-train")` | 2 (BLOCKED) | Use `/x-epic-implement Phase 5` |
+| `gh-pr-merge-rebase-admin` | `gh pr merge --rebase --admin` | 2 (BLOCKED) | Standard PR merge via `/x-merge-pr` |
+| `skill-x-pr-merge` | `Skill(skill: "x-merge-pr")` | 2 (BLOCKED) | Use orchestrators that enforce CI-watch |
+| `skill-x-pr-merge-train` | `Skill(skill: "x-manage-pr-merge-train")` | 2 (BLOCKED) | Use `/x-implement-epic Phase 5` |
 | `gh-pr-close-merged` | `gh pr close` | 0+WARN (phase=warn) | Verify PR status; use standard merge flow |
 
 ---

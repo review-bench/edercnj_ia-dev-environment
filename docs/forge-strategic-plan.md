@@ -43,7 +43,7 @@ A V0 não vai apenas substituir o `ia-dev-env`: vai **inverter o modelo de execu
 ### Modelo atual (problema-raiz)
 
 ```
-Usuário → Claude Code → lê x-epic-implement.md → LLM tenta executar passo-a-passo
+Usuário → Claude Code → lê x-implement-epic.md → LLM tenta executar passo-a-passo
                                                     ↑
                                                     Hooks bash + audit scripts
                                                     tentam impedir o LLM de pular
@@ -67,7 +67,7 @@ Usuário → forge epic implement EPIC-0072
 
 | Efeito | Detalhe |
 |---|---|
-| **Skills orquestradoras viram comandos do CLI** | `x-epic-implement` → `forge epic implement <ID>`. `x-story-implement` → `forge story implement <ID>`. `x-task-implement` → `forge task implement <ID>`. `x-review`, `x-review-pr`, `x-release`, `x-epic-orchestrate`, `x-pr-merge-train` — todas. Ver §5.1 para o mapeamento completo. |
+| **Skills orquestradoras viram comandos do CLI** | `x-implement-epic` → `forge epic implement <ID>`. `x-implement-story` → `forge story implement <ID>`. `x-implement-task` → `forge task implement <ID>`. `x-review-codebase`, `x-review-pr`, `x-release`, `x-orchestrate-epic`, `x-manage-pr-merge-train` — todas. Ver §5.1 para o mapeamento completo. |
 | **Hooks e scripts shell são eliminados** | `.claude/hooks/*.sh` (Stop, PreToolUse, PostToolUse), `scripts/audit-*.sh`, `scripts/preflight.sh`, `scripts/enforce-*.sh` — substituídos. Forge aplica os mesmos invariantes em código nativo, antes/depois de cada fase, dentro do próprio processo. |
 | **Camadas 0-4 da Rule 26 colapsam em 2** | Camada 0 (preventiva), 1 (normativa), 2 (CI bash), 3 (Java test), 4 (observability) → reduzem para: **Camada A** (Forge runtime — bloqueia em processo, antes de qualquer efeito colateral) e **Camada B** (CI — valida o que o Forge produziu). Carga cognitiva cai em ~80%. |
 | **Zero-bypass vira propriedade arquitetural** | Rule 27 hoje exige 4 camadas porque o LLM pode bypassar. Com Forge como entry-point, **bypass é impossível por construção**: ou você roda `forge ...` e ele aplica os gates, ou você não usa o produto. Acabaram os "LLM pulou a etapa X" silenciosos. |
@@ -75,17 +75,17 @@ Usuário → forge epic implement EPIC-0072
 | **Tool-call grammar (Rule 28) vira tipagem** | Hoje é regex contra markdown. No Forge, `[required]/[optional]/[conditional]` é declarado em código (data class / enum) e enforçado em compile-time + runtime. Lint sobre markdown desaparece. |
 | **Telemetria é in-process** | NDJSON gravado pelo Forge enquanto roda; não precisa de hooks bash emitindo eventos. Trace OTel-compatible nasce nativo, sem post-processing. |
 | **Determinismo total da orquestração** | Mesma input → mesmo plano de execução, mesmo grafo de fases, mesmas validações. A variação fica isolada nos *outputs criativos do LLM*, nunca na orquestração. |
-| **Phase gates viram função, não script** | `x-internal-phase-gate` em bash → método `phaseGate.assertPre(phase, ctx)` em código, com tipos, testes unitários e exceções tipadas. |
+| **Phase gates viram função, não script** | `x-internal-verify-phase-gates` em bash → método `phaseGate.assertPre(phase, ctx)` em código, com tipos, testes unitários e exceções tipadas. |
 | **Rules como engine, não como prosa** | Rules continuam existindo, mas viram *políticas executáveis* (YAML+JSONLogic ou DSL) que o Forge avalia, em vez de markdown que o LLM tenta interpretar. |
 
 ### O que continua sendo "skill" no Forge
 
 Skills *narrow / leaf* que pedem criatividade do LLM permanecem como **prompts versionados** consumidos pelo Forge:
 
-- `x-arch-plan`, `x-test-plan`, `x-task-plan`, `x-story-refine`, `x-epic-refine` → continuam como templates de prompt + schema de saída esperado; o Forge invoca `claude -p` com o template, valida o JSON/Markdown de retorno contra schema, e só então persiste o artefato.
-- `x-code-format`, `x-code-lint`, `x-test-run` → 100% determinísticas, viram código Forge que chama o tooling (mvn, gradle, pytest); LLM nem é envolvido.
-- `x-test-tdd` (cycle Red-Green-Refactor) → orquestração em código (Forge decide quando rodar Red, Green, Refactor); LLM é chamado pontualmente para "redigir o teste falho" e "escrever o código mínimo para passar".
-- `x-review`, `x-review-pr`, `x-doc-generate`, `x-adr-generate` → prompts focados, com Forge escolhendo *quando* invocar, *quem* invocar (qual persona/modelo) e validando o resultado antes de aceitar.
+- `x-plan-architecture`, `x-plan-tests`, `x-plan-task`, `x-refine-story`, `x-refine-epic` → continuam como templates de prompt + schema de saída esperado; o Forge invoca `claude -p` com o template, valida o JSON/Markdown de retorno contra schema, e só então persiste o artefato.
+- `x-format-code`, `x-lint-code`, `x-execute-tests` → 100% determinísticas, viram código Forge que chama o tooling (mvn, gradle, pytest); LLM nem é envolvido.
+- `x-drive-tdd` (cycle Red-Green-Refactor) → orquestração em código (Forge decide quando rodar Red, Green, Refactor); LLM é chamado pontualmente para "redigir o teste falho" e "escrever o código mínimo para passar".
+- `x-review-codebase`, `x-review-pr`, `x-generate-docs`, `x-generate-adr` → prompts focados, com Forge escolhendo *quando* invocar, *quem* invocar (qual persona/modelo) e validando o resultado antes de aceitar.
 
 ### Integração com Claude Code na V0
 
@@ -112,8 +112,8 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 | --- | --- | --- |
 | **Núcleo de geração** | `CapabilityResolver` + `CapabilityAwareComposer` + `OutputPruner` (EPIC-0064 v5) | Composição é file-system + Pebble, sem runtime; mudança = regenerar + commit |
 | **Governança** | 31+ Rules (`.claude/rules/`), 4 camadas de audit gates (Rule 26), zero-bypass (Rule 27), refinement gate (Rule 29) | Carga cognitiva alta; regras são markdown estático, não programáveis |
-| **Orquestração** | ~85 skills (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-review`, …), TDD double-loop, multi-agent dispatch via `Agent(...)` | Acoplado ao Claude Code (CLI Anthropic); single-LLM (Claude Opus/Sonnet/Haiku) |
-| **Observabilidade** | Telemetria NDJSON local (`ai/epics/epic-*/telemetry/events.ndjson`), `x-telemetry-analyze`, `x-telemetry-trend` | Sem stream real-time, sem dashboard, sem cross-project analytics |
+| **Orquestração** | ~85 skills (`x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-review-codebase`, …), TDD double-loop, multi-agent dispatch via `Agent(...)` | Acoplado ao Claude Code (CLI Anthropic); single-LLM (Claude Opus/Sonnet/Haiku) |
+| **Observabilidade** | Telemetria NDJSON local (`ai/epics/epic-*/telemetry/events.ndjson`), `x-analyze-telemetry`, `x-analyze-telemetry-trends` | Sem stream real-time, sem dashboard, sem cross-project analytics |
 | **Lifecycle** | Local-First (EPIC-0061), Camada 0 preventiva (EPIC-0063), value-driven templates v2 (EPIC-0070), doc-as-DoD (EPIC-0071) | Tudo baseado em hooks bash + scripts shell; difícil estender em outros IDEs |
 | **Distribuição** | Self-contained generator → diretório `.claude/` per-projeto | Nenhum marketplace, nenhum versionamento de skills, nenhum compartilhamento entre orgs |
 
@@ -176,19 +176,19 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 
 ### Product P2: **Orchestration Runtime** — coração da V0; o Forge É o orquestrador
 
-> **Este é o produto-âncora da V0.** Hoje a "execução" é o LLM interpretando markdown e os hooks bash tentando consertar o que ele pula. Aqui vira um **runtime in-process determinístico**, escrito em código, que invoca o LLM apenas para tarefas pontuais via `claude` CLI. Todas as skills orquestradoras de hoje (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-review`, `x-review-pr`, `x-release`, `x-epic-orchestrate`, `x-pr-merge-train`) viram comandos do CLI `forge`. Hooks e audit scripts shell são substituídos por gates in-process. **Roda como processo local; bypass é impossível por construção.**
+> **Este é o produto-âncora da V0.** Hoje a "execução" é o LLM interpretando markdown e os hooks bash tentando consertar o que ele pula. Aqui vira um **runtime in-process determinístico**, escrito em código, que invoca o LLM apenas para tarefas pontuais via `claude` CLI. Todas as skills orquestradoras de hoje (`x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-review-codebase`, `x-review-pr`, `x-release`, `x-orchestrate-epic`, `x-manage-pr-merge-train`) viram comandos do CLI `forge`. Hooks e audit scripts shell são substituídos por gates in-process. **Roda como processo local; bypass é impossível por construção.**
 
 #### Capacity P2.C0: **Comandos orquestradores nativos do CLI** *(nova capacity — substitui os hooks/scripts)*
-- Feature P2.C0.F1 `[V0]`: `forge epic implement <ID>` — substitui `x-epic-implement` (state machine de 6 fases em código)
-- Feature P2.C0.F2 `[V0]`: `forge story implement <ID>` — substitui `x-story-implement` (fase 1 planning paralelo, fase 2 implementação, fase 3 verify, fase 4 report — tudo determinístico)
-- Feature P2.C0.F3 `[V0]`: `forge task implement <ID>` — substitui `x-task-implement` (TDD double-loop em código; LLM só redige teste e código mínimo)
-- Feature P2.C0.F4 `[V0]`: `forge story refine <ID>` / `forge epic refine <ID>` — substitui `x-story-refine` / `x-epic-refine` (multi-persona dispatch em código; cada persona é uma chamada `claude -p` com prompt versionado)
-- Feature P2.C0.F5 `[V0]`: `forge review <STORY>` / `forge review pr <PR>` — substitui `x-review` / `x-review-pr` (especialistas em paralelo, consolidação determinística)
+- Feature P2.C0.F1 `[V0]`: `forge epic implement <ID>` — substitui `x-implement-epic` (state machine de 6 fases em código)
+- Feature P2.C0.F2 `[V0]`: `forge story implement <ID>` — substitui `x-implement-story` (fase 1 planning paralelo, fase 2 implementação, fase 3 verify, fase 4 report — tudo determinístico)
+- Feature P2.C0.F3 `[V0]`: `forge task implement <ID>` — substitui `x-implement-task` (TDD double-loop em código; LLM só redige teste e código mínimo)
+- Feature P2.C0.F4 `[V0]`: `forge story refine <ID>` / `forge epic refine <ID>` — substitui `x-refine-story` / `x-refine-epic` (multi-persona dispatch em código; cada persona é uma chamada `claude -p` com prompt versionado)
+- Feature P2.C0.F5 `[V0]`: `forge review <STORY>` / `forge review pr <PR>` — substitui `x-review-codebase` / `x-review-pr` (especialistas em paralelo, consolidação determinística)
 - Feature P2.C0.F6 `[V0]`: `forge release [--patch|--minor|--major]` — substitui `x-release` (versionamento, changelog, release branch, gates em código)
-- Feature P2.C0.F7 `[V0]`: `forge epic orchestrate <ID>` — substitui `x-epic-orchestrate` (loop sequencial determinístico sobre stories)
-- Feature P2.C0.F8 `[V0]`: `forge merge-train [--epic <ID>|--prs <list>]` — substitui `x-pr-merge-train` (ordem topológica em código)
-- Feature P2.C0.F9 `[V0]`: `forge pr watch <PR>` — substitui `x-pr-watch-ci` (polling determinístico com 8 exit codes da Rule 45 como enum tipado)
-- Feature P2.C0.F10 `[V0]`: `forge pr fix <PR>` / `forge pr fix-epic <EPIC>` — substitui `x-pr-fix` / `x-pr-fix-epic`
+- Feature P2.C0.F7 `[V0]`: `forge epic orchestrate <ID>` — substitui `x-orchestrate-epic` (loop sequencial determinístico sobre stories)
+- Feature P2.C0.F8 `[V0]`: `forge merge-train [--epic <ID>|--prs <list>]` — substitui `x-manage-pr-merge-train` (ordem topológica em código)
+- Feature P2.C0.F9 `[V0]`: `forge pr watch <PR>` — substitui `x-watch-pr-ci` (polling determinístico com 8 exit codes da Rule 45 como enum tipado)
+- Feature P2.C0.F10 `[V0]`: `forge pr fix <PR>` / `forge pr fix-epic <EPIC>` — substitui `x-fix-pr` / `x-fix-epic-pr`
 - Feature P2.C0.F11 `[V0]`: `forge pipeline run <COMMAND>` — entry point único; aceita qualquer comando orquestrador, aplica os mesmos gates, telemetria e audit log
 - Feature P2.C0.F12 `[V0]`: Headless mode (`--non-interactive`, `--output json`) garantido em todos os comandos para integração CI
 
@@ -200,7 +200,7 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 
 #### Capacity P2.C2: **Task Hierarchy & Phase Gates v2** *(em código nativo, não bash)*
 - Feature P2.C2.F1 `[V0]`: Task tree como entidade de primeira classe do Forge (substitui o pareamento `TaskCreate`/`TaskUpdate` que dependia do harness do Claude Code)
-- Feature P2.C2.F2 `[V0]`: **Phase gates como funções tipadas em código** — `phaseGate.assertPre(phase, ctx)` / `phaseGate.assertPost(phase, ctx, evidence)` substituindo `x-internal-phase-gate.sh` e os scripts `enforce-*.sh` / `audit-*.sh`. Exit codes viram exceptions tipadas; baselines viram fixtures de teste.
+- Feature P2.C2.F2 `[V0]`: **Phase gates como funções tipadas em código** — `phaseGate.assertPre(phase, ctx)` / `phaseGate.assertPost(phase, ctx, evidence)` substituindo `x-internal-verify-phase-gates.sh` e os scripts `enforce-*.sh` / `audit-*.sh`. Exit codes viram exceptions tipadas; baselines viram fixtures de teste.
 - Feature P2.C2.F3 `[V0]`: Pré-condições in-process antes de qualquer efeito colateral (substitui Camada 0 / `enforce-preflight-gates.sh`) — `forge story implement` falha rapidamente se refinement não foi aprovado, working tree está sujo, ou capabilities estão inválidas. Sem hook PreToolUse, sem `CLAUDE_RECOVERY_MODE`.
 - Feature P2.C2.F4 `[V1+]`: Gates customizáveis per-org (org adiciona "gate de SOC2", "gate de LGPD") via plug-in compilado, não via bash
 - Feature P2.C2.F5 `[V0]`: Replay determinístico de execução (`forge replay <run-id>`) — recria o grafo de fases a partir do audit log; LLM responses ficam em cache para reprodução offline
@@ -214,7 +214,7 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 #### Capacity P2.C4: **Reliability & Replay**
 - Feature P2.C4.F1 `[V0]`: Determinismo controlado (mesma input + mesma seed = mesma saída quando possível)
 - Feature P2.C4.F2 `[V0]`: Snapshot de contexto local (hoje, perder a janela = perder o contexto)
-- Feature P2.C4.F3 `[V0]`: Idempotência por skill (chamar `x-pr-create` 2× para o mesmo task = no-op detectado)
+- Feature P2.C4.F3 `[V0]`: Idempotência por skill (chamar `x-create-pr` 2× para o mesmo task = no-op detectado)
 - Feature P2.C4.F4 `[V0]`: File-locking local (evitar 2 agentes editando o mesmo arquivo em `--parallel`)
 
 ---
@@ -324,13 +324,13 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 - Feature P6.C1.F5 `[V0]`: **CI Camada B** (substitui Camadas 2/3/4 atuais) — único script CI: `forge ci verify` valida o que o Forge produziu. Sem `audit-execution-integrity.sh`, `audit-bypass-flags.sh`, `audit-tool-call-grammar.sh`, etc.
 
 #### Capacity P6.C2: **Refinement & Quality Gates v2**
-- Feature P6.C2.F1 `[V0]`: AI-assisted refinement (`/x-story-refine` evolui para multi-round dialogue com persona-specific feedback inline)
+- Feature P6.C2.F1 `[V0]`: AI-assisted refinement (`/x-refine-story` evolui para multi-round dialogue com persona-specific feedback inline)
 - Feature P6.C2.F2 `[V1+]`: Refinement memory (lembra que essa persona já vetou X risco em stories similares)
 - Feature P6.C2.F3 `[V0]`: Refinement templates por domínio (refinement de feature de pagamento vs. refinement de UI cosmético)
 - Feature P6.C2.F4 `[V0]`: NO-GO library (catálogo de razões de NO-GO recorrentes para shortcut)
 
 #### Capacity P6.C3: **Security Posture & Threat Modeling**
-- Feature P6.C3.F1 `[V0]`: Continuous threat modeling (não só `x-threat-model` sob demanda; roda no CI a cada PR estrutural)
+- Feature P6.C3.F1 `[V0]`: Continuous threat modeling (não só `x-model-threats` sob demanda; roda no CI a cada PR estrutural)
 - Feature P6.C3.F2 `[V0]`: SBOM gerado e validado (Rule 06 evolui para CycloneDX + assinatura)
 - Feature P6.C3.F3 `[V0]`: Secret scanning integrado (não só `audit-bypass-flags`, scan completo de credenciais)
 - Feature P6.C3.F4 `[V1+]`: Supply chain trust score por skill/profile importado do marketplace
@@ -372,7 +372,7 @@ O `ia-dev-environment` hoje é um **gerador CLI Java** que materializa um diret�
 - **Performance da composition em escala.** Hoje compõe 182 artefatos em ~2-5s. Com plug-ins externos (P1.C2.F3) e marketplace, pode chegar a 1000+. Cache local distribuído (P1.C2.F1) é crítico, não nice-to-have.
 - **Determinismo cross-LLM.** A garantia "compor 2× = mesmo SHA bytewise" (audit-capability-determinism.sh do EPIC-0064) é mais difícil quando o LLM faz parte da geração. Provavelmente: split entre *deterministic composition* (artefatos) e *LLM-rendered content* (placeholders {{...}}).
 - **Estado distribuído.** Pause/resume cross-machine (P2.C1.F3) exige store de estado serializado. Decidir cedo na V2: PostgreSQL? S3? Sync via git? Para V0/V1, file-based local com lock é suficiente.
-- **Trace OTel completo.** O atual `events.ndjson` não é OTel-compliant. Migração precisa ser planejada para não quebrar `x-telemetry-analyze` / `x-telemetry-trend`.
+- **Trace OTel completo.** O atual `events.ndjson` não é OTel-compliant. Migração precisa ser planejada para não quebrar `x-analyze-telemetry` / `x-analyze-telemetry-trends`.
 
 ### 4.2 Produto
 
@@ -420,51 +420,51 @@ Estas são as candidatas diretas a comandos de primeira classe do CLI. O Forge d
 
 | Skill atual | Destino Forge V0 | Nota de migração |
 | --- | --- | --- |
-| `x-epic-implement` | `forge epic implement <ID>` | State machine de 6 fases tipada; substitui hooks de phase gate, execution integrity e bypass audit. |
-| `x-story-implement` | `forge story implement <ID>` | Loop end-to-end de story: planning, task execution, PR, review, verify e report. |
-| `x-task-implement` | `forge task implement <ID>` | TDD double-loop em código; LLM só redige teste, implementação mínima e refactors pontuais. |
+| `x-implement-epic` | `forge epic implement <ID>` | State machine de 6 fases tipada; substitui hooks de phase gate, execution integrity e bypass audit. |
+| `x-implement-story` | `forge story implement <ID>` | Loop end-to-end de story: planning, task execution, PR, review, verify e report. |
+| `x-implement-task` | `forge task implement <ID>` | TDD double-loop em código; LLM só redige teste, implementação mínima e refactors pontuais. |
 | `x-release` | `forge release [--patch\|--minor\|--major]` | Versionamento, changelog, release branch, PR, aprovação, tag e back-merge sob controle determinístico. |
-| `x-epic-orchestrate` | `forge epic orchestrate <ID>` | Planejamento/orquestração multi-story com ordem de dependências, checkpoints e resume. |
-| `x-pr-merge-train` | `forge merge-train [--epic <ID>\|--prs <list>]` | Merge train com descoberta, validação, ordenação, waves, smoke verify e report. |
-| `x-review` | `forge review <STORY>` | Fan-out/fan-in de especialistas em paralelo; consolidação e scoring em código. |
+| `x-orchestrate-epic` | `forge epic orchestrate <ID>` | Planejamento/orquestração multi-story com ordem de dependências, checkpoints e resume. |
+| `x-manage-pr-merge-train` | `forge merge-train [--epic <ID>\|--prs <list>]` | Merge train com descoberta, validação, ordenação, waves, smoke verify e report. |
+| `x-review-codebase` | `forge review <STORY>` | Fan-out/fan-in de especialistas em paralelo; consolidação e scoring em código. |
 | `x-review-pr` | `forge review pr <PR>` | Review Tech Lead com checklist e veredito GO/NO-GO estruturado. |
-| `x-story-refine` | `forge story refine <ID>` | Refinement multi-persona; Q&A e verdict persistidos por schema validado. |
-| `x-epic-refine` | `forge epic refine <ID>` | Refinement estratégico multi-persona de epic; verdict de escopo `epic`. |
-| `x-story-plan` | `forge story plan <ID>` | Planejamento multi-agente, task breakdown, task plans e DoR validation. |
-| `x-feature-create` | `forge feature create <SPEC>` | Pipeline completo spec → epic → stories → implementation map → branch/PR. |
-| `x-feature-ideate` | `forge feature ideate` | Prosa livre → spec RA9 + PR docs; fluxo público de entrada no backlog. |
-| `x-test-tdd` | `forge test tdd <TASK>` | Ciclos Red/Green/Refactor, validações e commits ficam em código; LLM atua por ciclo. |
+| `x-refine-story` | `forge story refine <ID>` | Refinement multi-persona; Q&A e verdict persistidos por schema validado. |
+| `x-refine-epic` | `forge epic refine <ID>` | Refinement estratégico multi-persona de epic; verdict de escopo `epic`. |
+| `x-plan-story` | `forge story plan <ID>` | Planejamento multi-agente, task breakdown, task plans e DoR validation. |
+| `x-create-feature` | `forge feature create <SPEC>` | Pipeline completo spec → epic → stories → implementation map → branch/PR. |
+| `x-ideate-feature` | `forge feature ideate` | Prosa livre → spec RA9 + PR docs; fluxo público de entrada no backlog. |
+| `x-drive-tdd` | `forge test tdd <TASK>` | Ciclos Red/Green/Refactor, validações e commits ficam em código; LLM atua por ciclo. |
 
 #### 5.1.2. Orquestradores internos → serviços internos do aplicativo
 
 Estas skills não devem aparecer como comandos públicos por padrão. Elas viram serviços, componentes ou métodos internos chamados pelos comandos acima. O equivalente Forge deve ser testável em unidade, tipado, idempotente e com contratos de entrada/saída estáveis.
 
-- `x-internal-story-build-plan`
-- `x-internal-epic-build-plan`
-- `x-internal-phase-gate`
-- `x-internal-story-verify`
-- `x-internal-epic-integrity-gate`
-- `x-internal-epic-branch-ensure`
-- `x-internal-status-update`
-- `x-internal-report-write`
-- `x-internal-pr-body-render`
-- `x-internal-story-load-context`
-- `x-internal-story-resume`
-- `x-internal-story-report`
-- `x-internal-args-normalize`
-- `x-internal-worktree-precheck`
-- `x-lib-group-verifier`
+- `x-internal-build-story-plan`
+- `x-internal-build-epic-plan`
+- `x-internal-verify-phase-gates`
+- `x-internal-verify-story`
+- `x-internal-verify-epic-integrity`
+- `x-internal-ensure-epic-branch`
+- `x-internal-update-status`
+- `x-internal-write-report`
+- `x-internal-render-pr-body`
+- `x-internal-load-story-context`
+- `x-internal-resume-story`
+- `x-internal-write-story-report`
+- `x-internal-normalize-args`
+- `x-internal-precheck-worktree`
+- `x-lib-verify-group`
 
 Destino sugerido:
 
 | Grupo interno | Forma em Forge |
 | --- | --- |
-| Gates (`x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate`) | Serviços de policy/gate chamados antes/depois de cada fase. |
-| Estado (`x-internal-status-update`, `x-internal-story-resume`, `x-internal-story-load-context`) | Repositório de estado + state machine local com locking e schema. |
-| Planejamento (`x-internal-story-build-plan`, `x-internal-epic-build-plan`) | Builders de execution plan e dispatchers internos de workers LLM. |
-| Renderização (`x-internal-report-write`, `x-internal-pr-body-render`, `x-internal-story-report`) | Renderers tipados com templates versionados e golden tests. |
-| Git/precheck (`x-internal-epic-branch-ensure`, `x-internal-worktree-precheck`) | Serviços internos usados pelos comandos `forge epic`, `forge story` e `forge git`. |
-| Build groups (`x-lib-group-verifier`) | Verificador interno entre waves paralelas. |
+| Gates (`x-internal-verify-phase-gates`, `x-internal-verify-story`, `x-internal-verify-epic-integrity`) | Serviços de policy/gate chamados antes/depois de cada fase. |
+| Estado (`x-internal-update-status`, `x-internal-resume-story`, `x-internal-load-story-context`) | Repositório de estado + state machine local com locking e schema. |
+| Planejamento (`x-internal-build-story-plan`, `x-internal-build-epic-plan`) | Builders de execution plan e dispatchers internos de workers LLM. |
+| Renderização (`x-internal-write-report`, `x-internal-render-pr-body`, `x-internal-write-story-report`) | Renderers tipados com templates versionados e golden tests. |
+| Git/precheck (`x-internal-ensure-epic-branch`, `x-internal-precheck-worktree`) | Serviços internos usados pelos comandos `forge epic`, `forge story` e `forge git`. |
+| Build groups (`x-lib-verify-group`) | Verificador interno entre waves paralelas. |
 
 #### 5.1.3. Orquestradoras auxiliares → avaliar visibilidade pública
 
@@ -472,30 +472,30 @@ Estas skills coordenam fluxo suficiente para não serem tratadas como leaf promp
 
 | Skill auxiliar | Decisão a tomar |
 | --- | --- |
-| `x-code-audit` | Provável comando público (`forge code audit`) ou parte de `forge ci verify`; mantém fan-out de dimensões em workers. |
+| `x-audit-code` | Provável comando público (`forge code audit`) ou parte de `forge ci verify`; mantém fan-out de dimensões em workers. |
 | `x-lib-audit-rules` | Provável serviço interno de governance/audit; avaliar se precisa de modo público para autores de rules. |
-| `x-doc-generate` | Provável comando público (`forge doc generate`) e fase interna de `forge story implement`. |
-| `x-template-migrate` | Provável comando público de migração (`forge template migrate`), mas com engine interna reutilizável. |
-| `x-pr-create` | Provável comando público (`forge pr create`) e serviço interno de PR usado por story/task/release. |
-| `x-pr-fix` | Provável comando público (`forge pr fix <PR>`). |
-| `x-pr-fix-epic` | Provável comando público (`forge pr fix-epic <EPIC>`) ou modo de `forge pr fix --epic`. |
-| `x-pr-watch-ci` | Provável comando público (`forge pr watch <PR>`) com exit codes como enum tipado. |
-| `x-pr-merge` | Avaliar: comando público avançado (`forge pr merge`) ou serviço interno usado por merge-train/release. |
-| `x-git-push` | Avaliar: pode virar subcomandos `forge git push/commit/pr`; parte pode ser interna. |
-| `x-git-commit` | Provável comando público (`forge git commit`) e serviço interno de commit transacional. |
-| `x-git-worktree` | Provável comando público (`forge git worktree`) e serviço interno de lifecycle. |
-| `x-git-cleanup-branches` | Provável comando público avançado (`forge git cleanup-branches`) com confirmação e dry-run. |
-| `x-status-reconcile` | Avaliar: comando de recovery/admin (`forge status reconcile`) ou ferramenta interna de migração. |
-| `x-ci-generate` | Provável comando público (`forge ci generate`). |
+| `x-generate-docs` | Provável comando público (`forge doc generate`) e fase interna de `forge story implement`. |
+| `x-migrate-templates` | Provável comando público de migração (`forge template migrate`), mas com engine interna reutilizável. |
+| `x-create-pr` | Provável comando público (`forge pr create`) e serviço interno de PR usado por story/task/release. |
+| `x-fix-pr` | Provável comando público (`forge pr fix <PR>`). |
+| `x-fix-epic-pr` | Provável comando público (`forge pr fix-epic <EPIC>`) ou modo de `forge pr fix --epic`. |
+| `x-watch-pr-ci` | Provável comando público (`forge pr watch <PR>`) com exit codes como enum tipado. |
+| `x-merge-pr` | Avaliar: comando público avançado (`forge pr merge`) ou serviço interno usado por merge-train/release. |
+| `x-push-branch` | Avaliar: pode virar subcomandos `forge git push/commit/pr`; parte pode ser interna. |
+| `x-commit-changes` | Provável comando público (`forge git commit`) e serviço interno de commit transacional. |
+| `x-manage-worktrees` | Provável comando público (`forge git worktree`) e serviço interno de lifecycle. |
+| `x-cleanup-git-branches` | Provável comando público avançado (`forge git cleanup-branches`) com confirmação e dry-run. |
+| `x-reconcile-status` | Avaliar: comando de recovery/admin (`forge status reconcile`) ou ferramenta interna de migração. |
+| `x-generate-ci` | Provável comando público (`forge ci generate`). |
 | `x-setup-env` | Provável comando público (`forge doctor` / `forge setup env`). |
-| `x-perf-profile` | Provável comando público (`forge perf profile`) com adapters por stack. |
-| `x-ops-troubleshoot` | Avaliar: comando público assistivo (`forge troubleshoot`) ou prompt versionado acionado por falhas. |
-| `x-ops-incident` | Avaliar: comando público opcional; pode ficar fora do core V0 se não for essencial ao fluxo local-first. |
-| `x-jira-create-stories` | Avaliar: integração opcional/plugin (`forge jira create stories`), não core offline obrigatório. |
-| `x-adr-generate` | Provável comando público (`forge adr generate`) e fase interna de arquitetura/migração. |
-| `x-owasp-scan` | Provável comando público (`forge security owasp-scan`) e entrada do `forge ci verify`. |
-| `x-security-dashboard` | Avaliar: comando público de agregação local (`forge security dashboard`) ou recurso V1+ com UI. |
-| `x-security-pentest` | Avaliar: comando público condicional por capability, com restrições fortes de ambiente. |
+| `x-profile-performance` | Provável comando público (`forge perf profile`) com adapters por stack. |
+| `x-troubleshoot-operations` | Avaliar: comando público assistivo (`forge troubleshoot`) ou prompt versionado acionado por falhas. |
+| `x-handle-incident` | Avaliar: comando público opcional; pode ficar fora do core V0 se não for essencial ao fluxo local-first. |
+| `x-create-jira-stories` | Avaliar: integração opcional/plugin (`forge jira create stories`), não core offline obrigatório. |
+| `x-generate-adr` | Provável comando público (`forge adr generate`) e fase interna de arquitetura/migração. |
+| `x-scan-owasp` | Provável comando público (`forge security owasp-scan`) e entrada do `forge ci verify`. |
+| `x-generate-security-dashboard` | Avaliar: comando público de agregação local (`forge security dashboard`) ou recurso V1+ com UI. |
+| `x-run-pentest` | Avaliar: comando público condicional por capability, com restrições fortes de ambiente. |
 
 **Princípio invariante:** se a skill atual era principalmente *fluxo* (decidir ordem, validar, comitar, abrir PR, consolidar workers, controlar retry/resume), vira comando ou serviço Forge. Se era principalmente *criatividade* (gerar plano, redigir review, escrever ADR), continua como prompt versionado consumido pelo comando Forge correspondente. Se hoje é pública apenas porque o LLM precisava chamá-la manualmente, sua visibilidade deve ser reavaliada: no Forge, o usuário vê comandos de produto; o restante é API interna.
 
@@ -510,19 +510,19 @@ Critério usado: uma skill pura executa um trabalho focado — formatar, validar
 | Grupo | Skills puras | Responsabilidade isolada |
 | --- | --- | --- |
 | `conditional/dev` | `x-setup-stack` | Setup pontual de stack local. |
-| `conditional/ops` | `x-obs-instrument` | Instrumentação de observabilidade. |
-| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-obs`, `x-review-security` | Reviews especialistas por uma dimensão técnica. |
-| `conditional/security` | `x-security-container`, `x-security-dast`, `x-security-infra`, `x-security-sast`, `x-security-secrets`, `x-security-sonar` | Scans e avaliações de segurança por superfície. |
-| `conditional/test` | `x-test-contract-lint`, `x-test-contract`, `x-test-e2e`, `x-test-perf`, `x-test-smoke-api`, `x-test-smoke-socket` | Execução ou validação de uma categoria de teste. |
+| `conditional/ops` | `x-instrument-observability` | Instrumentação de observabilidade. |
+| `conditional/review` | `x-review-api`, `x-review-compliance`, `x-review-data-modeling`, `x-review-database`, `x-review-devops`, `x-review-events`, `x-review-gateway`, `x-review-graphql`, `x-review-grpc`, `x-review-observability`, `x-review-security` | Reviews especialistas por uma dimensão técnica. |
+| `conditional/security` | `x-scan-container-security`, `x-run-dast`, `x-assess-infrastructure-security`, `x-run-sast`, `x-scan-secrets`, `x-run-sonar-security` | Scans e avaliações de segurança por superfície. |
+| `conditional/test` | `x-lint-contract-tests`, `x-execute-contract-tests`, `x-execute-e2e-tests`, `x-run-perf-tests`, `x-execute-api-smoke-tests`, `x-execute-socket-smoke-tests` | Execução ou validação de uma categoria de teste. |
 
 #### 5.2.2. Core code/dev/git skills
 
 | Grupo | Skills puras | Responsabilidade isolada |
 | --- | --- | --- |
-| `core/code` | `x-code-format`, `x-code-lint` | Formatação e lint como operações determinísticas. |
+| `core/code` | `x-format-code`, `x-lint-code` | Formatação e lint como operações determinísticas. |
 | `core/dev` | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Scaffold ou geração pontual de componente. |
-| `core/dev` | `x-ci-generate`, `x-mcp-recommend`, `x-setup-env`, `x-spec-drift` | Geração de CI, recomendação, diagnóstico de ambiente ou drift report. |
-| `core/git` | `x-git-branch`, `x-git-cleanup-branches`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-planning-commit` | Primitivas Git isoladas, reutilizáveis pelos orquestradores. |
+| `core/dev` | `x-generate-ci`, `x-recommend-mcp`, `x-setup-env`, `x-detect-spec-drift` | Geração de CI, recomendação, diagnóstico de ambiente ou drift report. |
+| `core/git` | `x-create-git-branch`, `x-cleanup-git-branches`, `x-commit-changes`, `x-merge-branches`, `x-push-branch`, `x-manage-worktrees`, `x-commit-planning` | Primitivas Git isoladas, reutilizáveis pelos orquestradores. |
 
 #### 5.2.3. Internal skills com responsabilidade única
 
@@ -530,28 +530,28 @@ Estas skills continuam sendo candidatas naturais a serviços internos do Forge, 
 
 | Grupo | Skills puras | Responsabilidade isolada |
 | --- | --- | --- |
-| `core/internal/git` | `x-internal-epic-branch-ensure`, `x-internal-worktree-precheck` | Garantia de branch e pré-check de worktree. |
-| `core/internal/ops` | `x-internal-args-normalize`, `x-internal-report-write`, `x-internal-status-update` | Normalização de argumentos, escrita de relatório e atualização de estado. |
-| `core/internal/plan` | `x-frontmatter-migrate`, `x-internal-epic-build-plan`, `x-internal-epic-create`, `x-internal-epic-integrity-gate`, `x-internal-epic-map`, `x-internal-phase-gate`, `x-internal-story-create`, `x-internal-story-load-context`, `x-internal-story-report`, `x-internal-story-resume`, `x-internal-story-verify` | Migração, geração, carga de contexto, verificação, gates e reports com um objetivo explícito por skill. |
-| `core/internal/pr` | `x-internal-pr-body-render` | Renderização do corpo de PR. |
+| `core/internal/git` | `x-internal-ensure-epic-branch`, `x-internal-precheck-worktree` | Garantia de branch e pré-check de worktree. |
+| `core/internal/ops` | `x-internal-normalize-args`, `x-internal-write-report`, `x-internal-update-status` | Normalização de argumentos, escrita de relatório e atualização de estado. |
+| `core/internal/plan` | `x-migrate-frontmatter`, `x-internal-build-epic-plan`, `x-internal-create-epic`, `x-internal-verify-epic-integrity`, `x-internal-map-epic`, `x-internal-verify-phase-gates`, `x-internal-create-story`, `x-internal-load-story-context`, `x-internal-write-story-report`, `x-internal-resume-story`, `x-internal-verify-story` | Migração, geração, carga de contexto, verificação, gates e reports com um objetivo explícito por skill. |
+| `core/internal/pr` | `x-internal-render-pr-body` | Renderização do corpo de PR. |
 
 #### 5.2.4. Integrações, bibliotecas e operações
 
 | Grupo | Skills puras | Responsabilidade isolada |
 | --- | --- | --- |
-| `core/jira` | `x-jira-create-epic`, `x-jira-create-stories` | Sincronização local → Jira. |
-| `core/lib` | `x-lib-group-verifier`, `x-lib-task-decomposer` | Verificação de grupo ou decomposição estrutural. |
-| `core/ops` | `x-doc-generate`, `x-doc-validate`, `x-ops-incident`, `x-ops-troubleshoot`, `x-perf-profile`, `x-release-changelog`, `x-status-reconcile`, `x-telemetry-analyze`, `x-telemetry-trend` | Documentação, troubleshooting, profiling, changelog, reconciliação e análise operacional. |
+| `core/jira` | `x-create-jira-epic`, `x-create-jira-stories` | Sincronização local → Jira. |
+| `core/lib` | `x-lib-verify-group`, `x-lib-decompose-task` | Verificação de grupo ou decomposição estrutural. |
+| `core/ops` | `x-generate-docs`, `x-validate-docs`, `x-handle-incident`, `x-troubleshoot-operations`, `x-profile-performance`, `x-generate-release-changelog`, `x-reconcile-status`, `x-analyze-telemetry`, `x-analyze-telemetry-trends` | Documentação, troubleshooting, profiling, changelog, reconciliação e análise operacional. |
 
 #### 5.2.5. Planning, PR, review, security e test
 
 | Grupo | Skills puras | Responsabilidade isolada |
 | --- | --- | --- |
-| `core/plan` | `planning-standards-kp`, `x-adr-generate`, `x-arch-plan`, `x-arch-system-update`, `x-arch-update`, `x-parallel-eval`, `x-task-plan`, `x-template-migrate`, `x-threat-model` | Knowledge pack, planos, ADRs, atualização documental, avaliação de paralelismo, migração de template e threat model. |
-| `core/pr` | `x-pr-create`, `x-pr-fix`, `x-pr-merge`, `x-pr-watch-ci` | Operações pontuais de PR, correção localizada, merge e watch de CI. |
-| `core/review` | `x-review-perf`, `x-review-pr`, `x-review-qa` | Reviews focados em performance, checklist Tech Lead de PR ou QA. |
-| `core/security` | `x-dependency-audit`, `x-hardening-eval`, `x-owasp-scan`, `x-runtime-eval`, `x-security-dashboard`, `x-security-pipeline`, `x-supply-chain-audit` | Auditorias e avaliações de segurança com saída própria. |
-| `core/test` | `x-test-plan`, `x-test-run` | Plano de testes ou execução de testes/cobertura. |
+| `core/plan` | `planning-standards-kp`, `x-generate-adr`, `x-plan-architecture`, `x-update-system-architecture`, `x-update-architecture`, `x-evaluate-parallelism`, `x-plan-task`, `x-migrate-templates`, `x-model-threats` | Knowledge pack, planos, ADRs, atualização documental, avaliação de paralelismo, migração de template e threat model. |
+| `core/pr` | `x-create-pr`, `x-fix-pr`, `x-merge-pr`, `x-watch-pr-ci` | Operações pontuais de PR, correção localizada, merge e watch de CI. |
+| `core/review` | `x-review-performance`, `x-review-pr`, `x-review-qa` | Reviews focados em performance, checklist Tech Lead de PR ou QA. |
+| `core/security` | `x-audit-dependencies`, `x-evaluate-hardening`, `x-scan-owasp`, `x-evaluate-runtime`, `x-generate-security-dashboard`, `x-generate-security-pipeline`, `x-audit-supply-chain` | Auditorias e avaliações de segurança com saída própria. |
+| `core/test` | `x-plan-tests`, `x-execute-tests` | Plano de testes ou execução de testes/cobertura. |
 
 **Decisão de migração:** estas 98 skills devem ser portadas sem inflar seu escopo. O Forge pode chamá-las como workers, comandos auxiliares ou serviços internos, mas a responsabilidade de coordenar ordem, retries globais, gates cross-phase, commits, PRs e evidências pertence ao runtime de orquestração (§P2), não a essas skills.
 
@@ -577,14 +577,14 @@ Fonte conceitual: `HooksAssembler` gera `.claude/hooks/*.sh` e registra eventos 
 
 | Artefato | Tipo | O que faz | Bloqueia/dispara | Skills/fluxos impactados | Destino Forge |
 | --- | --- | --- | --- | --- | --- |
-| `enforce-phase-sequence.sh` | PreToolUse / phase gate | Lê `execution-state.json.taskTracking.phaseGateResults` e impede avanço quando a última fase falhou. | `exit 2` bloqueia tool call; opt-out local `CLAUDE_PHASE_GATE_DISABLED=1`. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-epic-orchestrate`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | `phaseGate.assertPre/assertPost` em código. |
-| `enforce-no-bypass-flags.sh` | PreToolUse / anti-bypass | Intercepta `Skill(...)` e bloqueia `--skip-*` / `--no-ci-watch` fora de recovery. | `exit 1` bloqueia; `exit 2` erro operacional; `CLAUDE_RECOVERY_MODE=1` apenas bypass aceito. | `x-story-implement`, `x-task-implement`, `x-epic-implement`, `x-pr-fix-epic`, `x-release`, `x-internal-story-verify`. | Validação tipada de flags nos comandos Forge. |
-| `enforce-refinement-gate.sh` | PreToolUse / DoR gate | Exige `refinementVerdict.status=approved` antes de implementar/orquestrar. | `exit 33 REFINEMENT_REQUIRED`; exceções: recovery, `hotfix/*`, `flowVersion=1`. | `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate`. | Pré-condição nativa de `forge story/epic/task`. |
-| `enforce-preflight-gates.sh` + `scripts/preflight.sh` | PreToolUse / preflight remoto | Roda checagens locais antes de `git push`, `gh pr create` e `x-pr-create`. | Bloqueia operação remota quando review, verify, coverage ou execution integrity falham. | `x-git-push`, `x-pr-create`, fluxos de release/story/task que abrem PR. | Preflight in-process antes de push/PR. |
-| `post-compile-check.sh` | PostToolUse / compile gate | Após `Write`/`Edit` em `.java`, roda `compileJava` via Gradle. | `exit 2` com JSON `decision: block` se compilação quebra. | Qualquer skill que edite Java, especialmente `x-task-implement` e `x-test-tdd`. | Adapter de build por stack; Maven/Gradle tipados. |
-| `verify-story-completion.sh` | Stop / evidence gate | Detecta commit/PR de story e verifica artefatos obrigatórios em `plans/`, `reports/` e `.claude/state`. | `exit 2` warning bloqueante quando falta evidência. | `x-story-implement`, `x-review`, `x-review-pr`, `x-internal-story-verify`, `x-internal-story-report`, `x-doc-validate`, `x-dependency-audit`, `x-pr-watch-ci`. | Gate de completion no runtime + espelho em CI. |
+| `enforce-phase-sequence.sh` | PreToolUse / phase gate | Lê `execution-state.json.taskTracking.phaseGateResults` e impede avanço quando a última fase falhou. | `exit 2` bloqueia tool call; opt-out local `CLAUDE_PHASE_GATE_DISABLED=1`. | `x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-release`, `x-orchestrate-epic`, `x-review-codebase`, `x-review-pr`, `x-manage-pr-merge-train`. | `phaseGate.assertPre/assertPost` em código. |
+| `enforce-no-bypass-flags.sh` | PreToolUse / anti-bypass | Intercepta `Skill(...)` e bloqueia `--skip-*` / `--no-ci-watch` fora de recovery. | `exit 1` bloqueia; `exit 2` erro operacional; `CLAUDE_RECOVERY_MODE=1` apenas bypass aceito. | `x-implement-story`, `x-implement-task`, `x-implement-epic`, `x-fix-epic-pr`, `x-release`, `x-internal-verify-story`. | Validação tipada de flags nos comandos Forge. |
+| `enforce-refinement-gate.sh` | PreToolUse / DoR gate | Exige `refinementVerdict.status=approved` antes de implementar/orquestrar. | `exit 33 REFINEMENT_REQUIRED`; exceções: recovery, `hotfix/*`, `flowVersion=1`. | `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-orchestrate-epic`. | Pré-condição nativa de `forge story/epic/task`. |
+| `enforce-preflight-gates.sh` + `scripts/preflight.sh` | PreToolUse / preflight remoto | Roda checagens locais antes de `git push`, `gh pr create` e `x-create-pr`. | Bloqueia operação remota quando review, verify, coverage ou execution integrity falham. | `x-push-branch`, `x-create-pr`, fluxos de release/story/task que abrem PR. | Preflight in-process antes de push/PR. |
+| `post-compile-check.sh` | PostToolUse / compile gate | Após `Write`/`Edit` em `.java`, roda `compileJava` via Gradle. | `exit 2` com JSON `decision: block` se compilação quebra. | Qualquer skill que edite Java, especialmente `x-implement-task` e `x-drive-tdd`. | Adapter de build por stack; Maven/Gradle tipados. |
+| `verify-story-completion.sh` | Stop / evidence gate | Detecta commit/PR de story e verifica artefatos obrigatórios em `plans/`, `reports/` e `.claude/state`. | `exit 2` warning bloqueante quando falta evidência. | `x-implement-story`, `x-review-codebase`, `x-review-pr`, `x-internal-verify-story`, `x-internal-write-story-report`, `x-validate-docs`, `x-audit-dependencies`, `x-watch-pr-ci`. | Gate de completion no runtime + espelho em CI. |
 | `verify-phase-gates.sh` | Stop / phase warning | Lê gates com `passed=false` e mostra tarefas/artefatos faltantes. | `exit 2` warning; não muta estado. | Orquestradores com task hierarchy. | Diagnóstico de phase gate no runtime. |
-| `enforce-continuous-flow.sh` | Stop / stall detector | Em modo não-interativo, detecta fase aberta sem próximo tool call obrigatório. | `exit 2 CONTINUOUS_FLOW_INTERRUPT` orienta o próximo tool call. | Orquestradores long-running, principalmente `x-epic-implement` e `x-story-implement`. | Scheduler/state machine do Forge; não precisa de nudge textual. |
+| `enforce-continuous-flow.sh` | Stop / stall detector | Em modo não-interativo, detecta fase aberta sem próximo tool call obrigatório. | `exit 2 CONTINUOUS_FLOW_INTERRUPT` orienta o próximo tool call. | Orquestradores long-running, principalmente `x-implement-epic` e `x-implement-story`. | Scheduler/state machine do Forge; não precisa de nudge textual. |
 | `stage-telemetry.sh` | Stop / staging helper | Dá `git add` em `events.ndjson` para telemetria virar evidência commitada. | Fail-open, sempre `exit 0`; usa lock para worktrees paralelos. | Fluxos com telemetria obrigatória Rule 24/27. | Telemetria escrita e anexada pelo próprio Forge. |
 
 #### 5.3.3. Telemetria automática
@@ -605,15 +605,15 @@ Os `scripts/audit-*.sh` são a camada detectiva: eles não impedem o LLM de tent
 
 | Família/script | Responsabilidade | O que bloqueia | Skills/fluxos impactados | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `audit-execution-integrity.sh` | Verifica as 12 superfícies Rule 24/27: evidence de verify, review, PR body, telemetry, dependency audit, doc validate, CI watch. | PR com `EIE_EVIDENCE_MISSING`, baseline inválido ou exemption inválida. | `x-story-implement`, `x-task-implement`, `x-review`, `x-review-pr`, `x-pr-create`, `x-pr-watch-ci`, `x-doc-validate`, `x-dependency-audit`. | CI Camada B: validar artefatos que o Forge prometeu gerar. |
+| `audit-execution-integrity.sh` | Verifica as 12 superfícies Rule 24/27: evidence de verify, review, PR body, telemetry, dependency audit, doc validate, CI watch. | PR com `EIE_EVIDENCE_MISSING`, baseline inválido ou exemption inválida. | `x-implement-story`, `x-implement-task`, `x-review-codebase`, `x-review-pr`, `x-create-pr`, `x-watch-pr-ci`, `x-validate-docs`, `x-audit-dependencies`. | CI Camada B: validar artefatos que o Forge prometeu gerar. |
 | `audit-bypass-flags.sh` | Busca `--skip-*` e `--no-ci-watch` fora de blocos `## Recovery`. | Uso indevido de bypass no happy path. | Orquestradores e skills com flags de escape. | Lint de definição de comando/skill + CI Camada B. |
-| `audit-phase-gates.sh` | Confere `phaseGateResults`, tasks concluídas e artefatos esperados. | Fase marcada como concluída sem filhos/evidências. | `x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-release`, `x-review`, `x-review-pr`, `x-pr-merge-train`. | Testes do state machine + CI Camada B. |
+| `audit-phase-gates.sh` | Confere `phaseGateResults`, tasks concluídas e artefatos esperados. | Fase marcada como concluída sem filhos/evidências. | `x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-release`, `x-review-codebase`, `x-review-pr`, `x-manage-pr-merge-train`. | Testes do state machine + CI Camada B. |
 | `audit-task-hierarchy.sh` | Valida hierarquia Epic › Story › Phase › Wave/Cycle. | Task tracking quebrado, profundidade inválida, filhos inconsistentes. | Todos os fluxos com Rule 25. | Validação de modelo de estado. |
-| `audit-refinement-gate.sh` | Confirma verdict aprovado e hash consistente entre state e markdown. | Implementação sem refinement aprovado. | `x-story-refine`, `x-epic-refine`, `x-story-implement`, `x-epic-implement`, `x-task-implement`. | Pré-condição nativa + CI de consistência. |
-| `audit-doc-freshness.sh` | Garante documentação atualizada como DoD. | Código alterado sem README/API/ADR/system docs quando aplicável. | `x-doc-validate`, `x-doc-generate`, `x-story-implement`, `x-release-changelog`. | Gate de documentação no runtime + CI. |
-| `audit-template-version.sh` | Garante templates v2/value-driven em epics novos. | Template legado fora de baseline. | `x-template-migrate`, `x-internal-epic-create`, `x-internal-story-create`. | Validador de schema/template. |
+| `audit-refinement-gate.sh` | Confirma verdict aprovado e hash consistente entre state e markdown. | Implementação sem refinement aprovado. | `x-refine-story`, `x-refine-epic`, `x-implement-story`, `x-implement-epic`, `x-implement-task`. | Pré-condição nativa + CI de consistência. |
+| `audit-doc-freshness.sh` | Garante documentação atualizada como DoD. | Código alterado sem README/API/ADR/system docs quando aplicável. | `x-validate-docs`, `x-generate-docs`, `x-implement-story`, `x-generate-release-changelog`. | Gate de documentação no runtime + CI. |
+| `audit-template-version.sh` | Garante templates v2/value-driven em epics novos. | Template legado fora de baseline. | `x-migrate-templates`, `x-internal-create-epic`, `x-internal-create-story`. | Validador de schema/template. |
 | `audit-flow-version.sh` | Verifica semântica de `flowVersion` e fallbacks Rule 19. | Estado legado usado sem marcação/compatibilidade. | Orquestradores que leem `execution-state.json`. | Migração + schema validator. |
-| `audit-epic-branches.sh` | Confere modelo de branches `epic/*`. | Branch de epic ausente/divergente ou violação de target. | `x-internal-epic-branch-ensure`, `x-epic-implement`, `x-epic-orchestrate`. | Branch policy service. |
+| `audit-epic-branches.sh` | Confere modelo de branches `epic/*`. | Branch de epic ausente/divergente ou violação de target. | `x-internal-ensure-epic-branch`, `x-implement-epic`, `x-orchestrate-epic`. | Branch policy service. |
 | `audit-skill-visibility.sh` | Valida visibilidade, catálogo e referências de scripts/skills. | Skill interna exposta, referência órfã, gate sem catálogo. | Catálogo inteiro de skills/rules. | Registry/linter de pacotes Forge. |
 | `audit-model-selection.sh` | Confere Rule 23/modelos permitidos por tier. | Uso de modelo fora da política. | Skills multi-agent/review/refinement. | Model router policy. |
 | `audit-capability-graph.sh` | Valida grafo de capabilities e frontmatter v3+. | Capability ausente, ciclo, schema inválido. | Composition engine, skills/rules/agents/templates. | Resolver tipado + testes. |
@@ -685,11 +685,11 @@ Os KPs devem virar pacotes oficiais versionados, com binding explícito por stac
 | Skill atual | Tipo-alvo provável | Justificativa |
 | --- | --- | --- |
 | `planning-standards-kp` | Knowledge Pack | Já é explicitamente uma fonte RA9; deve sair da lista de comandos e virar contexto versionado de planejamento. |
-| `x-mcp-recommend` | KP + advisor command | O catálogo de MCPs é conhecimento versionado; o comando só aplica matching contra o profile. |
+| `x-recommend-mcp` | KP + advisor command | O catálogo de MCPs é conhecimento versionado; o comando só aplica matching contra o profile. |
 | `helidon-scaffold`, `micronaut-scaffold`, `picocli-command`, `quarkus-resource`, `spring-controller` | Template/snippet + render command | A maior parte do valor é template stack-specific. O comando Forge deve renderizar templates e aplicar variações, não conter conhecimento espalhado. |
-| `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, demais especialistas | Worker skill + KP externo | Devem permanecer workers se produzem review estruturado, mas seus critérios precisam vir de KPs/policies, não de prosa duplicada em cada skill. |
-| `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate` | Rule/policy service | São gates normativos. No Forge viram funções do runtime e contratos de CI, não skills markdown. |
-| `x-doc-validate` | Policy + command | A regra de documentação é policy; a execução continua comando/gate. Separar critério de enforcement. |
+| `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-performance`, demais especialistas | Worker skill + KP externo | Devem permanecer workers se produzem review estruturado, mas seus critérios precisam vir de KPs/policies, não de prosa duplicada em cada skill. |
+| `x-internal-verify-phase-gates`, `x-internal-verify-story`, `x-internal-verify-epic-integrity` | Rule/policy service | São gates normativos. No Forge viram funções do runtime e contratos de CI, não skills markdown. |
+| `x-validate-docs` | Policy + command | A regra de documentação é policy; a execução continua comando/gate. Separar critério de enforcement. |
 | `x-lib-audit-rules` | Policy/registry validator | Seu papel é validar rules/KPs/skills; no Forge vira `forge lint policy` ou validação do registry. |
 | `audit-*.sh` e `verify/enforce-*.sh` | Policy executable | Não são skills; seus invariantes migram para runtime e `forge ci verify`. |
 
@@ -698,7 +698,7 @@ Os KPs devem virar pacotes oficiais versionados, com binding explícito por stac
 | Grupo | Permanecem como | Como consomem rule/KP |
 | --- | --- | --- |
 | Orquestradoras públicas | Comandos Forge (`forge story implement`, `forge epic implement`, `forge release`, etc.) | Declaram `requires-policies` para gates e `requires-context` para KPs por fase. |
-| Planejamento e arquitetura | Worker prompts/comandos (`x-arch-plan`, `x-task-plan`, `x-threat-model`, `x-adr-generate`) | Geram artefatos, mas carregam KPs RA9, arquitetura, segurança e testing por contrato. |
+| Planejamento e arquitetura | Worker prompts/comandos (`x-plan-architecture`, `x-plan-task`, `x-model-threats`, `x-generate-adr`) | Geram artefatos, mas carregam KPs RA9, arquitetura, segurança e testing por contrato. |
 | Testes, lint, format e scans | Comandos determinísticos/adapters | Executam tooling; thresholds vêm de policies. |
 | Git/PR/Jira/ops | Comandos ou plugins | Executam integração; branching/release/CI rules vêm de policies. |
 | Reviews especialistas | Workers de julgamento estruturado | Critérios vêm de KPs; veredito e schema de saída vêm da policy do review. |
@@ -740,18 +740,18 @@ Para o registry Forge, os ativos devem ser agrupados por domínio de responsabil
 
 | Grupo canônico | O que governa | Rules/policies | KPs | Skills/artefatos relacionados |
 | --- | --- | --- | --- | --- |
-| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, SOLID/Clean Code, limites de método/classe. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-code-format`, `x-code-lint`, `x-code-audit`, review specialists consomem este grupo. |
-| `architecture-standards` | Estrutura, camadas, dependency direction e decisões de design. | Architecture summary, dependency rules, capability/frontmatter constraints quando afetam arquitetura. | `architecture`, `api-design`, `protocols`, `resilience`, `layer-templates`. | `x-arch-plan`, `x-arch-update`, `x-arch-system-update`; scaffolds viram templates stack-specific. |
-| `security-compliance` | Segurança mínima, compliance e postura regulatória. | Security baseline, conditional security rules, compliance gates, evidence requirements. | `security`, `compliance` e overlays `pci`, `hipaa`, `lgpd`, `soc2`. | `x-owasp-scan`, `x-hardening-eval`, `x-runtime-eval`, `x-dependency-audit`, `x-supply-chain-audit`, `x-doc-validate` como command/policy hybrid. |
-| `testing-quality` | Como provar comportamento, cobertura e aceitação. | Coverage thresholds, TDD requirements, acceptance criteria coverage, smoke/contract requirements. | `testing`, `story-planning`. | `x-test-plan`, `x-test-run`, `x-test-tdd`, `x-test-e2e`, `x-test-contract`, `x-test-perf`, `x-test-smoke-*`. |
-| `planning-product` | Como transformar intenção em backlog, planos e artefatos RA9. | Refinement gate, value-driven templates, flow version rules, DoR. | `story-planning`, `planning-standards-kp`. | `planning-standards-kp` vira KP; `x-story-plan`, `x-task-plan`, `x-template-migrate`, `x-feature-create`, `x-feature-ideate` consomem policies/KPs. |
-| `execution-governance` | Integridade de execução, anti-bypass, phase gates e lifecycle. | Execution Integrity, Zero-bypass Lifecycle, Task Hierarchy, Phase Gates, Audit Lifecycle, Refinement Gate. | Guidance curta de lifecycle para humanos; critérios executáveis vivem em policy. | `x-internal-phase-gate`, `x-internal-story-verify`, `x-internal-epic-integrity-gate`, `verify-*`, `enforce-*`, `audit-execution-integrity.sh`, `audit-phase-gates.sh`, `audit-task-hierarchy.sh`. |
-| `git-release-pr` | Branching, commits, PRs, merge train e releases. | Branching model, release process, commit conventions, PR evidence requirements, CI-watch integrity. | Git/release workflow guidance. | `x-git-branch`, `x-git-commit`, `x-git-merge`, `x-git-push`, `x-git-worktree`, `x-pr-create`, `x-pr-merge`, `x-pr-watch-ci`, `x-pr-merge-train`, `x-release`. |
-| `documentation` | Documentação como DoD e rastreabilidade técnica. | Documentation freshness, ADR requirements, changelog rules, system architecture update rules. | Architecture docs guidance, API docs guidance, ADR/changelog knowledge. | `x-doc-generate`, `x-doc-validate`, `x-adr-generate`, `x-release-changelog`, `x-arch-system-update`. |
-| `observability-ops` | Telemetria, operação, incidentes e troubleshooting. | Telemetry privacy, operations baseline, CI-watch observability signals. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | `telemetry-*` hooks viram telemetry service; `x-telemetry-analyze`, `x-telemetry-trend`, `x-ops-troubleshoot`, `x-ops-incident`, `x-perf-profile`. |
-| `review-governance` | Critérios e vereditos de review técnico. | Mandatory review surfaces, GO/NO-GO schema, review evidence requirements. | `security`, `testing`, `architecture`, `api-design`, `observability`, `resilience`. | `x-review`, `x-review-pr`, `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-perf`, `x-review-db`, `x-review-events`, `x-review-graphql`, `x-review-grpc`. |
-| `capability-registry` | Como capabilities, skills, rules, KPs e policies são descritos e distribuídos. | Capability frontmatter, skill visibility, audit gate lifecycle, model selection. | Governance authoring guidance, capability composition knowledge. | `x-lib-audit-rules`, `x-frontmatter-migrate`, `audit-capability-graph.sh`, `audit-skill-visibility.sh`, `audit-model-selection.sh`. |
-| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, MCP/Jira/GitHub boundaries, provider usage policy. | MCP catalog, Jira workflow knowledge, provider docs. | `x-mcp-recommend` vira KP + advisor command; `x-jira-create-epic`, `x-jira-create-stories` viram plugins/commands. |
+| `engineering-standards` | Como código deve ser escrito e mantido. | Coding standards, quality gates, SOLID/Clean Code, limites de método/classe. | `coding-standards`, `patterns`, partes de `layer-templates`. | `x-format-code`, `x-lint-code`, `x-audit-code`, review specialists consomem este grupo. |
+| `architecture-standards` | Estrutura, camadas, dependency direction e decisões de design. | Architecture summary, dependency rules, capability/frontmatter constraints quando afetam arquitetura. | `architecture`, `api-design`, `protocols`, `resilience`, `layer-templates`. | `x-plan-architecture`, `x-update-architecture`, `x-update-system-architecture`; scaffolds viram templates stack-specific. |
+| `security-compliance` | Segurança mínima, compliance e postura regulatória. | Security baseline, conditional security rules, compliance gates, evidence requirements. | `security`, `compliance` e overlays `pci`, `hipaa`, `lgpd`, `soc2`. | `x-scan-owasp`, `x-evaluate-hardening`, `x-evaluate-runtime`, `x-audit-dependencies`, `x-audit-supply-chain`, `x-validate-docs` como command/policy hybrid. |
+| `testing-quality` | Como provar comportamento, cobertura e aceitação. | Coverage thresholds, TDD requirements, acceptance criteria coverage, smoke/contract requirements. | `testing`, `story-planning`. | `x-plan-tests`, `x-execute-tests`, `x-drive-tdd`, `x-execute-e2e-tests`, `x-execute-contract-tests`, `x-run-perf-tests`, `x-test-smoke-*`. |
+| `planning-product` | Como transformar intenção em backlog, planos e artefatos RA9. | Refinement gate, value-driven templates, flow version rules, DoR. | `story-planning`, `planning-standards-kp`. | `planning-standards-kp` vira KP; `x-plan-story`, `x-plan-task`, `x-migrate-templates`, `x-create-feature`, `x-ideate-feature` consomem policies/KPs. |
+| `execution-governance` | Integridade de execução, anti-bypass, phase gates e lifecycle. | Execution Integrity, Zero-bypass Lifecycle, Task Hierarchy, Phase Gates, Audit Lifecycle, Refinement Gate. | Guidance curta de lifecycle para humanos; critérios executáveis vivem em policy. | `x-internal-verify-phase-gates`, `x-internal-verify-story`, `x-internal-verify-epic-integrity`, `verify-*`, `enforce-*`, `audit-execution-integrity.sh`, `audit-phase-gates.sh`, `audit-task-hierarchy.sh`. |
+| `git-release-pr` | Branching, commits, PRs, merge train e releases. | Branching model, release process, commit conventions, PR evidence requirements, CI-watch integrity. | Git/release workflow guidance. | `x-create-git-branch`, `x-commit-changes`, `x-merge-branches`, `x-push-branch`, `x-manage-worktrees`, `x-create-pr`, `x-merge-pr`, `x-watch-pr-ci`, `x-manage-pr-merge-train`, `x-release`. |
+| `documentation` | Documentação como DoD e rastreabilidade técnica. | Documentation freshness, ADR requirements, changelog rules, system architecture update rules. | Architecture docs guidance, API docs guidance, ADR/changelog knowledge. | `x-generate-docs`, `x-validate-docs`, `x-generate-adr`, `x-generate-release-changelog`, `x-update-system-architecture`. |
+| `observability-ops` | Telemetria, operação, incidentes e troubleshooting. | Telemetry privacy, operations baseline, CI-watch observability signals. | `observability`, `infrastructure`, `dockerfile`, `resilience`. | `telemetry-*` hooks viram telemetry service; `x-analyze-telemetry`, `x-analyze-telemetry-trends`, `x-troubleshoot-operations`, `x-handle-incident`, `x-profile-performance`. |
+| `review-governance` | Critérios e vereditos de review técnico. | Mandatory review surfaces, GO/NO-GO schema, review evidence requirements. | `security`, `testing`, `architecture`, `api-design`, `observability`, `resilience`. | `x-review-codebase`, `x-review-pr`, `x-review-api`, `x-review-security`, `x-review-devops`, `x-review-qa`, `x-review-performance`, `x-review-database`, `x-review-events`, `x-review-graphql`, `x-review-grpc`. |
+| `capability-registry` | Como capabilities, skills, rules, KPs e policies são descritos e distribuídos. | Capability frontmatter, skill visibility, audit gate lifecycle, model selection. | Governance authoring guidance, capability composition knowledge. | `x-lib-audit-rules`, `x-migrate-frontmatter`, `audit-capability-graph.sh`, `audit-skill-visibility.sh`, `audit-model-selection.sh`. |
+| `ecosystem-integrations` | Integrações externas e limites de plugins. | Permission model, MCP/Jira/GitHub boundaries, provider usage policy. | MCP catalog, Jira workflow knowledge, provider docs. | `x-recommend-mcp` vira KP + advisor command; `x-create-jira-epic`, `x-create-jira-stories` viram plugins/commands. |
 
 #### 5.5.1. Regras de reclassificação por grupo
 
@@ -779,58 +779,58 @@ No Forge, templates não devem ser arquivos soltos copiados para cada projeto se
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `_TEMPLATE-EPIC.md` | Estrutura v2/value-driven para documento de épico. | `x-internal-epic-create`, `x-epic-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/epic-XXXX.md`. | Template registry + schema de epic/refinement. |
-| `_TEMPLATE-STORY.md` | História implementável com contratos, Gherkin, tarefas e refinement verdict. | `x-internal-story-create`, `x-story-create`, `x-feature-create`, refinement. | `ai/epics/epic-XXXX-*/story-XXXX-YYYY.md`. | Template registry + validação estrutural. |
-| `_TEMPLATE-TASK.md` | Contrato de tarefa fina no modelo task-first. | `x-story-plan`, `x-task-plan`. | `ai/epics/.../tasks/task-TASK-*.md`. | Template de task contract. |
-| `_TEMPLATE-TASK-PLAN.md` | Plano de implementação por tarefa, incluindo TDD e file footprint. | `x-task-plan`. | `ai/epics/.../plans/plan-task-*.md`. | Prompt/output template versionado. |
-| `_TEMPLATE-TASK-IMPLEMENTATION-MAP.md` | Mapa de dependências e paralelismo entre tarefas. | `x-story-plan`. | `plans/task-implementation-map-*.md`. | Renderer determinístico + grafo. |
-| `_TEMPLATE-IMPLEMENTATION-MAP.md` | Mapa de implementação do épico. | `x-internal-epic-map`, `x-epic-map`, `x-feature-create`. | `ai/epics/.../IMPLEMENTATION-MAP.md`. | Core planning renderer. |
-| `_TEMPLATE-STORY-PLANNING-REPORT.md` | Relatório consolidado do planejamento multi-agente da story. | `x-story-plan`. | `plans/story-planning-report-*.md`. | Report renderer. |
-| `_TEMPLATE-DOR-CHECKLIST.md` | Checklist de Definition of Ready. | `x-story-plan`, refinement/planning gates. | `plans/` ou relatório de DoR. | Policy checklist renderizado. |
+| `_TEMPLATE-EPIC.md` | Estrutura v2/value-driven para documento de épico. | `x-internal-create-epic`, `x-epic-create`, `x-create-feature`, refinement. | `ai/epics/epic-XXXX-*/epic-XXXX.md`. | Template registry + schema de epic/refinement. |
+| `_TEMPLATE-STORY.md` | História implementável com contratos, Gherkin, tarefas e refinement verdict. | `x-internal-create-story`, `x-story-create`, `x-create-feature`, refinement. | `ai/epics/epic-XXXX-*/story-XXXX-YYYY.md`. | Template registry + validação estrutural. |
+| `_TEMPLATE-TASK.md` | Contrato de tarefa fina no modelo task-first. | `x-plan-story`, `x-plan-task`. | `ai/epics/.../tasks/task-TASK-*.md`. | Template de task contract. |
+| `_TEMPLATE-TASK-PLAN.md` | Plano de implementação por tarefa, incluindo TDD e file footprint. | `x-plan-task`. | `ai/epics/.../plans/plan-task-*.md`. | Prompt/output template versionado. |
+| `_TEMPLATE-TASK-IMPLEMENTATION-MAP.md` | Mapa de dependências e paralelismo entre tarefas. | `x-plan-story`. | `plans/task-implementation-map-*.md`. | Renderer determinístico + grafo. |
+| `_TEMPLATE-IMPLEMENTATION-MAP.md` | Mapa de implementação do épico. | `x-internal-map-epic`, `x-epic-map`, `x-create-feature`. | `ai/epics/.../IMPLEMENTATION-MAP.md`. | Core planning renderer. |
+| `_TEMPLATE-STORY-PLANNING-REPORT.md` | Relatório consolidado do planejamento multi-agente da story. | `x-plan-story`. | `plans/story-planning-report-*.md`. | Report renderer. |
+| `_TEMPLATE-DOR-CHECKLIST.md` | Checklist de Definition of Ready. | `x-plan-story`, refinement/planning gates. | `plans/` ou relatório de DoR. | Policy checklist renderizado. |
 | `_TEMPLATE.md` | Modelo amplo de especificação técnica inicial. | Uso manual ou pipeline de spec/feature. | `docs/specs/` ou entrada para feature creation. | Spec template opcional do registry. |
 
 #### 5.6.2. Execution governance templates
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | Plano de implementação por story. | `x-story-implement`, `x-internal-story-build-plan`. | `ai/epics/.../plans/plan-story-*.md`. | Prompt + evidência obrigatória. |
-| `_TEMPLATE-TASK-BREAKDOWN.md` | Quebra de tarefas a partir de plano/testes. | `x-lib-task-decomposer`, `x-internal-story-build-plan`. | `plans/tasks-story-*.md`. | Estrutura de decomposição. |
-| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | Plano de execução de épico com DAG, fases e critical path. | `x-internal-epic-build-plan`, `x-internal-report-write`. | `ai/epics/.../epic-execution-plan.md`. | Renderer determinístico de plano. |
-| `_TEMPLATE-EPIC-EXECUTION-REPORT.md` | Relatório pós-implementação de épico. | `x-epic-implement`, `x-internal-report-write`. | `ai/epics/.../reports/`. | Report renderer. |
-| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | Relatório de conclusão de fase. | `x-epic-implement`. | `reports/phase-report-epic-*.md`. | Report renderer de phase gate. |
-| `_TEMPLATE-STORY-COMPLETION-REPORT.md` | Fechamento de story com PR, coverage, tasks e findings. | `x-internal-story-report`, `x-internal-report-write`. | `reports/story-completion-report-*.md`. | Report renderer obrigatório. |
-| `_TEMPLATE-EXECUTION-STATE.json` | Esqueleto JSON de estado de execução. | Orquestradores, `x-internal-status-update`. | `ai/epics/.../execution-state.json`. | Schema tipado, não template textual LLM. |
-| `_TEMPLATE-REFINEMENT-VERDICT.md` | Estrutura textual do verdict de refinement. | `x-story-refine`, `x-epic-refine`. | Markdown + dual-write em `execution-state.json`. | Schema + view markdown gerada. |
+| `_TEMPLATE-IMPLEMENTATION-PLAN.md` | Plano de implementação por story. | `x-implement-story`, `x-internal-build-story-plan`. | `ai/epics/.../plans/plan-story-*.md`. | Prompt + evidência obrigatória. |
+| `_TEMPLATE-TASK-BREAKDOWN.md` | Quebra de tarefas a partir de plano/testes. | `x-lib-decompose-task`, `x-internal-build-story-plan`. | `plans/tasks-story-*.md`. | Estrutura de decomposição. |
+| `_TEMPLATE-EPIC-EXECUTION-PLAN.md` | Plano de execução de épico com DAG, fases e critical path. | `x-internal-build-epic-plan`, `x-internal-write-report`. | `ai/epics/.../epic-execution-plan.md`. | Renderer determinístico de plano. |
+| `_TEMPLATE-EPIC-EXECUTION-REPORT.md` | Relatório pós-implementação de épico. | `x-implement-epic`, `x-internal-write-report`. | `ai/epics/.../reports/`. | Report renderer. |
+| `_TEMPLATE-PHASE-COMPLETION-REPORT.md` | Relatório de conclusão de fase. | `x-implement-epic`. | `reports/phase-report-epic-*.md`. | Report renderer de phase gate. |
+| `_TEMPLATE-STORY-COMPLETION-REPORT.md` | Fechamento de story com PR, coverage, tasks e findings. | `x-internal-write-story-report`, `x-internal-write-report`. | `reports/story-completion-report-*.md`. | Report renderer obrigatório. |
+| `_TEMPLATE-EXECUTION-STATE.json` | Esqueleto JSON de estado de execução. | Orquestradores, `x-internal-update-status`. | `ai/epics/.../execution-state.json`. | Schema tipado, não template textual LLM. |
+| `_TEMPLATE-REFINEMENT-VERDICT.md` | Estrutura textual do verdict de refinement. | `x-refine-story`, `x-refine-epic`. | Markdown + dual-write em `execution-state.json`. | Schema + view markdown gerada. |
 
 #### 5.6.3. Review governance templates
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `_TEMPLATE-ARCHITECTURE-PLAN.md` | Plano arquitetural com diagramas, NFRs e mini-ADRs. | `x-arch-plan`. | `plans/arch-story-*.md`. | Prompt output estruturado. |
-| `_TEMPLATE-SPECIALIST-REVIEW.md` | Relatório de review por especialista. | `x-review` e review specialists. | `plans/review-story-*.md`. | Worker review template. |
-| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | Dashboard consolidado dos reviews especialistas. | `x-review`. | `plans/review-dashboard-*.md`. | Report renderer + scorecard. |
+| `_TEMPLATE-ARCHITECTURE-PLAN.md` | Plano arquitetural com diagramas, NFRs e mini-ADRs. | `x-plan-architecture`. | `plans/arch-story-*.md`. | Prompt output estruturado. |
+| `_TEMPLATE-SPECIALIST-REVIEW.md` | Relatório de review por especialista. | `x-review-codebase` e review specialists. | `plans/review-story-*.md`. | Worker review template. |
+| `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | Dashboard consolidado dos reviews especialistas. | `x-review-codebase`. | `plans/review-dashboard-*.md`. | Report renderer + scorecard. |
 | `_TEMPLATE-TECH-LEAD-REVIEW.md` | Review final Tech Lead com GO/NO-GO. | `x-review-pr`. | `plans/techlead-review-story-*.md`. | Veredito estruturado. |
-| `_TEMPLATE-REVIEW-REMEDIATION.md` | Plano de correção pós-review. | `x-story-implement` fase de remediação. | `plans/remediation-story-*.md`. | Backlog de remediação. |
+| `_TEMPLATE-REVIEW-REMEDIATION.md` | Plano de correção pós-review. | `x-implement-story` fase de remediação. | `plans/remediation-story-*.md`. | Backlog de remediação. |
 
 #### 5.6.4. Security, compliance and quality templates
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `_TEMPLATE-SECURITY-ASSESSMENT.md` | Avaliação de segurança da story. | `x-internal-story-build-plan` fase 1E. | `plans/security-story-*.md`. | Prompt + policy evidence. |
-| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | Avaliação compliance da story. | `x-internal-story-build-plan` fase 1F. | `plans/compliance-story-*.md`. | Prompt condicionado por compliance pack. |
-| `_TEMPLATE-THREAT-MODEL.md` | Threat model estruturado. | `x-threat-model`. | `plans/threat-model-story-*.md` ou reports. | Security document template. |
+| `_TEMPLATE-SECURITY-ASSESSMENT.md` | Avaliação de segurança da story. | `x-internal-build-story-plan` fase 1E. | `plans/security-story-*.md`. | Prompt + policy evidence. |
+| `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | Avaliação compliance da story. | `x-internal-build-story-plan` fase 1F. | `plans/compliance-story-*.md`. | Prompt condicionado por compliance pack. |
+| `_TEMPLATE-THREAT-MODEL.md` | Threat model estruturado. | `x-model-threats`. | `plans/threat-model-story-*.md` ou reports. | Security document template. |
 | `_TEMPLATE-SLO-SLI-DEFINITION.md` | Definição de SLO/SLI. | Ops/governance docs. | `governance/slo-sli/` ou docs. | Policy/doc template. |
-| `_TEMPLATE-TEST-PLAN.md` | Plano de testes Double-Loop TDD. | `x-test-plan`, `x-internal-story-build-plan`. | `plans/tests-story-*.md`. | Prompt output obrigatório. |
+| `_TEMPLATE-TEST-PLAN.md` | Plano de testes Double-Loop TDD. | `x-plan-tests`, `x-internal-build-story-plan`. | `plans/tests-story-*.md`. | Prompt output obrigatório. |
 
 #### 5.6.5. Documentation templates
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
 | `_TEMPLATE-SERVICE-ARCHITECTURE.md` | Documento de arquitetura do serviço. | Composer/scaffold. | `docs/architecture/` ou steering docs. | Generated documentation view. |
-| `_TEMPLATE-ARCHITECTURE-SYSTEM.md` | Arquitetura de sistema com decision log. | `x-arch-system-update`, scaffold. | `docs/architecture/system.md`. | Patchable document template. |
+| `_TEMPLATE-ARCHITECTURE-SYSTEM.md` | Arquitetura de sistema com decision log. | `x-update-system-architecture`, scaffold. | `docs/architecture/system.md`. | Patchable document template. |
 | `_TEMPLATE-GRPC-REFERENCE.md` | Referência gRPC/protobuf. | Contract/docs generation. | `contracts/api/grpc-reference.md`. | Protocol docs template. |
-| `_TEMPLATE-ADR.md` | Estrutura de ADR. | `x-adr-generate`, scaffold. | `docs/adr/ADR-*.md`. | ADR registry + numbering engine. |
-| `_TEMPLATE-DOC-VALIDATE-REPORT.md` | Relatório de doc freshness. | `x-doc-validate`. | `reports/doc-validate-report-*.md`. | Report renderer de documentation gate. |
+| `_TEMPLATE-ADR.md` | Estrutura de ADR. | `x-generate-adr`, scaffold. | `docs/adr/ADR-*.md`. | ADR registry + numbering engine. |
+| `_TEMPLATE-DOC-VALIDATE-REPORT.md` | Relatório de doc freshness. | `x-validate-docs`. | `reports/doc-validate-report-*.md`. | Report renderer de documentation gate. |
 | `_TEMPLATE-PERFORMANCE-BASELINE.md` | Baseline de performance. | Performance/profile docs. | Docs ou reports de performance. | Optional performance template. |
 | `_TEMPLATE-DATA-MIGRATION-PLAN.md` | Plano de migração de dados. | Data migration planning. | Docs/plans. | Optional planning template. |
 | `_TEMPLATE-CONTRIBUTING.md` | Guia de contribuição. | Generator/docs scaffold. | `CONTRIBUTING.md` ou docs. | Generated repo documentation. |
@@ -844,18 +844,18 @@ No Forge, templates não devem ser arquivos soltos copiados para cada projeto se
 | --- | --- | --- | --- | --- |
 | `_TEMPLATE-TELEMETRY-EVENT.json` | Forma canônica de evento de telemetria. | `telemetry-*`, `telemetry-emit.sh`, `telemetry-phase.sh`. | `events.ndjson`. | Event schema versionado. |
 | `_TEMPLATE-TELEMETRY-EVENT.README.md` | Documenta campos do evento de telemetria. | Operadores/devs, docs geradas. | README/doc interno. | Schema documentation generated view. |
-| `_TEMPLATE-TELEMETRY-REPORT.md` | Relatório agregado de telemetria. | `x-telemetry-analyze`. | Markdown/JSON/CSV report. | Report renderer determinístico. |
+| `_TEMPLATE-TELEMETRY-REPORT.md` | Relatório agregado de telemetria. | `x-analyze-telemetry`. | Markdown/JSON/CSV report. | Report renderer determinístico. |
 | `_TEMPLATE-DEPLOY-RUNBOOK.md` | Runbook de deploy. | Ops docs/scaffold. | `results/runbooks/deploy-runbook.md`. | Ops pack template. |
-| `_TEMPLATE-INCIDENT-RESPONSE.md` e runbooks similares | Resposta a incidente e procedimentos operacionais. | `x-ops-incident`, ops docs. | `results/runbooks/`. | Ops workflow templates. |
+| `_TEMPLATE-INCIDENT-RESPONSE.md` e runbooks similares | Resposta a incidente e procedimentos operacionais. | `x-handle-incident`, ops docs. | `results/runbooks/`. | Ops workflow templates. |
 
 #### 5.6.7. Git, PR and release templates
 
 | Template | Para que serve | Quem consome hoje | Saída típica | Destino Forge |
 | --- | --- | --- | --- | --- |
-| `_TEMPLATE-CHANGELOG-ENTRY.md` | Entrada de changelog. | `x-release-changelog`, release flow. | `CHANGELOG.md`. | SemVer/changelog renderer. |
+| `_TEMPLATE-CHANGELOG-ENTRY.md` | Entrada de changelog. | `x-generate-release-changelog`, release flow. | `CHANGELOG.md`. | SemVer/changelog renderer. |
 | `_TEMPLATE-RELEASE-CHECKLIST.md` | Checklist de release. | `x-release`. | `ai/releases/` ou release report. | Release workflow checklist. |
-| `_TEMPLATE-PR-IMPLEMENTATION.md` | Corpo de PR de implementação com evidências. | `x-internal-pr-body-render --kind implementation`, `x-pr-create`. | PR body. | Strict PR body renderer. |
-| `_TEMPLATE-PR-BACKLOG.md` | Corpo de PR de backlog/spec. | `x-internal-pr-body-render --kind backlog`, `x-feature-create`. | PR body de docs/backlog. | Strict PR body renderer. |
+| `_TEMPLATE-PR-IMPLEMENTATION.md` | Corpo de PR de implementação com evidências. | `x-internal-render-pr-body --kind implementation`, `x-create-pr`. | PR body. | Strict PR body renderer. |
+| `_TEMPLATE-PR-BACKLOG.md` | Corpo de PR de backlog/spec. | `x-internal-render-pr-body --kind backlog`, `x-create-feature`. | PR body de docs/backlog. | Strict PR body renderer. |
 
 #### 5.6.8. Meta-generator, infra and overlays
 
@@ -893,48 +893,48 @@ Para cada família: **objetivo**, **geradores típicos** (skill ou componente), 
 
 | Artefato | Objetivo | Quem gera | O que faz / conteúdo | Consumidores |
 | --- | --- | --- | --- | --- |
-| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico (índice de stories, regras, status). | `x-epic-create`, `x-epic-decompose`, `x-feature-create`, `x-internal-epic-create`; atualizações em fases de planejamento (`x-epic-orchestrate`, `x-epic-map`, orquestradores). | Markdown vivo: escopo, DoR/DoD, story index, colunas de status; pode incluir `refinementVerdict`, `flowVersion`. | Operadores; `x-story-create` / `x-story-implement` (contexto); hooks de refinement; auditorias de epic branch / flow version. |
-| `story-XXXX-YYYY.md` | Contrato implementável da story (critérios, dependências, tarefas). | `x-story-create`, `x-epic-decompose`, `x-internal-story-create`; updates de `x-story-plan` / `x-epic-orchestrate` (ex.: Seção 8 / status). | História + Gherkin + dados de planejamento; ancora todos os paths `plans/*` e `reports/*` da story. | `x-internal-story-load-context`, `x-story-implement`, `x-task-implement`, reviews, CI de integridade. |
-| `IMPLEMENTATION-MAP.md` | DAG e fases de execução entre stories. | `x-epic-map`, `x-internal-epic-map`, `x-feature-create`, `x-epic-decompose`. | Ordem, paralelismo, critical path; pode incluir “file footprint” / restrições de paralelismo (EPIC-0041). | `x-epic-implement`, `x-epic-orchestrate`, `x-parallel-eval`, planejamento humano. |
-| `execution-state.json` | Checkpoint único de orquestração (épico e/ou stories). | `x-epic-implement`, `x-epic-orchestrate`, `x-story-implement` (via `x-internal-status-update`), `x-internal-story-resume`, fases de gate. | JSON: status por story, fase atual, `refinementVerdict`, flags (`flowVersion`, `interactiveMode`, downgrades de paralelismo, etc.). | Resume/`--resume`; hooks (`enforce-phase-sequence`, `enforce-refinement-gate`, `enforce-continuous-flow`); operadores; futuro runtime Forge. |
-| `epic-execution-plan.md` | Plano de execução materializado do épico (fases, ondas, critérios). | `x-internal-epic-build-plan`, `x-epic-implement` (fases iniciais). | Markdown derivado do mapa + políticas; guia para waves. | `x-epic-implement`; relatórios finais; auditoria humana. |
-| `epic-execution-report.md` / relatórios de épico em `reports/` | Encerramento e evidências agregadas do épico. | `x-epic-implement`, `x-internal-report-write`. | Resumo de stories, gates, métricas, bloqueios. | Release train, stakeholders, CI de epic integrity quando aplicável. |
-| `spec-*.md` ou especificação anexa | Entrada de decomposição (feature/spec-driven). | Autor humano ou `x-feature-create` / pipeline de spec. | Requisitos fonte para épico/stories. | `x-epic-create`, `x-epic-decompose`, refinamento. |
-| `reviews/review-*.md` (alguns épicos) | Reviews agregados ao nível do épico (legado ou relatórios consolidados). | Varia: `x-review`, `x-epic-implement`, relatórios manuais. | Opinião especializada consolidada. | Tech lead, arquivo de épico; tende a convergir para `plans/` por story em fluxos novos. |
+| `epic-XXXX.md` / `EPIC-XXXX.md` | Fonte normativa do backlog do épico (índice de stories, regras, status). | `x-epic-create`, `x-epic-decompose`, `x-create-feature`, `x-internal-create-epic`; atualizações em fases de planejamento (`x-orchestrate-epic`, `x-epic-map`, orquestradores). | Markdown vivo: escopo, DoR/DoD, story index, colunas de status; pode incluir `refinementVerdict`, `flowVersion`. | Operadores; `x-story-create` / `x-implement-story` (contexto); hooks de refinement; auditorias de epic branch / flow version. |
+| `story-XXXX-YYYY.md` | Contrato implementável da story (critérios, dependências, tarefas). | `x-story-create`, `x-epic-decompose`, `x-internal-create-story`; updates de `x-plan-story` / `x-orchestrate-epic` (ex.: Seção 8 / status). | História + Gherkin + dados de planejamento; ancora todos os paths `plans/*` e `reports/*` da story. | `x-internal-load-story-context`, `x-implement-story`, `x-implement-task`, reviews, CI de integridade. |
+| `IMPLEMENTATION-MAP.md` | DAG e fases de execução entre stories. | `x-epic-map`, `x-internal-map-epic`, `x-create-feature`, `x-epic-decompose`. | Ordem, paralelismo, critical path; pode incluir “file footprint” / restrições de paralelismo (EPIC-0041). | `x-implement-epic`, `x-orchestrate-epic`, `x-evaluate-parallelism`, planejamento humano. |
+| `execution-state.json` | Checkpoint único de orquestração (épico e/ou stories). | `x-implement-epic`, `x-orchestrate-epic`, `x-implement-story` (via `x-internal-update-status`), `x-internal-resume-story`, fases de gate. | JSON: status por story, fase atual, `refinementVerdict`, flags (`flowVersion`, `interactiveMode`, downgrades de paralelismo, etc.). | Resume/`--resume`; hooks (`enforce-phase-sequence`, `enforce-refinement-gate`, `enforce-continuous-flow`); operadores; futuro runtime Forge. |
+| `epic-execution-plan.md` | Plano de execução materializado do épico (fases, ondas, critérios). | `x-internal-build-epic-plan`, `x-implement-epic` (fases iniciais). | Markdown derivado do mapa + políticas; guia para waves. | `x-implement-epic`; relatórios finais; auditoria humana. |
+| `epic-execution-report.md` / relatórios de épico em `reports/` | Encerramento e evidências agregadas do épico. | `x-implement-epic`, `x-internal-write-report`. | Resumo de stories, gates, métricas, bloqueios. | Release train, stakeholders, CI de epic integrity quando aplicável. |
+| `spec-*.md` ou especificação anexa | Entrada de decomposição (feature/spec-driven). | Autor humano ou `x-create-feature` / pipeline de spec. | Requisitos fonte para épico/stories. | `x-epic-create`, `x-epic-decompose`, refinamento. |
+| `reviews/review-*.md` (alguns épicos) | Reviews agregados ao nível do épico (legado ou relatórios consolidados). | Varia: `x-review-codebase`, `x-implement-epic`, relatórios manuais. | Opinião especializada consolidada. | Tech lead, arquivo de épico; tende a convergir para `plans/` por story em fluxos novos. |
 
 #### 5.7.2. `plans/` — planejamento e evidência de design
 
 | Artefato (padrão de nome) | Objetivo | Quem gera | O que faz | Consumidores |
 | --- | --- | --- | --- | --- |
-| `arch-story-XXXX-YYYY.md` | Plano arquitetural da story. | `x-arch-plan` (via `x-internal-story-build-plan` / Phase 1). | Componentes, diagramas, mini-ADRs, NFRs. | Implementação, `x-arch-update`, revisores; **Surface 07** (Rule 27). |
-| `plan-story-XXXX-YYYY.md` | Plano de implementação (fases, riscos, footprint). | `x-internal-story-build-plan` → template implementation plan. | Blueprint da codificação; alinha tasks e PRs. | `x-task-implement`, `x-internal-story-load-context` (staleness), verify gate. |
-| `tests-story-XXXX-YYYY.md` | Plano de testes Double-Loop / TPP. | `x-test-plan` ou wave interna de plano. | Ordem de testes, cenários AT/UT. | `x-task-implement`, QA, coverage gate. |
-| `tasks-story-XXXX-YYYY.md` | Decomposição em tasks. | `x-lib-task-decomposer` / build-plan. | Lista de tasks com IDs estáveis. | `x-task-implement`, execution-state, wave commits. |
-| `plan-task-*.md` / `task-plan-TASK-*-story-*.md` | Plano fino por task (TDD, footprint). | `x-task-plan`, `x-story-plan` (orquestração multi-task). | Passos atômicos por task. | `x-task-implement`, auditorias de paralelismo. |
-| `task-implementation-map-*.md` | DAG de tasks e paralelismo. | `x-story-plan`. | Ordem entre tasks da story. | `x-task-implement`, operadores. |
+| `arch-story-XXXX-YYYY.md` | Plano arquitetural da story. | `x-plan-architecture` (via `x-internal-build-story-plan` / Phase 1). | Componentes, diagramas, mini-ADRs, NFRs. | Implementação, `x-update-architecture`, revisores; **Surface 07** (Rule 27). |
+| `plan-story-XXXX-YYYY.md` | Plano de implementação (fases, riscos, footprint). | `x-internal-build-story-plan` → template implementation plan. | Blueprint da codificação; alinha tasks e PRs. | `x-implement-task`, `x-internal-load-story-context` (staleness), verify gate. |
+| `tests-story-XXXX-YYYY.md` | Plano de testes Double-Loop / TPP. | `x-plan-tests` ou wave interna de plano. | Ordem de testes, cenários AT/UT. | `x-implement-task`, QA, coverage gate. |
+| `tasks-story-XXXX-YYYY.md` | Decomposição em tasks. | `x-lib-decompose-task` / build-plan. | Lista de tasks com IDs estáveis. | `x-implement-task`, execution-state, wave commits. |
+| `plan-task-*.md` / `task-plan-TASK-*-story-*.md` | Plano fino por task (TDD, footprint). | `x-plan-task`, `x-plan-story` (orquestração multi-task). | Passos atômicos por task. | `x-implement-task`, auditorias de paralelismo. |
+| `task-implementation-map-*.md` | DAG de tasks e paralelismo. | `x-plan-story`. | Ordem entre tasks da story. | `x-implement-task`, operadores. |
 | `security-story-XXXX-YYYY.md` | Avaliação de segurança. | Fase 1E do build-plan. | Threats, controles, evidências. | Security review, compliance gate. |
 | `compliance-story-XXXX-YYYY.md` | Avaliação compliance. | Fase 1F do build-plan. | Mapeamento normativo. | Compliance, auditores. |
-| `story-planning-report-*.md` / `planning-report-story-*.md` | Relatório do wave de planejamento. | `x-story-plan`, `x-epic-orchestrate` (per story). | Síntese do plano + DoR inputs. | `x-epic-orchestrate` (veredito DoR), operadores. |
-| `dor-story-XXXX-YYYY.md` | Definition of Ready por story. | `x-story-plan` subagent. | Checklist e **veredito READY/NOT_READY**. | `x-epic-orchestrate` (checkpoint), replanejamento. |
-| `remediation-story-XXXX-YYYY.md` | Plano de correção pós-review. | `x-story-implement` (fase de remediação). | Itens acionáveis pós-`x-review` / `x-review-pr`. | Implementação iterativa, PR fixes. |
-| `review-*-story-*.md` (especialistas) | Review por dimensão (security, qa, perf, …). | `x-review` (+ sub-skills especializadas). | Achados e scores por especialista. | Dashboard consolidado, remediação; **Surface 04** (Rule 27). |
-| `review-dashboard-story-*.md` | Consolidação multi-especialista. | `x-review`. | Visão única para decisão. | Tech lead, story owner. |
+| `story-planning-report-*.md` / `planning-report-story-*.md` | Relatório do wave de planejamento. | `x-plan-story`, `x-orchestrate-epic` (per story). | Síntese do plano + DoR inputs. | `x-orchestrate-epic` (veredito DoR), operadores. |
+| `dor-story-XXXX-YYYY.md` | Definition of Ready por story. | `x-plan-story` subagent. | Checklist e **veredito READY/NOT_READY**. | `x-orchestrate-epic` (checkpoint), replanejamento. |
+| `remediation-story-XXXX-YYYY.md` | Plano de correção pós-review. | `x-implement-story` (fase de remediação). | Itens acionáveis pós-`x-review-codebase` / `x-review-pr`. | Implementação iterativa, PR fixes. |
+| `review-*-story-*.md` (especialistas) | Review por dimensão (security, qa, perf, …). | `x-review-codebase` (+ sub-skills especializadas). | Achados e scores por especialista. | Dashboard consolidado, remediação; **Surface 04** (Rule 27). |
+| `review-dashboard-story-*.md` | Consolidação multi-especialista. | `x-review-codebase`. | Visão única para decisão. | Tech lead, story owner. |
 | `techlead-review-story-*.md` | Veredito GO/NO-GO. | `x-review-pr`. | Checklist TL; **Surface 05**. | Merge gate humano, evidência em PR. |
-| `threat-model-story-*.md` | Threat model dedicado. | `x-threat-model`. | Cenários STRIDE/LINDDUN (conforme skill). | Security, auditorias. |
+| `threat-model-story-*.md` | Threat model dedicado. | `x-model-threats`. | Cenários STRIDE/LINDDUN (conforme skill). | Security, auditorias. |
 
-**Pacote “6 artefatos de Fase 1”** (Rule 27 **Surface 09**): em fluxos zero-bypass, `x-internal-story-build-plan` materializa o conjunto esperado sob `{epicDir}/plans/` — tipicamente **arch, implementation plan, test plan, task breakdown, security, compliance** (com variação SIMPLE que pode omitir security/compliance). O hook `x-internal-phase-gate` e o loader de contexto tratam esse conjunto como evidência.
+**Pacote “6 artefatos de Fase 1”** (Rule 27 **Surface 09**): em fluxos zero-bypass, `x-internal-build-story-plan` materializa o conjunto esperado sob `{epicDir}/plans/` — tipicamente **arch, implementation plan, test plan, task breakdown, security, compliance** (com variação SIMPLE que pode omitir security/compliance). O hook `x-internal-verify-phase-gates` e o loader de contexto tratam esse conjunto como evidência.
 
 #### 5.7.3. `reports/` — evidência de conclusão, verificação e auditoria
 
 | Artefato | Objetivo | Quem gera | O que faz | Consumidores |
 | --- | --- | --- | --- | --- |
-| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-story-report` ao final de `x-story-implement`. | Resumo de PRs, coverage, tasks, achados; **Surface 01**. | Operadores, merge checklist, `audit-execution-integrity.sh`. |
-| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-story-verify`. | Assinatura de que fases obrigatórias rodaram; **Surface 03**. | CI (integridade), auditorias JSON. |
-| `verify-envelope-epic-XXXX.json` | Verificação ao nível do épico. | `x-internal-epic-integrity-gate`. | Agregado de gates de épico; **Surface 10**. | CI, release. |
-| `dependency-audit-STORY-ID.md` | Evidência de auditoria de dependências. | `x-dependency-audit`; **Surface 08**. | Vulnerabilidades, licenças, drift. | Segurança, supply chain, PR evidence. |
-| `doc-validate-report-STORY-ID.md` | Evidência do documentation gate (EPIC-0071). | `x-doc-validate`. | Arquivos verificados, deltas, falhas. | `verify-story-completion.sh`, CI doc freshness. |
-| `phase-report-epic-XXXX.md` | Relatório de fase do épico. | `x-epic-implement`. | Checkpoint entre fases grandes. | Epic orchestration, stakeholders. |
-| `epic-planning-report-XXXX.md` | Saída consolidada do planejamento multi-story. | `x-epic-orchestrate` Phase 3. | Status DoR por story, próximos passos. | Equipe, re-run com `--resume`. |
+| `story-completion-report-STORY-ID.md` | Prova de fechamento da story. | `x-internal-write-story-report` ao final de `x-implement-story`. | Resumo de PRs, coverage, tasks, achados; **Surface 01**. | Operadores, merge checklist, `audit-execution-integrity.sh`. |
+| `verify-envelope-STORY-ID.json` | Envelope estruturado do verify gate. | `x-internal-verify-story`. | Assinatura de que fases obrigatórias rodaram; **Surface 03**. | CI (integridade), auditorias JSON. |
+| `verify-envelope-epic-XXXX.json` | Verificação ao nível do épico. | `x-internal-verify-epic-integrity`. | Agregado de gates de épico; **Surface 10**. | CI, release. |
+| `dependency-audit-STORY-ID.md` | Evidência de auditoria de dependências. | `x-audit-dependencies`; **Surface 08**. | Vulnerabilidades, licenças, drift. | Segurança, supply chain, PR evidence. |
+| `doc-validate-report-STORY-ID.md` | Evidência do documentation gate (EPIC-0071). | `x-validate-docs`. | Arquivos verificados, deltas, falhas. | `verify-story-completion.sh`, CI doc freshness. |
+| `phase-report-epic-XXXX.md` | Relatório de fase do épico. | `x-implement-epic`. | Checkpoint entre fases grandes. | Epic orchestration, stakeholders. |
+| `epic-planning-report-XXXX.md` | Saída consolidada do planejamento multi-story. | `x-orchestrate-epic` Phase 3. | Status DoR por story, próximos passos. | Equipe, re-run com `--resume`. |
 | `epic-execution-plan-*.md` / `epic-orchestrator-state.json` (variações) | Estado ou plano exportado em alguns fluxos legados ou extensões. | Skills de épico / relatório interno. | Snapshots para ferramentas externas. | Integrações, debug (normalizar no Forge). |
 
 **Pacote “4 artefatos de Fase 3”** (narrativa Rule 27): na prática são as **evidências pós-implementação** exigidas para merge (relatório de story, verify envelope, auditorias correlatas, doc validate quando no escopo). A lista exata é validada por `scripts/audit-execution-integrity.sh` e pelo Stop hook `verify-story-completion.sh`.
@@ -943,14 +943,14 @@ Para cada família: **objetivo**, **geradores típicos** (skill ou componente), 
 
 | Artefato | Objetivo | Quem gera | O que faz | Consumidores |
 | --- | --- | --- | --- | --- |
-| `telemetry/events.ndjson` | Trilha auditável tempo-fase-skill. | Hooks (`telemetry-session`, `telemetry-pretool`/`posttool`, `telemetry-phase.sh`) + marcações nas skills. | NDJSON append-only: fases, subagentes, durações, scrubbed privacy. | `x-telemetry-analyze`, `x-telemetry-trend`; **Surface 12** / Camada 4 (Rule 27); operadores. |
+| `telemetry/events.ndjson` | Trilha auditável tempo-fase-skill. | Hooks (`telemetry-session`, `telemetry-pretool`/`posttool`, `telemetry-phase.sh`) + marcações nas skills. | NDJSON append-only: fases, subagentes, durações, scrubbed privacy. | `x-analyze-telemetry`, `x-analyze-telemetry-trends`; **Surface 12** / Camada 4 (Rule 27); operadores. |
 
 #### 5.7.5. `tasks/` (task-first) e contratos fora de `ai/`
 
 | Artefato | Objetivo | Quem gera | O que faz | Consumidores |
 | --- | --- | --- | --- | --- |
-| `tasks/task-TASK-*.md` | Contrato de task isolável. | `x-story-plan`, planejadores task-first. | Escopo mínimo por task. | `x-task-implement`, estado por task. |
-| `contracts/{STORY_ID}-*.yaml` / `.proto` / AsyncAPI | Contratos API-first. | `x-story-implement` Phase 0.5 (condicional) + linters. | Schemas aprovados antes do código. | `x-test-contract-lint`, implementação, revisores de API. |
+| `tasks/task-TASK-*.md` | Contrato de task isolável. | `x-plan-story`, planejadores task-first. | Escopo mínimo por task. | `x-implement-task`, estado por task. |
+| `contracts/{STORY_ID}-*.yaml` / `.proto` / AsyncAPI | Contratos API-first. | `x-implement-story` Phase 0.5 (condicional) + linters. | Schemas aprovados antes do código. | `x-lint-contract-tests`, implementação, revisores de API. |
 
 #### 5.7.6. `ai/releases/`
 
@@ -968,8 +968,8 @@ Para cada família: **objetivo**, **geradores típicos** (skill ou componente), 
 
 | Artefato | Objetivo | Quem gera | Consumidores |
 | --- | --- | --- | --- |
-| `.claude/state/pr-watch-{PR}.json` | Estado do CI-watch / Copilot para um PR. | `x-pr-watch-ci`; **Surface 06**. | Stop hook `verify-story-completion`, operadores. |
-| Corpo de PR (`## Orchestrator Evidence`) | Ligação entre git e artefatos em disco. | `x-internal-pr-body-render`, `x-pr-create`; **Surface 11**. | Revisores, `audit-execution-integrity.sh`. |
+| `.claude/state/pr-watch-{PR}.json` | Estado do CI-watch / Copilot para um PR. | `x-watch-pr-ci`; **Surface 06**. | Stop hook `verify-story-completion`, operadores. |
+| Corpo de PR (`## Orchestrator Evidence`) | Ligação entre git e artefatos em disco. | `x-internal-render-pr-body`, `x-create-pr`; **Surface 11**. | Revisores, `audit-execution-integrity.sh`. |
 | `governance/baselines/*.txt` | Exceções explícitas a políticas (hotfix, capabilities, etc.). | Humanos + scripts de baseline. | CI auditors (`audit-*`), bypass documentado (Rule 27 Exception 2). |
 
 #### 5.7.9. Síntese — grafo de consumo
@@ -979,7 +979,7 @@ flowchart LR
   subgraph gen [Geração]
     A[Skills de criação / mapa]
     B[Wave de plano Phase 1]
-    C[x-story-implement / x-task-implement]
+    C[x-implement-story / x-implement-task]
     D[Verify e relatórios]
     E[Hooks de telemetria]
   end
@@ -992,8 +992,8 @@ flowchart LR
   subgraph use [Consumo]
     H[Hooks Camada 0/2]
     I[CI audit-execution-integrity]
-    J[x-internal-story-load-context]
-    K[x-telemetry-analyze]
+    J[x-internal-load-story-context]
+    K[x-analyze-telemetry]
   end
   A --> S
   B --> P
@@ -1020,13 +1020,13 @@ flowchart LR
 4. **Spike técnico de inversão de controle (§0.5)** — 2-3 semanas. Reimplementar **um único orquestrador** (sugestão: `forge story refine`) em código, usando `claude` CLI para invocar as 5-7 personas. Comparar tempo, taxa de bypass e qualidade de saída contra a versão markdown atual. **Se este spike falhar, o plano inteiro precisa ser revisto.**
 5. **Spike técnico de target adapter** (P1.C3.F2 — Cursor) — 2 semanas. Se isso for viável em paralelo com o §6.4, o resto do plano é viável.
 6. **Documentar como ADR** as 12 mudanças estruturais da seção §3 *antes* de começar qualquer código (evitar arrependimento estrutural depois). A ADR sobre inversão de controle (#0) é a mais crítica.
-7. **Refinement gate aplicado a este próprio plano** — passar pelas 6 personas (PO, Tech Lead, Architect, Security, QA, SRE/DevOps) com `/x-epic-refine` adaptado, antes de promover qualquer Capacity para Epic.
+7. **Refinement gate aplicado a este próprio plano** — passar pelas 6 personas (PO, Tech Lead, Architect, Security, QA, SRE/DevOps) com `/x-refine-epic` adaptado, antes de promover qualquer Capacity para Epic.
 8. **Definir o scope da V0** — escolher subconjunto mínimo de Features `[V0]` que entrega valor end-to-end via CLI. Sugestão de núcleo mínimo: P2.C0 (todos os 8 orquestradores), P2.C2 (phase gates como código), P2.C3.F1+F2+F4 (LLM abstraction básica + custo), P5.C1.F1 (telemetria local), P6.C1.F1+F2+F5 (audit log + evidence vault + `forge ci verify`). Sem isso, não é V0.
 9. **Plano de transição dual-mode** — durante 1 release, hooks/scripts atuais e Forge rodam em paralelo, validando paridade. Só então os scripts shell são removidos.
 
 ---
 
-> **Nota de processo.** Este plano usa a hierarquia `Project → Product → Capacity → Feature` conforme solicitado, parando antes de Epic. Quando aprovado, cada Feature deve ser refinada via `/x-epic-refine` (Rule 29) antes de virar Epic, e cada Epic resultante deve passar pelos 7 artefatos de planejamento (Rule 27 §Surface 09) antes de qualquer story implementar código. Pular esse fluxo desfaz o próprio diferencial competitivo do Forge.
+> **Nota de processo.** Este plano usa a hierarquia `Project → Product → Capacity → Feature` conforme solicitado, parando antes de Epic. Quando aprovado, cada Feature deve ser refinada via `/x-refine-epic` (Rule 29) antes de virar Epic, e cada Epic resultante deve passar pelos 7 artefatos de planejamento (Rule 27 §Surface 09) antes de qualquer story implementar código. Pular esse fluxo desfaz o próprio diferencial competitivo do Forge.
 >
 > **Nota de delivery.** O princípio fundador da seção §0 é vinculante para todas as Features marcadas `[V0]`: se uma Feature não puder ser entregue como CLI local-first, ela não está no escopo da V0 e precisa ser reclassificada para `[V1+]` ou `[V2+]`.
 >

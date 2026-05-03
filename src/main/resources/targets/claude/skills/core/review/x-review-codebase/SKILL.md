@@ -1,5 +1,5 @@
 ---
-name: x-review
+name: x-review-codebase
 model: sonnet
 description: "Parallel code review with specialist engineers (Security, QA, Performance, Database, Observability, DevOps, API, Event). Invokes individual review skills in parallel via Skill tool, then consolidates into a scored report. Use for pre-PR quality validation."
 user-invocable: true
@@ -19,13 +19,13 @@ fragment-slots: [{ slot: review-specialist, ordering: fragment-order }]
 
 ## Purpose
 
-Perform parallel specialist code reviews across multiple engineering dimensions by delegating to individual review skills (`/x-review-qa`, `/x-review-perf`, `/x-review-db`, etc.), consolidating findings into a scored dashboard, and optionally generating correction stories for critical findings.
+Perform parallel specialist code reviews across multiple engineering dimensions by delegating to individual review skills (`/x-review-qa`, `/x-review-performance`, `/x-review-database`, etc.), consolidating findings into a scored dashboard, and optionally generating correction stories for critical findings.
 
 ## When to Use
 
-- `/x-review` -- review current branch
-- `/x-review STORY-ID` -- review specific story
-- `/x-review --scope security,qa` -- run only specific reviewers
+- `/x-review-codebase` -- review current branch
+- `/x-review-codebase STORY-ID` -- review specific story
+- `/x-review-codebase --scope security,qa` -- run only specific reviewers
 
 ## Workflow Overview
 
@@ -64,7 +64,7 @@ Before executing a review, check if reports already exist and are still valid.
 
 Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+    Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
 
 Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
 
@@ -98,9 +98,9 @@ If `--scope` provided, filter to listed specialists only.
 | Specialist | Skill | Max Score | Condition |
 |------------|-------|-----------|-----------|
 | QA | `/x-review-qa` | /36 | Always |
-| Performance | `/x-review-perf` | /26 | Always |
-| Database | `/x-review-db` | /40 | database != none |
-| Observability | `/x-review-obs` | /18 | observability != none |
+| Performance | `/x-review-performance` | /26 | Always |
+| Database | `/x-review-database` | /40 | database != none |
+| Observability | `/x-review-observability` | /18 | observability != none |
 | DevOps | `/x-review-devops` | /20 | container != none |
 | Data Modeling | `/x-review-data-modeling` | /20 | database != none AND architecture in [hexagonal, ddd, cqrs] |
 | Security | `/x-review-security` | /30 | security frameworks configured |
@@ -128,14 +128,14 @@ For each applicable specialist determined in Phase 1, invoke the corresponding r
 
 ### Invocation Pattern
 
-Each specialist is invoked via `Skill(...)` (Rule 13 — INLINE-SKILL pattern, parallel execution) AND is tracked individually via a per-specialist TaskCreate/TaskUpdate pair (Story 0033-0003 Concern #3 — Level 3 tracking in x-review). ALL Skill calls and ALL TaskCreate calls in Batch A MUST be in the SAME assistant message for true parallelism — the Claude runtime dispatches tool calls in parallel only when they are siblings in one assistant turn.
+Each specialist is invoked via `Skill(...)` (Rule 13 — INLINE-SKILL pattern, parallel execution) AND is tracked individually via a per-specialist TaskCreate/TaskUpdate pair (Story 0033-0003 Concern #3 — Level 3 tracking in x-review-codebase). ALL Skill calls and ALL TaskCreate calls in Batch A MUST be in the SAME assistant message for true parallelism — the Claude runtime dispatches tool calls in parallel only when they are siblings in one assistant turn.
 
 **Activation conditions — evaluate BEFORE emitting the batch. Only emit the (TaskCreate, Skill) pair for specialists whose condition is true for the current project profile. Never emit a placeholder pair for inactive specialists.**
 
 - `x-review-qa` — always active.
-- `x-review-perf` — always active.
-- `x-review-db` — only if `database != none`.
-- `x-review-obs` — only if `observability != none`.
+- `x-review-performance` — always active.
+- `x-review-database` — only if `database != none`.
+- `x-review-observability` — only if `observability != none`.
 - `x-review-devops` — only if `container != none`.
 - `x-review-data-modeling` — only if `database != none` AND `architecture` is one of `[hexagonal, ddd, cqrs]`.
 - `x-review-security` — only if security frameworks are configured.
@@ -151,7 +151,7 @@ Skill) pair for specialists whose activation condition is true (Phase 1).
 **PRE gate (Rule 25 Invariant 4).** Before Batch A, verify Phase 1
 detected a valid diff and the story context is consistent:
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-review --phase Phase-2-SpecialistReviews")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-review-codebase --phase Phase-2-SpecialistReviews")
 
 On gate exit 12, abort with a clear error — a failed PRE gate indicates
 a stale execution-state.json or predecessor phase that must be resolved.
@@ -174,9 +174,9 @@ Each `subject` follows the Rule 25 §3 canonical regex with the `›`
 **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** Each `Skill(skill: "x-review-*")` below is a tool call, not prose. Silent omission of any active specialist is a `PROTOCOL_VIOLATION` and the resulting `review-story-{STORY-ID}.md` will fail Camada 3 audit (`EIE_EVIDENCE_MISSING`):
 
     Skill(skill: "x-review-qa",            model: "sonnet", args: "{STORY_ID}")
-    Skill(skill: "x-review-perf",          model: "sonnet", args: "{STORY_ID}")
-    Skill(skill: "x-review-db",            model: "sonnet", args: "{STORY_ID}")
-    Skill(skill: "x-review-obs",           model: "sonnet", args: "{STORY_ID}")
+    Skill(skill: "x-review-performance",          model: "sonnet", args: "{STORY_ID}")
+    Skill(skill: "x-review-database",            model: "sonnet", args: "{STORY_ID}")
+    Skill(skill: "x-review-observability",           model: "sonnet", args: "{STORY_ID}")
     Skill(skill: "x-review-devops",        model: "sonnet", args: "{STORY_ID}")
     Skill(skill: "x-review-data-modeling", model: "sonnet", args: "{STORY_ID}")
     Skill(skill: "x-review-security",      model: "sonnet", args: "{STORY_ID}")
@@ -203,7 +203,7 @@ Only emit `TaskUpdate` for specialists that were active in Batch A. If a special
 
 **Batch C — Wave POST gate (Rule 25 REGRA-003).** After Batch B, invoke the phase-gate skill in `--mode wave` to verify every task in `--expected-tasks` completed AND every file in `--expected-artifacts` exists:
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode wave --skill x-review --phase Phase-2-SpecialistReviews --expected-tasks {comma-separated-reviewTasks-ids} --expected-artifacts {comma-separated-report-paths}")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode wave --skill x-review-codebase --phase Phase-2-SpecialistReviews --expected-tasks {comma-separated-reviewTasks-ids} --expected-artifacts {comma-separated-report-paths}")
 
 `--expected-tasks` = the `reviewTasks` IDs recorded in Batch A for the active specialists (same filter as Batch A/B — Rule 25 Invariant 3). `--expected-artifacts` = `ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` for each active specialist; reports are written in Step 3c. On gate exit 12, surface the failure and return — Phase 3 is skipped until the broken specialist is resolved.
 
@@ -469,17 +469,17 @@ generate a correction story following these steps:
        ENTAO {expected fix result}
        E o score do review para {specialist} deve melhorar
      ```
-   - **Sub-tarefas**: One `[Dev]` task per CRITICAL finding, grouped `[Dev]` tasks for MEDIUM findings by specialist, one `[Test]` task to re-run `/x-review` after fixes
-   - **DoD Local**: All CRITICAL findings resolved, all MEDIUM findings resolved or justified, `/x-review` re-run with no new CRITICAL findings
+   - **Sub-tarefas**: One `[Dev]` task per CRITICAL finding, grouped `[Dev]` tasks for MEDIUM findings by specialist, one `[Test]` task to re-run `/x-review-codebase` after fixes
+   - **DoD Local**: All CRITICAL findings resolved, all MEDIUM findings resolved or justified, `/x-review-codebase` re-run with no new CRITICAL findings
 
 3. **Save the story** to `ai/epics/epic-XXXX/reviews/correction-story-XXXX-YYYY.md`
 
-4. **Report** to the user: story file path, number of findings converted, and suggested next step (`/x-task-implement` or manual fix).
+4. **Report** to the user: story file path, number of findings converted, and suggested next step (`/x-implement-task` or manual fix).
 
 ## Phase 5 -- Emit Frontmatter (MANDATORY -- Rule 24 §Camada-1)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-review Phase-5-Frontmatter`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-review-codebase Phase-5-Frontmatter`
 
 > **MANDATORY TOOL CALL (Rule 24 §Camada-1):** This phase MUST NOT be inlined, simulated,
 > or omitted. The LLM MUST prepend the populated YAML frontmatter to the review artifact.
@@ -491,7 +491,7 @@ TaskCreate(
   activeForm: "Emitting specialist review frontmatter",
   metadata: {
     "phase": "Phase 5",
-    "parentSkill": "x-review",
+    "parentSkill": "x-review-codebase",
     "storyId": "<STORY_ID>",
     "epicId": "<EPIC_ID>",
     "expectedArtifacts": ["<path to review-story-XXXX-YYYY.md>"]
@@ -500,7 +500,7 @@ TaskCreate(
 
 Invoke pre-gate (Rule 25 §Invariants 4):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-codebase")
 
 After all specialist subagents have returned findings and the prose body of
 `review-story-<STORY_ID>.md` has been assembled, prepend the YAML frontmatter block
@@ -510,7 +510,7 @@ conforming to `governance/schemas/review-frontmatter-1.0.json`:
 <!-- template-version: 1.0 -->
 ---
 schema-version: "1.0"
-generated-by: x-review@<git rev-parse HEAD>
+generated-by: x-review-codebase@<git rev-parse HEAD>
 story-id: <STORY_ID>
 epic-id: <EPIC_ID>
 date: <date -u +%Y-%m-%dT%H:%M:%SZ>
@@ -544,12 +544,12 @@ If the script returns exit ≠ 0, abort with `REVIEW_FRONTMATTER_INVALID`. No fa
 
 Invoke post-gate (Rule 25 §Invariants 4):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review --expected-artifacts <path to review-story-XXXX-YYYY.md>")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-codebase --expected-artifacts <path to review-story-XXXX-YYYY.md>")
 
 TaskUpdate(taskId: <id from TaskCreate above>, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review Phase-5-Frontmatter ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review-codebase Phase-5-Frontmatter ok`
 
 ## Error Handling
 
@@ -574,10 +574,10 @@ When templates are absent, dashboard/remediation are skipped.
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | Called by (Phase 4) | Produces the same artifacts as lifecycle Phase 4 |
-| `x-review-pr` | Followed by | Recommended flow: `/x-review` then fix criticals then `/x-review-pr` |
+| `x-implement-story` | Called by (Phase 4) | Produces the same artifacts as lifecycle Phase 4 |
+| `x-review-pr` | Followed by | Recommended flow: `/x-review-codebase` then fix criticals then `/x-review-pr` |
 | `x-story-create` | Reads format | Correction stories (Phase 4) follow the story template |
-| `x-task-implement` | Followed by | Correction stories can be picked up by `/x-task-implement` |
+| `x-implement-task` | Followed by | Correction stories can be picked up by `/x-implement-task` |
 | `_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md` | Reads | Dashboard format, cumulative across rounds (RULE-006) |
 | `_TEMPLATE-REVIEW-REMEDIATION.md` | Reads | Remediation tracking format |
 | `PlanTemplatesAssembler` | Depends on | Templates copied verbatim -- not rendered by the engine |

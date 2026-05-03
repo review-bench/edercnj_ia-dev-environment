@@ -110,7 +110,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 21 §Audit |
 | **Layer** | 2 — CI Script |
-| **Validates** | `epic/*` PRs carry `flowVersion: "2"` in `execution-state.json`; no force-push after first merge; `x-git-cleanup-branches` excludes `epic/*` |
+| **Validates** | `epic/*` PRs carry `flowVersion: "2"` in `execution-state.json`; no force-push after first merge; `x-cleanup-git-branches` excludes `epic/*` |
 | **Introduced** | story-0058-0004 (EPIC-0058) |
 | **Exit Codes** | `0` = OK · `1` = `EPIC_BRANCH_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
 
@@ -194,7 +194,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 25 §Enforcement Layers (Layer 4) |
 | **Layer** | 2 — CI Script |
-| **Validates** | Every numbered `## Phase N` in Anexo B orchestrators has a PRE gate and a POST-family gate invocation of `x-internal-phase-gate` |
+| **Validates** | Every numbered `## Phase N` in Anexo B orchestrators has a PRE gate and a POST-family gate invocation of `x-internal-verify-phase-gates` |
 | **Introduced** | story-0055-0003 (EPIC-0055) |
 | **Exit Codes** | `0` = OK · `26` = `PHASE_GATE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
 
@@ -230,7 +230,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 29 §Camada 0, Rule 26 §Camada 0 |
 | **Layer** | 0 — Local PreToolUse Hook (preventive) |
-| **Validates** | Blocks invocations of `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate` when target's `refinementVerdict.status != "approved"`. Bypasses: `CLAUDE_RECOVERY_MODE=1` (Rule 27), hotfix branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19) |
+| **Validates** | Blocks invocations of `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-orchestrate-epic` when target's `refinementVerdict.status != "approved"`. Bypasses: `CLAUDE_RECOVERY_MODE=1` (Rule 27), hotfix branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19) |
 | **Introduced** | story-0069-0005 (EPIC-0069) |
 | **Exit Codes** | `0` = OK (allow) · `33` = `REFINEMENT_REQUIRED` (block) · `2` = `OPERATIONAL_ERROR` (self-check) |
 
@@ -292,7 +292,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 25 §Enforcement Layers (Layer 4) |
 | **Layer** | 2 — CI Script |
-| **Validates** | Anexo B orchestrators emit `TaskCreate`/`TaskUpdate` per phase; `subject:` matches hierarchy regex; `x-internal-phase-gate` PRE invocation present |
+| **Validates** | Anexo B orchestrators emit `TaskCreate`/`TaskUpdate` per phase; `subject:` matches hierarchy regex; `x-internal-verify-phase-gates` PRE invocation present |
 | **Introduced** | story-0055-0002 (EPIC-0055) |
 | **Exit Codes** | `0` = OK · `25` = `TASK_HIERARCHY_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
 

@@ -1,11 +1,11 @@
-# x-code-lint
+# x-lint-code
 
 > Analyzes source code with the appropriate linter for {{LANGUAGE}}. Second step in the pre-commit chain (RULE-007: format -> lint -> compile -> commit). Supports --fix, --changed-only, and --strict modes.
 
 | | |
 |---|---|
 | **Category** | Dev/Quality |
-| **Invocation** | `/x-code-lint [--fix \| --changed-only \| --strict]` |
+| **Invocation** | `/x-lint-code [--fix \| --changed-only \| --strict]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,11 +16,11 @@ Runs static analysis on project source code using the language-appropriate linte
 ## Usage
 
 ```
-/x-code-lint
-/x-code-lint --fix
-/x-code-lint --changed-only
-/x-code-lint --strict
-/x-code-lint --fix --changed-only
+/x-lint-code
+/x-lint-code --fix
+/x-lint-code --changed-only
+/x-lint-code --strict
+/x-lint-code --fix --changed-only
 ```
 
 ## Workflow
@@ -53,7 +53,7 @@ Runs static analysis on project source code using the language-appropriate linte
 
 ## See Also
 
-- [x-code-format](../x-code-format/) -- Precedes lint in the pre-commit chain (code formatting)
-- [x-git-push](../x-git-push/) -- Follows lint in the pre-commit chain (commit and push)
-- [x-review](../x-review/) -- Deeper parallel code review with specialist engineers
-- [x-code-audit](../x-code-audit/) -- Full codebase audit including lint checks
+- [x-format-code](../x-format-code/) -- Precedes lint in the pre-commit chain (code formatting)
+- [x-push-branch](../x-push-branch/) -- Follows lint in the pre-commit chain (commit and push)
+- [x-review-codebase](../x-review-codebase/) -- Deeper parallel code review with specialist engineers
+- [x-audit-code](../x-audit-code/) -- Full codebase audit including lint checks

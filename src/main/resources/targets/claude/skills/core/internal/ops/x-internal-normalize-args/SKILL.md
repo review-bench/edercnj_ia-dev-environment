@@ -1,6 +1,6 @@
 ---
-name: x-internal-args-normalize
-description: "Parses an argv string against a declarative JSON schema with typed flags (boolean, string, integer, enum), defaults, mutually-exclusive groups, and deprecation warnings, then emits a normalized `{parsed, warnings, errors}` envelope on stdout. Replaces ~150 lines of inline argv parsing inlined inside `x-epic-implement`, `x-story-implement`, and `x-epic-orchestrate`, giving every orchestrator identical flag-validation syntax and error messages. Third skill in the x-internal-* convention (after x-internal-status-update pilot and x-internal-report-write): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+name: x-internal-normalize-args
+description: "Parses an argv string against a declarative JSON schema with typed flags (boolean, string, integer, enum), defaults, mutually-exclusive groups, and deprecation warnings, then emits a normalized `{parsed, warnings, errors}` envelope on stdout. Replaces ~150 lines of inline argv parsing inlined inside `x-implement-epic`, `x-implement-story`, and `x-orchestrate-epic`, giving every orchestrator identical flag-validation syntax and error messages. Third skill in the x-internal-* convention (after x-internal-update-status pilot and x-internal-write-report): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,13 +19,13 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-epic-implement, x-story-implement, x-epic-orchestrate.
-> Terceira skill da convenção `x-internal-*` (após x-internal-status-update,
-> a story PILOTO 0049-0005, e x-internal-report-write, story 0049-0006):
+> Caller principal: x-implement-epic, x-implement-story, x-orchestrate-epic.
+> Terceira skill da convenção `x-internal-*` (após x-internal-update-status,
+> a story PILOTO 0049-0005, e x-internal-write-report, story 0049-0006):
 > frontmatter `visibility: internal`, subdir `internal/ops/`, marker 🔒 e
 > filtragem do menu `/help` via generator.
 
-# Skill: x-internal-args-normalize
+# Skill: x-internal-normalize-args
 
 ## Purpose
 
@@ -37,7 +37,7 @@ a normalized envelope describing:
 3. `errors` — list of validation errors (populated only on non-zero exit).
 
 This removes the ~150 lines of ad-hoc argv parsing currently duplicated inside
-`x-epic-implement`, `x-story-implement`, and `x-epic-orchestrate` (catalogued
+`x-implement-epic`, `x-implement-story`, and `x-orchestrate-epic` (catalogued
 in EPIC-0049 story-0049-0007 dependency matrix), so future orchestrators can
 declare their flag surface once — as a schema — and reuse the same parser,
 the same error codes, and the same deprecation-warning policy.
@@ -46,7 +46,7 @@ the same error codes, and the same deprecation-warning policy.
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/ops/x-internal-args-normalize/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
+| Path | `internal/ops/x-internal-normalize-args/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -60,12 +60,12 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-args-normalize` in chat. All invocations
+by a human typing `/x-internal-normalize-args` in chat. All invocations
 follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-args-normalize",
-      args: "--schema @.claude/schemas/x-epic-implement.args.json \
+Skill(skill: "x-internal-normalize-args",
+      args: "--schema @.claude/schemas/x-implement-epic.args.json \
              --argv \"EPIC-0049 --parallel --auto-merge-strategy squash\"")
 ```
 
@@ -256,7 +256,7 @@ four invalid-schema / coercion cases. Full matrix in
 [`references/full-protocol.md`](references/full-protocol.md) §5.
 
 Goldens under
-`src/test/resources/golden/internal/ops/x-internal-args-normalize/` lock
+`src/test/resources/golden/internal/ops/x-internal-normalize-args/` lock
 the SKILL.md rendering. Coverage requirement: ≥ 95% line / ≥ 90%
 branch across the invoking Bash codepaths.
 
@@ -270,7 +270,7 @@ The `ia-dev-env` generator MUST exclude skills with
 3. User-facing autocomplete in the chat input.
 
 Internal skills are still copied into `.claude/skills/` (flat layout)
-so `Skill(skill: "x-internal-args-normalize")` invocations from other
+so `Skill(skill: "x-internal-normalize-args")` invocations from other
 skills resolve correctly. The invariant — set by the pilot story
 (0049-0005) — holds here: **user cannot see it; orchestrators can
 invoke it.**
@@ -291,12 +291,12 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-epic-implement` | caller | Replaces inline argv parsing in Phase 0 (~150 LOC — story-0049-0018) |
-| `x-story-implement` | caller | Replaces inline argv parsing in Phase 0 (~150 LOC — story-0049-0019) |
-| `x-epic-orchestrate` | caller | Shares the same schema convention; parses epic-level flags |
-| `x-internal-status-update` | peer | Pilot sibling `x-internal-*` skill; both scoped under `internal/ops/` |
-| `x-internal-report-write` | peer | Second sibling `x-internal-*` skill; no shared runtime state |
+| `x-implement-epic` | caller | Replaces inline argv parsing in Phase 0 (~150 LOC — story-0049-0018) |
+| `x-implement-story` | caller | Replaces inline argv parsing in Phase 0 (~150 LOC — story-0049-0019) |
+| `x-orchestrate-epic` | caller | Shares the same schema convention; parses epic-level flags |
+| `x-internal-update-status` | peer | Pilot sibling `x-internal-*` skill; both scoped under `internal/ops/` |
+| `x-internal-write-report` | peer | Second sibling `x-internal-*` skill; no shared runtime state |
 
 Downstream stories that depend on this skill: story-0049-0018
-(x-epic-implement consumes it), story-0049-0019 (x-story-implement
+(x-implement-epic consumes it), story-0049-0019 (x-implement-story
 consumes it).

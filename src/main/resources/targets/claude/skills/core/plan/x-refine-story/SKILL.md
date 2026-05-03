@@ -1,5 +1,5 @@
 ---
-name: x-story-refine
+name: x-refine-story
 description: "Multi-persona 4-phase story refinement dispatcher. Phase A: 5-7 parallel specialist agents analyse the story for gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-7 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict and dual-writes to execution-state.json + story markdown."
 visibility: public
 user-invocable: true
@@ -18,9 +18,9 @@ requires-capabilities: [governance.refinement-gate]
 ## Triggers
 
 ```
-/x-story-refine story-XXXX-YYYY                        — full 4-phase refinement (interactive)
-/x-story-refine story-XXXX-YYYY --non-interactive       — phases A+D only (no operator questions)
-/x-story-refine story-XXXX-YYYY --epic-id 0069          — explicit epic ID override
+/x-refine-story story-XXXX-YYYY                        — full 4-phase refinement (interactive)
+/x-refine-story story-XXXX-YYYY --non-interactive       — phases A+D only (no operator questions)
+/x-refine-story story-XXXX-YYYY --epic-id 0069          — explicit epic ID override
 ```
 
 ## Parameters
@@ -50,7 +50,7 @@ requires-capabilities: [governance.refinement-gate]
 | 1 | `STORY_NOT_FOUND` | Story markdown not found at expected path |
 | 2 | `EPIC_STATE_MISSING` | `execution-state.json` not found for epic |
 | 3 | `PHASE_A_EMPTY` | All personas returned empty gap-reports |
-| 4 | `VERDICT_WRITE_FAILED` | x-internal-status-update returned non-zero |
+| 4 | `VERDICT_WRITE_FAILED` | x-internal-update-status returned non-zero |
 
 ---
 
@@ -63,9 +63,9 @@ requires-capabilities: [governance.refinement-gate]
 ## Phase A — Parallel Specialist Analysis
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-refine Phase-A-SpecialistAnalysis`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-story Phase-A-SpecialistAnalysis`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-story-refine --phase Phase-A-SpecialistAnalysis")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-story --phase Phase-A-SpecialistAnalysis")
 
 Open phase tracker:
 
@@ -90,7 +90,7 @@ Read the dimensions KP for persona responsibilities:
 Always active (5 core personas):
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine PO`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story PO`
 
 ```
 Agent(
@@ -200,27 +200,27 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 ```
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine PO ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story PO ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine TechLead`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story TechLead`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine TechLead ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story TechLead ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine Architect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story Architect`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine Architect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story Architect ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine Security`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story Security`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine Security ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story Security ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine QA`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story QA`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine QA ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story QA ok`
 
 Collect all gap-reports. Validate each is parseable JSON; discard malformed. If ALL are empty → exit `PHASE_A_EMPTY`.
 
@@ -230,10 +230,10 @@ Separate:
 
     TaskUpdate(id: phaseATaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-story-refine --phase Phase-A-SpecialistAnalysis")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-refine-story --phase Phase-A-SpecialistAnalysis")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-refine Phase-A-SpecialistAnalysis ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-story Phase-A-SpecialistAnalysis ok`
 
 >>> Phase A completed. Proceeding to Phase B (Consolidation)...
 
@@ -244,7 +244,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 <!-- phase-no-gate: Phase B is skipped entirely when --non-interactive; gate is inside conditional block -->
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-refine Phase-B-Consolidate`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-story Phase-B-Consolidate`
 
 **Skip Phase B when `--non-interactive`**: set `answers = {}` and proceed directly to Phase C.
 
@@ -292,7 +292,7 @@ Map each answer back to its originating `{persona, dimension, gap}` entry.
     TaskUpdate(id: phaseBTaskId, status: "completed")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-refine Phase-B-Consolidate ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-story Phase-B-Consolidate ok`
 
 >>> Phase B completed. Proceeding to Phase C (Refinement)...
 
@@ -301,9 +301,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 ## Phase C — Parallel Specialist Refinement
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-refine Phase-C-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-story Phase-C-Refine`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-story-refine --phase Phase-C-Refine")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-story --phase Phase-C-Refine")
 
 **Skip Phase C when `--non-interactive`**: set `proposedSections = {}` and proceed to Phase D.
 
@@ -318,7 +318,7 @@ Open phase tracker:
 For each persona that had questions in Phase A, launch a refinement agent with the answers it owns:
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine PO-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story PO-Refine`
 
 ```
 Agent(
@@ -401,36 +401,36 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 ```
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine PO-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story PO-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine TechLead-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story TechLead-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine TechLead-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story TechLead-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine Architect-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story Architect-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine Architect-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story Architect-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine Security-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story Security-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine Security-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story Security-Refine ok`
 
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-refine QA-Refine`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-refine-story QA-Refine`
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-refine QA-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-refine-story QA-Refine ok`
 
 Collect `proposedSections` from each agent. Merge into a single map keyed by dimension.
 
     TaskUpdate(id: phaseCTaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-story-refine --phase Phase-C-Refine")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-refine-story --phase Phase-C-Refine")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-refine Phase-C-Refine ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-story Phase-C-Refine ok`
 
 >>> Phase C completed. Proceeding to Phase D (Architect Consolidation)...
 
@@ -439,9 +439,9 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 ## Phase D — Architect Consolidation + Dual-Write
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-refine Phase-D-Architect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-refine-story Phase-D-Architect`
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-story-refine --phase Phase-D-Architect")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-refine-story --phase Phase-D-Architect")
 
 Open phase tracker:
 
@@ -505,9 +505,9 @@ Bash command: `printf '%s' '<verdict JSON>' | sha256sum | awk '{print $1}'`
 
 ### D.3 Dual-write (MANDATORY — NON-NEGOTIABLE)
 
-**Write 1 — execution-state.json** (via x-internal-status-update, INLINE-SKILL):
+**Write 1 — execution-state.json** (via x-internal-update-status, INLINE-SKILL):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field refinementVerdict --value {\"status\":\"<status>\",\"scope\":\"story\",\"checkedAt\":\"<iso>\",\"dimensions\":{...},\"blockers\":[...],\"verdictHash\":\"<hash>\"}")  [required]
+    Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field refinementVerdict --value {\"status\":\"<status>\",\"scope\":\"story\",\"checkedAt\":\"<iso>\",\"dimensions\":{...},\"blockers\":[...],\"verdictHash\":\"<hash>\"}")  [required]
 
 Non-zero → exit `VERDICT_WRITE_FAILED`.
 
@@ -553,10 +553,10 @@ Use Edit tool to write the `## Refinement Verdict` block. If it already exists, 
 
     TaskUpdate(id: phaseDTaskId, status: "completed")
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-story-refine --phase Phase-D-Architect --expected-artifacts {storyPath},{epicStatePath}")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode final --skill x-refine-story --phase Phase-D-Architect --expected-artifacts {storyPath},{epicStatePath}")
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-refine Phase-D-Architect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-refine-story Phase-D-Architect ok`
 
 >>> Phase D completed. Refinement verdict written.
 
@@ -567,7 +567,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 Print a concise summary:
 
 ```
-x-story-refine completed for {STORY_ID}
+x-refine-story completed for {STORY_ID}
   Verdict: <approved|rejected|tbd>
   Blockers: <none | list>
   Verdict hash: <hash>
@@ -579,7 +579,7 @@ x-story-refine completed for {STORY_ID}
 
 ## Integration Notes
 
-- **Consumed by:** `x-story-implement` (Phase 0: checks `refinementVerdict.status == "approved"` via `enforce-refinement-gate.sh` hook).
-- **Depends on:** `x-internal-status-update` (INLINE-SKILL, Rule 13 Pattern 1), `knowledge/refinement/dimensions.md` (KP, story-0069-0001).
+- **Consumed by:** `x-implement-story` (Phase 0: checks `refinementVerdict.status == "approved"` via `enforce-refinement-gate.sh` hook).
+- **Depends on:** `x-internal-update-status` (INLINE-SKILL, Rule 13 Pattern 1), `knowledge/refinement/dimensions.md` (KP, story-0069-0001).
 - **Verdict drift detection:** `verdictHash` in state file vs `verdictHash` in story markdown is compared by `audit-refinement-gate.sh` (story-0069-0006). Drift fails CI with `REFINEMENT_VERDICT_DRIFT`.
-- **Re-run idempotency:** Running x-story-refine again on an `approved` story replaces the verdict. This is intentional — re-refinement after story changes should update the verdict.
+- **Re-run idempotency:** Running x-refine-story again on an `approved` story replaces the verdict. This is intentional — re-refinement after story changes should update the verdict.

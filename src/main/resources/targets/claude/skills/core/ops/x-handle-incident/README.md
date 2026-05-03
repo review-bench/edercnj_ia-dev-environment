@@ -1,11 +1,11 @@
-# x-ops-incident
+# x-handle-incident
 
 > Guides incident response with severity-based checklists, communication templates, and postmortem triggers. Interactive guide for SEV1-SEV4 incidents covering classification, response coordination, and action item tracking.
 
 | | |
 |---|---|
 | **Category** | Operations |
-| **Invocation** | `/x-ops-incident [severity SEV1\|SEV2\|SEV3\|SEV4] [--postmortem] [--notify]` |
+| **Invocation** | `/x-handle-incident [severity SEV1\|SEV2\|SEV3\|SEV4] [--postmortem] [--notify]` |
 | **Reads** | sre-practices |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,10 +17,10 @@ Provides an interactive incident response guide that walks the team through the 
 ## Usage
 
 ```
-/x-ops-incident
-/x-ops-incident SEV1
-/x-ops-incident SEV2 --postmortem
-/x-ops-incident SEV3 --notify
+/x-handle-incident
+/x-handle-incident SEV1
+/x-handle-incident SEV2 --postmortem
+/x-handle-incident SEV3 --notify
 ```
 
 ## Workflow
@@ -34,5 +34,5 @@ Provides an interactive incident response guide that walks the team through the 
 
 ## See Also
 
-- [x-ops-troubleshoot](../x-ops-troubleshoot/) -- Diagnoses errors and failures that may escalate to incidents
-- [x-perf-profile](../x-perf-profile/) -- Profiling for performance-related incidents
+- [x-troubleshoot-operations](../x-troubleshoot-operations/) -- Diagnoses errors and failures that may escalate to incidents
+- [x-profile-performance](../x-profile-performance/) -- Profiling for performance-related incidents

@@ -1,6 +1,6 @@
 ---
-name: x-supply-chain-audit
-description: "Enhanced supply chain security audit beyond x-dependency-audit. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring."
+name: x-audit-supply-chain
+description: "Enhanced supply chain security audit beyond x-audit-dependencies. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--depth shallow|deep] [--include-dev-deps] [--risk-threshold 0-100] [--focus all|maintainer|typosquatting|phantom|age|epss|slsa]"
@@ -17,16 +17,16 @@ requires-capabilities: []
 
 ## Purpose
 
-Performs advanced supply chain security analysis for {{PROJECT_NAME}} that complements (does NOT replace) the existing `x-dependency-audit` skill. While `x-dependency-audit` focuses on known CVEs, outdated versions, and license compliance, this skill identifies deeper supply chain risks: single-maintainer dependencies, typosquatting suspects, phantom dependencies, stale packages, EPSS exploit prediction, and SLSA integrity assessment.
+Performs advanced supply chain security analysis for {{PROJECT_NAME}} that complements (does NOT replace) the existing `x-audit-dependencies` skill. While `x-audit-dependencies` focuses on known CVEs, outdated versions, and license compliance, this skill identifies deeper supply chain risks: single-maintainer dependencies, typosquatting suspects, phantom dependencies, stale packages, EPSS exploit prediction, and SLSA integrity assessment.
 
-## Relationship with x-dependency-audit
+## Relationship with x-audit-dependencies
 
-| Capability | x-dependency-audit | x-supply-chain-audit |
+| Capability | x-audit-dependencies | x-audit-supply-chain |
 |------------|-------------------|----------------------|
-| Known CVEs | Yes | No (defers to x-dependency-audit) |
-| Outdated versions | Yes | No (defers to x-dependency-audit) |
+| Known CVEs | Yes | No (defers to x-audit-dependencies) |
+| Outdated versions | Yes | No (defers to x-audit-dependencies) |
 | License compliance | Yes | Extends with copyleft risk scoring |
-| SBOM generation | Yes (CycloneDX) | No (defers to x-dependency-audit) |
+| SBOM generation | Yes (CycloneDX) | No (defers to x-audit-dependencies) |
 | Maintainer risk | No | Yes (bus factor analysis) |
 | Typosquatting | No | Yes (Levenshtein distance) |
 | Phantom dependencies | No | Yes (AST scan vs manifest diff) |
@@ -39,16 +39,16 @@ Both skills can be executed independently. Results from both feed into the secur
 
 ## Triggers
 
-- `/x-supply-chain-audit` — full supply chain audit (all 6 capabilities)
-- `/x-supply-chain-audit --depth deep` — deep analysis including transitive dependencies
-- `/x-supply-chain-audit --focus maintainer` — maintainer risk analysis only
-- `/x-supply-chain-audit --focus typosquatting` — typosquatting detection only
-- `/x-supply-chain-audit --focus phantom` — phantom dependency detection only
-- `/x-supply-chain-audit --focus age` — dependency age analysis only
-- `/x-supply-chain-audit --focus epss` — EPSS exploit prediction only
-- `/x-supply-chain-audit --focus slsa` — SLSA level assessment only
-- `/x-supply-chain-audit --risk-threshold 50` — filter findings below score 50
-- `/x-supply-chain-audit --include-dev-deps` — include dev dependencies
+- `/x-audit-supply-chain` — full supply chain audit (all 6 capabilities)
+- `/x-audit-supply-chain --depth deep` — deep analysis including transitive dependencies
+- `/x-audit-supply-chain --focus maintainer` — maintainer risk analysis only
+- `/x-audit-supply-chain --focus typosquatting` — typosquatting detection only
+- `/x-audit-supply-chain --focus phantom` — phantom dependency detection only
+- `/x-audit-supply-chain --focus age` — dependency age analysis only
+- `/x-audit-supply-chain --focus epss` — EPSS exploit prediction only
+- `/x-audit-supply-chain --focus slsa` — SLSA level assessment only
+- `/x-audit-supply-chain --risk-threshold 50` — filter findings below score 50
+- `/x-audit-supply-chain --include-dev-deps` — include dev dependencies
 
 ## Parameters
 
@@ -250,7 +250,7 @@ risk_score = (cve_severity * 0.40)
 
 Write SARIF to `results/audits/supply-chain-audit-YYYY-MM-DD.sarif.json`:
 
-Follow the SARIF template from `knowledge/security/sarif-template.md`. Use tool name `x-supply-chain-audit` and rule IDs:
+Follow the SARIF template from `knowledge/security/sarif-template.md`. Use tool name `x-audit-supply-chain` and rule IDs:
 
 | Rule ID | Name | Category |
 |---------|------|----------|
@@ -349,9 +349,9 @@ Risk Score = (CVE Severity * 0.40) + (Depth * 0.20)
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-dependency-audit` | complementary | Handles CVEs, outdated versions, licenses, and SBOM generation |
-| `x-security-dashboard` | reads | Dashboard aggregates results from this skill |
-| `x-ci-generate` | called-by | Security pipeline may invoke supply chain audit |
+| `x-audit-dependencies` | complementary | Handles CVEs, outdated versions, licenses, and SBOM generation |
+| `x-generate-security-dashboard` | reads | Dashboard aggregates results from this skill |
+| `x-generate-ci` | called-by | Security pipeline may invoke supply chain audit |
 
 ## Knowledge Pack References
 

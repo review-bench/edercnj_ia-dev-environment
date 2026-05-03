@@ -1,11 +1,11 @@
-# x-arch-plan
+# x-plan-architecture
 
 > Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-arch-plan [STORY-ID or feature-name]` |
+| **Invocation** | `/x-plan-architecture [STORY-ID or feature-name]` |
 | **Reads** | architecture, protocols, security, observability, infrastructure, resilience, compliance |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Produces a structured architecture plan with 13 sections covering component diag
 ## Usage
 
 ```
-/x-arch-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md
-/x-arch-plan "Payment Gateway Integration"
+/x-plan-architecture ai/epics/epic-XXXX/story-XXXX-YYYY.md
+/x-plan-architecture "Payment Gateway Integration"
 ```
 
 ## Workflow
@@ -38,6 +38,6 @@ Produces a structured architecture plan with 13 sections covering component diag
 
 ## See Also
 
-- [x-arch-update](../x-arch-update/) — Incrementally update service architecture doc from plans
-- [x-adr-generate](../x-adr-generate/) — Expand mini-ADRs into full ADR files
-- [x-task-implement](../x-task-implement/) — Implement the feature using the architecture plan
+- [x-update-architecture](../x-update-architecture/) — Incrementally update service architecture doc from plans
+- [x-generate-adr](../x-generate-adr/) — Expand mini-ADRs into full ADR files
+- [x-implement-task](../x-implement-task/) — Implement the feature using the architecture plan

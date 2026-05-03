@@ -1,11 +1,11 @@
-# x-task-plan
+# x-plan-task
 
 > Generates a detailed implementation plan for an individual task with per-task TDD cycle mapping (TPP order), file impact analysis by architecture layer, security checklist by task type, and integration points. Reads the task definition from story Section 8 and produces a self-contained execution guide.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-task-plan [STORY-ID] --task [TASK-ID] [--force]` |
+| **Invocation** | `/x-plan-task [STORY-ID] --task [TASK-ID] [--force]` |
 | **Reads** | testing, architecture, security, coding-standards |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Produces a self-contained implementation plan for a single task extracted from a
 ## Usage
 
 ```
-/x-task-plan story-0029-0001 --task TASK-0029-0001-001
-/x-task-plan story-0029-0001 --task TASK-0029-0001-001 --force
+/x-plan-task story-0029-0001 --task TASK-0029-0001-001
+/x-plan-task story-0029-0001 --task TASK-0029-0001-001 --force
 ```
 
 ## Flags
@@ -70,7 +70,7 @@ Produces a self-contained implementation plan for a single task extracted from a
 
 ## See Also
 
-- [x-story-plan](../x-story-plan/) -- Multi-agent story planning (generates task breakdown consumed by this skill)
-- [x-story-implement](../x-story-implement/) -- Full lifecycle orchestrator (reads task plans in PRE_PLANNED mode)
-- [x-task-implement](../x-task-implement/) -- Implementation skill (uses task plans as execution guides)
-- [x-test-plan](../x-test-plan/) -- Story-level test planning (complementary to per-task TDD cycles)
+- [x-plan-story](../x-plan-story/) -- Multi-agent story planning (generates task breakdown consumed by this skill)
+- [x-implement-story](../x-implement-story/) -- Full lifecycle orchestrator (reads task plans in PRE_PLANNED mode)
+- [x-implement-task](../x-implement-task/) -- Implementation skill (uses task plans as execution guides)
+- [x-plan-tests](../x-plan-tests/) -- Story-level test planning (complementary to per-task TDD cycles)

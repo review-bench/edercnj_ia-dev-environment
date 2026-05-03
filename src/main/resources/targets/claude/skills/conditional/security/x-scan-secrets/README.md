@@ -1,4 +1,4 @@
-# x-security-secrets
+# x-scan-secrets
 
 > Scans code and git history for leaked credentials, API keys, tokens, and secrets. Produces SARIF output with scoring and CI integration.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `security.scanning.secretScan = true` |
-| **Invocation** | `/x-security-secrets [--scope current\|history\|both] [--baseline path] [--since-commit SHA]` |
+| **Invocation** | `/x-scan-secrets [--scope current\|history\|both] [--baseline path] [--since-commit SHA]` |
 | **Reads** | security (references: sarif-template, security-scoring, security-skill-template) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -22,14 +22,14 @@ Detects leaked secrets (API keys, tokens, passwords, certificates, connection st
 ## Usage
 
 ```
-/x-security-secrets
-/x-security-secrets --scope history
-/x-security-secrets --scope both --since-commit abc123
-/x-security-secrets --baseline .gitleaks-baseline.json
+/x-scan-secrets
+/x-scan-secrets --scope history
+/x-scan-secrets --scope both --since-commit abc123
+/x-scan-secrets --baseline .gitleaks-baseline.json
 ```
 
 ## See Also
 
-- [x-security-sast](../x-security-sast/) -- Static code analysis for security vulnerabilities
-- [x-security-container](../x-security-container/) -- Container image vulnerability scanning
-- [x-security-sonar](../x-security-sonar/) -- SonarQube quality gate enforcement
+- [x-run-sast](../x-run-sast/) -- Static code analysis for security vulnerabilities
+- [x-scan-container-security](../x-scan-container-security/) -- Container image vulnerability scanning
+- [x-run-sonar-security](../x-run-sonar-security/) -- SonarQube quality gate enforcement

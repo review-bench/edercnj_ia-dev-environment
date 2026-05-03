@@ -1,5 +1,5 @@
 ---
-name: x-test-smoke-socket
+name: x-execute-socket-smoke-tests
 description: "Runs automated smoke tests against the TCP socket server using a standalone Java client with message framing and protocol validation."
 user-invocable: true
 allowed-tools: Read, Bash
@@ -25,10 +25,10 @@ Include this skill when smoke_tests is enabled AND "tcp-custom" is in protocols.
 
 ## Triggers
 
-- `/x-test-smoke-socket` -- run all scenarios against local environment
-- `/x-test-smoke-socket --k8s` -- run with automatic port-forward (orchestrator)
-- `/x-test-smoke-socket --k8s --scenario echo` -- run specific scenario
-- `/x-test-smoke-socket --host 10.0.0.1 --port 8583` -- run against custom host/port
+- `/x-execute-socket-smoke-tests` -- run all scenarios against local environment
+- `/x-execute-socket-smoke-tests --k8s` -- run with automatic port-forward (orchestrator)
+- `/x-execute-socket-smoke-tests --k8s --scenario echo` -- run specific scenario
+- `/x-execute-socket-smoke-tests --host 10.0.0.1 --port 8583` -- run against custom host/port
 
 ## Parameters
 
@@ -101,7 +101,7 @@ Automatic via trap EXIT:
 |------|-------------|
 | `smoke-tests/socket/pom.xml` | Client build file (executable JAR) |
 | `smoke-tests/socket/src/` | Java client source code |
-| `smoke-tests/socket/x-test-smoke-socket.sh` | Execution script |
+| `smoke-tests/socket/x-execute-socket-smoke-tests.sh` | Execution script |
 
 ## Client Architecture
 

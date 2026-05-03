@@ -1,5 +1,5 @@
 ---
-name: x-test-performance
+name: x-execute-performance-tests
 description: "Stack-aware performance skill: reads QualityConfig.performance SLOs, dispatches to Newman (REST), ghz (gRPC), hyperfine (CLI), Artillery (GraphQL), or custom harness (Socket), compares against governance/baselines/performance-baseline.json, and blocks merge on regression > tolerance."
 visibility: public
 user-invocable: true
@@ -21,7 +21,7 @@ argument-hint: "<STORY-ID> [--stack rest|grpc|cli|graphql|socket] [--update-base
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: x-test-performance
+# Skill: x-execute-performance-tests
 
 Stack-aware CI performance gate. Reads `QualityConfig.performance` from the project YAML,
 dispatches to the correct load-testing tool per stack, compares p50/p95/p99 results
@@ -30,11 +30,11 @@ regression exceeds `baseline-tolerance-pct`.
 
 ## Triggers
 
-- `/x-test-performance story-0072-0002` — auto-detects stack from `interfaces[]`
-- `/x-test-performance story-0072-0002 --stack rest` — force REST dispatch
-- `/x-test-performance story-0072-0002 --stack grpc` — force gRPC dispatch
-- `/x-test-performance story-0072-0002 --update-baseline` — write new baseline (explicit opt-in)
-- `/x-test-performance story-0072-0002 --smoke-only` — run smoke test, skip SLO comparison
+- `/x-execute-performance-tests story-0072-0002` — auto-detects stack from `interfaces[]`
+- `/x-execute-performance-tests story-0072-0002 --stack rest` — force REST dispatch
+- `/x-execute-performance-tests story-0072-0002 --stack grpc` — force gRPC dispatch
+- `/x-execute-performance-tests story-0072-0002 --update-baseline` — write new baseline (explicit opt-in)
+- `/x-execute-performance-tests story-0072-0002 --smoke-only` — run smoke test, skip SLO comparison
 
 ## Parameters
 
@@ -258,7 +258,7 @@ Smoke tests use containers (`--platform=linux/amd64`) — no local binary instal
 |-----------|-------------|
 | `QualityConfig.performance` | Reads enabled, baselineTolerancePct, slo.* |
 | `governance/baselines/performance-baseline.json` | Read for comparison; written with `--update-baseline` |
-| `x-story-implement` Phase 3 | Invokes this skill as MANDATORY conditional (story-0072-0008) |
+| `x-implement-story` Phase 3 | Invokes this skill as MANDATORY conditional (story-0072-0008) |
 | `audit-performance-baseline.sh` | Camada 2 CI gate verifying baseline schema (story-0072-0005) |
 | KP `performance-rest` / `performance-grpc` / `performance-cli` / `performance-graphql` / `performance-socket` | Stack-specific tooling reference |
 

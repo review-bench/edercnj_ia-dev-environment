@@ -1,11 +1,11 @@
-# x-hardening-eval
+# x-evaluate-hardening
 
 > Evaluates application hardening posture against CIS and OWASP benchmarks: HTTP security headers, TLS configuration, CORS policy, cookie security, error handling, input limits, and information disclosure. Produces SARIF output with weighted scoring.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-hardening-eval --target <url> [--scope all\|headers\|tls\|cors\|cookies\|errors\|limits\|disclosure] [--benchmark cis\|owasp] [--level L1\|L2\|L3]` |
+| **Invocation** | `/x-evaluate-hardening --target <url> [--scope all\|headers\|tls\|cors\|cookies\|errors\|limits\|disclosure] [--benchmark cis\|owasp] [--level L1\|L2\|L3]` |
 | **Reads** | `knowledge/security/security-principles.md`, `knowledge/security/application-security.md`, `knowledge/security/cryptography.md` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,9 +17,9 @@ Evaluates the defensive posture of a running application against CIS and OWASP b
 ## Usage
 
 ```
-/x-hardening-eval --target https://app.example.com
-/x-hardening-eval --target https://app.example.com --scope headers
-/x-hardening-eval --target https://app.example.com --benchmark cis --level L2
+/x-evaluate-hardening --target https://app.example.com
+/x-evaluate-hardening --target https://app.example.com --scope headers
+/x-evaluate-hardening --target https://app.example.com --benchmark cis --level L2
 ```
 
 ## Workflow
@@ -40,6 +40,6 @@ Evaluates the defensive posture of a running application against CIS and OWASP b
 
 ## See Also
 
-- [x-runtime-eval](../x-runtime-eval/) -- Runtime protection controls (rate limiting, WAF, bot protection)
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification with ASVS mapping
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from all scanning skills
+- [x-evaluate-runtime](../x-evaluate-runtime/) -- Runtime protection controls (rate limiting, WAF, bot protection)
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification with ASVS mapping
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from all scanning skills

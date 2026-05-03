@@ -1,8 +1,8 @@
 <!-- Returns to [slim body](../SKILL.md) after reading this section. -->
 
-# x-task-implement — TDD Cycle Tracking Protocol (Rule 25)
+# x-implement-task — TDD Cycle Tracking Protocol (Rule 25)
 
-Canonical protocol for Phase 2 (TDD Cycles) of `x-task-implement`.
+Canonical protocol for Phase 2 (TDD Cycles) of `x-implement-task`.
 Supersedes inline Step 2 notes in `full-protocol.md` for Rule 25 tracking.
 
 ## Overview
@@ -57,7 +57,7 @@ TaskUpdate(id: tddCycleTaskIds[N].red, status: "in_progress")
 Write failing test (name: [method]_[scenario]_[expected]).
 Run: {{TEST_COMMAND}} — MUST fail (exit non-zero). If test passes, throw RED_NOT_OBSERVED.
 
-Skill(skill: "x-git-commit", model: "haiku",
+Skill(skill: "x-commit-changes", model: "haiku",
       args: "--type test --scope {scope} --subject \"add failing test UT-N (RED)\"")
 
 TaskUpdate(id: tddCycleTaskIds[N].red, status: "completed")
@@ -68,7 +68,7 @@ TaskUpdate(id: tddCycleTaskIds[N].green, status: "in_progress")
 Write minimum production code to make the test pass.
 Run: {{COMPILE_COMMAND}} && {{TEST_COMMAND}} — ALL must pass.
 
-Skill(skill: "x-git-commit", model: "haiku",
+Skill(skill: "x-commit-changes", model: "haiku",
       args: "--type feat --scope {scope} --subject \"implement UT-N (GREEN)\"")
 
 TaskUpdate(id: tddCycleTaskIds[N].green, status: "completed")
@@ -82,7 +82,7 @@ Improve design without adding behavior:
   - Improve naming
 Run: {{TEST_COMMAND}} — MUST stay GREEN. If tests fail, throw REFACTOR_BROKE_TESTS.
 
-Skill(skill: "x-git-commit", model: "haiku",
+Skill(skill: "x-commit-changes", model: "haiku",
       args: "--type refactor --scope {scope} --subject \"improve UT-N\"")
 
 TaskUpdate(id: tddCycleTaskIds[N].refactor, status: "completed")
@@ -94,8 +94,8 @@ After the loop completes all N cycles, invoke the wave gate to verify every
 cycle task (Red/Green/Refactor × N) has status `completed`:
 
 ```
-Skill(skill: "x-internal-phase-gate", model: "haiku",
-      args: "--mode wave --skill x-task-implement --phase Phase-2-TDD
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku",
+      args: "--mode wave --skill x-implement-task --phase Phase-2-TDD
              --expected-tasks {comma-separated list of all tddCycleTaskIds}")
 ```
 

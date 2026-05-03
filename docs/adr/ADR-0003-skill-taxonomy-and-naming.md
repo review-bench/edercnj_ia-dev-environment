@@ -29,7 +29,7 @@ The `skills/` tree under `java/src/main/resources/targets/claude/` currently sto
 
 4. **Hardcoded grouping in Java.** `SkillGroupRegistry.java` hardcodes 8 groups (`story`, `dev`, `review`, `testing`, `infrastructure`, `knowledge-packs`, `git-troubleshooting`, `lib`) used exclusively by `GithubSkillsAssembler` to partition skills for the GitHub Copilot output. The filesystem has no equivalent grouping, creating two sources of truth that must be kept in sync manually.
 
-5. **Inconsistent post-fixes in the security cluster.** `x-hardening-eval` uses `-eval`, `x-runtime-protection` uses `-protection` (a noun), `x-security-secret-scan` uses `-scan` (while siblings like `x-security-sast` omit the suffix).
+5. **Inconsistent post-fixes in the security cluster.** `x-evaluate-hardening` uses `-eval`, `x-runtime-protection` uses `-protection` (a noun), `x-security-secret-scan` uses `-scan` (while siblings like `x-run-sast` omit the suffix).
 
 6. **Documented problem statement scale.** The refactor has to update approximately 133 textual references to skills across `rules/`, cross-skill invocation bodies, `CLAUDE.md`, `README.md`, and plan/review templates.
 
@@ -62,9 +62,9 @@ Reorganize **only** `java/src/main/resources/targets/claude/skills/` into catego
 
 **Edge cases (explicit):**
 - `x-review-security` → **review** (intention: review code; `security/` is for automated scans and posture evaluation).
-- `x-code-audit` → **review** (it is a mega-review orchestrator, not a formatter).
-- `x-threat-model` → **plan** (produces a design artifact, not a scan).
-- `x-perf-profile` → **ops** (runtime profiler execution).
+- `x-audit-code` → **review** (it is a mega-review orchestrator, not a formatter).
+- `x-model-threats` → **plan** (produces a design artifact, not a scan).
+- `x-profile-performance` → **ops** (runtime profiler execution).
 - Unified `run-*` runners → **test**.
 
 **Out of scope:**
@@ -82,52 +82,52 @@ The `x-` namespace prefix is kept (it avoids collision with built-in Claude Code
 | `x-story-epic`              | `x-epic-create`        | Explicit verb; creates the epic document                              |
 | `x-story-epic-full`         | `x-epic-decompose`     | Distinguished from `-create`: decomposes an epic into stories + map   |
 | `x-story-create`            | `x-story-create`       | Keep — already clear                                                  |
-| `x-story-plan`              | `x-story-plan`         | Keep — multi-agent planning of a single story                         |
+| `x-plan-story`              | `x-plan-story`         | Keep — multi-agent planning of a single story                         |
 | `x-story-map`               | `x-epic-map`           | Produces an epic-level IMPLEMENTATION-MAP; current name is misleading |
-| `x-task-plan`               | `x-task-plan`          | Keep                                                                  |
-| `x-epic-plan`               | `x-epic-orchestrate`   | It is a multi-story orchestrator, not a planner                       |
-| `x-dev-implement`           | `x-task-implement`     | Runs a single task (TDD loop)                                         |
-| `x-dev-story-implement`     | `x-story-implement`    | Removes redundant `dev-` prefix (category is already `dev`)          |
-| `x-dev-epic-implement`      | `x-epic-implement`     | Same                                                                  |
-| `x-dev-architecture-plan`   | `x-arch-plan`          | Shorter, unambiguous                                                  |
-| `x-dev-arch-update`         | `x-arch-update`        | Parallel to `x-arch-plan`                                             |
-| `x-dev-adr-automation`      | `x-adr-generate`       | Verb + artifact                                                       |
+| `x-plan-task`               | `x-plan-task`          | Keep                                                                  |
+| `x-epic-plan`               | `x-orchestrate-epic`   | It is a multi-story orchestrator, not a planner                       |
+| `x-dev-implement`           | `x-implement-task`     | Runs a single task (TDD loop)                                         |
+| `x-dev-story-implement`     | `x-implement-story`    | Removes redundant `dev-` prefix (category is already `dev`)          |
+| `x-dev-epic-implement`      | `x-implement-epic`     | Same                                                                  |
+| `x-dev-architecture-plan`   | `x-plan-architecture`          | Shorter, unambiguous                                                  |
+| `x-dev-arch-update`         | `x-update-architecture`        | Parallel to `x-plan-architecture`                                             |
+| `x-dev-adr-automation`      | `x-generate-adr`       | Verb + artifact                                                       |
 
 The resulting **epic → story → task** axis is crisp:
 - **Create document:** `x-epic-create`, `x-story-create`.
-- **Plan / decompose:** `x-epic-decompose`, `x-epic-map`, `x-story-plan`, `x-task-plan`.
-- **Orchestrate / execute:** `x-epic-orchestrate`, `x-story-implement`, `x-task-implement`, `x-epic-implement`.
+- **Plan / decompose:** `x-epic-decompose`, `x-epic-map`, `x-plan-story`, `x-plan-task`.
+- **Orchestrate / execute:** `x-orchestrate-epic`, `x-implement-story`, `x-implement-task`, `x-implement-epic`.
 
 **`run-*` prefix unification:**
 
 | Current                | New                    |
 |------------------------|------------------------|
-| `run-e2e`              | `x-test-e2e`           |
-| `run-smoke-api`        | `x-test-smoke-api`     |
-| `run-smoke-socket`     | `x-test-smoke-socket`  |
-| `run-contract-tests`   | `x-test-contract`      |
-| `run-perf-test`        | `x-test-perf`          |
+| `run-e2e`              | `x-execute-e2e-tests`           |
+| `run-smoke-api`        | `x-execute-api-smoke-tests`     |
+| `run-smoke-socket`     | `x-execute-socket-smoke-tests`  |
+| `run-contract-tests`   | `x-execute-contract-tests`      |
+| `run-perf-test`        | `x-run-perf-tests`          |
 
 **Pointwise simplifications:**
 
 | Current                      | New                     | Why                                                  |
 |------------------------------|-------------------------|------------------------------------------------------|
-| `x-pr-fix-comments`          | `x-pr-fix`              | "comments" is redundant in the `pr` category        |
-| `x-pr-fix-epic-comments`     | `x-pr-fix-epic`         | Same                                                 |
-| `x-runtime-protection`       | `x-runtime-eval`        | Symmetry with `x-hardening-eval`                     |
-| `x-security-secret-scan`     | `x-security-secrets`    | Consistency with other `x-security-*` siblings       |
+| `x-pr-fix-comments`          | `x-fix-pr`              | "comments" is redundant in the `pr` category        |
+| `x-pr-fix-epic-comments`     | `x-fix-epic-pr`         | Same                                                 |
+| `x-runtime-protection`       | `x-evaluate-runtime`        | Symmetry with `x-evaluate-hardening`                     |
+| `x-security-secret-scan`     | `x-scan-secrets`    | Consistency with other `x-security-*` siblings       |
 
 **Kept as is** (already clear and internally consistent within their cluster):
-- `x-review`, `x-review-pr`, `x-review-qa`, `x-review-perf`, `x-review-api`, `x-review-db`, `x-review-devops`, `x-review-events`, `x-review-obs`, `x-review-security`, `x-review-graphql`, `x-review-grpc`, `x-review-gateway`, `x-review-compliance`, `x-review-data-modeling`
-- `x-code-audit`, `x-code-format`, `x-code-lint`
-- `x-git-commit`, `x-git-push`, `x-git-worktree`
-- `x-pr-create`
-- `x-security-dashboard`, `x-security-pipeline`, `x-security-sast`, `x-security-dast`, `x-security-container`, `x-security-sonar`, `x-security-pentest`, `x-security-infra`
-- `x-owasp-scan`, `x-hardening-eval`, `x-threat-model`, `x-dependency-audit`, `x-supply-chain-audit`
-- `x-ops-troubleshoot`, `x-ops-incident`
-- `x-release`, `x-release-changelog`
-- `x-doc-generate`, `x-perf-profile`, `x-spec-drift`, `x-ci-generate`, `x-setup-env`, `x-setup-stack`, `x-mcp-recommend`, `x-obs-instrument`, `x-test-plan`, `x-test-tdd`, `x-test-run`, `x-test-contract-lint`
-- `x-jira-create-epic`, `x-jira-create-stories`
+- `x-review-codebase`, `x-review-pr`, `x-review-qa`, `x-review-performance`, `x-review-api`, `x-review-database`, `x-review-devops`, `x-review-events`, `x-review-observability`, `x-review-security`, `x-review-graphql`, `x-review-grpc`, `x-review-gateway`, `x-review-compliance`, `x-review-data-modeling`
+- `x-audit-code`, `x-format-code`, `x-lint-code`
+- `x-commit-changes`, `x-push-branch`, `x-manage-worktrees`
+- `x-create-pr`
+- `x-generate-security-dashboard`, `x-generate-security-pipeline`, `x-run-sast`, `x-run-dast`, `x-scan-container-security`, `x-run-sonar-security`, `x-run-pentest`, `x-assess-infrastructure-security`
+- `x-scan-owasp`, `x-evaluate-hardening`, `x-model-threats`, `x-audit-dependencies`, `x-audit-supply-chain`
+- `x-troubleshoot-operations`, `x-handle-incident`
+- `x-release`, `x-generate-release-changelog`
+- `x-generate-docs`, `x-profile-performance`, `x-detect-spec-drift`, `x-generate-ci`, `x-setup-env`, `x-setup-stack`, `x-recommend-mcp`, `x-instrument-observability`, `x-plan-tests`, `x-drive-tdd`, `x-execute-tests`, `x-lint-contract-tests`
+- `x-create-jira-epic`, `x-create-jira-stories`
 
 ### D4 — Hard rename, no aliases
 

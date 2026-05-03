@@ -1,5 +1,5 @@
 ---
-name: x-hardening-eval
+name: x-evaluate-hardening
 description: "Evaluates application hardening posture against CIS and OWASP benchmarks: HTTP security headers, TLS configuration, CORS policy, cookie security, error handling, input limits, and information disclosure. Produces SARIF output with weighted scoring."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
@@ -21,11 +21,11 @@ Evaluates the defensive posture of {{PROJECT_NAME}} against recognized benchmark
 
 ## Triggers
 
-- `/x-hardening-eval --target <url>` — full hardening evaluation (all dimensions, OWASP benchmark, L1)
-- `/x-hardening-eval --target <url> --scope headers` — evaluate HTTP security headers only
-- `/x-hardening-eval --target <url> --scope tls` — evaluate TLS configuration only
-- `/x-hardening-eval --target <url> --benchmark cis` — evaluate against CIS benchmark
-- `/x-hardening-eval --target <url> --level L2` — evaluate against ASVS Level 2
+- `/x-evaluate-hardening --target <url>` — full hardening evaluation (all dimensions, OWASP benchmark, L1)
+- `/x-evaluate-hardening --target <url> --scope headers` — evaluate HTTP security headers only
+- `/x-evaluate-hardening --target <url> --scope tls` — evaluate TLS configuration only
+- `/x-evaluate-hardening --target <url> --benchmark cis` — evaluate against CIS benchmark
+- `/x-evaluate-hardening --target <url> --level L2` — evaluate against ASVS Level 2
 
 ## Parameters
 
@@ -243,7 +243,7 @@ Write SARIF to `results/security/hardening-eval-YYYY-MM-DD.sarif.json`:
   "runs": [{
     "tool": {
       "driver": {
-        "name": "x-hardening-eval",
+        "name": "x-evaluate-hardening",
         "version": "1.0.0",
         "rules": [
           {
@@ -358,7 +358,7 @@ Write report to `results/security/hardening-eval-YYYY-MM-DD.md`:
 ```yaml
 - name: Hardening Eval
   run: |
-    /x-hardening-eval --target ${{ env.APP_URL }} \
+    /x-evaluate-hardening --target ${{ env.APP_URL }} \
       --benchmark owasp --level L1
     # Upload SARIF to GitHub Security tab
     gh api repos/${{ github.repository }}/code-scanning/sarifs \
@@ -371,7 +371,7 @@ Write report to `results/security/hardening-eval-YYYY-MM-DD.md`:
 hardening-eval:
   stage: security
   script:
-    - /x-hardening-eval --target $APP_URL --benchmark owasp --level L1
+    - /x-evaluate-hardening --target $APP_URL --benchmark owasp --level L1
   artifacts:
     reports:
       sast: results/security/hardening-eval-*.sarif.json
@@ -393,8 +393,8 @@ hardening-eval:
 | Skill | Relationship | Context |
 |-------|-------------|---------|
 | `security-engineer` agent | calls | Used for in-depth analysis via Agent tool |
-| `x-security-dashboard` | reads | Dashboard aggregates results from this skill |
-| `x-owasp-scan` | complementary | OWASP scan covers application-level vulnerabilities; hardening covers infrastructure posture |
+| `x-generate-security-dashboard` | reads | Dashboard aggregates results from this skill |
+| `x-scan-owasp` | complementary | OWASP scan covers application-level vulnerabilities; hardening covers infrastructure posture |
 
 ## Knowledge Pack References
 

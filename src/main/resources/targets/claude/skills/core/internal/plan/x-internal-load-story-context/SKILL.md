@@ -1,6 +1,6 @@
 ---
-name: x-internal-story-load-context
-description: "Loads a story file, validates predecessor dependencies against execution-state.json, executes artifact pre-checks (mtime-based staleness detection across the 7 planning artifacts), classifies scope (SIMPLE / STANDARD / COMPLEX) from task-count + Gherkin-scenario heuristics, and detects planning mode (PRE_PLANNED / HYBRID / INLINE). Replaces ~140 lines of inline Phase 0 logic previously duplicated inside x-story-implement. Fourth skill in the x-internal-* convention (after x-internal-status-update pilot, x-internal-report-write, and x-internal-args-normalize): internal visibility, non-user-invocable, read-only, subdir scoping under internal/plan/."
+name: x-internal-load-story-context
+description: "Loads a story file, validates predecessor dependencies against execution-state.json, executes artifact pre-checks (mtime-based staleness detection across the 7 planning artifacts), classifies scope (SIMPLE / STANDARD / COMPLEX) from task-count + Gherkin-scenario heuristics, and detects planning mode (PRE_PLANNED / HYBRID / INLINE). Replaces ~140 lines of inline Phase 0 logic previously duplicated inside x-implement-story. Fourth skill in the x-internal-* convention (after x-internal-update-status pilot, x-internal-write-report, and x-internal-normalize-args): internal visibility, non-user-invocable, read-only, subdir scoping under internal/plan/."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,19 +19,19 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-story-implement (Phase 0 carve-out).
-> Quarta skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006, e
-> x-internal-args-normalize 0049-0007). Primeira skill na subdir
+> Caller principal: x-implement-story (Phase 0 carve-out).
+> Quarta skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006, e
+> x-internal-normalize-args 0049-0007). Primeira skill na subdir
 > `internal/plan/` (as três anteriores vivem em `internal/ops/`): o subdir
 > reflete categoria funcional — esta skill orquestra lógica de planejamento
 > (load+classify), não runtime ops (mutate/write).
 
-# Skill: x-internal-story-load-context
+# Skill: x-internal-load-story-context
 
 ## Purpose
 
-Carve out Phase 0 of `x-story-implement` into a single-responsibility,
+Carve out Phase 0 of `x-implement-story` into a single-responsibility,
 read-only Bash pipeline. The skill:
 
 1. Resolves and reads the story file under
@@ -50,14 +50,14 @@ read-only Bash pipeline. The skill:
    missing), `INLINE` (zero fresh).
 
 The output is a single-line JSON envelope consumed by
-`x-story-implement` to drive the subsequent Phase 0.5 / Phase 1 /
+`x-implement-story` to drive the subsequent Phase 0.5 / Phase 1 /
 Phase 1.5 branching. The skill **never** mutates the filesystem.
 
 ## Convention Anchors (x-internal-*)
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-story-load-context/` | `internal/` prefix scopes visibility; `plan/` aligns with sibling planning-category skills (x-story-plan, x-epic-map) and separates from `internal/ops/` siblings that mutate state |
+| Path | `internal/plan/x-internal-load-story-context/` | `internal/` prefix scopes visibility; `plan/` aligns with sibling planning-category skills (x-plan-story, x-epic-map) and separates from `internal/ops/` siblings that mutate state |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -71,12 +71,12 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-story-load-context` in chat. All
+by a human typing `/x-internal-load-story-context` in chat. All
 invocations follow Rule 13 INLINE-SKILL pattern from a calling
 orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-story-load-context",
+Skill(skill: "x-internal-load-story-context",
       args: "--story-id story-0049-0011 --epic-id 0049")
 ```
 
@@ -242,7 +242,7 @@ Exit 0.
 ### Example 1 — Happy path: simple story, no dependencies, no planning yet
 
 ```bash
-Skill(skill: "x-internal-story-load-context",
+Skill(skill: "x-internal-load-story-context",
       args: "--story-id story-0049-0001 --epic-id 0049")
 ```
 
@@ -255,7 +255,7 @@ Exit: 0.
 ### Example 2 — Dependency not DONE
 
 ```bash
-Skill(skill: "x-internal-story-load-context",
+Skill(skill: "x-internal-load-story-context",
       args: "--story-id story-0049-0008 --epic-id 0049")
 ```
 
@@ -280,7 +280,7 @@ Output contains `"scope":"COMPLEX"` and `"taskCount":10`. Exit: 0.
 ### Example 5 — Missing story file
 
 ```bash
-Skill(skill: "x-internal-story-load-context",
+Skill(skill: "x-internal-load-story-context",
       args: "--story-id story-9999-0001 --epic-id 9999")
 ```
 
@@ -347,7 +347,7 @@ Section 7 of story-0049-0011:
 5. **Boundary — COMPLEX scope.** Story with 10 tasks → `scope=COMPLEX`.
 
 Goldens under
-`src/test/resources/golden/internal/plan/x-internal-story-load-context/`
+`src/test/resources/golden/internal/plan/x-internal-load-story-context/`
 lock the SKILL.md rendering. Coverage requirement: ≥ 95% line /
 ≥ 90% branch across the invoking Bash codepaths.
 
@@ -381,11 +381,11 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-story-implement` | caller (primary) | Phase 0 carve-out: the skill's stdout envelope replaces ~140 inline lines previously executed by the orchestrator |
-| `x-epic-implement` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating stories at the epic scope |
-| `x-internal-status-update` | peer | Sibling `x-internal-*` skill; this skill *reads* `execution-state.json`, the other *mutates* it; both acquire the same `<file>.lock` when their lifetimes overlap (this skill uses `flock -s` shared lock) |
-| `x-internal-args-normalize` | delegate (optional) | Future refactor: the argument parser in Step 1 can be replaced by a call to `x-internal-args-normalize` once its schema-driven mode covers read-only skills |
-| `x-status-reconcile` | consumer (peer) | Reads the same story `**Status:**` header this skill inspects; no shared mutation |
+| `x-implement-story` | caller (primary) | Phase 0 carve-out: the skill's stdout envelope replaces ~140 inline lines previously executed by the orchestrator |
+| `x-implement-epic` | caller (indirect, via story-0049-0019 downstream) | Consumes the same envelope when iterating stories at the epic scope |
+| `x-internal-update-status` | peer | Sibling `x-internal-*` skill; this skill *reads* `execution-state.json`, the other *mutates* it; both acquire the same `<file>.lock` when their lifetimes overlap (this skill uses `flock -s` shared lock) |
+| `x-internal-normalize-args` | delegate (optional) | Future refactor: the argument parser in Step 1 can be replaced by a call to `x-internal-normalize-args` once its schema-driven mode covers read-only skills |
+| `x-reconcile-status` | consumer (peer) | Reads the same story `**Status:**` header this skill inspects; no shared mutation |
 
 Downstream stories that depend on this carve-out:
 story-0049-0019 (orchestrator consumes the envelope and deletes the

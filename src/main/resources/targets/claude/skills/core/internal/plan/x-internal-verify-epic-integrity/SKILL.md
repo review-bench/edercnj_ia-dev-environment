@@ -1,6 +1,6 @@
 ---
-name: x-internal-epic-integrity-gate
-description: "Executes the epic-level verification gate end-to-end (Phase 1.7 / Phase 4 carve-out of x-epic-implement) on the epic/XXXX branch HEAD: checks out the branch, runs mvn clean test + jacoco:report, parses filtered coverage against epic-level thresholds (default line >=95, branch >=90), runs a declarative DoD checklist (presence of tests, tasks DONE, CHANGELOG entry, ADR references), and emits a single-line JSON envelope {passed, failures, coverageDelta, dodChecklist}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, and x-internal-story-verify). Isolates ~180 inline lines of integrity-gate logic from x-epic-implement."
+name: x-internal-verify-epic-integrity
+description: "Executes the epic-level verification gate end-to-end (Phase 1.7 / Phase 4 carve-out of x-implement-epic) on the epic/XXXX branch HEAD: checks out the branch, runs mvn clean test + jacoco:report, parses filtered coverage against epic-level thresholds (default line >=95, branch >=90), runs a declarative DoD checklist (presence of tests, tasks DONE, CHANGELOG entry, ADR references), and emits a single-line JSON envelope {passed, failures, coverageDelta, dodChecklist}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, and x-internal-verify-story). Isolates ~180 inline lines of integrity-gate logic from x-implement-epic."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
@@ -19,24 +19,24 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: `x-epic-implement` (Phase 1.7 / Phase 4 carve-out).
-> Sétima skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, x-internal-story-load-context
-> 0049-0011, x-internal-story-build-plan 0049-0012, e
-> x-internal-story-verify 0049-0014). Quarta skill na subdir
+> Caller principal: `x-implement-epic` (Phase 1.7 / Phase 4 carve-out).
+> Sétima skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, x-internal-build-story-plan 0049-0012, e
+> x-internal-verify-story 0049-0014). Quarta skill na subdir
 > `internal/plan/` — o subdir `plan/` agrupa skills que orquestram
 > planejamento e verificação (load → build → verify → integrity-gate).
 > Difere de `internal/ops/`, cujas sibling skills mutam estado
 > (`execution-state.json`, reports).
 
-# Skill: x-internal-epic-integrity-gate
+# Skill: x-internal-verify-epic-integrity
 
 ## Purpose
 
-Carve out the epic-level integrity gate of `x-epic-implement` (the
+Carve out the epic-level integrity gate of `x-implement-epic` (the
 ~180 inline lines documented in `references/integrity-gate.md` of
-`x-epic-implement`) into a single, single-responsibility skill with a
+`x-implement-epic`) into a single, single-responsibility skill with a
 stable JSON envelope. The orchestrator shrinks to a read-the-envelope
 consumer that drives its phase-advance / regression-diagnosis branching
 off the four response fields.
@@ -65,11 +65,11 @@ Responsibilities (single):
 Non-responsibilities (explicit):
 
 - The skill does NOT dispatch specialist reviews or the Tech Lead
-  review — those stay in `x-epic-implement` Phase 4.4 / 4.6.
+  review — those stay in `x-implement-epic` Phase 4.4 / 4.6.
 - The skill does NOT mutate `execution-state.json`, `**Status:**`
   headers, or IMPLEMENTATION-MAP — those belong to
-  `x-internal-status-update`.
-- The skill does NOT write reports; `x-internal-report-write` renders
+  `x-internal-update-status`.
+- The skill does NOT write reports; `x-internal-write-report` renders
   the phase-completion report off the envelope this skill emits.
 - The skill does NOT perform regression diagnosis (failed-test → story
   correlation) — that stays in the orchestrator, which consumes
@@ -81,7 +81,7 @@ Non-responsibilities (explicit):
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-epic-integrity-gate/` | `internal/` prefix scopes visibility; `plan/` co-locates with sibling verification carve-outs (`x-internal-story-verify`, `x-internal-epic-build-plan`) |
+| Path | `internal/plan/x-internal-verify-epic-integrity/` | `internal/` prefix scopes visibility; `plan/` co-locates with sibling verification carve-outs (`x-internal-verify-story`, `x-internal-build-epic-plan`) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
@@ -95,17 +95,17 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never
-invoked by a human typing `/x-internal-epic-integrity-gate` in chat.
+invoked by a human typing `/x-internal-verify-epic-integrity` in chat.
 All invocations follow the Rule 13 INLINE-SKILL pattern from a
 calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049")
 ```
 
 ```markdown
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049 --branch epic/0049 --coverage-threshold-line 90 --coverage-threshold-branch 85")
 ```
 
@@ -288,7 +288,7 @@ jq -nc \
 ### Example 1 — Happy path: gate passes on clean epic branch
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049")
 ```
 
@@ -303,7 +303,7 @@ Exit: 0.
 ### Example 2 — Coverage below threshold
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049")
 ```
 
@@ -314,7 +314,7 @@ Exit: 3.
 ### Example 3 — Test failure
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049")
 ```
 
@@ -324,7 +324,7 @@ emitted.
 ### Example 4 — Branch not found
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 9999")
 ```
 
@@ -333,7 +333,7 @@ Stderr: `Branch epic/9999 not found`. Exit: 1. No envelope emitted.
 ### Example 5 — Boundary: coverage exactly on threshold
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049")
 ```
 
@@ -343,7 +343,7 @@ Exit: 0.
 ### Example 6 — Custom thresholds (per-epic override)
 
 ```bash
-Skill(skill: "x-internal-epic-integrity-gate",
+Skill(skill: "x-internal-verify-epic-integrity",
       args: "--epic-id 0049 --coverage-threshold-line 80 --coverage-threshold-branch 75")
 ```
 
@@ -438,7 +438,7 @@ orchestrators can invoke them.**
 Internal skills DO NOT emit `phase.start` / `phase.end` markers —
 telemetry is produced by the invoking orchestrator (the `phase`
 wrapping the orchestrator's own step — Phase 1.7 / Phase 4 in
-`x-epic-implement` — is the correct aggregation boundary). Passive
+`x-implement-epic` — is the correct aggregation boundary). Passive
 hooks still capture `tool.call` for the underlying `Bash` invocations
 (git, Maven, jq).
 
@@ -451,15 +451,15 @@ internal skills from the 3-option menu contract), and ADR-0011
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-epic-implement` | caller (primary) | Phase 1.7 / Phase 4 carve-out: the skill's stdout envelope replaces the ~180 inline lines that currently live in `references/integrity-gate.md` and the Phase 4 orchestrator body — Phase 4 shrinks to ~80 lines (story-level metric per story-0049-0018) |
-| `x-internal-story-verify` | peer | Sibling `internal/plan/` skill; runs the equivalent gate at story scope (coverage filtered to story's files, cross-file consistency, AC mapping). `x-internal-epic-integrity-gate` runs at the epic/phase scope — aggregate coverage, aggregate DoD |
-| `x-internal-epic-build-plan` | peer | Sibling `internal/plan/` skill; computes the epic DAG + phase ordering upstream (Phase 0). This skill consumes the `epic/<id>` branch AFTER all phase stories are merged |
-| `x-internal-report-write` | downstream | Consumes this skill's envelope to render the phase-completion report `phase-report-epic-XXXX.md` via `_TEMPLATE-PHASE-COMPLETION-REPORT.md` |
-| `x-internal-status-update` | downstream | Consumes `passed` to transition phase status and trigger the semantic version bump (when `passed=true`) per RULE-013 |
-| `x-parallel-eval` | indirect | Runs BEFORE this skill at Phase 1.5 to validate parallelism constraints; its output does not feed the integrity gate |
+| `x-implement-epic` | caller (primary) | Phase 1.7 / Phase 4 carve-out: the skill's stdout envelope replaces the ~180 inline lines that currently live in `references/integrity-gate.md` and the Phase 4 orchestrator body — Phase 4 shrinks to ~80 lines (story-level metric per story-0049-0018) |
+| `x-internal-verify-story` | peer | Sibling `internal/plan/` skill; runs the equivalent gate at story scope (coverage filtered to story's files, cross-file consistency, AC mapping). `x-internal-verify-epic-integrity` runs at the epic/phase scope — aggregate coverage, aggregate DoD |
+| `x-internal-build-epic-plan` | peer | Sibling `internal/plan/` skill; computes the epic DAG + phase ordering upstream (Phase 0). This skill consumes the `epic/<id>` branch AFTER all phase stories are merged |
+| `x-internal-write-report` | downstream | Consumes this skill's envelope to render the phase-completion report `phase-report-epic-XXXX.md` via `_TEMPLATE-PHASE-COMPLETION-REPORT.md` |
+| `x-internal-update-status` | downstream | Consumes `passed` to transition phase status and trigger the semantic version bump (when `passed=true`) per RULE-013 |
+| `x-evaluate-parallelism` | indirect | Runs BEFORE this skill at Phase 1.5 to validate parallelism constraints; its output does not feed the integrity gate |
 
 Downstream stories that depend on this carve-out:
-- **story-0049-0018** (refactor `x-epic-implement`) consumes the
+- **story-0049-0018** (refactor `x-implement-epic`) consumes the
   envelope and deletes the inline Phase 4 block.
 
 Full workflow detail (argument-parser rejection matrix, JaCoCo CSV

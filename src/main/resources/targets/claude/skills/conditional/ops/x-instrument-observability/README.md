@@ -1,4 +1,4 @@
-# x-obs-instrument
+# x-instrument-observability
 
 > OpenTelemetry Instrumentation -- adds or reviews distributed tracing, metrics, and structured logging using OpenTelemetry SDK with OTLP export.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `observability != "none"` |
-| **Invocation** | `/x-obs-instrument [component-name or 'full']` |
+| **Invocation** | `/x-instrument-observability [component-name or 'full']` |
 | **Reads** | observability (references: observability-principles) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -22,10 +22,10 @@ Adds or reviews OpenTelemetry instrumentation across the application, covering t
 ## Usage
 
 ```
-/x-obs-instrument
-/x-obs-instrument full
-/x-obs-instrument PaymentService
-/x-obs-instrument TransactionRepository
+/x-instrument-observability
+/x-instrument-observability full
+/x-instrument-observability PaymentService
+/x-instrument-observability TransactionRepository
 ```
 
 ## See Also

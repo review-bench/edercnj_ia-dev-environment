@@ -13,13 +13,13 @@ This document lists every skill that produces auditable evidence in `plans/epic-
 
 ---
 
-## 1. x-review
+## 1. x-review-codebase
 
 - **Tipo de evidência hoje:** both (file + telemetry, but telemetry not validated as gate)
 - **Padrão de bypass observado:** EPIC-0062 — review-story-*.md com 2 linhas "Verdict: GO" passa Camada 3
 - **Plano de blindagem:**
   - story-0063-0002 (Content Audits): heurísticas sintáticas (≥50 lines, ≥3 sections, ≥2 file refs, decision marker)
-  - story-0063-0003 (Telemetry Audit): cross-validate ≥1 evento `tool.call x-review` por story merged
+  - story-0063-0003 (Telemetry Audit): cross-validate ≥1 evento `tool.call x-review-codebase` por story merged
 
 ## 2. x-review-pr
 
@@ -29,39 +29,39 @@ This document lists every skill that produces auditable evidence in `plans/epic-
   - story-0063-0002 (mesma heurística aplica a techlead-review-*.md)
   - story-0063-0003 (≥1 evento `tool.call x-review-pr`)
 
-## 3. x-internal-story-verify
+## 3. x-internal-verify-story
 
 - **Tipo de evidência hoje:** schema (verify-envelope-*.json) + telemetry
 - **Padrão de bypass observado/possível:** envelope com `passed=true, failures=[], acCheckResults=[]` (zero AC checks executados)
 - **Plano de blindagem:**
   - story-0063-0002 (audit-verify-envelope.sh): valida `acCheckResults.length >= acCheckCount` quando `passed=true`
-  - story-0063-0003 (telemetry): ≥1 evento `tool.call x-internal-story-verify`
+  - story-0063-0003 (telemetry): ≥1 evento `tool.call x-internal-verify-story`
 
-## 4. x-dependency-audit
+## 4. x-audit-dependencies
 
 - **Tipo de evidência hoje:** file (dependency-audit-*.md)
 - **Padrão de bypass possível:** report stub com "0 vulnerabilidades" sem rodar `mvn dependency:analyze` real
 - **Plano de blindagem:**
   - **Backlog:** Tier-2 — output validation contra real Maven plugin output (CycloneDX BOM cross-check)
-  - story-0063-0003 (telemetry parcial): evento `tool.call x-dependency-audit` confirma invocação
+  - story-0063-0003 (telemetry parcial): evento `tool.call x-audit-dependencies` confirma invocação
 
-## 5. x-arch-plan
+## 5. x-plan-architecture
 
 - **Tipo de evidência hoje:** file (arch-story-*.md) + telemetry (when scope=STANDARD+)
 - **Padrão de bypass possível:** plano arquitetural com seções vazias ou genéricas
 - **Plano de blindagem:**
   - story-0063-0015 (Planning-Content Audits): heurísticas para 6 artefatos Phase 1 (arch + impl + test + tasks + security + compliance)
-  - Telemetria já registrada via x-internal-story-build-plan dispatch
+  - Telemetria já registrada via x-internal-build-story-plan dispatch
 
-## 6. x-test-tdd
+## 6. x-drive-tdd
 
 - **Tipo de evidência hoje:** commit history (TDD tags `[TDD:RED]`, `[TDD:GREEN]`)
 - **Padrão de bypass possível:** commits de test e implementação no mesmo commit (não TDD)
 - **Plano de blindagem:**
   - **Backlog:** Tier-2 — commit-order audit (test commit precedes implementation per task)
-  - Auditar timeline de telemetria: tool.call x-test-tdd RED antes de GREEN
+  - Auditar timeline de telemetria: tool.call x-drive-tdd RED antes de GREEN
 
-## 7. x-task-plan
+## 7. x-plan-task
 
 - **Tipo de evidência hoje:** file (plan-task-TASK-*.md, schema v2)
 - **Padrão de bypass possível:** plan-task ausente para tarefas v2 (silently skipped)
@@ -69,15 +69,15 @@ This document lists every skill that produces auditable evidence in `plans/epic-
   - **Backlog:** Tier-2 — pre-flight gate verifies plan-task-*.md exists for every TASK-id em tasks-story-*.md
   - story-0063-0015 (Planning-Content Audits): valida plan-task-*.md tem mínimo de seções
 
-## 8. x-threat-model
+## 8. x-model-threats
 
 - **Tipo de evidência hoje:** file (threat-model-story-*.md, soft check)
 - **Padrão de bypass possível:** threat model omitido para stories tocando auth/network/persistence
 - **Plano de blindagem:**
   - **Backlog:** Tier-2 — story classification: detect auth/network/persistence keywords in story.md, fail if threat model absent
-  - Telemetria: enforce evento `tool.call x-threat-model` for stories matching keyword set
+  - Telemetria: enforce evento `tool.call x-model-threats` for stories matching keyword set
 
-## 9. x-test-run
+## 9. x-execute-tests
 
 - **Tipo de evidência hoje:** file (test-run-*.txt, soft check) + JaCoCo report
 - **Padrão de bypass possível:** test-run report sem coverage data
@@ -85,21 +85,21 @@ This document lists every skill that produces auditable evidence in `plans/epic-
   - story-0063-0007 (Local Coverage Gate): audit-coverage-local.sh valida JaCoCo CSV contra thresholds
   - **Backlog:** Tier-2 — JaCoCo report committable (não gitignore) para audit retroativo
 
-## 10. x-spec-drift
+## 10. x-detect-spec-drift
 
 - **Tipo de evidência hoje:** none (skill standalone, no required artifact)
 - **Padrão de bypass possível:** skill nunca invocada — drift acumula silenciosamente
 - **Plano de blindagem:**
-  - **Backlog:** Tier-3 — periodic gate (e.g., monthly cron CI job) que invoca x-spec-drift e fails CI if drift detected
-  - Telemetria: evento `tool.call x-spec-drift` com timestamp da última execução
+  - **Backlog:** Tier-3 — periodic gate (e.g., monthly cron CI job) que invoca x-detect-spec-drift e fails CI if drift detected
+  - Telemetria: evento `tool.call x-detect-spec-drift` com timestamp da última execução
 
-## 11. x-code-audit
+## 11. x-audit-code
 
 - **Tipo de evidência hoje:** none (skill standalone, no required artifact)
 - **Padrão de bypass possível:** skill nunca invocada antes de release
 - **Plano de blindagem:**
-  - **Backlog:** Tier-3 — release branch gate (`x-release` Step N requires x-code-audit invocation)
-  - Telemetria: evento `tool.call x-code-audit` registrado durante release flow
+  - **Backlog:** Tier-3 — release branch gate (`x-release` Step N requires x-audit-code invocation)
+  - Telemetria: evento `tool.call x-audit-code` registrado durante release flow
 
 ---
 
@@ -107,9 +107,9 @@ This document lists every skill that produces auditable evidence in `plans/epic-
 
 | Tier | Scope | Enforcement |
 | :--- | :--- | :--- |
-| **Tier-1 (in EPIC-0063)** | x-review, x-review-pr, x-internal-story-verify | Camada 0 (preflight) + Camada 3 (CI audit) ALL artifacts validated |
-| **Tier-2 (backlog)** | x-dependency-audit, x-test-tdd, x-task-plan, x-threat-model | Output/timeline validation against external sources |
-| **Tier-3 (backlog)** | x-spec-drift, x-code-audit | Periodic / lifecycle-bound enforcement |
+| **Tier-1 (in EPIC-0063)** | x-review-codebase, x-review-pr, x-internal-verify-story | Camada 0 (preflight) + Camada 3 (CI audit) ALL artifacts validated |
+| **Tier-2 (backlog)** | x-audit-dependencies, x-drive-tdd, x-plan-task, x-model-threats | Output/timeline validation against external sources |
+| **Tier-3 (backlog)** | x-detect-spec-drift, x-audit-code | Periodic / lifecycle-bound enforcement |
 
 ## Bypass Pattern Taxonomy
 

@@ -1,11 +1,11 @@
-# x-test-run
+# x-execute-tests
 
 > Runs tests with coverage reporting and threshold validation. Use whenever writing, running, or analyzing tests. Triggers on: test, coverage, TDD, unit test, integration test, test failure, coverage gap, or Definition of Done validation.
 
 | | |
 |---|---|
 | **Category** | Testing |
-| **Invocation** | `/x-test-run [ClassName or package or --coverage]` |
+| **Invocation** | `/x-execute-tests [ClassName or package or --coverage]` |
 | **Reads** | testing |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,10 +17,10 @@ Executes project tests and enforces strict coverage thresholds (line >= 95%, bra
 ## Usage
 
 ```
-/x-test-run
-/x-test-run MyServiceTest
-/x-test-run --coverage
-/x-test-run --traceability STORY-0007-0003
+/x-execute-tests
+/x-execute-tests MyServiceTest
+/x-execute-tests --coverage
+/x-execute-tests --traceability STORY-0007-0003
 ```
 
 ## Workflow
@@ -38,5 +38,5 @@ Executes project tests and enforces strict coverage thresholds (line >= 95%, bra
 
 ## See Also
 
-- [x-spec-drift](../x-spec-drift/) -- Detects drift between story specs and implemented code
-- [x-test-e2e](../../conditional/x-test-e2e/) -- End-to-end tests with real database
+- [x-detect-spec-drift](../x-detect-spec-drift/) -- Detects drift between story specs and implemented code
+- [x-execute-e2e-tests](../../conditional/x-execute-e2e-tests/) -- End-to-end tests with real database

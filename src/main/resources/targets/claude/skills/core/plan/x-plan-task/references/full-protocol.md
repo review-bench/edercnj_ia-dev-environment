@@ -1,12 +1,12 @@
-# x-task-plan — Full Protocol
+# x-plan-task — Full Protocol
 
-Supplementary reference for `x-task-plan/SKILL.md`. The body of the skill carries the minimum viable contract; this document expands the full behavior envelope, corner cases, and historical context per ADR-0007 / EPIC-0047 carve-out policy.
+Supplementary reference for `x-plan-task/SKILL.md`. The body of the skill carries the minimum viable contract; this document expands the full behavior envelope, corner cases, and historical context per ADR-0007 / EPIC-0047 carve-out policy.
 
 ## 1. Invocation Modes (Detailed)
 
 ### 1.1 Task-file-first mode (`--task-file <path>`) — EPIC-0038 canonical
 
-Consumes a standalone `task-TASK-XXXX-YYYY-NNN.md` contract previously emitted by `x-story-plan` Phase 4a. The task file follows the `task-schema.md` specification (story-0038-0001) and is validated by `TaskFileParser`. Required sections:
+Consumes a standalone `task-TASK-XXXX-YYYY-NNN.md` contract previously emitted by `x-plan-story` Phase 4a. The task file follows the `task-schema.md` specification (story-0038-0001) and is validated by `TaskFileParser`. Required sections:
 
 - Header with `**Task ID:**`, `**Story:**`, `**Status:**`
 - `## 1. Objetivo`
@@ -30,12 +30,12 @@ This skill adopts the canonical planning-versioning lifecycle (RULE-007). Placem
 
 | Step | When | Child skill | Behavior on `--no-commit` | Behavior on `--dry-run` |
 |------|------|-------------|---------------------------|-------------------------|
-| P1 — detect worktree | Start | `x-git-worktree detect-context` | Skip (orchestrator owns lifecycle) | Skip |
-| P2 — ensure `epic/<ID>` branch | After P1 | `x-internal-epic-branch-ensure` | Skip | Skip |
+| P1 — detect worktree | Start | `x-manage-worktrees detect-context` | Skip (orchestrator owns lifecycle) | Skip |
+| P2 — ensure `epic/<ID>` branch | After P1 | `x-internal-ensure-epic-branch` | Skip | Skip |
 | Phases 0-4 (original) | Middle | (inline) | Run unchanged | Run unchanged |
 | Phase 5 (Write Plan) | Middle | (inline) | Run; file written | Run; file written |
-| **Phase 5.4 — Planning Status Propagation** (alias Step P4) | After Phase 5 | `x-git-commit` (v1) / staged-only (v2 batch) | SKIP commit; log `"[no-commit] Plan written; commit deferred to caller"` | SKIP commit; log `"dry-run, skipping commit"` |
-| P5 — push | End | `x-git-push` | Skip | Skip |
+| **Phase 5.4 — Planning Status Propagation** (alias Step P4) | After Phase 5 | `x-commit-changes` (v1) / staged-only (v2 batch) | SKIP commit; log `"[no-commit] Plan written; commit deferred to caller"` | SKIP commit; log `"dry-run, skipping commit"` |
+| P5 — push | End | `x-push-branch` | Skip | Skip |
 
 The P4 step is an **alias** over the pre-existing Phase 5.4 (Planning Status Propagation) which already orchestrates the commit. No additional P4 invocation is issued — adding one would double-commit. The alias section exists in the skill body purely so the P1-P5 naming is readable end-to-end.
 
@@ -46,11 +46,11 @@ The P4 step is an **alias** over the pre-existing Phase 5.4 (Planning Status Pro
 | Plan file written to disk | Yes | Yes |
 | Status flipped `Pendente -> Planejada` | Yes | Yes |
 | `git add` of plan + task file | Yes | Yes |
-| `x-git-commit` invoked | Yes | **NO** (deferred to caller) |
+| `x-commit-changes` invoked | Yes | **NO** (deferred to caller) |
 | Response `commitSha` | non-null SHA | `null` |
 | Re-invocation semantics | Idempotent (staleness check) | Idempotent; flipping the flag between runs alternates commit behavior |
 
-**Caller contract (e.g., `x-story-plan`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-planning-commit` call covering every plan + status update — producing a single commit per story instead of N commits.
+**Caller contract (e.g., `x-plan-story`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-commit-planning` call covering every plan + status update — producing a single commit per story instead of N commits.
 
 **Backward compat:** absence of `--no-commit` (or explicit `--no-commit=false`) preserves pre-EPIC-0049 behavior byte-for-byte.
 
@@ -58,11 +58,11 @@ The P4 step is an **alias** over the pre-existing Phase 5.4 (Planning Status Pro
 
 | Scenario | Exit code | Mitigation |
 |----------|-----------|------------|
-| `x-internal-epic-branch-ensure` fails (P2) | 5 | Repair remote; re-run |
+| `x-internal-ensure-epic-branch` fails (P2) | 5 | Repair remote; re-run |
 | `StatusFieldParserCli` exit 20 | 20 | Story-0049-0010 integrity gate recovery |
 | `StatusFieldParserCli` exit 40 | 40 | Invalid transition — check source markdown |
-| `x-git-commit` failure in Phase 5.4 | propagate | Investigate pre-commit chain |
-| `x-git-push` failure (P5) | 0 (soft-fail) | Operator pushes manually |
+| `x-commit-changes` failure in Phase 5.4 | propagate | Investigate pre-commit chain |
+| `x-push-branch` failure (P5) | 0 (soft-fail) | Operator pushes manually |
 
 ## 5. Telemetry
 

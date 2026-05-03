@@ -1,5 +1,5 @@
 ---
-name: x-test-smoke-api
+name: x-execute-api-smoke-tests
 description: "Runs automated smoke tests against the REST API using Newman/Postman. Supports local, container-orchestrated, and staging environments."
 user-invocable: true
 allowed-tools: Read, Bash
@@ -25,9 +25,9 @@ Include this skill when smoke_tests is enabled AND "rest" is in protocols.
 
 ## Triggers
 
-- `/x-test-smoke-api` -- run against local environment (already running on default port)
-- `/x-test-smoke-api --k8s` -- run with automatic port-forward (orchestrator)
-- `/x-test-smoke-api --env staging` -- run against staging environment
+- `/x-execute-api-smoke-tests` -- run against local environment (already running on default port)
+- `/x-execute-api-smoke-tests --k8s` -- run with automatic port-forward (orchestrator)
+- `/x-execute-api-smoke-tests --env staging` -- run against staging environment
 
 ## Parameters
 
@@ -106,7 +106,7 @@ Automatic via trap EXIT:
 | `smoke-tests/api/*.postman_collection.json` | Newman test collection |
 | `smoke-tests/api/environment.local.json` | Local environment config |
 | `smoke-tests/api/environment.*.json` | Per-environment configs |
-| `smoke-tests/api/x-test-smoke-api.sh` | Execution script |
+| `smoke-tests/api/x-execute-api-smoke-tests.sh` | Execution script |
 
 ## Error Handling
 

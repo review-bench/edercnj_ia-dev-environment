@@ -1,4 +1,4 @@
-# x-test-tdd — Full Protocol
+# x-drive-tdd — Full Protocol
 
 > **Slim/Full split** per [ADR-0012 — Skill Body Slim-by-Default](../../../../../../../../../adr/ADR-0012-skill-body-slim-by-default.md).
 > The `SKILL.md` sibling carries the minimum viable contract; this file
@@ -95,7 +95,7 @@ Verify cycles are ordered by TPP priority (lower priority number first); see §7
 When `--dry-run` is provided, output the cycle listing and exit without executing:
 
 ```
-x-test-tdd dry-run for TASK-XXXX-YYYY-NNN
+x-drive-tdd dry-run for TASK-XXXX-YYYY-NNN
 Task Plan: task-plan-XXXX-YYYY-NNN.md
 Total Cycles: N
 
@@ -143,7 +143,7 @@ For each cycle from `--from-cycle` (default 1) to the last cycle:
      ```
 6. Stage test files and delegate commit via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-       Skill(skill: "x-git-commit", args: "--task TASK-XXXX-YYYY-NNN --type test --subject \"add test for [description]\" --tdd RED")
+       Skill(skill: "x-commit-changes", args: "--task TASK-XXXX-YYYY-NNN --type test --subject \"add test for [description]\" --tdd RED")
 
 ### 5.2 GREEN Phase — Minimum Implementation
 
@@ -176,7 +176,7 @@ For each cycle from `--from-cycle` (default 1) to the last cycle:
      - Max 2 retry attempts to reach coverage; after 2 failures, ABORT the cycle.
 6. Stage implementation files and delegate commit via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-       Skill(skill: "x-git-commit", args: "--task TASK-XXXX-YYYY-NNN --type feat --subject \"implement [description]\" --tdd GREEN")
+       Skill(skill: "x-commit-changes", args: "--task TASK-XXXX-YYYY-NNN --type feat --subject \"implement [description]\" --tdd GREEN")
 
 ### 5.3 REFACTOR Phase — Improve Design
 
@@ -205,7 +205,7 @@ For each cycle from `--from-cycle` (default 1) to the last cycle:
         Skip the REFACTOR commit for this cycle (do NOT abort the entire execution).
    d. Stage refactored files and delegate commit via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-          Skill(skill: "x-git-commit", args: "--task TASK-XXXX-YYYY-NNN --type refactor --subject \"[refactoring description]\" --tdd REFACTOR")
+          Skill(skill: "x-commit-changes", args: "--task TASK-XXXX-YYYY-NNN --type refactor --subject \"[refactoring description]\" --tdd REFACTOR")
 
 ### 5.4 Cycle Transition (Full vs Compact Log)
 
@@ -248,7 +248,7 @@ Once `emit_format` is determined at the start of execution, apply it consistentl
 After all cycles are complete, produce a summary:
 
 ```
-x-test-tdd execution complete for TASK-XXXX-YYYY-NNN
+x-drive-tdd execution complete for TASK-XXXX-YYYY-NNN
 
 Cycles executed: N (from cycle X to cycle Y)
 Commits created: M
@@ -298,10 +298,10 @@ Tests MUST progress from lower priority (simpler transformations) to higher prio
 This skill operates as the **inner loop** of Double-Loop TDD:
 
 ```
-OUTER LOOP (Acceptance Test -- driven by x-story-implement):
+OUTER LOOP (Acceptance Test -- driven by x-implement-story):
   Write failing acceptance test (end-to-end scenario)
   |
-  INNER LOOP (Unit Tests -- driven by x-test-tdd):
+  INNER LOOP (Unit Tests -- driven by x-drive-tdd):
   |  Cycle 1: RED -> GREEN -> REFACTOR
   |  Cycle 2: RED -> GREEN -> REFACTOR
   |  ...
@@ -310,8 +310,8 @@ OUTER LOOP (Acceptance Test -- driven by x-story-implement):
   Acceptance test passes (all unit behavior composes into acceptance)
 ```
 
-- The outer loop is managed by `x-story-implement` or `x-task-implement`.
-- This skill (`x-test-tdd`) drives the inner loop: systematic unit-level TDD cycles.
+- The outer loop is managed by `x-implement-story` or `x-implement-task`.
+- This skill (`x-drive-tdd`) drives the inner loop: systematic unit-level TDD cycles.
 - Each cycle builds on the previous, following TPP ordering from simple to complex.
 
 ## 9. Anti-Patterns

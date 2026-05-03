@@ -1,6 +1,6 @@
 ---
-name: x-parallel-eval
-description: "Detects and classifies file-collision risks between work units (tasks, stories, or epic phases) before parallel execution. Reads ## File Footprint blocks produced by x-task-plan / x-story-plan, applies the parallelism-heuristics knowledge pack (hard / regen / soft categories + hotspot overrides), and emits a collision matrix + serialization recommendation in Markdown (default) or JSON."
+name: x-evaluate-parallelism
+description: "Detects and classifies file-collision risks between work units (tasks, stories, or epic phases) before parallel execution. Reads ## File Footprint blocks produced by x-plan-task / x-plan-story, applies the parallelism-heuristics knowledge pack (hard / regen / soft categories + hotspot overrides), and emits a collision matrix + serialization recommendation in Markdown (default) or JSON."
 user-invocable: true
 argument-hint: "--scope=epic|story|task [--epic PATH] [--a ID --b ID] [--out PATH] [--format markdown|json]"
 allowed-tools:
@@ -10,7 +10,7 @@ allowed-tools:
 requires-capabilities: []
 ---
 
-# Skill: x-parallel-eval
+# Skill: x-evaluate-parallelism
 
 ## Purpose
 
@@ -18,12 +18,12 @@ Evaluate the merge-conflict risk of running two or more work units in parallel,
 using the canonical file-collision heuristics catalogued in the
 `parallelism-heuristics` knowledge pack. The skill is intentionally cascading:
 it consumes the structured `## File Footprint` blocks already emitted by
-`x-task-plan` (Phase 4.5) and `x-story-plan` (Phase 6), so the output is
+`x-plan-task` (Phase 4.5) and `x-plan-story` (Phase 6), so the output is
 deterministic and independent of prose parsing (RULE-008).
 
 The primary consumers are:
 
-- Operators validating an epic before dispatching `x-epic-implement` in parallel.
+- Operators validating an epic before dispatching `x-implement-epic` in parallel.
 - `x-epic-map` Step 8.5 (`story-0041-0005`), which invokes this skill as a gate.
 - `x-dev-*-implement` future gates (`story-0041-0006`).
 
@@ -109,10 +109,10 @@ regardless of the nominal write / regen sets.
 ## Invocation Examples
 
 ```bash
-/x-parallel-eval --scope=epic --epic ai/epics/epic-XXXX
-/x-parallel-eval --scope=epic --epic ai/epics/epic-XXXX --out reports/parallelism.md
-/x-parallel-eval --scope=story --a story-0041-0002 --b story-0041-0003
-/x-parallel-eval --scope=task --a TASK-0041-0002-001 --b TASK-0041-0003-001
+/x-evaluate-parallelism --scope=epic --epic ai/epics/epic-XXXX
+/x-evaluate-parallelism --scope=epic --epic ai/epics/epic-XXXX --out reports/parallelism.md
+/x-evaluate-parallelism --scope=story --a story-0041-0002 --b story-0041-0003
+/x-evaluate-parallelism --scope=task --a TASK-0041-0002-001 --b TASK-0041-0003-001
 ```
 
 The skill shells out to the project CLI (`parallel-eval` subcommand backed by
@@ -130,8 +130,8 @@ when `--out` is supplied.
 | Consumer | Relationship | Context |
 | :--- | :--- | :--- |
 | `x-epic-map` | Invokes (Step 8.5) | Parallel-dispatch gate before an epic plan is approved |
-| `x-story-plan` | Produces input | Emits the `## File Footprint` blocks read here |
-| `x-task-plan` | Produces input | Emits the per-task footprints used in `--scope=task` |
+| `x-plan-story` | Produces input | Emits the `## File Footprint` blocks read here |
+| `x-plan-task` | Produces input | Emits the per-task footprints used in `--scope=task` |
 | `x-dev-*-implement` | Invokes (future, EPIC-0041 §5+) | Pre-dispatch safety check before parallel worktrees |
 
 ## Determinism (RULE-008)

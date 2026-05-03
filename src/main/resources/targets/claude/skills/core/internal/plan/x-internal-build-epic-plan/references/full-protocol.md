@@ -1,6 +1,6 @@
-# x-internal-epic-build-plan — Full Protocol
+# x-internal-build-epic-plan — Full Protocol
 
-> Depth reference for `x-internal-epic-build-plan`. The SKILL.md
+> Depth reference for `x-internal-build-epic-plan`. The SKILL.md
 > body is the normative contract; this document expands the
 > workflow internals that orchestrators do not need in their
 > working context but that implementers and auditors must be able
@@ -10,8 +10,8 @@
 
 The parser is a tight single-file loop (`while (($#)); case "$1" in …`)
 to keep the SKILL.md within the SkillSizeLinter 500-line threshold
-without delegating to `x-internal-args-normalize` (peer, not a
-dependency — same policy as `x-internal-story-build-plan` §1).
+without delegating to `x-internal-normalize-args` (peer, not a
+dependency — same policy as `x-internal-build-story-plan` §1).
 
 | Input | Result | Exit |
 | :--- | :--- | :--- |
@@ -188,9 +188,9 @@ When `warnings` contains footprint-unknown advisories, the severity
 computation still runs on the pairs WITH known footprints; the
 unknowns do NOT inflate the severity.
 
-## 7. `x-internal-report-write` stdin Schema
+## 7. `x-internal-write-report` stdin Schema
 
-The downstream `x-internal-report-write` invocation consumes a
+The downstream `x-internal-write-report` invocation consumes a
 JSON document on stdin. The schema passed by this skill:
 
 ```json
@@ -210,19 +210,19 @@ JSON document on stdin. The schema passed by this skill:
 }
 ```
 
-`x-internal-report-write` applies the placeholders to the template
+`x-internal-write-report` applies the placeholders to the template
 literal and writes the result to its own `--output`. This skill
 passes `--output` verbatim from its own argument; the child does
 NOT re-resolve.
 
 On child non-zero exit, this skill does NOT retry — retry logic
-belongs upstream in `x-epic-implement`'s resume path. The
+belongs upstream in `x-implement-epic`'s resume path. The
 non-retried error yields exit 5 with the child's first stderr line
 appended.
 
-## 8. Interaction with `x-parallel-eval` (Downstream)
+## 8. Interaction with `x-evaluate-parallelism` (Downstream)
 
-The Phase 1.5 collision gate in `x-epic-implement` consumes the
+The Phase 1.5 collision gate in `x-implement-epic` consumes the
 `overlapMatrix` and `overlapSeverity` fields of this skill's
 envelope and compares them against the per-wave planning scope.
 The boundary of responsibility:
@@ -230,12 +230,12 @@ The boundary of responsibility:
 - **This skill:** detects and classifies write-collisions across
   every Kahn-co-scheduled pair; advisory only — never aborts on
   severity.
-- **`x-parallel-eval`:** applies wave-specific thresholds,
+- **`x-evaluate-parallelism`:** applies wave-specific thresholds,
   downgrades waves to serial, and records
   `ExecutionState.parallelismDowngrades` (EPIC-0041
   story-0041-0006).
 
-The split allows `x-internal-epic-build-plan` to remain pure
+The split allows `x-internal-build-epic-plan` to remain pure
 computation + render — it can be invoked with `--mode parallel`
 from non-orchestrator contexts (e.g., ad-hoc audits) without side
 effects.
@@ -254,7 +254,7 @@ effects.
   For the widest phase in epic-0049 (phase index 2 with 9 stories),
   81 pair comparisons × footprint-set-intersection. < 5 ms.
 - **Render delegation:** ~500–2000 ms (network-free, template-only
-  substitution) — bounded by `x-internal-report-write`'s own
+  substitution) — bounded by `x-internal-write-report`'s own
   perf contract, not this skill's.
 
 Total wall-clock for the happy path on a 22-story epic: consistently
@@ -274,4 +274,4 @@ larger epics (up to 30 stories).
 
 These cases are covered by the acceptance scenarios in the SKILL.md
 Testing section and by the future regression goldens under
-`src/test/resources/golden/internal/plan/x-internal-epic-build-plan/`.
+`src/test/resources/golden/internal/plan/x-internal-build-epic-plan/`.

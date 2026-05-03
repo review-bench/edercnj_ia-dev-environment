@@ -1,6 +1,6 @@
 ---
-name: x-spec-drift
-description: "Detects spec-code drift by comparing story data contracts, endpoints, and Gherkin scenarios against implemented code. Supports standalone mode (full report) and inline mode (compact output for TDD loop integration in x-story-implement Phase 2)."
+name: x-detect-spec-drift
+description: "Detects spec-code drift by comparing story data contracts, endpoints, and Gherkin scenarios against implemented code. Supports standalone mode (full report) and inline mode (compact output for TDD loop integration in x-implement-story Phase 2)."
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
 argument-hint: "[STORY-ID] [--mode standalone|inline]"
@@ -24,8 +24,8 @@ Compares story specifications (data contracts, endpoints, Gherkin scenarios) aga
 
 ## Triggers
 
-- `/x-spec-drift STORY-ID` — standalone mode (full report)
-- `/x-spec-drift STORY-ID --mode inline` — inline mode (compact output)
+- `/x-detect-spec-drift STORY-ID` — standalone mode (full report)
+- `/x-detect-spec-drift STORY-ID --mode inline` — inline mode (compact output)
 
 ## Parameters
 
@@ -39,7 +39,7 @@ Compares story specifications (data contracts, endpoints, Gherkin scenarios) aga
 | Mode | When to Use | Output |
 |------|-------------|--------|
 | `standalone` | Manual invocation before PR | Full itemized report |
-| `inline` | Automated call in x-story-implement Phase 2 | Single-line compact summary |
+| `inline` | Automated call in x-implement-story Phase 2 | Single-line compact summary |
 
 ## Workflow
 
@@ -107,9 +107,9 @@ Summary: N FAIL, M WARN — DRIFT DETECTED / NO DRIFT
 - **0**: No FAIL results (only PASS and WARN)
 - **Non-zero**: At least one FAIL detected
 
-### Inline Mode (x-story-implement TDD Loop Integration)
+### Inline Mode (x-implement-story TDD Loop Integration)
 
-Provides compact, non-blocking drift checks after each RED-GREEN-REFACTOR cycle in x-story-implement Phase 2. Designed for automated integration — not manual invocation.
+Provides compact, non-blocking drift checks after each RED-GREEN-REFACTOR cycle in x-implement-story Phase 2. Designed for automated integration — not manual invocation.
 
 #### Scope Restrictions
 
@@ -148,7 +148,7 @@ Drift Check (inline): CRITICAL — FieldName (Type, M) NOT FOUND in DTO
 
 #### TDD Loop Integration Point
 
-Called automatically by x-story-implement after each TDD cycle:
+Called automatically by x-implement-story after each TDD cycle:
 
 ```
 Phase 2 TDD Loop:
@@ -207,6 +207,6 @@ else:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-story-implement | Called by | Invoked during Phase 2 TDD loop for inline drift detection |
-| x-task-implement | Complements | Drift check validates that implementation matches story spec |
+| x-implement-story | Called by | Invoked during Phase 2 TDD loop for inline drift detection |
+| x-implement-task | Complements | Drift check validates that implementation matches story spec |
 | x-review-pr | Complements | Standalone drift check provides pre-PR validation of spec alignment |

@@ -1,5 +1,5 @@
 ---
-name: x-pr-fix
+name: x-fix-pr
 description: "Reads PR review comments and fixes actionable ones automatically. Detects PR from argument or branch, classifies comments (actionable/suggestion/question/praise), implements fixes, and commits with proper conventional commit messages."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -21,8 +21,8 @@ Automates the process of addressing PR review comments for {{PROJECT_NAME}}. Rea
 
 ## Triggers
 
-- `/x-pr-fix` — fix comments on current branch's PR
-- `/x-pr-fix 123` — fix comments on PR #123
+- `/x-fix-pr` — fix comments on current branch's PR
+- `/x-fix-pr 123` — fix comments on PR #123
 
 ## Parameters
 
@@ -223,7 +223,7 @@ Output a summary table:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | called-by | Invoked during Phase 4 (fix review comments) |
-| `x-pr-fix-epic` | called-by | Batch mode processes multiple PRs from an epic |
-| `x-git-push` | calls | Uses Conventional Commits format for fix commits |
-| `x-review` | reads | Processes comments produced by specialist reviews |
+| `x-implement-story` | called-by | Invoked during Phase 4 (fix review comments) |
+| `x-fix-epic-pr` | called-by | Batch mode processes multiple PRs from an epic |
+| `x-push-branch` | calls | Uses Conventional Commits format for fix commits |
+| `x-review-codebase` | reads | Processes comments produced by specialist reviews |

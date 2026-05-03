@@ -1,11 +1,11 @@
-# x-security-dashboard
+# x-generate-security-dashboard
 
 > Aggregates results from all security scanning skills into a unified posture view with score 0-100, trend tracking, OWASP risk heatmap, per-dimension breakdown, and remediation priority queue. Never executes scans -- reads existing results only (RULE-011).
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-security-dashboard [--period last-7d\|last-30d\|last-90d\|all] [--format markdown\|json] [--compare-previous]` |
+| **Invocation** | `/x-generate-security-dashboard [--period last-7d\|last-30d\|last-90d\|all] [--format markdown\|json] [--compare-previous]` |
 | **Reads** | `knowledge/security/security-scoring.md`, `knowledge/security/security-skill-template.md` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,10 +17,10 @@ Generates a consolidated security posture dashboard by aggregating SARIF results
 ## Usage
 
 ```
-/x-security-dashboard
-/x-security-dashboard --period last-30d
-/x-security-dashboard --format json
-/x-security-dashboard --period last-7d --compare-previous
+/x-generate-security-dashboard
+/x-generate-security-dashboard --period last-30d
+/x-generate-security-dashboard --format json
+/x-generate-security-dashboard --period last-7d --compare-previous
 ```
 
 ## Workflow
@@ -43,7 +43,7 @@ Generates a consolidated security posture dashboard by aggregating SARIF results
 
 ## See Also
 
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification (feeds into dashboard)
-- [x-hardening-eval](../x-hardening-eval/) -- Application hardening evaluation (feeds into dashboard)
-- [x-runtime-eval](../x-runtime-eval/) -- Runtime protection evaluation (feeds into dashboard)
-- [x-security-pipeline](../x-security-pipeline/) -- CI/CD pipeline generation with security stages
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification (feeds into dashboard)
+- [x-evaluate-hardening](../x-evaluate-hardening/) -- Application hardening evaluation (feeds into dashboard)
+- [x-evaluate-runtime](../x-evaluate-runtime/) -- Runtime protection evaluation (feeds into dashboard)
+- [x-generate-security-pipeline](../x-generate-security-pipeline/) -- CI/CD pipeline generation with security stages

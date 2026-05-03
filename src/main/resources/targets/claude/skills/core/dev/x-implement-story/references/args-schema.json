@@ -1,5 +1,5 @@
 {
-  "name": "x-story-implement",
+  "name": "x-implement-story",
   "version": "2.0",
   "positional": [
     {
@@ -15,14 +15,14 @@
       "name": "--target-branch",
       "type": "string",
       "default": "develop",
-      "description": "Explicit base branch for story / task PRs. Propagated to x-pr-create --target-branch and x-task-implement. Default develop preserves legacy behavior."
+      "description": "Explicit base branch for story / task PRs. Propagated to x-create-pr --target-branch and x-implement-task. Default develop preserves legacy behavior."
     },
     {
       "name": "--auto-merge",
       "type": "enum",
       "values": ["none", "merge", "squash", "rebase"],
       "default": "none",
-      "description": "Post-create auto-merge strategy. Propagated to x-pr-create --auto-merge. Default none preserves legacy behavior."
+      "description": "Post-create auto-merge strategy. Propagated to x-create-pr --auto-merge. Default none preserves legacy behavior."
     },
     {
       "name": "--epic-id",
@@ -46,7 +46,7 @@
       "name": "--resume",
       "type": "boolean",
       "default": false,
-      "description": "Resume from execution-state.json; delegates resume-point detection to x-internal-story-resume"
+      "description": "Resume from execution-state.json; delegates resume-point detection to x-internal-resume-story"
     },
     {
       "name": "--skip-verification",
@@ -94,7 +94,7 @@
       "name": "--skip-review",
       "type": "boolean",
       "default": false,
-      "description": "Skip specialist + tech-lead reviews (propagated from x-epic-implement)"
+      "description": "Skip specialist + tech-lead reviews (propagated from x-implement-epic)"
     }
   ],
   "deprecatedFlags": [

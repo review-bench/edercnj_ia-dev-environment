@@ -1,5 +1,5 @@
 ---
-name: x-test-run
+name: x-execute-tests
 description: "Runs tests with coverage reporting and threshold validation. Use whenever writing, running, or analyzing tests. Triggers on: test, coverage, TDD, unit test, integration test, test failure, coverage gap, or Definition of Done validation."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[ClassName or package or --coverage]"
@@ -135,10 +135,10 @@ When invoked with `--traceability [STORY-ID|EPIC-ID]`, generates a bidirectional
 
 ```bash
 # Single story traceability
-/x-test-run --traceability STORY-0007-0003
+/x-execute-tests --traceability STORY-0007-0003
 
 # Epic-wide traceability (consolidates all stories)
-/x-test-run --traceability EPIC-0007
+/x-execute-tests --traceability EPIC-0007
 ```
 
 ### Output
@@ -180,7 +180,7 @@ For EPIC-ID, the matrix consolidates all stories in the epic with one section pe
 
 ## Integration Notes
 
-- Invoked by `x-story-implement` during Phase 2 (G7) and Phase 4
-- Invoked by `x-task-implement` during Step 4
-- Coverage report consumed by `x-review` skill (QA engineer)
-- Thresholds enforced by `x-lib-group-verifier` in G7 verification
+- Invoked by `x-implement-story` during Phase 2 (G7) and Phase 4
+- Invoked by `x-implement-task` during Step 4
+- Coverage report consumed by `x-review-codebase` skill (QA engineer)
+- Thresholds enforced by `x-lib-verify-group` in G7 verification

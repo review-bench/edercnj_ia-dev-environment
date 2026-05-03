@@ -1,11 +1,11 @@
-# x-jira-create-stories
+# x-create-jira-stories
 
 > Creates Jira Stories from existing local story markdown files. Reads all story files in an epic directory, maps fields to Jira, creates issues with parent epic link, creates dependency links between stories, and syncs Jira keys back to local files.
 
 | | |
 |---|---|
 | **Category** | Jira Integration |
-| **Invocation** | `/x-jira-create-stories [EPIC_DIR_PATH or EPIC_ID]` |
+| **Invocation** | `/x-create-jira-stories [EPIC_DIR_PATH or EPIC_ID]` |
 | **Reads** | jira-field-mapping |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Creates Jira Stories from all local `story-XXXX-YYYY.md` files in an epic direct
 ## Usage
 
 ```
-/x-jira-create-stories ai/epics/epic-XXXX
-/x-jira-create-stories 0012
+/x-create-jira-stories ai/epics/epic-XXXX
+/x-create-jira-stories 0012
 ```
 
 ## Workflow
@@ -40,6 +40,6 @@ Creates Jira Stories from all local `story-XXXX-YYYY.md` files in an epic direct
 
 ## See Also
 
-- [x-jira-create-epic](../x-jira-create-epic/) -- Creates the parent epic in Jira first
+- [x-create-jira-epic](../x-create-jira-epic/) -- Creates the parent epic in Jira first
 - [x-story-create](../x-story-create/) -- Generates the local story files from an epic
 - [x-epic-map](../x-epic-map/) -- Generates the implementation map with dependency graph

@@ -1,11 +1,11 @@
-# x-ops-troubleshoot
+# x-troubleshoot-operations
 
 > Diagnoses errors, stacktraces, build failures, and unexpected behavior. Systematic approach: reproduce, locate, understand, fix, verify. Use whenever something fails: compilation errors, test failures, runtime exceptions, coverage gaps, or performance issues.
 
 | | |
 |---|---|
 | **Category** | Operations |
-| **Invocation** | `/x-ops-troubleshoot [error-description or test-name]` |
+| **Invocation** | `/x-troubleshoot-operations [error-description or test-name]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,9 +16,9 @@ Provides a systematic approach to diagnose and fix issues across the project. Co
 ## Usage
 
 ```
-/x-ops-troubleshoot
-/x-ops-troubleshoot "NullPointerException in TransactionService"
-/x-ops-troubleshoot testCalculateTotal_negativeAmount
+/x-troubleshoot-operations
+/x-troubleshoot-operations "NullPointerException in TransactionService"
+/x-troubleshoot-operations testCalculateTotal_negativeAmount
 ```
 
 ## Workflow
@@ -31,6 +31,6 @@ Provides a systematic approach to diagnose and fix issues across the project. Co
 
 ## See Also
 
-- [x-ops-incident](../x-ops-incident/) -- Escalate to incident response when issues affect production
-- [x-test-run](../x-test-run/) -- Run tests with coverage after troubleshooting
-- [x-story-implement](../x-story-implement/) -- References this skill during Phase 4 (fixes)
+- [x-handle-incident](../x-handle-incident/) -- Escalate to incident response when issues affect production
+- [x-execute-tests](../x-execute-tests/) -- Run tests with coverage after troubleshooting
+- [x-implement-story](../x-implement-story/) -- References this skill during Phase 4 (fixes)

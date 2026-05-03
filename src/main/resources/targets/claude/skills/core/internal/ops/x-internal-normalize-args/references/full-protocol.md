@@ -1,4 +1,4 @@
-# x-internal-args-normalize — Full Protocol
+# x-internal-normalize-args — Full Protocol
 
 Detail carve-out for [`../SKILL.md`](../SKILL.md) (ADR-0007). Normative
 contract remains in SKILL.md; this file expands grammar rules, the canonical
@@ -239,7 +239,7 @@ Stderr: `Schema validation failed: flags contract violation`. Exit 1.
 ## §5 — Acceptance Test Catalogue
 
 Story-0049-0007 ships acceptance test scenarios that every future
-`x-internal-args-normalize` consumer MUST be able to rely on:
+`x-internal-normalize-args` consumer MUST be able to rely on:
 
 1. **Defaults applied** — empty argv, schema with defaults → `parsed`
    reflects every default, `warnings=[]`, `errors=[]`, exit 0.
@@ -265,6 +265,6 @@ Story-0049-0007 ships acceptance test scenarios that every future
     ⇒ exit 1 with `TYPE_COERCION_FAILED`.
 
 Goldens under
-`src/test/resources/golden/internal/ops/x-internal-args-normalize/` lock
+`src/test/resources/golden/internal/ops/x-internal-normalize-args/` lock
 the SKILL.md rendering. Coverage requirement: ≥ 95% line / ≥ 90%
 branch across the invoking Bash codepaths.

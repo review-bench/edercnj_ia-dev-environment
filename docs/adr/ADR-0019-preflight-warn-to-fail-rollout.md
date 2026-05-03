@@ -11,7 +11,7 @@
 ## Context
 
 EPIC-0063 introduces `enforce-preflight-gates.sh` (Camada 0 hook) that intercepts `git push`,
-`gh pr create`, and `Skill(x-pr-create)` tool calls and blocks them when one or more preflight
+`gh pr create`, and `Skill(x-create-pr)` tool calls and blocks them when one or more preflight
 gates fail. Switching from WARN mode (log only) to FAIL mode (block) is a breaking change for
 teams that have not yet adapted their workflows.
 

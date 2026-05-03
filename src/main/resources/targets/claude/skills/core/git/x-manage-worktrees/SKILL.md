@@ -1,5 +1,5 @@
 ---
-name: x-git-worktree
+name: x-manage-worktrees
 model: haiku
 description: "Manages git worktrees for parallel task and story execution. Operations: create, list, remove, cleanup, detect-context. Follows Rule 14 (Worktree Lifecycle) naming convention under .claude/worktrees/{identifier}/."
 user-invocable: true
@@ -17,11 +17,11 @@ requires-capabilities: []
 ## Triggers
 
 ```
-/x-git-worktree create --branch feat/task-0049-0001-001-domain [--base develop] [--id task-0049-0001-001]
-/x-git-worktree list
-/x-git-worktree remove --id task-0049-0001-001
-/x-git-worktree cleanup [--dry-run]
-/x-git-worktree detect-context
+/x-manage-worktrees create --branch feat/task-0049-0001-001-domain [--base develop] [--id task-0049-0001-001]
+/x-manage-worktrees list
+/x-manage-worktrees remove --id task-0049-0001-001
+/x-manage-worktrees cleanup [--dry-run]
+/x-manage-worktrees detect-context
 ```
 
 ## Parameters
@@ -64,4 +64,4 @@ All worktrees are placed under `.claude/worktrees/{identifier}/`. Protected bran
 
 ## Full Protocol
 
-> Complete per-operation Bash implementations (create 7-step workflow, list status classification, cleanup criteria — MERGED/STALE/ORPHAN, detect-context canonical snippet with CWE-116/CWE-209 hardening and JSON-escape), Git Flow integration table (task/story/hotfix base-branch rules), post-merge lifecycle, naming convention derivation, and Integration Notes (x-epic-implement/x-story-implement/x-task-implement callers) in [`references/full-protocol.md`](references/full-protocol.md).
+> Complete per-operation Bash implementations (create 7-step workflow, list status classification, cleanup criteria — MERGED/STALE/ORPHAN, detect-context canonical snippet with CWE-116/CWE-209 hardening and JSON-escape), Git Flow integration table (task/story/hotfix base-branch rules), post-merge lifecycle, naming convention derivation, and Integration Notes (x-implement-epic/x-implement-story/x-implement-task callers) in [`references/full-protocol.md`](references/full-protocol.md).

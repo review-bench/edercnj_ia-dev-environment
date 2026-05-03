@@ -1,5 +1,5 @@
 ---
-name: x-test-e2e
+name: x-execute-e2e-tests
 description: "Runs integration tests that validate the complete flow from request through all application layers to response, using a real database."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -25,10 +25,10 @@ Include this skill for all projects with integration test infrastructure.
 
 ## Triggers
 
-- `/x-test-e2e` -- run all E2E tests
-- `/x-test-e2e happy-path` -- run only happy path scenarios
-- `/x-test-e2e persistent` -- run persistent connection tests
-- `/x-test-e2e all` -- run all scenarios explicitly
+- `/x-execute-e2e-tests` -- run all E2E tests
+- `/x-execute-e2e-tests happy-path` -- run only happy path scenarios
+- `/x-execute-e2e-tests persistent` -- run persistent connection tests
+- `/x-execute-e2e-tests all` -- run all scenarios explicitly
 
 ## Parameters
 

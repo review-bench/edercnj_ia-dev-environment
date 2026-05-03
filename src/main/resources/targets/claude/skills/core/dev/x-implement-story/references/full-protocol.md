@@ -1,4 +1,4 @@
-# x-story-implement — Full Protocol
+# x-implement-story — Full Protocol
 
 > **Slim/Full split** per [ADR-0012 — Skill Body Slim-by-Default](../../../../../../../../../adr/ADR-0012-skill-body-slim-by-default.md).
 > The `SKILL.md` sibling carries the minimum viable contract (Triggers,
@@ -37,11 +37,11 @@ For artifacts marked as "Reuse", the corresponding generation phase is skipped. 
 
 ### 1.2 Worktree-First Branch Creation (Rule 14 + ADR-0004)
 
-Branch creation in `x-story-implement` follows the **worktree-first policy** defined in [ADR-0004](../../../../../../../../../adr/ADR-0004-worktree-first-branch-creation-policy.md) and the normative invariants of Rule 14. The routine below is **mandatory** and MUST execute before any `git checkout -b` or `/x-git-worktree create` call.
+Branch creation in `x-implement-story` follows the **worktree-first policy** defined in [ADR-0004](../../../../../../../../../adr/ADR-0004-worktree-first-branch-creation-policy.md) and the normative invariants of Rule 14. The routine below is **mandatory** and MUST execute before any `git checkout -b` or `/x-manage-worktrees create` call.
 
-**Step 6a — Detect worktree context (Rule 14 §3 — Non-Nesting Invariant).** Invoke the `x-git-worktree` skill via the Skill tool (Rule 13 Pattern 1 — INLINE-SKILL):
+**Step 6a — Detect worktree context (Rule 14 §3 — Non-Nesting Invariant).** Invoke the `x-manage-worktrees` skill via the Skill tool (Rule 13 Pattern 1 — INLINE-SKILL):
 
-    Skill(skill: "x-git-worktree", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", args: "detect-context")
 
 The skill returns a JSON envelope:
 
@@ -59,29 +59,29 @@ Record `inWorktree`, `worktreePath`, and `mainRepoPath` for use in subsequent st
 
 | # | Condition | Mode | Action |
 | :--- | :--- | :--- | :--- |
-| 1 | `inWorktree == true` | **REUSE (orchestrated)** | Reuse the current worktree. Do NOT invoke `/x-git-worktree create`. Do NOT create a nested worktree (Rule 14 §3). Branch creation inside the reused worktree follows the `--auto-approve-pr` legacy behavior via `git checkout -b`. The creator of the outer worktree owns its removal (Rule 14 §5). |
-| 2 | `inWorktree == false` AND `--worktree` present | **CREATE (standalone opt-in)** | Provision a dedicated worktree via `Skill(skill: "x-git-worktree", args: "create --branch feat/story-XXXX-YYYY-desc --base develop --id story-XXXX-YYYY")`. `x-story-implement` is the creator and owns removal (Rule 14 §5 — end of Phase 3 on success; preserved on failure per Rule 14 §4). |
+| 1 | `inWorktree == true` | **REUSE (orchestrated)** | Reuse the current worktree. Do NOT invoke `/x-manage-worktrees create`. Do NOT create a nested worktree (Rule 14 §3). Branch creation inside the reused worktree follows the `--auto-approve-pr` legacy behavior via `git checkout -b`. The creator of the outer worktree owns its removal (Rule 14 §5). |
+| 2 | `inWorktree == false` AND `--worktree` present | **CREATE (standalone opt-in)** | Provision a dedicated worktree via `Skill(skill: "x-manage-worktrees", args: "create --branch feat/story-XXXX-YYYY-desc --base develop --id story-XXXX-YYYY")`. `x-implement-story` is the creator and owns removal (Rule 14 §5 — end of Phase 3 on success; preserved on failure per Rule 14 §4). |
 | 3 | `inWorktree == false` AND `--worktree` absent | **LEGACY (main checkout)** | Create branches directly in the main working tree via `git checkout -b`. Preserves backward compatibility. |
 
-> **Orchestrator auto-path.** When this skill is dispatched by `x-epic-implement`, the parent creates the worktree **before** dispatching, and this invocation detects `inWorktree == true` and selects Mode 1 (REUSE) automatically. No flag is required from the caller.
+> **Orchestrator auto-path.** When this skill is dispatched by `x-implement-epic`, the parent creates the worktree **before** dispatching, and this invocation detects `inWorktree == true` and selects Mode 1 (REUSE) automatically. No flag is required from the caller.
 
-> **Anti-pattern (DO NOT USE):** `Agent(isolation:"worktree")` is DEPRECATED (see ADR-0004 and Rule 14 §7). The harness-native isolation is replaced by explicit `/x-git-worktree create` calls so the worktree lifecycle is visible in logs and recoverable on failure.
+> **Anti-pattern (DO NOT USE):** `Agent(isolation:"worktree")` is DEPRECATED (see ADR-0004 and Rule 14 §7). The harness-native isolation is replaced by explicit `/x-manage-worktrees create` calls so the worktree lifecycle is visible in logs and recoverable on failure.
 
 **Step 6c — Execute the selected branching mode.**
 
 - **Mode 1 (REUSE).** The parent orchestrator has already placed the process inside the worktree at `worktreePath`. Proceed with branch creation *inside* that worktree:
   - If `--auto-approve-pr`: create parent branch `feat/story-XXXX-YYYY-desc` from `develop` via `git checkout -b`. All task branches are created from and target this parent branch.
   - If NOT `--auto-approve-pr`: no parent branch is created at this stage. Task branches are created later (Phase 2) and target `develop` directly.
-  - Do NOT call `/x-git-worktree remove` here or at end of Phase 3. The orchestrator is the creator and owns removal.
+  - Do NOT call `/x-manage-worktrees remove` here or at end of Phase 3. The orchestrator is the creator and owns removal.
 
-- **Mode 2 (CREATE).** Invoke `x-git-worktree` via the Skill tool:
+- **Mode 2 (CREATE).** Invoke `x-manage-worktrees` via the Skill tool:
 
-      Skill(skill: "x-git-worktree", args: "create --branch feat/story-XXXX-YYYY-desc --base develop --id story-XXXX-YYYY")
+      Skill(skill: "x-manage-worktrees", args: "create --branch feat/story-XXXX-YYYY-desc --base develop --id story-XXXX-YYYY")
 
   The operation creates `.claude/worktrees/story-XXXX-YYYY/` with `feat/story-XXXX-YYYY-desc` checked out. That branch always exists because it anchors the standalone worktree.
   - If `--auto-approve-pr`: that branch IS the parent branch.
   - If NOT `--auto-approve-pr`: that branch is an isolation branch only; it is **not** treated as the parent branch for task PR flow. Task branches target `develop` directly.
-  - In standalone mode `x-story-implement` is the creator and MUST invoke `Skill(skill: "x-git-worktree", args: "remove --id story-XXXX-YYYY")` at end of Phase 3 on success. On failure, the worktree is preserved for diagnosis.
+  - In standalone mode `x-implement-story` is the creator and MUST invoke `Skill(skill: "x-manage-worktrees", args: "remove --id story-XXXX-YYYY")` at end of Phase 3 on success. On failure, the worktree is preserved for diagnosis.
 
 - **Mode 3 (LEGACY).** Execute the pre-EPIC-0037 behavior unchanged, operating directly in the main working tree:
   - If `--auto-approve-pr`: `git checkout -b feat/story-XXXX-YYYY-desc develop` creates the parent branch.
@@ -98,7 +98,7 @@ Record `inWorktree`, `worktreePath`, and `mainRepoPath` for use in subsequent st
 | Selected Mode | `STORY_OWNS_WORKTREE` | Rationale |
 | :--- | :--- | :--- |
 | Mode 1 (REUSE) | `false` | Outer orchestrator is creator. |
-| Mode 2 (CREATE) | `true` | `x-story-implement` is creator. |
+| Mode 2 (CREATE) | `true` | `x-implement-story` is creator. |
 | Mode 3 (LEGACY) | `false` | No worktree created. |
 
 Phase 3 Step 3.8b reads this variable to decide whether to invoke removal. `STORY_ID` throughout MUST match `story-\d{4}-\d{4}` (Rule 14 §1).
@@ -192,7 +192,7 @@ Perform inline contract validation using the appropriate linter for `{CONTRACT_F
 
 If validation errors are found: fix errors in the generated contract and re-run validation until it passes.
 
-> **Note:** a dedicated `x-test-contract-lint` skill does not exist in `core/` at the time of writing (the reference was an orphan removed in EPIC-0033 / STORY-0033-0001). If `x-test-contract-lint` is added in the future, convert this step to `Skill(skill: "x-test-contract-lint", args: "{CONTRACT_PATH}")` following Rule 13 — Skill Invocation Protocol (INLINE-SKILL pattern).
+> **Note:** a dedicated `x-lint-contract-tests` skill does not exist in `core/` at the time of writing (the reference was an orphan removed in EPIC-0033 / STORY-0033-0001). If `x-lint-contract-tests` is added in the future, convert this step to `Skill(skill: "x-lint-contract-tests", args: "{CONTRACT_PATH}")` following Rule 13 — Skill Invocation Protocol (INLINE-SKILL pattern).
 
 ### Step 0.5.4 — Approval Gate (EPIC-0043)
 
@@ -244,7 +244,7 @@ Evaluate change scope:
 **If Full or Simplified:**
 
     TaskCreate(description: "Planning: Architecture Plan — Story {storyId}")
-    Skill(skill: "x-arch-plan", args: "{STORY_PATH}")
+    Skill(skill: "x-plan-architecture", args: "{STORY_PATH}")
     TaskUpdate(id: archPlanTaskId, status: "completed")
 
 Output: `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md`. On failure: emit `WARNING: Architecture plan generation failed. Continuing without architecture plan.`, still close tracking, proceed to 1B.
@@ -270,10 +270,10 @@ Summary of who emits what:
 | Planner | Strategy | Batch A | Batch B |
 |---|---|---|---|
 | 1B Implementation Plan | Subagent | Agent launch (subagent self-tracks FIRST/LAST ACTION) | — |
-| 1B Test Plan | Skill-invoked | `TaskCreate` + `Skill(x-test-plan)` | `TaskUpdate` |
-| 1C Task Decomposition | Skill-invoked | `TaskCreate` + `Skill(x-lib-task-decomposer)` | `TaskUpdate` |
+| 1B Test Plan | Skill-invoked | `TaskCreate` + `Skill(x-plan-tests)` | `TaskUpdate` |
+| 1C Task Decomposition | Skill-invoked | `TaskCreate` + `Skill(x-lib-decompose-task)` | `TaskUpdate` |
 | 1D Event Schema | Subagent | Agent launch (subagent self-tracks) | — |
-| 1E Security (primary) | Skill-invoked | `TaskCreate` + `Skill(x-threat-model)` | `TaskUpdate` on success; pre-fallback close + fallback subagent launch on unavailability |
+| 1E Security (primary) | Skill-invoked | `TaskCreate` + `Skill(x-model-threats)` | `TaskUpdate` on success; pre-fallback close + fallback subagent launch on unavailability |
 | 1F Compliance | Subagent | Agent launch (subagent self-tracks) | — |
 
 ### 2.3 Per-Planner Subagent Prompts
@@ -360,7 +360,7 @@ Prompt content:
 
 ## 3. Phase 1.5 — Parallelism Gate (EPIC-0041 / story-0041-0006)
 
-Invoke `Skill(skill: "x-parallel-eval", args: "--scope=story --story={STORY_ID}")`. The skill consumes per-task/per-story File Footprints and returns a collision matrix classifying interactions as HARD (same file write), REGEN (same golden regen target), or SOFT. On any HARD or REGEN collision between tasks declared parallel, downgrade the affected wave to serial and record `ExecutionState.parallelismDowngrades` with fields `{taskA, taskB, collisionType, hotspot}`. RULE-004 hotspots (`SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`, `pom.xml`, `.gitignore`, `src/test/resources/golden/**`) are pre-classified. Plans predating EPIC-0041 lack footprint data — warn, do not block (RULE-006).
+Invoke `Skill(skill: "x-evaluate-parallelism", args: "--scope=story --story={STORY_ID}")`. The skill consumes per-task/per-story File Footprints and returns a collision matrix classifying interactions as HARD (same file write), REGEN (same golden regen target), or SOFT. On any HARD or REGEN collision between tasks declared parallel, downgrade the affected wave to serial and record `ExecutionState.parallelismDowngrades` with fields `{taskA, taskB, collisionType, hotspot}`. RULE-004 hotspots (`SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`, `pom.xml`, `.gitignore`, `src/test/resources/golden/**`) are pre-classified. Plans predating EPIC-0041 lack footprint data — warn, do not block (RULE-006).
 
 ## 4. Phase 2 — Task Execution Loop (Full)
 
@@ -404,7 +404,7 @@ If no test plan with TPP markers was produced by Phase 1B and no formal tasks ex
 > - After G7: run `{{TEST_COMMAND}}` and `{{COVERAGE_COMMAND}}`.
 > - Coverage targets: line ≥ 95%, branch ≥ 90%.
 
-Emit warning: `"WARNING: No TDD test plan available. Using G1-G7 group-based implementation as single implicit task. Consider running /x-test-plan for future implementations."`
+Emit warning: `"WARNING: No TDD test plan available. Using G1-G7 group-based implementation as single implicit task. Consider running /x-plan-tests for future implementations."`
 
 ## 5. Phase 3 — Story-Level Verification (Full)
 
@@ -440,11 +440,11 @@ Verify uniform error handling patterns across classes of the same role. Verify c
 | `graphql` | GraphQL schema doc generator | `contracts/api/graphql-reference.md` |
 | `websocket` / `kafka` / `event-consumer` / `event-producer` | Event doc generator | `contracts/api/event-reference.md` |
 
-No documentable interfaces ⇒ skip with `"No documentable interfaces configured"`. Always generate CHANGELOG entry from Conventional Commits. If `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` exists, invoke `Skill(skill: "x-arch-update", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")` to update `steering/service-architecture.md`.
+No documentable interfaces ⇒ skip with `"No documentable interfaces configured"`. Always generate CHANGELOG entry from Conventional Commits. If `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` exists, invoke `Skill(skill: "x-update-architecture", args: "ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md")` to update `steering/service-architecture.md`.
 
 ### 5.5 Step 3.4 — Specialist Reviews
 
-    Skill(skill: "x-review", args: "{STORY_ID}")
+    Skill(skill: "x-review-codebase", args: "{STORY_ID}")
 
 The review skill launches its own 8 parallel specialist subagents (Security, QA, Performance, Database, Observability, DevOps, API, Event). Instruct each specialist to read `.claude/templates/_TEMPLATE-SPECIALIST-REVIEW.md`. On missing template, WARN and fall back to inline format.
 
@@ -455,7 +455,7 @@ Consolidated dashboard (RULE-006): read `.claude/templates/_TEMPLATE-CONSOLIDATE
 1. Read `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md`. Map open findings from dashboard to remediation items. Save to `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`.
 2. Fix ALL failed items (every specialist must reach STATUS: Approved).
 3. TDD discipline: write/update test FIRST, then apply fix.
-4. Atomic commits via `Skill(skill: "x-git-commit", ...)`.
+4. Atomic commits via `Skill(skill: "x-commit-changes", ...)`.
 5. Run `{{COMPILE_COMMAND}}` + `{{TEST_COMMAND}}`. Update remediation tracking with commit references.
 
 **Agent-Assisted Remediation (EPIC-0042):** on CRITICAL/HIGH findings, auto-dispatch per-finding agents unless `--no-auto-remediation`:
@@ -463,7 +463,7 @@ Consolidated dashboard (RULE-006): read `.claude/templates/_TEMPLATE-CONSOLIDATE
     Agent(
       subagent_type: "general-purpose",
       description: "Fix review finding FIND-NNN",
-      prompt: "Read finding FIND-NNN from ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md. Apply TDD discipline: write/update test FIRST for the finding, then fix implementation. Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}}. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix FIND-NNN: [description]\"'). Update remediation tracking: mark FIND-NNN as Fixed with commit SHA."
+      prompt: "Read finding FIND-NNN from ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md. Apply TDD discipline: write/update test FIRST for the finding, then fix implementation. Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}}. Commit via Skill(skill: 'x-commit-changes', args: '--type fix --subject \"fix FIND-NNN: [description]\"'). Update remediation tracking: mark FIND-NNN as Fixed with commit SHA."
     )
 
 After all finding agents complete, re-run test + coverage. Step 3.6 re-validates (max 2 cycles).
@@ -472,7 +472,7 @@ After all finding agents complete, re-run test + coverage. Step 3.6 re-validates
 
 `Skill(skill: "x-review-pr", args: "{STORY_ID}")` for holistic review. Requires all items passing for GO. If NO-GO, fix all failed items and re-review (max 2 cycles). Update dashboard with Tech Lead findings.
 
-**Step 3.6.5 — PR fix on GO:** invoke `Skill(skill: "x-pr-fix", args: "--pr {prNumber}")` to apply reviewer comments automatically. On compile regression, ABORT with `PR_FIX_COMPILE_REGRESSION`; do NOT proceed to 3.7.
+**Step 3.6.5 — PR fix on GO:** invoke `Skill(skill: "x-fix-pr", args: "--pr {prNumber}")` to apply reviewer comments automatically. On compile regression, ABORT with `PR_FIX_COMPILE_REGRESSION`; do NOT proceed to 3.7.
 
 ### 5.8 Step 3.7 — Story-Level PR (Auto-Approve Mode Only)
 
@@ -504,7 +504,7 @@ If `--auto-approve-pr` is active:
 8. **Post-Deploy Verification — SMOKE GATE (HARD, EPIC-0042):**
    - `testing.smoke_tests == false` ⇒ SKIP with `"Post-deploy verification skipped (testing.smoke_tests=false)"`.
    - `--skip-smoke` present ⇒ SKIP with `"Smoke gate bypassed via --skip-smoke flag"`.
-   - Otherwise execute (invoke `/x-test-e2e` or configured smoke):
+   - Otherwise execute (invoke `/x-execute-e2e-tests` or configured smoke):
      - Health Check: GET `/health` → 200 OK.
      - Critical Path: primary request flow → valid response.
      - Response Time: p95 < configured SLO (advisory — WARNING only).
@@ -531,12 +531,12 @@ Concrete per-mode actions:
 
 - **Mode 1 (REUSE, `STORY_OWNS_WORKTREE=false`):** do NOT remove. Do NOT run `git checkout develop && git pull origin develop` here (violates Rule 14 §2).
 - **Mode 2 (CREATE, `STORY_OWNS_WORKTREE=true`) + DoD passed:**
-  1. Remove: `Skill(skill: "x-git-worktree", args: "remove --id story-XXXX-YYYY")`.
+  1. Remove: `Skill(skill: "x-manage-worktrees", args: "remove --id story-XXXX-YYYY")`.
   2. Switch context back to `mainRepoPath` and run `git checkout develop && git pull origin develop`.
-- **Mode 2 (CREATE) + story FAILED:** preserve for diagnosis (Rule 14 §4). Log the preserved path and instruct the operator to run `Skill(skill: "x-git-worktree", args: "remove --force --id story-XXXX-YYYY")` after triage.
+- **Mode 2 (CREATE) + story FAILED:** preserve for diagnosis (Rule 14 §4). Log the preserved path and instruct the operator to run `Skill(skill: "x-manage-worktrees", args: "remove --force --id story-XXXX-YYYY")` after triage.
 - **Mode 3 (LEGACY, `STORY_OWNS_WORKTREE=false`):** no worktree created; run `git checkout develop && git pull origin develop` in the main checkout.
 
-> **Anti-pattern (Rule 14 §5).** `x-story-implement` MUST NEVER call `/x-git-worktree remove` when `STORY_OWNS_WORKTREE=false`. Removal ownership belongs to the outer orchestrator (Mode 1) or is not applicable (Mode 3).
+> **Anti-pattern (Rule 14 §5).** `x-implement-story` MUST NEVER call `/x-manage-worktrees remove` when `STORY_OWNS_WORKTREE=false`. Removal ownership belongs to the outer orchestrator (Mode 1) or is not applicable (Mode 3).
 
 ## 6. Error Classification, Retry, and Reporting
 
@@ -563,7 +563,7 @@ PERMANENT errors MUST NOT be retried.
 
 ### 6.3 SubagentResult Error Reporting
 
-When `x-story-implement` is invoked as a subagent by `x-epic-implement`, errors MUST be reported back via `SubagentResult` JSON fields:
+When `x-implement-story` is invoked as a subagent by `x-implement-epic`, errors MUST be reported back via `SubagentResult` JSON fields:
 
 - `errorType` — TRANSIENT | CONTEXT | PERMANENT
 - `errorMessage` — human-readable description
@@ -572,7 +572,7 @@ When `x-story-implement` is invoked as a subagent by `x-epic-implement`, errors 
 
 ## 7. Graceful Degradation
 
-When invoked by `x-epic-implement`, the lifecycle skill respects context-pressure levels communicated via the subagent prompt. The epic orchestrator manages pressure detection and level advancement (see `x-epic-implement` Section 1.7).
+When invoked by `x-implement-epic`, the lifecycle skill respects context-pressure levels communicated via the subagent prompt. The epic orchestrator manages pressure detection and level advancement (see `x-implement-epic` Section 1.7).
 
 | Level | Lifecycle Behavior |
 |-------|--------------------|
@@ -581,7 +581,7 @@ When invoked by `x-epic-implement`, the lifecycle skill respects context-pressur
 | Level 2 (Critical) | Skip Phase 3 reviews (specialist + tech lead); minimize output in all tool calls; include `"CONTEXT PRESSURE: minimize output"` in delegated prompts |
 | Level 3 (Emergency) | Not applicable — epic orchestrator saves state and exits before dispatching at Level 3 |
 
-**Detection within lifecycle:** if tool calls return "output too large" or truncated responses, log `"CONTEXT PRESSURE signal detected in x-story-implement for {storyId}"`, set `contextPressureDetected: true` in SubagentResult, apply Level 1 actions locally, continue execution.
+**Detection within lifecycle:** if tool calls return "output too large" or truncated responses, log `"CONTEXT PRESSURE signal detected in x-implement-story for {storyId}"`, set `contextPressureDetected: true` in SubagentResult, apply Level 1 actions locally, continue execution.
 
 ## 8. Template Fallback (RULE-012)
 
@@ -590,7 +590,7 @@ Templates referenced by this skill follow RULE-012. When a template does not exi
 | Template | Fallback |
 |----------|----------|
 | `_TEMPLATE-IMPLEMENTATION-PLAN.md` | Inline section list used in Step 1B subagent |
-| `_TEMPLATE-TEST-PLAN.md` | `x-test-plan` handles its own fallback |
+| `_TEMPLATE-TEST-PLAN.md` | `x-plan-tests` handles its own fallback |
 | `_TEMPLATE-TASK-BREAKDOWN.md` | Task decomposer handles its own fallback |
 | `_TEMPLATE-SECURITY-ASSESSMENT.md` | Inline format for security assessment |
 | `_TEMPLATE-COMPLIANCE-ASSESSMENT.md` | Inline format for compliance assessment |
@@ -605,29 +605,29 @@ Templates referenced by this skill follow RULE-012. When a template does not exi
 |------|-------|------|
 | Architect | Phase 1 | Senior |
 | Task Decomposer | Phase 1C | Mid |
-| Developer (via x-test-tdd) | Phase 2 | Adaptive (per task) |
+| Developer (via x-drive-tdd) | Phase 2 | Adaptive (per task) |
 | Specialist Reviews | Phase 3.4 | Adaptive (max task tier in domain) |
 | Tech Lead | Phase 3.6 | Adaptive (story max tier) |
 
 ## 10. v2 Extensions (EPIC-0038 — Wave-Based Task Orchestration)
 
-This appendix documents the schema-aware orchestration introduced by story-0038-0006. The legacy monolithic flow (coalesce tasks ad-hoc, run Double-Loop TDD inside `x-story-implement` itself) is preserved for v1. In v2, `x-story-implement` becomes a **wave dispatcher** that reads `task-implementation-map-STORY-*.md` and invokes `x-task-implement` per task, honouring declared parallelism.
+This appendix documents the schema-aware orchestration introduced by story-0038-0006. The legacy monolithic flow (coalesce tasks ad-hoc, run Double-Loop TDD inside `x-implement-story` itself) is preserved for v1. In v2, `x-implement-story` becomes a **wave dispatcher** that reads `task-implementation-map-STORY-*.md` and invokes `x-implement-task` per task, honouring declared parallelism.
 
 ### 10.1 Phase 0f — Schema Version Detection
 
-Same `SchemaVersionResolver` as `x-story-plan` (story-0038-0004). When `planningSchemaVersion == "2.0"`, activate the wave dispatcher. Otherwise fall through to the legacy task-centric flow documented above.
+Same `SchemaVersionResolver` as `x-plan-story` (story-0038-0004). When `planningSchemaVersion == "2.0"`, activate the wave dispatcher. Otherwise fall through to the legacy task-centric flow documented above.
 
 ### 10.2 Phase 1 (v2) — Read Task Implementation Map
 
 1. Resolve `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md`.
-2. If missing, abort with `MAP_NOT_FOUND {path}` (the map should already exist from `x-story-plan` v2 Phase 4c; if not, the epic orchestrator or operator should re-run planning).
-3. Parse the Execution Order table to recover wave structure (Wave N → list of TASK-IDs). Coalesced super-nodes appear as `(TASK-A, TASK-B)` and map to a single `x-task-implement` invocation (the child skill's Phase 0e COALESCED check handles partner presence).
+2. If missing, abort with `MAP_NOT_FOUND {path}` (the map should already exist from `x-plan-story` v2 Phase 4c; if not, the epic orchestrator or operator should re-run planning).
+3. Parse the Execution Order table to recover wave structure (Wave N → list of TASK-IDs). Coalesced super-nodes appear as `(TASK-A, TASK-B)` and map to a single `x-implement-task` invocation (the child skill's Phase 0e COALESCED check handles partner presence).
 
 ### 10.3 Phase 2 (v2) — Wave Dispatch Loop
 
 For each wave in topological order:
 
-1. **Dispatch:** for every TASK-ID in the wave, invoke `x-task-implement <TASK-ID>` via the Skill tool. Emit all invocations as sibling tool calls in a SINGLE assistant message (Rule 13 — INLINE-SKILL, parallel dispatch).
+1. **Dispatch:** for every TASK-ID in the wave, invoke `x-implement-task <TASK-ID>` via the Skill tool. Emit all invocations as sibling tool calls in a SINGLE assistant message (Rule 13 — INLINE-SKILL, parallel dispatch).
 2. **Await:** wait for every invocation in the wave to return.
 3. **Verify wave:** assert every TASK result has `status == "DONE"` and a valid `commitSha`. Any FAILED task aborts the wave and the story.
 4. **Integration verification:** run `{{COMPILE_COMMAND}}` + `{{TEST_COMMAND}}` on the aggregated state of develop + wave commits. Regression at this boundary reports which TASK-ID introduced the failure (last-writer per failing file).
@@ -637,8 +637,8 @@ For each wave in topological order:
 
 A wave row containing a coalesced super-node `(TASK-A, TASK-B)`:
 
-- Dispatch a SINGLE `x-task-implement` invocation specifying both task IDs in the `--coalesce <ID1,ID2>` flag.
-- `x-task-implement` Phase 4 emits one commit with `Coalesces-with: TASK-B` footer (RULE-TF-04). The other task's status is updated transitively — both IDs move to DONE with the same `commitSha`.
+- Dispatch a SINGLE `x-implement-task` invocation specifying both task IDs in the `--coalesce <ID1,ID2>` flag.
+- `x-implement-task` Phase 4 emits one commit with `Coalesces-with: TASK-B` footer (RULE-TF-04). The other task's status is updated transitively — both IDs move to DONE with the same `commitSha`.
 
 ### 10.5 Phase 4 (v2) — Story-Level Aggregation
 

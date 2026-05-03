@@ -1,11 +1,11 @@
-# x-git-cleanup-branches
+# x-cleanup-git-branches
 
 > Fetches with prune, removes all non-main worktrees, and deletes every local branch except `main`, `master`, `develop`.
 
 | | |
 |---|---|
 | **Category** | Git/Release |
-| **Invocation** | `/x-git-cleanup-branches [--dry-run] [--yes]` |
+| **Invocation** | `/x-cleanup-git-branches [--dry-run] [--yes]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,9 +16,9 @@ Collapses the "reset local git state" workflow into a single command. After a ba
 ## Usage
 
 ```
-/x-git-cleanup-branches
-/x-git-cleanup-branches --dry-run
-/x-git-cleanup-branches --yes
+/x-cleanup-git-branches
+/x-cleanup-git-branches --dry-run
+/x-cleanup-git-branches --yes
 ```
 
 ## Workflow
@@ -45,6 +45,6 @@ Collapses the "reset local git state" workflow into a single command. After a ba
 
 ## See Also
 
-- [x-git-worktree](../x-git-worktree/) — targeted worktree operations with MERGED/STALE/ORPHAN criteria
-- [x-git-push](../x-git-push/) — commit + push + PR creation
-- [x-git-commit](../x-git-commit/) — atomic Conventional Commits
+- [x-manage-worktrees](../x-manage-worktrees/) — targeted worktree operations with MERGED/STALE/ORPHAN criteria
+- [x-push-branch](../x-push-branch/) — commit + push + PR creation
+- [x-commit-changes](../x-commit-changes/) — atomic Conventional Commits

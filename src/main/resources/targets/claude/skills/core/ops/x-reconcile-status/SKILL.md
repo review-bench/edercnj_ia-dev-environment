@@ -1,6 +1,6 @@
 ---
-name: x-status-reconcile
-description: "Reconciles execution-state.json (telemetry) against the **Status:** field of Epic / Story markdown artifacts. Default mode (diagnose) is read-only and prints a divergence table. Opt-in --apply rewrites the markdowns atomically via StatusFieldParser and commits via x-git-commit. Respects Rule 19 (legacy v1 epics skip silently) and Rule 22 (markdown is SoT; state.json is telemetry). Use for manual recovery of legacy epics whose markdown status drifted from execution checkpoints."
+name: x-reconcile-status
+description: "Reconciles execution-state.json (telemetry) against the **Status:** field of Epic / Story markdown artifacts. Default mode (diagnose) is read-only and prints a divergence table. Opt-in --apply rewrites the markdowns atomically via StatusFieldParser and commits via x-commit-changes. Respects Rule 19 (legacy v1 epics skip silently) and Rule 22 (markdown is SoT; state.json is telemetry). Use for manual recovery of legacy epics whose markdown status drifted from execution checkpoints."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, AskUserQuestion
 argument-hint: "--epic XXXX | --story story-XXXX-YYYY [--apply] [--non-interactive] [--dry-run]"
@@ -27,17 +27,17 @@ Rule 22 — Lifecycle Integrity).
 Typical use case: legacy epic EPIC-0024 has 16 stories with
 `status: SUCCESS` in `execution-state.json` but every story
 markdown still says `**Status:** Pendente`. Running
-`/x-status-reconcile --epic 0024 --apply` rewrites the 16
+`/x-reconcile-status --epic 0024 --apply` rewrites the 16
 markdowns (plus the epic-level rollup) and emits a single
 audit commit.
 
 ## Triggers
 
-- `/x-status-reconcile --epic 0024` — diagnose mode (read-only)
-- `/x-status-reconcile --epic 0024 --apply` — apply + commit
-- `/x-status-reconcile --epic 0024 --apply --non-interactive` — CI
-- `/x-status-reconcile --story story-0024-0005 --apply` — narrow scope
-- `/x-status-reconcile --epic 0024 --apply --dry-run` — force diagnose even with --apply
+- `/x-reconcile-status --epic 0024` — diagnose mode (read-only)
+- `/x-reconcile-status --epic 0024 --apply` — apply + commit
+- `/x-reconcile-status --epic 0024 --apply --non-interactive` — CI
+- `/x-reconcile-status --story story-0024-0005 --apply` — narrow scope
+- `/x-reconcile-status --epic 0024 --apply --dry-run` — force diagnose even with --apply
 
 ## Parameters
 
@@ -119,11 +119,11 @@ AskUserQuestion(
 1. `LifecycleReconciler.apply(divergences)` — validates every
    transition against `LifecycleTransitionMatrix` BEFORE any
    write (atomicity). A forbidden transition → exit 40.
-2. Delegate the commit to `x-git-commit` via Rule 13
+2. Delegate the commit to `x-commit-changes` via Rule 13
    INLINE-SKILL:
 
    ```
-   Skill(skill: "x-git-commit",
+   Skill(skill: "x-commit-changes",
          args: "--type chore --scope epic-XXXX --subject 'reconcile lifecycle status backfill'")
    ```
 
@@ -176,5 +176,5 @@ preceding is human-readable diagnostics.
 - Rule 22 — Lifecycle Integrity (SoT contract).
 - Rule 19 — Backward Compatibility (v1 skip).
 - Rule 20 — Interactive Gates Convention (PROCEED / FIX / ABORT).
-- Rule 13 — Skill Invocation Protocol (INLINE-SKILL for `x-git-commit`).
+- Rule 13 — Skill Invocation Protocol (INLINE-SKILL for `x-commit-changes`).
 - Helpers: `StatusFieldParser`, `LifecycleTransitionMatrix`, `LifecycleReconciler` (story-0046-0001 + 0046-0006).

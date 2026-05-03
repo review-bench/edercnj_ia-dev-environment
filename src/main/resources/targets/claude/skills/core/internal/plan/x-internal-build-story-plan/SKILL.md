@@ -1,6 +1,6 @@
 ---
-name: x-internal-story-build-plan
-description: "Orchestrates parallel story-planning (Phase 1 carve-out of x-story-implement): invokes x-arch-plan (Step 1A) and then dispatches 5 sibling Agent subagents in ONE assistant message for implementation plan, test plan, task breakdown, security assessment, and compliance assessment (Steps 1B-1F). Applies the Rule 13 SUBAGENT-GENERAL pattern as the canonical parallel-planning gateway. Scope-aware: SIMPLE skips 1E/1F. Returns a consolidated envelope of artifact paths to the calling orchestrator. Fifth skill in the x-internal-* convention and the second under internal/plan/ (after x-internal-story-load-context)."
+name: x-internal-build-story-plan
+description: "Orchestrates parallel story-planning (Phase 1 carve-out of x-implement-story): invokes x-plan-architecture (Step 1A) and then dispatches 5 sibling Agent subagents in ONE assistant message for implementation plan, test plan, task breakdown, security assessment, and compliance assessment (Steps 1B-1F). Applies the Rule 13 SUBAGENT-GENERAL pattern as the canonical parallel-planning gateway. Scope-aware: SIMPLE skips 1E/1F. Returns a consolidated envelope of artifact paths to the calling orchestrator. Fifth skill in the x-internal-* convention and the second under internal/plan/ (after x-internal-load-story-context)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill, Agent
@@ -19,28 +19,28 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-story-implement (Phase 1 carve-out).
-> Quinta skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, e x-internal-story-load-context
+> Caller principal: x-implement-story (Phase 1 carve-out).
+> Quinta skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, e x-internal-load-story-context
 > 0049-0011). Segunda skill na subdir `internal/plan/` (co-habita com
-> x-internal-story-load-context). A subdir `plan/` agrupa as skills que
+> x-internal-load-story-context). A subdir `plan/` agrupa as skills que
 > orquestram lógica de planejamento; difere de `internal/ops/`, cujas
 > sibling skills mutam estado (execution-state.json, reports).
 
-# Skill: x-internal-story-build-plan
+# Skill: x-internal-build-story-plan
 
 ## Purpose
 
 Carve out Phase 1 (Architecture Planning + Parallel Planning) of
-`x-story-implement` into a single orchestration skill. The ~250
-inline lines currently inside `x-story-implement` Phase 1 become a
-single `Skill(skill: "x-internal-story-build-plan", …)` invocation;
+`x-implement-story` into a single orchestration skill. The ~250
+inline lines currently inside `x-implement-story` Phase 1 become a
+single `Skill(skill: "x-internal-build-story-plan", …)` invocation;
 the orchestrator shrinks to a read-the-envelope consumer.
 
 Responsibilities (single):
 
-1. Invoke `x-arch-plan` for the story (Step 1A).
+1. Invoke `x-plan-architecture` for the story (Step 1A).
 2. Dispatch 5 sibling `Agent(general-purpose, …)` subagents in ONE
    assistant message for Steps 1B (implementation plan), 1C (test
    plan), 1D (task breakdown), 1E (security assessment), and 1F
@@ -48,22 +48,22 @@ Responsibilities (single):
 3. Gate Steps 1E and 1F behind `--scope` (SIMPLE → skip 1E/1F).
 4. Collect artifact paths from every subagent, assemble a
    consolidated response envelope, and emit it on stdout.
-5. Translate individual subagent or `x-arch-plan` failures into the
+5. Translate individual subagent or `x-plan-architecture` failures into the
    stable exit-code catalogue below.
 
 Non-responsibilities (explicit):
 
 - The skill does NOT read, re-parse, or classify the story file —
-  that is `x-internal-story-load-context`'s contract (story-0049-0011).
+  that is `x-internal-load-story-context`'s contract (story-0049-0011).
 - The skill does NOT mutate `execution-state.json`, story
   `**Status:**` headers, or IMPLEMENTATION-MAP — those belong to
-  `x-internal-status-update` (story-0049-0005).
+  `x-internal-update-status` (story-0049-0005).
 - The skill does NOT run the parallelism-collision gate — Phase 1.5
-  remains the orchestrator's responsibility via `x-parallel-eval`
+  remains the orchestrator's responsibility via `x-evaluate-parallelism`
   (EPIC-0041).
 - The skill does NOT perform pre-check / freshness classification of
   the 7 planning artifacts — that runs upstream inside
-  `x-internal-story-load-context` (Step 4). Callers only invoke this
+  `x-internal-load-story-context` (Step 4). Callers only invoke this
   skill when `planningMode ∈ {HYBRID, INLINE}` and a regen is
   actually required.
 
@@ -71,11 +71,11 @@ Non-responsibilities (explicit):
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-story-build-plan/` | `internal/` prefix scopes visibility; `plan/` co-locates with the sibling read-only carve-out (x-internal-story-load-context) |
+| Path | `internal/plan/x-internal-build-story-plan/` | `internal/` prefix scopes visibility; `plan/` co-locates with the sibling read-only carve-out (x-internal-load-story-context) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
-| Allowed tools | `Bash, Skill, Agent` | Minimal for an orchestrator: `Skill` for Step 1A (x-arch-plan), `Agent` for Steps 1B-1F, `Bash` for argv parsing and the envelope `jq -nc` assembly |
+| Allowed tools | `Bash, Skill, Agent` | Minimal for an orchestrator: `Skill` for Step 1A (x-plan-architecture), `Agent` for Steps 1B-1F, `Bash` for argv parsing and the envelope `jq -nc` assembly |
 | Naming | `x-internal-{subject}-{action}` | Mirrors Rule 04 skill taxonomy; `story-build-plan` = subject+action |
 
 Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
@@ -85,12 +85,12 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never
-invoked by a human typing `/x-internal-story-build-plan` in chat.
+invoked by a human typing `/x-internal-build-story-plan` in chat.
 All invocations follow Rule 13 INLINE-SKILL pattern from a calling
 orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-story-build-plan",
+Skill(skill: "x-internal-build-story-plan",
       args: "--story-id story-0049-0012 --epic-id 0049 --scope STANDARD")
 ```
 
@@ -128,11 +128,11 @@ On success the skill writes a single-line JSON object to stdout:
 
 The six artifact basenames (all under `ai/epics/epic-XXXX/plans/`):
 
-1. `arch-story-XXXX-YYYY.md` (Step 1A — `x-arch-plan`)
+1. `arch-story-XXXX-YYYY.md` (Step 1A — `x-plan-architecture`)
 2. `plan-story-XXXX-YYYY.md` (Step 1B — Senior Architect subagent)
-3. `tests-story-XXXX-YYYY.md` (Step 1C — `x-test-plan` subagent)
-4. `tasks-story-XXXX-YYYY.md` (Step 1D — `x-lib-task-decomposer` subagent)
-5. `security-story-XXXX-YYYY.md` (Step 1E — `x-threat-model` subagent; omitted in SIMPLE)
+3. `tests-story-XXXX-YYYY.md` (Step 1C — `x-plan-tests` subagent)
+4. `tasks-story-XXXX-YYYY.md` (Step 1D — `x-lib-decompose-task` subagent)
+5. `security-story-XXXX-YYYY.md` (Step 1E — `x-model-threats` subagent; omitted in SIMPLE)
 6. `compliance-story-XXXX-YYYY.md` (Step 1F — Compliance Engineer subagent; omitted in SIMPLE)
 
 The task-implementation-map (`task-implementation-map-story-XXXX-YYYY.md`)
@@ -144,7 +144,7 @@ artifact (EPIC-0038 v2 contract).
 | Code | Name | Condition | Message Format |
 | :--- | :--- | :--- | :--- |
 | 0 | SUCCESS | All required artifacts produced | — |
-| 1 | ARCH_PLAN_FAILED | `x-arch-plan` (Step 1A) returned non-zero or failed to produce `arch-story-*.md` | `Architecture plan failed: <detail>` |
+| 1 | ARCH_PLAN_FAILED | `x-plan-architecture` (Step 1A) returned non-zero or failed to produce `arch-story-*.md` | `Architecture plan failed: <detail>` |
 | 2 | SUBAGENT_FAILED | Any of Steps 1B-1F (subagent dispatch) failed or did not produce its artifact | `Subagent <name> failed: <detail>` |
 | 64 | EX_USAGE | Unknown flag, missing required flag, or malformed `--story-id` / `--epic-id` | `usage: <detail>` |
 
@@ -172,20 +172,20 @@ plans_dir="${epic_dir}/plans"
 When `${epic_dir}` is not a directory, exit 64 with
 `usage: epic dir not found: ai/epics/epic-<id>`. The skill does NOT
 re-validate the story file existence — that is the caller's
-responsibility (`x-internal-story-load-context` runs upstream).
+responsibility (`x-internal-load-story-context` runs upstream).
 
 ### Step 1A — Architecture plan (sequential)
 
-Invoke `x-arch-plan` via the Rule 13 INLINE-SKILL pattern:
+Invoke `x-plan-architecture` via the Rule 13 INLINE-SKILL pattern:
 
 ```markdown
-Skill(skill: "x-arch-plan",
+Skill(skill: "x-plan-architecture",
       args: "--story-id ${story_id} --epic-id ${epic_id}")
 ```
 
 Expected output: `${plans_dir}/arch-story-${story_id}.md`.
 
-On any failure (non-zero exit from `x-arch-plan`, or the expected
+On any failure (non-zero exit from `x-plan-architecture`, or the expected
 file does not exist after invocation), emit to stderr:
 `Architecture plan failed: <underlying message>` and exit `1`.
 
@@ -218,9 +218,9 @@ Per-step role and artifact mapping:
 | Step | Role | Skill delegate (if any) | Artifact basename |
 | :--- | :--- | :--- | :--- |
 | 1B | Senior Architect | — (inline prompt) | `plan-story-${story_id}.md` |
-| 1C | QA Engineer | `x-test-plan` via `Skill(…)` inside subagent | `tests-story-${story_id}.md` |
-| 1D | Task Decomposer | `x-lib-task-decomposer` via `Skill(…)` inside subagent | `tasks-story-${story_id}.md` + `task-implementation-map-story-${story_id}.md` |
-| 1E | Security Engineer | `x-threat-model` via `Skill(…)` inside subagent | `security-story-${story_id}.md` |
+| 1C | QA Engineer | `x-plan-tests` via `Skill(…)` inside subagent | `tests-story-${story_id}.md` |
+| 1D | Task Decomposer | `x-lib-decompose-task` via `Skill(…)` inside subagent | `tasks-story-${story_id}.md` + `task-implementation-map-story-${story_id}.md` |
+| 1E | Security Engineer | `x-model-threats` via `Skill(…)` inside subagent | `security-story-${story_id}.md` |
 | 1F | Compliance Engineer | — (inline prompt) | `compliance-story-${story_id}.md` |
 
 #### Origin Marker Emission (EPIC-0059 — mandatory for all 1B-1F artifacts)
@@ -230,7 +230,7 @@ before writing the file content:
 
 ```yaml
 ---
-generated-by: x-internal-story-build-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+generated-by: x-internal-build-story-plan@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 story-id: ${story_id}
 ---
@@ -242,7 +242,7 @@ Include the following instruction in each subagent prompt:
 > block at the very top of the output file before any Markdown content:
 > ```yaml
 > ---
-> generated-by: x-internal-story-build-plan@<run: git rev-parse HEAD>
+> generated-by: x-internal-build-story-plan@<run: git rev-parse HEAD>
 > generated-at: <run: date -u +%Y-%m-%dT%H:%M:%SZ>
 > story-id: ${story_id}
 > ---
@@ -298,7 +298,7 @@ Emit on stdout as a single line terminated by `\n`. Exit 0.
 ### Example 1 — Happy path: STANDARD scope (6 artifacts)
 
 ```bash
-Skill(skill: "x-internal-story-build-plan",
+Skill(skill: "x-internal-build-story-plan",
       args: "--story-id story-0049-0012 --epic-id 0049 --scope STANDARD")
 ```
 
@@ -311,7 +311,7 @@ Exit: 0.
 ### Example 2 — SIMPLE scope skips 1E / 1F
 
 ```bash
-Skill(skill: "x-internal-story-build-plan",
+Skill(skill: "x-internal-build-story-plan",
       args: "--story-id story-0049-0001 --epic-id 0049 --scope SIMPLE")
 ```
 
@@ -325,19 +325,19 @@ Exit: 0.
 
 COMPLEX currently produces the same 6 artifacts as STANDARD; the
 tier is echoed in `scope` for downstream decisions (e.g., post-Phase-2
-stakeholder review gate in `x-story-implement`) but does not change
+stakeholder review gate in `x-implement-story`) but does not change
 the planning surface.
 
 ### Example 4 — Architecture plan fails
 
 ```bash
-Skill(skill: "x-internal-story-build-plan",
+Skill(skill: "x-internal-build-story-plan",
       args: "--story-id story-0049-0099 --epic-id 0049 --scope STANDARD")
 ```
 
 Stderr:
 ```
-Architecture plan failed: x-arch-plan exit 3 (story not found)
+Architecture plan failed: x-plan-architecture exit 3 (story not found)
 ```
 Exit: 1.
 
@@ -357,12 +357,12 @@ Exit: 2.
 | :--- | :--- | :--- |
 | Response envelope | stdout | Single-line JSON matching the Response Contract |
 | Error diagnostic | stderr | Single line, non-empty only on exit ≠ 0 |
-| Planning artifacts | `ai/epics/epic-${epic_id}/plans/*.md` | Written by `x-arch-plan` + Step 1B-1F subagents |
+| Planning artifacts | `ai/epics/epic-${epic_id}/plans/*.md` | Written by `x-plan-architecture` + Step 1B-1F subagents |
 
-This skill DOES create files — unlike `x-internal-story-load-context`,
+This skill DOES create files — unlike `x-internal-load-story-context`,
 which is strictly read-only. The `allowed-tools` frontmatter
 includes `Skill` and `Agent` to reflect this: the writes happen
-inside the dispatched subagents / the invoked `x-arch-plan`, not
+inside the dispatched subagents / the invoked `x-plan-architecture`, not
 directly from this skill's body.
 
 ## Error Handling
@@ -373,7 +373,7 @@ directly from this skill's body.
 | Unknown flag | Print `usage: unknown flag …` to stderr; exit 64 |
 | Malformed `--story-id` | `usage: --story-id must match story-NNNN-NNNN`; exit 64 |
 | Missing epic dir | `usage: epic dir not found: ai/epics/epic-<id>`; exit 64 |
-| `x-arch-plan` non-zero | `Architecture plan failed: <detail>`; exit 1 |
+| `x-plan-architecture` non-zero | `Architecture plan failed: <detail>`; exit 1 |
 | Expected `arch-story-*.md` absent after Step 1A | `Architecture plan failed: arch-story-*.md not produced`; exit 1 |
 | Any subagent returns error | `Subagent <step> failed: <detail>`; exit 2 |
 | Any subagent returns success but required artifact absent | `Subagent <step> failed: <basename> not produced`; exit 2 |
@@ -383,7 +383,7 @@ directly from this skill's body.
 The skill is fail-fast: the first error aborts the run. Partial
 artifacts produced by successful subagents remain on disk (the
 orchestrator may choose to re-invoke with the same arguments —
-`x-arch-plan` and each subagent are idempotent with respect to their
+`x-plan-architecture` and each subagent are idempotent with respect to their
 artifact path).
 
 ## Performance Contract
@@ -408,7 +408,7 @@ Acceptance scenarios (mirroring Section 7 of story-0049-0012):
    `skipped=["1E","1F"]`.
 3. **Boundary — COMPLEX.** Same 6 artifacts as STANDARD; envelope
    echoes `scope=COMPLEX`.
-4. **Error — `x-arch-plan` fails.** Exit 1; stderr starts with
+4. **Error — `x-plan-architecture` fails.** Exit 1; stderr starts with
    `Architecture plan failed:`.
 5. **Error — subagent failure.** Exit 2; stderr identifies which
    step (`1B` / `1C` / `1D` / `1E` / `1F`).
@@ -416,7 +416,7 @@ Acceptance scenarios (mirroring Section 7 of story-0049-0012):
 Coverage requirement: ≥ 95% line / ≥ 90% branch across the
 invoking Bash codepaths and the dispatch / envelope-assembly
 logic. Goldens (if added) lock the SKILL.md rendering under
-`src/test/resources/golden/internal/plan/x-internal-story-build-plan/`
+`src/test/resources/golden/internal/plan/x-internal-build-story-plan/`
 per the sibling pattern.
 
 ## Generator Filter Contract
@@ -443,7 +443,7 @@ underlying `Skill` / `Agent` / `Bash` invocation made from inside
 the skill body.
 
 Subagent `subagent.start` / `subagent.end` markers around Steps
-1B-1F are emitted by the caller (`x-story-implement` Phase 1)
+1B-1F are emitted by the caller (`x-implement-story` Phase 1)
 because that orchestrator owns the enclosing phase. Re-emitting
 from inside this skill would double-count the wave.
 
@@ -455,14 +455,14 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-story-implement` | caller (primary) | Phase 1 carve-out: ~250 inline lines collapse to one `Skill(skill: "x-internal-story-build-plan", …)` invocation in story-0049-0019 |
-| `x-internal-story-load-context` | upstream peer | Caller runs this sibling first to decide whether Phase 1 needs regen (`planningMode != PRE_PLANNED`); only then invokes `x-internal-story-build-plan` |
-| `x-arch-plan` | delegate (Step 1A) | Sequential precondition; produces `arch-story-*.md` consumed by Steps 1B-1F |
-| `x-test-plan` | delegate (Step 1C) | Invoked from inside the QA-Engineer subagent |
-| `x-lib-task-decomposer` | delegate (Step 1D) | Invoked from inside the Task-Decomposer subagent; produces both the tasks file and the task-implementation-map |
-| `x-threat-model` | delegate (Step 1E) | Invoked from inside the Security-Engineer subagent; skipped in SIMPLE |
-| `x-parallel-eval` | consumer (downstream) | Phase 1.5 of the caller reads the `task-implementation-map` produced here to compute the collision matrix (EPIC-0041) |
-| `x-internal-status-update` | peer | Separate concern (mutates state); never invoked from this skill |
+| `x-implement-story` | caller (primary) | Phase 1 carve-out: ~250 inline lines collapse to one `Skill(skill: "x-internal-build-story-plan", …)` invocation in story-0049-0019 |
+| `x-internal-load-story-context` | upstream peer | Caller runs this sibling first to decide whether Phase 1 needs regen (`planningMode != PRE_PLANNED`); only then invokes `x-internal-build-story-plan` |
+| `x-plan-architecture` | delegate (Step 1A) | Sequential precondition; produces `arch-story-*.md` consumed by Steps 1B-1F |
+| `x-plan-tests` | delegate (Step 1C) | Invoked from inside the QA-Engineer subagent |
+| `x-lib-decompose-task` | delegate (Step 1D) | Invoked from inside the Task-Decomposer subagent; produces both the tasks file and the task-implementation-map |
+| `x-model-threats` | delegate (Step 1E) | Invoked from inside the Security-Engineer subagent; skipped in SIMPLE |
+| `x-evaluate-parallelism` | consumer (downstream) | Phase 1.5 of the caller reads the `task-implementation-map` produced here to compute the collision matrix (EPIC-0041) |
+| `x-internal-update-status` | peer | Separate concern (mutates state); never invoked from this skill |
 
 Downstream stories that depend on this carve-out:
 story-0049-0019 (orchestrator consumes the envelope and deletes the
@@ -470,6 +470,6 @@ inline Phase 1 block).
 
 Full workflow detail (subagent prompt catalogue per step, scope-gate
 decision table, envelope-assembly edge cases, and the interaction
-with `x-internal-story-load-context`'s upstream freshness result)
+with `x-internal-load-story-context`'s upstream freshness result)
 lives in [`references/full-protocol.md`](references/full-protocol.md)
 per ADR-0011.

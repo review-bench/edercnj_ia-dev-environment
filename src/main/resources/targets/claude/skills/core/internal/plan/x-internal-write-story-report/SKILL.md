@@ -1,6 +1,6 @@
 ---
-name: x-internal-story-report
-description: "Generates the final consolidated story-completion report by reading ai/epics/epic-XXXX/execution-state.json, collecting per-task status and commitSha, PR metadata (prNumber, prState), coverage delta, and review findings, then rendering the output via x-internal-report-write with _TEMPLATE-STORY-COMPLETION-REPORT.md to the caller-specified --output path. Eighth skill in the x-internal-* convention and the fifth under internal/plan/ (after x-internal-story-load-context, x-internal-story-build-plan, x-internal-story-verify, and x-internal-story-resume). Read-only against state; writes only to --output via x-internal-report-write."
+name: x-internal-write-story-report
+description: "Generates the final consolidated story-completion report by reading ai/epics/epic-XXXX/execution-state.json, collecting per-task status and commitSha, PR metadata (prNumber, prState), coverage delta, and review findings, then rendering the output via x-internal-write-report with _TEMPLATE-STORY-COMPLETION-REPORT.md to the caller-specified --output path. Eighth skill in the x-internal-* convention and the fifth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, x-internal-verify-story, and x-internal-resume-story). Read-only against state; writes only to --output via x-internal-write-report."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill
@@ -19,25 +19,25 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-story-implement (Phase 3 carve-out — final report).
-> Oitava skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, x-internal-story-load-context
-> 0049-0011, x-internal-story-build-plan 0049-0012,
-> x-internal-story-verify 0049-0014, e x-internal-story-resume
+> Caller principal: x-implement-story (Phase 3 carve-out — final report).
+> Oitava skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, x-internal-build-story-plan 0049-0012,
+> x-internal-verify-story 0049-0014, e x-internal-resume-story
 > 0049-0013). Quinta skill em `internal/plan/`: o subdir `plan/` agrupa
 > orquestração de planejamento e verificação da story; esta skill fecha
 > a quíntupla `load → build → verify → resume → report` com o report
 > final consolidado. Difere de `internal/ops/`, cujas sibling skills
 > mutam estado compartilhado (`execution-state`, append-markers); esta
 > skill é **single-writer** para o seu próprio `--output` e delega o
-> render a `x-internal-report-write`.
+> render a `x-internal-write-report`.
 
-# Skill: x-internal-story-report
+# Skill: x-internal-write-story-report
 
 ## Purpose
 
-Carve out the "final story report" block that `x-story-implement`
+Carve out the "final story report" block that `x-implement-story`
 currently inlines at the end of Phase 3 into a single,
 single-responsibility skill. The orchestrator passes three flags
 (`--story-id`, `--epic-id`, `--output`) and consumes a compact
@@ -68,7 +68,7 @@ Responsibilities (single):
 5. Resolve the template at
    `.claude/templates/_TEMPLATE-STORY-COMPLETION-REPORT.md`; exit 2
    (`TEMPLATE_MISSING`) when absent.
-6. Invoke `Skill(skill: "x-internal-report-write", …)` with the
+6. Invoke `Skill(skill: "x-internal-write-report", …)` with the
    resolved template, the built payload, and the forwarded `--output`
    path. On render success, forward `outputPath` to the caller.
 7. Emit the response envelope
@@ -77,30 +77,30 @@ Responsibilities (single):
 Non-responsibilities (explicit):
 
 - The skill does NOT mutate `execution-state.json`; it is read-only
-  against the state file (delegation to `x-internal-status-update
+  against the state file (delegation to `x-internal-update-status
   --read-only` is not required because a single best-effort read is
-  sufficient — downstream `x-internal-report-write` owns the atomic
+  sufficient — downstream `x-internal-write-report` owns the atomic
   write of the report file).
 - The skill does NOT run tests, coverage, or review dispatch — those
   values must already be present in the state file (written by
-  `x-internal-story-verify`, `x-review`, and `x-review-pr`
+  `x-internal-verify-story`, `x-review-codebase`, and `x-review-pr`
   upstream).
 - The skill does NOT create branches, PRs, or mutate git state.
 - The skill does NOT emit telemetry markers — the caller
-  (`x-story-implement` Phase 3) owns the phase boundary.
+  (`x-implement-story` Phase 3) owns the phase boundary.
 - The skill does NOT implement its own render engine — it delegates
   100% of placeholder substitution and `{{#each}}` expansion to
-  `x-internal-report-write`.
+  `x-internal-write-report`.
 
 ## Convention Anchors (x-internal-*)
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-story-report/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other story-lifecycle carve-outs (`x-internal-story-load-context`, `x-internal-story-build-plan`, `x-internal-story-verify`, `x-internal-story-resume`) |
+| Path | `internal/plan/x-internal-write-story-report/` | `internal/` prefix scopes visibility; `plan/` co-locates with the other story-lifecycle carve-outs (`x-internal-load-story-context`, `x-internal-build-story-plan`, `x-internal-verify-story`, `x-internal-resume-story`) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
-| Allowed tools | `Bash, Skill` | `Bash` reads the state file and builds the JSON payload with `jq`; `Skill` dispatches `x-internal-report-write` for rendering. No direct `Write` / `Edit` surface |
+| Allowed tools | `Bash, Skill` | `Bash` reads the state file and builds the JSON payload with `jq`; `Skill` dispatches `x-internal-write-report` for rendering. No direct `Write` / `Edit` surface |
 | Naming | `x-internal-{subject}-{action}` | Mirrors Rule 04 skill taxonomy; `story-report` = subject+action |
 
 Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
@@ -110,12 +110,12 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never
-invoked by a human typing `/x-internal-story-report` in chat. All
+invoked by a human typing `/x-internal-write-story-report` in chat. All
 invocations follow Rule 13 INLINE-SKILL pattern from a calling
 orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-story-report",
+Skill(skill: "x-internal-write-story-report",
       args: "--story-id story-0049-0001 --epic-id 0049 --output ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
@@ -125,7 +125,7 @@ Skill(skill: "x-internal-story-report",
 | :--- | :--- | :--- | :--- |
 | `--story-id <id>` | M | — | Story identifier (`story-XXXX-YYYY` canonical form; lowercase-normalised) |
 | `--epic-id <id>` | M | — | 4-digit epic identifier (`XXXX`) — used to resolve `ai/epics/epic-XXXX/` (zero-padded) |
-| `--output <path>` | M | — | Target path for the rendered report; forwarded verbatim to `x-internal-report-write --output` |
+| `--output <path>` | M | — | Target path for the rendered report; forwarded verbatim to `x-internal-write-report --output` |
 
 All three flags support both `--key value` and `--key=value` forms.
 Unknown or missing required flags exit with `64` (sysexits
@@ -139,7 +139,7 @@ On success the skill writes a single-line JSON object to stdout:
 
 | Field | Type | Always Present | Description |
 | :--- | :--- | :--- | :--- |
-| `reportPath` | `String` | yes | Absolute path of the written report (echoed from `x-internal-report-write`) |
+| `reportPath` | `String` | yes | Absolute path of the written report (echoed from `x-internal-write-report`) |
 | `summary` | `Object` | yes | Compact summary used by the orchestrator for final logging (see sub-schema below) |
 
 ### `summary` sub-schema
@@ -177,7 +177,7 @@ On success the skill writes a single-line JSON object to stdout:
 | 127 | DEPENDENCY_MISSING | `jq` absent on `PATH` | `dependency missing: jq` |
 
 Render-time failures (e.g., `UNRESOLVED_PLACEHOLDER`) propagate the
-`x-internal-report-write` exit code unchanged so the caller branches
+`x-internal-write-report` exit code unchanged so the caller branches
 on the original semantic. No envelope is emitted on any non-zero
 exit.
 
@@ -187,8 +187,8 @@ exit.
 
 Parse the three flags via a tight `while (($#)); case "$1" in …` loop
 to stay within the SkillSizeLinter 500-line budget without delegating
-to `x-internal-args-normalize` (peer skill; same rationale as
-`x-internal-story-resume` §1 of full-protocol).
+to `x-internal-normalize-args` (peer skill; same rationale as
+`x-internal-resume-story` §1 of full-protocol).
 
 ```bash
 epic_dir="ai/epics/epic-${epic_id}"
@@ -227,7 +227,7 @@ the exit code.
 ### Step 3 — Compute summary fields
 
 Tasks classification uses the same DONE synonym set as
-`x-internal-story-resume` (see references §2):
+`x-internal-resume-story` (see references §2):
 
 ```text
 DONE synonyms: DONE, MERGED, COMPLETE, Concluída, Concluida, Done, Merged
@@ -253,7 +253,7 @@ coverage_branch=$(echo "${story_json}" | jq '.verification.coverage.branch // nu
 ### Step 4 — Build the render payload
 
 Assemble the payload as a single `jq -n` expression so the
-`x-internal-report-write` invocation receives canonical JSON:
+`x-internal-write-report` invocation receives canonical JSON:
 
 ```bash
 data_json=$(jq -nc \
@@ -286,15 +286,15 @@ fi
 ```
 
 The pre-check is intentionally local (not delegated to
-`x-internal-report-write`) so the orchestrator gets a distinct
+`x-internal-write-report`) so the orchestrator gets a distinct
 `TEMPLATE_MISSING` exit code (2) rather than the renderer's
 `TEMPLATE_NOT_FOUND` exit code (1 of that skill). This keeps the
 two skills' exit-code spaces non-overlapping.
 
-### Step 6 — Delegate to x-internal-report-write
+### Step 6 — Delegate to x-internal-write-report
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-STORY-COMPLETION-REPORT.md \
              --output ${output_path} \
              --data ${data_json}")
@@ -302,7 +302,7 @@ Skill(skill: "x-internal-report-write",
 
 The renderer handles all placeholder substitution and `{{#each}}`
 loops. Its stdout is a single JSON line matching the
-`x-internal-report-write` response contract
+`x-internal-write-report` response contract
 (`{outputPath, bytesWritten, placeholdersReplaced, entriesAppended}`);
 this skill reads `outputPath` and discards the rest.
 
@@ -345,7 +345,7 @@ State snippet for `story-0049-0001`:
 Invocation:
 
 ```markdown
-Skill(skill: "x-internal-story-report",
+Skill(skill: "x-internal-write-story-report",
       args: "--story-id story-0049-0001 --epic-id 0049 --output ai/epics/epic-XXXX/reports/story-XXXX-YYYY-report.md")
 ```
 
@@ -366,7 +366,7 @@ status table via the template's `{{#each tasks}}` block. Exit: 0.
 ### Example 3 — Error: STATE_NOT_FOUND
 
 ```bash
-Skill(skill: "x-internal-story-report",
+Skill(skill: "x-internal-write-story-report",
       args: "--story-id story-0049-0099 --epic-id 0099 --output /tmp/out.md")
 ```
 
@@ -406,12 +406,12 @@ template guards that block on `{{prNumber}}`. Exit: 0.
 
 | Artifact | Path | Description |
 | :--- | :--- | :--- |
-| Rendered report | `<--output>` | Markdown file written via `x-internal-report-write` (atomic tmp+rename) |
+| Rendered report | `<--output>` | Markdown file written via `x-internal-write-report` (atomic tmp+rename) |
 | Response envelope | stdout | Single-line JSON (`reportPath` / `summary`) |
 | Error diagnostic | stderr | Single line, non-empty only on exit ≠ 0 |
 
 No file is created by this skill directly — every disk mutation is
-delegated to `x-internal-report-write`, which provides the atomic
+delegated to `x-internal-write-report`, which provides the atomic
 write contract.
 
 ## Error Handling
@@ -429,8 +429,8 @@ write contract.
 | `.verification.coverage` absent | Emit `coverageLine=null, coverageBranch=null`; exit 0 |
 | `.reviews.findings` absent | Emit `findings:[]`; exit 0 |
 | Template file absent | Exit 2 (`TEMPLATE_MISSING`); no envelope |
-| `x-internal-report-write` UNRESOLVED_PLACEHOLDER (exit 3) | Propagate exit code 3 unchanged; stderr already populated by renderer |
-| `x-internal-report-write` WRITE_FAILED (exit 4) | Propagate exit code 4 unchanged |
+| `x-internal-write-report` UNRESOLVED_PLACEHOLDER (exit 3) | Propagate exit code 3 unchanged; stderr already populated by renderer |
+| `x-internal-write-report` WRITE_FAILED (exit 4) | Propagate exit code 4 unchanged |
 
 ## Performance Contract
 
@@ -440,7 +440,7 @@ write contract.
   - Summary JSON computation (jq): < 100 ms
   - Payload assembly: < 50 ms
   - Template resolution: < 10 ms
-  - `x-internal-report-write` invocation: ~200 ms (its own contract)
+  - `x-internal-write-report` invocation: ~200 ms (its own contract)
   - Envelope emission: < 10 ms
 - Memory bounded by state-file size + 2× payload size; the skill
   never loads the rendered report into memory.
@@ -464,7 +464,7 @@ mirroring Section 7 of the story file:
    `prState=null`, rendered report omits the "Pull Request" section.
 
 Goldens live under
-`src/test/resources/golden/internal/plan/x-internal-story-report/`
+`src/test/resources/golden/internal/plan/x-internal-write-story-report/`
 and lock the SKILL.md rendering (per EPIC-0049 convention: generator
 copies internal skills into `.claude/skills/` flat layout but filters
 them from `/help` — goldens validate the source, not the flattened
@@ -483,7 +483,7 @@ The `ia-dev-env` generator MUST exclude skills with
 3. User-facing autocomplete in the chat input.
 
 Internal skills are still copied into `.claude/skills/` (flat layout)
-so `Skill(skill: "x-internal-story-report")` invocations from other
+so `Skill(skill: "x-internal-write-story-report")` invocations from other
 skills resolve correctly. The invariant: **user cannot see it;
 orchestrators can invoke it.**
 
@@ -494,7 +494,7 @@ telemetry is produced by the invoking orchestrator (the `phase`
 wrapping the orchestrator's own step — Phase 3 in this case — is
 the correct aggregation boundary). Passive hooks still capture
 `tool.call` for the underlying `Bash` invocations (`jq`) and the
-nested `Skill(x-internal-report-write)` dispatch.
+nested `Skill(x-internal-write-report)` dispatch.
 
 Reference: Rule 13 (Skill Invocation Protocol), Rule 22 (Lifecycle
 Integrity Audit), ADR-0010 (Interactive Gates Convention — exempts
@@ -504,13 +504,13 @@ internal skills from the 3-option menu contract).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-story-implement` | caller (primary) | Phase 3 final-report carve-out: orchestrator passes `--story-id --epic-id --output` and consumes `{reportPath, summary}` |
-| `x-internal-report-write` | downstream (delegated render) | Resolves `{{KEY}}` placeholders and `{{#each tasks}} / {{#each findings}}` loops against the payload built in Step 4 |
-| `x-internal-status-update` | peer (read-only consumer) | Both read `execution-state.json`; this skill does NOT write to it |
-| `x-internal-story-verify` | upstream producer | Writes `.verification.coverage` consumed in Step 3 |
-| `x-internal-story-resume` | peer | Shares the DONE synonym set and task-classification logic; no runtime coupling |
-| `x-review` / `x-review-pr` | upstream producers | Write `.reviews.findings` consumed in Step 4 |
-| `x-status-reconcile` | downstream reader | May read the rendered report for epic-wide status reconciliation (never mutates concurrently) |
+| `x-implement-story` | caller (primary) | Phase 3 final-report carve-out: orchestrator passes `--story-id --epic-id --output` and consumes `{reportPath, summary}` |
+| `x-internal-write-report` | downstream (delegated render) | Resolves `{{KEY}}` placeholders and `{{#each tasks}} / {{#each findings}}` loops against the payload built in Step 4 |
+| `x-internal-update-status` | peer (read-only consumer) | Both read `execution-state.json`; this skill does NOT write to it |
+| `x-internal-verify-story` | upstream producer | Writes `.verification.coverage` consumed in Step 3 |
+| `x-internal-resume-story` | peer | Shares the DONE synonym set and task-classification logic; no runtime coupling |
+| `x-review-codebase` / `x-review-pr` | upstream producers | Write `.reviews.findings` consumed in Step 4 |
+| `x-reconcile-status` | downstream reader | May read the rendered report for epic-wide status reconciliation (never mutates concurrently) |
 
 Downstream story that depends on this skill: story-0049-0019
 (orchestrator consumes the envelope and deletes the inline Phase 3

@@ -1,6 +1,6 @@
 ---
-name: x-git-merge
-description: "Merges a source branch into a target branch locally with configurable strategy (merge/squash/rebase), automatic conflict detection + rollback, and idempotent no-op when target already contains source HEAD. Centralizes the ~120 lines of inline Bash previously in x-epic-implement Phase 1.4e auto-rebase."
+name: x-merge-branches
+description: "Merges a source branch into a target branch locally with configurable strategy (merge/squash/rebase), automatic conflict detection + rollback, and idempotent no-op when target already contains source HEAD. Centralizes the ~120 lines of inline Bash previously in x-implement-epic Phase 1.4e auto-rebase."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--source <branch> --target <branch> [--strategy merge|squash|rebase] [--message <msg>] [--no-push]"
@@ -13,18 +13,18 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Local Git Merge with Conflict Rollback (x-git-merge)
+# Skill: Local Git Merge with Conflict Rollback (x-merge-branches)
 
 ## Purpose
 
-Single, idempotent entry point for merging one local branch into another with three strategies (`merge` / `squash` / `rebase`), automatic conflict detection and rollback, and a structured result payload. Replaces ~120 lines of inline Bash in `x-epic-implement` Phase 1.4e (auto-rebase between parallel stories + `develop → epic/XXXX` sync). Callers receive either `{mergeSha, conflicts:false}` or `{conflicts:true, rolledBack:true, conflictedFiles:[...]}` — never a half-merged working tree.
+Single, idempotent entry point for merging one local branch into another with three strategies (`merge` / `squash` / `rebase`), automatic conflict detection and rollback, and a structured result payload. Replaces ~120 lines of inline Bash in `x-implement-epic` Phase 1.4e (auto-rebase between parallel stories + `develop → epic/XXXX` sync). Callers receive either `{mergeSha, conflicts:false}` or `{conflicts:true, rolledBack:true, conflictedFiles:[...]}` — never a half-merged working tree.
 
 ## Triggers
 
-- `/x-git-merge --source develop --target epic/0049` — default `merge` strategy, push after success
-- `/x-git-merge --source develop --target epic/0049 --strategy squash --message "sync develop"` — squash with custom message
-- `/x-git-merge --source feat/foo --target develop --strategy rebase` — linear history via rebase
-- `/x-git-merge --source develop --target epic/0049 --no-push` — merge locally only
+- `/x-merge-branches --source develop --target epic/0049` — default `merge` strategy, push after success
+- `/x-merge-branches --source develop --target epic/0049 --strategy squash --message "sync develop"` — squash with custom message
+- `/x-merge-branches --source feat/foo --target develop --strategy rebase` — linear history via rebase
+- `/x-merge-branches --source develop --target epic/0049 --no-push` — merge locally only
 
 ## Parameters
 
@@ -215,37 +215,37 @@ printf '{"mergeSha":"%s","conflicts":false,"conflictedFiles":[],"rolledBack":fal
 
 ```
 # Happy path — merge develop into epic/0049, push after
-/x-git-merge --source develop --target epic/0049
+/x-merge-branches --source develop --target epic/0049
 # -> {"mergeSha":"abc123...","conflicts":false,...,"noOp":false}
 
 # No-op — target already contains source HEAD
-/x-git-merge --source develop --target epic/0049
+/x-merge-branches --source develop --target epic/0049
 # -> {"mergeSha":null,...,"noOp":true}
 
 # Conflict with automatic rollback (exit 10)
-/x-git-merge --source develop --target epic/0049
+/x-merge-branches --source develop --target epic/0049
 # -> {"mergeSha":null,"conflicts":true,"conflictedFiles":["a.md"],"rolledBack":true,...}
 
 # Squash with custom commit message
-/x-git-merge --source feat/foo --target develop --strategy squash --message "feat(foo): batch"
+/x-merge-branches --source feat/foo --target develop --strategy squash --message "feat(foo): batch"
 
 # Rebase feature branch onto develop (linear history, no push)
-/x-git-merge --source develop --target feat/foo --strategy rebase --no-push
+/x-merge-branches --source develop --target feat/foo --strategy rebase --no-push
 ```
 
 ## Rule References
 
 - **Rule 09** (Branching Model) — merge-direction rules and target-branch conventions.
 - **RULE-004** (EPIC-0049 — Estratégia de merge: preserva history) — default strategy `merge` with `--no-ff` preserves per-task TDD commits for bisect.
-- **RULE-005** (EPIC-0049 — Thin orchestrator) — `x-epic-implement` and `x-story-implement` delegate local merges here; no inline `git merge` blocks.
+- **RULE-005** (EPIC-0049 — Thin orchestrator) — `x-implement-epic` and `x-implement-story` delegate local merges here; no inline `git merge` blocks.
 - **RULE-010** (EPIC-0049 — Skills internas pequenas) — this SKILL.md stays under 250 lines.
 
 ## Integration Notes
 
 | Skill | Relationship | Context |
 |-------|--------------|---------|
-| `x-epic-implement` | caller (future refactor — story-0049-0018) | Phase 1.4e auto-rebase between parallel stories; `develop → epic/XXXX` sync |
-| `x-story-implement` | caller (future refactor — story-0049-0019) | Optional auto-sync of story branch with parent epic branch |
-| `x-internal-epic-branch-ensure` | related (story-0049-0008) | Ensures `epic/XXXX` exists before this skill merges `develop` into it |
-| `x-pr-merge` | sibling (story-0049-0003) | Remote PR merge via `gh pr merge`; this skill handles local-only merges |
-| `x-git-branch` | sibling (story-0049-0001) | Bare branch creation; this skill assumes both branches exist |
+| `x-implement-epic` | caller (future refactor — story-0049-0018) | Phase 1.4e auto-rebase between parallel stories; `develop → epic/XXXX` sync |
+| `x-implement-story` | caller (future refactor — story-0049-0019) | Optional auto-sync of story branch with parent epic branch |
+| `x-internal-ensure-epic-branch` | related (story-0049-0008) | Ensures `epic/XXXX` exists before this skill merges `develop` into it |
+| `x-merge-pr` | sibling (story-0049-0003) | Remote PR merge via `gh pr merge`; this skill handles local-only merges |
+| `x-create-git-branch` | sibling (story-0049-0001) | Bare branch creation; this skill assumes both branches exist |

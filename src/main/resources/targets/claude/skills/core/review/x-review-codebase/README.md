@@ -1,24 +1,24 @@
-# x-review
+# x-review-codebase
 
 > Parallel code review with specialist engineers (Security, QA, Performance, Database, Observability, DevOps, API, Event). Launches parallel subagents, each reading their own knowledge pack, then consolidates into a scored report. Use for pre-PR quality validation.
 
 | | |
 |---|---|
 | **Category** | Orchestrator |
-| **Invocation** | `/x-review [STORY-ID or --scope reviewer1,reviewer2]` |
+| **Invocation** | `/x-review-codebase [STORY-ID or --scope reviewer1,reviewer2]` |
 | **Delegates to** | Security, QA, Performance, Database, Data Modeling, Observability, DevOps, API, Event specialist subagents |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
 ## Overview
 
-x-review orchestrates a multi-specialist code review by launching parallel subagents, each with its own knowledge pack and checklist. It detects the branch diff, determines which specialists are applicable based on the project stack, dispatches all reviews in a single message for true parallelism, then consolidates individual scores into a dashboard with remediation tracking. Optionally generates a correction story for critical findings.
+x-review-codebase orchestrates a multi-specialist code review by launching parallel subagents, each with its own knowledge pack and checklist. It detects the branch diff, determines which specialists are applicable based on the project stack, dispatches all reviews in a single message for true parallelism, then consolidates individual scores into a dashboard with remediation tracking. Optionally generates a correction story for critical findings.
 
 ## Execution Flow
 
 ```mermaid
 flowchart TD
-    START(["/x-review STORY-ID"]) --> P0
+    START(["/x-review-codebase STORY-ID"]) --> P0
 
     subgraph P0["Phase 0 -- Idempotency Pre-Check"]
         P0A[Check existing reports] --> P0B{Reports valid?}
@@ -116,7 +116,7 @@ Findings are classified by severity: `CRITICAL | HIGH | MEDIUM | LOW`. Any item 
 
 ## See Also
 
-- [x-review-pr](../x-review-pr/SKILL.md) -- Tech Lead holistic 45-point review (runs after x-review)
-- [x-story-implement](../x-story-implement/SKILL.md) -- Full development cycle (invokes x-review in Phase 4)
-- [x-epic-implement](../x-epic-implement/SKILL.md) -- Epic orchestrator (delegates stories to x-story-implement)
-- [x-test-run](../x-test-run/SKILL.md) -- Coverage validation used during review verification
+- [x-review-pr](../x-review-pr/SKILL.md) -- Tech Lead holistic 45-point review (runs after x-review-codebase)
+- [x-implement-story](../x-implement-story/SKILL.md) -- Full development cycle (invokes x-review-codebase in Phase 4)
+- [x-implement-epic](../x-implement-epic/SKILL.md) -- Epic orchestrator (delegates stories to x-implement-story)
+- [x-execute-tests](../x-execute-tests/SKILL.md) -- Coverage validation used during review verification

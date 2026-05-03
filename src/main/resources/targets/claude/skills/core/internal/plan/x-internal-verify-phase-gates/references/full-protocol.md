@@ -1,4 +1,4 @@
-# x-internal-phase-gate — Full Protocol
+# x-internal-verify-phase-gates — Full Protocol
 
 Supplementary reference for the SKILL.md contract. Covers state-file schema, polling algorithm, atomic write sequence, and mode-specific pseudocode.
 
@@ -48,10 +48,10 @@ Polling interval is fixed at 500ms. `--timeout-s` defaults to 10 (giving 20 poll
 
 ## 3. Atomic write sequence (`phaseGateResults[]` append)
 
-The skill NEVER writes `execution-state.json` directly. It delegates to `x-internal-status-update`:
+The skill NEVER writes `execution-state.json` directly. It delegates to `x-internal-update-status`:
 
 ```bash
-Skill(skill: "x-internal-status-update",
+Skill(skill: "x-internal-update-status",
       args: "--file <state-file> --type phase-gate --phase <phase> --mode <mode> --passed <true|false> --missing-artifacts <comma-list> --missing-tasks <comma-list>")
 ```
 
@@ -127,7 +127,7 @@ The tracker task renders in the CLI list as a single wave-level entry alongside 
 function final_gate(phase, expected_tasks, expected_artifacts, skill):
   base_result = post_gate(phase, expected_tasks, expected_artifacts, default_timeout)
 
-  if skill == "x-story-implement":
+  if skill == "x-implement-story":
     # Augment with Rule 24 mandatory artifacts
     rule_24_required = [
       f"plans/{epic_dir}/reports/verify-envelope-{story_id}.json",
@@ -143,7 +143,7 @@ function final_gate(phase, expected_tasks, expected_artifacts, skill):
   return base_result
 ```
 
-`--mode final` composes with `x-internal-story-verify` / `x-internal-epic-integrity-gate`: the calling orchestrator runs those first; then invokes `--mode final` to confirm their evidence files exist before marking the phase complete. This is the Rule 24 synchronous enforcement point.
+`--mode final` composes with `x-internal-verify-story` / `x-internal-verify-epic-integrity`: the calling orchestrator runs those first; then invokes `--mode final` to confirm their evidence files exist before marking the phase complete. This is the Rule 24 synchronous enforcement point.
 
 ## 8. Error envelope format
 
@@ -160,7 +160,7 @@ PHASE_GATE_MALFORMED — --mode wave requires --expected-tasks
 PHASE_GATE_TIMEOUT — task 203 still in_progress after 10s
 PHASE_GATE_FAILED — missing 1 task(s), 2 artifact(s)
 STATE_FILE_AMBIGUOUS — multiple ai/epics/epic-*/execution-state.json found under $PWD
-STATE_UPDATE_FAILED — x-internal-status-update returned exit 3
+STATE_UPDATE_FAILED — x-internal-update-status returned exit 3
 ```
 
 Stderr is ALWAYS one line. Stdout ALWAYS carries the JSON envelope (even on `passed=false` — exit 12 — so the caller can parse it for reporting).

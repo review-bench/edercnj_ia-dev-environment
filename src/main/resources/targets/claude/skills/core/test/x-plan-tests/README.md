@@ -1,11 +1,11 @@
-# x-test-plan
+# x-plan-tests
 
 > Generates a Double-Loop TDD test plan with TPP-ordered scenarios before implementation. Delegates KP reading to a context-gathering subagent, then produces structured Acceptance Tests (outer loop) and Unit Tests in Transformation Priority Premise order (inner loop).
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-test-plan [STORY-ID]` |
+| **Invocation** | `/x-plan-tests [STORY-ID]` |
 | **Reads** | testing, architecture |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Produces a test plan that serves as the implementation roadmap for TDD. It maps 
 ## Usage
 
 ```
-/x-test-plan ai/epics/epic-XXXX/story-XXXX-YYYY.md
-/x-test-plan story-0012-0003
+/x-plan-tests ai/epics/epic-XXXX/story-XXXX-YYYY.md
+/x-plan-tests story-0012-0003
 ```
 
 ## Workflow
@@ -38,5 +38,5 @@ Produces a test plan that serves as the implementation roadmap for TDD. It maps 
 
 ## See Also
 
-- [x-task-implement](../x-task-implement/) — Consumes the test plan to drive TDD implementation
-- [x-story-implement](../x-story-implement/) — Invokes this skill during Phase 1B
+- [x-implement-task](../x-implement-task/) — Consumes the test plan to drive TDD implementation
+- [x-implement-story](../x-implement-story/) — Invokes this skill during Phase 1B

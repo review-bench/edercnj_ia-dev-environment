@@ -41,4 +41,4 @@ Computes the optimal implementation order from the story dependency graph. It gr
 
 - [x-epic-create](../x-epic-create/) — Generate the Epic with story index and dependencies
 - [x-story-create](../x-story-create/) — Generate the story files consumed by this skill
-- [x-epic-implement](../x-epic-implement/) — Execute stories following the implementation map
+- [x-implement-epic](../x-implement-epic/) — Execute stories following the implementation map

@@ -1,11 +1,11 @@
-# x-pr-create
+# x-create-pr
 
 > Task-level PR creation with formatted title, automatic labels, structured body, and target branch logic. Creates standardized PRs for individual tasks with Task ID traceability.
 
 | | |
 |---|---|
 | **Category** | Git/Release |
-| **Invocation** | `/x-pr-create TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description "desc"]` |
+| **Invocation** | `/x-create-pr TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description "desc"]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,10 +16,10 @@ Creates standardized Pull Requests for individual tasks with Task ID in the titl
 ## Usage
 
 ```
-/x-pr-create TASK-0029-0001-001
-/x-pr-create TASK-0029-0001-001 --draft
-/x-pr-create TASK-0029-0001-001 --auto-approve-pr
-/x-pr-create TASK-0029-0001-001 --description "add user validation"
+/x-create-pr TASK-0029-0001-001
+/x-create-pr TASK-0029-0001-001 --draft
+/x-create-pr TASK-0029-0001-001 --auto-approve-pr
+/x-create-pr TASK-0029-0001-001 --description "add user validation"
 ```
 
 ## Flags
@@ -68,6 +68,6 @@ Labels are auto-created via `gh label create` if they do not exist.
 
 ## See Also
 
-- [x-git-commit](../x-git-commit/) -- Creates commits with Task ID in scope
-- [x-git-push](../x-git-push/) -- General git workflow (branch, commit, push, PR)
-- [x-story-implement](../x-story-implement/) -- Full feature lifecycle that delegates PR creation
+- [x-commit-changes](../x-commit-changes/) -- Creates commits with Task ID in scope
+- [x-push-branch](../x-push-branch/) -- General git workflow (branch, commit, push, PR)
+- [x-implement-story](../x-implement-story/) -- Full feature lifecycle that delegates PR creation

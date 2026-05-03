@@ -5,7 +5,7 @@ user-invocable: false
 requires-capabilities: []
 ---
 
-> 🔒 **INTERNAL KNOWLEDGE PACK** — Referenced by plan skills (`x-epic-create`, `x-epic-decompose`, `x-story-plan`, `x-task-plan`). Not user-invocable.
+> 🔒 **INTERNAL KNOWLEDGE PACK** — Referenced by plan skills (`x-epic-create`, `x-epic-decompose`, `x-plan-story`, `x-plan-task`). Not user-invocable.
 
 # Knowledge Pack: Planning Standards (RA9 — Rule-Aligned 9-Section)
 

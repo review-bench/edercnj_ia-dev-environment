@@ -1,5 +1,5 @@
 ---
-name: x-security-pipeline
+name: x-generate-security-pipeline
 description: "Generate CI/CD pipeline configurations with conditional security stages based on SecurityConfig flags. Support GitHub Actions, GitLab CI, and Azure DevOps with minimal and full stage modes, configurable severity thresholds, and SARIF artifact upload."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
@@ -16,13 +16,13 @@ requires-capabilities: []
 ## Triggers
 
 ```
-/x-security-pipeline                          — GitHub Actions, all stages, pr trigger (default)
-/x-security-pipeline --ci github              — GitHub Actions security pipeline
-/x-security-pipeline --ci gitlab              — GitLab CI security pipeline
-/x-security-pipeline --ci azure               — Azure DevOps security pipeline
-/x-security-pipeline --stages minimal         — SAST + secret scan + dependency audit only
-/x-security-pipeline --stages all             — full pipeline with all 9 conditional stages
-/x-security-pipeline --trigger schedule       — scheduled trigger
+/x-generate-security-pipeline                          — GitHub Actions, all stages, pr trigger (default)
+/x-generate-security-pipeline --ci github              — GitHub Actions security pipeline
+/x-generate-security-pipeline --ci gitlab              — GitLab CI security pipeline
+/x-generate-security-pipeline --ci azure               — Azure DevOps security pipeline
+/x-generate-security-pipeline --stages minimal         — SAST + secret scan + dependency audit only
+/x-generate-security-pipeline --stages all             — full pipeline with all 9 conditional stages
+/x-generate-security-pipeline --trigger schedule       — scheduled trigger
 ```
 
 ## Parameters
@@ -47,15 +47,15 @@ All platforms support SARIF artifact upload for GitHub Advanced Security integra
 
 | Stage | Skill | Condition |
 |-------|-------|-----------|
-| Secret Scan | x-security-secrets | `security.scanning.secrets = true` |
-| SAST | x-security-sast | `security.scanning.sast = true` |
-| Dependency Audit | x-dependency-audit | Always |
-| SonarQube | x-security-sonar | `security.scanning.sonar = true` |
-| Container Scan | x-security-container | `infrastructure.container != none` |
-| DAST Passive | x-security-dast | `security.scanning.dast = true` |
-| OWASP Scan | x-owasp-scan | `security.frameworks contains "owasp"` |
-| Hardening Eval | x-hardening-eval | `security.scanning.hardening = true` |
-| Quality Gate | x-security-sonar | `security.scanning.sonar = true` |
+| Secret Scan | x-scan-secrets | `security.scanning.secrets = true` |
+| SAST | x-run-sast | `security.scanning.sast = true` |
+| Dependency Audit | x-audit-dependencies | Always |
+| SonarQube | x-run-sonar-security | `security.scanning.sonar = true` |
+| Container Scan | x-scan-container-security | `infrastructure.container != none` |
+| DAST Passive | x-run-dast | `security.scanning.dast = true` |
+| OWASP Scan | x-scan-owasp | `security.frameworks contains "owasp"` |
+| Hardening Eval | x-evaluate-hardening | `security.scanning.hardening = true` |
+| Quality Gate | x-run-sonar-security | `security.scanning.sonar = true` |
 
 ## Error Envelope
 

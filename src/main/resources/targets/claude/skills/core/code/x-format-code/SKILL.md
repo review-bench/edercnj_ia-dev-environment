@@ -1,5 +1,5 @@
 ---
-name: x-code-format
+name: x-format-code
 model: haiku
 description: "Formats source code using the appropriate formatter for {{LANGUAGE}}. First step of the pre-commit chain (format -> lint -> compile -> commit). Supports --check (dry-run) and --changed-only modes."
 user-invocable: true
@@ -16,13 +16,13 @@ requires-capabilities: []
 
 # Skill: Format Code (slim — ADR-0012)
 
-Ensures source code in {{PROJECT_NAME}} follows a consistent style before commits. First step of the pre-commit chain (RULE-007: `x-code-format -> x-code-lint -> compile -> commit`). Detects `{{LANGUAGE}}`, selects the appropriate formatter, runs it, and re-stages modified files automatically.
+Ensures source code in {{PROJECT_NAME}} follows a consistent style before commits. First step of the pre-commit chain (RULE-007: `x-format-code -> x-lint-code -> compile -> commit`). Detects `{{LANGUAGE}}`, selects the appropriate formatter, runs it, and re-stages modified files automatically.
 
 ## Triggers
 
-- `/x-code-format` -- format all project files
-- `/x-code-format --check` -- verify formatting without modifying files (CI mode)
-- `/x-code-format --changed-only` -- format only modified files (staged + unstaged)
+- `/x-format-code` -- format all project files
+- `/x-format-code --check` -- verify formatting without modifying files (CI mode)
+- `/x-format-code --changed-only` -- format only modified files (staged + unstaged)
 
 ## Parameters
 
@@ -40,7 +40,7 @@ Ensures source code in {{PROJECT_NAME}} follows a consistent style before commit
 
 ## Error Envelope
 
-> **Chain-wide error matrix.** Canonical `format -> lint -> compile -> commit` rows live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). Rows below are `x-code-format`-specific.
+> **Chain-wide error matrix.** Canonical `format -> lint -> compile -> commit` rows live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). Rows below are `x-format-code`-specific.
 
 | Scenario | Behavior | Exit |
 |----------|----------|------|
@@ -59,8 +59,8 @@ Minimum viable contract above. Detailed language/formatter mapping, the 6-step w
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-code-lint` | follows | Second step of the pre-commit chain (after format). |
-| `x-git-commit` | orchestrator | Invokes this skill as step 3a of its chain. |
+| `x-lint-code` | follows | Second step of the pre-commit chain (after format). |
+| `x-commit-changes` | orchestrator | Invokes this skill as step 3a of its chain. |
 
 ## Template Variables
 

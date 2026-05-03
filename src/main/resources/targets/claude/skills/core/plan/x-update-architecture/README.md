@@ -1,11 +1,11 @@
-# x-arch-update
+# x-update-architecture
 
 > Incrementally updates the service architecture document with changes from architecture plans. Adds new components, integrations, flows, and ADR references without rewriting existing content. Use after implementation to keep architecture documentation current.
 
 | | |
 |---|---|
 | **Category** | Planning |
-| **Invocation** | `/x-arch-update [STORY-ID or architecture-plan-path]` |
+| **Invocation** | `/x-update-architecture [STORY-ID or architecture-plan-path]` |
 | **Reads** | architecture |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,8 +17,8 @@ Keeps the service architecture document (`steering/service-architecture.md`) up 
 ## Usage
 
 ```
-/x-arch-update story-0012-0003
-/x-arch-update ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
+/x-update-architecture story-0012-0003
+/x-update-architecture ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md
 ```
 
 ## Workflow
@@ -38,5 +38,5 @@ Keeps the service architecture document (`steering/service-architecture.md`) up 
 
 ## See Also
 
-- [x-arch-plan](../x-arch-plan/) — Generate the architecture plan consumed by this skill
-- [x-adr-generate](../x-adr-generate/) — Expand mini-ADRs into full ADR files
+- [x-plan-architecture](../x-plan-architecture/) — Generate the architecture plan consumed by this skill
+- [x-generate-adr](../x-generate-adr/) — Expand mini-ADRs into full ADR files

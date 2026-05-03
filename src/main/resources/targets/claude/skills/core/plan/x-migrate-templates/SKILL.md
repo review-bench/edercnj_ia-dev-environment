@@ -1,6 +1,6 @@
 ---
-name: x-template-migrate
-description: "Assists migration of a v1 epic document to the v2 value-driven template (EPIC-0070). Parses v1 technical blocks (Packages, Contratos, SOLID, Observabilidade), classifies each block with a safe default heuristic, and optionally asks the operator for confirmation per block (--interactive). Side-effects: writes epic.md in v2 format atomically, creates ADRs for 'virar ADR' decisions, updates system.md via x-arch-system-update. Supports --dry-run and recovery from interrupted sessions."
+name: x-migrate-templates
+description: "Assists migration of a v1 epic document to the v2 value-driven template (EPIC-0070). Parses v1 technical blocks (Packages, Contratos, SOLID, Observabilidade), classifies each block with a safe default heuristic, and optionally asks the operator for confirmation per block (--interactive). Side-effects: writes epic.md in v2 format atomically, creates ADRs for 'virar ADR' decisions, updates system.md via x-update-system-architecture. Supports --dry-run and recovery from interrupted sessions."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Edit, Write, Skill, AskUserQuestion, Bash
@@ -14,7 +14,7 @@ requires-capabilities: [governance.value-driven-templates]
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: x-template-migrate
+# Skill: x-migrate-templates
 
 ## Purpose
 
@@ -22,9 +22,9 @@ Assists the migration of a v1 epic document (`ai/epics/<epic-id>/epic-<epic-id>.
 
 ## Triggers
 
-- `/x-template-migrate <epic-id>` — migrate the epic to v2 (non-interactive by default — applies safe heuristics automatically)
-- `/x-template-migrate <epic-id> --interactive` — migrate with per-block confirmation prompts
-- `/x-template-migrate <epic-id> --dry-run` — preview diff and classification without writing
+- `/x-migrate-templates <epic-id>` — migrate the epic to v2 (non-interactive by default — applies safe heuristics automatically)
+- `/x-migrate-templates <epic-id> --interactive` — migrate with per-block confirmation prompts
+- `/x-migrate-templates <epic-id> --dry-run` — preview diff and classification without writing
 
 ## Parameters
 
@@ -107,7 +107,7 @@ When **not** `--interactive` (default): apply heuristics without prompting. Prin
    - Section 6: Riscos (from original risks)
    - Section 7: Índice de Histórias (from story list)
    - Section 8: Quality Gates (from v1 quality criteria)
-   - Refinement Verdict: `Status: tbd` (placeholder — run `/x-epic-refine` to refine)
+   - Refinement Verdict: `Status: tbd` (placeholder — run `/x-refine-epic` to refine)
 2. Write to temp path `epic-<EPIC-ID>.md.tmp`.
 3. Move temp to final path (atomic replace).
 4. Write migration log to `ai/epics/epic-<EPIC-ID>*/reports/migration-log-epic-<EPIC-ID>.md`.
@@ -120,7 +120,7 @@ Execute side-effects for blocks classified as `move-to-system-md` or `create-adr
 
 **`move-to-system-md` blocks:**
 
-    Skill(skill: "x-arch-system-update", model: "sonnet", args: "<EPIC-ID>")  [conditional: not flag.dry_run]
+    Skill(skill: "x-update-system-architecture", model: "sonnet", args: "<EPIC-ID>")  [conditional: not flag.dry_run]
 
 **`create-adr` blocks:** Write a new ADR file at `docs/adr/ADR-NNNN-<slug>.md` (next available ADR number) with the extracted decision content. ADR number is determined by scanning existing `docs/adr/ADR-*.md` files.
 
@@ -160,26 +160,26 @@ Re-invocation with `--resume` loads this state, verifies `originalHash`, and con
 
 ```bash
 # Default non-interactive migration (apply heuristics, no prompts)
-/x-template-migrate 0050
+/x-migrate-templates 0050
 
 # Interactive migration with per-block confirmation
-/x-template-migrate 0050 --interactive
+/x-migrate-templates 0050 --interactive
 
 # Dry-run — preview diff without writing
-/x-template-migrate 0050 --dry-run
+/x-migrate-templates 0050 --dry-run
 
 # Resume an interrupted session
-/x-template-migrate 0050 --resume
+/x-migrate-templates 0050 --resume
 
 # Full epic-id form also accepted
-/x-template-migrate epic-0036 --interactive
+/x-migrate-templates epic-0036 --interactive
 ```
 
 ## Integration Notes
 
-- Invokes `x-arch-system-update` (story-0070-0006) for `move-to-system-md` side-effects — Rule 13 INLINE-SKILL.
+- Invokes `x-update-system-architecture` (story-0070-0006) for `move-to-system-md` side-effects — Rule 13 INLINE-SKILL.
 - State-file mirrors `pr-watch-*.json` pattern (Rule 45) for session persistence.
 - Rule 20 (EPIC-0061): `--non-interactive` is deprecated; non-interactive is the default.
 - Rule 45 (CI-Watch): **not applicable** — this skill does not create PRs.
 - Rule 22 (Skill Visibility): **public** — user-invocable, appears in `/help`.
-- After migration, run `/x-epic-refine epic-<ID>` to obtain `refinementVerdict.status = approved` for the migrated epic.
+- After migration, run `/x-refine-epic epic-<ID>` to obtain `refinementVerdict.status = approved` for the migrated epic.

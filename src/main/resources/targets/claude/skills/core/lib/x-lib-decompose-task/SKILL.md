@@ -1,6 +1,6 @@
 ---
-name: x-lib-task-decomposer
-description: "Decomposes an implementation plan into tasks. Primary mode: derives tasks from test scenarios (x-test-plan output) using TDD structure (RED/GREEN/REFACTOR). Fallback mode: uses Layer Task Catalog (G1-G7) when no test plan exists."
+name: x-lib-decompose-task
+description: "Decomposes an implementation plan into tasks. Primary mode: derives tasks from test scenarios (x-plan-tests output) using TDD structure (RED/GREEN/REFACTOR). Fallback mode: uses Layer Task Catalog (G1-G7) when no test plan exists."
 user-invocable: false
 allowed-tools: Read, Write, Grep, Glob
 requires-capabilities: []
@@ -16,13 +16,13 @@ requires-capabilities: []
 
 ## Purpose
 
-Decomposes an implementation plan into granular tasks. When a test plan exists (from `x-test-plan`), derives tasks from test scenarios using TDD structure (RED/GREEN/REFACTOR) with a per-task `Parallel` flag. Falls back to the Layer Task Catalog (G1-G7) when no test plan is available, where tasks are additionally assigned to parallelism groups. Each task is assigned a model tier (Junior/Mid/Senior) and context budget.
+Decomposes an implementation plan into granular tasks. When a test plan exists (from `x-plan-tests`), derives tasks from test scenarios using TDD structure (RED/GREEN/REFACTOR) with a per-task `Parallel` flag. Falls back to the Layer Task Catalog (G1-G7) when no test plan is available, where tasks are additionally assigned to parallelism groups. Each task is assigned a model tier (Junior/Mid/Senior) and context budget.
 
 ## When Called
 
 | Caller Skill | Phase | Context |
 |-------------|-------|---------|
-| x-story-implement | Phase 1C | After the Architect produces the plan, BEFORE implementation |
+| x-implement-story | Phase 1C | After the Architect produces the plan, BEFORE implementation |
 | (standalone) | N/A | When breaking down a plan into implementable tasks |
 
 ## Inputs
@@ -31,7 +31,7 @@ Decomposes an implementation plan into granular tasks. When a test plan exists (
 |-------|------|----------|
 | Architect's plan | `ai/epics/epic-XXXX/plans/plan-story-XXXX-YYYY.md` | Yes |
 | Story requirements | Story file | Yes |
-| Test plan (from x-test-plan) | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | No |
+| Test plan (from x-plan-tests) | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` | No |
 
 ## Procedure
 
@@ -308,9 +308,9 @@ Target: < 15% of tasks escalate.
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-story-implement | called-by | Invoked during Phase 1C |
-| x-test-plan | reads | Consumes test plan (Phase 1B output) when available |
-| x-story-implement Phase 2 | produces-for | Output consumed by group-based or TDD-based implementation |
+| x-implement-story | called-by | Invoked during Phase 1C |
+| x-plan-tests | reads | Consumes test plan (Phase 1B output) when available |
+| x-implement-story Phase 2 | produces-for | Output consumed by group-based or TDD-based implementation |
 
 - Works with any layered architecture (hexagonal, clean, onion) — layer names derived from project rules
 - When test plan present: generates TDD tasks with RED/GREEN/REFACTOR structure

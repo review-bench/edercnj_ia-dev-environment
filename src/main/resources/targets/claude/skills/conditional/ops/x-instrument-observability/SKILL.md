@@ -1,5 +1,5 @@
 ---
-name: x-obs-instrument
+name: x-instrument-observability
 description: "Adds or reviews distributed tracing, metrics, and structured logging using OpenTelemetry SDK with OTLP export."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
@@ -25,9 +25,9 @@ Include this skill when observability is not "none" in the project configuration
 
 ## Triggers
 
-- `/x-obs-instrument full` -- instrument all components
-- `/x-obs-instrument transaction-service` -- instrument a specific component
-- `/x-obs-instrument persistence-layer` -- instrument a specific layer
+- `/x-instrument-observability full` -- instrument all components
+- `/x-instrument-observability transaction-service` -- instrument a specific component
+- `/x-instrument-observability persistence-layer` -- instrument a specific layer
 
 ## Parameters
 

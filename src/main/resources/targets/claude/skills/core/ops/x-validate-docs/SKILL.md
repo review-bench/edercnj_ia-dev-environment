@@ -1,5 +1,5 @@
 ---
-name: x-doc-validate
+name: x-validate-docs
 description: "Documentation freshness gate: validates 6 dimensions (readme, api-specs, grpc-proto, adr, skill-docs, system-architecture) against code changes in a PR. Stack-aware — only validates targets declared/auto-detected from ProjectConfig.documentation.targets. Returns exit non-zero on staleness; produces structured report."
 visibility: public
 user-invocable: true
@@ -27,11 +27,11 @@ Produces a report at the path specified by `--report-path` (default: stdout). Ex
 
 ## Triggers
 
-- `/x-doc-validate` — validate all active dimensions from `documentation.targets`
-- `/x-doc-validate --story-id story-XXXX-YYYY` — validate for a specific story's PR
-- `/x-doc-validate --pr-number 123` — validate against PR #123 diff
-- `/x-doc-validate --scope src/main/java/` — limit code change analysis to path
-- `/x-doc-validate --report-path ai/epics/epic-XXXX/reports/doc-validate-STORY-ID.md` — persist report
+- `/x-validate-docs` — validate all active dimensions from `documentation.targets`
+- `/x-validate-docs --story-id story-XXXX-YYYY` — validate for a specific story's PR
+- `/x-validate-docs --pr-number 123` — validate against PR #123 diff
+- `/x-validate-docs --scope src/main/java/` — limit code change analysis to path
+- `/x-validate-docs --report-path ai/epics/epic-XXXX/reports/doc-validate-STORY-ID.md` — persist report
 
 ## Parameters
 
@@ -228,13 +228,13 @@ git diff {range} --name-only | grep -E "^src/.*(application/|domain/|adapter/inb
 - **FAIL**: New component detected (new subdir in application/domain/adapter/ with ≥1 Java/TS/PY/Go file) but `system.md` was NOT touched.
 - **SKIP**: No architectural changes detected.
 
-When fail detected, optionally invoke `x-arch-system-update --validate-only` (if EPIC-0070 available):
+When fail detected, optionally invoke `x-update-system-architecture --validate-only` (if EPIC-0070 available):
 ```
-Skill(skill: "x-arch-system-update", model: "sonnet", args: "--validate-only")
+Skill(skill: "x-update-system-architecture", model: "sonnet", args: "--validate-only")
 ```
 [optional]
 
-If `x-arch-system-update` is unavailable: log `WARN: x-arch-system-update unavailable — system-architecture dimension evaluated heuristically`.
+If `x-update-system-architecture` is unavailable: log `WARN: x-update-system-architecture unavailable — system-architecture dimension evaluated heuristically`.
 
 ### Step 5 — Apply Freshness Window
 
@@ -304,7 +304,7 @@ Documentation Validation Report
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | called-by | Phase 3 — mandatory gate (story-0071-0006 wires this) |
-| `x-doc-generate` | precedes (in Phase 3) | generate runs first, validate confirms |
-| `x-arch-system-update` | optional-delegates-to | system-architecture dimension, EPIC-0070 |
+| `x-implement-story` | called-by | Phase 3 — mandatory gate (story-0071-0006 wires this) |
+| `x-generate-docs` | precedes (in Phase 3) | generate runs first, validate confirms |
+| `x-update-system-architecture` | optional-delegates-to | system-architecture dimension, EPIC-0070 |
 | `audit-doc-freshness.sh` | CI counterpart | story-0071-0005 wires CI version of same checks |

@@ -1,11 +1,11 @@
-# x-code-audit
+# x-audit-code
 
 > Full codebase review against all project standards. Launches parallel subagents per audit dimension (Clean Code, SOLID, Architecture, Tests, Security, Cross-file), consolidates findings into a severity-categorized report with score. Use for periodic quality validation.
 
 | | |
 |---|---|
 | **Category** | Review |
-| **Invocation** | `/x-code-audit [--scope all\|rules\|patterns\|architecture\|cross-file]` |
+| **Invocation** | `/x-audit-code [--scope all\|rules\|patterns\|architecture\|cross-file]` |
 | **Reads** | coding-standards, architecture, quality-gates |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,9 +17,9 @@ Performs a comprehensive audit of the entire codebase against project standards 
 ## Usage
 
 ```
-/x-code-audit
-/x-code-audit --scope architecture
-/x-code-audit --scope security
+/x-audit-code
+/x-audit-code --scope architecture
+/x-audit-code --scope security
 ```
 
 ## Workflow
@@ -37,6 +37,6 @@ Performs a comprehensive audit of the entire codebase against project standards 
 
 ## See Also
 
-- [x-review](../x-review/) -- PR-scoped specialist review (per-story, not full codebase)
+- [x-review-codebase](../x-review-codebase/) -- PR-scoped specialist review (per-story, not full codebase)
 - [x-review-pr](../x-review-pr/) -- Tech Lead review for a single PR
-- [x-owasp-scan](../x-owasp-scan/) -- Security-focused OWASP Top 10 verification
+- [x-scan-owasp](../x-scan-owasp/) -- Security-focused OWASP Top 10 verification

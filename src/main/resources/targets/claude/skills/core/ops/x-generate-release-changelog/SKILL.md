@@ -1,5 +1,5 @@
 ---
-name: x-release-changelog
+name: x-generate-release-changelog
 description: "Changelog generator v2: hybrid format combining narrative Highlights block (derived from 'Entrega de Valor' of merged v2 epics) with Keep-a-Changelog sections (Added/Changed/Fixed/Breaking/Deprecated). Stack-aware via documentation.changelog.format config. Falls back gracefully when EPIC-0070 epics unavailable (D-R10)."
 user-invocable: true
 model: sonnet
@@ -29,12 +29,12 @@ When v2 epic content is unavailable, degrades gracefully per **D-R10**: empty Hi
 
 ## Triggers
 
-- `/x-release-changelog` — generate hybrid changelog for unreleased changes
-- `/x-release-changelog v3.10.0` — generate entry for version v3.10.0
-- `/x-release-changelog --unreleased` — unreleased changes since last tag
-- `/x-release-changelog --full` — regenerate entire changelog from all tags
-- `/x-release-changelog --format keep-a-changelog` — v1 format (no Highlights)
-- `/x-release-changelog --format conventional-only` — raw commit grouping
+- `/x-generate-release-changelog` — generate hybrid changelog for unreleased changes
+- `/x-generate-release-changelog v3.10.0` — generate entry for version v3.10.0
+- `/x-generate-release-changelog --unreleased` — unreleased changes since last tag
+- `/x-generate-release-changelog --full` — regenerate entire changelog from all tags
+- `/x-generate-release-changelog --format keep-a-changelog` — v1 format (no Highlights)
+- `/x-generate-release-changelog --format conventional-only` — raw commit grouping
 
 ## Parameters
 
@@ -107,7 +107,7 @@ Apply v2 template detection: epic uses v2 if it contains `## 1. Visão & Problem
 - `ai/epics/` directory absent:
 
 ```
-WARN [x-release-changelog] No EPIC-0070 v2 epics found in range {range} — Highlights will be empty.
+WARN [x-generate-release-changelog] No EPIC-0070 v2 epics found in range {range} — Highlights will be empty.
      Install/merge EPIC-0070 epics to enable narrative Highlights. (D-R10 degraded mode)
 ```
 
@@ -140,7 +140,7 @@ When `format = hybrid` and ≥ 1 v2 epic was found:
 3. **Minimum (3 paragraphs):** if fewer than 3 paragraphs can be derived from epic content, expand with bullet-point summaries of `feat:` commits until minimum is reached.
 4. **Maximum (8 paragraphs):** if more than 8 paragraphs would be generated, truncate with trailing `...` and emit:
    ```
-   WARN [x-release-changelog] Highlights truncated at 8 paragraphs — review manually.
+   WARN [x-generate-release-changelog] Highlights truncated at 8 paragraphs — review manually.
    ```
 
 **Content sanitization:** strip markdown link syntax (`[text](url)`) that references internal CI paths. Escape `<`, `>`, `&` characters. Never include paths matching `/home/`, `/tmp/`, `/var/`, `/Users/` (CI runner internals). Remove environment variables (`$VAR`, `${VAR}`).
@@ -287,5 +287,5 @@ D-R10 degraded output:
 | Skill | Relationship | Context |
 |-------|-------------|---------|
 | `x-release` | called-by | Release Step 5 changelog generation |
-| `x-doc-generate` | called-by | When `--type changelog` delegated |
-| `x-internal-report-write` | uses | Template rendering for CHANGELOG entry |
+| `x-generate-docs` | called-by | When `--type changelog` delegated |
+| `x-internal-write-report` | uses | Template rendering for CHANGELOG entry |

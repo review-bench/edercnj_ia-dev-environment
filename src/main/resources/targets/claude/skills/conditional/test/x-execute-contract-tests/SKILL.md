@@ -1,5 +1,5 @@
 ---
-name: x-test-contract
+name: x-execute-contract-tests
 description: "Stack-aware contract breaking-change detection: openapi-diff (REST), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), schema registry compat (events). Pact opt-in via quality.contract.pact=true."
 visibility: public
 model: sonnet
@@ -19,7 +19,7 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Contract Breaking-Change Detection (`x-test-contract`)
+# Skill: Contract Breaking-Change Detection (`x-execute-contract-tests`)
 
 ## Purpose
 
@@ -35,9 +35,9 @@ Detect breaking changes in API contracts before they reach production. Stack-awa
 
 ## Triggers
 
-- `/x-test-contract` — auto-detect contracts, run all applicable tools
-- `/x-test-contract --story-id story-XXXX-YYYY` — scope report to story
-- `/x-test-contract --base-ref HEAD~1` — compare against specific base ref
+- `/x-execute-contract-tests` — auto-detect contracts, run all applicable tools
+- `/x-execute-contract-tests --story-id story-XXXX-YYYY` — scope report to story
+- `/x-execute-contract-tests --base-ref HEAD~1` — compare against specific base ref
 
 ## Parameters
 

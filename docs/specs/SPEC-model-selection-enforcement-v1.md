@@ -34,14 +34,14 @@ skills e 10 agents expõe três gaps técnicos:
 
 1. **Nenhum skill declara `model:` no frontmatter** — todas 72 skills herdam Opus do contexto pai.
 2. **Invocações `Agent(subagent_type: "general-purpose", ...)` e `Skill(skill: "...")` não passam
-   `model:` como parâmetro** — a "RULE-009" referenciada em 8 locais (`x-arch-plan:153,255`,
-   `x-story-implement:429`, `x-test-plan:36,57,310`, `x-story-plan` subagent prompts) vive apenas
+   `model:` como parâmetro** — a "RULE-009" referenciada em 8 locais (`x-plan-architecture:153,255`,
+   `x-implement-story:429`, `x-plan-tests:36,57,310`, `x-plan-story` subagent prompts) vive apenas
    em prosa, sem enforcement técnico.
 3. **8 dos 10 agents declaram `Recommended Model: Adaptive`** — placeholder não-determinístico que
    na prática resolve para Opus.
 
-Cada execução de epic amplifica esses defaults por cascateamento: `x-epic-implement` →
-`x-story-implement` → `x-test-tdd` → `x-git-commit` — 4 níveis de Opus onde 3 poderiam ser Sonnet
+Cada execução de epic amplifica esses defaults por cascateamento: `x-implement-epic` →
+`x-implement-story` → `x-drive-tdd` → `x-commit-changes` — 4 níveis de Opus onde 3 poderiam ser Sonnet
 ou Haiku. Estimativa de desperdício: **~7.850 tokens/execução** em alvos corrigíveis sem perda
 de qualidade.
 
@@ -50,10 +50,10 @@ de qualidade.
 1. **Frontmatter `model:` em skills** — declaração explícita no YAML header (os 72 skills herdam
    Opus hoje; queremos ≥25 com seleção explícita após o épico).
 2. **`Agent(...)` com `model:` parâmetro** — invocações de `general-purpose` subagents passam o
-   modelo explicitamente (5 subagents em `x-story-plan` + 4 em `x-arch-plan`/`x-test-plan`).
+   modelo explicitamente (5 subagents em `x-plan-story` + 4 em `x-plan-architecture`/`x-plan-tests`).
 3. **`Skill(...)` com `model:` parâmetro** — chamadas entre skills em orquestradores passam
-   o modelo apropriado (alvo: ~30 call-sites em `x-epic-implement`, `x-story-implement`,
-   `x-review`, `x-release`).
+   o modelo apropriado (alvo: ~30 call-sites em `x-implement-epic`, `x-implement-story`,
+   `x-review-codebase`, `x-release`).
 4. **Agent metadata determinístico** — substituir `Recommended Model: Adaptive` pelo modelo
    específico (8 agents afetados; `product-owner` de Opus → Sonnet).
 5. **Haiku eligibility** — marcar skills utilitárias (git ops, format, lint, knowledge packs
@@ -80,8 +80,8 @@ de qualidade.
 
 **RULE-001**: Toda skill identificada como "orquestrador" (disparar múltiplos `Agent()` ou
 `Skill()`) DEVE declarar `model:` no frontmatter. O valor default para orquestradores é `sonnet`
-(não-planejamento), exceto quando a skill é dedicada a design arquitetural profundo (`x-arch-plan`,
-subagent Architect em `x-story-plan`), onde `opus` é apropriado.
+(não-planejamento), exceto quando a skill é dedicada a design arquitetural profundo (`x-plan-architecture`,
+subagent Architect em `x-plan-story`), onde `opus` é apropriado.
 
 **RULE-002**: Toda invocação `Agent(subagent_type: "general-purpose", ...)` dentro de um skill
 DEVE passar o parâmetro `model:` explicitamente. Heranças implícitas do contexto pai são
@@ -102,7 +102,7 @@ usam `Sonnet`.
 **RULE-005**: Skills elegíveis para `model: haiku` são aquelas que (a) executam operações
 utilitárias sem raciocínio de design (git ops, format, lint), OU (b) são knowledge packs
 read-only consumidos como referência (não executam lógica). A lista alvo inicial é:
-`x-git-worktree`, `x-git-commit`, `x-code-format`, `x-code-lint`, `architecture`,
+`x-manage-worktrees`, `x-commit-changes`, `x-format-code`, `x-lint-code`, `architecture`,
 `coding-standards`, `testing`, `layer-templates`, `patterns`, `dockerfile`.
 
 **RULE-006**: O CI do projeto DEVE executar um audit script (`scripts/audit-model-selection.sh`)
@@ -211,18 +211,18 @@ Feature: Rule de model selection strategy
 **Dependências**: STORY-0001 (matriz da rule define `sonnet` como default para orquestradores).
 
 **Contexto técnico**:
-Os 4 orquestradores com maior peso de SKILL.md são: `x-epic-implement` (1.941 linhas),
-`x-story-implement` (1.263 linhas), `x-release` (1.646 linhas), `x-review` (374 linhas). Cada
+Os 4 orquestradores com maior peso de SKILL.md são: `x-implement-epic` (1.941 linhas),
+`x-implement-story` (1.263 linhas), `x-release` (1.646 linhas), `x-review-codebase` (374 linhas). Cada
 invocação via `Skill()` reinjeta o body inteiro — multiplicar por Opus é caro. Nenhum deles
 realiza raciocínio de design; orquestração é tarefa apropriada para Sonnet.
 
 **Escopo de implementação**:
 
 1. Adicionar `model: sonnet` no frontmatter YAML dos 4 arquivos:
-   - `java/src/main/resources/targets/claude/skills/core/x-epic-implement/SKILL.md`
-   - `java/src/main/resources/targets/claude/skills/core/x-story-implement/SKILL.md`
+   - `java/src/main/resources/targets/claude/skills/core/x-implement-epic/SKILL.md`
+   - `java/src/main/resources/targets/claude/skills/core/x-implement-story/SKILL.md`
    - `java/src/main/resources/targets/claude/skills/core/x-release/SKILL.md`
-   - `java/src/main/resources/targets/claude/skills/core/x-review/SKILL.md`
+   - `java/src/main/resources/targets/claude/skills/core/x-review-codebase/SKILL.md`
 
 2. Cada arquivo recebe uma linha `model: sonnet` entre `name:` e `description:` no frontmatter
    (consistente com a ordem observada em outros SKILL.md).
@@ -238,20 +238,20 @@ realiza raciocínio de design; orquestração é tarefa apropriada para Sonnet.
       retorna 4 linhas.
 - [ ] Golden files regenerados sem diffs além da linha `model:`.
 - [ ] Testes passam em `mvn verify`.
-- [ ] Smoke test: `/x-review` invocado em conversa de teste carrega sem erro de frontmatter.
+- [ ] Smoke test: `/x-review-codebase` invocado em conversa de teste carrega sem erro de frontmatter.
 
 **Gherkin**:
 
 ```gherkin
 Feature: Orquestradores pesados declaram model: sonnet
 
-  Scenario: x-epic-implement tem model sonnet
-    Given o arquivo x-epic-implement/SKILL.md gerado
+  Scenario: x-implement-epic tem model sonnet
+    Given o arquivo x-implement-epic/SKILL.md gerado
     When o frontmatter é parseado
     Then o campo "model" vale "sonnet"
 
   Scenario: Orquestrador carrega sem erro com model declarado
-    Given o claude-code lê x-review/SKILL.md
+    Given o claude-code lê x-review-codebase/SKILL.md
     When o skill é invocado
     Then nenhum warning de frontmatter é emitido
     And o subagent criado usa modelo sonnet
@@ -271,15 +271,15 @@ Feature: Orquestradores pesados declaram model: sonnet
 
 **Contexto técnico**:
 Além dos 4 pesados da STORY-0002, existem orquestradores menores que também invocam
-`Skill()` em cascata: `x-epic-orchestrate` (621 linhas), `x-pr-fix-epic` (1.298 linhas),
-`x-task-implement` (627 linhas), `x-epic-decompose` (variável).
+`Skill()` em cascata: `x-orchestrate-epic` (621 linhas), `x-fix-epic-pr` (1.298 linhas),
+`x-implement-task` (627 linhas), `x-epic-decompose` (variável).
 
 **Escopo de implementação**:
 
 1. Adicionar `model: sonnet` em:
-   - `x-epic-orchestrate/SKILL.md`
-   - `x-pr-fix-epic/SKILL.md`
-   - `x-task-implement/SKILL.md`
+   - `x-orchestrate-epic/SKILL.md`
+   - `x-fix-epic-pr/SKILL.md`
+   - `x-implement-task/SKILL.md`
    - `x-epic-decompose/SKILL.md`
 
 2. Regenerar golden files.
@@ -295,8 +295,8 @@ Além dos 4 pesados da STORY-0002, existem orquestradores menores que também in
 ```gherkin
 Feature: Orquestradores secundários declaram model
 
-  Scenario: x-epic-orchestrate tem model sonnet
-    Given x-epic-orchestrate/SKILL.md gerado
+  Scenario: x-orchestrate-epic tem model sonnet
+    Given x-orchestrate-epic/SKILL.md gerado
     When o frontmatter é lido
     Then o campo "model" vale "sonnet"
 ```
@@ -321,7 +321,7 @@ sem perda de qualidade nessas tarefas.
 **Escopo de implementação**:
 
 1. Adicionar `model: haiku` em skills utilitárias:
-   - `x-git-worktree`, `x-git-commit`, `x-code-format`, `x-code-lint`
+   - `x-manage-worktrees`, `x-commit-changes`, `x-format-code`, `x-lint-code`
 
 2. Adicionar `model: haiku` em knowledge packs read-only:
    - `architecture`, `coding-standards`, `testing`, `layer-templates`, `patterns`, `dockerfile`
@@ -333,15 +333,15 @@ sem perda de qualidade nessas tarefas.
 - [ ] Os 10 arquivos têm `model: haiku` no frontmatter.
 - [ ] Golden files regenerados.
 - [ ] Testes passam.
-- [ ] Smoke test: `x-git-commit` executa um commit de teste sem regressão.
+- [ ] Smoke test: `x-commit-changes` executa um commit de teste sem regressão.
 
 **Gherkin**:
 
 ```gherkin
 Feature: Skills utilitárias e KPs declaram model: haiku
 
-  Scenario: x-git-commit usa Haiku
-    Given x-git-commit/SKILL.md
+  Scenario: x-commit-changes usa Haiku
+    Given x-commit-changes/SKILL.md
     When o frontmatter é lido
     Then o campo "model" vale "haiku"
 
@@ -353,9 +353,9 @@ Feature: Skills utilitárias e KPs declaram model: haiku
 
 ---
 
-### STORY-0005: `Agent(...)` com `model:` explícito em x-story-plan
+### STORY-0005: `Agent(...)` com `model:` explícito em x-plan-story
 
-**Título**: Refator dos 5 subagents de x-story-plan para passar `model:` parâmetro explícito
+**Título**: Refator dos 5 subagents de x-plan-story para passar `model:` parâmetro explícito
 
 **Tipo**: Feature — Subagent Invocation Refactor
 
@@ -364,13 +364,13 @@ Feature: Skills utilitárias e KPs declaram model: haiku
 **Dependências**: STORY-0001.
 
 **Contexto técnico**:
-`x-story-plan` (1.007 linhas) dispara 5 subagents em paralelo via `Agent(subagent_type:
+`x-plan-story` (1.007 linhas) dispara 5 subagents em paralelo via `Agent(subagent_type:
 "general-purpose", ...)`. O texto atual documenta "model hint: opus" ou "model hint: sonnet" em
 prosa, mas nenhum `model:` parameter é passado na chamada — todos os 5 herdam Opus.
 
 **Escopo de implementação**:
 
-1. No arquivo `java/src/main/resources/targets/claude/skills/core/x-story-plan/SKILL.md`,
+1. No arquivo `java/src/main/resources/targets/claude/skills/core/x-plan-story/SKILL.md`,
    localizar as 5 invocações de subagents (aprox. linhas 231-436).
 
 2. Refatorar cada chamada para incluir `model:` conforme matriz:
@@ -389,39 +389,39 @@ prosa, mas nenhum `model:` parameter é passado na chamada — todos os 5 herdam
 
 **Critérios de Aceitação (DoD)**:
 
-- [ ] As 5 invocações `Agent(...)` em x-story-plan têm `model:` explícito.
+- [ ] As 5 invocações `Agent(...)` em x-plan-story têm `model:` explícito.
 - [ ] Valores batem com matriz da STORY-0001.
-- [ ] `grep -A1 "Agent(subagent_type" x-story-plan/SKILL.md | grep "model:"` retorna 5 linhas.
+- [ ] `grep -A1 "Agent(subagent_type" x-plan-story/SKILL.md | grep "model:"` retorna 5 linhas.
 - [ ] Nenhum "model hint" em prosa remanescente.
 - [ ] Golden files regenerados.
-- [ ] Smoke test: `/x-story-plan` invocado em story de teste completa sem erro.
+- [ ] Smoke test: `/x-plan-story` invocado em story de teste completa sem erro.
 
 **Gherkin**:
 
 ```gherkin
-Feature: x-story-plan subagents têm model explícito
+Feature: x-plan-story subagents têm model explícito
 
   Scenario: Subagent Architect usa Opus
-    Given x-story-plan/SKILL.md
+    Given x-plan-story/SKILL.md
     When a invocação do subagent Architect é lida
     Then contém 'model: "opus"'
 
   Scenario: Subagent QA usa Sonnet
-    Given x-story-plan/SKILL.md
+    Given x-plan-story/SKILL.md
     When a invocação do subagent QA é lida
     Then contém 'model: "sonnet"'
 
   Scenario: Não há mais "model hint" em prosa
-    Given x-story-plan/SKILL.md
+    Given x-plan-story/SKILL.md
     When o arquivo é grepado por "model hint"
     Then 0 matches são retornados
 ```
 
 ---
 
-### STORY-0006: `Agent(...)` com `model:` explícito em x-arch-plan e x-test-plan
+### STORY-0006: `Agent(...)` com `model:` explícito em x-plan-architecture e x-plan-tests
 
-**Título**: Aplicar o padrão da STORY-0005 em x-arch-plan e x-test-plan
+**Título**: Aplicar o padrão da STORY-0005 em x-plan-architecture e x-plan-tests
 
 **Tipo**: Feature — Subagent Invocation Refactor
 
@@ -430,16 +430,16 @@ Feature: x-story-plan subagents têm model explícito
 **Dependências**: STORY-0005 (padrão estabelecido).
 
 **Contexto técnico**:
-Assim como `x-story-plan`, os skills `x-arch-plan` (linhas 153, 255) e `x-test-plan` (linhas
+Assim como `x-plan-story`, os skills `x-plan-architecture` (linhas 153, 255) e `x-plan-tests` (linhas
 36, 57, 310) documentam em prosa "use `model: opus`" mas não passam o param na chamada
 `Agent(...)`.
 
 **Escopo de implementação**:
 
-1. `x-arch-plan/SKILL.md` — refatorar ~2 subagent calls para `model: "opus"` (design
+1. `x-plan-architecture/SKILL.md` — refatorar ~2 subagent calls para `model: "opus"` (design
    arquitetural é raciocínio profundo).
 
-2. `x-test-plan/SKILL.md` — refatorar ~3 subagent calls para `model: "opus"` (planning de
+2. `x-plan-tests/SKILL.md` — refatorar ~3 subagent calls para `model: "opus"` (planning de
    testes envolve decisão de cobertura, TPP, Double-Loop TDD — justificam Opus).
 
 3. Alinhar ao Pattern 2 da Rule 13.
@@ -448,22 +448,22 @@ Assim como `x-story-plan`, os skills `x-arch-plan` (linhas 153, 255) e `x-test-p
 
 **Critérios de Aceitação (DoD)**:
 
-- [ ] Todas invocações `Agent(...)` em x-arch-plan e x-test-plan têm `model:`.
+- [ ] Todas invocações `Agent(...)` em x-plan-architecture e x-plan-tests têm `model:`.
 - [ ] Golden files regenerados.
 - [ ] Testes passam.
 
 **Gherkin**:
 
 ```gherkin
-Feature: x-arch-plan e x-test-plan têm model explícito
+Feature: x-plan-architecture e x-plan-tests têm model explícito
 
-  Scenario: x-arch-plan subagent usa Opus
-    Given x-arch-plan/SKILL.md
+  Scenario: x-plan-architecture subagent usa Opus
+    Given x-plan-architecture/SKILL.md
     When uma invocação Agent(...) é lida
     Then contém 'model: "opus"'
 
-  Scenario: x-test-plan subagent usa Opus
-    Given x-test-plan/SKILL.md
+  Scenario: x-plan-tests subagent usa Opus
+    Given x-plan-tests/SKILL.md
     When uma invocação Agent(...) é lida
     Then contém 'model: "opus"'
 ```
@@ -472,7 +472,7 @@ Feature: x-arch-plan e x-test-plan têm model explícito
 
 ### STORY-0007: `Skill(...)` com `model:` param em orquestradores
 
-**Título**: Propagação de `model:` nas chamadas Skill() de x-epic-implement, x-story-implement e x-review
+**Título**: Propagação de `model:` nas chamadas Skill() de x-implement-epic, x-implement-story e x-review-codebase
 
 **Tipo**: Feature — Skill-to-Skill Invocation Refactor
 
@@ -483,24 +483,24 @@ Feature: x-arch-plan e x-test-plan têm model explícito
 **Contexto técnico**:
 Os orquestradores invocam sub-skills via `Skill(skill: "...", args: "...")`. Sem `model:`
 param, o sub-skill herda o modelo do orquestrador — e se a cadeia inteira começa em Opus,
-cascateia. Exemplo: `x-epic-implement` (que após STORY-0002 será Sonnet) → `Skill("x-story-
-implement")` herda Sonnet, o que é OK; mas `x-story-implement` → `Skill("x-git-commit")` deveria
+cascateia. Exemplo: `x-implement-epic` (que após STORY-0002 será Sonnet) → `Skill("x-story-
+implement")` herda Sonnet, o que é OK; mas `x-implement-story` → `Skill("x-commit-changes")` deveria
 forçar Haiku explicitamente.
 
 **Escopo de implementação**:
 
-1. Em `x-epic-implement/SKILL.md`, adicionar `model: "sonnet"` nas invocações:
-   - `Skill(skill: "x-story-implement", ...)` — explícito mesmo herdando
+1. Em `x-implement-epic/SKILL.md`, adicionar `model: "sonnet"` nas invocações:
+   - `Skill(skill: "x-implement-story", ...)` — explícito mesmo herdando
 
-2. Em `x-story-implement/SKILL.md`, adicionar:
-   - `Skill(skill: "x-test-tdd", model: "sonnet", ...)`
-   - `Skill(skill: "x-git-commit", model: "haiku", ...)`
-   - `Skill(skill: "x-task-implement", model: "sonnet", ...)`
+2. Em `x-implement-story/SKILL.md`, adicionar:
+   - `Skill(skill: "x-drive-tdd", model: "sonnet", ...)`
+   - `Skill(skill: "x-commit-changes", model: "haiku", ...)`
+   - `Skill(skill: "x-implement-task", model: "sonnet", ...)`
 
-3. Em `x-review/SKILL.md`, adicionar `model: "sonnet"` nas ~10 invocações de sub-skills de review.
+3. Em `x-review-codebase/SKILL.md`, adicionar `model: "sonnet"` nas ~10 invocações de sub-skills de review.
 
-4. Em `x-task-implement/SKILL.md`, propagar `model:` para `x-git-commit` (haiku) e
-   `x-test-tdd` (sonnet).
+4. Em `x-implement-task/SKILL.md`, propagar `model:` para `x-commit-changes` (haiku) e
+   `x-drive-tdd` (sonnet).
 
 5. Regenerar golden files.
 
@@ -510,20 +510,20 @@ forçar Haiku explicitamente.
 - [ ] `grep -c 'Skill(skill: "x-' x-{epic,story}-implement/SKILL.md | grep model` ≥ N-0.
 - [ ] Golden files regenerados.
 - [ ] Testes passam.
-- [ ] Smoke test: `x-review` completa um review de teste sem regressão.
+- [ ] Smoke test: `x-review-codebase` completa um review de teste sem regressão.
 
 **Gherkin**:
 
 ```gherkin
 Feature: Orquestradores propagam model em Skill() calls
 
-  Scenario: x-story-implement invoca x-git-commit com Haiku
-    Given x-story-implement/SKILL.md
-    When uma chamada Skill(skill: "x-git-commit", ...) é lida
+  Scenario: x-implement-story invoca x-commit-changes com Haiku
+    Given x-implement-story/SKILL.md
+    When uma chamada Skill(skill: "x-commit-changes", ...) é lida
     Then contém 'model: "haiku"'
 
-  Scenario: x-review invoca x-review-qa com Sonnet
-    Given x-review/SKILL.md
+  Scenario: x-review-codebase invoca x-review-qa com Sonnet
+    Given x-review-codebase/SKILL.md
     When uma chamada Skill(skill: "x-review-qa", ...) é lida
     Then contém 'model: "sonnet"'
 ```
@@ -692,7 +692,7 @@ mergeada).
 
 **Contexto técnico**:
 O EPIC-0040 instalou hooks de telemetria (`.claude/hooks/telemetry-*.sh`) que registram
-invocações de skill com metadata. A STORY-0011 do EPIC-0040 criou `/x-telemetry-trend` para
+invocações de skill com metadata. A STORY-0011 do EPIC-0040 criou `/x-analyze-telemetry-trends` para
 comparação entre epics. Este épico fecha o loop medindo o impacto real em produção.
 
 **Escopo de implementação**:
@@ -701,7 +701,7 @@ comparação entre epics. Este épico fecha o loop medindo o impacto real em pro
    capturar pelo log de subagent dispatch).
 
 2. Criar uma consulta/report `scripts/telemetry-model-mix.sh` (ou subcommando de
-   `/x-telemetry-analyze`) que computa:
+   `/x-analyze-telemetry`) que computa:
    - % tokens por modelo (opus / sonnet / haiku) nas últimas N execuções
    - Top 10 skills consumidoras de Opus
    - Trend comparativo: pré-EPIC-0050 vs pós-EPIC-0050

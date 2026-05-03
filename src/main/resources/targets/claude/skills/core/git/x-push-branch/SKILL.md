@@ -1,5 +1,5 @@
 ---
-name: x-git-push
+name: x-push-branch
 description: "Git operations: branch creation, atomic commits (Conventional Commits), push, and PR creation. Use for any git workflow task including branching, committing, pushing, creating PRs, or managing version control."
 user-invocable: true
 allowed-tools: Bash, Read
@@ -21,9 +21,9 @@ Standardizes the Git workflow for {{PROJECT_NAME}}. Every feature starts with a 
 
 ## Triggers
 
-- `/x-git-push` — commit and push current changes
-- `/x-git-push branch-name` — create branch, commit, and push
-- `/x-git-push "commit message"` — commit with message and push
+- `/x-push-branch` — commit and push current changes
+- `/x-push-branch branch-name` — create branch, commit, and push
+- `/x-push-branch "commit message"` — commit with message and push
 
 ## Workflow
 
@@ -75,7 +75,7 @@ develop (integration, always green)
 **Rules:**
 - Maximum **60 characters** total
 - Created from `develop`; task branches are created from this parent
-- Used when `--auto-approve-pr` is active in `x-story-implement`
+- Used when `--auto-approve-pr` is active in `x-implement-story`
 
 **Example:** `feat/story-0029-0015-lifecycle` (30 chars)
 
@@ -402,11 +402,11 @@ The git log should read as a **progression from the simplest case to the most co
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-story-implement` | called-by | Phase 0 (branch from develop) and Phase 5 (push + PR to develop) |
-| `x-task-implement` | called-by | Atomic TDD commits during implementation |
+| `x-implement-story` | called-by | Phase 0 (branch from develop) and Phase 5 (push + PR to develop) |
+| `x-implement-task` | called-by | Atomic TDD commits during implementation |
 | `x-release` | called-by | Release commit and tag creation |
-| `x-git-commit` | delegates-to | Commit creation with task ID scope and TDD tags |
-| `x-pr-create` | delegates-to | PR creation with task references and body template |
+| `x-commit-changes` | delegates-to | Commit creation with task ID scope and TDD tags |
+| `x-create-pr` | delegates-to | PR creation with task references and body template |
 
 - Hotfix workflow branches from `main` and creates PRs targeting `main`, then back-merges to `develop`
 - Can be used standalone for any git workflow task

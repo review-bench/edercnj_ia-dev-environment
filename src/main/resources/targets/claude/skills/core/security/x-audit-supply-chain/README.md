@@ -1,26 +1,26 @@
-# x-supply-chain-audit
+# x-audit-supply-chain
 
-> Enhanced supply chain security audit beyond x-dependency-audit. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring.
+> Enhanced supply chain security audit beyond x-audit-dependencies. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-supply-chain-audit [--depth shallow\|deep] [--include-dev-deps] [--risk-threshold 0-100] [--focus all\|maintainer\|typosquatting\|phantom\|age\|epss\|slsa]` |
+| **Invocation** | `/x-audit-supply-chain [--depth shallow\|deep] [--include-dev-deps] [--risk-threshold 0-100] [--focus all\|maintainer\|typosquatting\|phantom\|age\|epss\|slsa]` |
 | **Reads** | `knowledge/security/sarif-template.md`, `knowledge/security/security-scoring.md`, `knowledge/security/supply-chain-hardening.md`, `knowledge/security/sbom-generation-guide.md` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
 ## What It Does
 
-Performs advanced supply chain security analysis that complements `x-dependency-audit`. While that skill covers known CVEs and outdated versions, this skill identifies deeper risks: single-maintainer dependencies (bus factor), typosquatting suspects via Levenshtein distance, phantom dependencies not declared in manifests, stale packages, EPSS exploit prediction from FIRST.org, and SLSA integrity assessment. Produces a multi-dimensional weighted risk score per dependency.
+Performs advanced supply chain security analysis that complements `x-audit-dependencies`. While that skill covers known CVEs and outdated versions, this skill identifies deeper risks: single-maintainer dependencies (bus factor), typosquatting suspects via Levenshtein distance, phantom dependencies not declared in manifests, stale packages, EPSS exploit prediction from FIRST.org, and SLSA integrity assessment. Produces a multi-dimensional weighted risk score per dependency.
 
 ## Usage
 
 ```
-/x-supply-chain-audit
-/x-supply-chain-audit --depth deep
-/x-supply-chain-audit --focus typosquatting
-/x-supply-chain-audit --risk-threshold 50
+/x-audit-supply-chain
+/x-audit-supply-chain --depth deep
+/x-audit-supply-chain --focus typosquatting
+/x-audit-supply-chain --risk-threshold 50
 ```
 
 ## Workflow
@@ -41,6 +41,6 @@ Performs advanced supply chain security analysis that complements `x-dependency-
 
 ## See Also
 
-- [x-dependency-audit](../x-dependency-audit/) -- CVE scanning, outdated versions, license compliance, and SBOM generation
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from all scanning skills
-- [x-security-pipeline](../x-security-pipeline/) -- CI/CD pipeline generation with security stages
+- [x-audit-dependencies](../x-audit-dependencies/) -- CVE scanning, outdated versions, license compliance, and SBOM generation
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from all scanning skills
+- [x-generate-security-pipeline](../x-generate-security-pipeline/) -- CI/CD pipeline generation with security stages

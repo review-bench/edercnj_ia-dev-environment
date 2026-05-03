@@ -1,6 +1,6 @@
 ---
-name: x-internal-epic-build-plan
-description: "Builds the canonical ExecutionPlan for an epic (Phase 0/0.5 carve-out of x-epic-implement): loads epic-XXXX.md, IMPLEMENTATION-MAP.md, and every story-*.md; constructs the inter-story dependency DAG; runs Kahn's algorithm with cycle detection; optionally computes a file-overlap matrix (mode=parallel) and the critical path; then renders ai/epics/epic-XXXX/epic-execution-plan.md via x-internal-report-write using the _TEMPLATE-EPIC-EXECUTION-PLAN.md template. Emits a stable JSON envelope on stdout for orchestrator consumption. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-story-load-context and x-internal-story-build-plan)."
+name: x-internal-build-epic-plan
+description: "Builds the canonical ExecutionPlan for an epic (Phase 0/0.5 carve-out of x-implement-epic): loads epic-XXXX.md, IMPLEMENTATION-MAP.md, and every story-*.md; constructs the inter-story dependency DAG; runs Kahn's algorithm with cycle detection; optionally computes a file-overlap matrix (mode=parallel) and the critical path; then renders ai/epics/epic-XXXX/epic-execution-plan.md via x-internal-write-report using the _TEMPLATE-EPIC-EXECUTION-PLAN.md template. Emits a stable JSON envelope on stdout for orchestrator consumption. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-load-story-context and x-internal-build-story-plan)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill
@@ -19,21 +19,21 @@ requires-capabilities: []
 > 🔒 **INTERNAL SKILL**
 > Esta skill é invocada apenas por outras skills (orquestradores).
 > NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: `x-epic-implement` (Phase 0 / 0.5 carve-out).
-> Sexta skill da convenção `x-internal-*` (após x-internal-status-update
-> pilot 0049-0005, x-internal-report-write 0049-0006,
-> x-internal-args-normalize 0049-0007, x-internal-story-load-context
-> 0049-0011, e x-internal-story-build-plan 0049-0012). Terceira skill
+> Caller principal: `x-implement-epic` (Phase 0 / 0.5 carve-out).
+> Sexta skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, e x-internal-build-story-plan 0049-0012). Terceira skill
 > na subdir `internal/plan/`. A subdir `plan/` agrupa as skills que
 > orquestram lógica de planejamento (read-only computation + render);
 > difere de `internal/ops/`, cujas sibling skills mutam estado
 > (execution-state.json, reports).
 
-# Skill: x-internal-epic-build-plan
+# Skill: x-internal-build-epic-plan
 
 ## Purpose
 
-Carve out the Phase 0 / 0.5 pre-flight of `x-epic-implement` — the
+Carve out the Phase 0 / 0.5 pre-flight of `x-implement-epic` — the
 ~250 inline lines that load epic metadata, stories, and dependency
 matrices, compute the phase ordering via Kahn's algorithm, optionally
 analyse file overlaps, and compute the critical path — into a single
@@ -55,10 +55,10 @@ Responsibilities (single):
    Advisory by default; `--strict-overlap` escalates any hard
    collision to a non-zero warning in the envelope (NOT a fatal
    error — Phase 1.5 parallelism gate remains the orchestrator's
-   abort point via `x-parallel-eval`).
+   abort point via `x-evaluate-parallelism`).
 6. Compute the critical path (longest chain of dependencies measured
    in story count).
-7. Render `${output}` via `x-internal-report-write` using the
+7. Render `${output}` via `x-internal-write-report` using the
    template `_TEMPLATE-EPIC-EXECUTION-PLAN.md`.
 8. Emit a stable JSON envelope on stdout; translate every error
    category to the exit-code catalogue below.
@@ -67,15 +67,15 @@ Non-responsibilities (explicit):
 
 - The skill does NOT mutate `execution-state.json`, `**Status:**`
   headers, or IMPLEMENTATION-MAP — those belong to
-  `x-internal-status-update` (story-0049-0005).
+  `x-internal-update-status` (story-0049-0005).
 - The skill does NOT run the Phase 1.5 collision gate — that is
-  `x-parallel-eval`'s exclusive contract (EPIC-0041).
+  `x-evaluate-parallelism`'s exclusive contract (EPIC-0041).
 - The skill does NOT dispatch story implementation waves — that is
-  `x-epic-implement`'s contract, downstream of this skill.
+  `x-implement-epic`'s contract, downstream of this skill.
 - The skill does NOT re-read individual stories' planning artifacts
   (arch/impl/test/task plans) — those belong to
-  `x-internal-story-load-context` (per-story, called inside
-  `x-story-implement` Phase 0).
+  `x-internal-load-story-context` (per-story, called inside
+  `x-implement-story` Phase 0).
 - The skill does NOT write the story `**Status:**` header or trigger
   Jira transitions — those are status-finalize concerns.
 
@@ -83,11 +83,11 @@ Non-responsibilities (explicit):
 
 | Aspect | Value | Rationale |
 | :--- | :--- | :--- |
-| Path | `internal/plan/x-internal-epic-build-plan/` | `internal/` prefix scopes visibility; `plan/` co-locates with the sibling read-and-compute carve-outs (x-internal-story-load-context, x-internal-story-build-plan) |
+| Path | `internal/plan/x-internal-build-epic-plan/` | `internal/` prefix scopes visibility; `plan/` co-locates with the sibling read-and-compute carve-outs (x-internal-load-story-context, x-internal-build-story-plan) |
 | Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
 | Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
 | Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
-| Allowed tools | `Bash, Skill` | Minimal: `Bash` for parsing + DAG + envelope assembly, `Skill` for the single downstream `x-internal-report-write` invocation. No `Agent` — planning is deterministic computation, not subagent dispatch |
+| Allowed tools | `Bash, Skill` | Minimal: `Bash` for parsing + DAG + envelope assembly, `Skill` for the single downstream `x-internal-write-report` invocation. No `Agent` — planning is deterministic computation, not subagent dispatch |
 | Naming | `x-internal-{subject}-{action}` | `epic-build-plan` = subject+action per Rule 04 skill taxonomy |
 
 Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
@@ -97,12 +97,12 @@ Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
 ## Triggers
 
 Bare-slash form is intentionally omitted — this skill is never
-invoked by a human typing `/x-internal-epic-build-plan` in chat.
+invoked by a human typing `/x-internal-build-epic-plan` in chat.
 All invocations follow the Rule 13 INLINE-SKILL pattern from a
 calling orchestrator:
 
 ```markdown
-Skill(skill: "x-internal-epic-build-plan",
+Skill(skill: "x-internal-build-epic-plan",
       args: "--epic-id XXXX --mode sequential --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
@@ -129,7 +129,7 @@ On success the skill writes a single-line JSON object to stdout:
 | :--- | :--- | :--- | :--- |
 | `phases` | `Array<Phase>` | yes | Ordered list of Kahn phases, each `{ "index": <int>, "stories": [<storyId>,…] }` |
 | `overlapMatrix` | `Object<storyId, Array<storyId>>` \| `null` | no — `null` when `mode=sequential` | Map from each story to the list of co-scheduled peers touching the same files |
-| `overlapSeverity` | `String` \| `null` | no — `null` when `mode=sequential` | One of `"none"` / `"soft"` / `"regen"` / `"hard"`; mirrors `x-parallel-eval` severity vocabulary |
+| `overlapSeverity` | `String` \| `null` | no — `null` when `mode=sequential` | One of `"none"` / `"soft"` / `"regen"` / `"hard"`; mirrors `x-evaluate-parallelism` severity vocabulary |
 | `criticalPath` | `Array<storyId>` | yes | Longest dependency chain in the DAG (length = N stories); ties broken by lexicographic storyId |
 | `planPath` | `String` | yes | Echo of `--output` after normalisation — also the path of the rendered markdown |
 | `mode` | `String` | yes | Echo of the resolved mode (`sequential` / `parallel`) |
@@ -151,7 +151,7 @@ schema.
 | 2 | MAP_NOT_FOUND | `ai/epics/epic-${epic_id}/IMPLEMENTATION-MAP.md` is missing | `IMPLEMENTATION-MAP.md missing under ai/epics/epic-<id>` |
 | 3 | CYCLIC_DEPENDENCY | Kahn's algorithm detected a cycle in the DAG | `Cycle detected: <storyA> -> <storyB> -> … -> <storyA>` |
 | 4 | STORY_FILE_MISSING | Dependency matrix references a story whose `.md` file is absent | `Story file missing: <storyId>.md` |
-| 5 | REPORT_WRITE_FAILED | Downstream `x-internal-report-write` returned non-zero or did not produce `${output}` | `Report write failed: <detail>` |
+| 5 | REPORT_WRITE_FAILED | Downstream `x-internal-write-report` returned non-zero or did not produce `${output}` | `Report write failed: <detail>` |
 | 64 | EX_USAGE | Unknown flag, missing required flag, malformed `--epic-id` / `--mode`, or unwritable `--output` | `usage: <detail>` |
 
 No partial-success state: the first non-recoverable error aborts the
@@ -262,12 +262,12 @@ The critical path is the chain ending at the story with maximum
 `longest[story]`, unwound via back-pointers. Ties broken by
 lexicographic storyId.
 
-### Step 6 — Render markdown via x-internal-report-write
+### Step 6 — Render markdown via x-internal-write-report
 
 Invoke the downstream via the Rule 13 INLINE-SKILL pattern:
 
 ```markdown
-Skill(skill: "x-internal-report-write",
+Skill(skill: "x-internal-write-report",
       args: "--template _TEMPLATE-EPIC-EXECUTION-PLAN.md --output ${output} --data-stdin")
 ```
 
@@ -309,7 +309,7 @@ Emit on stdout as a single line terminated by `\n`. Exit `0`.
 ### Example 1 — Happy path: sequential mode
 
 ```bash
-Skill(skill: "x-internal-epic-build-plan",
+Skill(skill: "x-internal-build-epic-plan",
       args: "--epic-id XXXX --mode sequential --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
@@ -322,7 +322,7 @@ Exit: 0.
 ### Example 2 — Parallel mode with overlap
 
 ```bash
-Skill(skill: "x-internal-epic-build-plan",
+Skill(skill: "x-internal-build-epic-plan",
       args: "--epic-id XXXX --mode parallel --output ai/epics/epic-XXXX/epic-execution-plan.md")
 ```
 
@@ -346,7 +346,7 @@ Exit: 3.
 ### Example 4 — Epic directory missing
 
 ```bash
-Skill(skill: "x-internal-epic-build-plan",
+Skill(skill: "x-internal-build-epic-plan",
       args: "--epic-id 9999 --mode sequential --output /tmp/out.md")
 ```
 
@@ -370,7 +370,7 @@ Exit: 4.
 ### Example 6 — Boundary: epic with 1 story, zero deps
 
 ```bash
-Skill(skill: "x-internal-epic-build-plan",
+Skill(skill: "x-internal-build-epic-plan",
       args: "--epic-id YYYY --mode sequential --output ai/epics/epic-YYYY/epic-execution-plan.md")
 ```
 
@@ -386,10 +386,10 @@ Exit: 0.
 | :--- | :--- | :--- |
 | Response envelope | stdout | Single-line JSON matching the Response Contract |
 | Error diagnostic | stderr | Single line, non-empty only on exit ≠ 0 |
-| Execution plan markdown | `${output}` (typically `ai/epics/epic-XXXX/epic-execution-plan.md`) | Rendered by `x-internal-report-write` using the `_TEMPLATE-EPIC-EXECUTION-PLAN.md` template |
+| Execution plan markdown | `${output}` (typically `ai/epics/epic-XXXX/epic-execution-plan.md`) | Rendered by `x-internal-write-report` using the `_TEMPLATE-EPIC-EXECUTION-PLAN.md` template |
 
 The skill DOES create files — specifically the `${output}` markdown —
-but only via the `x-internal-report-write` delegation. The
+but only via the `x-internal-write-report` delegation. The
 `allowed-tools` frontmatter therefore does not include `Write`: the
 write happens inside the child skill's own adapter, not directly
 from this skill's body.
@@ -408,8 +408,8 @@ from this skill's body.
 | Missing IMPLEMENTATION-MAP | `IMPLEMENTATION-MAP.md missing under ai/epics/epic-<id>`; exit 2 |
 | Cycle detected in DAG | `Cycle detected: <chain>`; exit 3 |
 | Story-file referenced by map but absent | `Story file missing: <storyId>.md`; exit 4 |
-| `x-internal-report-write` non-zero | `Report write failed: <child stderr line>`; exit 5 |
-| `x-internal-report-write` success but `${output}` absent | `Report write failed: expected output not produced`; exit 5 |
+| `x-internal-write-report` non-zero | `Report write failed: <child stderr line>`; exit 5 |
+| `x-internal-write-report` success but `${output}` absent | `Report write failed: expected output not produced`; exit 5 |
 | `jq` absent on PATH | Exit 127 with `jq is required`; abort before any file read |
 | Story has no `## File Footprint` block (parallel mode) | Emit advisory in envelope `warnings`; include story in matrix with empty peer list; do NOT abort |
 
@@ -427,7 +427,7 @@ threshold from story-0049-0009 §4. The dominant cost is the
 file-system scan of `story-*.md` + footprint-block parsing; DAG
 processing is O(V + E) and negligible.
 
-The render step (`x-internal-report-write`) is measured separately
+The render step (`x-internal-write-report`) is measured separately
 and is typically 0.5–2 seconds for a 22-story epic; it is NOT
 counted against the 5-second DoD because the DoD bounds plan
 computation, not the physical write.
@@ -455,7 +455,7 @@ Acceptance scenarios (mirroring Section 7 of story-0049-0009):
 Coverage requirement: ≥ 95% line / ≥ 90% branch across the
 parser, DAG, overlap matrix, and envelope-assembly logic. Goldens
 (if added) lock the SKILL.md rendering under
-`src/test/resources/golden/internal/plan/x-internal-epic-build-plan/`
+`src/test/resources/golden/internal/plan/x-internal-build-epic-plan/`
 per the sibling pattern (story-0049-0012, story-0049-0014).
 
 ## Generator Filter Contract
@@ -491,20 +491,20 @@ and RULE-006 footprint-unknown advisory).
 
 | Skill | Relationship | Context |
 | :--- | :--- | :--- |
-| `x-epic-implement` | caller (primary) | Phase 0 / 0.5 carve-out: ~250 inline lines collapse to one `Skill(skill: "x-internal-epic-build-plan", …)` invocation in story-0049-0018 |
-| `x-internal-report-write` | delegate (Step 6) | Renders `epic-execution-plan.md` using `_TEMPLATE-EPIC-EXECUTION-PLAN.md`; defined in story-0049-0006 (MERGED) |
-| `x-parallel-eval` | downstream peer | Phase 1.5 of the caller consumes the `overlapMatrix` to compute per-wave collision classification (EPIC-0041) |
-| `x-internal-status-update` | peer | Separate concern (mutates state); never invoked from this skill |
-| `x-internal-story-load-context` | peer | Sibling read-only carve-out at the story level; never invoked from this skill |
-| `x-internal-story-build-plan` | peer | Sibling story-level planning carve-out; never invoked from this skill |
+| `x-implement-epic` | caller (primary) | Phase 0 / 0.5 carve-out: ~250 inline lines collapse to one `Skill(skill: "x-internal-build-epic-plan", …)` invocation in story-0049-0018 |
+| `x-internal-write-report` | delegate (Step 6) | Renders `epic-execution-plan.md` using `_TEMPLATE-EPIC-EXECUTION-PLAN.md`; defined in story-0049-0006 (MERGED) |
+| `x-evaluate-parallelism` | downstream peer | Phase 1.5 of the caller consumes the `overlapMatrix` to compute per-wave collision classification (EPIC-0041) |
+| `x-internal-update-status` | peer | Separate concern (mutates state); never invoked from this skill |
+| `x-internal-load-story-context` | peer | Sibling read-only carve-out at the story level; never invoked from this skill |
+| `x-internal-build-story-plan` | peer | Sibling story-level planning carve-out; never invoked from this skill |
 
 Downstream stories that depend on this carve-out:
-story-0049-0018 (`x-epic-implement` refactor consumes the envelope
+story-0049-0018 (`x-implement-epic` refactor consumes the envelope
 and deletes the inline Phase 0 / 0.5 blocks).
 
 Full workflow detail (parser grammar for the IMPLEMENTATION-MAP
 dependency table, Kahn-algorithm pseudocode, footprint-block regex,
-overlap-severity decision table, and the `x-internal-report-write`
+overlap-severity decision table, and the `x-internal-write-report`
 stdin schema) lives in
 [`references/full-protocol.md`](references/full-protocol.md)
 per ADR-0011.

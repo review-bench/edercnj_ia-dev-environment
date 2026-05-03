@@ -1,6 +1,6 @@
 ---
-name: x-feature-ideate
-description: "Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-feature-create."
+name: x-ideate-feature
+description: "Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-create-feature."
 model: opus
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Skill, Agent
@@ -14,18 +14,18 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: x-feature-ideate
+# Skill: x-ideate-feature
 
 ## Purpose
 
-Transform free-form ideation prose (or a text file) into a structured feature specification document (RA9 v2 minimal, 5 sections) and open a pull request for human review. The operator reviews and optionally edits the spec, then manually invokes `x-feature-create` to drive the full epic + story decomposition.
+Transform free-form ideation prose (or a text file) into a structured feature specification document (RA9 v2 minimal, 5 sections) and open a pull request for human review. The operator reviews and optionally edits the spec, then manually invokes `x-create-feature` to drive the full epic + story decomposition.
 
-**RULE-005 (no auto-chain):** This skill does NOT call `x-feature-create` automatically. It terminates after opening the PR with an explicit instruction to the operator.
+**RULE-005 (no auto-chain):** This skill does NOT call `x-create-feature` automatically. It terminates after opening the PR with an explicit instruction to the operator.
 
 ## Triggers
 
-- `/x-feature-ideate "Implement CSV export with filters..."` — inline prose
-- `/x-feature-ideate path/to/idea.txt` — text file as input
+- `/x-ideate-feature "Implement CSV export with filters..."` — inline prose
+- `/x-ideate-feature path/to/idea.txt` — text file as input
 - User wants to convert an idea into a structured spec for engineer review
 
 ## Parameters
@@ -41,14 +41,14 @@ Transform free-form ideation prose (or a text file) into a structured feature sp
 | 0 | SUCCESS | Spec created and PR opened |
 | 1 | INPUT_TOO_SHORT | Prose < 100 characters |
 | 2 | OPERATIONAL_ERROR | `gh` auth failure, push failure, or `git` error |
-| 3 | WORKTREE_FAILED | `x-git-worktree` non-zero |
+| 3 | WORKTREE_FAILED | `x-manage-worktrees` non-zero |
 
 ---
 
 ## Phase 0 — Input validation and worktree setup
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-ideate Phase-0-Setup`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-ideate-feature Phase-0-Setup`
 
 **0.1 Read input:**
 
@@ -62,23 +62,23 @@ Derive a kebab-case slug from the first 5 words of the prose (ASCII-only, lowerc
 
 **0.3 Create worktree + branch:**
 
-Invoke `x-git-worktree` to create an isolated working tree:
+Invoke `x-manage-worktrees` to create an isolated working tree:
 
-    Skill(skill: "x-git-worktree", model: "haiku", args: "create --identifier feature-ideation-<slug> --branch docs/feature-<slug> --base develop")
+    Skill(skill: "x-manage-worktrees", model: "haiku", args: "create --identifier feature-ideation-<slug> --branch docs/feature-<slug> --base develop")
 
 - Worktree path: `.claude/worktrees/feature-ideation-<slug>/`
 - Branch: `docs/feature-<slug>` (base: `develop`)
 - On non-zero exit → `WORKTREE_FAILED`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-ideate Phase-0-Setup ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-0-Setup ok`
 
 ---
 
 ## Phase 1 — Prose analysis (deep-reasoning)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-ideate Phase-1-Analyze`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-ideate-feature Phase-1-Analyze`
 
 Dispatch a deep-reasoning subagent to extract structure from the prose:
 
@@ -105,14 +105,14 @@ Dispatch a deep-reasoning subagent to extract structure from the prose:
 Capture the returned structured analysis as `{domain, scopeIn, scopeOut, rules, stories, dor, dod, risks}`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-ideate Phase-1-Analyze ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-1-Analyze ok`
 
 ---
 
 ## Phase 2 — Spec generation (RA9 v2 minimal)
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-ideate Phase-2-Spec`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-ideate-feature Phase-2-Spec`
 
 Using the analysis from Phase 1, write the spec file inside the worktree.
 
@@ -157,7 +157,7 @@ Using the analysis from Phase 1, write the spec file inside the worktree.
 
 ## Histórias
 
-Lista preliminar (sem decomposição detalhada — será refinada em x-feature-create):
+Lista preliminar (sem decomposição detalhada — será refinada em x-create-feature):
 
 | # | Título | Stakeholder |
 |---|--------|-------------|
@@ -195,44 +195,44 @@ mkdir -p .claude/worktrees/feature-ideation-<slug>/docs/specs
 **Validation:** After writing, verify each of the 5 sections (Sistema, Escopo, Regras, Histórias, DoR/DoD) has ≥ 100 characters. If any section is too short, expand with domain-relevant placeholder content.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-ideate Phase-2-Spec ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-2-Spec ok`
 
 ---
 
 ## Phase 3 — Commit + PR
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-ideate Phase-3-PR`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-ideate-feature Phase-3-PR`
 
 **3.1 Commit the spec:**
 
 From inside the worktree, commit the spec file:
 
-    Skill(skill: "x-git-commit", model: "haiku", args: "--worktree .claude/worktrees/feature-ideation-<slug> --type docs --subject \"add SPEC-<slug>-v1 ideation spec\" --body \"Generated by x-feature-ideate from prose ideation\"")
+    Skill(skill: "x-commit-changes", model: "haiku", args: "--worktree .claude/worktrees/feature-ideation-<slug> --type docs --subject \"add SPEC-<slug>-v1 ideation spec\" --body \"Generated by x-ideate-feature from prose ideation\"")
 
 **3.2 Push and create PR:**
 
-    Skill(skill: "x-pr-create", model: "haiku", args: "--head docs/feature-<slug> --target-branch develop --label docs --no-auto-merge --title \"docs: SPEC-<slug>-v1 ideation spec (review before x-feature-create)\" --body \"Spec generated by x-feature-ideate. Review and edit before invoking x-feature-create.\"")
+    Skill(skill: "x-create-pr", model: "haiku", args: "--head docs/feature-<slug> --target-branch develop --label docs --no-auto-merge --title \"docs: SPEC-<slug>-v1 ideation spec (review before x-create-feature)\" --body \"Spec generated by x-ideate-feature. Review and edit before invoking x-create-feature.\"")
 
 Capture `{prUrl, prNumber}`.
 
-**3.3 No CI-watch (RULE-003):** Ideation PRs do not require CI validation — they are planning artifacts, not code changes. Skip `x-pr-watch-ci`.
+**3.3 No CI-watch (RULE-003):** Ideation PRs do not require CI validation — they are planning artifacts, not code changes. Skip `x-watch-pr-ci`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-ideate Phase-3-PR ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-3-PR ok`
 
 ---
 
 ## Phase 4 — Report
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-feature-ideate Phase-4-Report`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-ideate-feature Phase-4-Report`
 
 Print the following structured report to stdout:
 
 ```
 ====================================================
- x-feature-ideate — Spec ready
+ x-ideate-feature — Spec ready
 ====================================================
  Slug:    <slug>
  Spec:    docs/specs/SPEC-<slug>-v1.md
@@ -243,14 +243,14 @@ Print the following structured report to stdout:
  Next step:
    1. Review and edit the spec at <prUrl>
    2. Once satisfied, invoke:
-      /x-feature-create docs/specs/SPEC-<slug>-v1.md --epic-id <NNNN>
+      /x-create-feature docs/specs/SPEC-<slug>-v1.md --epic-id <NNNN>
 ====================================================
 ```
 
-**Exact mandatory phrase (RULE-005):** "Spec pronta. Para criar a feature inteira, invoque `/x-feature-create <PR-spec-path> --epic-id <NNNN>`."
+**Exact mandatory phrase (RULE-005):** "Spec pronta. Para criar a feature inteira, invoque `/x-create-feature <PR-spec-path> --epic-id <NNNN>`."
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-feature-ideate Phase-4-Report ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-4-Report ok`
 
 ---
 
@@ -270,10 +270,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-featur
 
 | Skill | Relationship | Notes |
 |-------|-------------|-------|
-| `x-git-worktree` | delegates (P0) | Creates isolated `feature-ideation-<slug>` worktree |
-| `x-git-commit` | delegates (P3) | Commits spec with `docs:` Conventional Commits prefix |
-| `x-pr-create` | delegates (P3) | Opens PR to `develop` with label `docs`, no auto-merge |
-| `x-feature-create` | NOT called | Operator manually invokes after reviewing the spec PR |
+| `x-manage-worktrees` | delegates (P0) | Creates isolated `feature-ideation-<slug>` worktree |
+| `x-commit-changes` | delegates (P3) | Commits spec with `docs:` Conventional Commits prefix |
+| `x-create-pr` | delegates (P3) | Opens PR to `develop` with label `docs`, no auto-merge |
+| `x-create-feature` | NOT called | Operator manually invokes after reviewing the spec PR |
 
 ## Backward Compatibility
 

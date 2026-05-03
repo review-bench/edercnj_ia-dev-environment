@@ -1,5 +1,5 @@
 ---
-name: x-git-commit
+name: x-commit-changes
 model: haiku
 description: "Creates Conventional Commits with Task ID in scope and pre-commit chain (format -> lint -> compile). Central commit point in the task-centric workflow with TDD tag support."
 user-invocable: true
@@ -16,13 +16,13 @@ requires-capabilities: []
 
 # Skill: Conventional Commit with Task ID (slim — ADR-0012)
 
-Creates standardized commits for {{PROJECT_NAME}} with the Task ID in the scope, enforces the pre-commit chain (RULE-007: `x-code-format -> x-code-lint -> compile -> commit`), and annotates commits with TDD tags (RULE-008). Central commit point in the task-centric workflow.
+Creates standardized commits for {{PROJECT_NAME}} with the Task ID in the scope, enforces the pre-commit chain (RULE-007: `x-format-code -> x-lint-code -> compile -> commit`), and annotates commits with TDD tags (RULE-008). Central commit point in the task-centric workflow.
 
 ## Triggers
 
-- `/x-git-commit --task TASK-XXXX-YYYY-NNN --type feat --subject "add detection logic"` -- normal commit
-- `/x-git-commit --task TASK-XXXX-YYYY-NNN --type test --subject "add unit tests" --tdd RED` -- TDD-tagged commit
-- `/x-git-commit --task TASK-XXXX-YYYY-NNN --type chore --subject "update config" --skip-chain` -- skip pre-commit chain (emergency only)
+- `/x-commit-changes --task TASK-XXXX-YYYY-NNN --type feat --subject "add detection logic"` -- normal commit
+- `/x-commit-changes --task TASK-XXXX-YYYY-NNN --type test --subject "add unit tests" --tdd RED` -- TDD-tagged commit
+- `/x-commit-changes --task TASK-XXXX-YYYY-NNN --type chore --subject "update config" --skip-chain` -- skip pre-commit chain (emergency only)
 
 ## Parameters
 
@@ -39,7 +39,7 @@ Creates standardized commits for {{PROJECT_NAME}} with the Task ID in the scope,
 ## Output Contract
 
 - **Commit message format:** `<type>(<TASK-XXXX-YYYY-NNN>): <subject> [TDD:TAG]` (tag suffix omitted when `--tdd` absent) followed by optional body/footer.
-- **Orchestrator signature trailer:** every commit produced by `x-git-commit` MUST carry `Co-Authored-By: x-git-commit@<HEAD-sha-40-hex>` (injected via `git commit --trailer`). This trailer is the proof-of-orchestration required by the `.githooks/commit-msg` surface-D guard (EPIC-0059, story-0059-0005). The `<sha>` is `$(git rev-parse HEAD)` captured immediately before the commit executes, so it references the parent commit (not the commit being created — that SHA is unavailable at commit-message composition time).
+- **Orchestrator signature trailer:** every commit produced by `x-commit-changes` MUST carry `Co-Authored-By: x-commit-changes@<HEAD-sha-40-hex>` (injected via `git commit --trailer`). This trailer is the proof-of-orchestration required by the `.githooks/commit-msg` surface-D guard (EPIC-0059, story-0059-0005). The `<sha>` is `$(git rev-parse HEAD)` captured immediately before the commit executes, so it references the parent commit (not the commit being created — that SHA is unavailable at commit-message composition time).
 - **Git state:** one new commit on the current branch (or last commit amended when `--amend`); staged files are re-staged after format/lint auto-fix.
 - **Report to stdout:** task id, type, subject, TDD tag, chain status (passed/skipped), short SHA, full message first line.
 - **Exit codes:** see `## Error Envelope` below.
@@ -47,14 +47,14 @@ Creates standardized commits for {{PROJECT_NAME}} with the Task ID in the scope,
 ## Pre-Commit Chain (RULE-007)
 
 ```
-x-code-format -> x-code-lint -> compile ({{COMPILE_COMMAND}}) -> commit
+x-format-code -> x-lint-code -> compile ({{COMPILE_COMMAND}}) -> commit
 ```
 
 Each step invoked via the Skill tool (Rule 13 — INLINE-SKILL pattern). Files modified by format/lint are automatically re-staged. Chain-wide error rows (exit codes, soft-vs-hard classification) live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md).
 
 ## Error Envelope
 
-> **Chain-wide error matrix.** The canonical `format -> lint -> compile -> commit` error rows (shared across the pre-commit cluster) live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). The rows below cover `x-git-commit`-specific scenarios only.
+> **Chain-wide error matrix.** The canonical `format -> lint -> compile -> commit` error rows (shared across the pre-commit cluster) live in [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md). The rows below cover `x-commit-changes`-specific scenarios only.
 
 | Scenario | Behavior |
 |----------|----------|
@@ -63,8 +63,8 @@ Each step invoked via the Skill tool (Rule 13 — INLINE-SKILL pattern). Files m
 | Invalid commit type | ABORT with valid types list (`feat, fix, test, refactor, docs, chore, perf`) |
 | Invalid TDD tag | ABORT with valid tags list (`RED, GREEN, REFACTOR, TDD`) |
 | No staged files | ABORT with `"No staged files for commit"` |
-| x-code-format fails | ABORT with `"Pre-commit chain failed at step 'x-code-format'"` |
-| x-code-lint finds ERRORs | ABORT with `"Pre-commit chain failed at step 'x-code-lint'"` |
+| x-format-code fails | ABORT with `"Pre-commit chain failed at step 'x-format-code'"` |
+| x-lint-code finds ERRORs | ABORT with `"Pre-commit chain failed at step 'x-lint-code'"` |
 | Compile fails | ABORT with `"Pre-commit chain failed at step 'compile'"` |
 | git commit fails | ABORT with git error message |
 | Non-imperative subject (e.g., "adds", "fixed") | WARN but proceed (soft validation) |
@@ -78,11 +78,11 @@ Minimum viable contract above. Detailed validation rules, the full workflow with
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-code-format` | invoked by | First step of pre-commit chain |
-| `x-code-lint` | invoked by | Second step of pre-commit chain |
-| `x-git-push` | followed by | Push after commit is created |
-| `x-story-implement` | orchestrated by | Lifecycle invokes x-git-commit for each task |
-| `x-test-run` | precedes | Tests should pass before committing |
+| `x-format-code` | invoked by | First step of pre-commit chain |
+| `x-lint-code` | invoked by | Second step of pre-commit chain |
+| `x-push-branch` | followed by | Push after commit is created |
+| `x-implement-story` | orchestrated by | Lifecycle invokes x-commit-changes for each task |
+| `x-execute-tests` | precedes | Tests should pass before committing |
 
 ## Template Variables
 

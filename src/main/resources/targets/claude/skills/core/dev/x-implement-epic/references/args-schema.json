@@ -1,5 +1,5 @@
 {
-  "name": "x-epic-implement",
+  "name": "x-implement-epic",
   "version": "2.0",
   "positional": [
     {
@@ -52,7 +52,7 @@
       "name": "--skip-review",
       "type": "boolean",
       "default": false,
-      "description": "Propagate to x-story-implement: skip specialist + tech-lead reviews"
+      "description": "Propagate to x-implement-story: skip specialist + tech-lead reviews"
     },
     {
       "name": "--auto-merge-strategy",
@@ -95,7 +95,7 @@
       "name": "--auto-approve-pr",
       "type": "boolean",
       "default": false,
-      "description": "Propagate to x-story-implement for task-PR-into-parent-branch flow"
+      "description": "Propagate to x-implement-story for task-PR-into-parent-branch flow"
     }
   ],
   "deprecatedFlags": [

@@ -1,5 +1,5 @@
 ---
-name: x-test-regression-shell
+name: x-execute-shell-regression-tests
 description: "Regression-shell gate: reads QualityConfig.regression, runs curated scenario scripts against the target (self mode: generator output; service mode: client services), compares against baseline, and blocks merge on unexpected diffs."
 visibility: public
 user-invocable: true
@@ -18,7 +18,7 @@ argument-hint: "<STORY-ID> [--mode self|service] [--update-baseline] [--scenario
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: x-test-regression-shell
+# Skill: x-execute-shell-regression-tests
 
 Regression-shell quality gate. Reads `QualityConfig.regression` from the project YAML,
 dispatches scenario scripts, captures output, diffs against
@@ -36,11 +36,11 @@ Two modes:
 
 ## Triggers
 
-- `/x-test-regression-shell story-0073-0001` — auto-detects mode from `quality.regression.mode`
-- `/x-test-regression-shell story-0073-0001 --mode self` — force self mode
-- `/x-test-regression-shell story-0073-0001 --mode service` — force service mode
-- `/x-test-regression-shell story-0073-0001 --update-baseline` — record new baseline (opt-in)
-- `/x-test-regression-shell story-0073-0001 --scenarios-file tests/regression/custom.yaml` — override scenarios file
+- `/x-execute-shell-regression-tests story-0073-0001` — auto-detects mode from `quality.regression.mode`
+- `/x-execute-shell-regression-tests story-0073-0001 --mode self` — force self mode
+- `/x-execute-shell-regression-tests story-0073-0001 --mode service` — force service mode
+- `/x-execute-shell-regression-tests story-0073-0001 --update-baseline` — record new baseline (opt-in)
+- `/x-execute-shell-regression-tests story-0073-0001 --scenarios-file tests/regression/custom.yaml` — override scenarios file
 
 ## Parameters
 
@@ -55,7 +55,7 @@ Two modes:
 ## Phase 1 — Parse & Configure
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-regression-shell Phase-1-Parse`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-execute-shell-regression-tests Phase-1-Parse`
 
 Read `quality.regression` from project YAML:
 
@@ -74,12 +74,12 @@ When `--mode self` and no generator binary found → exit 2 `OPERATIONAL_ERROR`.
 When `--mode service` and scenarios file absent → exit 1 `REGRESSION_SCENARIOS_MISSING`.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-regression-shell Phase-1-Parse ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-execute-shell-regression-tests Phase-1-Parse ok`
 
 ## Phase 2 — Execute Scenarios
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-regression-shell Phase-2-Execute`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-execute-shell-regression-tests Phase-2-Execute`
 
 ### Self mode
 
@@ -110,12 +110,12 @@ For each scenario:
 4. Record PASS/FAIL per scenario.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-regression-shell Phase-2-Execute ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-execute-shell-regression-tests Phase-2-Execute ok`
 
 ## Phase 3 — Report & Gate
 
 <!-- TELEMETRY: phase.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-test-regression-shell Phase-3-Report`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-execute-shell-regression-tests Phase-3-Report`
 
 Produce report at `ai/epics/epic-XXXX/reports/regression-report-STORY-ID.md` using
 `_TEMPLATE-REGRESSION-SHELL.md`.
@@ -131,7 +131,7 @@ When NOT `--update-baseline`:
 - If `failed == 0` → exit 0.
 
 <!-- TELEMETRY: phase.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-regression-shell Phase-3-Report ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-execute-shell-regression-tests Phase-3-Report ok`
 
 ## Exit Codes
 
@@ -144,7 +144,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-test-r
 
 ## Integration Notes
 
-- Invoked by `x-story-implement` Phase 3.Q when `quality.regression.enabled=true` (conditional gate — EPIC-0073, Rule 24).
+- Invoked by `x-implement-story` Phase 3.Q when `quality.regression.enabled=true` (conditional gate — EPIC-0073, Rule 24).
 - Evidence artifact: `ai/epics/epic-XXXX/reports/regression-report-STORY-ID.md` (Rule 24 §Mandatory Evidence Artifacts).
 - Baseline updates require an entry in `governance/baselines/regression-baseline-updates.log` — silent overwrites fail `audit-regression-shell.sh`.
-- Internal skill `x-internal-status-update` is NOT invoked here; status updates are the caller's responsibility.
+- Internal skill `x-internal-update-status` is NOT invoked here; status updates are the caller's responsibility.

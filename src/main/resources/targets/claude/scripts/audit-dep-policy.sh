@@ -63,8 +63,8 @@ fi
 
 VIOLATIONS=()
 
-# 1. x-dep-policy-validate skill must exist when capability is active
-SKILL_PATH="${SKILLS_DIR}/x-dep-policy-validate/SKILL.md"
+# 1. x-validate-dependency-policy skill must exist when capability is active
+SKILL_PATH="${SKILLS_DIR}/x-validate-dependency-policy/SKILL.md"
 if [[ ! -f "${SKILL_PATH}" ]]; then
   VIOLATIONS+=("SKILL_MISSING: ${SKILL_PATH} not found — governance.dependency-policy capability requires this skill")
 fi

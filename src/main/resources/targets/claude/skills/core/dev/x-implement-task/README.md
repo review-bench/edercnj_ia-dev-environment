@@ -1,11 +1,11 @@
-# x-task-implement
+# x-implement-task
 
 > Implements a feature/story using TDD (Red-Green-Refactor) workflow. Delegates preparation to a subagent that reads architecture, coding, and test plan KPs, then implements test-first with Double-Loop TDD, layer-by-layer with compile checks after each cycle.
 
 | | |
 |---|---|
 | **Category** | Implementation |
-| **Invocation** | `/x-task-implement [STORY-ID or feature-description]` |
+| **Invocation** | `/x-implement-task [STORY-ID or feature-description]` |
 | **Reads** | architecture, coding-standards, layer-templates, testing |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -17,9 +17,9 @@ Implements a feature or story end-to-end using strict TDD discipline. It reuses 
 ## Usage
 
 ```
-/x-task-implement
-/x-task-implement ai/epics/epic-XXXX/story-XXXX-YYYY.md
-/x-task-implement "Add payment retry logic"
+/x-implement-task
+/x-implement-task ai/epics/epic-XXXX/story-XXXX-YYYY.md
+/x-implement-task "Add payment retry logic"
 ```
 
 ## Workflow
@@ -40,6 +40,6 @@ Implements a feature or story end-to-end using strict TDD discipline. It reuses 
 
 ## See Also
 
-- [x-story-implement](../x-story-implement/) — Full lifecycle: code, review, fix, PR
-- [x-test-plan](../x-test-plan/) — Generate test plan before implementation
-- [x-arch-plan](../x-arch-plan/) — Generate architecture plan before implementation
+- [x-implement-story](../x-implement-story/) — Full lifecycle: code, review, fix, PR
+- [x-plan-tests](../x-plan-tests/) — Generate test plan before implementation
+- [x-plan-architecture](../x-plan-architecture/) — Generate architecture plan before implementation

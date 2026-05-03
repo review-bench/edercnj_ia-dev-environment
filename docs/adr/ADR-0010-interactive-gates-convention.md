@@ -17,8 +17,8 @@ Accepted | 2026-04-16
 Skills that orchestrate long-running operations pause execution at decision
 points where a human must approve, reject, or fix something before the workflow
 continues. Examples: `x-release` pauses before merging the release PR, waiting
-for someone to confirm the draft looks correct; `x-story-implement` pauses after
-creating a task PR under `--manual-task-approval`; `x-epic-implement` pauses
+for someone to confirm the draft looks correct; `x-implement-story` pauses after
+creating a task PR under `--manual-task-approval`; `x-implement-epic` pauses
 after creating a batch of story PRs under `--manual-batch-approval`;
 `x-review-pr` terminates with "NO-GO" after exhausting auto-remediation retries.
 
@@ -32,8 +32,8 @@ para retomar.
 ```
 
 The operator had to memorise the exact resume command, had no in-band shortcut
-to invoke `x-pr-fix` to correct the PR without leaving the context, and — when
-`x-pr-fix` was called manually — had to re-enter the `x-release` flow with a
+to invoke `x-fix-pr` to correct the PR without leaving the context, and — when
+`x-fix-pr` was called manually — had to re-enter the `x-release` flow with a
 second resume command. Three invocations to complete what should be a one-option
 interaction.
 
@@ -42,15 +42,15 @@ A survey of the existing codebase revealed five distinct gate implementations:
 | Skill | Mechanism | Default |
 | :--- | :--- | :--- |
 | `x-release` Phase 8 | HALT text + `--interactive` opt-in | HALT |
-| `x-story-implement` Phase 0.5 (contract) | HALT text + `--manual-contract-approval` opt-in | HALT |
-| `x-story-implement` Phase 2.2.9 (task PR) | Auto-merge + `--manual-task-approval` opt-in | Auto |
-| `x-epic-implement` batch gate | HALT text + `--manual-batch-approval` opt-in | HALT |
+| `x-implement-story` Phase 0.5 (contract) | HALT text + `--manual-contract-approval` opt-in | HALT |
+| `x-implement-story` Phase 2.2.9 (task PR) | Auto-merge + `--manual-task-approval` opt-in | Auto |
+| `x-implement-epic` batch gate | HALT text + `--manual-batch-approval` opt-in | HALT |
 | `x-review-pr` retry-exhausted gate | Silent termination | None |
 
 There is no ADR or rule establishing a common shape. Each skill invented its own
 protocol, creating variability in operator experience, poor discoverability
 (flags are buried in long skill docs), and no loop-back behaviour (correcting a
-PR required the operator to leave the skill, run `x-pr-fix`, then restart or
+PR required the operator to leave the skill, run `x-fix-pr`, then restart or
 resume manually). EPIC-0039 introduced a good prior art with its structured
 approval-gate workflow for `x-release`; EPIC-0042 demonstrated the pattern of
 making structured interaction the default rather than an opt-in. This ADR
@@ -69,7 +69,7 @@ Every interactive gate MUST present **exactly 3 options** via `AskUserQuestion`:
 | Slot | Option | Label | Action |
 | :--- | :--- | :--- | :--- |
 | 1 | PROCEED | `"Continue (Recommended)"` | Advance the workflow from current state |
-| 2 | LOOP-BACK | `"Run x-pr-fix and retry"` (PR variant) or `"Regenerate and retry"` (no-PR variant) | Delegate to a fix/regenerate skill then re-present the same menu |
+| 2 | LOOP-BACK | `"Run x-fix-pr and retry"` (PR variant) or `"Regenerate and retry"` (no-PR variant) | Delegate to a fix/regenerate skill then re-present the same menu |
 | 3 | ABORT | `"Cancel the operation"` | Terminate the skill with cleanup |
 
 The menu is the **default** behaviour; no flag is required to activate it. The
@@ -82,8 +82,8 @@ When the operator selects slot 2, the skill invokes the fix/correction skill via
 Rule 13 Pattern 1 INLINE-SKILL:
 
 ```
-Skill(skill: "x-pr-fix", args: "<pr-number>")          # single-PR gates
-Skill(skill: "x-pr-fix-epic", args: "--epic <id>")      # multi-PR gates
+Skill(skill: "x-fix-pr", args: "<pr-number>")          # single-PR gates
+Skill(skill: "x-fix-epic-pr", args: "--epic <id>")      # multi-PR gates
 ```
 
 On return from the fix skill, the same menu is re-presented — the operator does
@@ -116,9 +116,9 @@ State is written atomically via `.tmp` + rename. Validation failure emits
 | Old flag | Skill | New behaviour |
 | :--- | :--- | :--- |
 | `--interactive` | `x-release` | No-op with deprecation warning (menu is now default) |
-| `--manual-contract-approval` | `x-story-implement` | No-op with deprecation warning |
-| `--manual-task-approval` | `x-story-implement` | No-op with deprecation warning |
-| `--manual-batch-approval` | `x-epic-implement` | No-op with deprecation warning |
+| `--manual-contract-approval` | `x-implement-story` | No-op with deprecation warning |
+| `--manual-task-approval` | `x-implement-story` | No-op with deprecation warning |
+| `--manual-batch-approval` | `x-implement-epic` | No-op with deprecation warning |
 
 Hard removal is deferred to a future epic after a deprecation period. Note:
 `x-release --interactive` under `--dry-run` has a separate dry-run semantic

@@ -1,5 +1,5 @@
 ---
-name: x-security-infra
+name: x-assess-infrastructure-security
 description: "Scans Kubernetes manifests, Terraform modules, Helm charts, and Docker Compose files for misconfigurations against CIS benchmarks."
 user-invocable: true
 allowed-tools: Bash, Read, Write, Glob, Grep
@@ -25,10 +25,10 @@ Include this skill when `security.scanning.infraScan: true` in the project confi
 
 ## Triggers
 
-- `/x-security-infra` -- scan all IaC types auto-detected in project
-- `/x-security-infra --scope k8s` -- scan Kubernetes manifests only
-- `/x-security-infra --scope terraform --benchmark cis-1.8` -- scan Terraform with specific benchmark
-- `/x-security-infra --scope helm --target charts/myapp` -- scan a specific Helm chart
+- `/x-assess-infrastructure-security` -- scan all IaC types auto-detected in project
+- `/x-assess-infrastructure-security --scope k8s` -- scan Kubernetes manifests only
+- `/x-assess-infrastructure-security --scope terraform --benchmark cis-1.8` -- scan Terraform with specific benchmark
+- `/x-assess-infrastructure-security --scope helm --target charts/myapp` -- scan a specific Helm chart
 
 ## Parameters
 

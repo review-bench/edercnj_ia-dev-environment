@@ -1,5 +1,5 @@
 ---
-name: x-pr-create
+name: x-create-pr
 description: "Task-level PR creation with formatted title, automatic labels, structured body, and target branch logic. Creates standardized PRs for individual tasks with Task ID traceability."
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Skill
@@ -21,11 +21,11 @@ Creates standardized Pull Requests for individual tasks in {{PROJECT_NAME}} with
 
 ## Triggers
 
-- `/x-pr-create TASK-0029-0001-001` -- create PR for the specified task
-- `/x-pr-create TASK-0029-0001-001 --draft` -- create as draft PR
-- `/x-pr-create TASK-0029-0001-001 --auto-approve-pr` -- target parent story branch instead of develop
-- `/x-pr-create TASK-0029-0001-001 --description "add user validation"` -- override PR title description
-- `/x-pr-create TASK-0029-0001-001 --target-branch epic/0049 --auto-merge merge --epic-id 0049` -- orchestrator-propagated PR targeting an epic branch with auto-merge enabled and epic label applied
+- `/x-create-pr TASK-0029-0001-001` -- create PR for the specified task
+- `/x-create-pr TASK-0029-0001-001 --draft` -- create as draft PR
+- `/x-create-pr TASK-0029-0001-001 --auto-approve-pr` -- target parent story branch instead of develop
+- `/x-create-pr TASK-0029-0001-001 --description "add user validation"` -- override PR title description
+- `/x-create-pr TASK-0029-0001-001 --target-branch epic/0049 --auto-merge merge --epic-id 0049` -- orchestrator-propagated PR targeting an epic branch with auto-merge enabled and epic label applied
 
 ## Parameters
 
@@ -50,7 +50,7 @@ Phase 3   BODY            -> Generate structured PR body
 Phase 3.5 EVIDENCE        -> Inject ## Orchestrator Evidence (unless --no-story-evidence)
 Phase 4   LABELS          -> Create labels if missing, collect label list
 Phase 5   CREATE          -> Create PR via gh pr create
-Phase 6   AUTO-MERGE      -> If --auto-merge != none, delegate to x-pr-merge
+Phase 6   AUTO-MERGE      -> If --auto-merge != none, delegate to x-merge-pr
 ```
 
 ### Phase 0 -- Validate Branch and Arguments
@@ -155,7 +155,7 @@ fi
 
 **MANDATORY TOOL CALL — Rule 24 §Camada-1 / Rule 13 Pattern 1 (INLINE-SKILL):**
 
-Delegate body generation to `x-internal-pr-body-render` (story-0066-0003). The render skill produces a body Markdown that includes the `<!-- template-version: 1.0 -->` marker required by `audit-pr-template.sh` (story-0066-0007).
+Delegate body generation to `x-internal-render-pr-body` (story-0066-0003). The render skill produces a body Markdown that includes the `<!-- template-version: 1.0 -->` marker required by `audit-pr-template.sh` (story-0066-0007).
 
 ```bash
 # Derive story-id from task-id: TASK-XXXX-YYYY-NNN -> story-XXXX-YYYY
@@ -166,12 +166,12 @@ TMP_BODY_PATH=$(mktemp -t pr-body-XXXXXX.md)
 chmod 600 "$TMP_BODY_PATH"
 trap 'rm -f "$TMP_BODY_PATH"' EXIT
 
-echo "INFO: Invoking x-internal-pr-body-render --kind=implementation --story-id=$STORY_ID_FOR_RENDER"
+echo "INFO: Invoking x-internal-render-pr-body --kind=implementation --story-id=$STORY_ID_FOR_RENDER"
 ```
 
-Invoke the `x-internal-pr-body-render` skill via the Skill tool:
+Invoke the `x-internal-render-pr-body` skill via the Skill tool:
 
-    Skill(skill: "x-internal-pr-body-render", model: "haiku", args: "--kind=implementation --story-id=$STORY_ID_FOR_RENDER --out=$TMP_BODY_PATH")
+    Skill(skill: "x-internal-render-pr-body", model: "haiku", args: "--kind=implementation --story-id=$STORY_ID_FOR_RENDER --out=$TMP_BODY_PATH")
 
 ```bash
 RENDER_EXIT=$?
@@ -183,7 +183,7 @@ else
   # Fallback path — see ## Recovery section
   echo "WARN [render-fallback]: PR body gerado via fallback inline (sem template-version marker)." >&2
   echo "     audit-pr-template.sh reportará PR_TEMPLATE_VIOLATION para este PR." >&2
-  echo "     Investigar: x-internal-pr-body-render exit code = $RENDER_EXIT." >&2
+  echo "     Investigar: x-internal-render-pr-body exit code = $RENDER_EXIT." >&2
 
   # Generate legacy inline body (see ## Recovery for full template)
   BODY="<inline body — see ## Recovery section>"
@@ -212,8 +212,8 @@ if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
   # Extract story ID from task ID: TASK-0059-0007-001 -> story-0059-0007
   STORY_ID_FOR_EVIDENCE="story-${TASK_EPIC_ID}-${TASK_STORY_NUM}"
 
-  # Orchestrator commit SHA: last commit matching x-story-implement in log
-  ORCH_SHA=$(git log --grep="x-story-implement" -1 --format="%H" 2>/dev/null)
+  # Orchestrator commit SHA: last commit matching x-implement-story in log
+  ORCH_SHA=$(git log --grep="x-implement-story" -1 --format="%H" 2>/dev/null)
   if [[ -z "$ORCH_SHA" ]]; then
     # Fallback: use current HEAD SHA
     ORCH_SHA=$(git rev-parse HEAD)
@@ -260,13 +260,13 @@ if [[ "${NO_STORY_EVIDENCE:-false}" != "true" ]]; then
   ORCHESTRATOR_EVIDENCE_SECTION="
 ## Orchestrator Evidence
 
-<!-- Filled automatically by x-pr-create. Do not edit manually. -->
+<!-- Filled automatically by x-create-pr. Do not edit manually. -->
 
 | Campo | Valor |
 | :--- | :--- |
 | Story IDs | ${STORY_ID_FOR_EVIDENCE} |
 | Orchestrator Commit SHA | ${ORCH_SHA} |
-| Invocation Skill | x-story-implement |
+| Invocation Skill | x-implement-story |
 | Phase 1 Artifacts | ${P1_ARTIFACTS} |
 | Phase 3 Artifacts | ${P3_ARTIFACTS} |
 "
@@ -355,10 +355,10 @@ PR #42 created: https://github.com/owner/repo/pull/42
 
 ### Phase 6 -- Post-Create Auto-Merge (Optional)
 
-When `--auto-merge` is set to a strategy other than `none`, delegate to `x-pr-merge` so the PR is queued for automatic merge once checks pass. Uses Pattern 1 (INLINE-SKILL) per Rule 13.
+When `--auto-merge` is set to a strategy other than `none`, delegate to `x-merge-pr` so the PR is queued for automatic merge once checks pass. Uses Pattern 1 (INLINE-SKILL) per Rule 13.
 
 ```
-Skill(skill: "x-pr-merge", args: "--pr <PR_NUMBER> --strategy <AUTO_MERGE_STRATEGY> --auto")
+Skill(skill: "x-merge-pr", args: "--pr <PR_NUMBER> --strategy <AUTO_MERGE_STRATEGY> --auto")
 ```
 
 Set `autoMergeEnabled=true` in the skill response when the delegated call succeeds; otherwise fall through with `autoMergeEnabled=false` and a WARN line so the orchestrator can decide whether to retry.
@@ -367,7 +367,7 @@ Backward compatibility: when `--auto-merge` is absent (default `none`), Phase 6 
 
 ## Recovery (Render Skill Fallback — EPIC-0066, story-0066-0005)
 
-When `x-internal-pr-body-render` returns exit ≠ 0 in Phase 3, this skill falls back to the legacy inline body generator to ensure PR creation never aborts (RULE-004 fail-open). The fallback body lacks the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will block the merge with `PR_TEMPLATE_VIOLATION`. This is intentional: the preventive render path produces the marker; the detective audit gate enforces it.
+When `x-internal-render-pr-body` returns exit ≠ 0 in Phase 3, this skill falls back to the legacy inline body generator to ensure PR creation never aborts (RULE-004 fail-open). The fallback body lacks the `<!-- template-version: 1.0 -->` marker — `audit-pr-template.sh` (story-0066-0007) will block the merge with `PR_TEMPLATE_VIOLATION`. This is intentional: the preventive render path produces the marker; the detective audit gate enforces it.
 
 The WARN message includes `RENDER_EXIT` (the render skill exit code) so the operator can diagnose the cause:
 
@@ -391,7 +391,7 @@ Full fallback body template, dedup interaction, and RULE-004 contract detail in 
 | `--epic-id` fails regex `^\d{4}$` | ABORT exit 5 `INVALID_EPIC_ID`: "Epic ID must be 4 digits" |
 | `--auto-merge` != none without `--target-branch` | ABORT exit 6 `AUTO_MERGE_REQUIRES_TARGET`: "--auto-merge requires --target-branch" |
 | `--target-branch develop` combined with `--auto-merge` != none | WARN and continue: "Auto-merge directly to develop is unusual; consider using an epic branch" |
-| `x-pr-merge` delegation fails in Phase 6 | WARN and continue: PR is created, `autoMergeEnabled=false`, orchestrator retries |
+| `x-merge-pr` delegation fails in Phase 6 | WARN and continue: PR is created, `autoMergeEnabled=false`, orchestrator retries |
 | `git log --grep` returns empty SHA | Fall back to `git rev-parse HEAD` for `Orchestrator Commit SHA` field |
 | No Phase 1/3 artifacts found on disk | Use `(none found)` as value; PR is still created (audit validates at CI time) |
 
@@ -399,19 +399,19 @@ Full fallback body template, dedup interaction, and RULE-004 contract detail in 
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-git-commit` | predecessor | Commits are created before PR |
-| `x-git-push` | alternative | x-git-push handles general git workflow; x-pr-create is task-specific |
-| `x-story-implement` | called-by | Phase 5 (PR creation) delegates to this skill for task-level PRs |
-| `x-test-run` | called-by | Phase 1 pre-check runs the test command |
-| `x-pr-merge` | called (Phase 6) | Invoked when `--auto-merge` != `none` to enable GitHub auto-merge with the chosen strategy |
-| `x-epic-implement` | caller | Propagates `--target-branch epic/XXXX --auto-merge merge --epic-id XXXX` OO-style (RULE-009) |
+| `x-commit-changes` | predecessor | Commits are created before PR |
+| `x-push-branch` | alternative | x-push-branch handles general git workflow; x-create-pr is task-specific |
+| `x-implement-story` | called-by | Phase 5 (PR creation) delegates to this skill for task-level PRs |
+| `x-execute-tests` | called-by | Phase 1 pre-check runs the test command |
+| `x-merge-pr` | called (Phase 6) | Invoked when `--auto-merge` != `none` to enable GitHub auto-merge with the chosen strategy |
+| `x-implement-epic` | caller | Propagates `--target-branch epic/XXXX --auto-merge merge --epic-id XXXX` OO-style (RULE-009) |
 
 ## Examples
 
 ### Basic Task PR
 
 ```
-/x-pr-create TASK-0029-0001-001
+/x-create-pr TASK-0029-0001-001
 ```
 
 Creates PR:
@@ -422,7 +422,7 @@ Creates PR:
 ### Draft PR
 
 ```
-/x-pr-create TASK-0029-0001-001 --draft
+/x-create-pr TASK-0029-0001-001 --draft
 ```
 
 Creates draft PR with `[DRAFT] This PR is not ready for review` banner.
@@ -430,7 +430,7 @@ Creates draft PR with `[DRAFT] This PR is not ready for review` banner.
 ### Auto-Approve Mode
 
 ```
-/x-pr-create TASK-0029-0001-001 --auto-approve-pr
+/x-create-pr TASK-0029-0001-001 --auto-approve-pr
 ```
 
 Creates PR targeting parent story branch (`feat/story-0029-0001-*`) instead of `develop`.
@@ -438,7 +438,7 @@ Creates PR targeting parent story branch (`feat/story-0029-0001-*`) instead of `
 ### Custom Description
 
 ```
-/x-pr-create TASK-0029-0001-001 --description "implement user input validation"
+/x-create-pr TASK-0029-0001-001 --description "implement user input validation"
 ```
 
 Creates PR with title: `feat(TASK-0029-0001-001): implement user input validation`
@@ -446,7 +446,7 @@ Creates PR with title: `feat(TASK-0029-0001-001): implement user input validatio
 ### Target an Epic Branch (orchestrator propagation)
 
 ```
-/x-pr-create TASK-0049-0016-001 --target-branch epic/0049
+/x-create-pr TASK-0049-0016-001 --target-branch epic/0049
 ```
 
 Creates PR with `--base epic/0049`. Legacy label set is preserved; no auto-merge is enabled.
@@ -454,15 +454,15 @@ Creates PR with `--base epic/0049`. Legacy label set is preserved; no auto-merge
 ### Full Orchestrator Chain (target + auto-merge + epic-id)
 
 ```
-/x-pr-create TASK-0049-0016-001 --target-branch epic/0049 --auto-merge merge --epic-id 0049
+/x-create-pr TASK-0049-0016-001 --target-branch epic/0049 --auto-merge merge --epic-id 0049
 ```
 
-Creates PR with `--base epic/0049`, label `epic-0049` injected, and delegates Phase 6 to `x-pr-merge --pr <N> --strategy merge --auto`. Response includes `autoMergeEnabled=true`.
+Creates PR with `--base epic/0049`, label `epic-0049` injected, and delegates Phase 6 to `x-merge-pr --pr <N> --strategy merge --auto`. Response includes `autoMergeEnabled=true`.
 
 ### Error -- auto-merge without target-branch
 
 ```
-/x-pr-create TASK-0049-0016-001 --auto-merge merge
+/x-create-pr TASK-0049-0016-001 --auto-merge merge
 ```
 
 Exits with code `6` (`AUTO_MERGE_REQUIRES_TARGET`): "--auto-merge requires --target-branch".
@@ -470,7 +470,7 @@ Exits with code `6` (`AUTO_MERGE_REQUIRES_TARGET`): "--auto-merge requires --tar
 ### Error -- invalid epic-id
 
 ```
-/x-pr-create TASK-0049-0016-001 --target-branch epic/0049 --epic-id 49
+/x-create-pr TASK-0049-0016-001 --target-branch epic/0049 --epic-id 49
 ```
 
 Exits with code `5` (`INVALID_EPIC_ID`): "Epic ID must be 4 digits".

@@ -1,6 +1,6 @@
 ---
-name: x-internal-epic-map
-description: "Generate Implementation Map from Epic and Stories: dependency matrix, phase computation, critical path, ASCII diagrams, Mermaid graphs, strategic observations. Invoked only by x-feature-create (Phase 4)."
+name: x-internal-map-epic
+description: "Generate Implementation Map from Epic and Stories: dependency matrix, phase computation, critical path, ASCII diagrams, Mermaid graphs, strategic observations. Invoked only by x-create-feature (Phase 4)."
 visibility: internal
 user-invocable: false
 model: sonnet
@@ -53,9 +53,9 @@ Read the following files before starting:
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-map Phase-P1-Worktree-Detect`
 
-Invoke `x-git-worktree` in detect-context mode so downstream steps know whether the current checkout is already inside an epic worktree. Result is advisory only — `x-internal-epic-branch-ensure` (Step P2) owns the authoritative branch decision.
+Invoke `x-manage-worktrees` in detect-context mode so downstream steps know whether the current checkout is already inside an epic worktree. Result is advisory only — `x-internal-ensure-epic-branch` (Step P2) owns the authoritative branch decision.
 
-    Skill(skill: "x-git-worktree", args: "detect-context")
+    Skill(skill: "x-manage-worktrees", args: "detect-context")
 
 Fail-open (RULE-006): any detect-context failure is logged and Step P2 proceeds.
 
@@ -69,7 +69,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 Derive the epic ID from the `<EPIC_FILE>` path (`ai/epics/epic-<XXXX>/epic-<XXXX>.md`), then ensure the `epic/<XXXX>` branch exists locally AND on origin. The ensure skill is idempotent — a no-op when the caller is already on that branch.
 
-    Skill(skill: "x-internal-epic-branch-ensure", args: "--epic-id <XXXX>")
+    Skill(skill: "x-internal-ensure-epic-branch", args: "--epic-id <XXXX>")
 
 On non-zero exit, abort with `EPIC_BRANCH_ENSURE_FAILED`.
 
@@ -320,14 +320,14 @@ If stories do not contain formal task IDs, **skip this step entirely** and note:
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-map Phase-8-5-Parallelism-Eval`
 
-Invoke `/x-parallel-eval --scope=epic` against the epic under analysis to detect file-level collision risks between stories that Step 2 placed in the same phase. The output feeds the "## 8.5 Restrições de Paralelismo" section of the map.
+Invoke `/x-evaluate-parallelism --scope=epic` against the epic under analysis to detect file-level collision risks between stories that Step 2 placed in the same phase. The output feeds the "## 8.5 Restrições de Paralelismo" section of the map.
 
-**Fail-open behavior (RULE-005 / RULE-006):** If the `x-parallel-eval` skill is not available in the project (skill file missing under `.claude/skills/x-parallel-eval/` or `src/main/resources/targets/claude/skills/core/plan/x-parallel-eval/`) OR the invocation returns a non-zero exit code, DO NOT abort the map generation. Instead, emit section 8.5 with the following body:
+**Fail-open behavior (RULE-005 / RULE-006):** If the `x-evaluate-parallelism` skill is not available in the project (skill file missing under `.claude/skills/x-evaluate-parallelism/` or `src/main/resources/targets/claude/skills/core/plan/x-evaluate-parallelism/`) OR the invocation returns a non-zero exit code, DO NOT abort the map generation. Instead, emit section 8.5 with the following body:
 
 ```markdown
 ## 8.5 Restrições de Paralelismo
 
-> análise pulada — /x-parallel-eval não disponível (RULE-006 fail-open)
+> análise pulada — /x-evaluate-parallelism não disponível (RULE-006 fail-open)
 ```
 
 and continue to Step 9. Log a WARNING with the reason (skill missing, exit code N, etc.) for operator diagnostics.
@@ -337,7 +337,7 @@ and continue to Step 9. Log a WARNING with the reason (skill missing, exit code 
 ```markdown
 ## 8.5 Restrições de Paralelismo
 
-> Análise gerada por /x-parallel-eval em <timestamp omitido para determinismo>.
+> Análise gerada por /x-evaluate-parallelism em <timestamp omitido para determinismo>.
 
 **Conflitos detectados:** <H> hard, <R> regen, <S> soft
 
@@ -356,7 +356,7 @@ and continue to Step 9. Log a WARNING with the reason (skill missing, exit code 
 
 **Invocation shape:** Invoke via the Skill tool (Rule 13 — INLINE-SKILL pattern):
 
-    Skill(skill: "x-parallel-eval", args: "--scope=epic --epic <EPIC_FILE>")
+    Skill(skill: "x-evaluate-parallelism", args: "--scope=epic --epic <EPIC_FILE>")
 
 **Degenerate case:** If no conflicts are detected (`0 hard, 0 regen, 0 soft`), emit section 8.5 with "Conflitos detectados: 0" and omit subsections 8.5.1 / 8.5.2.
 
@@ -376,12 +376,12 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 
 If `--dry-run` is set, log `"dry-run, skipping commit"` and skip this step entirely.
 
-Otherwise, delegate the commit to `x-planning-commit` so the refreshed `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain:
+Otherwise, delegate the commit to `x-commit-planning` so the refreshed `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` is versioned on the canonical `epic/<ID>` branch without triggering the code pre-commit chain:
 
-    Skill(skill: "x-planning-commit",
+    Skill(skill: "x-commit-planning",
           args: "--scope docs --epic-id <XXXX> --paths ai/epics/epic-<XXXX>/IMPLEMENTATION-MAP.md --subject \"update implementation map\"")
 
-Idempotency: when the map is byte-identical to the previously committed version, `x-planning-commit` returns `commitSha=null` and `noOp=true` (silent no-op). No additional diff check is required here.
+Idempotency: when the map is byte-identical to the previously committed version, `x-commit-planning` returns `commitSha=null` and `noOp=true` (silent no-op). No additional diff check is required here.
 
 On `COMMIT_FAILED` (exit 4), abort with the same error code.
 
@@ -397,7 +397,7 @@ If `--dry-run` is set, log `"dry-run, skipping push"` and skip.
 
 Otherwise, push the canonical epic branch so the updated map is observable on origin:
 
-    Skill(skill: "x-git-push", args: "--branch epic/<XXXX>")
+    Skill(skill: "x-push-branch", args: "--branch epic/<XXXX>")
 
 On push failure, log a WARNING and continue — the local commit is preserved; the operator re-runs manually. Do NOT abort.
 
@@ -417,11 +417,11 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 | Cross-story task dep without story-level dep (RULE-012) | Abort with error listing the inconsistent dependencies |
 | Cycle in task dependency graph | Abort with cycle path: "Cycle detected: TASK-A -> TASK-B -> TASK-A" |
 | Stories without formal task IDs | Skip Section 8 with note; proceed with story-level map only |
-| `/x-parallel-eval` skill missing or exit code ≥ 1 (Step 8.5) | Fail-open: emit section 8.5 with "análise pulada — /x-parallel-eval não disponível" (RULE-005 / RULE-006); log WARNING; continue to Step 9 |
-| `x-internal-epic-branch-ensure` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
-| `x-planning-commit` exit 4 (Step P4) | Abort with `COMMIT_FAILED`; file written but not versioned |
-| `x-planning-commit` exit 0 + `noOp=true` (Step P4) | Silent no-op — re-execution idempotency confirmed; continue to Step P5 |
-| `x-git-push` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
+| `/x-evaluate-parallelism` skill missing or exit code ≥ 1 (Step 8.5) | Fail-open: emit section 8.5 with "análise pulada — /x-evaluate-parallelism não disponível" (RULE-005 / RULE-006); log WARNING; continue to Step 9 |
+| `x-internal-ensure-epic-branch` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |
+| `x-commit-planning` exit 4 (Step P4) | Abort with `COMMIT_FAILED`; file written but not versioned |
+| `x-commit-planning` exit 0 + `noOp=true` (Step P4) | Silent no-op — re-execution idempotency confirmed; continue to Step P5 |
+| `x-push-branch` fails (Step P5) | WARN only; local commit preserved; operator re-runs manually |
 | `--dry-run` set | Steps P4 and P5 become no-ops with log line `"dry-run, skipping commit"` / `"dry-run, skipping push"` |
 
 ## Common Mistakes
@@ -439,18 +439,18 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 | x-epic-create | reads | Reads the Epic file with story index and dependencies |
 | x-story-create | reads | Reads generated story files for dependency details |
 | x-epic-decompose | called-by | Orchestrator invokes x-epic-map in Phase D |
-| x-epic-implement | reads | Epic implementation reads the map for execution order |
-| x-git-worktree | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
-| x-internal-epic-branch-ensure | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
-| x-planning-commit | calls (Step P4) | Batch-commit implementation map without code pre-commit chain (EPIC-0049 / RULE-007) |
-| x-git-push | calls (Step P5) | Push canonical epic branch to origin (optional) |
+| x-implement-epic | reads | Epic implementation reads the map for execution order |
+| x-manage-worktrees | calls (Step P1) | Detect-context (EPIC-0049 / RULE-001) |
+| x-internal-ensure-epic-branch | calls (Step P2) | Ensure `epic/<ID>` exists locally + origin (EPIC-0049 / RULE-001) |
+| x-commit-planning | calls (Step P4) | Batch-commit implementation map without code pre-commit chain (EPIC-0049 / RULE-007) |
+| x-push-branch | calls (Step P5) | Push canonical epic branch to origin (optional) |
 
 ## Knowledge Pack References
 
 | Knowledge Pack | Usage |
 |----------------|-------|
 | story-planning | Phase computation, dependency DAG, critical path analysis |
-| parallelism-heuristics | Step 8.5 collision categories (hard/regen/soft) consumed from `/x-parallel-eval` output |
+| parallelism-heuristics | Step 8.5 collision categories (hard/regen/soft) consumed from `/x-evaluate-parallelism` output |
 
 ## Planning Status Propagation (Rule 22 / EPIC-0046)
 
@@ -459,7 +459,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-m
 `x-epic-map` reads story files (it does NOT write to them) and emits/refreshes `ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md` with two lifecycle columns:
 
 - **Planejamento** — mirrors the current `**Status:**` of each story (values: `Pendente`, `Planejada`, `Em Andamento`, `Concluída`, `Falha`, `Bloqueada`).
-- **Status** — the execution lifecycle status (same six values; driven by `x-story-implement` / `x-epic-implement` downstream).
+- **Status** — the execution lifecycle status (same six values; driven by `x-implement-story` / `x-implement-epic` downstream).
 
 Both columns are populated by reading the story files in situ via the CLI. `x-epic-map` never transitions any story — it is a read-only skill with respect to lifecycle status. The `{{PLANNING_STATUS}}` token in the implementation-map template is resolved at render-time by reading each story.
 
@@ -479,6 +479,6 @@ Both columns are populated by reading the story files in situ via the CLI. `x-ep
    git add ai/epics/epic-XXXX/IMPLEMENTATION-MAP.md
    ```
 
-       Skill(skill: "x-git-commit", args: "docs(epic-XXXX): refresh implementation map with lifecycle columns")
+       Skill(skill: "x-commit-changes", args: "docs(epic-XXXX): refresh implementation map with lifecycle columns")
 
 **Fail-loud:** CLI exit 20 on any story aborts map generation (RULE-046-08). `x-epic-map` never calls `write` on a story — the skill only reads.

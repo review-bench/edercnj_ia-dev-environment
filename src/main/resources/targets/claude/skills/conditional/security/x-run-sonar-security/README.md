@@ -1,4 +1,4 @@
-# x-security-sonar
+# x-run-sonar-security
 
 > SonarQube Quality Gate -- integrates with SonarQube/SonarCloud for security hotspot tracking, quality gate enforcement, and SARIF output from findings.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `security.qualityGate.provider != "none"` |
-| **Invocation** | `/x-security-sonar --server <url> --token <token> [--quality-gate default\|strict] [--project-key <key>]` |
+| **Invocation** | `/x-run-sonar-security --server <url> --token <token> [--quality-gate default\|strict] [--project-key <key>]` |
 | **Reads** | security (references: security-principles, application-security) |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
@@ -22,13 +22,13 @@ Integrates with SonarQube or SonarCloud to generate `sonar-project.properties`, 
 ## Usage
 
 ```
-/x-security-sonar --server https://sonar.example.com --token squ_xxxx
-/x-security-sonar --server https://sonar.example.com --token squ_xxxx --quality-gate strict
-/x-security-sonar --server https://sonarcloud.io --token squ_xxxx --project-key my-project
+/x-run-sonar-security --server https://sonar.example.com --token squ_xxxx
+/x-run-sonar-security --server https://sonar.example.com --token squ_xxxx --quality-gate strict
+/x-run-sonar-security --server https://sonarcloud.io --token squ_xxxx --project-key my-project
 ```
 
 ## See Also
 
-- [x-security-sast](../x-security-sast/) -- Static application security testing
-- [x-security-secrets](../x-security-secrets/) -- Secret detection in code and git history
-- [x-security-pentest](../x-security-pentest/) -- Multi-phase penetration test orchestrator
+- [x-run-sast](../x-run-sast/) -- Static application security testing
+- [x-scan-secrets](../x-scan-secrets/) -- Secret detection in code and git history
+- [x-run-pentest](../x-run-pentest/) -- Multi-phase penetration test orchestrator

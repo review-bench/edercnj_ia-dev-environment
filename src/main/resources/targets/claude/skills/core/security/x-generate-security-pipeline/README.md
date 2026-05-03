@@ -1,11 +1,11 @@
-# x-security-pipeline
+# x-generate-security-pipeline
 
 > Generates CI/CD pipeline configurations with conditional security stages based on SecurityConfig flags. Supports GitHub Actions, GitLab CI, and Azure DevOps with minimal and full stage modes.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-security-pipeline [--ci github\|gitlab\|azure] [--stages all\|minimal] [--trigger push\|pr\|schedule] [--fail-on-findings true\|false] [--severity-threshold CRITICAL\|HIGH\|MEDIUM]` |
+| **Invocation** | `/x-generate-security-pipeline [--ci github\|gitlab\|azure] [--stages all\|minimal] [--trigger push\|pr\|schedule] [--fail-on-findings true\|false] [--severity-threshold CRITICAL\|HIGH\|MEDIUM]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,10 +16,10 @@ Generates CI/CD pipeline configuration files with up to 9 conditional security s
 ## Usage
 
 ```
-/x-security-pipeline
-/x-security-pipeline --ci gitlab --stages minimal
-/x-security-pipeline --ci azure --trigger schedule
-/x-security-pipeline --fail-on-findings false --severity-threshold CRITICAL
+/x-generate-security-pipeline
+/x-generate-security-pipeline --ci gitlab --stages minimal
+/x-generate-security-pipeline --ci azure --trigger schedule
+/x-generate-security-pipeline --fail-on-findings false --severity-threshold CRITICAL
 ```
 
 ## Workflow
@@ -42,7 +42,7 @@ Generates CI/CD pipeline configuration files with up to 9 conditional security s
 
 ## See Also
 
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification (referenced as pipeline stage)
-- [x-dependency-audit](../x-dependency-audit/) -- Dependency audit (always-enabled baseline stage)
-- [x-hardening-eval](../x-hardening-eval/) -- Hardening evaluation (optional pipeline stage)
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from scan results
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification (referenced as pipeline stage)
+- [x-audit-dependencies](../x-audit-dependencies/) -- Dependency audit (always-enabled baseline stage)
+- [x-evaluate-hardening](../x-evaluate-hardening/) -- Hardening evaluation (optional pipeline stage)
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from scan results

@@ -1,11 +1,11 @@
-# x-dependency-audit
+# x-audit-dependencies
 
 > Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report.
 
 | | |
 |---|---|
 | **Category** | Security |
-| **Invocation** | `/x-dependency-audit [--scope all\|vulnerabilities\|outdated\|licenses\|sbom\|license-report\|tree]` |
+| **Invocation** | `/x-audit-dependencies [--scope all\|vulnerabilities\|outdated\|licenses\|sbom\|license-report\|tree]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -16,11 +16,11 @@ Audits all project dependencies for security vulnerabilities, outdated versions,
 ## Usage
 
 ```
-/x-dependency-audit
-/x-dependency-audit --scope vulnerabilities
-/x-dependency-audit --scope sbom
-/x-dependency-audit --scope license-report
-/x-dependency-audit --scope tree
+/x-audit-dependencies
+/x-audit-dependencies --scope vulnerabilities
+/x-audit-dependencies --scope sbom
+/x-audit-dependencies --scope license-report
+/x-audit-dependencies --scope tree
 ```
 
 ## Workflow
@@ -42,6 +42,6 @@ Audits all project dependencies for security vulnerabilities, outdated versions,
 
 ## See Also
 
-- [x-supply-chain-audit](../x-supply-chain-audit/) -- Advanced supply chain analysis (maintainer risk, typosquatting, EPSS)
-- [x-owasp-scan](../x-owasp-scan/) -- OWASP Top 10 verification (delegates A06 to this skill)
-- [x-security-dashboard](../x-security-dashboard/) -- Aggregated security posture view from all scanning skills
+- [x-audit-supply-chain](../x-audit-supply-chain/) -- Advanced supply chain analysis (maintainer risk, typosquatting, EPSS)
+- [x-scan-owasp](../x-scan-owasp/) -- OWASP Top 10 verification (delegates A06 to this skill)
+- [x-generate-security-dashboard](../x-generate-security-dashboard/) -- Aggregated security posture view from all scanning skills

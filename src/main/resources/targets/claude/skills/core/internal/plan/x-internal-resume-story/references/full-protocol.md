@@ -1,6 +1,6 @@
-# x-internal-story-resume — Full Protocol
+# x-internal-resume-story — Full Protocol
 
-> Depth reference for `x-internal-story-resume`. The SKILL.md body is
+> Depth reference for `x-internal-resume-story`. The SKILL.md body is
 > the normative contract; this document expands the workflow
 > internals that orchestrators do not need in their working context
 > but that implementers and auditors must be able to consult.
@@ -9,7 +9,7 @@
 
 The parser is a tight single-file loop (`while (($#)); case "$1" in …`)
 to keep the SKILL.md within the SkillSizeLinter 500-line threshold
-without delegating to `x-internal-args-normalize` (that skill is a
+without delegating to `x-internal-normalize-args` (that skill is a
 peer, not a dependency — see Rule 14).
 
 | Input | Result | Exit |
@@ -49,17 +49,17 @@ Supported status strings (case-insensitive, trimmed):
 | `DONE`, `MERGED`, `COMPLETE`, `Concluída`, `Concluida`, `Done`, `Merged` | `PENDING`, `IN_PROGRESS`, `PR_CREATED`, `PR_APPROVED`, `PR_MERGED`, `FAILED`, `BLOCKED`, `UNKNOWN`, everything else |
 
 `PR_MERGED` intentionally appears in the pending bucket: in the
-`x-story-implement` lifecycle, `PR_MERGED` means the PR landed on
+`x-implement-story` lifecycle, `PR_MERGED` means the PR landed on
 `develop` but `execution-state.json` has not yet been transitioned
-to `DONE` by `x-internal-status-update`. The caller
-(`x-story-implement`) is the sole authority on that transition;
+to `DONE` by `x-internal-update-status`. The caller
+(`x-implement-story`) is the sole authority on that transition;
 classifying `PR_MERGED` as DONE here would pre-empt the
 orchestrator's own lifecycle bookkeeping.
 
 ## 3. Task-Order Invariant Edge Cases
 
 The baseline algorithm in Step 4 assumes DONE tasks precede PENDING
-tasks in task-order (the invariant upheld by `x-story-implement`
+tasks in task-order (the invariant upheld by `x-implement-story`
 Phase 2 wave dispatch, which never retries a PENDING task before an
 earlier DONE one). When that invariant is violated, the skill
 degrades gracefully:
@@ -80,7 +80,7 @@ warning:
 warn: non-contiguous DONE tasks detected; resume point computed from first non-DONE position
 ```
 
-so operators can reconcile the state file with `x-status-reconcile`
+so operators can reconcile the state file with `x-reconcile-status`
 if the divergence is systematic. The envelope itself stays
 well-formed.
 
@@ -93,7 +93,7 @@ is the last DONE-labelled task in the state file's insertion order
 
 ## 4. ISO-8601 Timestamp Parser Portability
 
-`completedAt` is written by `x-internal-status-update` as
+`completedAt` is written by `x-internal-update-status` as
 `date -u +%Y-%m-%dT%H:%M:%SZ` (GNU and BSD both accept this form).
 Step 5's staleness comparison reads it back via:
 
@@ -113,7 +113,7 @@ toolchain, which the skill tolerates.
 ## 5. Concurrency Contract
 
 - The skill does NOT open `<state_file>.lock` directly. It delegates
-  the locked read to `x-internal-status-update --read-only`, which
+  the locked read to `x-internal-update-status --read-only`, which
   internally acquires `flock -s` (shared lock). The delegation
   consolidates all lock bookkeeping into the pilot skill and avoids
   duplicate lock-acquisition code paths.
@@ -125,7 +125,7 @@ toolchain, which the skill tolerates.
 - Step 5 (staleness detection) runs lock-free: it reads the story
   file's mtime via `stat`, not the state file. No lock upgrade is
   required.
-- The `x-internal-status-update --read-only` delegation also validates
+- The `x-internal-update-status --read-only` delegation also validates
   the state-file schema as a side effect; parse failures surface as
   its own exit 3, which this skill re-maps to exit 2
   (`STORY_NOT_IN_STATE`) when the cause is a missing story node.
@@ -138,7 +138,7 @@ per story in `execution-state.json`):
 | Step | Median time | Dominated by |
 | :--- | :--- | :--- |
 | 1 | 4 ms | argument parsing |
-| 2 | 32 ms | `Skill(x-internal-status-update)` cold start + `flock -s` + `jq` |
+| 2 | 32 ms | `Skill(x-internal-update-status)` cold start + `flock -s` + `jq` |
 | 3 | 8 ms | `jq` iteration over tasks |
 | 4 | 1 ms | arithmetic |
 | 5 | 12 ms | 1× `stat` + per-task `date -f` |
@@ -146,7 +146,7 @@ per story in `execution-state.json`):
 | **Total** | **~80 ms** | well under the 200 ms DoD budget |
 
 The skill is CPU-bound on `jq`; the dominant factor is the cold-start
-cost of the delegate `x-internal-status-update` invocation (~32 ms).
+cost of the delegate `x-internal-update-status` invocation (~32 ms).
 Inlining the `jq -c .stories[…]` read would shave ~20 ms but forfeit
 the shared-lock contract, so the delegation is kept.
 
@@ -167,7 +167,7 @@ Story not in execution-state.json
 Envelope for exit 64 (usage error):
 
 ```text
-usage: x-internal-story-resume --story-id <id> --epic-id <id>
+usage: x-internal-resume-story --story-id <id> --epic-id <id>
 ```
 
 Envelope for exit 127 (dependency missing):
@@ -180,16 +180,16 @@ No JSON is written to stdout on any non-zero exit — callers
 distinguish success from failure by exit code, not by parsing
 stdout.
 
-## 8. Why Delegate the State Read to x-internal-status-update?
+## 8. Why Delegate the State Read to x-internal-update-status?
 
-Unlike `x-internal-story-load-context` (which reads `stories.<id>.status`
+Unlike `x-internal-load-story-context` (which reads `stories.<id>.status`
 for dependency validation via a direct `jq` call), this skill
 delegates its state read to the pilot skill. The reasons diverge:
 
-| Axis | `x-internal-story-load-context` | `x-internal-story-resume` |
+| Axis | `x-internal-load-story-context` | `x-internal-resume-story` |
 | :--- | :--- | :--- |
 | Frequency of invocation | Once per story at Phase 0 entry | Once per story at Phase 0 resume-detection step |
-| Concurrent writers expected? | No (Phase 0 runs before any `x-story-implement` or `x-task-implement` writes) | Yes (resume can be invoked while a parallel task is in-flight, writing `status=IN_PROGRESS`) |
+| Concurrent writers expected? | No (Phase 0 runs before any `x-implement-story` or `x-implement-task` writes) | Yes (resume can be invoked while a parallel task is in-flight, writing `status=IN_PROGRESS`) |
 | Data volume | Single `status` string | Full `tasks.*` sub-tree |
 | Lock requirement | Best-effort (dependency check is idempotent) | Shared-lock REQUIRED (reading mid-write of `.tasks[…]` yields partial JSON) |
 
@@ -198,7 +198,7 @@ concurrent with a task-status write can observe half-updated JSON
 (e.g., `status` updated but `commitSha` not yet), which would
 produce a DONE task with `commitSha=null` — then `lastCommitSha`
 would be wrongly `null` on the returned envelope. Delegating to
-`x-internal-status-update --read-only` pins the read behind its
+`x-internal-update-status --read-only` pins the read behind its
 shared lock and eliminates the race.
 
 The tradeoff is a ~20 ms cold-start cost, well within the 200 ms DoD
@@ -207,8 +207,8 @@ budget.
 ## 9. Downstream Consumer Contract (story-0049-0019)
 
 `story-0049-0019` will delete the ~120-line inline resume-detection
-block from `x-story-implement` Phase 0 and replace it with a single
-`Skill(x-internal-story-resume …)` invocation. The consumer contract
+block from `x-implement-story` Phase 0 and replace it with a single
+`Skill(x-internal-resume-story …)` invocation. The consumer contract
 for that downstream refactor:
 
 1. `resumePoint == "fresh-start"` → proceed to Phase 2 task-1 with a
@@ -223,7 +223,7 @@ for that downstream refactor:
    but do NOT block; the staleness heuristic is advisory (a docs-only
    tweak to the story file after a code task DONE is routine).
 5. Exit 2 (`STORY_NOT_IN_STATE`) → initialise a new story node via
-   `x-internal-status-update --initialize` and restart from (1).
+   `x-internal-update-status --initialize` and restart from (1).
 6. Exit 1 (`STATE_FILE_MISSING`) → same as (5); the state file is
    created by the pilot skill's `--initialize` mode.
 
@@ -235,7 +235,7 @@ here so the consumer story-0049-0019 does not need to rediscover it.
 An early draft returned the first-PENDING task's ID directly (e.g.,
 `resumePoint="TASK-0049-0013-004"`). That was rejected because:
 
-1. The caller (`x-story-implement` Phase 0 → Phase 2 wiring) uses
+1. The caller (`x-implement-story` Phase 0 → Phase 2 wiring) uses
    `resumePoint` to decide WHICH orchestrator phase to enter. A
    task ID couples the envelope to the wave-dispatch algorithm; a
    phase marker (`phase-2-…`) keeps the consumer independent of

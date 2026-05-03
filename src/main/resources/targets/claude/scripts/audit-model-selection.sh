@@ -57,8 +57,8 @@ find_skill_md() {
 # Check A — Frontmatter `model:` in declared orchestrator skills
 # ---------------------------------------------------------------------------
 ORCHESTRATORS=(
-  x-epic-implement x-story-implement x-release x-review
-  x-epic-orchestrate x-pr-fix-epic x-task-implement x-epic-decompose
+  x-implement-epic x-implement-story x-release x-review-codebase
+  x-orchestrate-epic x-fix-epic-pr x-implement-task x-epic-decompose
 )
 
 fail_a=0
@@ -83,7 +83,7 @@ echo "Check A: $([[ ${fail_a} -eq 0 ]] && echo PASS || echo FAIL)"
 # Check B — Agent(subagent_type: "general-purpose", ...) must have model:
 # within 5 lines of the opening paren.
 # ---------------------------------------------------------------------------
-PLANNING_SKILLS=(x-story-plan x-arch-plan x-test-plan)
+PLANNING_SKILLS=(x-plan-story x-plan-architecture x-plan-tests)
 
 fail_b=0
 echo "Check B — Agent(subagent_type: \"general-purpose\") with explicit model:"
@@ -116,7 +116,7 @@ echo "Check B: $([[ ${fail_b} -eq 0 ]] && echo PASS || echo FAIL)"
 # ---------------------------------------------------------------------------
 # Check C — Skill(skill: "x-...", ...) must have model: in orchestrators
 # ---------------------------------------------------------------------------
-ORCHESTRATOR_SUBSET_C=(x-epic-implement x-story-implement x-review x-task-implement)
+ORCHESTRATOR_SUBSET_C=(x-implement-epic x-implement-story x-review-codebase x-implement-task)
 
 # Internal skills inherit parent tier per Rule 23 Exceptions — not audited.
 # Utility / per-story-branch dispatch skills are listed as expected Skill()
@@ -128,7 +128,7 @@ echo "Check C — Skill(...) with explicit model: in orchestrators"
 # followed by `Skill(`). Prose mentions inside backticks (`Skill(...)`)
 # or inside bullet-list sentences are documentation, not dispatch, and
 # are skipped. Internal skills (x-internal-*) inherit tier per Rule 23
-# Exceptions; x-parallel-eval and x-pr-watch-ci are runtime utilities
+# Exceptions; x-evaluate-parallelism and x-watch-pr-ci are runtime utilities
 # likewise exempt.
 for skill in "${ORCHESTRATOR_SUBSET_C[@]}"; do
   skill_md="$(find_skill_md "${skill}")"
@@ -139,7 +139,7 @@ for skill in "${ORCHESTRATOR_SUBSET_C[@]}"; do
   mapfile -t matches < <(
     grep -nE '^\s{4,}Skill\(skill: "x-[a-z-]+' "${skill_md}" \
       | grep -vE 'x-internal-' \
-      | grep -vE 'x-parallel-eval|x-pr-watch-ci' \
+      | grep -vE 'x-evaluate-parallelism|x-watch-pr-ci' \
       || true
   )
   for match in "${matches[@]}"; do

@@ -1,4 +1,4 @@
-# Full Protocol — x-internal-epic-integrity-gate
+# Full Protocol — x-internal-verify-epic-integrity
 
 > **Context:** Fat reference of the slim SKILL.md under this folder.
 > ADR-0011 mandates this split for every skill > 250 lines. The
@@ -235,16 +235,16 @@ Invariants when `--skip-clean` is active:
 Not enabled by default — the integrity gate prioritises reproducibility
 over speed.
 
-## 6. Integration With x-epic-implement Phase 4
+## 6. Integration With x-implement-epic Phase 4
 
-The orchestrator (`x-epic-implement`) consumes this skill's envelope
+The orchestrator (`x-implement-epic`) consumes this skill's envelope
 in Phase 4 (post-phase integration gate). Pseudocode:
 
 ```pseudo
-envelope = Skill(x-internal-epic-integrity-gate, --epic-id {id})
+envelope = Skill(x-internal-verify-epic-integrity, --epic-id {id})
 if envelope.passed:
-    x-internal-status-update --phase {N} --status PASS
-    x-internal-report-write --template _TEMPLATE-PHASE-COMPLETION-REPORT
+    x-internal-update-status --phase {N} --status PASS
+    x-internal-write-report --template _TEMPLATE-PHASE-COMPLETION-REPORT
     advance_to_next_phase()
 else:
     if any(f.startswith("coverage:") for f in envelope.failures):
@@ -273,8 +273,8 @@ Passive `tool.call` hooks capture:
 - `awk` / `jq` invocations (Steps 4–6) — sub-second
 
 Aggregation happens at the orchestrator's Phase 4 boundary:
-`phase.start x-epic-implement Phase-4-IntegrityGate` …
-`phase.end x-epic-implement Phase-4-IntegrityGate ok`.
+`phase.start x-implement-epic Phase-4-IntegrityGate` …
+`phase.end x-implement-epic Phase-4-IntegrityGate ok`.
 
 ## 8. Known Gotchas
 

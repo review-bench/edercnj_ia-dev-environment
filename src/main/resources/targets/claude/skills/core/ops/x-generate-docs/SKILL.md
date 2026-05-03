@@ -1,6 +1,6 @@
 ---
-name: x-doc-generate
-description: "Documentation automation v2: stack-aware generation consuming documentation.targets from ProjectConfig. Detects documentation type needed (API, README, ADR, changelog, system-architecture) from code changes and stack config, delegates to specialized skills or generates inline. Invokes x-arch-system-update on architectural change detection."
+name: x-generate-docs
+description: "Documentation automation v2: stack-aware generation consuming documentation.targets from ProjectConfig. Detects documentation type needed (API, README, ADR, changelog, system-architecture) from code changes and stack config, delegates to specialized skills or generates inline. Invokes x-update-system-architecture on architectural change detection."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
@@ -20,20 +20,20 @@ requires-capabilities: [governance.doc-as-dod]
 
 Single entry point for generating and updating all project documentation for {{PROJECT_NAME}}. Operates in two modes:
 
-- **`--target-stack-aware` (default, v2):** Reads `documentation.targets` from ProjectConfig (story-0071-0001) and generates only targets relevant to the project stack. Invokes `x-arch-system-update` (EPIC-0070) when architectural changes are detected.
+- **`--target-stack-aware` (default, v2):** Reads `documentation.targets` from ProjectConfig (story-0071-0001) and generates only targets relevant to the project stack. Invokes `x-update-system-architecture` (EPIC-0070) when architectural changes are detected.
 - **`--legacy-v1` (deprecated, removed in 2 releases):** Original behavior — uniform auto-detection from `git diff` without stack awareness. Emits visible deprecation warning.
 
 ## Triggers
 
-- `/x-doc-generate` — stack-aware auto-detect from `documentation.targets` (v2 default)
-- `/x-doc-generate --type api` — generate or update API documentation (OpenAPI/AsyncAPI/gRPC)
-- `/x-doc-generate --type readme` — update project README.md
-- `/x-doc-generate --type adr` — delegate to `x-adr-generate`
-- `/x-doc-generate --type changelog` — delegate to `x-release-changelog`
-- `/x-doc-generate --type all` — process all applicable documentation targets
-- `/x-doc-generate --type all --force` — regenerate all regardless of change status
-- `/x-doc-generate --dry-run` — list what would be updated, without writing
-- `/x-doc-generate --legacy-v1` — **DEPRECATED** v1 behavior (uniform auto-detect, no stack awareness)
+- `/x-generate-docs` — stack-aware auto-detect from `documentation.targets` (v2 default)
+- `/x-generate-docs --type api` — generate or update API documentation (OpenAPI/AsyncAPI/gRPC)
+- `/x-generate-docs --type readme` — update project README.md
+- `/x-generate-docs --type adr` — delegate to `x-generate-adr`
+- `/x-generate-docs --type changelog` — delegate to `x-generate-release-changelog`
+- `/x-generate-docs --type all` — process all applicable documentation targets
+- `/x-generate-docs --type all --force` — regenerate all regardless of change status
+- `/x-generate-docs --dry-run` — list what would be updated, without writing
+- `/x-generate-docs --legacy-v1` — **DEPRECATED** v1 behavior (uniform auto-detect, no stack awareness)
 
 ## Parameters
 
@@ -43,7 +43,7 @@ Single entry point for generating and updating all project documentation for {{P
 | `--scope` | String | No | Path to limit change analysis (e.g., `src/main/java/com/example/api/`). |
 | `--force` | Flag | No | Regenerate even if no changes detected. |
 | `--dry-run` | Flag | No | List what would be updated without writing any file. |
-| `--target-stack-aware` | Flag | No | **(default)** Reads `documentation.targets` from ProjectConfig and generates only targets relevant to the project stack. Invokes `x-arch-system-update` when architectural changes detected. |
+| `--target-stack-aware` | Flag | No | **(default)** Reads `documentation.targets` from ProjectConfig and generates only targets relevant to the project stack. Invokes `x-update-system-architecture` when architectural changes detected. |
 | `--legacy-v1` | Flag | No | **DEPRECATED** — emits WARNING: "v1 behavior deprecated; will be removed in 2 releases". Mutually exclusive with `--target-stack-aware`. |
 
 **Flag conflict:** passing both `--legacy-v1` and `--target-stack-aware` in the same invocation exits with `FLAG_CONFLICT` and lists both flags as mutually exclusive.
@@ -54,7 +54,7 @@ Single entry point for generating and updating all project documentation for {{P
 1. PARSE      -> Parse arguments; detect mode (v2 default vs --legacy-v1)
 2. LOAD       -> Load documentation.targets from ProjectConfig YAML
 3. DETECT     -> Analyze git diff filtered by active targets
-4. ARCH       -> Detect architectural changes; invoke x-arch-system-update if needed
+4. ARCH       -> Detect architectural changes; invoke x-update-system-architecture if needed
 5. DISPATCH   -> Delegate to specialized skills or generate inline
 6. VERIFY     -> Idempotency check (skip if identical)
 7. REPORT     -> Summary of documentation actions taken
@@ -67,7 +67,7 @@ Detect mode:
 1. If `--legacy-v1` AND `--target-stack-aware` both present → exit `FLAG_CONFLICT` immediately.
 2. If `--legacy-v1` → emit to stderr:
    ```
-   WARN [x-doc-generate] --legacy-v1 behavior deprecated (EPIC-0071, Rule 19 §Skill Renaming).
+   WARN [x-generate-docs] --legacy-v1 behavior deprecated (EPIC-0071, Rule 19 §Skill Renaming).
         Will be removed in 2 releases. Remove --legacy-v1 to use stack-aware v2 default.
    ```
    Then proceed with v1 workflow (§v1 Fallback below).
@@ -120,18 +120,18 @@ Exclude rename-only moves (detect via `git diff --diff-filter=R`).
 
 **If new architectural component detected AND `system-architecture` is in active targets:**
 
-Invoke `x-arch-system-update` via INLINE-SKILL (Rule 13 Pattern 1):
+Invoke `x-update-system-architecture` via INLINE-SKILL (Rule 13 Pattern 1):
 
 ```
-Invoke the `x-arch-system-update` skill via the Skill tool:
+Invoke the `x-update-system-architecture` skill via the Skill tool:
 
-    Skill(skill: "x-arch-system-update", model: "sonnet", args: "--component {new_component_name}")
+    Skill(skill: "x-update-system-architecture", model: "sonnet", args: "--component {new_component_name}")
 ```
 [conditional: flag.arch_change_detected]
 
-If `x-arch-system-update` is unavailable (skill not found, EPIC-0070 not present):
+If `x-update-system-architecture` is unavailable (skill not found, EPIC-0070 not present):
 ```
-WARN [x-doc-generate] x-arch-system-update unavailable — system.md not updated. Install EPIC-0070 to enable.
+WARN [x-generate-docs] x-update-system-architecture unavailable — system.md not updated. Install EPIC-0070 to enable.
 ```
 Proceed without blocking.
 
@@ -139,23 +139,23 @@ Proceed without blocking.
 
 #### 5A — Changelog (`--type changelog`)
 
-Invoke `x-release-changelog` via the Skill tool:
+Invoke `x-generate-release-changelog` via the Skill tool:
 
 ```
-Invoke the `x-release-changelog` skill via the Skill tool:
+Invoke the `x-generate-release-changelog` skill via the Skill tool:
 
-    Skill(skill: "x-release-changelog", model: "sonnet", args: "--unreleased")
+    Skill(skill: "x-generate-release-changelog", model: "sonnet", args: "--unreleased")
 ```
 [required]
 
 #### 5B — ADR (`--type adr`)
 
-Invoke `x-adr-generate` via the Skill tool:
+Invoke `x-generate-adr` via the Skill tool:
 
 ```
-Invoke the `x-adr-generate` skill via the Skill tool:
+Invoke the `x-generate-adr` skill via the Skill tool:
 
-    Skill(skill: "x-adr-generate", model: "sonnet", args: "{architecture-plan-path} {story-id}")
+    Skill(skill: "x-generate-adr", model: "sonnet", args: "{architecture-plan-path} {story-id}")
 ```
 [optional]
 
@@ -208,9 +208,9 @@ Documentation generation complete:
   Files updated:
     - {relative/path/file.md} ({type})
   Delegated to:
-    - x-release-changelog (changelog)
-    - x-adr-generate (adr)
-    - x-arch-system-update (system-architecture)
+    - x-generate-release-changelog (changelog)
+    - x-generate-adr (adr)
+    - x-update-system-architecture (system-architecture)
   Skipped:       {types skipped with reason}
   Warnings:      {any warnings emitted}
   Duration:      {time}s
@@ -231,7 +231,7 @@ When `--legacy-v1` is active, the skill uses the original v1 detection logic:
 | `SKILL.md`, `README*`, `config*`, `setup*`, `*.yaml` (config) | `readme` |
 | No matches | No action |
 
-3. Process all detected types (no stack filter, no `x-arch-system-update`).
+3. Process all detected types (no stack filter, no `x-update-system-architecture`).
 4. No Highlights block in changelog (v1 format only).
 
 The `--legacy-v1` flag and v1 code path will be **removed in 2 releases** per Rule 19 §Skill Renaming. Operators on automated pipelines should migrate to the v2 default before the removal release.
@@ -247,7 +247,7 @@ The `--legacy-v1` flag and v1 code path will be **removed in 2 releases** per Ru
 | Path traversal in `documentation.targets` | Exit `PATH_TRAVERSAL_REJECTED` |
 | Symlink encountered | Skip, log WARN, never follow |
 | Target file is read-only | Report error for that file, continue with others |
-| `x-arch-system-update` unavailable | Log WARN, continue without arch update |
+| `x-update-system-architecture` unavailable | Log WARN, continue without arch update |
 
 ## Performance Contract
 
@@ -258,8 +258,8 @@ The `--legacy-v1` flag and v1 code path will be **removed in 2 releases** per Ru
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-release-changelog` | delegates-to | Changelog generation is fully delegated |
-| `x-adr-generate` | delegates-to | ADR generation from architecture plans |
-| `x-arch-system-update` | delegates-to (conditional) | On architectural change detection; EPIC-0070 |
-| `x-doc-validate` | followed-by (Phase 3) | generate runs first; validate confirms freshness |
-| `x-story-implement` | called-by | Phase 3 (Documentation) — story-0071-0006 wires both generate + validate |
+| `x-generate-release-changelog` | delegates-to | Changelog generation is fully delegated |
+| `x-generate-adr` | delegates-to | ADR generation from architecture plans |
+| `x-update-system-architecture` | delegates-to (conditional) | On architectural change detection; EPIC-0070 |
+| `x-validate-docs` | followed-by (Phase 3) | generate runs first; validate confirms freshness |
+| `x-implement-story` | called-by | Phase 3 (Documentation) — story-0071-0006 wires both generate + validate |

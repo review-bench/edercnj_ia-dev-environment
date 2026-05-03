@@ -1,4 +1,4 @@
-# x-test-smoke-api
+# x-execute-api-smoke-tests
 
 > REST API Smoke Tests -- runs automated smoke tests against the REST API using Newman/Postman. Supports local, container-orchestrated, and staging environments.
 
@@ -6,7 +6,7 @@
 |---|---|
 | **Category** | Conditional |
 | **Condition** | `smoke_tests = true` AND `protocols` contains `rest` |
-| **Invocation** | `/x-test-smoke-api [--env local\|k8s\|staging] [--k8s]` |
+| **Invocation** | `/x-execute-api-smoke-tests [--env local\|k8s\|staging] [--k8s]` |
 
 > **Spec**: See [SKILL.md](./SKILL.md) for the complete execution specification.
 
@@ -21,14 +21,14 @@ Orchestrates black-box smoke tests against the application's REST API using Newm
 ## Usage
 
 ```
-/x-test-smoke-api
-/x-test-smoke-api --env local
-/x-test-smoke-api --env k8s --k8s
-/x-test-smoke-api --env staging
+/x-execute-api-smoke-tests
+/x-execute-api-smoke-tests --env local
+/x-execute-api-smoke-tests --env k8s --k8s
+/x-execute-api-smoke-tests --env staging
 ```
 
 ## See Also
 
-- [x-test-smoke-socket](../x-test-smoke-socket/) -- TCP socket smoke tests
-- [x-test-e2e](../x-test-e2e/) -- End-to-end integration tests
-- [x-security-dast](../x-security-dast/) -- Dynamic application security testing against running app
+- [x-execute-socket-smoke-tests](../x-execute-socket-smoke-tests/) -- TCP socket smoke tests
+- [x-execute-e2e-tests](../x-execute-e2e-tests/) -- End-to-end integration tests
+- [x-run-dast](../x-run-dast/) -- Dynamic application security testing against running app
