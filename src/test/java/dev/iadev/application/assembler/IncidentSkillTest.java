@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0010: x-ops-incident skill for interactive incident response with severity
+ * Tests for story-0013-0010: x-handle-incident skill for interactive incident response with severity
  * checklists.
  *
- * <p>Validates that the x-ops-incident skill template is generated correctly with proper
+ * <p>Validates that the x-handle-incident skill template is generated correctly with proper
  * frontmatter, severity definitions, communication templates, workflow steps, and error handling.
  */
-@DisplayName("x-ops-incident Skill")
+@DisplayName("x-handle-incident Skill")
 class IncidentSkillTest {
 
     @Nested
@@ -28,18 +28,18 @@ class IncidentSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-ops-incident SKILL.md exists after" + " assembly")
+        @DisplayName("x-handle-incident SKILL.md exists after" + " assembly")
         void assemble_incident_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-ops-incident/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-handle-incident/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-ops-incident")
+        @DisplayName("frontmatter contains name:" + " x-handle-incident")
         void assemble_incident_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-ops-incident");
+            assertThat(content).contains("name: x-handle-incident");
         }
 
         @Test
@@ -237,6 +237,6 @@ class IncidentSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-ops-incident/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-handle-incident/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

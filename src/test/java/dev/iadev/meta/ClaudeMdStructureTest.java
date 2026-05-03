@@ -60,8 +60,8 @@ class ClaudeMdStructureTest {
 
         assertThat(body)
                 .as(
-                        "CLAUDE.md must point at x-story-implement as the canonical "
+                        "CLAUDE.md must point at x-implement-story as the canonical "
                                 + "instrumented example (story-0040-0009 §3.3)")
-                .contains("x-story-implement");
+                .contains("x-implement-story");
     }
 }

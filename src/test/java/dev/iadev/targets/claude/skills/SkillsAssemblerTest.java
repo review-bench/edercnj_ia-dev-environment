@@ -24,7 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 class SkillsAssemblerTest {
 
     @Test
-    @DisplayName("listCoreSkills includes x-pr-merge-train")
+    @DisplayName("listCoreSkills includes x-manage-pr-merge-train")
     void listCoreSkills_includesMergeTrain(@TempDir Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
@@ -32,18 +32,18 @@ class SkillsAssemblerTest {
         new SkillsAssembler()
                 .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-        assertThat(outputDir.resolve("skills/x-pr-merge-train/SKILL.md"))
+        assertThat(outputDir.resolve("skills/x-manage-pr-merge-train/SKILL.md"))
                 .as(
-                        "x-pr-merge-train must be discoverable "
+                        "x-manage-pr-merge-train must be discoverable "
                                 + "in the core skill catalog — "
                                 + "check that "
                                 + "targets/claude/skills/core/pr/"
-                                + "x-pr-merge-train/SKILL.md exists")
+                                + "x-manage-pr-merge-train/SKILL.md exists")
                 .exists();
     }
 
     @Test
-    @DisplayName("listSkills includes x-status-reconcile " + "(EPIC-0046 story-0006)")
+    @DisplayName("listSkills includes x-reconcile-status " + "(EPIC-0046 story-0006)")
     void listSkills_includesStatusReconcile(@TempDir Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
@@ -51,19 +51,19 @@ class SkillsAssemblerTest {
         new SkillsAssembler()
                 .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-        assertThat(outputDir.resolve("skills/x-status-reconcile/" + "SKILL.md"))
+        assertThat(outputDir.resolve("skills/x-reconcile-status/" + "SKILL.md"))
                 .as(
-                        "x-status-reconcile must be "
+                        "x-reconcile-status must be "
                                 + "discoverable in the core skill "
                                 + "catalog — check that "
                                 + "targets/claude/skills/core/ops/"
-                                + "x-status-reconcile/SKILL.md "
+                                + "x-reconcile-status/SKILL.md "
                                 + "exists")
                 .exists();
     }
 
     @Test
-    @DisplayName("x-story-implement SKILL.md contains " + "## Review Policy section (EPIC-0053)")
+    @DisplayName("x-implement-story SKILL.md contains " + "## Review Policy section (EPIC-0053)")
     void xStoryImplement_containsReviewPolicySection(@TempDir Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
         Files.createDirectories(outputDir);
@@ -71,21 +71,21 @@ class SkillsAssemblerTest {
         new SkillsAssembler()
                 .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-        String content = Files.readString(outputDir.resolve("skills/x-story-implement/SKILL.md"));
+        String content = Files.readString(outputDir.resolve("skills/x-implement-story/SKILL.md"));
 
         assertThat(content)
                 .as(
-                        "Generated x-story-implement/SKILL.md "
+                        "Generated x-implement-story/SKILL.md "
                                 + "must contain '## Review Policy' "
                                 + "section (EPIC-0053 enforcement — "
                                 + "source: targets/claude/skills/core/"
-                                + "dev/x-story-implement/SKILL.md)")
+                                + "dev/x-implement-story/SKILL.md)")
                 .contains("## Review Policy");
     }
 
     @Test
     @DisplayName(
-            "x-story-implement SKILL.md contains "
+            "x-implement-story SKILL.md contains "
                     + ">= 2 MANDATORY — NON-NEGOTIABLE markers (EPIC-0053)")
     void xStoryImplement_containsMandatoryMarkersOnBothReviewSteps(@TempDir Path tempDir)
             throws IOException {
@@ -95,14 +95,14 @@ class SkillsAssemblerTest {
         new SkillsAssembler()
                 .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-        String content = Files.readString(outputDir.resolve("skills/x-story-implement/SKILL.md"));
+        String content = Files.readString(outputDir.resolve("skills/x-implement-story/SKILL.md"));
 
         int count = countOccurrences(content, MANDATORY_MARKER);
 
         assertThat(count)
                 .as(
                         "Expected >= 2 MANDATORY — NON-NEGOTIABLE "
-                                + "markers in generated x-story-implement/"
+                                + "markers in generated x-implement-story/"
                                 + "SKILL.md (one per review step: x-review "
                                 + "and x-review-pr), found: "
                                 + count)
@@ -111,7 +111,7 @@ class SkillsAssemblerTest {
 
     @Test
     @DisplayName(
-            "x-story-implement SKILL.md contains "
+            "x-implement-story SKILL.md contains "
                     + "PROTOCOL_VIOLATION and REVIEW_SKIPPED_WITHOUT_FLAG "
                     + "error codes (EPIC-0053)")
     void xStoryImplement_containsProtocolViolationErrorCodes(@TempDir Path tempDir)
@@ -122,7 +122,7 @@ class SkillsAssemblerTest {
         new SkillsAssembler()
                 .assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-        String content = Files.readString(outputDir.resolve("skills/x-story-implement/SKILL.md"));
+        String content = Files.readString(outputDir.resolve("skills/x-implement-story/SKILL.md"));
 
         assertThat(content)
                 .as(
@@ -139,7 +139,7 @@ class SkillsAssemblerTest {
                         "Expected >= 2 '"
                                 + PROTOCOL_VIOLATION_CODE
                                 + "' error codes in generated "
-                                + "x-story-implement/SKILL.md "
+                                + "x-implement-story/SKILL.md "
                                 + "(one per review step), found: "
                                 + violationCount)
                 .isGreaterThanOrEqualTo(2);
