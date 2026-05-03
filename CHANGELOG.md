@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0075 (AI Memory Layer)
+
+Antes desta release, recuperar contexto de decisões passadas exigia re-leitura de arquivos markdown de épicos inteiros (200–500 linhas cada). Para um projeto com 75+ épicos, "o que decidimos sobre X no EPIC-0054?" demandava horas de leitura manual ou overflow do context window do LLM.
+
+**A partir desta release, o projeto tem uma camada de memória estruturada.** `x-internal-epic-summary` (haiku, determinístico) gera `ai/memory/epic-XXXX-summary.md` com frontmatter YAML de 16 campos + 7 seções H2 obrigatórias ao concluir cada épico. `/x-memory-search` recupera summaries em segundos por tag, capability, rule, pattern ou epic-id. 27 épicos históricos (0040–0075) seedados retroativamente. `audit-memory-coverage.sh` bloqueia merges de épicos concluídos sem summary.
+
+**LLM context retrieval: minutos → segundos.** Re-litigation de decisões passadas reduzida via seção "Alternatives rejected" em cada summary. Onboarding acelerado: novo dev lê `_index.yaml` + 5 summaries recentes = panorama em 1h.
+
+### Added — EPIC-0075 (AI Memory Layer)
+
+- **`ai/memory/` estrutura**: `_index.yaml` (schema v1.0 com 27 entries), `_TEMPLATE-EPIC-MEMORY-SUMMARY.md`, `_retro-seed-rubric.md` (6 critérios C1–C6). Introduzido por story-0075-0001.
+- **Skill `x-internal-epic-summary`** (internal, `model: haiku`, `requires-capabilities: [governance.ai-memory]`): 4 fases — Parse epic artifacts, Extract 7-section body, Validate (C1–C6 rubric), Write summary + update `_index.yaml`. Exit codes: `0`=OK, `1`=EPIC_NOT_FOUND, `2`=SCHEMA_VIOLATION, `3`=MEMORY_SUMMARY_TOO_LONG, `4`=EXTRACTION_FAILED, `5`=INDEX_LOCK_TIMEOUT, `6`=TEMPLATE_VERSION_MISMATCH, `7`=MANUAL_REFINEMENT_PRESENT (skip gracioso para summaries com `<!-- manual-refinement -->`). Introduzido por story-0075-0002.
+- **Skill `/x-memory-search`** (public, `model: haiku`, `requires-capabilities: [governance.ai-memory]`): 5 modos de busca — `--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`; `--include-archived` opt-in; `--format compact|full`; `--limit N`. Exit codes: `0`=OK, `1`=INDEX_NOT_FOUND, `2`=INVALID_ARGS. Introduzido por story-0075-0003.
+- **Exit-7 marker detection** (`<!-- manual-refinement -->`): `x-internal-epic-summary` sai com código 7 sem erro quando encontra o marcador; permite summaries manuais coexistirem com geração automática. Introduzido por story-0075-0003.
+- **Rule 33 — AI Memory Production** (`33-ai-memory-production.md`): invocação obrigatória de `x-internal-epic-summary` em Phase 5 de `x-epic-implement`; backward compatibility (Rule 19) via `memory.enabled: false`; `audit-memory-coverage.sh` como Camada 2. Introduzido por story-0075-0004.
+- **Capability `governance.ai-memory`** (`capabilities/governance/ai-memory.yaml`): registrada em `capabilities/_index.yaml`; referenciada por `x-internal-epic-summary` e `x-memory-search`. Introduzido por story-0075-0004.
+- **`audit-memory-coverage.sh`** (Camada 2 CI Script, Rule 26): verifica `ai/memory/epic-XXXX-summary.md` para cada épico `Concluída`; exit codes: `0`=OK, `1`=MEMORY_COVERAGE_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implementa `--self-check`. Introduzido por story-0075-0004.
+- **Integração em `x-epic-implement` Phase 5** (story-0075-0005): `x-internal-epic-summary` invocado como **MANDATORY TOOL CALL** [required] antes da criação do PR final; `[required]` marker para Rule 28 compliance.
+- **Retro-seed de 27 épicos históricos** (0040–0075, story-0075-0006): `scripts/retro-seed-memory.sh` com flags `--from`, `--to`, `--dry-run`, `--continue-on-error`, `--self-check`; 5 exit codes; valida consistência `_index.yaml` ao final.
+- **`ai/memory/_retro-seed-rubric.md`**: 6 critérios de qualidade (C1 frontmatter 16 campos, C2 7 seções obrigatórias, C3 ≤200 linhas, C4 consistência bidirecional index, C5 hypothesis não-vazio, C6 superseded-by referencia arquivo existente).
+- **`RetroSeedSmokeIT`**: 6 testes parametrizados cobrindo rubric C1–C6 sobre `ai/memory/epic-*-summary.md` reais. Introduzido por story-0075-0006.
+- **`Epic0075MemoryLayerSmokeIT`**: 10 cenários estruturais validando frontmatter, body marker, parâmetros, exit codes, seções de extração, determinismo, playbook, fixtures e Rule 33. Introduzido por story-0075-0001 através 0075-0005.
+- **Dogfood `ai/memory/epic-0075-summary.md`**: EPIC-0075 gera seu próprio summary como meta-prova do sistema. Introduzido por story-0075-0007.
+- **Knowledge Pack `governance/ai-memory-playbook`**: `index.md` + `tags-catalog.md` com catálogo de tags canônicas usadas pelos summaries. Introduzido por story-0075-0001.
+
 ### Highlights — EPIC-0074 (Dependency Policy & SCA Final Gate)
 
 Antes desta release, projetos gerados por `ia-dev-env` podiam declarar qualquer versão de dependência, independente de CVEs conhecidas, licenças banidas, ou staleness — nenhum gate existia para enforçar política organizacional em CI. O resultado: vulnerabilidades descobertas acumulavam silenciosamente, compliance de licença era checado manualmente, e freshness drifted até um audit forçar remediação reativa.

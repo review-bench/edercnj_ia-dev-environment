@@ -257,9 +257,29 @@ entries:
     created: "2026-05-03"
     last-updated: "2026-05-03"
 
+  - epic-id: EPIC-0070
+    slug: value-driven-templates-v2
+    summary-path: epic-0070-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
   - epic-id: EPIC-0074
     slug: dependency-policy-and-sca-gate
     summary-path: epic-0074-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-03"
+    last-updated: "2026-05-03"
+
+  - epic-id: EPIC-0075
+    slug: ai-memory-layer
+    summary-path: epic-0075-summary.md
     summary-version: "1.0"
     indexable: true
     archived: false
