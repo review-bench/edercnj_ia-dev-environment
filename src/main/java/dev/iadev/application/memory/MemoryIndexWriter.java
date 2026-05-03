@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
 public final class MemoryIndexWriter {
 
     private static final Pattern EPIC_ID_LINE = Pattern.compile("^(\\s*)- epic-id:\\s*(\\S+)");
-    private static final Pattern INDEXABLE_LINE = Pattern.compile("^(\\s*)indexable:\\s*(true|false)");
-    private static final Pattern ARCHIVED_LINE = Pattern.compile("^(\\s*)archived:\\s*(true|false)");
     private static final Pattern ENTRIES_INLINE_EMPTY = Pattern.compile("entries:\\s*\\[\\s*\\]");
 
     private MemoryIndexWriter() {}
