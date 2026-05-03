@@ -104,6 +104,13 @@ To exclude an entry from `/x-memory-search` results without deleting the file:
 
 The summary file is preserved. This is useful for decisions that are fully superseded but may still be historically interesting.
 
+## Tag Taxonomy
+
+The canonical tag list lives in [`tags-catalog.yaml`](tags-catalog.yaml) (30 initial tags).
+Use only tags from that list. Tags outside the catalog emit a WARNING from `x-internal-epic-summary` (not an error).
+
+To add a new tag: open a PR editing `tags-catalog.yaml` with an `id`, `description`, and `introduced-by` entry. The PR requires human tech-lead review and cannot be auto-merged.
+
 ## Updating a Summary
 
 Summaries are generated once, not continuously updated. If an epic is significantly revisited by a successor epic:
