@@ -104,7 +104,7 @@ Essa hipótese é fundamentada na evidência operacional qualitativa observada e
 - 4 skills novas (x-create-product, x-create-capability, x-create-feature, x-promote-ideation)
 - 5 skills refatoradas (x-epic-create, x-story-create, x-plan-architecture, x-plan-task, x-plan-story)
 - 2 agents refatorados (planning-refinement, planning-decompose)
-- 4 scripts audit (product-validate.sh, capability-validate.sh, feature-validate.sh, rnf-audit.sh)
+- 4 scripts audit com prefixo `audit-` (product-upstream, c4-completeness, rnf-gates, pentest-coverage)
 - 10 SOLID rules (RULE-001 até RULE-010)
 - 28 stories distribuídas em 7 phases (0-7, seriais)
 - Quality gates (DoR 6-item, DoD 28-story + cobertura + audits)
@@ -320,14 +320,14 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 - **Cobertura:** ≥ 95% Line, ≥ 90% Branch (absolute gate via x-execute-tests). Delta < 2% entre main e branch
 - **Testes Automatizados:** 28 stories × 1 acceptance test Gherkin mínimo por story = 28 testes passando. Double-Loop TDD: Gherkin AC outer loop, TPP unit tests inner loop. Gate aplicado em cada merge de story
 - **Smoke Tests:** suíte happy-path cobrindo **ideation → product → capability → feature → epic → story → tasks**. `Smoke.yaml` propaga ao concluir story-0077-0019 e executa na Phase 6 antes de golden fixtures. Cenários negativos ficam fora de smoke e pertencem a acceptance, integration, audit e pentest
-- **Golden Fixtures:** Subset de 920 fixtures regenerado (product-validate.sh, capability-validate.sh, feature-validate.sh outputs)
+- **Golden Fixtures:** Subset de 920 fixtures regenerado (outputs dos audit scripts canônicos `audit-*.sh`)
 - **Relatório de Cobertura:** Coverage.xml + HTML report linked em final story report. Trend analysis vs EPIC-0064 baseline
 - **Documentação:** CHANGELOG.md Updated (28 new skills/scripts/rules). ADR registry de 10 SOLID rules gerado. _TEMPLATE-*.md versionados (v1/v3)
 - **Persistência:** Todos product.yaml, capability.yaml, feature.yaml validos contra JSON schema. Zero orphaned FKs (product_id not in products/*)
 - **Performance:** Product create < 100ms. Epic plan gen < 5s. Batch validate 100 epics < 2s. No regression vs EPIC-0064 baseline (use x-analyze-telemetry-trends)
 - **RNF Validation:** 100% de stories com RNF table declarada. enforce-refinement-gate.sh PASS em 28 stories. Zero RNF relaxamento via --force
 - **Pentest:** Mínimo 1 pentest-checklist gerado (auth, IDOR). Core paths (product create, feature promote) PASS pentest gate
-- **Audit Scripts:** scripts canônicos em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh` todos PASS em golden fixtures. Camada 2 health checks integrados
+- **Audit Scripts:** scripts canônicos com prefixo `audit-` em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh` todos PASS em golden fixtures. Cobertura mínima do épico: product lineage, C4 completeness, RNF gates e pentest coverage
 
 ---
 
@@ -403,7 +403,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | RNFValidator.validate() | P99 < 200ms | latency_ms | > 500ms = critical |
 | C4DiagramValidator.validate() | P99 < 300ms | latency_ms | > 1s = critical |
 | enforce-refinement-gate.sh | P99 < 2s | latency_ms | > 5s = critical |
-| product-validate.sh (batch 100) | P99 < 2s | throughput | > 50 items/sec |
+| audit-product-upstream.sh (batch 100) | P99 < 2s | throughput | > 50 items/sec |
 
 **Health checks:** `/health/live` (liveness), `/health/ready` (readiness) — Rule 07.
 **Correlation ID:** `X-Correlation-ID` propagated through all downstream calls (product create → capability create → RNF validate).
@@ -428,11 +428,11 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 ### DR-002: C4 Model Como Contrato Visual Obrigatório
 
-**Decisão:** C4 diagrams em arquivos `.md` com blocos Mermaid (System C1, Container C2, Component C3, Code C4) tornam-se obrigatórios em Epic-level plans e validados automaticamente antes de Story creation.
+**Decisão:** C4 diagrams em arquivos `.md` com blocos Mermaid (System C1, Container C2, Component C3, Code C4) tornam-se o formato canônico e obrigatório em Epic-level plans e são validados automaticamente antes de Story creation.
 
 **Motivo:** Arquitetura desacoplada de implementação é escopo de épico. C4 força discussão visual pré-dev, reduzindo "surprises" em task-plan. RULE-003 + x-plan-architecture validator detectam inconsistências cedo (C1 system conta com containers não declarados em C2, etc).
 
-**Alternativa descartada:** Arquitetura em ADRs apenas (silos de tech leads, sem validação). Diagrama opcional (guessing game sobre scope). PlantUML/ASCII como formato primário foi descartado em favor de Mermaid em `.md`.
+**Alternativa descartada:** Arquitetura em ADRs apenas (silos de tech leads, sem validação). Diagrama opcional (guessing game sobre scope). PlantUML/ASCII também foram descartados como formatos aceitos para satisfazer a RULE-003 neste épico; Mermaid em `.md` é a convenção mandatória.
 
 **Consequência:** Epic template v3 requer campo `c4_system_diagram` não-nulo em arquivo `.md` com bloco `mermaid`. x-plan-architecture falha se C4 Container não linkar com C1 System. Agents planning-refinement + planning-decompose herdam C4 obrigatoriedade. `story-0077-0001` bootstrapa `c4-system-context.md` e `c4-containers.md` antes da aprovação do DoR; `story-0077-0013` e `story-0077-0016` endurecem a validação sem alterar essa obrigatoriedade.
 
@@ -454,7 +454,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Decisão:** QA charter v5 enfatiza AC measurable (dado X, quando Y, ENTÃO métrica Z < threshold), error-message catalog padrão (HTTP + descriptive), response-time SLO, success metrics negócio.
 
-**Motivo:** "Testable acceptance criteria" reduz ambiguidade PM ↔ QA. Error catalog previne "what error?" debates em prod. RULE-005 + x-review-codebase-qa validator checam AC syntax. E2E E2E scenarios por story garantem integração.
+**Motivo:** "Testable acceptance criteria" reduz ambiguidade PM ↔ QA. Error catalog previne "what error?" debates em prod. RULE-005 + x-review-codebase-qa validator checam AC syntax. E2E scenarios por story garantem integração.
 
 **Alternativa descartada:** "Happy path only" (descobrem failures em prod). Generic error messages (bad DX).
 
@@ -476,13 +476,13 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 ### DR-006: Audit Scripts Camada 2 Como Health Checks
 
-**Decisão:** 4 audit scripts novos (product-validate.sh, capability-validate.sh, feature-validate.sh, rnf-audit.sh) validam estrutura + linkage. Integrados em infrastructure health checks (Camada 2).
+**Decisão:** 4 audit scripts novos com prefixo `audit-` validam product lineage, C4 completeness, RNF gates e pentest coverage. Integrados em infrastructure health checks (Camada 2).
 
 **Motivo:** Validação declarativa (regex + JSON schema) é simples + rápido, permite audits batch (100 products em < 2s). Observabilidade: cada script emite logs estruturados (product_id, validation_status, error_code).
 
 **Alternativa descartada:** Validação inline em skills (overhead por criação). Zero validation infra (discover issues via manual audits).
 
-**Consequência:** source-of-truth dos scripts em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh`. Cada script outputs JSON (`valid_count`, `error_count`, `error_details`). CI integra via health-check stage (pré-deploy validação).
+**Consequência:** source-of-truth dos scripts em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh` (`audit-product-upstream.sh`, `audit-c4-completeness.sh`, `audit-rnf-gates.sh`, `audit-pentest-coverage.sh`). Cada script outputs JSON (`valid_count`, `error_count`, `error_details`). CI integra via health-check stage (pré-deploy validação).
 
 ---
 
@@ -531,10 +531,10 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | [story-0077-0013](./story-0077-0013.md) | Skill REFACTOR: x-plan-architecture (C4 Container validation) | story-0077-0012 | Architecture planning com C4 rigor | 4 |
 | [story-0077-0014](./story-0077-0014.md) | Skill REFACTOR: x-plan-task (RNF inheritance, SLO) | story-0077-0013 | Task planning com SLO context | 4 |
 | [story-0077-0015](./story-0077-0015.md) | Skill REFACTOR: x-plan-story (RNF validation layer) | story-0077-0014 | Story planning com RNF verify | 4 |
-| [story-0077-0016](./story-0077-0016.md) | Script Audit: product-validate.sh + tests | story-0077-0015 | Product structure validation | 5 |
-| [story-0077-0017](./story-0077-0017.md) | Script Audit: capability-validate.sh + tests | story-0077-0016 | Capability linkage audit | 5 |
-| [story-0077-0018](./story-0077-0018.md) | Script Audit: feature-validate.sh + tests | story-0077-0017 | Feature linkage audit | 5 |
-| [story-0077-0019](./story-0077-0019.md) | Script Audit: rnf-audit.sh + E2E | story-0077-0018 | RNF table coverage validation | 5 |
+| [story-0077-0016](./story-0077-0016.md) | Script Audit: audit-product-upstream.sh + tests | story-0077-0015 | Product lineage validation | 5 |
+| [story-0077-0017](./story-0077-0017.md) | Script Audit: audit-c4-completeness.sh + tests | story-0077-0016 | C4 completeness audit | 5 |
+| [story-0077-0018](./story-0077-0018.md) | Script Audit: audit-rnf-gates.sh + tests | story-0077-0017 | RNF gate validation | 5 |
+| [story-0077-0019](./story-0077-0019.md) | Script Audit: audit-pentest-coverage.sh + E2E | story-0077-0018 | Pentest coverage validation | 5 |
 | [story-0077-0020](./story-0077-0020.md) | E2E Scenario 1: Ideation → Product → Capability | story-0077-0019 | End-to-end flow happy path | 6 |
 | [story-0077-0021](./story-0077-0021.md) | E2E Scenario 2: Feature → Epic (C4) → Story (RNF) | story-0077-0020 | C4 + RNF integration test | 6 |
 | [story-0077-0022](./story-0077-0022.md) | E2E Scenario 3: Epic decompose + 4 skills refactored | story-0077-0021 | Refactored skills integration | 6 |
