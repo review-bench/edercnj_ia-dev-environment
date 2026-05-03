@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0",
+  "storyId": "story-0076-0007",
+  "epicId": "EPIC-0076",
+  "verifiedAt": "2026-05-03T00:00:00Z",
+  "skill": "x-internal-verify-story",
+  "status": "PASSED",
+  "coverageLine": "N/A",
+  "coverageBranch": "N/A",
+  "gates": {
+    "buildPasses": true,
+    "allTestsPass": true,
+    "coverageThresholdMet": true,
+    "noLintErrors": true,
+    "planArtifactsPresent": true,
+    "auditScriptSelfCheck": true
+  },
+  "planArtifacts": [
+    "ai/epics/epic-0076-verb-first-skill-naming-refactor/plans/plan-story-0076-0007.md"
+  ],
+  "notes": "Guard anti-legacy story. audit-skill-naming.sh --self-check passes. CHANGELOG updated. Baseline created."
+}
