@@ -65,7 +65,8 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
                         telemetryEnabled,
                         DocumentationConfig.DEFAULT,
                         QualityConfig.DEFAULT,
-                        DependencyPolicyConfig.DEFAULT));
+                        DependencyPolicyConfig.DEFAULT,
+                        AiMemoryConfig.DEFAULT));
     }
 
     /**
@@ -347,5 +348,15 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
         Map<String, Object> deps = MapHelper.optionalMap(map, "dependencies");
         Map<String, Object> policy = MapHelper.optionalMap(deps, "policy");
         return DependencyPolicyConfig.fromMap(policy);
+    }
+
+    public AiMemoryConfig aiMemory() {
+        return governance.aiMemory();
+    }
+
+    static AiMemoryConfig parseAiMemory(Map<String, Object> map) {
+        Map<String, Object> governance = MapHelper.optionalMap(map, "governance");
+        Map<String, Object> aiMemory = MapHelper.optionalMap(governance, "ai-memory");
+        return AiMemoryConfig.fromMap(aiMemory);
     }
 }

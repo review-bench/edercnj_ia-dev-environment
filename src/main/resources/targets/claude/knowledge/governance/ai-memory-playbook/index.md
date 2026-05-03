@@ -1,8 +1,6 @@
 ---
 name: ai-memory-playbook
 description: Playbook for producing and maintaining ai/memory/ epic summaries
-visibility: internal
-user-invocable: false
 requires-capabilities: [governance.ai-memory]
 ---
 

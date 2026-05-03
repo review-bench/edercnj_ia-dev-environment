@@ -44,7 +44,7 @@ class GovernanceQualityTest {
 
     @Test
     void constructor_nullQuality_defaultsToDefault() {
-        var gov = new Governance("none", null, null, true, null, null, null);
+        var gov = new Governance("none", null, null, true, null, null, null, null);
 
         assertThat(gov.quality()).isEqualTo(QualityConfig.DEFAULT);
     }
