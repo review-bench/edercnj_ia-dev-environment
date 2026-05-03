@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "1.0",
+  "flowVersion": "5",
+  "epicId": "EPIC-0077",
+  "epicTitle": "Product-First Lifecycle & Planning C4 Model",
+  "epicBranch": "epic/0077",
+  "createdAt": "2026-04-29T00:00:00Z",
+  "lastRefinementAt": "2026-05-03T20:03:14Z",
+  "status": "Backlog",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0077-0001": { "status": "Pendente", "phase": "Phase 0", "predecessors": [] },
+    "story-0077-0002": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0001"] },
+    "story-0077-0003": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0002"] },
+    "story-0077-0004": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0003"] },
+    "story-0077-0005": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0004"] },
+    "story-0077-0006": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0005"] },
+    "story-0077-0007": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0006"] },
+    "story-0077-0008": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0007"] },
+    "story-0077-0009": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0008"] },
+    "story-0077-0010": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0009"] },
+    "story-0077-0011": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0010"] },
+    "story-0077-0012": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0011"] },
+    "story-0077-0013": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0012"] },
+    "story-0077-0014": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0013"] },
+    "story-0077-0015": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0014"] },
+    "story-0077-0016": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0015"] },
+    "story-0077-0017": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0016"] },
+    "story-0077-0018": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0017"] },
+    "story-0077-0019": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0018"] },
+    "story-0077-0020": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0019"] },
+    "story-0077-0021": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0020"] },
+    "story-0077-0022": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0021"] },
+    "story-0077-0023": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0022"] },
+    "story-0077-0024": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0023"] },
+    "story-0077-0025": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0024"] },
+    "story-0077-0026": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0025"] },
+    "story-0077-0027": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0026"] },
+    "story-0077-0028": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0027"] }
+  },
+  "totalStories": 28,
+  "documents": {
+    "epic": "ai/epics/epic-0077-product-first-lifecycle/epic-0077-product-first-lifecycle.md",
+    "implementationMap": "ai/epics/epic-0077-product-first-lifecycle/IMPLEMENTATION-MAP.md"
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-05-03T20:03:14Z",
+    "verdictHash": "3bce87d04a0a1e0baf869e201c5779257b88ead7034a35ce92e561547bbbd6c8",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": [],
+    "verdictRationale": "O épico agora explicita problema observável com evidências, personas afetadas, hipótese de valor, KPIs mensuráveis, alternativas estratégicas, riscos produto+técnicos e escopo/out-of-scope suficiente. As decisões de rerun foram materializadas no documento e não resta lacuna estratégica bloqueante para aprovação."
+  }
+}
