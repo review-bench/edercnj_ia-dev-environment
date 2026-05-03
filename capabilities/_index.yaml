@@ -51,6 +51,7 @@ categories:
       - governance.dependency-policy.version
       - governance.dependency-policy.freshness
       - governance.dependency-policy.scope
+      - governance.ai-memory
 
   - name: quality
     description: Quality gates — performance, mutation, contract, regression, and DAST testing

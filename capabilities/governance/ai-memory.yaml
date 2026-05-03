@@ -1,0 +1,7 @@
+id: governance.ai-memory
+name: AI Memory Layer
+description: Strategic memory production and retrieval for completed epics. Generates ai/memory/epic-XXXX-summary.md after each epic Phase 5 and provides /x-memory-search for selective retrieval.
+category: governance
+universal: true
+requires: []
+excludes: []
