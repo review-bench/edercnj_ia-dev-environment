@@ -1,83 +1,70 @@
-# EPIC-0072 — Comprehensive Test Strategy: Memory Summary
+---
+epic-id: EPIC-0072
+slug: comprehensive-test-strategy
+summary-version: "1.0"
+created: "2026-05-03"
+last-updated: "2026-05-03"
 
-**Concluded:** 2026-05-01
-**Epic branch:** `epic/0072`
-**Stories:** 9 (all Concluída)
-**ADR:** [ADR-0025](../../docs/adr/ADR-0025-comprehensive-test-strategy.md)
+indexable: true
+archived: false
+superseded-by: null
 
-## What was delivered
+tags: [quality, testing, performance, mutation, contract, governance]
+capabilities-affected: [quality.performance, quality.mutation, quality.contract]
+rules-affected: [Rule 05, Rule 24, Rule 26]
+adrs-referenced: [ADR-0025]
 
-Three conditional quality gates were added to `x-story-implement` Phase 3 (§3.Q). They fire
-in the D-R11 fast-fail sequence: **performance → mutation → contract**. The first failure
-cancels subsequent gates. All gates are disabled by default (`quality.*.enabled=false` in
-project YAML) — backward compatible per Rule 19.
+patterns-introduced:
+  - conditional-quality-gate-yaml-config
+  - d-r11-fast-fail-sequence
+  - stack-aware-quality-dispatcher
+  - stage-policy-warn-then-fail
+antipatterns-rejected:
+  - quality-gate-always-on-breaks-existing-projects
+  - single-monolithic-quality-gate
 
-| Gate | Skill | Disabled exit | Blocking exit |
-| :--- | :--- | :--- | :--- |
-| Performance regression | `x-test-performance` | 50 PERF_DISABLED | 1 PERF_REGRESSION_DETECTED → x-story-implement exit 14 |
-| Mutation score | `x-test-mutation` | 50 MUTATION_DISABLED | 1 MUTATION_SCORE_BELOW_THRESHOLD → exit 17 |
-| Contract breaking | `x-test-contract` | n/a (WARN) | 1 CONTRACT_BREAKING_CHANGE → exit 18 |
+dependencies-of: [EPIC-0061, EPIC-0064]
+dependencies-for: [EPIC-0074, EPIC-0075]
+---
+# Memory: EPIC-0072 — Comprehensive Test Strategy
 
-## Key files modified / created
+## Why this epic existed
 
-| File | Change |
-| :--- | :--- |
-| `src/main/resources/targets/claude/skills/conditional/test/x-test-performance/SKILL.md` | NEW (story-0072-0002) |
-| `src/main/resources/targets/claude/skills/conditional/test/x-test-mutation/SKILL.md` | NEW (story-0072-0003) |
-| `src/main/resources/targets/claude/skills/conditional/test/x-test-contract/SKILL.md` | NEW (story-0072-0004) |
-| `src/main/resources/targets/claude/scripts/audit-perf-baseline.sh` | NEW (story-0072-0005) |
-| `src/main/resources/targets/claude/scripts/audit-mutation-score.sh` | NEW (story-0072-0006) |
-| `src/main/resources/targets/claude/scripts/audit-contract-breaking.sh` | NEW (story-0072-0007) |
-| `src/main/resources/targets/claude/skills/core/dev/x-story-implement/SKILL.md` | MODIFIED — added §3.Q (story-0072-0008) |
-| `src/main/resources/targets/claude/rules/24-execution-integrity.md` | MODIFIED — 3 conditional artifact rows (story-0072-0008) |
-| `src/main/resources/targets/claude/scripts/audit-execution-integrity.sh` | MODIFIED — QUALITY_*_ENABLED env var checks (story-0072-0008) |
-| `src/test/java/dev/iadev/smoke/Epic0072TestStrategySmokeIT.java` | NEW — 8 E2E scenarios (story-0072-0009) |
-| `CHANGELOG.md` | ADDED — EPIC-0072 [Unreleased] entry with [Breaking] (story-0072-0009) |
-| `CLAUDE.md` | ADDED — "Concluded — EPIC-0072" block (story-0072-0009) |
-| `docs/adr/ADR-0025-comprehensive-test-strategy.md` | NEW (story-0072-0001) |
-| `src/main/java/dev/iadev/domain/model/QualityConfig.java` | NEW (story-0072-0001) |
+Only unit and integration tests existed as quality gates. No performance baseline, mutation score, or contract test verified meaningful behavior. High line coverage could coexist with weak assertions that never caught regressions (mutation survivors). No gate stopped contract-breaking API changes from merging silently.
 
-## Design decisions
+## Hypothesis tested
 
-- **D-R11 fast-fail**: perf first because it's cheapest (ms vs seconds for mutation). Contract
-  last because it needs the build artifacts from the perf/mutation runs.
-- **Conditional defaults to false**: projects without quality config stay green. Gate activation
-  requires explicit opt-in in project YAML (`quality.performance.enabled: true` etc).
-- **Telemetry sub-phases**: Phase-3-Quality-Perf, Phase-3-Quality-Mutation,
-  Phase-3-Quality-Contract — 3 separate pairs for per-gate timing visibility in telemetry analysis.
-- **Exit codes non-colliding**: 14/17/18 chosen to avoid existing codes (12=PHASE_GATE_FAILED,
-  15=WORKTREE_AMBIGUOUS, 33=REFINEMENT_REQUIRED, 40-70=Rule 45 range).
-- **SKILL.md line limit raised**: `x-story-implement` limit raised 360→410 in
-  `Epic0047CompressionSmokeTest` to accommodate §3.Q addition (403 lines total).
-- **audit-execution-integrity.sh backward compat**: conditional checks via env vars
-  (`QUALITY_*_ENABLED:-false`) so CI environments without quality config pass cleanly.
+Three **conditional quality gates** (performance, mutation, contract) inserted into `x-story-implement` Phase 3 in a **D-R11 fast-fail sequence** would provide deeper quality signal without blocking existing projects (safe default `enabled: false`, Rule 19). **Confirmed**: 3 stack-aware skills (`x-test-performance`, `x-test-mutation`, `x-test-contract`); 3 audit scripts; `QualityConfig` domain record; Rule 05 §Quality Gates extended; ADR-0025.
 
-## Stack-awareness matrix
+## Decisions taken (with why)
 
-| Gate | REST | gRPC | CLI | Java | JS/TS | OpenAPI | proto3 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Performance | Newman | ghz | hyperfine | — | Artillery | — | — |
-| Mutation | — | — | — | PIT/pitest | Stryker | — | — |
-| Contract | openapi-diff | — | — | SCC | — | openapi-diff | buf |
+1. **D-R11 fast-fail sequence**: performance → mutation → contract → dep-policy (EPIC-0074); first non-zero exit cancels remaining; performance first (cheapest), contract last (needs build artifacts).
+2. **Safe default `quality.*.enabled: false`** (Rule 19): existing projects see zero change; each gate opted into independently via YAML.
+3. **Stack-aware dispatchers**: `x-test-performance` → Newman/ghz/hyperfine/Artillery; `x-test-mutation` → PIT/Stryker/mutmut/go-mutesting; `x-test-contract` → openapi-diff/buf/SCC/schema-registry.
+4. **Stage policy (WARN → FAIL)**: first release with gate enabled → WARN only + baseline initialized; `release_count ≥ 1` → hard FAIL. Prevents adoption shock.
+5. **Non-colliding exit codes**: 14 (`x-story-implement` PERF_REGRESSION), 17 (MUTATION_SCORE_BELOW_THRESHOLD), 18 (CONTRACT_BREAKING_CHANGE); chosen to avoid 12/15/33/40-70 ranges.
+6. **`governance/baselines/mutation-baseline.json`**: tracks mutation score per release; regression tolerance configurable; tampering detected via `--strict-baseline` against `git tag` count.
 
-## Integration with existing gates
+## Alternatives rejected (with why)
 
-- Rule 24 §Mandatory Evidence Artifacts: 3 new conditional rows (perf-report, mutation-report,
-  contract-report) — conditional on `quality.*.enabled=true` in Camada 3 audit.
-- Rule 05 §Quality Gates: extended with 3 conditional gates + D-R11 fast-fail doc.
-- `--skip-quality` flag: Recovery-block-only bypass (same pattern as `--skip-doc`, `--skip-review`).
+- **Single quality gate toggle** — can't independently disable expensive mutation for fast feedback; gates must be independently togglable.
+- **Mutation gate always enabled** — PIT takes 5-15min on large codebases; opt-in prevents CI latency regressions.
 
-## Smoke test coverage
+## Reusable patterns produced
 
-`Epic0072TestStrategySmokeIT` (8 scenarios) validates:
-1. Perf regression blocking + REST stack (Newman dispatch)
-2. Perf success + tolerance config
-3. Mutation blocking + Java stack (PIT dispatch)
-4. Mutation success + threshold config
-5. Contract blocking without CHANGELOG (OpenAPI stack)
-6. Contract pass with CHANGELOG (proto3/buf stack)
-7. Opt-out (all disabled) — PERF_DISABLED/MUTATION_DISABLED + config defaults
-8. Stack-awareness across all 3 skills (6 tool dispatches)
+- **`conditional-quality-gate-yaml-config`**: gate active only when `quality.X.enabled: true`; absent = disabled.
+- **`d-r11-fast-fail-sequence`**: fixed order; first failure cancels remaining; evidence artifact produced per gate.
+- **`stack-aware-quality-dispatcher`**: same skill interface; dispatches to stack-appropriate tool internally.
+- **`stage-policy-warn-then-fail`**: first release = WARN + initialize baseline; second release = FAIL.
 
-Also covered by story-specific ITs: `Epic0072Phase3IntegratedSmokeIT` (11 scenarios in 5
-nested classes verifying SKILL.md, Rule 24, audit script structural invariants).
+## Anti-patterns observed
+
+- **Quality gate always-on for new features** — blocks adoption; always use safe default `enabled: false` for new gates.
+- **Single quality gate covering all dimensions** — one broken dimension blocks everything; gates must be independently controlled.
+
+## Links
+
+- Epic: `ai/epics/epic-0072-comprehensive-test-strategy/epic-0072.md`
+- ADRs: `docs/adr/ADR-0025-comprehensive-test-strategy.md`
+- PRs: (merged into develop)
+- Reports: `ai/epics/epic-0072-comprehensive-test-strategy/reports/`
