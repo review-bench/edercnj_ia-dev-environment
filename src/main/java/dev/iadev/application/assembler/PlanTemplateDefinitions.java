@@ -344,14 +344,42 @@ public final class PlanTemplateDefinitions {
                                     "Changes",
                                     "Orchestrator Evidence")));
 
+    private static final List<Map.Entry<String, List<String>>> AI_MEMORY_TEMPLATES =
+            List.of(
+                    Map.entry(
+                            "_TEMPLATE-EPIC-MEMORY-SUMMARY.md",
+                            List.of(
+                                    "Why this epic existed",
+                                    "Hypothesis tested",
+                                    "Decisions taken (with why)",
+                                    "Alternatives rejected (with why)",
+                                    "Reusable patterns produced",
+                                    "Anti-patterns observed",
+                                    "Links")));
+
     /**
      * Template definitions: filename to mandatory sections mapping. {@link LinkedHashMap} preserves
      * insertion order for deterministic processing.
      */
     public static final Map<String, List<String>> TEMPLATE_SECTIONS = buildTemplateSections();
 
+    /**
+     * Conditional templates for the {@code governance.ai-memory} capability. Copied only when
+     * {@code ProjectConfig.aiMemory().enabled()} is {@code true}.
+     */
+    public static final Map<String, List<String>> MEMORY_TEMPLATE_SECTIONS =
+            buildMemoryTemplateSections();
+
     private PlanTemplateDefinitions() {
         // utility class
+    }
+
+    private static Map<String, List<String>> buildMemoryTemplateSections() {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> e : AI_MEMORY_TEMPLATES) {
+            map.put(e.getKey(), e.getValue());
+        }
+        return Collections.unmodifiableMap(map);
     }
 
     private static Map<String, List<String>> buildTemplateSections() {

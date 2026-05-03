@@ -86,6 +86,12 @@ public final class PlanTemplatesAssembler implements Assembler {
             processTemplate(entry.getKey(), entry.getValue(), outputDir, files, warnings);
         }
 
+        if (config.aiMemory().enabled()) {
+            for (var entry : PlanTemplateDefinitions.MEMORY_TEMPLATE_SECTIONS.entrySet()) {
+                processTemplate(entry.getKey(), entry.getValue(), outputDir, files, warnings);
+            }
+        }
+
         return AssemblerResult.of(files, warnings);
     }
 
