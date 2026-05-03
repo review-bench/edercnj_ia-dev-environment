@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0",
+  "flowVersion": "5",
+  "epicId": "EPIC-0077",
+  "epicTitle": "Product-First Lifecycle & Planning C4 Model",
+  "epicBranch": "epic/0077",
+  "createdAt": "2026-04-29T00:00:00Z",
+  "lastRefinementAt": "2026-05-03T18:45:36Z",
+  "status": "Backlog",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0077-0001": { "status": "Pendente", "phase": "Phase 0", "predecessors": [] },
+    "story-0077-0002": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0001"] },
+    "story-0077-0003": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0002"] },
+    "story-0077-0004": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0003"] },
+    "story-0077-0005": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0004"] },
+    "story-0077-0006": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0005"] },
+    "story-0077-0007": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0006"] },
+    "story-0077-0008": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0007"] },
+    "story-0077-0009": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0008"] },
+    "story-0077-0010": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0009"] },
+    "story-0077-0011": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0010"] },
+    "story-0077-0012": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0011"] },
+    "story-0077-0013": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0012"] },
+    "story-0077-0014": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0013"] },
+    "story-0077-0015": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0014"] },
+    "story-0077-0016": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0015"] },
+    "story-0077-0017": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0016"] },
+    "story-0077-0018": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0017"] },
+    "story-0077-0019": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0018"] },
+    "story-0077-0020": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0019"] },
+    "story-0077-0021": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0020"] },
+    "story-0077-0022": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0021"] },
+    "story-0077-0023": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0022"] },
+    "story-0077-0024": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0023"] },
+    "story-0077-0025": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0024"] },
+    "story-0077-0026": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0025"] },
+    "story-0077-0027": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0026"] },
+    "story-0077-0028": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0027"] }
+  },
+  "totalStories": 28,
+  "documents": {
+    "epic": "ai/epics/epic-0077-product-first-lifecycle/epic-0077-product-first-lifecycle.md",
+    "implementationMap": "ai/epics/epic-0077-product-first-lifecycle/IMPLEMENTATION-MAP.md"
+  },
+  "refinementVerdict": {
+    "status": "rejected",
+    "scope": "epic",
+    "checkedAt": "2026-05-03T18:45:36Z",
+    "verdictHash": "939f2dfee3e48448175019be09c3df2dc0be5666f8502f94228593d0d98db8fa",
+    "dimensions": {
+      "problem": {
+        "checked": false,
+        "blocker": "O épico continua descrevendo escopo e entregáveis, mas não explicita uma dor operacional observável nem evidências mensuráveis que justifiquem a mudança."
+      },
+      "persona": {
+        "checked": false,
+        "blocker": "Não há persona afetada em nível de épico definida de forma explícita, o que impede rastrear impacto operacional e priorização."
+      },
+      "value": {
+        "checked": false,
+        "blocker": "Falta hipótese de valor no formato se/então/porque; o texto atual ainda descreve funcionalidade, não resultado esperado."
+      },
+      "okrs": {
+        "checked": false,
+        "blocker": "Não há OKR/KPI de negócio com unidade, meta e método de medição para validar sucesso do épico."
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": false,
+        "blocker": "O épico toca auth/identity, mas não declara framework de compliance aplicável nem escopo explícito de threat modeling; além disso, permanecem riscos abertos de validação de token, SSRF e normalização de path."
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": [
+      "problem: o épico não apresenta dor operacional observável com evidências.",
+      "persona: falta persona épica afetada.",
+      "value: falta hipótese de valor em formato se/então/porque.",
+      "okrs: faltam OKRs/KPIs com unidade, meta e método de medição.",
+      "risks: faltam gatilhos de compliance para auth/identity e escopo explícito de threat modeling."
+    ],
+    "verdictRationale": "Strategic refinement remains blocked because the epic still lacks the foundational problem statement, affected persona, value hypothesis, measurable OKRs, and explicit risk/compliance framing required for epic approval. Technical clarifications improved execution details, but they do not resolve the strategic entry criteria."
+  }
+}

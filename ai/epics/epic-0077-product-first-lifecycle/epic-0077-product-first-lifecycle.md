@@ -13,7 +13,7 @@
 > `Pendente → Planejada | Em Andamento | Falha | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
-> reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
+> reabertura `Concluída → Em Andamento` (via `x-reconcile-status --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
 > Ver [`.claude/rules/22-lifecycle-integrity.md`](../../rules/22-lifecycle-integrity.md).
 
@@ -23,7 +23,7 @@
 
 > **Cross-Epic Dependency Awareness (EPIC-0076)**
 > Epic-level dependencies are declared in this section and used by the implementation workflow as a Phase 0.5 gate.
-> If any dependency's `expectedStatus` is not met, `x-epic-implement` aborts synchronously with exit 1.
+> If any dependency's `expectedStatus` is not met, `x-implement-epic` aborts synchronously with exit 1.
 
 ### Blocked By Epics
 
@@ -36,9 +36,9 @@
 
 | Epic ID   | Title                              | Expected Status | Reason                                              |
 | --------- | ---------------------------------- | ---------------- | --------------------------------------------------- |
-| EPIC-0065 | Feature Creation Chain Refactor    | Backlog          | x-feature-create rename coordena em story-0077-0003 |
-| EPIC-0070 | Value-Driven Templates v2          | Backlog          | Template Epic v3 refator sobre v2 (Phase 1)        |
-| EPIC-0072 | Comprehensive Test Strategy        | Backlog          | RNF table popula de quality.* YAML (Phase 7)       |
+| EPIC-0065 | Feature Creation Chain Refactor    | Backlog          | x-create-feature rename coordena em story-0077-0003 |
+| EPIC-0070 | Value-Driven Templates v2          | Concluída        | Template Epic v3 refator sobre v2 (Phase 1)        |
+| EPIC-0072 | Comprehensive Test Strategy        | Concluída        | RNF table popula de quality.* YAML (Phase 7)       |
 
 ### Blocks (informational, derived)
 
@@ -59,7 +59,7 @@ O épico Product-First Lifecycle & Planning C4 Model estabelece a hierarquia Ide
 - 4 templates novos (Product, Capability, Feature, RNF-Validation)
 - 1 template refatorado (Epic v3)
 - 4 skills novas (x-create-product, x-create-capability, x-create-feature, x-promote-ideation)
-- 5 skills refatoradas (x-epic-create, x-story-create, x-arch-plan, x-task-plan, x-story-plan)
+- 5 skills refatoradas (x-epic-create, x-story-create, x-plan-architecture, x-plan-task, x-plan-story)
 - 2 agents refatorados (planning-refinement, planning-decompose)
 - 4 scripts audit (product-validate.sh, capability-validate.sh, feature-validate.sh, rnf-audit.sh)
 - 10 SOLID rules (RULE-001 até RULE-010)
@@ -149,9 +149,9 @@ java/src/main/resources/targets/claude/skills/
   ├── x-promote-ideation/SKILL.md       # NEW
   ├── x-epic-create/SKILL.md            # REFACTOR
   ├── x-story-create/SKILL.md           # REFACTOR
-  ├── x-arch-plan/SKILL.md              # REFACTOR
-  ├── x-task-plan/SKILL.md              # REFACTOR
-  └── x-story-plan/SKILL.md             # REFACTOR
+  ├── x-plan-architecture/SKILL.md              # REFACTOR
+  ├── x-plan-task/SKILL.md              # REFACTOR
+  └── x-plan-story/SKILL.md             # REFACTOR
 ```
 
 **Impacto:** 4 skills novas, 5 refatoradas. Zero breaking changes em invoke interface.
@@ -208,9 +208,9 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | `x-promote-ideation` | `--ideation-id <ID> [--product-create]` | `product.yaml` (v1 schema) | Promover Ideation → Product (ou fail se existe) |
 | `x-epic-create` | `--feature-id <ID> --title <str> --c4-system <str>` | `epic-0XXX-*.md` (v3 schema + C4) | Criar Epic, validar C4 system diagram obrigatório |
 | `x-story-create` | `--epic-id <ID> --title <str> --rnf <yaml>` | `story-XXXX-YYYY.md` (v4 schema + RNF) | Criar Story, validar RNF schema against epic gate |
-| `x-arch-plan` | `--epic-id <ID> --c4-container <str>` | `arch-plan-epic-XXXX.md` | Validar C4 Container obrigatório antes de arch plan |
-| `x-task-plan` | `--story-id <ID> --rnf-inherit <yaml>` | `task-plan-story-XXXX-YYYY.md` | Herdar RNF de story, validar SLO + success metrics |
-| `x-story-plan` | `--story-id <ID> [--verify-rnf]` | `story-plan-XXXX-YYYY.md` | RNF validation optional (default), escalate to epic if fails |
+| `x-plan-architecture` | `--epic-id <ID> --c4-container <str>` | `arch-plan-epic-XXXX.md` | Validar C4 Container obrigatório antes de arch plan |
+| `x-plan-task` | `--story-id <ID> --rnf-inherit <yaml>` | `task-plan-story-XXXX-YYYY.md` | Herdar RNF de story, validar SLO + success metrics |
+| `x-plan-story` | `--story-id <ID> [--verify-rnf]` | `story-plan-XXXX-YYYY.md` | RNF validation optional (default), escalate to epic if fails |
 
 ### Eventos/Commands (Internal Planning Layer)
 
@@ -219,7 +219,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | `ideation.promoted` | `x-promote-ideation` | `planning-refinement` | `{ideation_id, product_id, timestamp}` |
 | `product.created` | `x-create-product` | `planning-decompose` | `{product_id, title, vision}` |
 | `feature.created` | `x-create-feature` | `planning-decompose` | `{feature_id, capability_id, title}` |
-| `epic.c4-required` | `x-epic-create` | `x-arch-plan` | `{epic_id, feature_id, c4_requirement}` |
+| `epic.c4-required` | `x-epic-create` | `x-plan-architecture` | `{epic_id, feature_id, c4_requirement}` |
 | `story.rnf-validated` | `x-story-create` | `planning-gate` | `{story_id, epic_id, rnf_status}` |
 
 ---
@@ -233,11 +233,11 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | **[RULE-003]** | C4 Model Obrigatório em Plans | Toda Epic DEVE conter C4 System diagram (C1). Toda Story DEVE referenciar C4 Container (C2). Código DEVE referenciar C4 Component/Code (C3-C4). Plan validation falha sem C4 linkage. Diagrama PlantUML ou ASCII válido. |
 | **[RULE-004]** | RNF Entrada Obrigatória com Gate No-Relax | Toda Story DEVE declarar RNF table (performance, availability, security). RNF gate enforce-refinement-gate.sh verifica 100% coverage. Relaxamento proibido (no --force override). DoR = 6 épicos pré-requisito + RNF schema v1 sem omissões. |
 | **[RULE-005]** | QA Charter v5 — AC Measurability + SLO Harness | AC DEVE ser observável (dado X, quando Y, ENTÃO métrica Z < threshold). Error-message catalog obrigatório (código HTTP + mensagem padrão). Response-time SLO declarado em task-plan. E2E scenario per Story. Success metrics in terms de negócio (conversion, retention, MTTR). |
-| **[RULE-006]** | Pentest Unconditional Core | Toda Epic impactando auth/data DEVE submeter pentest (auth bypass, IDOR, SSRF, injection, race conditions). Output: pentest-checklist-story-XXXX-YYYY.md. Falha pentest = story não entra Concluída (gates em x-internal-story-verify). |
+| **[RULE-006]** | Pentest Unconditional Core | Toda Epic impactando auth/data DEVE submeter pentest (auth bypass, IDOR, SSRF, injection, race conditions). Output: pentest-checklist-story-XXXX-YYYY.md. Falha pentest = story não entra Concluída (gates em x-internal-verify-story). |
 | **[RULE-007]** | O QUE (Product/Capability/Feature) vs O COMO (Epic/Story) | Product = problema de negócio. Feature = solução de negócio. Epic = como implementar. Story = task técnica. Plan DEVE mencionar trade-off entre o quê e como. Decision Rationale mínimo de 4 linhas. |
 | **[RULE-008]** | flowVersion "5" em Todos Artefatos Planning | Epic v3, Story v4, Task v2, Product v1, Capability v1, Feature v1, RNF-Validation v1. Cada artifact contem `flowVersion: "5"` em frontmatter. Mismatch bloqueia planning-gate. |
 | **[RULE-009]** | Decision Rationale Split (Produto / Execução / Local) | CADA decisão DEVE ser categorizada: Produto (O QUE — visível ao PM), Execução (COMO — visível ao tech lead), Local (implementation detail — visível ao dev). 4 linhas mínimo por decisão. Produto decisions bloqueiam refactoring, execução decisions bloqueiam deploys. |
-| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `x-feature-create` rename em EPIC-0065 story-0077-0003 coordena. Até entonces, usar `x-create-feature`. Post-migrate, skill alias mantém backward compat. |
+| **[RULE-010]** | Coordenação EPIC-0065 — Feature Creation Chain Refactor | `x-create-feature` rename em EPIC-0065 story-0077-0003 coordena. Até entonces, usar `x-create-feature`. Post-migrate, skill alias mantém backward compat. |
 
 ---
 
@@ -248,23 +248,23 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 - **Épicos pré-requisito:** EPIC-0064 Concluída (Capability v3.0 base), EPIC-0069 Backlog (DoR gate infra)
 - **Linguistics:** Todas seções preenchidas (zero `{{PLACEHOLDER}}`). Nenhum `TODO` sem assignee + ETA
 - **RNF Schema:** Epic declare RNF table v1 com mínimo 4 linhas (perf, avail, security, compliance)
-- **C4 Notation:** System diagram (C1) presente em épico. ASCII PlantUML válido. Containment hierarchy clara
+- **C4 Notation:** System diagram (C1) presente em arquivo `.md` dedicado com bloco `mermaid` válido. Containment hierarchy clara entre C1, C2 e C3
 - **Decision Rationale:** Mínimo 1 decisão, formato 4-linhas (Decisão / Motivo / Alternativa / Consequência)
 - **Cross-Epic Links:** Todos épicos dependentes listados em seção 0.5 com expectedStatus. In-flight allowances explícitas
 
 ### Global Definition of Done (DoD)
 
-- **Cobertura:** ≥ 95% Line, ≥ 90% Branch (absolute gate via x-test-run). Delta < 2% entre main e branch
-- **Testes Automatizados:** 28 stories × 1 test mínimo = 28 testes passando. Double-Loop TDD: Gherkin AC outer loop, TPP unit tests inner loop. Refactoring commits explícitos pós-green
-- **Smoke Tests:** ≥ 4 happy-path E2E scenarios cobrindo Product → Feature → Epic → Story flow. Smoke.yaml propagação automática
+- **Cobertura:** ≥ 95% Line, ≥ 90% Branch (absolute gate via x-execute-tests). Delta < 2% entre main e branch
+- **Testes Automatizados:** 28 stories × 1 acceptance test Gherkin mínimo por story = 28 testes passando. Double-Loop TDD: Gherkin AC outer loop, TPP unit tests inner loop. Gate aplicado em cada merge de story
+- **Smoke Tests:** ≥ 4 happy-path E2E scenarios cobrindo Product → Feature → Epic → Story flow. `Smoke.yaml` propaga ao concluir story-0077-0019 e executa na Phase 6 antes de golden fixtures
 - **Golden Fixtures:** Subset de 920 fixtures regenerado (product-validate.sh, capability-validate.sh, feature-validate.sh outputs)
 - **Relatório de Cobertura:** Coverage.xml + HTML report linked em final story report. Trend analysis vs EPIC-0064 baseline
 - **Documentação:** CHANGELOG.md Updated (28 new skills/scripts/rules). ADR registry de 10 SOLID rules gerado. _TEMPLATE-*.md versionados (v1/v3)
 - **Persistência:** Todos product.yaml, capability.yaml, feature.yaml validos contra JSON schema. Zero orphaned FKs (product_id not in products/*)
-- **Performance:** Product create < 100ms. Epic plan gen < 5s. Batch validate 100 epics < 2s. No regression vs EPIC-0064 baseline (use x-telemetry-trend)
+- **Performance:** Product create < 100ms. Epic plan gen < 5s. Batch validate 100 epics < 2s. No regression vs EPIC-0064 baseline (use x-analyze-telemetry-trends)
 - **RNF Validation:** 100% de stories com RNF table declarada. enforce-refinement-gate.sh PASS em 28 stories. Zero RNF relaxamento via --force
 - **Pentest:** Mínimo 1 pentest-checklist gerado (auth, IDOR). Core paths (product create, feature promote) PASS pentest gate
-- **Audit Scripts:** product-validate.sh, capability-validate.sh, feature-validate.sh, rnf-audit.sh todos PASS em golden fixtures. Camada 2 health checks integrados
+- **Audit Scripts:** scripts canônicos em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh` todos PASS em golden fixtures. Camada 2 health checks integrados
 
 ---
 
@@ -282,6 +282,12 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | Path operations | product.yaml sempre em ai/products/PRODUCT-PP/ dir | RULE-002, RULE-006 | Normalize paths, prevent traversal (CWE-22). Deny `../../` |
 | CSRF protection | x-create-product POST requires CSRF token | RULE-006 | State-based CSRF validation via skill middleware |
 | Rate limiting | Product create API 10 req/min por user | RULE-006 | Redis-backed rate limiter. Return 429 se excedido |
+
+**Riscos em aberto do refinement:**
+- Estratégia de validação de token OAuth2, allowlist de algoritmos e TTL máximo ainda não foram confirmados
+- `--roadmap-url <str>` em `x-create-product` exige mitigação explícita de SSRF via allowlist de hosts ou restrição de schema
+- Classificação e retenção de `product.yaml`, `capability.yaml` e `feature.yaml` seguem indefinidas e bloqueiam fechamento de compliance
+- Audit log mínimo para ações privilegiadas (`who`, `what`, `when`, `resource_id`) ainda precisa de contrato explícito
 
 ---
 
@@ -322,13 +328,13 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 ### DR-002: C4 Model Como Contrato Visual Obrigatório
 
-**Decisão:** C4 diagrams (System C1, Container C2, Component C3, Code C4) tornam-se obrigatórios em Epic-level plans e validados automaticamente antes de Story creation.
+**Decisão:** C4 diagrams em arquivos `.md` com blocos Mermaid (System C1, Container C2, Component C3, Code C4) tornam-se obrigatórios em Epic-level plans e validados automaticamente antes de Story creation.
 
-**Motivo:** Arquitetura desacoplada de implementação é escopo de épico. C4 força discussão visual pré-dev, reduzindo "surprises" em task-plan. RULE-003 + x-arch-plan validator detectam inconsistências cedo (C1 system conta com containers não declarados em C2, etc).
+**Motivo:** Arquitetura desacoplada de implementação é escopo de épico. C4 força discussão visual pré-dev, reduzindo "surprises" em task-plan. RULE-003 + x-plan-architecture validator detectam inconsistências cedo (C1 system conta com containers não declarados em C2, etc).
 
-**Alternativa descartada:** Arquitetura em ADRs apenas (silos de tech leads, sem validação). Diagrama opcional (guessing game sobre scope).
+**Alternativa descartada:** Arquitetura em ADRs apenas (silos de tech leads, sem validação). Diagrama opcional (guessing game sobre scope). PlantUML/ASCII como formato primário foi descartado em favor de Mermaid em `.md`.
 
-**Consequência:** Epic template v3 requer campo `c4_system_diagram` não-nulo. x-arch-plan falha se C4 Container não linkar com C1 System. Agents planning-refinement + planning-decompose herdam C4 obrigatoriedade.
+**Consequência:** Epic template v3 requer campo `c4_system_diagram` não-nulo em arquivo `.md` com bloco `mermaid`. x-plan-architecture falha se C4 Container não linkar com C1 System. Agents planning-refinement + planning-decompose herdam C4 obrigatoriedade.
 
 ---
 
@@ -348,23 +354,23 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Decisão:** QA charter v5 enfatiza AC measurable (dado X, quando Y, ENTÃO métrica Z < threshold), error-message catalog padrão (HTTP + descriptive), response-time SLO, success metrics negócio.
 
-**Motivo:** "Testable acceptance criteria" reduz ambiguidade PM ↔ QA. Error catalog previne "what error?" debates em prod. RULE-005 + x-review-qa validator checam AC syntax. E2E E2E scenarios por story garantem integração.
+**Motivo:** "Testable acceptance criteria" reduz ambiguidade PM ↔ QA. Error catalog previne "what error?" debates em prod. RULE-005 + x-review-codebase-qa validator checam AC syntax. E2E E2E scenarios por story garantem integração.
 
 **Alternativa descartada:** "Happy path only" (descobrem failures em prod). Generic error messages (bad DX).
 
-**Consequência:** Story template v4 requer `acceptance_criteria` com operador relacional (`<`, `>`, `==`, `≤`, `≥`). x-review-qa rejeita "should be fast" (não mensurável). Pentest gate escalação automática para stories impactando auth/data.
+**Consequência:** Story template v4 requer `acceptance_criteria` com operador relacional (`<`, `>`, `==`, `≤`, `≥`). x-review-codebase-qa rejeita "should be fast" (não mensurável). Pentest gate escalação automática para stories impactando auth/data.
 
 ---
 
 ### DR-005: Skills Novas (4) + Refatoradas (5) Para Frontload Validação
 
-**Decisão:** x-create-product, x-create-capability, x-create-feature, x-promote-ideation são skills novas. x-epic-create, x-story-create, x-arch-plan, x-task-plan, x-story-plan refatorados para consumir novos tipos de input (C4, RNF, hierarchy).
+**Decisão:** x-create-product, x-create-capability, x-create-feature, x-promote-ideation são skills novas. x-epic-create, x-story-create, x-plan-architecture, x-plan-task, x-plan-story refatorados para consumir novos tipos de input (C4, RNF, hierarchy).
 
 **Motivo:** Frontload de validação em skills vs. descoberta em planning-gate reduz buracos. Skills emitem eventos (ideation.promoted, product.created) que agents consumem. Refactor de epics existentes bloqueado até Phase 1 (seria disruptivo).
 
 **Alternativa descartada:** Monolith única skill "create-all" (impossível validar in stages). Lazy validation post-decompose (permite epics mal-formados).
 
-**Consequência:** Cada skill nova + refatorada é uma story separada (stories 0077-0002 até 0077-0006). Backward compat via aliases (x-feature-create = x-create-feature post-EPIC-0065). x-skill-invoke adapta UnicodeScript → bash bridge.
+**Consequência:** Cada skill nova + refatorada é uma story separada (stories 0077-0002 até 0077-0006). Backward compat via aliases (x-create-feature = x-create-feature post-EPIC-0065). x-skill-invoke adapta UnicodeScript → bash bridge.
 
 ---
 
@@ -376,7 +382,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Alternativa descartada:** Validação inline em skills (overhead por criação). Zero validation infra (discover issues via manual audits).
 
-**Consequência:** scripts/audit/ diretório novo. Cada script outputs JSON (valid_count, error_count, error_details). CI integra via health-check stage (pré-deploy validação).
+**Consequência:** source-of-truth dos scripts em `java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh`. Cada script outputs JSON (`valid_count`, `error_count`, `error_details`). CI integra via health-check stage (pré-deploy validação).
 
 ---
 
@@ -400,7 +406,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 **Alternativa descartada:** Flat decision list (ambiguidade sobre quem valida).
 
-**Consequência:** RULE-009. Decision Rationale obrigatório em cada story + task. x-internal-story-verify valida categoria (rejeita Decision Rationale não-categorizado).
+**Consequência:** RULE-009. Decision Rationale obrigatório em cada story + task. x-internal-verify-story valida categoria (rejeita Decision Rationale não-categorizado).
 
 ---
 
@@ -422,9 +428,9 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | [story-0077-0010](./story-0077-0010.md) | Skill NEW: x-promote-ideation UnicodeScript wrapper | story-0077-0009 | Ideation → Product promotion CLI | 3 |
 | [story-0077-0011](./story-0077-0011.md) | Skill REFACTOR: x-epic-create (C4 required, RULE-003) | story-0077-0010 | Epic creation com C4 mandatory | 4 |
 | [story-0077-0012](./story-0077-0012.md) | Skill REFACTOR: x-story-create (RNF validation, RULE-004) | story-0077-0011 | Story creation com RNF gate | 4 |
-| [story-0077-0013](./story-0077-0013.md) | Skill REFACTOR: x-arch-plan (C4 Container validation) | story-0077-0012 | Architecture planning com C4 rigor | 4 |
-| [story-0077-0014](./story-0077-0014.md) | Skill REFACTOR: x-task-plan (RNF inheritance, SLO) | story-0077-0013 | Task planning com SLO context | 4 |
-| [story-0077-0015](./story-0077-0015.md) | Skill REFACTOR: x-story-plan (RNF validation layer) | story-0077-0014 | Story planning com RNF verify | 4 |
+| [story-0077-0013](./story-0077-0013.md) | Skill REFACTOR: x-plan-architecture (C4 Container validation) | story-0077-0012 | Architecture planning com C4 rigor | 4 |
+| [story-0077-0014](./story-0077-0014.md) | Skill REFACTOR: x-plan-task (RNF inheritance, SLO) | story-0077-0013 | Task planning com SLO context | 4 |
+| [story-0077-0015](./story-0077-0015.md) | Skill REFACTOR: x-plan-story (RNF validation layer) | story-0077-0014 | Story planning com RNF verify | 4 |
 | [story-0077-0016](./story-0077-0016.md) | Script Audit: product-validate.sh + tests | story-0077-0015 | Product structure validation | 5 |
 | [story-0077-0017](./story-0077-0017.md) | Script Audit: capability-validate.sh + tests | story-0077-0016 | Capability linkage audit | 5 |
 | [story-0077-0018](./story-0077-0018.md) | Script Audit: feature-validate.sh + tests | story-0077-0017 | Feature linkage audit | 5 |
@@ -437,7 +443,7 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | [story-0077-0025](./story-0077-0025.md) | Coverage: Unit + Integration (≥95% line, ≥90% branch) | story-0077-0024 | QA gate validation | 6 |
 | [story-0077-0026](./story-0077-0026.md) | Docs: CHANGELOG.md + skills reference | story-0077-0025 | User-facing documentation | 7 |
 | [story-0077-0027](./story-0077-0027.md) | Docs: ADR registry (10 SOLID rules) | story-0077-0026 | Architecture decision traceability | 7 |
-| [story-0077-0028](./story-0077-0028.md) | Final QA: x-internal-epic-integrity-gate + audit | story-0077-0027 | Epic completion gate | 7 |
+| [story-0077-0028](./story-0077-0028.md) | Final QA: x-internal-verify-epic-integrity + audit | story-0077-0027 | Epic completion gate | 7 |
 
 ### File Footprint (EPIC-0041 parallelism evaluation)
 
@@ -447,13 +453,11 @@ write:
   - /ai/capabilities/_TEMPLATE-CAPABILITY.md (v1)
   - /ai/features/_TEMPLATE-FEATURE.md (v1)
   - /ai/epics/epic-0077-product-first-lifecycle/_TEMPLATE-EPIC.md (v3 refactor)
+  - /.claude/rules/c4-model-architecture.md
   - /ai/planning/c4-validation/_TEMPLATE-C4-VALIDATION.md
   - /ai/planning/rnf-validation/_TEMPLATE-RNF-VALIDATION.md
   - /ai/epics/epic-0077-product-first-lifecycle/story-0077-000[1-9].md (28 stories)
-  - /scripts/audit/product-validate.sh
-  - /scripts/audit/capability-validate.sh
-  - /scripts/audit/feature-validate.sh
-  - /scripts/audit/rnf-audit.sh
+  - /java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh
   - /skills/x-create-product/
   - /skills/x-create-capability/
   - /skills/x-create-feature/
@@ -464,7 +468,6 @@ read:
   - /ai/epics/epic-0064-capability-driven-composition/epic-0064-*.md
   - /.claude/rules/22-lifecycle-integrity.md
   - /.claude/rules/planning-standards-kp.md
-  - /.claude/rules/c4-model-architecture.md
   - /ai/epics/epic-0077-product-first-lifecycle/_TEMPLATE-EPIC.md (v2 baseline)
   - /skills/x-epic-create/ (refactor inputs)
   - /skills/x-story-create/ (refactor inputs)
@@ -519,6 +522,39 @@ Total E.T.A: ~26 days (serial critical path, início em Refinement)
 
 ---
 
+## Refinement Verdict
+
+**Status:** rejected  
+**Scope:** epic  
+**Refined at:** 2026-05-03T18:45:36Z  
+**Verdict hash:** `939f2dfee3e48448175019be09c3df2dc0be5666f8502f94228593d0d98db8fa`
+
+### Dimensions
+
+| Dimension | Status | Blocker |
+|-----------|--------|---------|
+| problem | noGo | O épico não explicita dor operacional observável nem evidências mensuráveis |
+| persona | noGo | Persona épica afetada não está definida |
+| value | noGo | Falta hipótese de valor em formato se/então/porque |
+| okrs | noGo | Faltam OKRs/KPIs com unidade, meta e método de medição |
+| alternatives | passed | — |
+| risks | noGo | Faltam compliance triggers para auth/identity e escopo explícito de threat modeling |
+| scope | passed | — |
+
+### Blockers
+
+- problem: o épico não apresenta dor operacional observável com evidências.
+- persona: falta persona épica afetada.
+- value: falta hipótese de valor em formato se/então/porque.
+- okrs: faltam OKRs/KPIs com unidade, meta e método de medição.
+- risks: faltam gatilhos de compliance para auth/identity e escopo explícito de threat modeling.
+
+### Rationale
+
+Strategic refinement remains blocked because the epic still lacks the foundational problem statement, affected persona, value hypothesis, measurable OKRs, and explicit risk/compliance framing required for epic approval. Technical clarifications improved execution details, but they do not resolve the strategic entry criteria.
+
+---
+
 ## Observações Finais
 
 Este épico establece a fundação canônica Product-First da plataforma com 28 stories em 7 phases. Hierarquia rigorosa (Product → Capability → Feature → Epic → Story → Task) + C4 Model + RNF gate no-relax definem contratos imutáveis. QA refocus em measurability, pentest obrigatório, e audit scripts Camada 2 elevam quality bar.
@@ -528,5 +564,5 @@ Este épico establece a fundação canônica Product-First da plataforma com 28 
 ---
 
 **Documento versão:** RA9 v2  
-**Última atualização:** 2026-04-29  
+**Última atualização:** 2026-05-03  
 **Próxima revisão:** Pós-Phase 0 (story-0077-0001 conclusion)
