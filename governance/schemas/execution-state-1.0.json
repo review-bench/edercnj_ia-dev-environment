@@ -7,8 +7,8 @@
   "properties": {
     "flowVersion": {
       "type": "string",
-      "enum": ["1", "2", "3", "4"],
-      "description": "Lifecycle variant: 1=legacy, 2=epic-branch, 3=local-first, 4=v4-layout"
+      "enum": ["1", "2", "3", "4", "5"],
+      "description": "Lifecycle variant: 1=legacy, 2=epic-branch, 3=local-first, 4=v4-layout, 5=product-first (EPIC-0077)"
     },
     "epicId": {
       "type": "string",
@@ -32,6 +32,10 @@
     "localFirstLifecycle": {
       "type": "boolean",
       "description": "Derived from flowVersion 3 or 4 — serialized for jq discoverability"
+    },
+    "productFirstLifecycle": {
+      "type": "boolean",
+      "description": "Required when flowVersion=5 (EPIC-0077). Signals Product-First Lifecycle: C4 gates, RNF gate, ideation-to-feature hierarchy tracking active. Absence on flowVersion=5 emits WARN [productFirstLifecycle-absent] per Rule 19."
     },
     "taskTracking": {
       "type": "object",

@@ -6,7 +6,8 @@
   "epicBranch": "epic/0077",
   "createdAt": "2026-04-29T00:00:00Z",
   "lastRefinementAt": "2026-05-04T12:00:00Z",
-  "status": "Backlog",
+  "status": "Em Andamento",
+  "interactiveMode": "non-interactive",
   "taskTracking": {
     "enabled": true,
     "rootTaskId": null,
