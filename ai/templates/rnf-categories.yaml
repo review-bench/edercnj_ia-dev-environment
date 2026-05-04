@@ -1,0 +1,81 @@
+# RNF Root Categories — Reference
+# Used by _TEMPLATE-PRODUCT.md and RNFCategory.java
+# 6 categories are MANDATORY (cannot be omitted in any product)
+# 4 categories are OPTIONAL (recommended but may be omitted with justification)
+
+schema_version: "1.0"
+
+categories:
+  - id: PERFORMANCE
+    mandatory: true
+    description: "Latency, throughput, and response time requirements"
+    example_target: "P99 < 200ms under 1000 RPS"
+    verification: "Load test (k6, JMeter, Gatling)"
+
+  - id: SCALABILITY
+    mandatory: true
+    description: "Horizontal/vertical scaling capabilities"
+    example_target: "Handle 10x peak without redeployment"
+    verification: "Auto-scaling chaos test"
+
+  - id: RELIABILITY
+    mandatory: true
+    description: "Availability and fault tolerance"
+    example_target: "SLA 99.9% per calendar month"
+    verification: "Uptime monitoring (Grafana, Datadog)"
+
+  - id: SECURITY
+    mandatory: true
+    description: "Authentication, authorization, and data protection"
+    example_target: "OAuth 2.0 + MFA mandatory for admins; AES-256 at rest"
+    verification: "Biannual penetration test"
+
+  - id: COMPLIANCE
+    mandatory: true
+    description: "Regulatory and legal requirements"
+    example_target: "LGPD DPA signed; GDPR Article 30 documented"
+    verification: "Annual ANPD audit"
+
+  - id: OBSERVABILITY
+    mandatory: true
+    description: "Logging, tracing, and monitoring coverage"
+    example_target: "100% requests with trace_id propagated; structured JSON logs"
+    verification: "Grafana dashboard coverage report"
+
+  - id: DATA_INTEGRITY
+    mandatory: false
+    description: "Transactional consistency and data loss prevention"
+    example_target: "Zero data loss on node failure; ACID transactions"
+    verification: "Chaos monkey + DB failover test"
+
+  - id: MAINTAINABILITY
+    mandatory: false
+    description: "Test coverage, code quality, and documentation freshness"
+    example_target: "≥95% line, ≥90% branch coverage; zero CRITICAL SonarQube"
+    verification: "JaCoCo gate in CI"
+
+  - id: PORTABILITY
+    mandatory: false
+    description: "Cloud-agnostic and deployment flexibility"
+    example_target: "Deploy on AWS, GCP, Azure without code changes"
+    verification: "Smoke test on 2+ cloud providers"
+
+  - id: USABILITY
+    mandatory: false
+    description: "Onboarding time and user experience targets"
+    example_target: "< 1 hour to first value for new customer"
+    verification: "Onboarding analytics funnel"
+
+mandatory_categories:
+  - PERFORMANCE
+  - SCALABILITY
+  - RELIABILITY
+  - SECURITY
+  - COMPLIANCE
+  - OBSERVABILITY
+
+optional_categories:
+  - DATA_INTEGRITY
+  - MAINTAINABILITY
+  - PORTABILITY
+  - USABILITY
