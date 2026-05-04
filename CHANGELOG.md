@@ -7,6 +7,242 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-05-04
+
+### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+Antes desta release, a convenção de nomes das ~100 skills do repositório misturava padrões noun-first (`x-epic-implement`, `x-story-plan`) e verb-first (`x-create-pr`, `x-run-sast`), gerando inconsistência cognitiva na hora de invocar, descobrir ou documentar skills.
+
+**A partir desta release, todas as skills seguem padrão verb-first uniforme.** Public: `x-<verb>-<object>` (ex: `x-implement-story`, `x-review-codebase`). Internal: `x-internal-<verb>-<object>` (ex: `x-internal-verify-story`). Lib: `x-lib-<verb>-<object>`. O SPEC canônico está em `docs/specs/SPEC-verb-first-skill-naming-v1.md`. Guard anti-legado `audit-skill-naming.sh` bloqueia regressões em CI.
+
+### Added — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+- **SPEC canônico** `docs/specs/SPEC-verb-first-skill-naming-v1.md` (v1.2): 84 pares old→new com justificativa e collision resolution. Introduzido por story-0076-0001.
+- **ADR-0029** `docs/adr/ADR-0029-verb-first-skill-naming.md`: decisão arquitetural e critérios de aprovação da convenção. Introduzido por story-0076-0002.
+- **Guard anti-legado `audit-skill-naming.sh`** (Camada 2 CI Script, Rule 26): detecta nomes noun-first reintroduzidos fora da allow-list histórica; exit codes: `0`=OK, `1`=SKILL_NAMING_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT; baseline imutável `governance/baselines/skill-naming-baseline.txt`. Introduzido por story-0076-0007.
+
+### Changed — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+Skills renomeadas (84 pares — seções 6.1–6.10 do SPEC):
+
+**Lifecycle (§6.1):** `x-epic-implement` → `x-implement-epic`, `x-story-implement` → `x-implement-story`, `x-task-implement` → `x-implement-task`, `x-story-plan` → `x-plan-story`, `x-task-plan` → `x-plan-task`, `x-epic-refine` → `x-refine-epic`, `x-story-refine` → `x-refine-story`, `x-arch-plan` → `x-plan-architecture`, `x-arch-update` → `x-update-architecture`, `x-arch-system-update` → `x-update-system-architecture`, `x-adr-generate` → `x-generate-adr`, `x-epic-orchestrate` → `x-orchestrate-epic`, `x-feature-ideate` → `x-ideate-feature`, `x-feature-create` → `x-create-feature`, `x-threat-model` → `x-model-threats`, `x-spec-drift` → `x-detect-spec-drift`, `x-parallel-eval` → `x-evaluate-parallelism`.
+
+**Tests (§6.2):** `x-test-run` → `x-execute-tests`, `x-test-tdd` → `x-drive-tdd`, `x-test-e2e` → `x-execute-e2e-tests`, `x-test-contract` → `x-execute-contract-tests`, `x-test-mutation` → `x-execute-mutation-tests`, `x-test-performance` → `x-execute-performance-tests`, `x-test-perf` → `x-run-perf-tests`, `x-test-plan` → `x-plan-tests`, `x-test-smoke-api` → `x-execute-api-smoke-tests`, `x-test-smoke-socket` → `x-execute-socket-smoke-tests`, `x-test-regression-shell` → `x-execute-shell-regression-tests`, `x-test-contract-lint` → `x-lint-contract-tests`.
+
+**Review (§6.3):** `x-review` → `x-review-codebase`, `x-review-db` → `x-review-database`, `x-review-obs` → `x-review-observability`, `x-review-perf` → `x-review-performance`, `x-code-audit` → `x-audit-code`.
+
+**Code/Docs (§6.4):** `x-code-format` → `x-format-code`, `x-code-lint` → `x-lint-code`, `x-doc-generate` → `x-generate-docs`, `x-doc-validate` → `x-validate-docs`, `x-template-migrate` → `x-migrate-templates`, `x-frontmatter-migrate` → `x-migrate-frontmatter`, `x-ci-generate` → `x-generate-ci`, `x-mcp-recommend` → `x-recommend-mcp`.
+
+**Git/PR (§6.5):** `x-pr-create` → `x-create-pr`, `x-pr-merge` → `x-merge-pr`, `x-pr-fix` → `x-fix-pr`, `x-pr-fix-epic` → `x-fix-epic-pr`, `x-pr-watch-ci` → `x-watch-pr-ci`, `x-pr-merge-train` → `x-manage-pr-merge-train`, `x-git-commit` → `x-commit-changes`, `x-git-push` → `x-push-branch`, `x-git-merge` → `x-merge-branches`, `x-git-branch` → `x-create-git-branch`, `x-git-worktree` → `x-manage-worktrees`, `x-git-cleanup-branches` → `x-cleanup-git-branches`, `x-planning-commit` → `x-commit-planning`.
+
+**Ops (§6.6):** `x-telemetry-analyze` → `x-analyze-telemetry`, `x-telemetry-trend` → `x-analyze-telemetry-trends`, `x-release-changelog` → `x-generate-release-changelog`, `x-status-reconcile` → `x-reconcile-status`, `x-ops-incident` → `x-handle-incident`, `x-obs-instrument` → `x-instrument-observability`, `x-ops-troubleshoot` → `x-troubleshoot-operations`, `x-perf-profile` → `x-profile-performance`, `x-memory-search` → `x-search-memory`.
+
+**Security (§6.7):** `x-dependency-audit` → `x-audit-dependencies`, `x-supply-chain-audit` → `x-audit-supply-chain`, `x-hardening-eval` → `x-evaluate-hardening`, `x-runtime-eval` → `x-evaluate-runtime`, `x-owasp-scan` → `x-scan-owasp`, `x-security-dashboard` → `x-generate-security-dashboard`, `x-security-pipeline` → `x-generate-security-pipeline`, `x-security-secrets` → `x-scan-secrets`, `x-security-sast` → `x-run-sast`, `x-security-dast` → `x-run-dast`, `x-security-container` → `x-scan-container-security`, `x-pentest-dynamic` → `x-run-dynamic-pentest`, `x-security-pentest` → `x-run-pentest`, `x-security-infra` → `x-assess-infrastructure-security`, `x-security-sonar` → `x-run-sonar-security`, `x-dep-policy-validate` → `x-validate-dependency-policy`.
+
+**Jira (§6.8):** `x-jira-create-epic` → `x-create-jira-epic`, `x-jira-create-stories` → `x-create-jira-stories`.
+
+**Internals (§6.9):** `x-internal-story-verify` → `x-internal-verify-story`, `x-internal-story-report` → `x-internal-write-story-report`, `x-internal-story-resume` → `x-internal-resume-story`, `x-internal-story-build-plan` → `x-internal-build-story-plan`, `x-internal-story-create` → `x-internal-create-story`, `x-internal-story-load-context` → `x-internal-load-story-context`, `x-internal-epic-integrity-gate` → `x-internal-verify-epic-integrity`, `x-internal-epic-branch-ensure` → `x-internal-ensure-epic-branch`, `x-internal-epic-build-plan` → `x-internal-build-epic-plan`, `x-internal-epic-summary` → `x-internal-summarize-epic`, `x-internal-epic-create` → `x-internal-create-epic`, `x-internal-epic-map` → `x-internal-map-epic`, `x-internal-worktree-precheck` → `x-internal-precheck-worktree`, `x-internal-pr-body-render` → `x-internal-render-pr-body`, `x-internal-phase-gate` → `x-internal-verify-phase-gates`, `x-internal-report-write` → `x-internal-write-report`, `x-internal-status-update` → `x-internal-update-status`, `x-internal-args-normalize` → `x-internal-normalize-args`.
+
+**Libs (§6.10):** `x-lib-group-verifier` → `x-lib-verify-group`, `x-lib-task-decomposer` → `x-lib-decompose-task`.
+
+### Highlights — EPIC-0075 (AI Memory Layer)
+
+Antes desta release, recuperar contexto de decisões passadas exigia re-leitura de arquivos markdown de épicos inteiros (200–500 linhas cada). Para um projeto com 75+ épicos, "o que decidimos sobre X no EPIC-0054?" demandava horas de leitura manual ou overflow do context window do LLM.
+
+**A partir desta release, o projeto tem uma camada de memória estruturada.** `x-internal-epic-summary` (haiku, determinístico) gera `ai/memory/epic-XXXX-summary.md` com frontmatter YAML de 16 campos + 7 seções H2 obrigatórias ao concluir cada épico. `/x-memory-search` recupera summaries em segundos por tag, capability, rule, pattern ou epic-id. 27 épicos históricos (0040–0075) seedados retroativamente. `audit-memory-coverage.sh` bloqueia merges de épicos concluídos sem summary.
+
+**LLM context retrieval: minutos → segundos.** Re-litigation de decisões passadas reduzida via seção "Alternatives rejected" em cada summary. Onboarding acelerado: novo dev lê `_index.yaml` + 5 summaries recentes = panorama em 1h.
+
+### Added — EPIC-0075 (AI Memory Layer)
+
+- **`ai/memory/` estrutura**: `_index.yaml` (schema v1.0 com 27 entries), `_TEMPLATE-EPIC-MEMORY-SUMMARY.md`, `_retro-seed-rubric.md` (6 critérios C1–C6). Introduzido por story-0075-0001.
+- **Skill `x-internal-epic-summary`** (internal, `model: haiku`, `requires-capabilities: [governance.ai-memory]`): 4 fases — Parse epic artifacts, Extract 7-section body, Validate (C1–C6 rubric), Write summary + update `_index.yaml`. Exit codes: `0`=OK, `1`=EPIC_NOT_FOUND, `2`=SCHEMA_VIOLATION, `3`=MEMORY_SUMMARY_TOO_LONG, `4`=EXTRACTION_FAILED, `5`=INDEX_LOCK_TIMEOUT, `6`=TEMPLATE_VERSION_MISMATCH, `7`=MANUAL_REFINEMENT_PRESENT (skip gracioso para summaries com `<!-- manual-refinement -->`). Introduzido por story-0075-0002.
+- **Skill `/x-memory-search`** (public, `model: haiku`, `requires-capabilities: [governance.ai-memory]`): 5 modos de busca — `--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`; `--include-archived` opt-in; `--format compact|full`; `--limit N`. Exit codes: `0`=OK, `1`=INDEX_NOT_FOUND, `2`=INVALID_ARGS. Introduzido por story-0075-0003.
+- **Exit-7 marker detection** (`<!-- manual-refinement -->`): `x-internal-epic-summary` sai com código 7 sem erro quando encontra o marcador; permite summaries manuais coexistirem com geração automática. Introduzido por story-0075-0003.
+- **Rule 33 — AI Memory Production** (`33-ai-memory-production.md`): invocação obrigatória de `x-internal-epic-summary` em Phase 5 de `x-epic-implement`; backward compatibility (Rule 19) via `memory.enabled: false`; `audit-memory-coverage.sh` como Camada 2. Introduzido por story-0075-0004.
+- **Capability `governance.ai-memory`** (`capabilities/governance/ai-memory.yaml`): registrada em `capabilities/_index.yaml`; referenciada por `x-internal-epic-summary` e `x-memory-search`. Introduzido por story-0075-0004.
+- **`audit-memory-coverage.sh`** (Camada 2 CI Script, Rule 26): verifica `ai/memory/epic-XXXX-summary.md` para cada épico `Concluída`; exit codes: `0`=OK, `1`=MEMORY_COVERAGE_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implementa `--self-check`. Introduzido por story-0075-0004.
+- **Integração em `x-epic-implement` Phase 5** (story-0075-0005): `x-internal-epic-summary` invocado como **MANDATORY TOOL CALL** [required] antes da criação do PR final; `[required]` marker para Rule 28 compliance.
+- **Retro-seed de 27 épicos históricos** (0040–0075, story-0075-0006): `scripts/retro-seed-memory.sh` com flags `--from`, `--to`, `--dry-run`, `--continue-on-error`, `--self-check`; 5 exit codes; valida consistência `_index.yaml` ao final.
+- **`ai/memory/_retro-seed-rubric.md`**: 6 critérios de qualidade (C1 frontmatter 16 campos, C2 7 seções obrigatórias, C3 ≤200 linhas, C4 consistência bidirecional index, C5 hypothesis não-vazio, C6 superseded-by referencia arquivo existente).
+- **`RetroSeedSmokeIT`**: 6 testes parametrizados cobrindo rubric C1–C6 sobre `ai/memory/epic-*-summary.md` reais. Introduzido por story-0075-0006.
+- **`Epic0075MemoryLayerSmokeIT`**: 10 cenários estruturais validando frontmatter, body marker, parâmetros, exit codes, seções de extração, determinismo, playbook, fixtures e Rule 33. Introduzido por story-0075-0001 através 0075-0005.
+- **Dogfood `ai/memory/epic-0075-summary.md`**: EPIC-0075 gera seu próprio summary como meta-prova do sistema. Introduzido por story-0075-0007.
+- **Knowledge Pack `governance/ai-memory-playbook`**: `index.md` + `tags-catalog.md` com catálogo de tags canônicas usadas pelos summaries. Introduzido por story-0075-0001.
+
+### Highlights — EPIC-0074 (Dependency Policy & SCA Final Gate)
+
+Antes desta release, projetos gerados por `ia-dev-env` podiam declarar qualquer versão de dependência, independente de CVEs conhecidas, licenças banidas, ou staleness — nenhum gate existia para enforçar política organizacional em CI. O resultado: vulnerabilidades descobertas acumulavam silenciosamente, compliance de licença era checado manualmente, e freshness drifted até um audit forçar remediação reativa.
+
+**A partir desta release, o gate de política de dependências está codificado no lifecycle do `x-story-implement`.** Quando `dependencies.policy.enabled: true` no YAML do projeto, o skill `x-dep-policy-validate` é invocado como **MANDATORY TOOL CALL** em Phase 3 (após os gates de qualidade EPIC-0072/0073). O gate valida em sequência: CVEs hard-block (`denied-cves` — RULE-074-01, independe de scope), severidade CVE (threshold configurável), whitelist de licenças SPDX, versões mínimas e máximas (cross-stack: JVM groupId/artifactId, NPM/PyPI name, Go module), e freshness window. Cada dimensão tem ação configurável (`BLOCK`, `WARN_ONLY`, `IGNORE`) com defaults D-R10 e overrides por escopo D-R11.
+
+**Safe default (Rule 19):** `dependencies.policy.enabled: false` — projetos existentes são completamente não afetados até opt-in.
+
+**Surface 13 adicionada ao Zero-Bypass Lifecycle (Rule 27):** `dep-policy-validation-report-STORY-ID.md` é agora artefato de evidência obrigatório quando o gate está ativo. A Camada 3 (`audit-dep-policy.sh`) verifica sua presença por story merged via `DEPENDENCY_POLICY_ENABLED` env var.
+
+### Added — EPIC-0074 (Dependency Policy & SCA Final Gate)
+
+- **Domain model** (`DependencyPolicyConfig`, `BlockAction`, `BlockOnPolicy`, `ScopePolicy`, `VersionConstraint`, `LicenseWhitelist`): 6 novos records/enums para o modelo de política de dependências. `DependencyPolicyConfig` inclui `enabled`, `minVersions`, `maxVersions`, `allowedLicenses`, `deniedCves`, `freshnessWindowDays`, `blockOn`, `scopePolicy`. `BlockAction.fromYaml` suporta aliases (`any-violation → BLOCK`, `warn-only → WARN_ONLY`). `VersionConstraint` suporta 3 formatos mutuamente exclusivos: JVM (`groupId+artifactId`), NPM/PyPI (`name`), Go (`module`). Introduzido por story-0074-0001.
+- **Skill `x-dep-policy-validate`** (conditional, `model: haiku`, `requires-capabilities: [governance.dependency-policy]`): 4 fases — Parse (load policy config), Resolve (scan manifests via x-dependency-audit), Validate (CVE/license/version/freshness checks), Report. Exit codes: `0`=DEP_POLICY_PASS, `20`=DEP_POLICY_BLOCK, `21`=DEP_POLICY_WARN, `22`=DEP_POLICY_DISABLED, `2`=OPERATIONAL_ERROR. `--policy` flag em `x-dependency-audit` para delegação direta. Introduzido por story-0074-0002.
+- **`_TEMPLATE-DEP-POLICY-REPORT.md`**: template de evidência para `dep-policy-validation-report-STORY-ID.md`. Seções: Header, Summary, Blocking Violations, Warning Violations, Policy Snapshot, Tooling. Registrado em `PlanTemplateDefinitions.TEMPLATE_SECTIONS`. Introduzido por story-0074-0002.
+- **`_TEMPLATE-DEP-POLICY-DECLARATION.md`**: template de documentação de política do projeto. Seções: Policy Status, Enforcement Matrix (D-R10), Scope Policy (D-R11), Version Constraints, CVE Exceptions, License Rationale. Gerado por `DocsAssembler` quando `governance.dependency-policy` capability ativa. Introduzido por story-0074-0003.
+- **6 capabilities** (`governance/dependency-policy`, `.cve`, `.license`, `.version`, `.freshness`, `.scope`): declaradas em `capabilities/governance/` + registradas em `capabilities/_index.yaml`. `requires-capabilities: [governance.dependency-policy]` no frontmatter do skill. Introduzido por story-0074-0001.
+- **`audit-dep-policy.sh`** (Camada 2 CI Script, Rule 26): verifica artefatos `dep-policy-validation-report-*.md` por story merged quando `DEPENDENCY_POLICY_ENABLED=true`; baseline grandfathering via `governance/baselines/dep-policy-baseline.txt`. Exit codes: `0`=OK, `1`=DEPENDENCY_POLICY_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implementa `--self-check`. Introduzido por story-0074-0004.
+- **`governance/baselines/dep-policy-baseline.txt`**: baseline vazio (imutável após EPIC-0074 merge). Introduzido por story-0074-0004.
+- **`docs/adr/ADR-0027-dependency-policy-gate.md`**: decision record para o gate de política de dependências, abordagem safe-default, schema de versionamento cross-stack, e sequência D-R11 de enforcement por escopo. Introduzido por story-0074-0001.
+- **Rule 32 — Dependency Policy Gate** (`32-dependency-policy-gate.md`): nova rule com YAML block `dependencies.policy`, matriz de enforcement D-R10, scope policy D-R11, RULE-074-01 hard-block CVE, backward compatibility (Rule 19). Gerada para todos os 10 perfis golden. Introduzido por story-0074-0001.
+- **`x-story-implement` Phase 3.Q extended** (EPIC-0074): `x-dep-policy-validate` adicionado como gate Phase 3.Q.5 (após contract gate); `[conditional: flag.dep_policy_enabled]` grammar marker (Rule 28); telemetry sub-phase `Phase-3-Quality-DepPolicy`; exit code 20 `DEP_POLICY_BLOCK` adicionado ao Error Envelope. Arquivo comprimido para 410 linhas (RULE-004). Introduzido por story-0074-0005.
+- **Rule 24 Evidence Artifacts extended**: `x-dep-policy-validate → dep-policy-validation-report-STORY-ID.md` adicionado como Camada 3 (soft — conditional: `dependencies.policy.enabled=true`, EPIC-0074). Introduzido por story-0074-0005.
+- **Rule 27 Surface 13 added**: "Dependency policy gate" adicionado à tabela Non-bypass Contract; "13 surfaces" documentado (era 12). Introduzido por story-0074-0005.
+- **`knowledge/security/dependency-policy-playbook.md`**: knowledge pack com playbook de política de dependências (CVE triage, license review, version pinning, freshness management). Introduzido por story-0074-0003.
+- **`Epic0074DepPolicyValidateSmokeIT`** (27 E2E scenarios): SKILL.md structure, exit codes, enforcement dimensions, RULE-074-01 hard-block, capability frontmatter, dep-audit `--policy` flag, domain model defaults, CI audit script structure, baseline, Rule 32, x-story-implement integration, Rule 24/27 updates, BlockAction values, capabilities index, ADR-0027, declaration template sections, golden profiles.
+
+### [Breaking] — EPIC-0074
+
+> **`x-story-implement` Phase 3 gains a 5th conditional quality gate.** When `dependencies.policy.enabled=true`, `x-dep-policy-validate` is invoked as MANDATORY TOOL CALL (exit code 20 `DEP_POLICY_BLOCK`). The gate runs after the contract gate (D-R11 ordering). Projects with `dependencies.policy.enabled=false` (the default — Rule 19 safe default) are completely unaffected. The `p3Tasks` task tracker map gains a `qualityDepPolicy` entry — implementations that pattern-match on the exact map size will need updating (13 trackers total in Phase 3).
+
+### Highlights — EPIC-0073 (Regression Shell + DAST)
+
+Antes desta release, projetos gerados por `ia-dev-env` podiam declarar testes de regressão e DAST no YAML mas **nenhum gate os executava automaticamente** — as skills `x-test-regression-shell` e `x-pentest-dynamic` existiam como comandos manuais sem integração no lifecycle do `x-story-implement`. DAST era especialmente opaco: precisava de configuração manual de ZAP, sem template de workflow, sem gate em PR, sem nightly separado.
+
+**A partir desta release, dois gaps fechados:**
+
+1. **Regression-shell como Phase 3.Q.0 MANDATORY conditional** — quando `quality.regression.enabled=true`, `x-story-implement` invoca `/x-test-regression-shell --service` como **MANDATORY TOOL CALL** antes dos gates perf/mutation/contract (D-R11 fast-fail: regression primeiro — mais barato e rápido; pesados depois). Exit 19 `REGRESSION_DETECTED` bloqueia o merge imediatamente.
+
+2. **DAST tier dual via CI workflows** — `dast-smoke.yml` executa em cada PR (ZAP passive + Nuclei top-50, upload SARIF para Security tab do GitHub); `dast-full.yml` executa nightly (ZAP active + Nuclei full, outputs `findings-count` e `sarif-artifact-id` consumíveis pela pipeline de release). Ambos são gerados por `ScriptsAssembler` condicionalmente via capabilities `quality.dast.*`. DAST permanece **CI-only** — não em Phase 3 (separação clara: runtime orchestrator vs. infra CI pipeline).
+
+**Dual-mode regression-shell:** `--self` valida o próprio gerador (`ia-dev-env generate` + diff bytewise contra golden snapshot); `--service` executa cenários HTTP/gRPC/CLI/WebSocket em `tests/regression/scenarios.yaml`. O template `scenarios.yaml.template` é gerado com blocos condicionais por interface (rest, grpc, websocket, cli), substituindo `{{PROJECT_NAME}}` e descartando blocos não declarados. Cinco capability families publicadas: `quality.regression.self`, `quality.regression.service`, `quality.dast.zap-passive`, `quality.dast.zap-active`, `quality.dast.nuclei`.
+
+### Added — EPIC-0073 (Regression Shell + DAST)
+
+- **`QualityConfig.RegressionConfig`** + **`QualityConfig.DastConfig`** (domain model, story-0073-0001): `QualityConfig` expandido para 5-param record. `RegressionConfig`: `enabled`, `mode` (self|service), `scenariosFile`. `DastConfig`: `enabled`, `tier` (smoke|full), `target`, `nucleiVersion`. Parsed from `quality.regression` and `quality.dast` YAML blocks.
+- **Skill `x-test-regression-shell`** (conditional, `model: sonnet`, `requires-any: [quality.regression.self, quality.regression.service]`): 3 phases — Parse (mode resolve), Execute (self: diff generator output vs golden; service: run scenarios.yaml), Report (PASS/FAIL per scenario, `regression-report-STORY-ID.md`). Exit codes: `0`=OK, `1`=REGRESSION_DETECTED, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. `--update-baseline` flag for explicit baseline writes.
+- **Skill `x-pentest-dynamic`** (CI-only, `model: sonnet`, `requires-any: [quality.dast.zap-passive, quality.dast.zap-active]`): ZAP + Nuclei DAST skill. Supports smoke tier (ZAP passive + Nuclei top-50) and full tier (ZAP active + all Nuclei). SARIF 2.1.0 output uploaded to GitHub Security tab. Nuclei version pinned (`nucleiVersion` in DastConfig). Exit codes: `0`=OK, `1`=HIGH_SEVERITY_FINDINGS, `2`=OPERATIONAL_ERROR, `3`=PRODUCTION_TARGET_BLOCKED.
+- **`scenarios.yaml.template`** (`shared/templates/scenarios.yaml.template`): main regression scenarios template with 4 block placeholders (`{{INTERFACE_REST_BLOCK}}`, `{{INTERFACE_GRPC_BLOCK}}`, `{{INTERFACE_WEBSOCKET_BLOCK}}`, `{{INTERFACE_CLI_BLOCK}}`). Stack-aware: blocks injected only when the corresponding interface is declared in project YAML.
+- **4 interface block snippets** (`shared/templates/regression/blocks/`): `rest.yaml.snippet` (2 scenarios: rest-health-check, rest-api-root), `grpc.yaml.snippet` (1: grpc-health-check), `socket.yaml.snippet` (1: websocket-connect), `cli.yaml.snippet` (2: cli-help, cli-version with `{{PROJECT_NAME}}` substitution).
+- **`ScriptsAssembler.renderRegressionScenarios()`**: generates `tests/regression/scenarios.yaml` when `quality.regression.enabled=true`. Resolves project name, assembles interface blocks, writes output. Returns `null` (no-op) when disabled.
+- **`dast-smoke.yml.template`** (GitHub Actions PR gate): triggers on `pull_request` to `develop`/`epic/**`; concurrency cancel-in-progress; ZAP passive + Nuclei top-50 + SARIF upload to Security tab + artifact upload (14 days). Generated by `ScriptsAssembler` when `quality.dast.enabled=true`.
+- **`dast-full.yml.template`** (GitHub Actions nightly + workflow_dispatch + workflow_call): cron `02:00 UTC`; ZAP active + Nuclei full; outputs `findings-count` + `sarif-artifact-id`; artifact retention 30 days; optional Slack notification on failure. Generated conditionally.
+- **`audit-regression-shell.sh`** (Camada 2 CI Script, Rule 26): verifies regression-shell executed for `mode=service` projects; evidence detection via `regression-report-*.md` artifact OR telemetry NDJSON; grandfathering via `governance/baselines/regression-shell-baseline.txt`. Exit codes: `0`=OK, `1`=REGRESSION_SHELL_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implements `--self-check`.
+- **`audit-dast-gate.sh`** (Camada 2 CI Script, Rule 26): validates DAST evidence for merged stories + config sanity; blocks `DAST_TARGET_PRODUCTION_FORBIDDEN` and `NUCLEI_VERSION_UNPINNED`; `--check-config-only` flag for config-only validation. Exit codes: `0`=OK, `1`=DAST_GATE_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT. Implements `--self-check`.
+- **`governance/baselines/regression-shell-baseline.txt`** + **`governance/baselines/dast-gate-baseline.txt`**: empty baselines (append-only, immutable after merge).
+- **`x-story-implement` Phase 3.Q extended** (EPIC-0073): `x-test-regression-shell` added as Phase 3.Q.0 gate (regression runs first — cheapest gate); D-R11 fast-fail extended to cover regression failure skipping perf+mutation+contract; telemetry sub-phase `Phase-3-Quality-Regression`; exit code 19 `REGRESSION_DETECTED` added to Error Envelope.
+- **`Epic0073ScenariosTemplateSmokeIT`** (8 E2E scenarios): snippet files exist, template has 4 placeholders, regression disabled returns null, REST/gRPC/CLI/all-interfaces block injection, regression skill with requires-any capabilities.
+- **`Epic0073RegressionDastSmokeIT`** (5 E2E scenarios): Phase 3 regression gate wiring, DAST CI-only boundary, D-R11 regression-first ordering, audit scripts structural contract, regression+DAST skill capabilities.
+
+### [Breaking] — EPIC-0073
+
+> **`x-story-implement` Phase 3 gains a 4th conditional quality gate.** When `quality.regression.enabled=true`, `x-test-regression-shell` is invoked as MANDATORY TOOL CALL (exit code 19 `REGRESSION_DETECTED`). The regression gate runs **before** perf/mutation/contract (D-R11 ordering). Projects with `quality.regression.enabled=false` (the default) are unaffected. The `p3Tasks` task tracker map gains a `qualityRegression` entry — implementations that pattern-match on the exact map size will need updating.
+
+### Highlights — EPIC-0072 (Comprehensive Test Strategy)
+
+Antes desta release, projetos gerados por `ia-dev-env` tinham dois gaps críticos na estratégia de teste: **performance regressions** passavam silenciosamente para produção (nenhum gate de p95/p99 antes do merge), **mutation score** era medido manualmente (sem bloqueio de merge quando mutantes sobreviviam acima de threshold), e **contract breaking changes** podiam entrar em `develop` sem evidência de migration plan no CHANGELOG.
+
+**A partir desta release, os três gates estão codificados como MANDATORY TOOL CALLS no Phase 3 de `x-story-implement`.** A sequência `x-test-performance → x-test-mutation → x-test-contract` segue o padrão D-R11 (fast-fail): a primeira falha cancela as etapas subsequentes, evitando ciclos de CI desnecessários. Cada gate é **condicional** — ativado apenas quando `quality.{performance,mutation,contract}.enabled=true` no YAML do projeto. Projetos existentes sem essa config continuam operando sem mudança (backward compatibility total, Rule 19).
+
+Os três skills são **stack-aware**: `x-test-performance` despacha para Newman (REST), ghz (gRPC), hyperfine (CLI), ou Artillery (GraphQL); `x-test-mutation` despacha para PIT/pitest (Java/Maven), gradle-pitest (Java/Gradle), Stryker (JS/TS), mutmut (Python), ou go-mutesting (Go); `x-test-contract` despacha para openapi-diff (REST/OpenAPI), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), ou schema registry compat (eventos). A configuração de stack no YAML do projeto determina automaticamente qual tooling é invocado — zero configuração extra de CI necessária.
+
+A integração com Rule 24 é completa: os três reports (`perf-report-STORY-ID.md`, `mutation-report-STORY-ID.md`, `contract-report-STORY-ID.md`) são artefatos de evidência mandatórios quando o gate correspondente está ativo. A Camada 3 (`audit-execution-integrity.sh`) verifica sua presença via variáveis de ambiente `QUALITY_*_ENABLED`, mantendo retrocompatibilidade com projetos sem quality config. A Camada 2 é servida por três novos audit scripts: `audit-perf-baseline.sh`, `audit-mutation-score.sh`, `audit-contract-breaking.sh`.
+
+### Added — EPIC-0072 (Comprehensive Test Strategy)
+
+- **Skill `x-test-performance`** (conditional, `model: sonnet`, capabilities `quality.performance.*`): stack-aware performance gate. Reads `QualityConfig.performance` SLOs, dispatches to Newman (REST), ghz (gRPC), hyperfine (CLI), or Artillery (GraphQL). Compares p50/p95/p99 against `governance/baselines/performance-baseline.json`. Exit codes: `0`=SUCCESS, `1`=PERF_REGRESSION_DETECTED, `2`=TOOL_NOT_FOUND, `3`=NO_SLO_DECLARED, `4`=BASELINE_NOT_FOUND, `50`=PERF_DISABLED. `--update-baseline` flag for explicit baseline writes.
+- **Skill `x-test-mutation`** (conditional, `model: sonnet`, capabilities `quality.mutation.*`): stack-aware mutation coverage gate. Dispatches to PIT/pitest (Java/Maven), gradle-pitest (Java/Gradle), Stryker (JS/TS), mutmut (Python), or go-mutesting (Go). Enforces `quality.mutation.threshold` (default 80%) and `runtime-cap-min` cap. Exit codes: `0`=SUCCESS, `1`=MUTATION_SCORE_BELOW_THRESHOLD, `2`=MUTATION_RUNTIME_CAP_EXCEEDED, `3`=TOOL_NOT_FOUND, `4`=MUTATION_CONFIG_INVALID, `50`=MUTATION_DISABLED.
+- **Skill `x-test-contract`** (conditional, `model: sonnet`, capabilities `quality.contract.*`): stack-aware contract breaking-change gate. Dispatches to openapi-diff (REST), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), or schema registry compat (events). CHANGELOG integration: exit 0 when breaking change documented under `## Breaking` or `## BREAKING CHANGE` in CHANGELOG. Exit codes: `0`=SUCCESS, `1`=CONTRACT_BREAKING_CHANGE, `2`=OPERATIONAL_ERROR, `3`=CONTRACT_ARTIFACT_INVALID.
+- **Knowledge Pack `performance-engineering`**: `index.md` + 7 stack-specific docs (performance-rest, performance-grpc, performance-cli, performance-graphql, performance-socket, performance-metrics-guide, load-testing-patterns, profiling-tools-matrix). Provides tooling reference consumed by `x-test-performance`.
+- **`_TEMPLATE-PERFORMANCE-PLAN.md`**: plan template for `quality.performance` SLO declarations (endpoint, stack, p50/p95/p99 targets, baseline tolerance).
+- **`_TEMPLATE-PERFORMANCE-BASELINE.md`**: report template for `governance/baselines/performance-baseline.json` schema documentation.
+- **`_TEMPLATE-MUTATION-PLAN.md`**: plan template for `quality.mutation` configuration (threshold, runtime cap, exclude packages, tool selection).
+- **`_TEMPLATE-CONTRACT-PLAN.md`**: plan template for `quality.contract` configuration (pact opt-in, openapi_breaking, proto_breaking, schema registry).
+- **`audit-perf-baseline.sh`** (Camada 2 CI Script, Rule 26): validates `governance/baselines/performance-baseline.json` schema and detects stale baselines (> N days old). Exit codes: `0`=OK, `1`=`PERF_BASELINE_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`audit-mutation-score.sh`** (Camada 2 CI Script, Rule 26): verifies `mutation-report-STORY-ID.md` artifacts are present and score meets threshold for merged stories with `quality.mutation.enabled=true`. Exit codes: `0`=OK, `1`=`MUTATION_SCORE_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`audit-contract-breaking.sh`** (Camada 2 CI Script, Rule 26): detects contract-report artifacts missing from merged story PRs with `quality.contract.enabled=true`; checks for path-traversal and command-injection in artifact paths. Exit codes: `0`=OK, `1`=`CONTRACT_BREAKING_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check`.
+- **`QualityConfig` record** (domain model): `PerformanceConfig`, `MutationConfig`, `ContractConfig` each with `enabled` boolean and stack-specific parameters. Parsed from project YAML `quality:` block.
+- **`QualityConfigParser`** + **`QualityConfigParserTest`** (11 unit tests): YAML → QualityConfig, including default values, stack-specific SLO parsing, and all 3 gates.
+- **`audit-execution-integrity.sh`** extended: conditional checks via `QUALITY_PERFORMANCE_ENABLED`, `QUALITY_MUTATION_ENABLED`, `QUALITY_CONTRACT_ENABLED` env vars (all default `false` for backward compatibility, Rule 19).
+- **`governance/baselines/performance-baseline.json`**: empty baseline (append-only, immutable schema after merge).
+- **`governance/baselines/mutation-score-baseline.txt`**: empty baseline for stories grandfathered before EPIC-0072.
+- **`governance/baselines/contract-breaking-baseline.txt`**: empty baseline for stories grandfathered before EPIC-0072.
+- **`docs/adr/ADR-0025-comprehensive-test-strategy.md`**: decision record for the 3-gate quality framework, D-R11 fast-fail sequence, backward-compatibility approach, and conditional evidence artifact design.
+- **Rule 05 §Quality Gates extended**: `x-test-performance`, `x-test-mutation`, `x-test-contract` added as conditional gates (EPIC-0072); D-R11 fast-fail sequence documented.
+- **`x-story-implement` Phase 3 §3.Q extended**: 3 new MANDATORY conditional invocations (`x-test-performance`, `x-test-mutation`, `x-test-contract`) with D-R11 fast-fail; 3 telemetry sub-phases (Phase-3-Quality-Perf, Phase-3-Quality-Mutation, Phase-3-Quality-Contract); `--skip-quality` flag added to Recovery block.
+- **`Epic0072TestStrategySmokeIT`** (8 E2E scenarios): stack dispatch, regression blocking, opt-out, CHANGELOG integration, structural invariants across all 3 skills and audit scripts.
+- **`setup-config.java-spring.yaml`** extended: `quality:` YAML block with all 3 gates defaulting to `enabled: false` and documented SLO/threshold parameters.
+
+### [Breaking] — EPIC-0072
+
+> **`x-story-implement` Phase 3 now includes conditional quality gates.** When `quality.{performance,mutation,contract}.enabled=true` in the project YAML, the corresponding skill (`x-test-performance`, `x-test-mutation`, `x-test-contract`) is invoked as a MANDATORY TOOL CALL and its report artifact is required by Rule 24. Projects with `quality.*.enabled=false` (the default) are unaffected. Exit codes `14` (PERF_REGRESSION_DETECTED), `17` (MUTATION_SCORE_BELOW_THRESHOLD), and `18` (CONTRACT_BREAKING_CHANGE) are new in `x-story-implement` Error Envelope — callers must handle them. The `--skip-quality` flag is accepted exclusively inside `## Recovery` blocks.
+
+### Highlights — EPIC-0071 (Documentation as DoD)
+
+Antes desta release, documentação era um artefato opcional no `x-story-implement`: o step existia, sabia gerar README, OpenAPI e ADRs, mas era invocado "se sobrasse tempo". PRs merged sem atualizar doc passavam CI sem fricção. O resultado era um débito documental silencioso — endpoints novos entravam na API sem entrada na OpenAPI spec; ADRs eram referenciados em PRs sem estarem publicados em `docs/adr/`; o CHANGELOG acumulava linhas técnicas como `- expand X interface` sem dizer **o que mudou para o usuário**.
+
+**A partir desta release, a atualização de documentação é um gate bloqueante.** O step `x-doc-validate` (Rule 31 — Documentation Freshness Gate) é invocado como **MANDATORY TOOL CALL** no Phase 3 de `x-story-implement`, antes do verify gate. `--skip-doc` foi removido dos parâmetros regulares e movido para o bloco `## Recovery` (bypass de emergência apenas). Ausência do artefato `doc-validate-report-STORY-ID.md` falha tanto o Stop hook (`verify-story-completion.sh`) quanto o CI audit (`scripts/audit-execution-integrity.sh`).
+
+O gate é **stack-aware**: o alvo de validação é determinado pelo YAML do projeto — `README` é sempre obrigatório; `OpenAPI` é checado quando `interfaces[].spec=openapi`; `asyncapi` quando há broker; `gRPC proto` quando `interfaces[].type=grpc`; `docs/architecture/system.md` é validado quando um componente novo é introduzido e `x-arch-system-update` não foi invocado. ADRs referenciados em `Decision Rationale` de stories v2 precisam ter o arquivo publicado em `docs/adr/`. Skill-docs (frontmatter v3.0 + `## Triggers` + `## Examples`) são validados quando a story modifica um `SKILL.md`.
+
+**O formato do CHANGELOG muda nesta release.** O skill `x-release-changelog` v2 gera um bloco `### Highlights` narrativo no topo de cada entry de versão, lendo o campo "Entrega de Valor" dos épicos v2 (EPIC-0070) merged no range da release. O resultado são releases comunicáveis para stakeholders — não mais um dump bruto de commits, mas uma narrativa de "o que entrou, o que muda para o usuário, quais valores foram entregues". Esta própria entry é o primeiro dogfood do formato: gerada pela lógica do v2 aplicada ao EPIC-0071, self-referencial por design.
+
+O CI script `audit-doc-freshness.sh` (Camada 2, Rule 26) complementa o gate local com verificação post-merge: detecta PRs que tiveram mudanças em código mas não tocaram os documentos esperados (heurísticas: novo `@RestController`/`@GetMapping` → requer update em `openapi.yaml`; nova referência `ADR-XXXX` em epic files → requer publicação em `docs/adr/`; novo pacote Java em `application/` ou `adapter/` → requer update em `system.md`). Baseline vazio em `governance/baselines/doc-freshness-baseline.txt` (imutável após merge do EPIC-0071).
+
+### Added — EPIC-0071 (Documentation as DoD)
+
+- **Capability `governance.doc-as-dod`** declared in `capabilities/governance/doc-as-dod.yaml` (universal — `requires-capabilities: []`). All EPIC-0071 artefacts (skills, rules, hooks, scripts) declare `requires-capabilities: [governance.doc-as-dod]` in their frontmatter (Rule 28).
+- **Rule 31 — Documentation Freshness Gate** + **ADR-0024**: defines the blocking documentation gate enforced at 4 layers — normative (Rule 31), local gate (`x-doc-validate` mandatory in Phase 3), CI (`audit-doc-freshness.sh` exit 1 `DOC_FRESHNESS_VIOLATION`), and observability (`doc-validate-report` artifact). Exception paths: `--skip-doc` in `## Recovery` block only, `hotfix/*` branches (Rule 27 Exception 2), `CLAUDE_RECOVERY_MODE=1`.
+- **Skill `/x-doc-validate`** (public, `model: sonnet`): blocking doc freshness gate with stack-aware targets (README, OpenAPI, asyncapi, gRPC proto, ADRs, skill-docs, system.md). Validated targets determined by project YAML configuration. Exit codes: `0`=OK, `1`=`DOC_FRESHNESS_VIOLATION` (produces report), `2`=`DOC_VALIDATION_ERROR`. Produces mandatory evidence artifact `doc-validate-report-STORY-ID.md`.
+- **Skill `/x-doc-generate` v2** (public, `model: sonnet`): gains `--target-stack-aware` mode (default) that reads project YAML and updates only relevant targets. Integration with `x-arch-system-update` (EPIC-0070) when architectural changes are detected.
+- **Skill `/x-release-changelog` v2**: generates hybrid format — `### Highlights` narrative block (3-8 paragraphs from "Entrega de Valor" of merged epics via EPIC-0070 v2 templates) + standard Keep-a-Changelog sections. Fallback (D-R10): when no EPIC-0070 v2 epics found, exits 0 with empty Highlights + visible WARN `"Highlights manual"`. Version placeholder (D-R12): emits `## [Unreleased]` / `## [vNEXT]`; `x-release` materializes the real version at release time per Rule 08 SemVer.
+- **`audit-doc-freshness.sh`** (Camada 2 CI Script, Rule 26): post-merge gate detecting code changes without corresponding doc updates. 4 heuristics: (1) new `@RestController`/`@GetMapping` → requires `openapi.yaml` update; (2) ADR-XXXX references in epic files → requires `docs/adr/ADR-XXXX-*.md`; (3) SKILL.md change → advisory notice (non-blocking); (4) new Java packages in `application/` or `adapter/` → requires `system.md` update. Auto-skips doc-only and test-only PRs. Exit codes: `0`=OK, `1`=`DOC_FRESHNESS_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT` or `INVALID_EXEMPTION`. Implements `--self-check` and `--pr-body-file` (audit-exempt detection).
+- **`governance/baselines/doc-freshness-baseline.txt`**: empty baseline (immutable after EPIC-0071 merges to develop).
+- **`docs/audit-gates-catalog.md`**: entry added for `audit-doc-freshness.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **`x-story-implement` Phase 3 extended**: step 3.0 added — `x-doc-generate` + `x-doc-validate` as **MANDATORY TOOL CALL** (Rule 24 + Rule 31), executed before the verify gate (step 3.1). Sub-task trackers expanded from 6 to 8 (added `docGenerate` + `docValidate`). Mandatory evidence artifact `doc-validate-report-STORY-ID.md` added to `--expected-artifacts` in final phase gate.
+- **`verify-story-completion.sh`** (Stop hook) extended: checks for `doc-validate-report-STORY-ID.md` after `story-completion-report` check. Missing artifact → `EXECUTION INTEGRITY WARNING` (exit 2).
+- **`audit-bypass-flags.sh` (all 7 stack templates)**: pattern extended to detect `--skip-doc` usage outside `## Recovery` blocks — emits `BYPASS_FLAG_VIOLATION`.
+- **Rule 24 §Mandatory Evidence Artifacts** extended: new row — `x-doc-validate` → `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (Camada 3, EPIC-0071).
+
+### [Breaking] — EPIC-0071
+
+> **`x-story-implement` Phase 3 now requires doc-generate + doc-validate.** Every story that runs through `x-story-implement` Phase 3 must produce `doc-validate-report-STORY-ID.md` as a mandatory evidence artifact (Rule 24). The CI audit (`audit-execution-integrity.sh`) will fail PRs missing this artifact; the Stop hook (`verify-story-completion.sh`) warns at turn-end. Recovery only: `--skip-doc` is accepted exclusively inside a `## Recovery` block of the calling skill — any other usage is blocked by `audit-bypass-flags.sh` (`BYPASS_FLAG_VIOLATION`).
+
+### Added — EPIC-0070 (Value-Driven Templates v2)
+
+- **Capability `governance.value-driven-templates`** — all EPIC-0070 artefacts (skills, scripts, templates) declare `requires-capabilities: [governance.value-driven-templates]` (Rule 28).
+- **v2 template sections** added to `_TEMPLATE-STORY.md` and `_TEMPLATE-EPIC.md`: `## 3. Hipótese & OKRs`, `## Refinement Verdict`. Skills `x-internal-epic-create` and `x-internal-story-create` emit v2 by default; `--legacy-template-v1` flag available with `DEPRECATED` warning (2-release deprecation window, Rule 19).
+- **`_TEMPLATE-ARCHITECTURE-SYSTEM.md`**: new template for `docs/architecture/system.md` with §11 Decision Log section for cross-epic architectural change tracking.
+- **`_TEMPLATE-ADR.md`**: standardised ADR template with v2 problem/hypothesis/value/alternatives structure.
+- **`_TEMPLATE-CAPABILITY.md`**: new template for capability YAML files under `capabilities/`.
+- **Skill `/x-arch-system-update`** (public, `model: sonnet`): incrementally updates `docs/architecture/system.md` after an epic completes — appends to §11 Decision Log (idempotent via `## ID: epic-<ID>` marker) and surgically updates sections 1-10 via SHA-256 hash guard. Errors: `SYSTEM_MD_MISSING`, `EPIC_DIR_MISSING`. Supports `--dry-run`.
+- **Skill `/x-template-migrate`** (public, `model: sonnet`): assists v1→v2 epic document migration with 7-category block classification heuristics, optional `--interactive` per-block confirmation (Rule 20 non-interactive default), atomic Write via `.tmp` swap, `PARSER_ERROR` abort guarantee, `--dry-run` preview mode, recovery state-file at `.claude/state/template-migrate-<epic-id>.json`.
+- **`audit-template-version.sh`** (Camada 2 CI Script, Rule 26): detects epics created after rollout date 2026-04-30 that are still in v1 format without a valid exemption. Exemption paths: `governance/baselines/template-version-baseline.txt`, `audit-exempt` marker, `legacyTemplateV1: true` in execution-state.json. Exit codes: `0`=OK, `1`=`TEMPLATE_VERSION_VIOLATION`, `2`=`OPERATIONAL_ERROR`, `3`=`BASELINE_CORRUPT`. Implements `--self-check` and `--epic <ID>` per Rule 26.
+- **`governance/baselines/template-version-baseline.txt`**: empty baseline (pre-EPIC-0070 epics are discriminated by rollout date in script logic; explicit entries for post-rollout exceptions only — append-only, immutable after EPIC-0070 merges).
+- **`ScriptsAssembler.AUDIT_SCRIPTS`**: `audit-template-version.sh` added (alphabetically between `audit-skill-visibility.sh` and `telemetry-consolidate.sh`).
+- **`docs/audit-gates-catalog.md`**: entry added for `audit-template-version.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **EPIC-0056 `## ⛔ SUPERSEDED`**: `epic-0056.md` marked superseded by EPIC-0070 (history preserved, file not deleted).
+- **Tests**: `Epic0070ValueTemplatesSmokeIT` (6 E2E scenarios), `PlanSkillsV2TemplateDefaultTest` (8 tests), `ArchSystemUpdateSkillTest` (8 tests), `TemplateMigrateSkillTest` (9 tests).
+
+### [Breaking] — EPIC-0070
+
+> **Template format changed for new epics/stories.** `x-internal-epic-create` and `x-internal-story-create` now emit v2 by default. Use `--legacy-template-v1` (with `DEPRECATED` warning) to produce v1 format; this flag will be removed in 2 releases. The `audit-template-version.sh` CI script will fail PRs introducing v1-format epics after 2026-04-30 without an exemption.
+
+### Added — EPIC-0069 (Story Refinement & DoR Gate)
+
+- **Capability `governance.refinement-gate`** declared in `capabilities/governance/refinement-gate.yaml` (universal — no stack-specific `requires-capabilities`). All EPIC-0069 artefacts (skills, hooks, scripts, KP) declare `requires-capabilities: [governance.refinement-gate]` in their frontmatter (Rule 28).
+- **Rule 29 — Refinement Gate** + **ADR-0022**: define the blocking refinement gate that bars `x-story-implement`, `x-epic-implement`, `x-task-implement`, and `x-epic-orchestrate` until the target's `refinementVerdict.status == "approved"`. Exception paths: `CLAUDE_RECOVERY_MODE=1` (Rule 27), `hotfix/*` branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19 legacy fallback).
+- **Skill `/x-story-refine`** (multi-persona 4-phase dispatcher): Phase A parallel persona analysis (Product Owner, Tech Lead, Architect, Security, QA, conditional Performance/SRE), Phase B single consolidated batch of questions, Phase C parallel refinement with answers, Phase D consolidation by Architect. Produces `## Refinement Verdict` block on the story markdown + `refinementVerdict` entry in `execution-state.json`.
+- **Skill `/x-epic-refine`** — analogous dispatcher for epics (problem, persona, value hypothesis, OKRs, alternatives, risks, scope/out-of-scope), with conditional SRE/DevOps persona gated on `infra.*` / `runtime.*` capabilities.
+- **`RefinementVerdict` domain model** + **`governance/schemas/execution-state-1.0.json`**: typed record (`status`, `scope`, `checkedAt`, `dimensions`, `blockers`, `verdictHash`) with absent() sentinel for Rule 19 fallback (status=tbd). Extended `ExecutionState` with `refinementVerdict` field + `effectiveRefinementVerdict()`.
+- **`_TEMPLATE-REFINEMENT-VERDICT.md`** + status `Refinada` added to `_TEMPLATE-STORY.md` / `_TEMPLATE-EPIC.md` (Rule 29 transitions: `Pendente → Refinada → Planejada`).
+- **PreToolUse hook `enforce-refinement-gate.sh`** (Camada 0): blocks orchestrator invocations with exit `33` `REFINEMENT_REQUIRED` when target verdict is not approved. PT-BR error message. Fail-open contract on jq absent / malformed input. Resolves `execution-state.json` via v3 + v4 layout probing. Registered in `settings.json` PreToolUse via `HooksAssembler.RULE_69_SCRIPTS`.
+- **CI script `audit-refinement-gate.sh`** (Camada 2 — Rule 26): post-merge audit verifying every implemented story/epic has `refinementVerdict.status="approved"` or is covered by a valid exception (hotfix, baseline, audit-exempt marker, flowVersion=1). Detects state↔markdown divergence via `verdictHash` (sha256 of the `## Refinement Verdict` block). Modes: `--self-check`, `--since <ref>`, `--story <id>`, default. Exit codes 0/1/2/3/4 per Rule 26 §Standardized.
+- **`governance/baselines/refinement-gate-baseline.txt`**: empty + immutable post-EPIC-0069 (new entries forbidden — use the hotfix exception path instead).
+- **`docs/audit-gates-catalog.md`**: entries added for both `enforce-refinement-gate.sh` (Camada 0) and `audit-refinement-gate.sh` (Camada 2) per Rule 26 §Catalog-before-Add (RULE-004).
+- **Tests**: `Epic0069RefinementGateSmokeIT` (8 E2E scenarios — Java), `enforce_refinement_gate_test.sh` (8 scenarios — bash), `audit_refinement_gate_test.sh` (7 scenarios — bash), `RefinementVerdictTest` (12 unit tests), `ExecutionStateRefinementTest` (18 unit tests).
+
+### Highlights — EPIC-0069
+
+> **Histórias e épicos deixam de chegar mal-definidos a `x-story-implement` e `x-epic-implement`.** O gate de refinamento (Rule 29) é bloqueante em quatro camadas — normativa (a própria Rule 29 + bloco "REFINEMENT GATE — INEGOCIÁVEL" em CLAUDE.md), preventiva local (PreToolUse hook `enforce-refinement-gate.sh`, exit `33`), CI (`audit-refinement-gate.sh`, exit `1`), e detecção pós-merge via `verdictHash`. Operadores rodam `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes de implementar; persona-agents paralelos (PO, Tech Lead, Architect, Security, QA, condicionais Perf/SRE) aplicam silenciosamente seus NO-GOs e consolidam um único batch de perguntas para o operador. O resultado: AC com 4 categorias obrigatórias (happy/erro/perf/sec), contratos tipados, métricas mensuráveis, alternativas consideradas e riscos identificados — antes do TDD começar.
+
+
 ## [5.1.0] - 2026-04-30
 
 ### Added — EPIC-0068 (Continuous-Flow Heartbeat Hook)
