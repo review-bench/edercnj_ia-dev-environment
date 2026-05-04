@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # audit-pr-fix-diff.sh — Camada 0 — EPIC-0063 story-0063-0021
 #
-# Validates that an x-pr-fix iteration produced real, on-target diff before
+# Validates that an x-fix-pr iteration produced real, on-target diff before
 # allowing re-review. Prevents "LLM finge fix" loop where attempts terminate
 # without actual file changes but trigger re-review with same NO-GO.
 #

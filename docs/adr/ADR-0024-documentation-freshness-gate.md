@@ -10,7 +10,7 @@
 
 ## Context
 
-Documentation in this project accumulated silent drift: README sections became stale, OpenAPI specs missed new endpoints, ADR references in story markdown pointed to unpublished files, and skill-docs lost `## Triggers` / `## Examples` as skills evolved. The root cause was structural — `x-doc-generate` was invoked as an optional step ("if time permits") in Phase 3 of `x-story-implement`, and no CI gate checked freshness. Without a blocking gate, the rational behavior for contributors is to skip documentation under time pressure.
+Documentation in this project accumulated silent drift: README sections became stale, OpenAPI specs missed new endpoints, ADR references in story markdown pointed to unpublished files, and skill-docs lost `## Triggers` / `## Examples` as skills evolved. The root cause was structural — `x-generate-docs` was invoked as an optional step ("if time permits") in Phase 3 of `x-implement-story`, and no CI gate checked freshness. Without a blocking gate, the rational behavior for contributors is to skip documentation under time pressure.
 
 This mirrors the pre-TDD era: tests were optional until a gate made them the path of least resistance.
 
@@ -19,7 +19,7 @@ This mirrors the pre-TDD era: tests were optional until a gate made them the pat
 **Documentation updates are a blocking gate in the story lifecycle (Documentation as DoD).**
 
 Specifically:
-1. `x-doc-generate` and `x-doc-validate` are promoted to **MANDATORY TOOL CALLS** (Rule 24) in Phase 3 of `x-story-implement`. The `--skip-doc` flag is removed from the happy-path; it is only accessible inside `## Recovery` blocks.
+1. `x-generate-docs` and `x-validate-docs` are promoted to **MANDATORY TOOL CALLS** (Rule 24) in Phase 3 of `x-implement-story`. The `--skip-doc` flag is removed from the happy-path; it is only accessible inside `## Recovery` blocks.
 2. `audit-doc-freshness.sh` is introduced as a Camada 2 CI gate (Rule 26) running on every PR to `develop` or `epic/*`.
 3. `DocumentationConfig.java` + `documentation.targets` YAML block allow per-project configuration of which targets are enforced and with what grace period.
 4. Auto-detection derives effective targets from `interfaces[]` declarations when the YAML block is absent — no configuration required for the common case.
@@ -44,11 +44,11 @@ The only overlap is the `system.md` target (Rule 30 defines it; Rule 31 enforces
 
 **Positive:**
 - Documentation debt accumulation stops by design — contributors cannot merge code changes without a corresponding doc update (or explicit recovery-mode bypass).
-- `x-doc-generate` v2 generates documentation in one step; `x-doc-validate` verifies it; contributors do not need to remember which docs to update.
+- `x-generate-docs` v2 generates documentation in one step; `x-validate-docs` verifies it; contributors do not need to remember which docs to update.
 - Stack-aware auto-detection means zero configuration required for most projects.
 
 **Negative:**
-- PRs touching many files will require more discipline — first run `x-doc-generate`, then validate.
+- PRs touching many files will require more discipline — first run `x-generate-docs`, then validate.
 - Legacy stories pre-EPIC-0071 are grandfathered via `governance/baselines/doc-freshness-baseline.txt` (introduced in story-0071-0005).
 
 ## Alternatives Considered

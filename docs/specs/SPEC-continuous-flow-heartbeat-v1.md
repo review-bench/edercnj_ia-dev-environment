@@ -28,7 +28,7 @@ Em 2026-04-28 durante execução de EPIC-0061 story-0061-0001, o LLM emitiu `Tas
 | :--- | :--- | :--- |
 | Rule 13/24 normativo + CLAUDE.md | "skill inlined em prosa" | "LLM emitiu prosa esperando confirmação" |
 | `verify-story-completion.sh` (Stop hook) | falta de evidência ao final | falta de progresso mid-execução |
-| `enforce-preflight-gates.sh` (PreToolUse, 0063-0004/0013) | bypass em `git push` / `gh pr create` / `Skill x-pr-create` | LLM que não chega a emitir tool call algum |
+| `enforce-preflight-gates.sh` (PreToolUse, 0063-0004/0013) | bypass em `git push` / `gh pr create` / `Skill x-create-pr` | LLM que não chega a emitir tool call algum |
 | `audit-tool-call-grammar.sh` (Rule 28, 0063-0012) | `[required]` ausente em NDJSON pós-merge | detecção em tempo real durante execução |
 | `enforce-phase-sequence.sh` (Rule 25 PreToolUse) | invocação fora de ordem | ausência de invocação |
 | `verify-phase-gates.sh` (Rule 25 Stop hook) | gate não chamado ao final da fase | LLM travado entre invocações dentro de uma fase |
@@ -87,13 +87,13 @@ Total: ~2.5 dias.
 
 - Reescrever os 8 orquestradores para subagent-per-phase (analisado e rejeitado — alto custo, risco de regressão).
 - Auto-retry quando NUDGE não destrava (LLM ainda preso após nudge): caso recovery_mode tradicional.
-- Telemetria de "tempo morto" (gap entre eventos): pode ser feature do `/x-telemetry-analyze` em outro escopo.
+- Telemetria de "tempo morto" (gap entre eventos): pode ser feature do `/x-analyze-telemetry` em outro escopo.
 
 ### Acceptance criteria
 
 ```gherkin
 Cenario: NUDGE em fase aberta sem progresso
-  DADO orchestrator x-story-implement com interactiveMode=non-interactive
+  DADO orchestrator x-implement-story com interactiveMode=non-interactive
   E taskTracking.openTasks=[14, 15] (sub-fase 3.1 e 3.2 abertas)
   E último evento NDJSON é tool.result de TaskUpdate(14, completed)
   QUANDO Stop hook dispara
@@ -102,20 +102,20 @@ Cenario: NUDGE em fase aberta sem progresso
   E stderr nomeia "x-review-pr" como next mandatory call
 
 Cenario: sem NUDGE em modo interactive
-  DADO orchestrator x-story-implement com interactiveMode=interactive
+  DADO orchestrator x-implement-story com interactiveMode=interactive
   E mesmas open tasks
   QUANDO Stop hook dispara
   ENTÃO exit 0
   E stderr vazio
 
 Cenario: sem NUDGE quando há finding HIGH pendente
-  DADO orchestrator x-story-implement non-interactive
+  DADO orchestrator x-implement-story non-interactive
   E último evento NDJSON é finding.high
   QUANDO Stop hook dispara
   ENTÃO exit 0 — pausa legítima para decisão humana
 
 Cenario: sem NUDGE quando todas as tarefas estão completas
-  DADO orchestrator x-story-implement non-interactive
+  DADO orchestrator x-implement-story non-interactive
   E taskTracking.openTasks=[]
   QUANDO Stop hook dispara
   ENTÃO exit 0 — fluxo natural de fim de orchestrator

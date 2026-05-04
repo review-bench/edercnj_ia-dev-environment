@@ -25,8 +25,8 @@ Introduce an AI Memory Layer with the following components:
 
 1. **`ai/memory/` directory** — flat set of `epic-XXXX-summary.md` files + `_index.yaml` manifest.
 2. **`_TEMPLATE-EPIC-MEMORY-SUMMARY.md`** — frontmatter v3.0 schema (tags, capabilities-affected, rules-affected, patterns-introduced, antipatterns-rejected) + structured body sections (why, hypothesis, decisions, alternatives, patterns, anti-patterns, links). Cap: ≤ 200 lines.
-3. **`x-internal-epic-summary`** (model: `haiku`, deterministic) — reads epic v2 documents + story files + ADRs + completion reports; extracts structured sections; writes summary + updates `_index.yaml`. Invoked **MANDATORY** at Phase 5 of `x-epic-implement` when `governance.ai-memory` is active.
-4. **`x-memory-search`** (user-invocable, model: `haiku`) — retrieval via 5 modes: `--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`. Implementation: grep + frontmatter parse; no RAG/vector DB needed at current volume.
+3. **`x-internal-summarize-epic`** (model: `haiku`, deterministic) — reads epic v2 documents + story files + ADRs + completion reports; extracts structured sections; writes summary + updates `_index.yaml`. Invoked **MANDATORY** at Phase 5 of `x-implement-epic` when `governance.ai-memory` is active.
+4. **`x-search-memory`** (user-invocable, model: `haiku`) — retrieval via 5 modes: `--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`. Implementation: grep + frontmatter parse; no RAG/vector DB needed at current volume.
 5. **Rule 33** — mandates production, defines contracts, enforcement matrix.
 6. **`audit-memory-coverage.sh`** — Camada 2 CI gate that fails when a completed epic lacks its summary.
 
@@ -55,7 +55,7 @@ Introduce an AI Memory Layer with the following components:
 ## Consequences
 
 ### Positive
-- Strategic decisions recoverable in seconds via `/x-memory-search`.
+- Strategic decisions recoverable in seconds via `/x-search-memory`.
 - New LLM sessions gain historical context without re-reading all epics.
 - Onboarding: reading `ai/memory/_index.yaml` + last 5 summaries ≈ 1h for strategic panorama.
 - Memory grows automatically with each completed epic (Phase 5 gate).

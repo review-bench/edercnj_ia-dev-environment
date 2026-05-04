@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Validates that x-story-implement and x-task-implement SKILL.md files contain balanced
+ * Validates that x-implement-story and x-implement-task SKILL.md files contain balanced
  * phase.start/phase.end markers for every numbered phase (static inspection).
  *
  * <p>Complements TelemetryMarkerLint: the lint detects DUPLICATE/DANGLING/UNCLOSED; this test
  * detects ABSENT markers per numbered phase (the gap the lint misses).
  *
- * <p>TPP order: degenerate (0 phases) → happy x-story-implement → happy x-task-implement → boundary
+ * <p>TPP order: degenerate (0 phases) → happy x-implement-story → happy x-implement-task → boundary
  * (error phase has failed status doc).
  */
 @DisplayName("PhaseMarkerEmissionTest")
@@ -30,9 +30,9 @@ class PhaseMarkerEmissionTest {
 
     private static final String SKILLS_ROOT = "src/main/resources/targets/claude/skills/core/dev/";
 
-    private static final Path X_STORY = Path.of(SKILLS_ROOT + "x-story-implement/SKILL.md");
+    private static final Path X_STORY = Path.of(SKILLS_ROOT + "x-implement-story/SKILL.md");
 
-    private static final Path X_TASK = Path.of(SKILLS_ROOT + "x-task-implement/SKILL.md");
+    private static final Path X_TASK = Path.of(SKILLS_ROOT + "x-implement-task/SKILL.md");
 
     private static final Pattern PHASE_HEADER = Pattern.compile("^## Phase (\\d+)[^\\d]");
     private static final Pattern PHASE_START =
@@ -61,19 +61,19 @@ class PhaseMarkerEmissionTest {
     }
 
     @Nested
-    @DisplayName("happy path — x-story-implement")
+    @DisplayName("happy path — x-implement-story")
     class XStoryImplement {
 
         @Test
         @DisplayName("every numbered phase has balanced phase.start/phase.end markers")
         void xStoryImplement_hasBalancedMarkersPerPhase() throws IOException {
-            assertThat(X_STORY).as("x-story-implement/SKILL.md must exist").exists();
+            assertThat(X_STORY).as("x-implement-story/SKILL.md must exist").exists();
 
             List<String> lines = Files.readAllLines(X_STORY, StandardCharsets.UTF_8);
             List<Integer> numberedPhases = extractNumberedPhasesFromLines(lines);
 
             assertThat(numberedPhases)
-                    .as("x-story-implement should have at least 3 numbered phases")
+                    .as("x-implement-story should have at least 3 numbered phases")
                     .hasSizeGreaterThanOrEqualTo(3);
 
             List<String> starts = extractMarkers(lines, PHASE_START);
@@ -92,19 +92,19 @@ class PhaseMarkerEmissionTest {
     }
 
     @Nested
-    @DisplayName("happy path — x-task-implement")
+    @DisplayName("happy path — x-implement-task")
     class XTaskImplement {
 
         @Test
         @DisplayName("every numbered phase has balanced phase.start/phase.end markers")
         void xTaskImplement_hasBalancedMarkersPerPhase() throws IOException {
-            assertThat(X_TASK).as("x-task-implement/SKILL.md must exist").exists();
+            assertThat(X_TASK).as("x-implement-task/SKILL.md must exist").exists();
 
             List<String> lines = Files.readAllLines(X_TASK, StandardCharsets.UTF_8);
             List<Integer> numberedPhases = extractNumberedPhasesFromLines(lines);
 
             assertThat(numberedPhases)
-                    .as("x-task-implement should have at least 4 numbered phases")
+                    .as("x-implement-task should have at least 4 numbered phases")
                     .hasSizeGreaterThanOrEqualTo(4);
 
             List<String> starts = extractMarkers(lines, PHASE_START);
@@ -127,7 +127,7 @@ class PhaseMarkerEmissionTest {
     class ErrorPhase {
 
         @Test
-        @DisplayName("x-story-implement contains phase.end with status=failed or error doc")
+        @DisplayName("x-implement-story contains phase.end with status=failed or error doc")
         void phaseWithError_emitsPhaseEndWithStatusFailed() throws IOException {
             assertThat(X_STORY).exists();
 
@@ -145,7 +145,7 @@ class PhaseMarkerEmissionTest {
 
             assertThat(hasFailedEnd || hasErrorDoc)
                     .as(
-                            "x-story-implement must document error phase-end (status=failed or"
+                            "x-implement-story must document error phase-end (status=failed or"
                                     + " equivalent)")
                     .isTrue();
         }

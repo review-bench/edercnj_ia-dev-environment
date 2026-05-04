@@ -33,5 +33,5 @@ Validates and configures the local development environment by detecting the proj
 
 ## See Also
 
-- [x-ops-troubleshoot](../x-ops-troubleshoot/) -- Diagnoses build failures and environment issues
-- [x-mcp-recommend](../x-mcp-recommend/) -- Recommends MCP servers to enhance the development environment
+- [x-troubleshoot-operations](../x-troubleshoot-operations/) -- Diagnoses build failures and environment issues
+- [x-recommend-mcp](../x-recommend-mcp/) -- Recommends MCP servers to enhance the development environment

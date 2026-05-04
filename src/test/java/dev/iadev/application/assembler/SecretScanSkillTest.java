@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0006: Secret Scanner (x-security-secrets).
+ * Tests for story-0022-0006: Secret Scanner (x-scan-secrets).
  *
  * <p>Validates the conditional SKILL.md template is generated when {@code
  * security.scanning.secretScan = true}, contains all required sections per security-skill-template,
  * and covers all 8 secret categories.
  */
-@DisplayName("Secret Scanner (x-security-secrets)")
+@DisplayName("Secret Scanner (x-scan-secrets)")
 class SecretScanSkillTest {
 
     @Nested
@@ -30,7 +30,7 @@ class SecretScanSkillTest {
     class ConditionalGeneration {
 
         @Test
-        @DisplayName("secretScan enabled generates" + " x-security-secrets SKILL.md")
+        @DisplayName("secretScan enabled generates" + " x-scan-secrets SKILL.md")
         void assemble_secretScanEnabled_generatesSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -40,12 +40,12 @@ class SecretScanSkillTest {
                             .build();
             new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
 
-            Path skill = outputDir.resolve("skills/x-security-secrets/SKILL.md");
+            Path skill = outputDir.resolve("skills/x-scan-secrets/SKILL.md");
             assertThat(skill).exists();
         }
 
         @Test
-        @DisplayName("secretScan disabled does not generate" + " x-security-secrets SKILL.md")
+        @DisplayName("secretScan disabled does not generate" + " x-scan-secrets SKILL.md")
         void assemble_secretScanDisabled_noSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -55,12 +55,12 @@ class SecretScanSkillTest {
                             .build();
             new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
 
-            Path skill = outputDir.resolve("skills/x-security-secrets/SKILL.md");
+            Path skill = outputDir.resolve("skills/x-scan-secrets/SKILL.md");
             assertThat(skill).doesNotExist();
         }
 
         @Test
-        @DisplayName("selectConditionalSkills includes" + " x-security-secrets when flag enabled")
+        @DisplayName("selectConditionalSkills includes" + " x-scan-secrets when flag enabled")
         void select_secretScanEnabled_includesSkill() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -69,11 +69,11 @@ class SecretScanSkillTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).contains("x-security-secrets");
+            assertThat(skills).contains("x-scan-secrets");
         }
 
         @Test
-        @DisplayName("selectConditionalSkills excludes" + " x-security-secrets when flag disabled")
+        @DisplayName("selectConditionalSkills excludes" + " x-scan-secrets when flag disabled")
         void select_secretScanDisabled_excludesSkill() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -82,7 +82,7 @@ class SecretScanSkillTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).doesNotContain("x-security-secrets");
+            assertThat(skills).doesNotContain("x-scan-secrets");
         }
     }
 
@@ -91,10 +91,10 @@ class SecretScanSkillTest {
     class Frontmatter {
 
         @Test
-        @DisplayName("contains name x-security-secrets")
+        @DisplayName("contains name x-scan-secrets")
         void content_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateAndRead(tempDir);
-            assertThat(content).contains("name: x-security-secrets");
+            assertThat(content).contains("name: x-scan-secrets");
         }
 
         @Test
@@ -482,6 +482,6 @@ class SecretScanSkillTest {
                 TestConfigBuilder.builder().scanningFlags(false, false, true, false, false).build();
         new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve("skills/x-security-secrets/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-scan-secrets/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

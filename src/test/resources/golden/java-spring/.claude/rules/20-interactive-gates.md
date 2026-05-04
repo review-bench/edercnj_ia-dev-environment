@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Orchestrating skills (`x-release`, `x-story-implement`, `x-epic-implement`, `x-review-pr`)
+Orchestrating skills (`x-release`, `x-implement-story`, `x-implement-epic`, `x-review-pr`)
 expose decision gates at critical lifecycle points (post-review, post-integrity-check,
 pre-merge). A gate presents a 3-option menu (PROCEED / FIX-PR / ABORT) and routes the
 operator's choice back into the orchestrator's flow.
@@ -34,13 +34,13 @@ where no human is waiting to answer a prompt.
 ┌─ Gate: <phase name> ───────────────────────────────────┐
 │                                                         │
 │  [1] PROCEED — merge/continue                          │
-│  [2] FIX-PR  — invoke x-pr-fix / x-pr-fix-epic        │
+│  [2] FIX-PR  — invoke x-fix-pr / x-fix-epic-pr        │
 │  [3] ABORT   — stop and preserve state                 │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-- FIX-PR slot invokes `x-pr-fix` (single PR) or `x-pr-fix-epic` (epic batch) via Rule 13 INLINE-SKILL.
+- FIX-PR slot invokes `x-fix-pr` (single PR) or `x-fix-epic-pr` (epic batch) via Rule 13 INLINE-SKILL.
 - After a fix cycle the menu loops back (max 3 consecutive FIX-PR cycles — `GATE_FIX_LOOP_EXCEEDED`).
 - `--non-interactive` behavior now equals no-flag behavior: proceed automatically.
 
@@ -56,14 +56,14 @@ where no human is waiting to answer a prompt.
 
 | Skill | Gate location |
 | :--- | :--- |
-| `x-epic-implement` | Phase 5 (final PR epic/XXXX → develop) |
-| `x-story-implement` | Phase 2 (story-level PR after tasks) |
+| `x-implement-epic` | Phase 5 (final PR epic/XXXX → develop) |
+| `x-implement-story` | Phase 2 (story-level PR after tasks) |
 | `x-release` | Step 8 (release PR approval) |
 | `x-review-pr` | After Tech-Lead GO/NO-GO verdict |
 
 ## Working-Tree Guard Integration
 
-`x-internal-worktree-precheck` (EPIC-0061, RULE-010) provides a deterministic exit
+`x-internal-precheck-worktree` (EPIC-0061, RULE-010) provides a deterministic exit
 code (`WORKTREE_AMBIGUOUS=15`) when the working tree is in an ambiguous state. In
 non-interactive mode (default), orchestrators dispatch on this exit code and fail fast
 instead of prompting. Use `--allow-dirty` to bypass in exceptional circumstances.

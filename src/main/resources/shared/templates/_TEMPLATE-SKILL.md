@@ -51,15 +51,15 @@ argument-hint: "{{ARGUMENT_HINT}}"
 When this skill is part of the Feature Creation Chain, document its position:
 
 ```
-x-feature-ideate  ──→  spec.md + PR docs/feature-<slug> → develop  (manual gate)
-x-feature-create  ──→  epic + stories + map + PR docs/<id>-<slug> → epic/XXXX  (auto-merge)
-x-epic-orchestrate ──→  planning multi-agent for each story (Phase 1 artifacts)
+x-ideate-feature  ──→  spec.md + PR docs/feature-<slug> → develop  (manual gate)
+x-create-feature  ──→  epic + stories + map + PR docs/<id>-<slug> → epic/XXXX  (auto-merge)
+x-orchestrate-epic ──→  planning multi-agent for each story (Phase 1 artifacts)
 ```
 
 Example caller invocation (Rule 13 INLINE-SKILL pattern):
 
 ```markdown
-Skill(skill: "x-feature-create", model: "sonnet", args: "docs/specs/SPEC-csv-export-v1.md --epic-id 0066")
+Skill(skill: "x-create-feature", model: "sonnet", args: "docs/specs/SPEC-csv-export-v1.md --epic-id 0066")
 ```
 
 ## Telemetry (Optional)
@@ -114,4 +114,4 @@ reflects the real outcome. Do NOT omit the status argument — the `*end`
 helpers default to `ok` only as a last-resort fail-open.
 
 Reference: `.claude/rules/13-skill-invocation-protocol.md` (section "Telemetry Markers").
-Canonical example: `x-story-implement` (see its phase markers for a working reference).
+Canonical example: `x-implement-story` (see its phase markers for a working reference).

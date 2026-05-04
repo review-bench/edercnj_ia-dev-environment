@@ -33,17 +33,17 @@ class Rule24EvidenceTableExpansionTest extends SmokeTestBase {
 
     private static final List<String> EXPECTED_SUBSKILLS =
             List.of(
-                    "x-internal-story-verify",
-                    "x-review",
+                    "x-internal-verify-story",
+                    "x-review-codebase",
                     "x-review-pr",
-                    "x-internal-story-report",
-                    "x-arch-plan",
-                    "x-pr-watch-ci",
-                    "x-pr-create",
-                    "x-test-tdd",
-                    "x-git-commit",
-                    "x-dependency-audit",
-                    "x-threat-model");
+                    "x-internal-write-story-report",
+                    "x-plan-architecture",
+                    "x-watch-pr-ci",
+                    "x-create-pr",
+                    "x-drive-tdd",
+                    "x-commit-changes",
+                    "x-audit-dependencies",
+                    "x-model-threats");
 
     private static final String TABLE_HEADER = "| Sub-skill | Artifact path | Enforced by |";
 

@@ -23,17 +23,17 @@ class Epic0059TrailerInjectionTest {
 
     private static final String CANONICAL_SKILL_PATH =
             "src/main/resources/targets/claude/skills/core/"
-                    + "internal/ops/x-internal-status-update/SKILL.md";
+                    + "internal/ops/x-internal-update-status/SKILL.md";
 
     @Test
     @DisplayName(
             "trailerInjection_skillMdDocumentsCanonicalFormat — "
-                    + "x-internal-status-update SKILL.md must contain "
+                    + "x-internal-update-status SKILL.md must contain "
                     + "the canonical Co-Authored-By trailer format "
                     + "(story-0059-0004 TASK-002 acceptance criterion)")
     void trailerInjection_skillMdDocumentsCanonicalFormat() throws IOException {
         Path skillMd = resolveRepoRoot().resolve(CANONICAL_SKILL_PATH);
-        assertThat(skillMd).as("x-internal-status-update SKILL.md must exist").isRegularFile();
+        assertThat(skillMd).as("x-internal-update-status SKILL.md must exist").isRegularFile();
 
         String content = Files.readString(skillMd, StandardCharsets.UTF_8);
 
@@ -45,7 +45,7 @@ class Epic0059TrailerInjectionTest {
 
         assertThat(content)
                 .as("SKILL.md must document canonical " + "Co-Authored-By trailer format")
-                .contains("Co-Authored-By: x-internal-status-update@");
+                .contains("Co-Authored-By: x-internal-update-status@");
 
         assertThat(content)
                 .as("SKILL.md must document git rev-parse HEAD " + "for SHA capture")

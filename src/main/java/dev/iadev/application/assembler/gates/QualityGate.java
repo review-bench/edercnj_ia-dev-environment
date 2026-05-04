@@ -7,8 +7,8 @@ import java.util.List;
 /**
  * Contributes quality-gate skills based on {@code quality.*} config (EPIC-0072).
  *
- * <p>Adds {@code x-test-performance} when {@code quality.performance.enabled=true}, {@code
- * x-test-mutation} when {@code quality.mutation.enabled=true}, and {@code x-test-contract} when
+ * <p>Adds {@code x-execute-performance-tests} when {@code quality.performance.enabled=true}, {@code
+ * x-execute-mutation-tests} when {@code quality.mutation.enabled=true}, and {@code x-execute-contract-tests} when
  * {@code quality.contract.enabled=true} (EPIC-0072).
  */
 public final class QualityGate implements SkillGateEvaluator {
@@ -17,13 +17,13 @@ public final class QualityGate implements SkillGateEvaluator {
     public List<String> evaluate(ProjectConfig config) {
         List<String> skills = new ArrayList<>();
         if (config.quality().performance().enabled()) {
-            skills.add("x-test-performance");
+            skills.add("x-execute-performance-tests");
         }
         if (config.quality().mutation().enabled()) {
-            skills.add("x-test-mutation");
+            skills.add("x-execute-mutation-tests");
         }
         if (config.quality().contract().enabled()) {
-            skills.add("x-test-contract");
+            skills.add("x-execute-contract-tests");
         }
         return skills;
     }

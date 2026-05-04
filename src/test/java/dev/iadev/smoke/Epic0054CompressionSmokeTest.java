@@ -17,8 +17,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <p>Validates the slim-rewrite contract for orchestrator skills: each SKILL.md body must be ≤ 500
  * lines (hard ADR-0012 limit) with a non-empty {@code references/full-protocol.md} sibling.
  * Assertions grow incrementally as stories are merged: story-0054-0001 covers PR-domain
- * (x-pr-fix-epic, x-pr-merge-train); story-0054-0002 covers medium orchestrators (x-task-implement,
- * x-security-pipeline, x-git-worktree); story-0054-0003 covers x-story-plan; story-0054-0004 covers
+ * (x-fix-epic-pr, x-manage-pr-merge-train); story-0054-0002 covers medium orchestrators (x-implement-task,
+ * x-generate-security-pipeline, x-manage-worktrees); story-0054-0003 covers x-plan-story; story-0054-0004 covers
  * XL orchestrators (x-epic-implement, x-release).
  *
  * @see Epic0047CompressionSmokeTest
@@ -44,24 +44,24 @@ class Epic0054CompressionSmokeTest extends SmokeTestBase {
                     "## Full Protocol");
 
     /**
-     * PR-domain skills from story-0054-0001. x-pr-fix-epic: 1297 → ≤ 250 lines x-pr-merge-train:
+     * PR-domain skills from story-0054-0001. x-fix-epic-pr: 1297 → ≤ 250 lines x-manage-pr-merge-train:
      * 873 → ≤ 250 lines
      */
     private static final List<String> STORY_0001_PR_DOMAIN_SKILLS =
-            List.of("x-pr-fix-epic", "x-pr-merge-train");
+            List.of("x-fix-epic-pr", "x-manage-pr-merge-train");
 
     /**
-     * Medium orchestrator skills from story-0054-0002. x-task-implement: 824 → ≤ 250 lines
-     * x-security-pipeline: 576 → ≤ 250 lines x-git-worktree: 569 → ≤ 250 lines
+     * Medium orchestrator skills from story-0054-0002. x-implement-task: 824 → ≤ 250 lines
+     * x-generate-security-pipeline: 576 → ≤ 250 lines x-manage-worktrees: 569 → ≤ 250 lines
      */
     private static final List<String> STORY_0002_MEDIUM_SKILLS =
-            List.of("x-task-implement", "x-security-pipeline", "x-git-worktree");
+            List.of("x-implement-task", "x-generate-security-pipeline", "x-manage-worktrees");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
             "smoke_prDomainSkillsSlimWithFullProtocol — "
-                    + "x-pr-fix-epic and x-pr-merge-train have "
+                    + "x-fix-epic-pr and x-manage-pr-merge-train have "
                     + "SKILL.md ≤ 500 lines, all 5 canonical headers, "
                     + "and a non-empty references/full-protocol.md "
                     + "(story-0054-0001 ADR-0012 invariant)")
@@ -115,7 +115,7 @@ class Epic0054CompressionSmokeTest extends SmokeTestBase {
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
             "smoke_mediumSkillsSlimWithFullProtocol — "
-                    + "x-task-implement, x-security-pipeline, and x-git-worktree "
+                    + "x-implement-task, x-generate-security-pipeline, and x-manage-worktrees "
                     + "have SKILL.md ≤ 500 lines, all 5 canonical headers, "
                     + "and a non-empty references/full-protocol.md "
                     + "(story-0054-0002 ADR-0012 invariant)")
@@ -170,7 +170,7 @@ class Epic0054CompressionSmokeTest extends SmokeTestBase {
      * ≤ 250 lines
      */
     private static final List<String> STORY_0004_XL_SKILLS =
-            List.of("x-epic-implement", "x-release");
+            List.of("x-implement-epic", "x-release");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")

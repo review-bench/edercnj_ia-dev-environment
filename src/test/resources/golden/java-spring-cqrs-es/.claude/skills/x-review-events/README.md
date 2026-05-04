@@ -30,5 +30,5 @@ Reviews event-driven patterns including event schema design, producer/consumer i
 ## See Also
 
 - [x-review-api](../x-review-api/) -- REST API design review
-- [x-test-contract-lint](../x-test-contract-lint/) -- AsyncAPI contract validation
-- [x-obs-instrument](../x-obs-instrument/) -- OpenTelemetry instrumentation for event tracing
+- [x-lint-contract-tests](../x-lint-contract-tests/) -- AsyncAPI contract validation
+- [x-instrument-observability](../x-instrument-observability/) -- OpenTelemetry instrumentation for event tracing

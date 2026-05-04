@@ -21,8 +21,8 @@ truth, so that:
 Content that is:
 
 - **Cross-cutting** — referenced by ≥ 2 skills in different subjects (e.g.,
-  pre-commit error handling is shared by `x-git-commit`, `x-code-format`,
-  `x-code-lint`).
+  pre-commit error handling is shared by `x-commit-changes`, `x-format-code`,
+  `x-lint-code`).
 - **Stable** — not a per-project or per-stack customization (for that, use
   `knowledge-packs/` or templates with `{{PLACEHOLDER}}` tokens).
 - **Narrow in scope** — a single topic per file, readable in isolation.
@@ -53,8 +53,8 @@ Example reference from a `SKILL.md`:
 ```markdown
 > **Pre-commit error matrix.** See
 > [`_shared/error-handling-pre-commit.md`](../../../_shared/error-handling-pre-commit.md)
-> for the canonical row set shared by `x-git-commit`, `x-code-format`, and
-> `x-code-lint`.
+> for the canonical row set shared by `x-commit-changes`, `x-format-code`, and
+> `x-lint-code`.
 ```
 
 The LLM follows the link on demand; the skill body stays compact.
@@ -63,9 +63,9 @@ The LLM follows the link on demand; the skill body stays compact.
 
 | File | Scope | Consumer Skills |
 | :--- | :--- | :--- |
-| [`error-handling-pre-commit.md`](./error-handling-pre-commit.md) | Error rows for the `format -> lint -> compile -> commit` chain | `x-git-commit`, `x-code-format`, `x-code-lint` |
-| [`tdd-tags-glossary.md`](./tdd-tags-glossary.md) | Canonical RED / GREEN / REFACTOR tag set and commit-footer format | `x-test-tdd`, `x-task-implement`, `x-story-implement` |
-| [`exit-codes-common.md`](./exit-codes-common.md) | Recurring `DEP_*` / `STATE_*` / `RULE_*` exit-code families | `x-release`, `x-epic-implement`, `x-story-implement` |
+| [`error-handling-pre-commit.md`](./error-handling-pre-commit.md) | Error rows for the `format -> lint -> compile -> commit` chain | `x-commit-changes`, `x-format-code`, `x-lint-code` |
+| [`tdd-tags-glossary.md`](./tdd-tags-glossary.md) | Canonical RED / GREEN / REFACTOR tag set and commit-footer format | `x-drive-tdd`, `x-implement-task`, `x-implement-story` |
+| [`exit-codes-common.md`](./exit-codes-common.md) | Recurring `DEP_*` / `STATE_*` / `RULE_*` exit-code families | `x-release`, `x-implement-epic`, `x-implement-story` |
 
 ## Adding a New Snippet
 

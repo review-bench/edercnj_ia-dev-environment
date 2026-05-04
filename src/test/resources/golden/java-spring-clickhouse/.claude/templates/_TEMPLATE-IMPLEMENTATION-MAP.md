@@ -221,12 +221,12 @@ graph LR
 
 <!--
   Seção gerada pelo Step 8.5 de x-epic-map (EPIC-0041 / story-0041-0005).
-  A análise invoca /x-parallel-eval --scope=epic e popula a matriz de colisão.
+  A análise invoca /x-evaluate-parallelism --scope=epic e popula a matriz de colisão.
 
-  Fail-open (RULE-005 / RULE-006): se /x-parallel-eval não estiver disponível
+  Fail-open (RULE-005 / RULE-006): se /x-evaluate-parallelism não estiver disponível
   ou retornar exit code >= 1, o Step 8.5 substitui o corpo desta seção por:
 
-      > análise pulada — /x-parallel-eval não disponível (RULE-006 fail-open)
+      > análise pulada — /x-evaluate-parallelism não disponível (RULE-006 fail-open)
 
   e o map continua sendo salvo normalmente — o Step 8.5 NUNCA bloqueia
   a geração do map.
@@ -236,7 +236,7 @@ graph LR
   Fase ASC -> Story-A lex -> Story-B lex.
 -->
 
-> Análise gerada por /x-parallel-eval em <timestamp omitido para determinismo>.
+> Análise gerada por /x-evaluate-parallelism em <timestamp omitido para determinismo>.
 
 **Conflitos detectados:** <H> hard, <R> regen, <S> soft
 

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates structural invariants of the {@code x-arch-system-update} SKILL.md (EPIC-0070 /
+ * Validates structural invariants of the {@code x-update-system-architecture} SKILL.md (EPIC-0070 /
  * story-0070-0006).
  *
  * <p>Checks: frontmatter contract (model: sonnet, requires-capabilities, user-invocable),
@@ -29,14 +29,14 @@ class ArchSystemUpdateSkillTest {
                     "skills",
                     "core",
                     "plan",
-                    "x-arch-system-update",
+                    "x-update-system-architecture",
                     "SKILL.md");
 
     @Test
     @DisplayName("skill_exists_atExpectedPath")
     void skill_exists_atExpectedPath() {
         assertThat(SKILL_FILE.toAbsolutePath())
-                .as("x-arch-system-update SKILL.md must exist at core/plan/ (story-0070-0006)")
+                .as("x-update-system-architecture SKILL.md must exist at core/plan/ (story-0070-0006)")
                 .exists()
                 .isRegularFile();
     }
@@ -46,7 +46,7 @@ class ArchSystemUpdateSkillTest {
     void skill_frontmatter_hasModelSonnet() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-arch-system-update MUST declare model: sonnet (Rule 23 — Reviewer tier)")
+                .as("x-update-system-architecture MUST declare model: sonnet (Rule 23 — Reviewer tier)")
                 .contains("model: sonnet");
     }
 
@@ -56,7 +56,7 @@ class ArchSystemUpdateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-arch-system-update MUST declare requires-capabilities"
+                        "x-update-system-architecture MUST declare requires-capabilities"
                                 + " [governance.value-driven-templates] (Rule 28)")
                 .contains("requires-capabilities")
                 .contains("governance.value-driven-templates");
@@ -68,7 +68,7 @@ class ArchSystemUpdateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-arch-system-update is a public skill (Rule 22) — must NOT set user-invocable: false")
+                        "x-update-system-architecture is a public skill (Rule 22) — must NOT set user-invocable: false")
                 .doesNotContain("user-invocable: false");
     }
 
@@ -78,7 +78,7 @@ class ArchSystemUpdateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-arch-system-update MUST document idempotency contract (story-0070-0006 AC: Boundary)")
+                        "x-update-system-architecture MUST document idempotency contract (story-0070-0006 AC: Boundary)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("Idempotency"),
                         c -> assertThat(c).contains("idempoten"));
@@ -90,7 +90,7 @@ class ArchSystemUpdateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-arch-system-update MUST document SYSTEM_MD_MISSING error (story-0070-0006 AC: Error)")
+                        "x-update-system-architecture MUST document SYSTEM_MD_MISSING error (story-0070-0006 AC: Error)")
                 .contains("SYSTEM_MD_MISSING");
     }
 
@@ -100,7 +100,7 @@ class ArchSystemUpdateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-arch-system-update MUST document degenerate case"
+                        "x-update-system-architecture MUST document degenerate case"
                                 + " (no architectural decisions → system.md unchanged)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("no architectural decisions"),
@@ -113,7 +113,7 @@ class ArchSystemUpdateSkillTest {
     void skill_hasExamplesSection() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-arch-system-update MUST have ## Examples section (story-0070-0006)")
+                .as("x-update-system-architecture MUST have ## Examples section (story-0070-0006)")
                 .contains("## Examples");
     }
 }

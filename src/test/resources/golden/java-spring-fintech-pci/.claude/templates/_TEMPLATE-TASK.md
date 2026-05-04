@@ -9,7 +9,7 @@
 > Transições válidas: `Pendente → Planejada | Em Andamento | Falha | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
-> reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
+> reabertura `Concluída → Em Andamento` (via `x-reconcile-status --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
 > Ver [`.claude/rules/22-lifecycle-integrity.md`](../.claude/rules/22-lifecycle-integrity.md).
 
@@ -132,7 +132,7 @@ N/A — <state why no significant design decision was made for this task, or rep
 
 ### 9.2 Implementation Plan Reference
 
-Ver `plan-task-{{TASK_ID}}.md` (gerado por `x-task-plan`).
+Ver `plan-task-{{TASK_ID}}.md` (gerado por `x-plan-task`).
 
 ### 9.3 File Footprint
 

@@ -31,4 +31,4 @@ Reviews gRPC service definitions, implementation patterns, and operational readi
 
 - [x-review-api](../x-review-api/) -- REST API design review
 - [x-review-graphql](../x-review-graphql/) -- GraphQL schema and resolver review
-- [x-test-contract-lint](../x-test-contract-lint/) -- Protobuf contract validation
+- [x-lint-contract-tests](../x-lint-contract-tests/) -- Protobuf contract validation

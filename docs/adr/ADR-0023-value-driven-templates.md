@@ -66,7 +66,7 @@ Skills `x-epic-create` and `x-story-create` default to v2. `--legacy-template-v1
 - Story ACs gain a 4-category Gherkin mandate (happy/error/performance/security) — enforced by Rule 29 refinement gate.
 
 **Negative:**
-- Migration effort: existing v1 epics/stories require `x-template-migrate` (story-0070-0007) for full v2 adoption.
+- Migration effort: existing v1 epics/stories require `x-migrate-templates` (story-0070-0007) for full v2 adoption.
 - Authors must learn two template files (epic + story) instead of one monolithic template.
 - `docs/architecture/system.md` requires initial scaffolding on project setup — `ia-dev-env generate` handles this but requires YAML completeness.
 

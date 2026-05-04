@@ -9,7 +9,7 @@
   NARRATIVE  → Free-text blocks marked < ... > that the operator fills manually.
                 Sections: Resilience, Integrações Externas, Decision Log do Sistema.
   IDEMPOTENT → This file is created once; re-running ia-dev-env generate does NOT overwrite it.
-               Incremental updates are performed by /x-arch-system-update (story-0070-0006).
+               Incremental updates are performed by /x-update-system-architecture (story-0070-0006).
 -->
 
 # Arquitetura do Sistema — my-spring-elasticsearch
@@ -141,7 +141,7 @@
 
 ## 11. Decision Log do Sistema
 
-> Populado de forma incremental por `/x-arch-system-update` (story-0070-0006).
+> Populado de forma incremental por `/x-update-system-architecture` (story-0070-0006).
 > Cada entrada registra uma decisão arquitetural de impacto transversal.
 
 | Data | Decisão | Motivo | Alternativa Descartada |

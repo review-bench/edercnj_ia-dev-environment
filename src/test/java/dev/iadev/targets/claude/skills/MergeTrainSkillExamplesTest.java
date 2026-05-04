@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * TDD tests for Integration Notes and Examples sections in x-pr-merge-train/SKILL.md
+ * TDD tests for Integration Notes and Examples sections in x-manage-pr-merge-train/SKILL.md
  * (story-0042-0003, TASK-0042-0003-005).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that the Integration
@@ -20,7 +20,7 @@ class MergeTrainSkillExamplesTest {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(
@@ -39,8 +39,8 @@ class MergeTrainSkillExamplesTest {
                 .contains("Integration Notes");
 
         assertThat(content)
-                .as("Golden SKILL.md Integration Notes must reference x-pr-fix-epic")
-                .contains("x-pr-fix-epic");
+                .as("Golden SKILL.md Integration Notes must reference x-fix-epic-pr")
+                .contains("x-fix-epic-pr");
 
         assertThat(content)
                 .as("Golden SKILL.md Examples must contain --resume --train-id invocation")

@@ -114,14 +114,14 @@ dependencies:
 
 ## Validation
 
-Run `x-dep-policy-validate` to validate all dependencies against this policy:
+Run `x-validate-dependency-policy` to validate all dependencies against this policy:
 
 ```bash
-/x-dep-policy-validate
+/x-validate-dependency-policy
 ```
 
 Or combined with the standard dependency audit:
 
 ```bash
-/x-dependency-audit --scope all --policy
+/x-audit-dependencies --scope all --policy
 ```

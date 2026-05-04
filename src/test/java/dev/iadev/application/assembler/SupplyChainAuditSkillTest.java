@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0014: Enhanced Supply Chain Audit (x-supply-chain-audit) skill generation.
+ * Tests for story-0022-0014: Enhanced Supply Chain Audit (x-audit-supply-chain) skill generation.
  *
- * <p>Validates that the x-supply-chain-audit SKILL.md is generated as a core skill, contains all 6
+ * <p>Validates that the x-audit-supply-chain SKILL.md is generated as a core skill, contains all 6
  * advanced capabilities, risk scoring formula, SARIF output format, and does not duplicate
- * x-dependency-audit content.
+ * x-audit-dependencies content.
  */
-@DisplayName("Supply Chain Audit Skill (x-supply-chain-audit)")
+@DisplayName("Supply Chain Audit Skill (x-audit-supply-chain)")
 class SupplyChainAuditSkillTest {
 
     @Nested
@@ -28,10 +28,10 @@ class SupplyChainAuditSkillTest {
     class CoreSkillGeneration {
 
         @Test
-        @DisplayName("x-supply-chain-audit SKILL.md exists" + " after assembly")
+        @DisplayName("x-audit-supply-chain SKILL.md exists" + " after assembly")
         void assemble_minimal_generatesSkillMd(@TempDir Path tempDir) throws IOException {
             generateOutput(tempDir);
-            Path skillMd = tempDir.resolve("output/skills/x-supply-chain-audit" + "/SKILL.md");
+            Path skillMd = tempDir.resolve("output/skills/x-audit-supply-chain" + "/SKILL.md");
             assertThat(skillMd).exists();
         }
 
@@ -39,7 +39,7 @@ class SupplyChainAuditSkillTest {
         @DisplayName("SKILL.md contains correct frontmatter" + " name")
         void assemble_minimal_hasFrontmatterName(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content).contains("name: x-supply-chain-audit");
+            assertThat(content).contains("name: x-audit-supply-chain");
         }
 
         @Test
@@ -218,25 +218,25 @@ class SupplyChainAuditSkillTest {
     }
 
     @Nested
-    @DisplayName("Relationship with x-dependency-audit")
+    @DisplayName("Relationship with x-audit-dependencies")
     class DependencyAuditRelation {
 
         @Test
-        @DisplayName("documents relationship with" + " x-dependency-audit")
+        @DisplayName("documents relationship with" + " x-audit-dependencies")
         void assemble_minimal_hasRelationTable(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
-            assertThat(content).contains("x-dependency-audit").contains("x-supply-chain-audit");
+            assertThat(content).contains("x-audit-dependencies").contains("x-audit-supply-chain");
         }
 
         @Test
-        @DisplayName("states it complements not replaces" + " x-dependency-audit")
+        @DisplayName("states it complements not replaces" + " x-audit-dependencies")
         void assemble_minimal_complementsNotReplaces(@TempDir Path tempDir) throws IOException {
             String content = generateContent(tempDir);
             assertThat(content).contains("complements").contains("does NOT replace");
         }
 
         @Test
-        @DisplayName("x-dependency-audit skill remains" + " unchanged")
+        @DisplayName("x-audit-dependencies skill remains" + " unchanged")
         void assemble_minimal_depAuditUnchanged(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -244,10 +244,10 @@ class SupplyChainAuditSkillTest {
             assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
             String depAudit =
                     Files.readString(
-                            outputDir.resolve("skills/x-dependency-audit" + "/SKILL.md"),
+                            outputDir.resolve("skills/x-audit-dependencies" + "/SKILL.md"),
                             StandardCharsets.UTF_8);
             assertThat(depAudit)
-                    .contains("name: x-dependency-audit")
+                    .contains("name: x-audit-dependencies")
                     .contains("## Workflow")
                     .contains("DETECT")
                     .contains("AUDIT")
@@ -280,7 +280,7 @@ class SupplyChainAuditSkillTest {
         SkillsAssembler assembler = new SkillsAssembler();
         assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve("skills/x-supply-chain-audit" + "/SKILL.md"),
+                outputDir.resolve("skills/x-audit-supply-chain" + "/SKILL.md"),
                 StandardCharsets.UTF_8);
     }
 

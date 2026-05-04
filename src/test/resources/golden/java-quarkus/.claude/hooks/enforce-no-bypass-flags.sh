@@ -54,17 +54,17 @@ esac
 command -v jq >/dev/null 2>&1 || exit 0
 
 # Orchestrators that accept blocked flags
-ORCHESTRATORS="x-story-implement x-task-implement x-epic-implement x-pr-fix-epic x-release x-internal-story-verify"
+ORCHESTRATORS="x-implement-story x-implement-task x-implement-epic x-fix-epic-pr x-release x-internal-verify-story"
 
 # Blocked flag → allowed orchestrators mapping
 # Format: FLAG:SKILL1,SKILL2,...
 BLOCKED_FLAG_MAP=(
-  "--skip-verification:x-story-implement,x-task-implement"
-  "--skip-review:x-story-implement,x-epic-implement"
-  "--skip-smoke:x-story-implement,x-internal-story-verify"
-  "--skip-pr-comments:x-pr-fix-epic"
-  "--no-ci-watch:x-story-implement,x-release"
-  "--no-auto-remediation:x-story-implement"
+  "--skip-verification:x-implement-story,x-implement-task"
+  "--skip-review:x-implement-story,x-implement-epic"
+  "--skip-smoke:x-implement-story,x-internal-verify-story"
+  "--skip-pr-comments:x-fix-epic-pr"
+  "--no-ci-watch:x-implement-story,x-release"
+  "--no-auto-remediation:x-implement-story"
 )
 
 # Read stdin payload

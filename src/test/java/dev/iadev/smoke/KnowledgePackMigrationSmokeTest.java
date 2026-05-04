@@ -82,7 +82,7 @@ class KnowledgePackMigrationSmokeTest {
     @DisplayName("migration_endToEnd_sampledSkillsUseNewPaths")
     void migration_endToEnd_sampledSkillsUseNewPaths(@TempDir Path tempDir) throws IOException {
         Path outputDir = runPipeline(tempDir);
-        List<String> sampled = List.of("x-arch-plan", "x-review-pr", "x-story-plan");
+        List<String> sampled = List.of("x-arch-plan", "x-review-pr", "x-plan-story");
         for (String skill : sampled) {
             Path skillMd = outputDir.resolve(".claude/skills/" + skill + "/SKILL.md");
             if (!Files.isRegularFile(skillMd)) {

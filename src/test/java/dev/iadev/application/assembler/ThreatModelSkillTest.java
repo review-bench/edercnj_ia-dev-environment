@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0022: x-threat-model skill for STRIDE threat modeling.
+ * Tests for story-0013-0022: x-model-threats skill for STRIDE threat modeling.
  *
- * <p>Validates that the x-threat-model skill template is generated correctly with proper
+ * <p>Validates that the x-model-threats skill template is generated correctly with proper
  * frontmatter, STRIDE categories, severity classification, and fallback instructions.
  */
-@DisplayName("x-threat-model Skill")
+@DisplayName("x-model-threats Skill")
 class ThreatModelSkillTest {
 
     @Nested
@@ -27,18 +27,18 @@ class ThreatModelSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-threat-model SKILL.md exists after" + " assembly")
+        @DisplayName("x-model-threats SKILL.md exists after" + " assembly")
         void assemble_threatModel_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-threat-model/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-model-threats/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-threat-model")
+        @DisplayName("frontmatter contains name:" + " x-model-threats")
         void assemble_threatModel_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-threat-model");
+            assertThat(content).contains("name: x-model-threats");
         }
 
         @Test
@@ -241,6 +241,6 @@ class ThreatModelSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-threat-model/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-model-threats/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

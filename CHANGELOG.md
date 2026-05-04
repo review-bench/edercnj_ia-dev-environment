@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+Antes desta release, a convenção de nomes das ~100 skills do repositório misturava padrões noun-first (`x-epic-implement`, `x-story-plan`) e verb-first (`x-create-pr`, `x-run-sast`), gerando inconsistência cognitiva na hora de invocar, descobrir ou documentar skills.
+
+**A partir desta release, todas as skills seguem padrão verb-first uniforme.** Public: `x-<verb>-<object>` (ex: `x-implement-story`, `x-review-codebase`). Internal: `x-internal-<verb>-<object>` (ex: `x-internal-verify-story`). Lib: `x-lib-<verb>-<object>`. O SPEC canônico está em `docs/specs/SPEC-verb-first-skill-naming-v1.md`. Guard anti-legado `audit-skill-naming.sh` bloqueia regressões em CI.
+
+### Added — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+- **SPEC canônico** `docs/specs/SPEC-verb-first-skill-naming-v1.md` (v1.2): 84 pares old→new com justificativa e collision resolution. Introduzido por story-0076-0001.
+- **ADR-0029** `docs/adr/ADR-0029-verb-first-skill-naming.md`: decisão arquitetural e critérios de aprovação da convenção. Introduzido por story-0076-0002.
+- **Guard anti-legado `audit-skill-naming.sh`** (Camada 2 CI Script, Rule 26): detecta nomes noun-first reintroduzidos fora da allow-list histórica; exit codes: `0`=OK, `1`=SKILL_NAMING_VIOLATION, `2`=OPERATIONAL_ERROR, `3`=BASELINE_CORRUPT; baseline imutável `governance/baselines/skill-naming-baseline.txt`. Introduzido por story-0076-0007.
+
+### Changed — EPIC-0076 (Verb-First Skill Naming Refactor)
+
+Skills renomeadas (84 pares — seções 6.1–6.10 do SPEC):
+
+**Lifecycle (§6.1):** `x-epic-implement` → `x-implement-epic`, `x-story-implement` → `x-implement-story`, `x-task-implement` → `x-implement-task`, `x-story-plan` → `x-plan-story`, `x-task-plan` → `x-plan-task`, `x-epic-refine` → `x-refine-epic`, `x-story-refine` → `x-refine-story`, `x-arch-plan` → `x-plan-architecture`, `x-arch-update` → `x-update-architecture`, `x-arch-system-update` → `x-update-system-architecture`, `x-adr-generate` → `x-generate-adr`, `x-epic-orchestrate` → `x-orchestrate-epic`, `x-feature-ideate` → `x-ideate-feature`, `x-feature-create` → `x-create-feature`, `x-threat-model` → `x-model-threats`, `x-spec-drift` → `x-detect-spec-drift`, `x-parallel-eval` → `x-evaluate-parallelism`.
+
+**Tests (§6.2):** `x-test-run` → `x-execute-tests`, `x-test-tdd` → `x-drive-tdd`, `x-test-e2e` → `x-execute-e2e-tests`, `x-test-contract` → `x-execute-contract-tests`, `x-test-mutation` → `x-execute-mutation-tests`, `x-test-performance` → `x-execute-performance-tests`, `x-test-perf` → `x-run-perf-tests`, `x-test-plan` → `x-plan-tests`, `x-test-smoke-api` → `x-execute-api-smoke-tests`, `x-test-smoke-socket` → `x-execute-socket-smoke-tests`, `x-test-regression-shell` → `x-execute-shell-regression-tests`, `x-test-contract-lint` → `x-lint-contract-tests`.
+
+**Review (§6.3):** `x-review` → `x-review-codebase`, `x-review-db` → `x-review-database`, `x-review-obs` → `x-review-observability`, `x-review-perf` → `x-review-performance`, `x-code-audit` → `x-audit-code`.
+
+**Code/Docs (§6.4):** `x-code-format` → `x-format-code`, `x-code-lint` → `x-lint-code`, `x-doc-generate` → `x-generate-docs`, `x-doc-validate` → `x-validate-docs`, `x-template-migrate` → `x-migrate-templates`, `x-frontmatter-migrate` → `x-migrate-frontmatter`, `x-ci-generate` → `x-generate-ci`, `x-mcp-recommend` → `x-recommend-mcp`.
+
+**Git/PR (§6.5):** `x-pr-create` → `x-create-pr`, `x-pr-merge` → `x-merge-pr`, `x-pr-fix` → `x-fix-pr`, `x-pr-fix-epic` → `x-fix-epic-pr`, `x-pr-watch-ci` → `x-watch-pr-ci`, `x-pr-merge-train` → `x-manage-pr-merge-train`, `x-git-commit` → `x-commit-changes`, `x-git-push` → `x-push-branch`, `x-git-merge` → `x-merge-branches`, `x-git-branch` → `x-create-git-branch`, `x-git-worktree` → `x-manage-worktrees`, `x-git-cleanup-branches` → `x-cleanup-git-branches`, `x-planning-commit` → `x-commit-planning`.
+
+**Ops (§6.6):** `x-telemetry-analyze` → `x-analyze-telemetry`, `x-telemetry-trend` → `x-analyze-telemetry-trends`, `x-release-changelog` → `x-generate-release-changelog`, `x-status-reconcile` → `x-reconcile-status`, `x-ops-incident` → `x-handle-incident`, `x-obs-instrument` → `x-instrument-observability`, `x-ops-troubleshoot` → `x-troubleshoot-operations`, `x-perf-profile` → `x-profile-performance`, `x-memory-search` → `x-search-memory`.
+
+**Security (§6.7):** `x-dependency-audit` → `x-audit-dependencies`, `x-supply-chain-audit` → `x-audit-supply-chain`, `x-hardening-eval` → `x-evaluate-hardening`, `x-runtime-eval` → `x-evaluate-runtime`, `x-owasp-scan` → `x-scan-owasp`, `x-security-dashboard` → `x-generate-security-dashboard`, `x-security-pipeline` → `x-generate-security-pipeline`, `x-security-secrets` → `x-scan-secrets`, `x-security-sast` → `x-run-sast`, `x-security-dast` → `x-run-dast`, `x-security-container` → `x-scan-container-security`, `x-pentest-dynamic` → `x-run-dynamic-pentest`, `x-security-pentest` → `x-run-pentest`, `x-security-infra` → `x-assess-infrastructure-security`, `x-security-sonar` → `x-run-sonar-security`, `x-dep-policy-validate` → `x-validate-dependency-policy`.
+
+**Jira (§6.8):** `x-jira-create-epic` → `x-create-jira-epic`, `x-jira-create-stories` → `x-create-jira-stories`.
+
+**Internals (§6.9):** `x-internal-story-verify` → `x-internal-verify-story`, `x-internal-story-report` → `x-internal-write-story-report`, `x-internal-story-resume` → `x-internal-resume-story`, `x-internal-story-build-plan` → `x-internal-build-story-plan`, `x-internal-story-create` → `x-internal-create-story`, `x-internal-story-load-context` → `x-internal-load-story-context`, `x-internal-epic-integrity-gate` → `x-internal-verify-epic-integrity`, `x-internal-epic-branch-ensure` → `x-internal-ensure-epic-branch`, `x-internal-epic-build-plan` → `x-internal-build-epic-plan`, `x-internal-epic-summary` → `x-internal-summarize-epic`, `x-internal-epic-create` → `x-internal-create-epic`, `x-internal-epic-map` → `x-internal-map-epic`, `x-internal-worktree-precheck` → `x-internal-precheck-worktree`, `x-internal-pr-body-render` → `x-internal-render-pr-body`, `x-internal-phase-gate` → `x-internal-verify-phase-gates`, `x-internal-report-write` → `x-internal-write-report`, `x-internal-status-update` → `x-internal-update-status`, `x-internal-args-normalize` → `x-internal-normalize-args`.
+
+**Libs (§6.10):** `x-lib-group-verifier` → `x-lib-verify-group`, `x-lib-task-decomposer` → `x-lib-decompose-task`.
+
 ### Highlights — EPIC-0075 (AI Memory Layer)
 
 Antes desta release, recuperar contexto de decisões passadas exigia re-leitura de arquivos markdown de épicos inteiros (200–500 linhas cada). Para um projeto com 75+ épicos, "o que decidimos sobre X no EPIC-0054?" demandava horas de leitura manual ou overflow do context window do LLM.

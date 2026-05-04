@@ -143,7 +143,7 @@ Senior Database Engineer with deep expertise in {{DB_TYPE}} schema design, query
 
 ## 18-Point Severity Checklist
 
-Used by the `x-review` skill as a parallel reviewer alongside security, QA, and performance engineers. Reads `database-patterns` KP and `data-management` KP for context. Generates findings report with severity classification.
+Used by the `x-review-codebase` skill as a parallel reviewer alongside security, QA, and performance engineers. Reads `database-patterns` KP and `data-management` KP for context. Generates findings report with severity classification.
 
 ### CRITICAL (1-6) — Blocking issues, must fix before merge
 
@@ -180,7 +180,7 @@ Used by the `x-review` skill as a parallel reviewer alongside security, QA, and 
 
 ### Integration Notes
 
-- Used by `x-review` skill as parallel reviewer alongside security, QA, performance engineers
+- Used by `x-review-codebase` skill as parallel reviewer alongside security, QA, performance engineers
 - Reads `database-patterns` KP and `data-management` KP for context
 - Generates findings report with severity classification
 - CRITICAL or MEDIUM findings result in REQUEST CHANGES verdict

@@ -10,7 +10,7 @@
 
 ## Context
 
-Stories enter `x-story-implement` without proof of refinement. The planning artifacts (arch/impl/tests/tasks/security/compliance) validate implementation coherence but not story quality: vague acceptance criteria, untyped contracts, missing metrics, and absent alternatives are undetectable by current gates.
+Stories enter `x-implement-story` without proof of refinement. The planning artifacts (arch/impl/tests/tasks/security/compliance) validate implementation coherence but not story quality: vague acceptance criteria, untyped contracts, missing metrics, and absent alternatives are undetectable by current gates.
 
 The result (observed across multiple sprints):
 - AC with no boundary/error scenarios → TDD encodes assumptions, not requirements
@@ -24,11 +24,11 @@ A checklist (`_TEMPLATE-DOR-CHECKLIST.md`) existed but had no enforcement: it de
 
 Introduce a **blocking refinement gate** (`governance.refinement-gate`) with:
 
-1. **Multi-persona dispatcher skills** `/x-story-refine` and `/x-epic-refine` — single-entry orchestrators that internally dispatch specialist persona-agents (PO, Tech Lead, Architect, Security, QA + conditional Performance/SRE) in parallel, consolidate gap-reports into a single batch for the operator, collect answers once, and have the Architect agent produce the final `## Refinement Verdict` block.
+1. **Multi-persona dispatcher skills** `/x-refine-story` and `/x-refine-epic` — single-entry orchestrators that internally dispatch specialist persona-agents (PO, Tech Lead, Architect, Security, QA + conditional Performance/SRE) in parallel, consolidate gap-reports into a single batch for the operator, collect answers once, and have the Architect agent produce the final `## Refinement Verdict` block.
 
 2. **`refinementVerdict` field** in `execution-state.json` — dual-write (markdown + state) for hook-accessible audit trail. `verdictHash` detects manual divergence between the two.
 
-3. **PreToolUse hook** `enforce-refinement-gate.sh` (Camada 0, exit `33`) — blocks `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-epic-orchestrate` when `refinementVerdict.status ≠ "approved"`.
+3. **PreToolUse hook** `enforce-refinement-gate.sh` (Camada 0, exit `33`) — blocks `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-orchestrate-epic` when `refinementVerdict.status ≠ "approved"`.
 
 4. **CI audit** `audit-refinement-gate.sh` (Camada 2, exit `REFINEMENT_GATE_VIOLATION`) — verifies `verdictHash` integrity for merged PRs.
 
@@ -49,7 +49,7 @@ One voice (e.g., PO) asks all questions in a loop. **Rejected:** misses domain-s
 Each persona is a separate invocable skill. **Rejected:** operator must invoke 5+ commands per story; not a gate, a suggestion. Taxonomy explosion (D-R4 preserves 10 canonical categories).
 
 ### E. Validation inline in each orchestrator (Phase 0 check)
-Each of `x-story-implement`, `x-epic-implement`, etc. reads `execution-state.json` and fails early. **Rejected:** 4 copies of the same logic → guaranteed drift within 2 sprints. Hook centralizes; orchestrators remain consumers.
+Each of `x-implement-story`, `x-implement-epic`, etc. reads `execution-state.json` and fails early. **Rejected:** 4 copies of the same logic → guaranteed drift within 2 sprints. Hook centralizes; orchestrators remain consumers.
 
 ## Decision Rationale
 
@@ -64,7 +64,7 @@ The chosen approach (multi-persona dispatcher + PreToolUse hook) is the minimal 
 ## Consequences
 
 ### Positive
-- Stories arrive at `x-story-implement` with measurable AC, typed contracts, and identified risks
+- Stories arrive at `x-implement-story` with measurable AC, typed contracts, and identified risks
 - Retrabalho silencioso in Phase 2 (TDD loop) decreases — proxy metric: ≥30% reduction in Phase 2 time over 5 epics
 - `execution-state.json` carries `refinementVerdict` — hooks and CI audit can read state without parsing markdown
 - Multi-persona approach catches Security NO-GOs (PII, credential handling) that single-voice misses

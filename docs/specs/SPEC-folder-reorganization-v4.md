@@ -258,19 +258,19 @@ escrevem nesses paths.
 - Inventário: `grep -rnE "plans/epic-|audits/|results/|specs/|adr/|steering/|contracts/" framework/src/main/resources/targets/claude/skills/ --include=SKILL.md`
 - Para cada match: substituir literal por placeholder `{{epicDir}}/...` ou similar resolvido em runtime via `PathResolver`
 - Skills agrupadas por categoria:
-  - **Implementação** (3): x-task-implement, x-story-implement, x-epic-implement
-  - **Planejamento** (10): x-epic-create, x-story-create, x-task-plan, x-story-plan, x-arch-plan, x-test-plan, x-epic-decompose, x-epic-map, x-epic-orchestrate, x-task-plan
-  - **Review** (6+): x-review, x-review-pr, x-review-qa, x-review-perf, x-review-devops, x-review-security
-  - **PR** (5): x-pr-create, x-pr-watch-ci, x-pr-fix, x-pr-fix-epic, x-pr-merge-train, x-pr-merge
-  - **Telemetria** (2): x-telemetry-analyze, x-telemetry-trend
-  - **Auditoria** (7+): x-code-audit, x-dependency-audit, x-supply-chain-audit, x-owasp-scan, x-spec-drift, x-status-reconcile, x-security-dashboard
-  - **Release/docs** (5): x-release, x-release-changelog, x-adr-generate, x-arch-update, x-doc-generate
-  - **Jira** (2): x-jira-create-stories, x-jira-create-epic
+  - **Implementação** (3): x-implement-task, x-implement-story, x-implement-epic
+  - **Planejamento** (10): x-epic-create, x-story-create, x-plan-task, x-plan-story, x-plan-architecture, x-plan-tests, x-epic-decompose, x-epic-map, x-orchestrate-epic, x-plan-task
+  - **Review** (6+): x-review-codebase, x-review-pr, x-review-qa, x-review-performance, x-review-devops, x-review-security
+  - **PR** (5): x-create-pr, x-watch-pr-ci, x-fix-pr, x-fix-epic-pr, x-manage-pr-merge-train, x-merge-pr
+  - **Telemetria** (2): x-analyze-telemetry, x-analyze-telemetry-trends
+  - **Auditoria** (7+): x-audit-code, x-audit-dependencies, x-audit-supply-chain, x-scan-owasp, x-detect-spec-drift, x-reconcile-status, x-generate-security-dashboard
+  - **Release/docs** (5): x-release, x-generate-release-changelog, x-generate-adr, x-update-architecture, x-generate-docs
+  - **Jira** (2): x-create-jira-stories, x-create-jira-epic
   - **Internas** (10): x-internal-* skills
 
 **Critérios de Aceite**:
 - `grep -rnE "plans/epic-|audits/|results/|specs/|adr/|steering/|contracts/" framework/src/main/resources/targets/claude/skills/ --include=SKILL.md` retorna 0 linhas (excluindo `## Triggers`, `## Examples`, notas históricas marcadas)
-- Smoke test executa `x-epic-create` + `x-story-implement` em fixture dummy e cria artefatos no novo layout
+- Smoke test executa `x-epic-create` + `x-implement-story` em fixture dummy e cria artefatos no novo layout
 - Cada skill tocada tem fixture de smoke test verde
 - Documentação (CLAUDE.md, READMEs por skill) atualizada
 
@@ -305,7 +305,7 @@ Java assemblers para refletir novos paths.
 - `bash scripts/audit-skill-visibility.sh` verifica catálogo `docs/audit-gates-catalog.md` atualizado
 - CI passa com baselines em `governance/baselines/`
 - `grep -rnE "plans/epic-|audits/|results/|specs/" framework/src/main/resources/targets/claude/{rules,hooks}/` retorna 0 (exceto notas de migração explícitas)
-- Smoke test end-to-end executa `x-epic-implement` em fixture dummy e produz todos os 12 surfaces de evidência (Rule 27) nos novos paths
+- Smoke test end-to-end executa `x-implement-epic` em fixture dummy e produz todos os 12 surfaces de evidência (Rule 27) nos novos paths
 
 ---
 
@@ -349,5 +349,5 @@ Java assemblers para refletir novos paths.
 - [ ] Tag `layout-v4-frozen` criada após Story 6
 - [ ] `governance/baselines/migration-report-2026.md` documenta tudo que foi migrado
 - [ ] Documentação operacional (CLAUDE.md, README.md, AGENTS.md) atualizada
-- [ ] Smoke test end-to-end (`x-epic-implement` em fixture dummy) passa pelos 12 surfaces de
+- [ ] Smoke test end-to-end (`x-implement-epic` em fixture dummy) passa pelos 12 surfaces de
       evidência (Rule 27) nos novos paths

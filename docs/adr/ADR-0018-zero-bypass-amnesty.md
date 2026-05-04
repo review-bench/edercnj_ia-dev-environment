@@ -10,7 +10,7 @@
 
 EPIC-0059 (Zero-Bypass Lifecycle Enforcement) introduced a suite of strict enforcement gates:
 
-- `audit-execution-integrity.sh` — Phase 1 planning artifacts (x-internal-story-build-plan wave) mandatory for every merged story
+- `audit-execution-integrity.sh` — Phase 1 planning artifacts (x-internal-build-story-plan wave) mandatory for every merged story
 - `audit-pr-evidence.sh` — Orchestrator evidence artifacts required per merged PR
 - Telemetry enforcement via `events.ndjson` phase markers
 - Baseline immutability after EPIC-0059 cutoff (story-0059-0011)

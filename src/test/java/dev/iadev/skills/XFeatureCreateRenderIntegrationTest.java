@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates x-feature-create/SKILL.md backlog render integration (story-0066-0006) via static
+ * Validates x-create-feature/SKILL.md backlog render integration (story-0066-0006) via static
  * inspection.
  *
  * <p>Checks: Phase P5.5 BACKLOG-RENDER MANDATORY TOOL CALL, --kind=backlog argument, Phase P6 uses
@@ -24,13 +24,13 @@ class XFeatureCreateRenderIntegrationTest {
     private static final Path SKILL_MD =
             Path.of(
                     "src/main/resources/targets/claude/skills/core/plan/"
-                            + "x-feature-create/SKILL.md");
+                            + "x-create-feature/SKILL.md");
 
     private static String content;
 
     @BeforeAll
     static void loadContent() throws IOException {
-        assertThat(SKILL_MD).as("x-feature-create/SKILL.md must exist").exists();
+        assertThat(SKILL_MD).as("x-create-feature/SKILL.md must exist").exists();
         content = Files.readString(SKILL_MD, StandardCharsets.UTF_8);
     }
 
@@ -46,11 +46,11 @@ class XFeatureCreateRenderIntegrationTest {
         }
 
         @Test
-        @DisplayName("Phase P5.5 invokes x-internal-pr-body-render with --kind=backlog")
+        @DisplayName("Phase P5.5 invokes x-internal-render-pr-body with --kind=backlog")
         void phaseP55_invokesRenderSkillWithBacklogKind() {
             assertThat(content)
                     .as("Phase P5.5 must invoke render skill via Skill tool")
-                    .contains("Skill(skill: \"x-internal-pr-body-render\"");
+                    .contains("Skill(skill: \"x-internal-render-pr-body\"");
             assertThat(content)
                     .as("invocation must use --kind=backlog (not implementation)")
                     .contains("--kind=backlog");

@@ -15,23 +15,23 @@ public final class SecurityScanningGate implements SkillGateEvaluator {
         List<String> skills = new ArrayList<>();
         var scanning = config.security().scanning();
         if (scanning.sast()) {
-            skills.add("x-security-sast");
+            skills.add("x-run-sast");
         }
         if (scanning.dast()) {
-            skills.add("x-security-dast");
+            skills.add("x-run-dast");
         }
         if (scanning.secretScan()) {
-            skills.add("x-security-secrets");
+            skills.add("x-scan-secrets");
         }
         if (scanning.containerScan()) {
-            skills.add("x-security-container");
+            skills.add("x-scan-container-security");
         }
         if (scanning.infraScan()) {
-            skills.add("x-security-infra");
+            skills.add("x-assess-infrastructure-security");
         }
         String qgProvider = config.security().qualityGate().provider();
         if (!"none".equalsIgnoreCase(qgProvider)) {
-            skills.add("x-security-sonar");
+            skills.add("x-run-sonar-security");
         }
         return skills;
     }

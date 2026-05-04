@@ -29,10 +29,10 @@ severidade, remediacoes concretas, scores normalizados) e integrar-se ao pipelin
 
 O gerador atual produz um ecossistema de seguranca funcional mas predominantemente **passivo**:
 - `security-engineer.md` (agent) faz review com checklist de 20 pontos
-- `x-dependency-audit` (skill) analisa vulnerabilidades e licencas de dependencias
-- `x-threat-model` (skill) gera modelos de ameaca STRIDE/PASTA/LINDDUN
+- `x-audit-dependencies` (skill) analisa vulnerabilidades e licencas de dependencias
+- `x-model-threats` (skill) gera modelos de ameaca STRIDE/PASTA/LINDDUN
 - `x-codebase-audit` (skill) tem dimensao de seguranca no audit
-- `x-review` (skill) inclui security engineer com 10 items no review paralelo
+- `x-review-codebase` (skill) inclui security engineer com 10 items no review paralelo
 - `security/SKILL.md` (KP) documenta OWASP Top 10, supply chain, SBOM
 - `compliance/SKILL.md` (KP) documenta GDPR, HIPAA, LGPD, PCI-DSS, SOX
 
@@ -54,7 +54,7 @@ O gerador atual produz um ecossistema de seguranca funcional mas predominantemen
 5. **Sem avaliacao de hardening** — Nao ha skill para avaliar configuracoes de seguranca da
    aplicacao (headers HTTP, TLS, CORS, rate limiting, session management).
 
-6. **Supply chain superficial** — `x-dependency-audit` cobre vulnerabilidades e licencas mas nao
+6. **Supply chain superficial** — `x-audit-dependencies` cobre vulnerabilidades e licencas mas nao
    analisa risco de mantenedor, typosquatting, phantom dependencies ou age analysis.
 
 7. **KP references incompletos** — O security KP referencia `application-security.md`,
@@ -119,7 +119,7 @@ remediacao. Skills produzem findings; KPs fornecem as correcoes.
 
 **RULE-008**: Classificacao de severidade usa CVSS 4.0 base score mapping: CRITICAL >= 9.0,
 HIGH >= 7.0, MEDIUM >= 4.0, LOW < 4.0. Quando CVSS nao esta disponivel, usar matriz
-impacto x probabilidade do x-threat-model.
+impacto x probabilidade do x-model-threats.
 
 **RULE-009**: Toda skill de scanning DEVE incluir secao `## CI Integration` com snippets YAML
 para GitHub Actions, GitLab CI, e Azure DevOps mostrando como executar a skill como stage do
@@ -130,7 +130,7 @@ condicionais sao incluidas quando flags especificas do `SecurityConfig` estao at
 (e.g., `security.scanning.sast: true`). A classe `SkillsSelection.selectSecurityScanningSkills()`
 avalia os novos flags.
 
-**RULE-011**: Skills orquestradoras (x-pentest, x-security-dashboard, x-security-pipeline) invocam
+**RULE-011**: Skills orquestradoras (x-pentest, x-generate-security-dashboard, x-generate-security-pipeline) invocam
 skills atomicas via delegacao de subagent. NUNCA duplicam logica de scanning. Se o x-pentest
 precisa de SAST, ele invoca x-sast-scan.
 
@@ -143,7 +143,7 @@ Verification Standard) — L1 (minimo), L2 (padrao), L3 (avancado). Skills refer
 ASVS cobrem.
 
 **RULE-014**: Componentes de seguranca existentes (`security-engineer.md`, `06-security-baseline.md`,
-`security/SKILL.md`, `x-dependency-audit`, `x-threat-model`) permanecem inalterados. Novas skills
+`security/SKILL.md`, `x-audit-dependencies`, `x-model-threats`) permanecem inalterados. Novas skills
 e agents ESTENDEM, nao substituem.
 
 **RULE-015**: Todos os novos skill templates usam sintaxe `{{PLACEHOLDER}}` compativel com o
@@ -406,7 +406,7 @@ Feature: Security Skill Template
 
 **Tipo**: Feature — Knowledge Pack
 
-**Prioridade**: Alta (base para x-owasp-scan e hardening skills)
+**Prioridade**: Alta (base para x-scan-owasp e hardening skills)
 
 **Dependencias**: Nenhuma. Pode ser implementada em paralelo com STORY-0001.
 
@@ -918,7 +918,7 @@ Feature: DAST Scanner Skill
 
 ---
 
-### STORY-0010: OWASP Top 10 Verification Skill (x-owasp-scan)
+### STORY-0010: OWASP Top 10 Verification Skill (x-scan-owasp)
 
 **Titulo**: Verificacao automatizada OWASP Top 10 com mapeamento ASVS
 
@@ -931,11 +931,11 @@ Feature: DAST Scanner Skill
 **Contexto tecnico**:
 A verificacao OWASP Top 10 combina analise estatica de codigo com checks de configuracao para
 validar cada uma das 10 categorias OWASP. Para A06 (Vulnerable Components), delega ao
-x-dependency-audit existente. Mapeia cada verificacao para ASVS levels.
+x-audit-dependencies existente. Mapeia cada verificacao para ASVS levels.
 
 **Escopo de implementacao**:
 
-1. Criar `skills/core/x-owasp-scan/SKILL.md`
+1. Criar `skills/core/x-scan-owasp/SKILL.md`
 
 2. Verificacoes por categoria:
 
@@ -946,7 +946,7 @@ x-dependency-audit existente. Mapeia cada verificacao para ASVS levels.
 | A03 Injection | Check input validation, parameterized queries, ORM usage | V5 |
 | A04 Insecure Design | Check security design patterns, threat model presence | V1 |
 | A05 Security Misconfiguration | Check configs, defaults, debug mode, error pages | V14 |
-| A06 Vulnerable Components | Delegate to x-dependency-audit | V10 |
+| A06 Vulnerable Components | Delegate to x-audit-dependencies | V10 |
 | A07 Auth Failures | Check auth implementation, password policy, MFA | V2, V3 |
 | A08 Data Integrity Failures | Check deserialization, CI/CD security, signatures | V10 |
 | A09 Logging Failures | Check logging patterns, audit trail, monitoring | V7 |
@@ -961,10 +961,10 @@ x-dependency-audit existente. Mapeia cada verificacao para ASVS levels.
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] `x-owasp-scan/SKILL.md` criado com verificacoes para todas as 10 categorias
+- [ ] `x-scan-owasp/SKILL.md` criado com verificacoes para todas as 10 categorias
 - [ ] Cada categoria mapeia para ASVS chapters
 - [ ] Parametros `--level`, `--category`, `--report-format` documentados
-- [ ] A06 delega ao x-dependency-audit existente (RULE-011)
+- [ ] A06 delega ao x-audit-dependencies existente (RULE-011)
 - [ ] Output com pass/fail por categoria e ASVS coverage percentage
 - [ ] Score normalizado 0-100 por RULE-005
 
@@ -975,25 +975,25 @@ Feature: OWASP Top 10 Verification
 
   Cenario: Verificacao completa L1 cobre todas as 10 categorias
     DADO um projeto Java com security headers e input validation
-    QUANDO x-owasp-scan e executado com --level L1 --category all
+    QUANDO x-scan-owasp e executado com --level L1 --category all
     ENTAO o report contem resultado para cada A01 a A10
     E o ASVS coverage para L1 e calculado como percentage
 
-  Cenario: Categoria A06 delega para x-dependency-audit
+  Cenario: Categoria A06 delega para x-audit-dependencies
     DADO um projeto com dependencias
-    QUANDO x-owasp-scan e executado com --category A06
-    ENTAO o x-dependency-audit existente e invocado
+    QUANDO x-scan-owasp e executado com --category A06
+    ENTAO o x-audit-dependencies existente e invocado
     E os resultados sao integrados no report OWASP
 
   Cenario: Verificacao L3 inclui checks avancados
     DADO um projeto com requisito de alta seguranca
-    QUANDO x-owasp-scan e executado com --level L3
+    QUANDO x-scan-owasp e executado com --level L3
     ENTAO verificacoes adicionais de L3 sao executadas (crypto avancado, anti-automation, etc.)
     E o report indica quais checks sao L3-only
 
   Cenario: Projeto sem input validation falha A03
     DADO um projeto sem validacao de input em endpoints
-    QUANDO x-owasp-scan e executado
+    QUANDO x-scan-owasp e executado
     ENTAO A03 (Injection) e marcado como FAIL
     E o score reflete deducoes para findings de A03
 ```
@@ -1077,7 +1077,7 @@ Feature: SonarQube Quality Gate
 
 ---
 
-### STORY-0012: Application Hardening Evaluation Skill (x-hardening-eval)
+### STORY-0012: Application Hardening Evaluation Skill (x-evaluate-hardening)
 
 **Titulo**: Avaliacao sistematica de hardening da aplicacao contra CIS benchmarks
 
@@ -1094,7 +1094,7 @@ TLS configuration, CORS policy, cookie attributes, session management. Diferente
 
 **Escopo de implementacao**:
 
-1. Criar `skills/core/x-hardening-eval/SKILL.md`
+1. Criar `skills/core/x-evaluate-hardening/SKILL.md`
 
 2. Categorias de avaliacao:
 
@@ -1115,7 +1115,7 @@ TLS configuration, CORS policy, cookie attributes, session management. Diferente
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] `x-hardening-eval/SKILL.md` criado com 7 categorias de avaliacao
+- [ ] `x-evaluate-hardening/SKILL.md` criado com 7 categorias de avaliacao
 - [ ] Cada categoria tem peso ponderado no score final
 - [ ] Parametros `--target`, `--scope`, `--benchmark` documentados
 - [ ] Report com score por categoria e score geral
@@ -1128,19 +1128,19 @@ Feature: Application Hardening Evaluation
 
   Cenario: Aplicacao sem HSTS gera finding HIGH
     DADO uma aplicacao respondendo sem header Strict-Transport-Security
-    QUANDO x-hardening-eval e executado com --scope headers
+    QUANDO x-evaluate-hardening e executado com --scope headers
     ENTAO o report contem finding HIGH "Missing HSTS header"
     E a remediacao inclui config especifica para o framework
 
   Cenario: TLS 1.1 gera finding CRITICAL
     DADO uma aplicacao aceitando TLS 1.1
-    QUANDO x-hardening-eval e executado com --scope tls
+    QUANDO x-evaluate-hardening e executado com --scope tls
     ENTAO o report contem finding CRITICAL "TLS 1.1 is deprecated"
     E a remediacao indica como configurar TLS 1.2 minimo
 
   Cenario: Aplicacao totalmente hardened recebe score alto
     DADO uma aplicacao com todos os headers, TLS 1.3, CORS restrito, cookies secure
-    QUANDO x-hardening-eval e executado com --scope all
+    QUANDO x-evaluate-hardening e executado com --scope all
     ENTAO o score geral e >= 95
     E nenhum finding CRITICAL ou HIGH
 
@@ -1223,9 +1223,9 @@ Feature: Runtime Protection Evaluation
 
 ---
 
-### STORY-0014: Enhanced Supply Chain Analysis Skill (x-supply-chain-audit)
+### STORY-0014: Enhanced Supply Chain Analysis Skill (x-audit-supply-chain)
 
-**Titulo**: Analise profunda de supply chain alem do x-dependency-audit existente
+**Titulo**: Analise profunda de supply chain alem do x-audit-dependencies existente
 
 **Tipo**: Feature — Skill Executavel
 
@@ -1234,15 +1234,15 @@ Feature: Runtime Protection Evaluation
 **Dependencias**: STORY-0001, STORY-0002
 
 **Contexto tecnico**:
-O x-dependency-audit existente cobre vulnerabilidades (CVE), outdated packages e license
+O x-audit-dependencies existente cobre vulnerabilidades (CVE), outdated packages e license
 compliance. Esta skill ESTENDE (nao substitui) com analises mais profundas: risco de mantenedor,
 typosquatting detection, phantom dependencies, dependency age analysis e CVE exploit prediction.
 
 **Escopo de implementacao**:
 
-1. Criar `skills/core/x-supply-chain-audit/SKILL.md`
+1. Criar `skills/core/x-audit-supply-chain/SKILL.md`
 
-2. Analises adicionais (alem do x-dependency-audit):
+2. Analises adicionais (alem do x-audit-dependencies):
    - **Maintainer Risk**: single-maintainer packages, low bus factor, inactive maintainers
    - **Typosquatting Detection**: name similarity analysis contra packages populares
    - **Phantom Dependencies**: deps usadas mas nao declaradas (e.g., transitive dep usada diretamente)
@@ -1259,8 +1259,8 @@ typosquatting detection, phantom dependencies, dependency age analysis e CVE exp
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] `x-supply-chain-audit/SKILL.md` criado com 6 analises adicionais
-- [ ] Integra com x-dependency-audit existente (RULE-011, RULE-014)
+- [ ] `x-audit-supply-chain/SKILL.md` criado com 6 analises adicionais
+- [ ] Integra com x-audit-dependencies existente (RULE-011, RULE-014)
 - [ ] Parametros `--depth`, `--include-dev-deps`, `--risk-threshold` documentados
 - [ ] Risk scoring formula documentada com pesos
 - [ ] Report com risk score por dependency e score geral
@@ -1272,25 +1272,25 @@ Feature: Enhanced Supply Chain Analysis
 
   Cenario: Dependency com single maintainer gera finding MEDIUM
     DADO uma dependency com apenas 1 maintainer no registry
-    QUANDO x-supply-chain-audit e executado com --depth deep
+    QUANDO x-audit-supply-chain e executado com --depth deep
     ENTAO o report contem finding MEDIUM "Single maintainer package"
     E recomenda avaliar alternativas
 
   Cenario: Nome similar a pacote popular detecta typosquatting risk
     DADO uma dependency com nome similar a um pacote top-1000 (edit distance <= 2)
-    QUANDO x-supply-chain-audit e executado
+    QUANDO x-audit-supply-chain e executado
     ENTAO o report contem finding HIGH "Potential typosquatting"
     E indica o pacote popular similar
 
   Cenario: Dependency sem release ha mais de 1 ano gera finding LOW
     DADO uma dependency cuja ultima release foi ha 18 meses
-    QUANDO x-supply-chain-audit e executado
+    QUANDO x-audit-supply-chain e executado
     ENTAO o report contem finding LOW "Stale dependency"
     E indica a data da ultima release
 
   Cenario: Deep analysis inclui transitive dependencies
     DADO um projeto com 10 direct e 50 transitive dependencies
-    QUANDO x-supply-chain-audit e executado com --depth deep
+    QUANDO x-audit-supply-chain e executado com --depth deep
     ENTAO todas as 60 dependencies sao analisadas
     E o report distingue entre direct e transitive
 ```
@@ -1529,7 +1529,7 @@ de seguranca por ambiente (RULE-004).
 1. Criar `skills/core/x-pentest/SKILL.md`
 
 2. Fases do pentest:
-   - **Phase 1 — Reconnaissance**: x-codebase-audit (security dimension) + x-threat-model
+   - **Phase 1 — Reconnaissance**: x-codebase-audit (security dimension) + x-model-threats
    - **Phase 2 — Vulnerability Scanning**: x-sast-scan + x-dast-scan + x-container-scan + x-infra-scan + x-secret-scan
    - **Phase 3 — Exploitation Validation**: pentest-engineer agent analisa findings e valida exploitability
    - **Phase 4 — Report Generation**: Consolida findings com risk ratings, attack chains, remediacao
@@ -1598,7 +1598,7 @@ Feature: Pentest Orchestrator
 
 ---
 
-### STORY-0019: Security Posture Dashboard Skill (x-security-dashboard)
+### STORY-0019: Security Posture Dashboard Skill (x-generate-security-dashboard)
 
 **Titulo**: Dashboard consolidado de postura de seguranca com score e trend
 
@@ -1614,7 +1614,7 @@ com score geral, trend (melhorando/estavel/degradando), e risk heatmap por categ
 
 **Escopo de implementacao**:
 
-1. Criar `skills/core/x-security-dashboard/SKILL.md`
+1. Criar `skills/core/x-generate-security-dashboard/SKILL.md`
 
 2. Fontes de dados (le results existentes):
    - SAST scan results
@@ -1643,7 +1643,7 @@ com score geral, trend (melhorando/estavel/degradando), e risk heatmap por categ
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] `x-security-dashboard/SKILL.md` criado com agregacao de 10 fontes
+- [ ] `x-generate-security-dashboard/SKILL.md` criado com agregacao de 10 fontes
 - [ ] Score geral e per-dimension calculados
 - [ ] Trend analysis com comparacao temporal
 - [ ] Risk heatmap em Markdown table
@@ -1656,31 +1656,31 @@ Feature: Security Posture Dashboard
 
   Cenario: Dashboard agrega resultados de todos os scans disponiveis
     DADO resultados de SAST, DAST e secret scan no diretorio results/security/
-    QUANDO x-security-dashboard e executado
+    QUANDO x-generate-security-dashboard e executado
     ENTAO o dashboard inclui scores de SAST, DAST e secret scan
     E dimensoes sem resultados sao marcadas como "Not scanned"
     E o score geral e calculado apenas com dimensoes escaneadas
 
   Cenario: Trend analysis identifica melhoria
     DADO resultados de SAST com score 70 ha 30 dias e score 85 agora
-    QUANDO x-security-dashboard e executado com --compare-previous
+    QUANDO x-generate-security-dashboard e executado com --compare-previous
     ENTAO a dimensao SAST mostra trend "improving" (+15)
 
   Cenario: Zero resultados indica necessidade de scans
     DADO diretorio results/security/ vazio
-    QUANDO x-security-dashboard e executado
+    QUANDO x-generate-security-dashboard e executado
     ENTAO o dashboard indica "No security scans found"
     E lista os scans recomendados com comandos de execucao
 
   Cenario: Output JSON para integracao
     DADO resultados de scans disponiveis
-    QUANDO x-security-dashboard e executado com --format json
+    QUANDO x-generate-security-dashboard e executado com --format json
     ENTAO o output e JSON valido com campos: overallScore, dimensions, trend, topFindings
 ```
 
 ---
 
-### STORY-0020: Security CI Pipeline Generator (x-security-pipeline)
+### STORY-0020: Security CI Pipeline Generator (x-generate-security-pipeline)
 
 **Titulo**: Gerador de pipeline CI/CD com stages de seguranca condicionais
 
@@ -1696,16 +1696,16 @@ no config. Suporta GitHub Actions, GitLab CI e Azure DevOps.
 
 **Escopo de implementacao**:
 
-1. Criar `skills/core/x-security-pipeline/SKILL.md`
+1. Criar `skills/core/x-generate-security-pipeline/SKILL.md`
 
 2. Pipeline stages (order de execucao):
    1. **Pre-commit**: secret scan (x-secret-scan)
-   2. **Build**: SAST (x-sast-scan) + dependency audit (x-dependency-audit)
+   2. **Build**: SAST (x-sast-scan) + dependency audit (x-audit-dependencies)
    3. **Build**: SonarQube analysis (x-sonar-gate) — se habilitado
    4. **Build**: container scan (x-container-scan) — se Dockerfile presente
    5. **Deploy-staging**: DAST passive (x-dast-scan --mode passive)
-   6. **Deploy-staging**: OWASP scan (x-owasp-scan)
-   7. **Deploy-staging**: hardening eval (x-hardening-eval)
+   6. **Deploy-staging**: OWASP scan (x-scan-owasp)
+   7. **Deploy-staging**: hardening eval (x-evaluate-hardening)
    8. **Quality Gate**: SonarQube quality gate check
 
 3. Parametros:
@@ -1717,7 +1717,7 @@ no config. Suporta GitHub Actions, GitLab CI e Azure DevOps.
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] `x-security-pipeline/SKILL.md` criado com 8 stages condicionais
+- [ ] `x-generate-security-pipeline/SKILL.md` criado com 8 stages condicionais
 - [ ] Gera YAML para GH Actions, GitLab CI e Azure DevOps
 - [ ] Stages sao condicionais baseados nos flags de SecurityConfig
 - [ ] Parametros `--ci`, `--stages`, `--trigger` documentados
@@ -1730,24 +1730,24 @@ Feature: Security CI Pipeline Generator
 
   Cenario: Config com SAST e secret scan gera pipeline minimal
     DADO um config com scanning.sast: true e scanning.secretScan: true
-    QUANDO x-security-pipeline e executado com --ci github --stages minimal
+    QUANDO x-generate-security-pipeline e executado com --ci github --stages minimal
     ENTAO o workflow GH Actions e gerado com steps para secret-scan e sast-scan
     E NAO inclui steps de DAST ou container scan
 
   Cenario: Config completo gera pipeline com todas as stages
     DADO um config com todos os scanning flags habilitados e SonarQube
-    QUANDO x-security-pipeline e executado com --ci github --stages all
+    QUANDO x-generate-security-pipeline e executado com --ci github --stages all
     ENTAO o workflow contem 8 stages na ordem correta
     E o YAML e valido
 
   Cenario: GitLab CI gera stages equivalentes
     DADO o mesmo config
-    QUANDO x-security-pipeline e executado com --ci gitlab
+    QUANDO x-generate-security-pipeline e executado com --ci gitlab
     ENTAO o .gitlab-ci.yml e gerado com stages equivalentes
 
   Cenario: Stage condicional omitida quando flag e false
     DADO um config com scanning.containerScan: false
-    QUANDO x-security-pipeline e executado
+    QUANDO x-generate-security-pipeline e executado
     ENTAO a stage de container scan NAO esta presente no pipeline
 ```
 
@@ -1824,7 +1824,7 @@ Feature: Compliance Auditor Agent
 
 ### STORY-0022: Security Review Integration Enhancement
 
-**Titulo**: Enriquecimento da dimensao de seguranca no x-review com 15 items e scan references
+**Titulo**: Enriquecimento da dimensao de seguranca no x-review-codebase com 15 items e scan references
 
 **Tipo**: Enhancement — Skill Existente
 
@@ -1833,18 +1833,18 @@ Feature: Compliance Auditor Agent
 **Dependencias**: STORY-0018, STORY-0019, STORY-0020, STORY-0021
 
 **Contexto tecnico**:
-O `x-review` atual tem dimensao de seguranca com 10 items (/20). Com os novos scans disponiveis,
+O `x-review-codebase` atual tem dimensao de seguranca com 10 items (/20). Com os novos scans disponiveis,
 o security engineer no review pode referenciar resultados existentes e cobrir mais areas.
 
 **Escopo de implementacao**:
 
-1. Estender security dimension no `x-review` de 10 para 15 items:
+1. Estender security dimension no `x-review-codebase` de 10 para 15 items:
    - Items 1-10: manter existentes
    - Item 11: Secret detection compliance (referenciar x-secret-scan results)
    - Item 12: Container security posture (referenciar x-container-scan results)
-   - Item 13: Supply chain risk assessment (referenciar x-supply-chain-audit results)
-   - Item 14: Hardening compliance (referenciar x-hardening-eval results)
-   - Item 15: OWASP Top 10 coverage (referenciar x-owasp-scan results)
+   - Item 13: Supply chain risk assessment (referenciar x-audit-supply-chain results)
+   - Item 14: Hardening compliance (referenciar x-evaluate-hardening results)
+   - Item 15: OWASP Top 10 coverage (referenciar x-scan-owasp results)
 
 2. Secao "Scan Results Integration": se resultados existem em `results/security/`, referenciar
 
@@ -1852,7 +1852,7 @@ o security engineer no review pode referenciar resultados existentes e cobrir ma
 
 **Criterios de Aceitacao (DoD)**:
 
-- [ ] Security dimension estendida para 15 items no template do x-review
+- [ ] Security dimension estendida para 15 items no template do x-review-codebase
 - [ ] 5 novos items referenciam resultados de scans quando disponiveis
 - [ ] Score ajustado para /30
 - [ ] Backward compatible: funciona sem resultados de scans (items marcados como "Not scanned")
@@ -1864,13 +1864,13 @@ Feature: Security Review Integration Enhancement
 
   Cenario: Review com scan results disponiveis referencia-os
     DADO resultados de x-sast-scan e x-secret-scan em results/security/
-    QUANDO x-review e executado (dimensao de seguranca)
+    QUANDO x-review-codebase e executado (dimensao de seguranca)
     ENTAO os items 11-15 referenciam os resultados existentes
     E o score e calculado com base nos 15 items
 
   Cenario: Review sem scan results marca items como Not Scanned
     DADO nenhum resultado em results/security/
-    QUANDO x-review e executado
+    QUANDO x-review-codebase e executado
     ENTAO items 11-15 sao marcados como "Not scanned — run x-{skill} first"
     E o score e calculado apenas com items 1-10
 
@@ -1907,8 +1907,8 @@ automaticamente. Adicionar secao mapeando cada requisito ao skill que o verifica
 | Path operations | x-sast-scan | `/x-sast-scan --scope owasp` |
 | Hardcoded secrets | x-secret-scan | `/x-secret-scan --scope current` |
 | Cryptographic RNG | x-sast-scan | `/x-sast-scan --scope owasp` |
-| HTTP security headers | x-hardening-eval | `/x-hardening-eval --scope headers` |
-| TLS configuration | x-hardening-eval | `/x-hardening-eval --scope tls` |
+| HTTP security headers | x-evaluate-hardening | `/x-evaluate-hardening --scope headers` |
+| TLS configuration | x-evaluate-hardening | `/x-evaluate-hardening --scope tls` |
 
 2. Secao e condicional: apenas incluida quando scanning skills estao habilitadas.
 

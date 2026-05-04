@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0005: SAST Scanner (x-security-sast).
+ * Tests for story-0022-0005: SAST Scanner (x-run-sast).
  *
- * <p>Validates that the x-security-sast conditional skill is generated when {@code
+ * <p>Validates that the x-run-sast conditional skill is generated when {@code
  * security.scanning.sast = true}, contains all mandatory sections per security-skill-template, and
  * includes the tool selection table for 6 build tools.
  */
-@DisplayName("SAST Scanner — x-security-sast")
+@DisplayName("SAST Scanner — x-run-sast")
 class SastScanSkillTest {
 
     @Nested
@@ -30,10 +30,10 @@ class SastScanSkillTest {
     class ConditionalGeneration {
 
         @Test
-        @DisplayName("sast enabled generates x-security-sast" + " skill directory")
+        @DisplayName("sast enabled generates x-run-sast" + " skill directory")
         void assemble_sastEnabled_generatesSkillDir(@TempDir Path tempDir) throws IOException {
             generateSastOutput(tempDir);
-            Path skillDir = tempDir.resolve("output/skills/x-security-sast");
+            Path skillDir = tempDir.resolve("output/skills/x-run-sast");
             assertThat(skillDir).isDirectory();
         }
 
@@ -41,38 +41,38 @@ class SastScanSkillTest {
         @DisplayName("sast enabled generates SKILL.md file")
         void assemble_sastEnabled_generatesSkillMd(@TempDir Path tempDir) throws IOException {
             generateSastOutput(tempDir);
-            Path skillFile = tempDir.resolve("output/skills/x-security-sast/SKILL.md");
+            Path skillFile = tempDir.resolve("output/skills/x-run-sast/SKILL.md");
             assertThat(skillFile).exists();
         }
 
         @Test
-        @DisplayName("sast disabled does not generate" + " x-security-sast directory")
+        @DisplayName("sast disabled does not generate" + " x-run-sast directory")
         void assemble_sastDisabled_noSkillDir(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
             ProjectConfig config = TestConfigBuilder.builder().build();
             new SkillsAssembler().assemble(config, new TemplateEngine(), outputDir);
-            Path skillDir = outputDir.resolve("skills/x-security-sast");
+            Path skillDir = outputDir.resolve("skills/x-run-sast");
             assertThat(skillDir).doesNotExist();
         }
 
         @Test
-        @DisplayName("selectConditionalSkills includes" + " x-security-sast when sast enabled")
+        @DisplayName("selectConditionalSkills includes" + " x-run-sast when sast enabled")
         void select_sastEnabled_includesSastScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
                             .scanningFlags(true, false, false, false, false)
                             .build();
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
-            assertThat(skills).contains("x-security-sast");
+            assertThat(skills).contains("x-run-sast");
         }
 
         @Test
-        @DisplayName("selectConditionalSkills excludes" + " x-security-sast when sast disabled")
+        @DisplayName("selectConditionalSkills excludes" + " x-run-sast when sast disabled")
         void select_sastDisabled_excludesSastScan() {
             ProjectConfig config = TestConfigBuilder.builder().build();
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
-            assertThat(skills).doesNotContain("x-security-sast");
+            assertThat(skills).doesNotContain("x-run-sast");
         }
     }
 
@@ -81,10 +81,10 @@ class SastScanSkillTest {
     class SkillMdFrontmatter {
 
         @Test
-        @DisplayName("frontmatter has name x-security-sast")
+        @DisplayName("frontmatter has name x-run-sast")
         void assemble_frontmatter_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateAndRead(tempDir);
-            assertThat(content).contains("name: x-security-sast");
+            assertThat(content).contains("name: x-run-sast");
         }
 
         @Test
@@ -433,7 +433,7 @@ class SastScanSkillTest {
     private String generateAndRead(Path tempDir) throws IOException {
         generateSastOutput(tempDir);
         return Files.readString(
-                tempDir.resolve("output/skills/x-security-sast" + "/SKILL.md"),
+                tempDir.resolve("output/skills/x-run-sast" + "/SKILL.md"),
                 StandardCharsets.UTF_8);
     }
 

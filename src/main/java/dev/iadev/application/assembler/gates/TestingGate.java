@@ -23,10 +23,10 @@ public final class TestingGate implements SkillGateEvaluator {
         }
         skills.add("x-test-e2e");
         if (config.testing().performanceTests()) {
-            skills.add("x-test-perf");
+            skills.add("x-run-perf-tests");
         }
         if (config.testing().contractTests()) {
-            skills.add("x-test-contract");
+            skills.add("x-execute-contract-tests");
         }
         return skills;
     }

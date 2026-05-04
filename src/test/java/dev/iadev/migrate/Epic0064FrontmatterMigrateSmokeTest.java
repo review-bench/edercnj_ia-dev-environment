@@ -96,7 +96,7 @@ class Epic0064FrontmatterMigrateSmokeTest {
                     getClass()
                             .getClassLoader()
                             .getResource(
-                                    "targets/claude/skills/core/internal/plan/x-frontmatter-migrate/SKILL.md");
+                                    "targets/claude/skills/core/internal/plan/x-migrate-frontmatter/SKILL.md");
             assertThat(resource).as("SKILL.md should be on classpath").isNotNull();
             Path skillPath = Path.of(resource.toURI());
             var result = validator.validate(skillPath);

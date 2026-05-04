@@ -76,12 +76,12 @@ class XReviewPrFrontmatterTest {
     void phase5_phase_gate_pre_and_post_invocations_present() throws IOException {
         String content = Files.readString(SKILL_PATH);
         assertThat(content)
-                .as("Phase 5 must invoke x-internal-phase-gate with --mode pre")
+                .as("Phase 5 must invoke x-internal-verify-phase-gates with --mode pre")
                 .containsPattern(
-                        "x-internal-phase-gate.*--mode pre.*--phase.*Phase 5.*--skill x-review-pr");
+                        "x-internal-verify-phase-gates.*--mode pre.*--phase.*Phase 5.*--skill x-review-pr");
         assertThat(content)
-                .as("Phase 5 must invoke x-internal-phase-gate with --mode post")
+                .as("Phase 5 must invoke x-internal-verify-phase-gates with --mode post")
                 .containsPattern(
-                        "x-internal-phase-gate.*--mode post.*--phase.*Phase 5.*--skill x-review-pr");
+                        "x-internal-verify-phase-gates.*--mode post.*--phase.*Phase 5.*--skill x-review-pr");
     }
 }

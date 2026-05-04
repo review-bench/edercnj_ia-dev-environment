@@ -1,12 +1,12 @@
-# Phase Shift — story-0063-0006: x-epic-implement Phase 4.5 (Epic-Level Review)
+# Phase Shift — story-0063-0006: x-implement-epic Phase 4.5 (Epic-Level Review)
 
 > **Story:** story-0063-0006
 > **Epic:** EPIC-0063 (Local-First Preflight Gates)
-> **Introduced by:** story-0063-0006 — x-epic-implement Phase 4.5
+> **Introduced by:** story-0063-0006 — x-implement-epic Phase 4.5
 
 ## Summary
 
-This document formalises **Phase 4.5** inside `x-epic-implement`. The gate invokes
+This document formalises **Phase 4.5** inside `x-implement-epic`. The gate invokes
 `x-review-pr` on the epic branch as a whole after Phase 4 (Integrity Gate) but
 **before Phase 5 (Final PR: epic/XXXX → develop)**.
 
@@ -16,22 +16,22 @@ with an incomplete or deficient change-set.
 
 ---
 
-## Gate Location in x-epic-implement Phases
+## Gate Location in x-implement-epic Phases
 
 ```
-x-epic-implement phases
+x-implement-epic phases
 │
-├── Phase 0  — Argument normalisation (x-internal-args-normalize)
-├── Phase 1  — Epic load + plan (x-internal-epic-build-plan)
-├── Phase 2  — Epic branch ensure (x-internal-epic-branch-ensure)
-├── Phase 3  — Sequential story loop (x-story-implement per story)
-├── Phase 4  — Integrity gate (x-internal-epic-integrity-gate + x-internal-report-write)
+├── Phase 0  — Argument normalisation (x-internal-normalize-args)
+├── Phase 1  — Epic load + plan (x-internal-build-epic-plan)
+├── Phase 2  — Epic branch ensure (x-internal-ensure-epic-branch)
+├── Phase 3  — Sequential story loop (x-implement-story per story)
+├── Phase 4  — Integrity gate (x-internal-verify-epic-integrity + x-internal-write-report)
 │
 ├── Phase 4.5 [NEW] Epic-Level Review Gate  ◄──── gate introduced here
 │           ├── Invoke x-review-pr on epic/XXXX branch HEAD
 │           └── Write evidence → plans/epic-XXXX/reports/epic-review.md
 │
-└── Phase 5  — Final PR epic/XXXX → develop (x-git-merge + x-pr-create)
+└── Phase 5  — Final PR epic/XXXX → develop (x-merge-branches + x-create-pr)
               (PR body now INCLUDES evidence of Phase 4.5 review)
 ```
 
@@ -79,7 +79,7 @@ with `EIE_EVIDENCE_MISSING`.
 
 3. **NO-GO handling before PR creation (Rule 20 §Interactive Gates):**
    A NO-GO verdict at Phase 4.5 triggers the FIX-PR slot of the gate menu (max 3 cycles).
-   Routing fixes through `x-pr-fix-epic` before the PR is created is cleaner than
+   Routing fixes through `x-fix-epic-pr` before the PR is created is cleaner than
    amending or closing an already-open PR.
 
 ---
@@ -90,7 +90,7 @@ with `EIE_EVIDENCE_MISSING`.
 --skip-review
 ```
 
-When `--skip-review` is passed to `x-epic-implement`, Phase 4.5 is skipped entirely.
+When `--skip-review` is passed to `x-implement-epic`, Phase 4.5 is skipped entirely.
 In that case, `plans/epic-XXXX/reports/epic-review.md` is NOT created, and the final PR
 body will note the review was skipped.
 
@@ -130,7 +130,7 @@ epic-complete path to check for this file as well.
 - Rule 27 — Zero-Bypass Lifecycle (`.claude/rules/27-zero-bypass-lifecycle.md`)
 - Rule 20 — Interactive Gates Convention (`.claude/rules/20-interactive-gates.md`)
 - `x-review-pr` skill (`.claude/skills/x-review-pr/`)
-- `x-epic-implement` skill (`.claude/skills/x-epic-implement/`)
-- `x-internal-epic-integrity-gate` skill (`.claude/skills/x-internal-epic-integrity-gate/`)
+- `x-implement-epic` skill (`.claude/skills/x-implement-epic/`)
+- `x-internal-verify-epic-integrity` skill (`.claude/skills/x-internal-verify-epic-integrity/`)
 - ADR-0016 — Zero-Bypass Lifecycle Convention (`docs/adr/ADR-0016-zero-bypass-lifecycle.md`)
-- story-0063-0005 — Phase Shift for `x-story-implement` (companion document)
+- story-0063-0005 — Phase Shift for `x-implement-story` (companion document)

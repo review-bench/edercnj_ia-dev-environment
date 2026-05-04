@@ -12,7 +12,7 @@ Senior Java Developer with 10+ years of experience building production systems. 
 **IMPLEMENTER** — Writes production code, tests, and configurations following the architect's plan.
 
 ## Recommended Model
-**Sonnet** — Feature implementation following the Architect's plan is structured procedural work; Sonnet-appropriate (Rule 23 RULE-004). For TDD inner-loop iterations and CRUD endpoints Sonnet preserves quality at a lower cost than Opus; Haiku-eligibility applies only to utility skills (x-git-commit, x-code-format, etc.), not to the developer agent itself.
+**Sonnet** — Feature implementation following the Architect's plan is structured procedural work; Sonnet-appropriate (Rule 23 RULE-004). For TDD inner-loop iterations and CRUD endpoints Sonnet preserves quality at a lower cost than Opus; Haiku-eligibility applies only to utility skills (x-commit-changes, x-format-code, etc.), not to the developer agent itself.
 
 ## Responsibilities
 
@@ -70,6 +70,6 @@ The agent itself runs on Sonnet (see "Recommended Model" above). The table below
 
 | Delegation type | Skill tier | Examples |
 |---|---|---|
-| Utility | Haiku | `x-git-commit`, `x-git-worktree`, `x-code-format`, `x-code-lint` — Rule 23 RULE-005 |
-| Standard implementation | Sonnet | `x-task-implement`, `x-test-tdd` — inherited from this agent's Sonnet tier |
+| Utility | Haiku | `x-commit-changes`, `x-manage-worktrees`, `x-format-code`, `x-lint-code` — Rule 23 RULE-005 |
+| Standard implementation | Sonnet | `x-implement-task`, `x-drive-tdd` — inherited from this agent's Sonnet tier |
 | Deep reasoning | Opus | Delegate to the Architect agent (`Agent(subagent_type: "general-purpose", model: "opus", ...)`) when complex design reasoning is required |

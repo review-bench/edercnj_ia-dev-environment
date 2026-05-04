@@ -38,11 +38,11 @@ identifier    ::= [A-Za-z][A-Za-z0-9_]*
 The marker MUST appear either:
 - **On the same line** as the `Skill(...)` or `Agent(...)` call, after the closing `)`:
   ```
-  Skill(skill: "x-arch-plan", model: "opus", args: "...")  [required]
+  Skill(skill: "x-plan-architecture", model: "opus", args: "...")  [required]
   ```
 - **On the immediately following line**, alone (regex: `^\s*\[(required|optional|conditional[^\]]*)\]\s*$`):
   ```
-  Skill(skill: "x-arch-plan", model: "opus", args: "...")
+  Skill(skill: "x-plan-architecture", model: "opus", args: "...")
   [required]
   ```
 
@@ -57,17 +57,17 @@ The marker MUST appear either:
 ### Valid Examples
 
 ```markdown
-Skill(skill: "x-arch-plan", model: "opus", args: "...")  [required]
+Skill(skill: "x-plan-architecture", model: "opus", args: "...")  [required]
 
-Skill(skill: "x-threat-model", model: "sonnet", args: "...")  [conditional: scope ∈ {auth, network, persistence}]
+Skill(skill: "x-model-threats", model: "sonnet", args: "...")  [conditional: scope ∈ {auth, network, persistence}]
 
-Skill(skill: "x-spec-drift", model: "sonnet", args: "...")  [optional]
+Skill(skill: "x-detect-spec-drift", model: "sonnet", args: "...")  [optional]
 
 Agent(subagent_type: "general-purpose", description: "...", prompt: "...")  [required]
 
-Skill(skill: "x-dependency-audit", model: "haiku", args: "...")  [conditional: not flag.skip_audit]
+Skill(skill: "x-audit-dependencies", model: "haiku", args: "...")  [conditional: not flag.skip_audit]
 
-Skill(skill: "x-test-tdd", model: "sonnet", args: "...")  [conditional: scope ∈ {STANDARD, COMPLEX} and flag.tdd_required]
+Skill(skill: "x-drive-tdd", model: "sonnet", args: "...")  [conditional: scope ∈ {STANDARD, COMPLEX} and flag.tdd_required]
 ```
 
 ### Conditional Expression Whitelist
@@ -89,16 +89,16 @@ This rule applies to the **8 Anexo B orchestrators** (Rule 25 §Scope):
 
 | Orchestrator | SKILL.md |
 | :--- | :--- |
-| `x-epic-implement` | `skills/core/dev/x-epic-implement/SKILL.md` |
-| `x-story-implement` | `skills/core/dev/x-story-implement/SKILL.md` |
-| `x-task-implement` | `skills/core/dev/x-task-implement/SKILL.md` |
+| `x-implement-epic` | `skills/core/dev/x-implement-epic/SKILL.md` |
+| `x-implement-story` | `skills/core/dev/x-implement-story/SKILL.md` |
+| `x-implement-task` | `skills/core/dev/x-implement-task/SKILL.md` |
 | `x-release` | `skills/core/dev/x-release/SKILL.md` |
-| `x-epic-orchestrate` | `skills/core/dev/x-epic-orchestrate/SKILL.md` |
-| `x-review` | `skills/core/review/x-review/SKILL.md` |
+| `x-orchestrate-epic` | `skills/core/dev/x-orchestrate-epic/SKILL.md` |
+| `x-review-codebase` | `skills/core/review/x-review-codebase/SKILL.md` |
 | `x-review-pr` | `skills/core/review/x-review-pr/SKILL.md` |
-| `x-pr-merge-train` | `skills/core/pr/x-pr-merge-train/SKILL.md` |
+| `x-manage-pr-merge-train` | `skills/core/pr/x-manage-pr-merge-train/SKILL.md` |
 
-**Out of scope:** Leaf skills (e.g., `x-code-format`, `x-git-commit`) and internal skills
+**Out of scope:** Leaf skills (e.g., `x-format-code`, `x-commit-changes`) and internal skills
 (`x-internal-*`) — they do not declare sub-skill invocations in their SKILL.md bodies.
 Future epics may extend scope to leaf skills.
 

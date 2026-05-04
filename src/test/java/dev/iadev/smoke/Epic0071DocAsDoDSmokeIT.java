@@ -62,7 +62,7 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario3_xDocValidate_skillPresent_withPassContract")
     void scenario3_xDocValidate_skillPresent_withPassContract() throws IOException {
-        String s = read(SKILLS_ROOT, "ops/x-doc-validate/SKILL.md");
+        String s = read(SKILLS_ROOT, "ops/x-validate-docs/SKILL.md");
         assertThat(s)
                 .as("must document exit 0 = PASS contract")
                 .satisfiesAnyOf(
@@ -87,17 +87,17 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario4_xStoryImplement_phase3DocGate_blocksOnDocValidateFail")
     void scenario4_xStoryImplement_phase3DocGate_blocksOnDocValidateFail() throws IOException {
-        String s = read(SKILLS_ROOT, "dev/x-story-implement/SKILL.md");
+        String s = read(SKILLS_ROOT, "dev/x-implement-story/SKILL.md");
         assertThat(s)
-                .as("Phase 3 MUST invoke x-doc-generate (Rule 24 + Rule 31)")
+                .as("Phase 3 MUST invoke x-generate-docs (Rule 24 + Rule 31)")
                 .satisfiesAnyOf(
-                        c -> assertThat(c).contains("x-doc-generate"),
-                        c -> assertThat(c).contains("Skill(skill: \"x-doc-generate\""));
+                        c -> assertThat(c).contains("x-generate-docs"),
+                        c -> assertThat(c).contains("Skill(skill: \"x-generate-docs\""));
         assertThat(s)
-                .as("Phase 3 MUST invoke x-doc-validate (Rule 24 + Rule 31)")
+                .as("Phase 3 MUST invoke x-validate-docs (Rule 24 + Rule 31)")
                 .satisfiesAnyOf(
-                        c -> assertThat(c).contains("x-doc-validate"),
-                        c -> assertThat(c).contains("Skill(skill: \"x-doc-validate\""));
+                        c -> assertThat(c).contains("x-validate-docs"),
+                        c -> assertThat(c).contains("Skill(skill: \"x-validate-docs\""));
         assertThat(s).as("MUST abort with DOC_VALIDATION_FAILED").contains("DOC_VALIDATION_FAILED");
         assertThat(s)
                 .as("doc gate MUST run BEFORE verify gate (step 3.0)")
@@ -110,7 +110,7 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario5_skipDoc_confinedToRecoveryBlock")
     void scenario5_skipDoc_confinedToRecoveryBlock() throws IOException {
-        String s = read(SKILLS_ROOT, "dev/x-story-implement/SKILL.md");
+        String s = read(SKILLS_ROOT, "dev/x-implement-story/SKILL.md");
         assertThat(s).as("MUST document --skip-doc flag").contains("--skip-doc");
         assertThat(s)
                 .as("--skip-doc MUST be confined to Recovery / hotfix/* (Rule 27)")
@@ -151,7 +151,7 @@ class Epic0071DocAsDoDSmokeIT {
         assertThat(rule31)
                 .as("Rule 31 MUST reference audit-doc-freshness.sh")
                 .contains("audit-doc-freshness.sh");
-        assertThat(rule31).as("Rule 31 MUST reference x-doc-validate").contains("x-doc-validate");
+        assertThat(rule31).as("Rule 31 MUST reference x-validate-docs").contains("x-validate-docs");
         assertBaselineHasZeroEntries();
     }
 

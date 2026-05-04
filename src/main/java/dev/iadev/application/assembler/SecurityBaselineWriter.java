@@ -14,9 +14,9 @@ import java.util.List;
  * <p>Each scanning flag controls which verification mappings are included:
  *
  * <ul>
- *   <li>{@code sast} — x-security-sast mappings (7 requirements)
- *   <li>{@code secretScan} — x-security-secrets mappings (1 requirement)
- *   <li>{@code dast} — x-security-dast and x-hardening-eval mappings (2 requirements: HTTP headers
+ *   <li>{@code sast} — x-run-sast mappings (7 requirements)
+ *   <li>{@code secretScan} — x-scan-secrets mappings (1 requirement)
+ *   <li>{@code dast} — x-run-dast and x-evaluate-hardening mappings (2 requirements: HTTP headers
  *       and TLS are verified via hardening evaluation triggered alongside DAST scanning)
  * </ul>
  *
@@ -102,34 +102,34 @@ public final class SecurityBaselineWriter {
     private static List<String> buildSastRows() {
         return List.of(
                 "| Input deserialization "
-                        + "| x-security-sast "
-                        + "| `/x-security-sast --scope owasp` |",
+                        + "| x-run-sast "
+                        + "| `/x-run-sast --scope owasp` |",
                 "| String escaping "
-                        + "| x-security-sast "
-                        + "| `/x-security-sast --scope owasp` |",
+                        + "| x-run-sast "
+                        + "| `/x-run-sast --scope owasp` |",
                 "| Temp files/directories "
-                        + "| x-security-sast "
-                        + "| `/x-security-sast --scope owasp` |",
+                        + "| x-run-sast "
+                        + "| `/x-run-sast --scope owasp` |",
                 "| Path operations "
-                        + "| x-security-sast "
-                        + "| `/x-security-sast --scope owasp` |",
-                "| Error messages " + "| x-security-sast " + "| `/x-security-sast --scope owasp` |",
-                "| Crypto RNG " + "| x-security-sast " + "| `/x-security-sast --scope owasp` |",
+                        + "| x-run-sast "
+                        + "| `/x-run-sast --scope owasp` |",
+                "| Error messages " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
+                "| Crypto RNG " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
                 "| Symlink following "
-                        + "| x-security-sast "
-                        + "| `/x-security-sast --scope owasp` |");
+                        + "| x-run-sast "
+                        + "| `/x-run-sast --scope owasp` |");
     }
 
     private static List<String> buildSecretScanRows() {
         return List.of(
                 "| Hardcoded secrets/tokens/credentials "
-                        + "| x-security-secrets "
-                        + "| `/x-security-secrets` |");
+                        + "| x-scan-secrets "
+                        + "| `/x-scan-secrets` |");
     }
 
     private static List<String> buildDastRows() {
         return List.of(
-                "| HTTP security headers " + "| x-hardening-eval " + "| `/x-hardening-eval` |",
-                "| TLS configuration " + "| x-hardening-eval " + "| `/x-hardening-eval` |");
+                "| HTTP security headers " + "| x-evaluate-hardening " + "| `/x-evaluate-hardening` |",
+                "| TLS configuration " + "| x-evaluate-hardening " + "| `/x-evaluate-hardening` |");
     }
 }

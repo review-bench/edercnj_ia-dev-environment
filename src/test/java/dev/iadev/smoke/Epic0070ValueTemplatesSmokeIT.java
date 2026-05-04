@@ -43,7 +43,7 @@ class Epic0070ValueTemplatesSmokeIT {
     void scenario1_epicCreate_emitsV2ByDefault() throws IOException {
         Path skillFile =
                 SKILLS_ROOT
-                        .resolve("internal/plan/x-internal-epic-create/SKILL.md")
+                        .resolve("internal/plan/x-internal-create-epic/SKILL.md")
                         .toAbsolutePath();
 
         assertThat(skillFile).exists();
@@ -72,7 +72,7 @@ class Epic0070ValueTemplatesSmokeIT {
     void scenario2_storyCreate_emitsV2ByDefault() throws IOException {
         Path skillFile =
                 SKILLS_ROOT
-                        .resolve("internal/plan/x-internal-story-create/SKILL.md")
+                        .resolve("internal/plan/x-internal-create-story/SKILL.md")
                         .toAbsolutePath();
 
         assertThat(skillFile).exists();
@@ -116,7 +116,7 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario4_archSystemUpdate_presentWithIdempotencyContract")
     void scenario4_archSystemUpdate_presentWithIdempotencyContract() throws IOException {
-        Path skillFile = SKILLS_ROOT.resolve("plan/x-arch-system-update/SKILL.md").toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("plan/x-update-system-architecture/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile)
                 .as("x-arch-system-update SKILL.md must exist (story-0070-0006)")
@@ -140,7 +140,7 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario5_templateMigrate_presentWithParserErrorAndDryRun")
     void scenario5_templateMigrate_presentWithParserErrorAndDryRun() throws IOException {
-        Path skillFile = SKILLS_ROOT.resolve("plan/x-template-migrate/SKILL.md").toAbsolutePath();
+        Path skillFile = SKILLS_ROOT.resolve("plan/x-migrate-templates/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile)
                 .as("x-template-migrate SKILL.md must exist (story-0070-0007)")

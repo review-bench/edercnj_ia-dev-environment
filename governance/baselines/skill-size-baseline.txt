@@ -25,6 +25,6 @@
 # Updated: 2026-04-21 (story-0047-0004) — 5 KPs carved out
 #   (click-cli-patterns, k8s-helm, axum-patterns, iac-terraform,
 #   dotnet-patterns); now 20 entries remain
-core/plan/x-epic-orchestrate/SKILL.md
+core/plan/x-orchestrate-epic/SKILL.md
 # core/plan/x-story-create/SKILL.md — hard-cut in EPIC-0065 (story-0065-0006); replaced by:
-core/internal/plan/x-internal-story-create/SKILL.md
+core/internal/plan/x-internal-create-story/SKILL.md

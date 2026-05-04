@@ -103,8 +103,8 @@ Senior Site Reliability Engineer specialized in production readiness, service re
 
 ## Integration Notes
 
-- **x-review skill:** Participates as the 9th parallel reviewer alongside Security, QA, Performance, Database, Observability, DevOps, API, and Event engineers
-- **x-ops-troubleshoot skill:** Primary agent for incident diagnosis, operational troubleshooting, and production debugging guidance
+- **x-review-codebase skill:** Participates as the 9th parallel reviewer alongside Security, QA, Performance, Database, Observability, DevOps, API, and Event engineers
+- **x-troubleshoot-operations skill:** Primary agent for incident diagnosis, operational troubleshooting, and production debugging guidance
 - **SRE Practices KP:** Reads `sre-practices` knowledge pack for domain-specific patterns, SLO templates, and capacity planning guidelines
 
 ## Knowledge References

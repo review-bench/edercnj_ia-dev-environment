@@ -10,10 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * TASK-0059-0007-002: Verification tests confirming that {@code x-pr-create} SKILL.md declares the
+ * TASK-0059-0007-002: Verification tests confirming that {@code x-create-pr} SKILL.md declares the
  * {@code ## Orchestrator Evidence} injection (Phase 3.5).
  *
- * <p>These tests verify the structural requirements of the extended {@code x-pr-create} SKILL.md
+ * <p>These tests verify the structural requirements of the extended {@code x-create-pr} SKILL.md
  * under the source-of-truth directory. They act as regression guards ensuring the Phase 3.5
  * Orchestrator Evidence section is not accidentally removed.
  *
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  *   <li>Phase 3.5 section header is present.
  *   <li>Orchestrator Evidence bash block is present (Story IDs extraction).
  *   <li>{@code --no-story-evidence} flag is declared in the parameters table.
- *   <li>{@code Invocation Skill | x-story-implement} canonical value is present.
+ *   <li>{@code Invocation Skill | x-implement-story} canonical value is present.
  *   <li>Both Phase 1 and Phase 3 artifact collection loops are present.
  * </ol>
  *
@@ -34,15 +34,15 @@ import org.junit.jupiter.api.Test;
 class Epic0059XPrCreateEvidenceTest {
 
     private static final String SOURCE_SKILL_PATH =
-            "src/main/resources/targets/claude/skills/core/pr/x-pr-create/SKILL.md";
+            "src/main/resources/targets/claude/skills/core/pr/x-create-pr/SKILL.md";
 
-    private static final String GENERATED_SKILL_PATH = ".claude/skills/x-pr-create/SKILL.md";
+    private static final String GENERATED_SKILL_PATH = ".claude/skills/x-create-pr/SKILL.md";
 
     @Test
-    @DisplayName("sourceSkillExists — source-of-truth x-pr-create/SKILL.md must exist")
+    @DisplayName("sourceSkillExists — source-of-truth x-create-pr/SKILL.md must exist")
     void sourceSkillExists() {
         Path skill = repoRoot().resolve(SOURCE_SKILL_PATH);
-        assertThat(skill).as("source-of-truth x-pr-create SKILL.md must exist").isRegularFile();
+        assertThat(skill).as("source-of-truth x-create-pr SKILL.md must exist").isRegularFile();
     }
 
     @Test
@@ -74,13 +74,13 @@ class Epic0059XPrCreateEvidenceTest {
 
     @Test
     @DisplayName(
-            "sourceSkillContainsCanonicalInvocationSkill — x-story-implement as canonical value")
+            "sourceSkillContainsCanonicalInvocationSkill — x-implement-story as canonical value")
     void sourceSkillContainsCanonicalInvocationSkill() throws IOException {
         String content = readSourceSkill();
         assertThat(content)
                 .as(
-                        "source SKILL.md must set 'Invocation Skill | x-story-implement' (not a placeholder)")
-                .contains("Invocation Skill | x-story-implement");
+                        "source SKILL.md must set 'Invocation Skill | x-implement-story' (not a placeholder)")
+                .contains("Invocation Skill | x-implement-story");
     }
 
     @Test
@@ -117,7 +117,7 @@ class Epic0059XPrCreateEvidenceTest {
         }
         String content = Files.readString(generated, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("generated .claude/skills/x-pr-create/SKILL.md must also contain Phase 3.5")
+                .as("generated .claude/skills/x-create-pr/SKILL.md must also contain Phase 3.5")
                 .contains("Phase 3.5 -- Inject Orchestrator Evidence");
     }
 

@@ -1,14 +1,20 @@
 # SPEC — Verb-First Skill Naming Refactor
 
-**Status:** Refined  
-**Versão:** 1.1  
-**Data:** 2026-04-29  
+**Status:** Accepted  
+**Versão:** 1.2  
+**Data:** 2026-05-03  
 **Autor:** GitHub Copilot CLI + Eder Junior  
 **Epic:** EPIC-0076
 
+> **v1.2 — Inventário real (2026-05-03):**
+> - Auditoria completa do catálogo em disco (`src/main/resources/targets/claude/skills/**`) contra a matriz v1.1.
+> - 2 skills encontradas no disco mas ausentes da SPEC: `x-update-system-architecture` (seção 6.4) e `x-run-dynamic-pentest` (seção 6.7) — adicionadas.
+> - 17 skills fantasmas (na SPEC mas não materializadas no disco) marcadas com nota `[não materializada — skip rename]`. As skills públicas `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create` existiam como skills públicas mas foram convertidas a internals por EPIC-0065 (hard-cut). As demais (`x-test-property`, `x-test-quality`, `x-test-regression-service`, `x-test-regression-self`, `x-doc-generate-v2`, `x-pr-body-render`, `x-license-check`, `x-dep-validate-with-policy`, internals do pr-body e doc) não foram materializadas por épicos predecessores.
+> - Matriz v1.2 é a fonte canônica para execução das stories 0003–0005.
+
 > **v1.1 — Refinamento (2026-04-29):**
 > - 11 skills do catálogo atual ausentes na v1.0 foram adicionadas à matriz canônica nas seções 6.1 e 6.4.
-> - Reordenadas seções para refletir presença real de `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create`, `x-parallel-eval`, `x-spec-drift`, `x-mcp-recommend`, `x-frontmatter-migrate`, `x-ci-generate`, `x-setup-env`, `x-setup-stack`.
+> - Reordenadas seções para refletir presença real de `x-epic-create`, `x-epic-decompose`, `x-epic-map`, `x-story-create`, `x-evaluate-parallelism`, `x-detect-spec-drift`, `x-recommend-mcp`, `x-migrate-frontmatter`, `x-generate-ci`, `x-setup-env`, `x-setup-stack`.
 > - Esclarecido que `x-setup-env` e `x-setup-stack` já estão em forma verb-first aceitável (não renomear).
 
 > SPEC funcional para a segunda onda de renomeação de skills.
@@ -19,7 +25,7 @@
 
 ## 1. Contexto
 
-O repositório já passou por uma primeira padronização de skills em EPIC-0036, que consolidou principalmente o formato **substantivo + ação** (`x-epic-decompose`, `x-story-implement`, `x-pr-fix`). A partir dos épicos posteriores, especialmente EPIC-0065, o catálogo continuará mudando com novas skills públicas e internas (`x-feature-create`, `x-feature-ideate`, `x-internal-epic-create`, `x-internal-epic-map`, `x-internal-story-create`).
+O repositório já passou por uma primeira padronização de skills em EPIC-0036, que consolidou principalmente o formato **substantivo + ação** (`x-epic-decompose`, `x-implement-story`, `x-fix-pr`). A partir dos épicos posteriores, especialmente EPIC-0065, o catálogo continuará mudando com novas skills públicas e internas (`x-create-feature`, `x-ideate-feature`, `x-internal-create-epic`, `x-internal-map-epic`, `x-internal-create-story`).
 
 O problema remanescente é semântico: ainda há muitos nomes que não representam a ação principal da skill logo no prefixo verbal. Para operadores, isso reduz previsibilidade. Para autores de docs, rules e templates, isso força memorizar exceções. Para futuras sessões LLM, a descoberta do comando correto fica menos natural do que deveria.
 
@@ -80,10 +86,10 @@ Objetivo: tornar o catálogo mais intencional, com o verbo aparecendo primeiro e
 
 | Ruim / ambíguo | Melhor |
 | :--- | :--- |
-| `x-epic-implement` | `x-implement-epic` |
-| `x-pr-fix` | `x-fix-pr` |
-| `x-test-run` | `x-execute-tests` |
-| `x-internal-story-load-context` | `x-internal-load-story-context` |
+| `x-implement-epic` | `x-implement-epic` |
+| `x-fix-pr` | `x-fix-pr` |
+| `x-execute-tests` | `x-execute-tests` |
+| `x-internal-load-story-context` | `x-internal-load-story-context` |
 
 ---
 
@@ -93,12 +99,12 @@ Esta SPEC assume que, antes de EPIC-0076 entrar em execução, os seguintes épi
 
 | Epic | Impacto no catálogo |
 | :--- | :--- |
-| EPIC-0065 | introduz `x-feature-ideate`, `x-feature-create`, `x-internal-epic-create`, `x-internal-epic-map`, `x-internal-story-create` |
+| EPIC-0065 | introduz `x-ideate-feature`, `x-create-feature`, `x-internal-create-epic`, `x-internal-map-epic`, `x-internal-create-story` |
 | EPIC-0066 | introduz surface de renderização de PR body |
-| EPIC-0069 | introduz skills de refinement (`x-story-refine`, `x-epic-refine`) |
+| EPIC-0069 | introduz skills de refinement (`x-refine-story`, `x-refine-epic`) |
 | EPIC-0072 | amplia catálogo de testes avançados |
 | EPIC-0073 | amplia catálogo de testes de regressão |
-| EPIC-0075 | introduz `x-memory-search` e `x-internal-epic-summary` |
+| EPIC-0075 | introduz `x-search-memory` e `x-internal-summarize-epic` |
 
 Regra prática: quando um nome futuro já estiver definido por um épico anterior, EPIC-0076 renomeia **esse nome futuro**, não o predecessor histórico.
 
@@ -112,82 +118,83 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-feature-ideate | x-ideate-feature |
-| x-feature-create | x-create-feature |
-| x-epic-create | x-create-epic |
-| x-story-create | x-create-story |
-| x-epic-decompose | x-decompose-epic |
-| x-epic-map | x-map-epic |
-| x-epic-orchestrate | x-orchestrate-epic |
-| x-arch-plan | x-plan-architecture |
-| x-arch-update | x-update-architecture |
-| x-adr-generate | x-generate-adr |
-| x-story-plan | x-plan-story |
-| x-task-plan | x-plan-task |
-| x-epic-implement | x-implement-epic |
-| x-story-implement | x-implement-story |
-| x-task-implement | x-implement-task |
-| x-story-refine | x-refine-story |
-| x-epic-refine | x-refine-epic |
-| x-threat-model | x-model-threats |
-| x-spec-drift | x-detect-spec-drift |
-| x-parallel-eval | x-evaluate-parallelism |
+| x-ideate-feature | x-ideate-feature |
+| x-create-feature | x-create-feature |
+| x-epic-create | ~~x-create-epic~~ *[não materializada — skip rename: convertida a x-internal-create-epic por EPIC-0065]* |
+| x-story-create | ~~x-create-story~~ *[não materializada — skip rename: convertida a x-internal-create-story por EPIC-0065]* |
+| x-epic-decompose | ~~x-decompose-epic~~ *[não materializada — skip rename: removida hard-cut por EPIC-0065]* |
+| x-epic-map | ~~x-map-epic~~ *[não materializada — skip rename: convertida a x-internal-map-epic por EPIC-0065]* |
+| x-orchestrate-epic | x-orchestrate-epic |
+| x-plan-architecture | x-plan-architecture |
+| x-update-architecture | x-update-architecture |
+| x-update-system-architecture | x-update-system-architecture |
+| x-generate-adr | x-generate-adr |
+| x-plan-story | x-plan-story |
+| x-plan-task | x-plan-task |
+| x-implement-epic | x-implement-epic |
+| x-implement-story | x-implement-story |
+| x-implement-task | x-implement-task |
+| x-refine-story | x-refine-story |
+| x-refine-epic | x-refine-epic |
+| x-model-threats | x-model-threats |
+| x-detect-spec-drift | x-detect-spec-drift |
+| x-evaluate-parallelism | x-evaluate-parallelism |
 
 ### 6.2 Testes
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-test-plan | x-plan-tests |
-| x-test-run | x-execute-tests |
-| x-test-tdd | x-drive-tdd |
-| x-test-e2e | x-execute-e2e-tests |
-| x-test-contract | x-execute-contract-tests |
-| x-test-contract-lint | x-lint-contract-tests |
-| x-test-smoke-api | x-execute-api-smoke-tests |
-| x-test-smoke-socket | x-execute-socket-smoke-tests |
-| x-test-perf | x-execute-performance-tests |
-| x-test-performance *(se EPIC-0072 introduzir nome expandido)* | x-execute-performance-tests |
-| x-test-mutation | x-execute-mutation-tests |
-| x-test-property | x-execute-property-tests |
-| x-test-quality | x-assess-test-quality |
-| x-test-regression-shell | x-execute-shell-regression-tests |
-| x-test-regression-service | x-execute-service-regression-tests |
-| x-test-regression-self | x-execute-self-regression-tests |
+| x-plan-tests | x-plan-tests |
+| x-execute-tests | x-execute-tests |
+| x-drive-tdd | x-drive-tdd |
+| x-execute-e2e-tests | x-execute-e2e-tests |
+| x-execute-contract-tests | x-execute-contract-tests |
+| x-lint-contract-tests | x-lint-contract-tests |
+| x-execute-api-smoke-tests | x-execute-api-smoke-tests |
+| x-execute-socket-smoke-tests | x-execute-socket-smoke-tests |
+| x-run-perf-tests | x-execute-performance-tests |
+| x-execute-performance-tests *(se EPIC-0072 introduzir nome expandido)* | x-execute-performance-tests |
+| x-execute-mutation-tests | x-execute-mutation-tests |
+| x-test-property | ~~x-execute-property-tests~~ *[não materializada — skip rename]* |
+| x-test-quality | ~~x-assess-test-quality~~ *[não materializada — skip rename]* |
+| x-execute-shell-regression-tests | x-execute-shell-regression-tests |
+| x-test-regression-service | ~~x-execute-service-regression-tests~~ *[não materializada — skip rename]* |
+| x-test-regression-self | ~~x-execute-self-regression-tests~~ *[não materializada — skip rename]* |
 
 ### 6.3 Review
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-review | x-review-codebase |
+| x-review-codebase | x-review-codebase |
 | x-review-pr | x-review-pr |
 | x-review-qa | x-review-qa |
-| x-review-perf | x-review-performance |
+| x-review-performance | x-review-performance |
 | x-review-api | x-review-api |
-| x-review-db | x-review-database |
+| x-review-database | x-review-database |
 | x-review-devops | x-review-devops |
 | x-review-events | x-review-events |
-| x-review-obs | x-review-observability |
+| x-review-observability | x-review-observability |
 | x-review-security | x-review-security |
 | x-review-graphql | x-review-graphql |
 | x-review-grpc | x-review-grpc |
 | x-review-gateway | x-review-gateway |
 | x-review-compliance | x-review-compliance |
 | x-review-data-modeling | x-review-data-modeling |
-| x-code-audit | x-audit-code |
+| x-audit-code | x-audit-code |
 
 ### 6.4 Code, docs, templates e setup de ambiente
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-code-format | x-format-code |
-| x-code-lint | x-lint-code |
-| x-doc-generate | x-generate-docs |
-| x-doc-generate-v2 | x-generate-docs-v2 |
-| x-doc-validate | x-validate-docs |
-| x-template-migrate | x-migrate-templates |
-| x-frontmatter-migrate | x-migrate-frontmatter |
-| x-ci-generate | x-generate-ci |
-| x-mcp-recommend | x-recommend-mcp |
+| x-format-code | x-format-code |
+| x-lint-code | x-lint-code |
+| x-generate-docs | x-generate-docs |
+| x-doc-generate-v2 | ~~x-generate-docs-v2~~ *[não materializada — skip rename]* |
+| x-validate-docs | x-validate-docs |
+| x-migrate-templates | x-migrate-templates |
+| x-migrate-frontmatter | x-migrate-frontmatter |
+| x-generate-ci | x-generate-ci |
+| x-recommend-mcp | x-recommend-mcp |
 | x-setup-env | x-setup-env *(já em verb-first; sem renome)* |
 | x-setup-stack | x-setup-stack *(já em verb-first; sem renome)* |
 
@@ -195,100 +202,101 @@ Regra prática: quando um nome futuro já estiver definido por um épico anterio
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-git-branch | x-create-git-branch |
-| x-git-cleanup-branches | x-cleanup-git-branches |
-| x-git-commit | x-commit-changes |
-| x-git-merge | x-merge-branches |
-| x-git-push | x-push-branch |
-| x-git-worktree | x-manage-worktrees |
-| x-planning-commit | x-commit-planning |
-| x-pr-create | x-create-pr |
-| x-pr-fix | x-fix-pr |
-| x-pr-fix-epic | x-fix-epic-pr |
-| x-pr-merge | x-merge-pr |
-| x-pr-merge-train | x-manage-pr-merge-train |
-| x-pr-watch-ci | x-watch-pr-ci |
-| x-pr-body-render | x-render-pr-body |
+| x-create-git-branch | x-create-git-branch |
+| x-cleanup-git-branches | x-cleanup-git-branches |
+| x-commit-changes | x-commit-changes |
+| x-merge-branches | x-merge-branches |
+| x-push-branch | x-push-branch |
+| x-manage-worktrees | x-manage-worktrees |
+| x-commit-planning | x-commit-planning |
+| x-create-pr | x-create-pr |
+| x-fix-pr | x-fix-pr |
+| x-fix-epic-pr | x-fix-epic-pr |
+| x-merge-pr | x-merge-pr |
+| x-manage-pr-merge-train | x-manage-pr-merge-train |
+| x-watch-pr-ci | x-watch-pr-ci |
+| x-pr-body-render | ~~x-render-pr-body~~ *[não materializada — skip rename]* |
 
 ### 6.6 Operações, release e telemetria
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-ops-incident | x-handle-incident |
-| x-ops-troubleshoot | x-troubleshoot-operations |
-| x-perf-profile | x-profile-performance |
+| x-handle-incident | x-handle-incident |
+| x-troubleshoot-operations | x-troubleshoot-operations |
+| x-profile-performance | x-profile-performance |
 | x-release | x-release |
-| x-release-changelog | x-generate-release-changelog |
-| x-status-reconcile | x-reconcile-status |
-| x-telemetry-analyze | x-analyze-telemetry |
-| x-telemetry-trend | x-analyze-telemetry-trends |
-| x-obs-instrument | x-instrument-observability |
-| x-memory-search | x-search-memory |
+| x-generate-release-changelog | x-generate-release-changelog |
+| x-reconcile-status | x-reconcile-status |
+| x-analyze-telemetry | x-analyze-telemetry |
+| x-analyze-telemetry-trends | x-analyze-telemetry-trends |
+| x-instrument-observability | x-instrument-observability |
+| x-search-memory | x-search-memory |
 
 ### 6.7 Segurança, dependências e compliance técnica
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-dependency-audit | x-audit-dependencies |
-| x-supply-chain-audit | x-audit-supply-chain |
-| x-hardening-eval | x-evaluate-hardening |
-| x-runtime-eval | x-evaluate-runtime |
-| x-owasp-scan | x-scan-owasp |
-| x-security-dashboard | x-generate-security-dashboard |
-| x-security-pipeline | x-generate-security-pipeline |
-| x-security-secrets | x-scan-secrets |
-| x-security-sast | x-run-sast |
-| x-security-dast | x-run-dast |
-| x-security-container | x-scan-container-security |
-| x-security-pentest | x-run-pentest |
-| x-security-infra | x-assess-infrastructure-security |
-| x-security-sonar | x-run-sonar-security |
-| x-license-check | x-check-licenses |
-| x-dep-policy-validate | x-validate-dependency-policy |
-| x-dep-validate-with-policy | x-validate-dependencies-with-policy |
+| x-audit-dependencies | x-audit-dependencies |
+| x-audit-supply-chain | x-audit-supply-chain |
+| x-evaluate-hardening | x-evaluate-hardening |
+| x-evaluate-runtime | x-evaluate-runtime |
+| x-scan-owasp | x-scan-owasp |
+| x-generate-security-dashboard | x-generate-security-dashboard |
+| x-generate-security-pipeline | x-generate-security-pipeline |
+| x-scan-secrets | x-scan-secrets |
+| x-run-sast | x-run-sast |
+| x-run-dast | x-run-dast |
+| x-scan-container-security | x-scan-container-security |
+| x-run-dynamic-pentest | x-run-dynamic-pentest |
+| x-run-pentest | x-run-pentest |
+| x-assess-infrastructure-security | x-assess-infrastructure-security |
+| x-run-sonar-security | x-run-sonar-security |
+| x-license-check | ~~x-check-licenses~~ *[não materializada — skip rename]* |
+| x-validate-dependency-policy | x-validate-dependency-policy |
+| x-dep-validate-with-policy | ~~x-validate-dependencies-with-policy~~ *[não materializada — skip rename]* |
 
 ### 6.8 Jira
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-jira-create-epic | x-create-jira-epic |
-| x-jira-create-stories | x-create-jira-stories |
+| x-create-jira-epic | x-create-jira-epic |
+| x-create-jira-stories | x-create-jira-stories |
 
 ### 6.9 Internas
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
-| x-internal-args-normalize | x-internal-normalize-args |
-| x-internal-epic-branch-ensure | x-internal-ensure-epic-branch |
-| x-internal-epic-build-plan | x-internal-build-epic-plan |
-| x-internal-epic-integrity-gate | x-internal-verify-epic-integrity |
-| x-internal-epic-create | x-internal-create-epic |
-| x-internal-epic-map | x-internal-map-epic |
-| x-internal-epic-summary | x-internal-summarize-epic |
-| x-internal-phase-gate | x-internal-verify-phase-gates |
-| x-internal-report-write | x-internal-write-report |
-| x-internal-status-update | x-internal-update-status |
-| x-internal-story-build-plan | x-internal-build-story-plan |
-| x-internal-story-create | x-internal-create-story |
-| x-internal-story-load-context | x-internal-load-story-context |
-| x-internal-story-report | x-internal-write-story-report |
-| x-internal-story-resume | x-internal-resume-story |
-| x-internal-story-verify | x-internal-verify-story |
-| x-internal-worktree-precheck | x-internal-precheck-worktree |
-| x-internal-pr-body-render | x-internal-render-pr-body |
-| x-internal-pr-body-render-backlog | x-internal-render-backlog-pr-body |
-| x-internal-pr-body-render-impl | x-internal-render-implementation-pr-body |
-| x-internal-pr-backlog-render | x-internal-render-pr-backlog |
-| x-internal-doc-generate-step | x-internal-generate-doc-step |
-| x-internal-doc-validate-step | x-internal-validate-doc-step |
+| x-internal-normalize-args | x-internal-normalize-args |
+| x-internal-ensure-epic-branch | x-internal-ensure-epic-branch |
+| x-internal-build-epic-plan | x-internal-build-epic-plan |
+| x-internal-verify-epic-integrity | x-internal-verify-epic-integrity |
+| x-internal-create-epic | x-internal-create-epic |
+| x-internal-map-epic | x-internal-map-epic |
+| x-internal-summarize-epic | x-internal-summarize-epic |
+| x-internal-verify-phase-gates | x-internal-verify-phase-gates |
+| x-internal-write-report | x-internal-write-report |
+| x-internal-update-status | x-internal-update-status |
+| x-internal-build-story-plan | x-internal-build-story-plan |
+| x-internal-create-story | x-internal-create-story |
+| x-internal-load-story-context | x-internal-load-story-context |
+| x-internal-write-story-report | x-internal-write-story-report |
+| x-internal-resume-story | x-internal-resume-story |
+| x-internal-verify-story | x-internal-verify-story |
+| x-internal-precheck-worktree | x-internal-precheck-worktree |
+| x-internal-render-pr-body | x-internal-render-pr-body |
+| x-internal-pr-body-render-backlog | ~~x-internal-render-backlog-pr-body~~ *[não materializada — skip rename]* |
+| x-internal-pr-body-render-impl | ~~x-internal-render-implementation-pr-body~~ *[não materializada — skip rename]* |
+| x-internal-pr-backlog-render | ~~x-internal-render-pr-backlog~~ *[não materializada — skip rename]* |
+| x-internal-doc-generate-step | ~~x-internal-generate-doc-step~~ *[não materializada — skip rename]* |
+| x-internal-doc-validate-step | ~~x-internal-validate-doc-step~~ *[não materializada — skip rename]* |
 
 ### 6.10 Libs internas
 
 | Baseline considerada | Nome canônico proposto |
 | :--- | :--- |
 | x-lib-audit-rules | x-lib-audit-rules |
-| x-lib-group-verifier | x-lib-verify-group |
-| x-lib-task-decomposer | x-lib-decompose-task |
+| x-lib-verify-group | x-lib-verify-group |
+| x-lib-decompose-task | x-lib-decompose-task |
 
 ---
 

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Epic0072PerformanceSkillSmokeIT — x-test-performance structural invariants")
+@DisplayName("Epic0072PerformanceSkillSmokeIT — x-execute-performance-tests structural invariants")
 class Epic0072PerformanceSkillSmokeIT {
 
     private static final Path SKILL_ROOT =
@@ -26,7 +26,7 @@ class Epic0072PerformanceSkillSmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-performance");
+                    "x-execute-performance-tests");
 
     private static final Path KP_ROOT =
             Path.of(
@@ -132,7 +132,7 @@ class Epic0072PerformanceSkillSmokeIT {
                                     dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT,
                                     dev.iadev.domain.model.AiMemoryConfig.DEFAULT));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
-            assertThat(skills).contains("x-test-performance");
+            assertThat(skills).contains("x-execute-performance-tests");
         }
 
         @Test
@@ -141,7 +141,7 @@ class Epic0072PerformanceSkillSmokeIT {
             var config = TestConfigBuilder.builder().build();
             assertThat(config.quality().performance().enabled()).isFalse();
             List<String> skills = SkillsSelection.selectQualitySkills(config);
-            assertThat(skills).doesNotContain("x-test-performance");
+            assertThat(skills).doesNotContain("x-execute-performance-tests");
         }
 
         @Test

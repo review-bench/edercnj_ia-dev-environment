@@ -26,7 +26,7 @@ emit human-readable progress messages during CLI generator runs:
 
 ```
 [START] assemble-skills (42 steps)
-[1] assemble-skills: copying skills/x-git-commit
+[1] assemble-skills: copying skills/x-commit-changes
 [DONE] assemble-skills
 [ERROR] assemble-skills: missing template
 ```

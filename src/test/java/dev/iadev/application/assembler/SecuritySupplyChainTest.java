@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Tests for story-0013-0021: Security KP extension with SBOM/supply chain content and
- * x-dependency-audit extension with SBOM generation capabilities.
+ * x-audit-dependencies extension with SBOM generation capabilities.
  */
 @Disabled(
         "EPIC-0051 complete: SkillsAssembler no longer emits KP output under .claude/skills/{kp}/; replaced by KnowledgePackMigrationSmokeTest + KnowledgeAssemblerTest on the new .claude/knowledge/ layout. See ADR-0013.")
@@ -231,25 +231,25 @@ class SecuritySupplyChainTest {
     }
 
     @Nested
-    @DisplayName("x-dependency-audit — SBOM Extension")
+    @DisplayName("x-audit-dependencies — SBOM Extension")
     class DependencyAuditSbom {
 
         @Test
-        @DisplayName("x-dependency-audit contains SBOM" + " Generation section")
+        @DisplayName("x-audit-dependencies contains SBOM" + " Generation section")
         void assemble_depAudit_hasSbomSection(@TempDir Path tempDir) throws IOException {
             String content = generateDepAuditContent(tempDir);
             assertThat(content).contains("## SBOM Generation");
         }
 
         @Test
-        @DisplayName("x-dependency-audit contains License" + " Attribution Report section")
+        @DisplayName("x-audit-dependencies contains License" + " Attribution Report section")
         void assemble_depAudit_hasLicenseReport(@TempDir Path tempDir) throws IOException {
             String content = generateDepAuditContent(tempDir);
             assertThat(content).contains("## License Attribution Report");
         }
 
         @Test
-        @DisplayName("x-dependency-audit contains" + " Dependency Tree Visualization section")
+        @DisplayName("x-audit-dependencies contains" + " Dependency Tree Visualization section")
         void assemble_depAudit_hasDependencyTree(@TempDir Path tempDir) throws IOException {
             String content = generateDepAuditContent(tempDir);
             assertThat(content).contains("## Dependency Tree Visualization");
@@ -264,7 +264,7 @@ class SecuritySupplyChainTest {
     }
 
     @Nested
-    @DisplayName("x-dependency-audit — Backward" + " Compatibility")
+    @DisplayName("x-audit-dependencies — Backward" + " Compatibility")
     class DependencyAuditBackwardCompat {
 
         @Test
@@ -298,7 +298,7 @@ class SecuritySupplyChainTest {
         @DisplayName("existing content preserved:" + " frontmatter")
         void assemble_depAudit_preservesFrontmatter(@TempDir Path tempDir) throws IOException {
             String content = generateDepAuditContent(tempDir);
-            assertThat(content).contains("name: x-dependency-audit").contains("allowed-tools:");
+            assertThat(content).contains("name: x-audit-dependencies").contains("allowed-tools:");
         }
     }
 
@@ -317,7 +317,7 @@ class SecuritySupplyChainTest {
         SkillsAssembler assembler = new SkillsAssembler();
         assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve("skills/x-dependency-audit/" + "SKILL.md"),
+                outputDir.resolve("skills/x-audit-dependencies/" + "SKILL.md"),
                 StandardCharsets.UTF_8);
     }
 

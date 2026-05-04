@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates x-internal-pr-body-render/SKILL.md contract via static inspection.
+ * Validates x-internal-render-pr-body/SKILL.md contract via static inspection.
  *
  * <p>Checks: frontmatter (visibility=internal, user-invocable=false, model=haiku), body marker, 5
  * numbered phases with balanced telemetry markers, exit-code contract, fail-open placeholders,
@@ -28,7 +28,7 @@ class XInternalPrBodyRenderImplementationTest {
     private static final Path SKILL_MD =
             Path.of(
                     "src/main/resources/targets/claude/skills/core/internal/pr"
-                            + "/x-internal-pr-body-render/SKILL.md");
+                            + "/x-internal-render-pr-body/SKILL.md");
 
     private static String content;
 
@@ -101,9 +101,9 @@ class XInternalPrBodyRenderImplementationTest {
         @DisplayName("phase.start markers match phase.end markers in count")
         void phaseMarkers_areBalanced() {
             long starts =
-                    countOccurrences(content, "telemetry-phase.sh start x-internal-pr-body-render");
+                    countOccurrences(content, "telemetry-phase.sh start x-internal-render-pr-body");
             long ends =
-                    countOccurrences(content, "telemetry-phase.sh end x-internal-pr-body-render");
+                    countOccurrences(content, "telemetry-phase.sh end x-internal-render-pr-body");
             assertThat(starts).as("phase.start count").isEqualTo(5);
             assertThat(ends).as("phase.end count").isEqualTo(5);
             assertThat(starts).as("starts must equal ends").isEqualTo(ends);

@@ -62,7 +62,7 @@ Agent(
 
 **Requirement:** the parent's `allowed-tools` MUST include `Agent`. The subagent itself has access to all tools (Read, Write, Edit, Skill, TaskCreate, TaskUpdate, etc.) by default — the `general-purpose` type inherits the full toolset.
 
-**Parallelism:** To launch multiple `general-purpose` subagents in parallel, emit all `Agent(...)` calls as SIBLING tool calls in the SAME assistant message. See `x-story-implement` Phases 1B-1F "Parallelism + tracking batching" section for the canonical parallel dispatch pattern (Batch A = all TaskCreate + Agent launches as siblings; Batch B = all TaskUpdate as siblings after results return).
+**Parallelism:** To launch multiple `general-purpose` subagents in parallel, emit all `Agent(...)` calls as SIBLING tool calls in the SAME assistant message. See `x-implement-story` Phases 1B-1F "Parallelism + tracking batching" section for the canonical parallel dispatch pattern (Batch A = all TaskCreate + Agent launches as siblings; Batch B = all TaskUpdate as siblings after results return).
 
 ### Pattern 3 — SUBAGENT-RESEARCH (no Skill call, pure exploration)
 
@@ -94,7 +94,7 @@ Invoke /x-foo with args
 ```
 
 ```markdown
-Each phase delegates to `/x-git-commit`: ...
+Each phase delegates to `/x-commit-changes`: ...
 ```
 
 They look like tool calls but are just text. The LLM must guess whether to literally execute them or read them as prose, and that ambiguity has caused silent delegation failures in this project. EPIC-0033 diagnosed **13 distinct logical routes (24 physical locations)** across 7 files where this pattern was in use; all were converted to one of the 3 permitted patterns above.
@@ -164,14 +164,14 @@ Do NOT add any of the following to a skill body:
 
 ## Telemetry Markers (story-0040-0006)
 
-Skills that participate in the implementation workflow (`x-epic-implement`, `x-story-implement`, `x-task-implement`, `x-task-plan`, and future siblings) MUST emit `phase.start` / `phase.end` telemetry markers around every numbered phase. Markers let operators analyse "which workflow phase is the bottleneck" without touching skill code — the signal is semantic, not just mechanical (passive hooks capture `tool.call` but not "which phase this call belongs to").
+Skills that participate in the implementation workflow (`x-implement-epic`, `x-implement-story`, `x-implement-task`, `x-plan-task`, and future siblings) MUST emit `phase.start` / `phase.end` telemetry markers around every numbered phase. Markers let operators analyse "which workflow phase is the bottleneck" without touching skill code — the signal is semantic, not just mechanical (passive hooks capture `tool.call` but not "which phase this call belongs to").
 
 ### When to Emit
 
 | Situation | Emit? |
 | :--- | :--- |
 | Numbered phase of an implementation skill (Phase 1, Phase 2, ...) | Yes — one `phase.start` at entry + one `phase.end` at exit |
-| TDD sub-phase of `x-task-implement` (Red / Green / Refactor) | Yes — one pair per sub-phase |
+| TDD sub-phase of `x-implement-task` (Red / Green / Refactor) | Yes — one pair per sub-phase |
 | Non-numbered prose sections (Integration Notes, Glossary) | No — captured passively by hooks |
 | Skill with zero numbered phases | No markers (zero pairs is a valid state) |
 | Phase aborts on error | Emit `phase.end` with `status=failed` |
@@ -198,7 +198,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end <skill-n
 | Argument | Kind | Values |
 | :--- | :--- | :--- |
 | `$1` | required | `start` \| `end` \| `subagent-start` \| `subagent-end` |
-| `$2` | required | skill identifier (kebab-case, e.g., `x-story-implement`) |
+| `$2` | required | skill identifier (kebab-case, e.g., `x-implement-story`) |
 | `$3` | required | phase identifier for `start`/`end` (max 64 chars, e.g., `Phase-2-Implement`) OR role identifier for `subagent-start`/`subagent-end` (max 64 chars, e.g., `Architect`) |
 | `$4` | required on `end` / `subagent-end` | `ok` \| `failed` \| `skipped` (defaults to `ok` if missing) |
 
@@ -206,25 +206,25 @@ Fail-open contract: invalid arguments, missing peer helpers, or `CLAUDE_TELEMETR
 
 ### Subagent Markers (story-0040-0007)
 
-Planning skills that dispatch parallel subagents (e.g., `x-story-plan` with its
-5-agent Architect/QA/Security/TechLead/PO wave, or `x-epic-orchestrate` with
+Planning skills that dispatch parallel subagents (e.g., `x-plan-story` with its
+5-agent Architect/QA/Security/TechLead/PO wave, or `x-orchestrate-epic` with
 its per-story loop) MUST emit `subagent.start` / `subagent.end` markers around
-each parallel dispatch so the `/x-telemetry-analyze` report can compute the
+each parallel dispatch so the `/x-analyze-telemetry` report can compute the
 overlap window and flag slow agents that bottleneck the wave.
 
 ```markdown
 <!-- TELEMETRY: subagent.start -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-story-plan Architect`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story Architect`
 
 ... subagent dispatch ...
 
 <!-- TELEMETRY: subagent.end -->
-Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-story-plan Architect ok`
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story Architect ok`
 ```
 
 The role argument (position 3) is persisted under `metadata.role` of the
 telemetry event. Degenerate planning skills (no parallel dispatch, e.g.,
-`x-arch-plan`, `x-test-plan`, `x-epic-map`) MUST emit ZERO subagent markers —
+`x-plan-architecture`, `x-plan-tests`, `x-epic-map`) MUST emit ZERO subagent markers —
 this is validated by the `PlanningSmokeIT` acceptance test.
 
 ### CI Enforcement

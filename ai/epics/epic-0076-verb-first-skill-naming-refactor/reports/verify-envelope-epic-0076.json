@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "epicId": "EPIC-0076",
+  "verifiedAt": "2026-05-03T00:00:00Z",
+  "skill": "x-internal-verify-epic-integrity",
+  "branch": "epic/0076",
+  "status": "PASSED",
+  "coverageLine": "N/A",
+  "coverageBranch": "N/A",
+  "gates": {
+    "allStoriesConcluida": true,
+    "allPlanArtifactsPresent": true,
+    "allReportArtifactsPresent": true,
+    "noRegressions": true,
+    "auditScriptSelfCheck": true
+  },
+  "storiesVerified": [
+    {"id": "story-0076-0001", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0002", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0003", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0004", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0005", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0006", "status": "PASSED", "allArtifactsPresent": true},
+    {"id": "story-0076-0007", "status": "PASSED", "allArtifactsPresent": true}
+  ],
+  "integrityChecks": {
+    "verbFirstConventionApplied": true,
+    "crossReferencesUpdated": true,
+    "hooksUpdated": true,
+    "auditGuardCreated": true,
+    "changelogUpdated": true
+  },
+  "notes": "All 7 stories completed. 102 skills renamed to verb-first convention. All cross-references updated via word-boundary regex. Anti-legacy guard deployed."
+}

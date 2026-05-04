@@ -24,8 +24,8 @@
 O CLI `ia-dev-env` nasceu para copiar templates de configuração do Claude Code com substituição de placeholders. Com o tempo, 7 subsistemas Java foram incorporados ao JAR para suportar workflows de runtime (não de geração):
 
 1. **`release/`** — SemVer, parser de Conventional Commits, orquestradores preflight/dryrun/handoff/resume/abort. Serve à skill `/x-release`.
-2. **`checkpoint/`** — `ExecutionState`, `StoryEntry`, `TaskEntry`, persistência em `execution-state.json`. Serve às skills `/x-epic-implement`, `/x-story-implement`, `/x-task-implement`.
-3. **`parallelism/`** — `CollisionDetector`, `FileFootprint`, `HotspotCatalog`. Serve à skill `/x-parallel-eval`.
+2. **`checkpoint/`** — `ExecutionState`, `StoryEntry`, `TaskEntry`, persistência em `execution-state.json`. Serve às skills `/x-implement-epic`, `/x-implement-story`, `/x-implement-task`.
+3. **`parallelism/`** — `CollisionDetector`, `FileFootprint`, `HotspotCatalog`. Serve à skill `/x-evaluate-parallelism`.
 4. **`progress/`** — `ProgressReporter`, `MetricsCalculator`. UX de execução longa.
 5. **`telemetry/`** (Java side) — `TelemetryWriter`, `TelemetryScrubber`, `TelemetryAnalyzeCli`, `TelemetryTrendCli`, `PiiAudit`. Servem às skills de análise + gate CI.
 6. **`smoke/`** — `ExpectedArtifactsGenerator` (main). Framework interno de regressão do CLI.
@@ -73,7 +73,7 @@ Cada um desses existe porque uma necessidade apareceu mid-flight e a decisão na
 |---|---|
 | `release/` | Feature de runtime consumida apenas pela skill `/x-release`; será reescrita em LLM+bash |
 | `checkpoint/` | Feature de runtime consumida pelas skills `/x-*-implement`; `execution-state.json` passa a ser JSON leve manejado pela skill |
-| `parallelism/` | Feature de runtime consumida pela skill `/x-parallel-eval`; heurística será aplicada pelo LLM |
+| `parallelism/` | Feature de runtime consumida pela skill `/x-evaluate-parallelism`; heurística será aplicada pelo LLM |
 | `progress/` | UX interna que cresceu de utilitário a subsistema |
 | `telemetry/` | Emissão + análise. **Os hooks shell permanecem** e continuam escrevendo NDJSON. A análise Java (`TelemetryAnalyzeCli`, `TelemetryTrendCli`, `PiiAudit`, scrubber Java, whitelist Java) é removida |
 | `smoke/` | Framework de regressão interno; testes unitários + de integração em `src/test/java/` cobrem os Assemblers sobreviventes |
@@ -110,13 +110,13 @@ Apenas `cli.IaDevEnvApplication.main` sobrevive.
 
 | Skill | Arquivo | Reescrita |
 |---|---|---|
-| `x-telemetry-analyze` | `resources/targets/claude/skills/core/ops/x-telemetry-analyze/SKILL.md` | Invocação via `java -cp ... TelemetryAnalyzeCli` → bash com `jq` agregando `events.ndjson` + template Markdown preenchido pelo LLM |
-| `x-telemetry-trend` | `resources/targets/claude/skills/core/ops/x-telemetry-trend/SKILL.md` | Idem: `jq` agregando múltiplos NDJSONs + heurística de comparação no LLM |
-| `x-parallel-eval` | `resources/targets/claude/skills/core/plan/x-parallel-eval/SKILL.md` | Invocação via `java -cp ... ParallelEvalCli` → LLM lê blocos `## File Footprint` dos planos de story/task e aplica as regras do knowledge pack `parallelism-heuristics` sem JVM |
+| `x-analyze-telemetry` | `resources/targets/claude/skills/core/ops/x-analyze-telemetry/SKILL.md` | Invocação via `java -cp ... TelemetryAnalyzeCli` → bash com `jq` agregando `events.ndjson` + template Markdown preenchido pelo LLM |
+| `x-analyze-telemetry-trends` | `resources/targets/claude/skills/core/ops/x-analyze-telemetry-trends/SKILL.md` | Idem: `jq` agregando múltiplos NDJSONs + heurística de comparação no LLM |
+| `x-evaluate-parallelism` | `resources/targets/claude/skills/core/plan/x-evaluate-parallelism/SKILL.md` | Invocação via `java -cp ... ParallelEvalCli` → LLM lê blocos `## File Footprint` dos planos de story/task e aplica as regras do knowledge pack `parallelism-heuristics` sem JVM |
 | `x-release` | `resources/targets/claude/skills/core/ops/x-release/SKILL.md` | Orquestrador Java → `git log`, `gh api`, `jq`, parsing de Conventional Commits em bash + decisões LLM. `.claude/state/release-state.json` é JSON leve manejado pela própria skill |
-| `x-epic-implement` | `resources/targets/claude/skills/core/dev/x-epic-implement/SKILL.md` | `execution-state.json` deixa de ser validado por `checkpoint.*` e passa a ser JSON leve escrito/lido via Read/Write tools |
-| `x-story-implement` | `resources/targets/claude/skills/core/dev/x-story-implement/SKILL.md` | Idem |
-| `x-task-implement` | `resources/targets/claude/skills/core/dev/x-task-implement/SKILL.md` | Idem |
+| `x-implement-epic` | `resources/targets/claude/skills/core/dev/x-implement-epic/SKILL.md` | `execution-state.json` deixa de ser validado por `checkpoint.*` e passa a ser JSON leve escrito/lido via Read/Write tools |
+| `x-implement-story` | `resources/targets/claude/skills/core/dev/x-implement-story/SKILL.md` | Idem |
+| `x-implement-task` | `resources/targets/claude/skills/core/dev/x-implement-task/SKILL.md` | Idem |
 
 ---
 
@@ -236,8 +236,8 @@ Apenas nos 8 pacotes `[KEEP]` acima, e SOMENTE quando:
 
 8. **Nenhuma skill mencionada em §"Skills reescritas" invoca classe Java**:
    ```bash
-   for skill in x-telemetry-analyze x-telemetry-trend x-parallel-eval \
-                x-release x-epic-implement x-story-implement x-task-implement; do
+   for skill in x-analyze-telemetry x-analyze-telemetry-trends x-evaluate-parallelism \
+                x-release x-implement-epic x-implement-story x-implement-task; do
      rg -l 'dev\.iadev\.' "java/src/main/resources/targets/claude/skills/**/$skill/SKILL.md"
    done
    # Expected: nada
@@ -261,7 +261,7 @@ O decomposer tem liberdade para ajustar granularidade, mas deve preservar a orde
 ### Fase 1 — Reescrita de skills (3 histórias paralelas)
 
 **H2 — Reescrever skills de análise de telemetria e paralelismo**
-- Alvo: `x-telemetry-analyze`, `x-telemetry-trend`, `x-parallel-eval`.
+- Alvo: `x-analyze-telemetry`, `x-analyze-telemetry-trends`, `x-evaluate-parallelism`.
 - Substituir invocação `java -cp ...` por `jq`/`awk`/LLM reasoning.
 - Manter comportamento observável (mesmos argumentos CLI, mesmo formato de saída Markdown).
 - *Paralelo com*: H3, H4.
@@ -273,7 +273,7 @@ O decomposer tem liberdade para ajustar granularidade, mas deve preservar a orde
 - *Paralelo com*: H2, H4.
 
 **H4 — Reescrever skills de implementação (epic/story/task)**
-- Alvo: `x-epic-implement`, `x-story-implement`, `x-task-implement`.
+- Alvo: `x-implement-epic`, `x-implement-story`, `x-implement-task`.
 - Remover dependência de `dev.iadev.checkpoint.*`.
 - `execution-state.json` passa a ser JSON leve sem schema Java — a skill documenta o shape inline.
 - *Paralelo com*: H2, H3.
@@ -331,7 +331,7 @@ O decomposer tem liberdade para ajustar granularidade, mas deve preservar a orde
 
 ## Riscos e mitigação
 
-- **R-A — Auto-dogfooding instável**: `/x-epic-implement` está sendo reescrito enquanto o épico seria executado. Mitigação: executar H1…H9 manualmente via `/x-story-implement` story-a-story; H9 valida o novo orchestrator contra um epic antigo já concluído como regressão.
+- **R-A — Auto-dogfooding instável**: `/x-implement-epic` está sendo reescrito enquanto o épico seria executado. Mitigação: executar H1…H9 manualmente via `/x-implement-story` story-a-story; H9 valida o novo orchestrator contra um epic antigo já concluído como regressão.
 - **R-B — Perda de dados históricos de telemetria**: NDJSONs em `plans/epic-*/telemetry/` permanecem. Só o analisador muda (Java → bash). Nada é apagado.
 - **R-C — Regressão nos 18 stacks**: golden files são o teste de regressão. H9 atualiza apenas onde H8 mudou payload (workflows gerados).
 - **R-D — Referências órfãs em documentação**: antes de H6/H7, `rg -r` em `specs/`, `adr/`, `plans/epic-*` por menções a classes removidas. Atualizar ou marcar como histórico.

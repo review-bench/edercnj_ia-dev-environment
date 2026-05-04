@@ -17,7 +17,7 @@
 #     - git commit -n | git commit --no-verify (bypass blocked unconditionally)
 #     - gh pr merge --admin (bypass blocked unconditionally)
 #   Skill tool calls:
-#     - skill=x-pr-create
+#     - skill=x-create-pr
 #
 # Fail-CLOSED contract (RULE-005): if preflight script is absent or stdin is malformed,
 # exit 2 (block) — never fail-open for intercepted tool calls.
@@ -237,8 +237,8 @@ if [ "$TOOL_NAME" = "Bash" ]; then
 elif [ "$TOOL_NAME" = "Skill" ]; then
     SKILL_NAME=$(echo "$PAYLOAD" | jq -r '.tool_input.skill // empty' 2>/dev/null || echo "")
 
-    # Pattern 4: Skill x-pr-create
-    if [ "$SKILL_NAME" = "x-pr-create" ]; then
+    # Pattern 4: Skill x-create-pr
+    if [ "$SKILL_NAME" = "x-create-pr" ]; then
         SHOULD_INTERCEPT=true
         INTERCEPT_CONTEXT="skill-x-pr-create"
     fi

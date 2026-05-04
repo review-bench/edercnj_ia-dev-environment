@@ -11,7 +11,7 @@ indexable: true
 archived: false
 superseded-by: null
 
-# ── Taxonomia (alimenta /x-memory-search) ───────────────────────────────────
+# ── Taxonomia (alimenta /x-search-memory) ───────────────────────────────────
 tags: []
 capabilities-affected: []
 rules-affected: []

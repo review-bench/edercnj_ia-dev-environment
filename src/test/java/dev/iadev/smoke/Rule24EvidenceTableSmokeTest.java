@@ -49,15 +49,15 @@ class Rule24EvidenceTableSmokeTest {
     }
 
     @Test
-    @DisplayName("reference golden references both x-pr-watch-ci and x-dependency-audit")
+    @DisplayName("reference golden references both x-pr-watch-ci and x-audit-dependencies")
     void smoke_referenceGolden_referencesNewSubSkills() throws IOException {
         Path rule = repoRoot().resolve(REFERENCE_GOLDEN_PATH);
         String body = Files.readString(rule, StandardCharsets.UTF_8);
 
-        assertThat(body).as("reference golden must list x-pr-watch-ci").contains("`x-pr-watch-ci`");
+        assertThat(body).as("reference golden must list x-watch-pr-ci").contains("`x-watch-pr-ci`");
         assertThat(body)
-                .as("reference golden must list x-dependency-audit")
-                .contains("`x-dependency-audit`");
+                .as("reference golden must list x-audit-dependencies")
+                .contains("`x-audit-dependencies`");
     }
 
     private Path repoRoot() {

@@ -85,7 +85,7 @@ class Epic0073ScenariosTemplateSmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-regression-shell",
+                    "x-execute-shell-regression-tests",
                     "SKILL.md");
 
     // ─── Scenario 1 ──────────────────────────────────────────────────────────
@@ -248,10 +248,10 @@ class Epic0073ScenariosTemplateSmokeIT {
     @Test
     @DisplayName(
             "regressionSkillExists_withRequiresAnyCapabilities — "
-                    + "x-test-regression-shell SKILL.md exists and declares requires-any capabilities")
+                    + "x-execute-shell-regression-tests SKILL.md exists and declares requires-any capabilities")
     void regressionSkillExists_withRequiresAnyCapabilities() throws Exception {
         assertThat(REGRESSION_SKILL.toAbsolutePath())
-                .as("x-test-regression-shell SKILL.md must exist")
+                .as("x-execute-shell-regression-tests SKILL.md must exist")
                 .exists();
 
         String content = Files.readString(REGRESSION_SKILL.toAbsolutePath());

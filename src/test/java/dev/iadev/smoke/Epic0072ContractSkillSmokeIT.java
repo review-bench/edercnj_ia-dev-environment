@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Epic0072ContractSkillSmokeIT — x-test-contract structural invariants")
+@DisplayName("Epic0072ContractSkillSmokeIT — x-execute-contract-tests structural invariants")
 class Epic0072ContractSkillSmokeIT {
 
     private static final Path SKILL_ROOT =
@@ -26,7 +26,7 @@ class Epic0072ContractSkillSmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-contract");
+                    "x-execute-contract-tests");
 
     private static final Path KP_ROOT =
             Path.of("src", "main", "resources", "targets", "claude", "knowledge", "testing");
@@ -130,7 +130,7 @@ class Epic0072ContractSkillSmokeIT {
                                     dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT,
                                     dev.iadev.domain.model.AiMemoryConfig.DEFAULT));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
-            assertThat(skills).contains("x-test-contract");
+            assertThat(skills).contains("x-execute-contract-tests");
         }
 
         @Test
@@ -139,7 +139,7 @@ class Epic0072ContractSkillSmokeIT {
             var config = TestConfigBuilder.builder().build();
             assertThat(config.quality().contract().enabled()).isFalse();
             List<String> skills = SkillsSelection.selectQualitySkills(config);
-            assertThat(skills).doesNotContain("x-test-contract");
+            assertThat(skills).doesNotContain("x-execute-contract-tests");
         }
 
         @Test

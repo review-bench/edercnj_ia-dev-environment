@@ -31,7 +31,7 @@ class SkillsSelectionScanningTest {
         }
 
         @Test
-        @DisplayName("sast enabled returns x-security-sast")
+        @DisplayName("sast enabled returns x-run-sast")
         void select_sastEnabled_returnsSastScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -40,11 +40,11 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-sast");
+            assertThat(skills).containsExactly("x-run-sast");
         }
 
         @Test
-        @DisplayName("dast enabled returns x-security-dast")
+        @DisplayName("dast enabled returns x-run-dast")
         void select_dastEnabled_returnsDastScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -53,11 +53,11 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-dast");
+            assertThat(skills).containsExactly("x-run-dast");
         }
 
         @Test
-        @DisplayName("secretScan enabled returns" + " x-security-secrets")
+        @DisplayName("secretScan enabled returns" + " x-scan-secrets")
         void select_secretScanEnabled_returnsSecretScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -66,11 +66,11 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-secrets");
+            assertThat(skills).containsExactly("x-scan-secrets");
         }
 
         @Test
-        @DisplayName("containerScan enabled returns" + " x-security-container")
+        @DisplayName("containerScan enabled returns" + " x-scan-container-security")
         void select_containerScanEnabled_returnsContScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -79,11 +79,11 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-container");
+            assertThat(skills).containsExactly("x-scan-container-security");
         }
 
         @Test
-        @DisplayName("infraScan enabled returns" + " x-security-infra")
+        @DisplayName("infraScan enabled returns" + " x-assess-infrastructure-security")
         void select_infraScanEnabled_returnsInfraScan() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -92,42 +92,42 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-infra");
+            assertThat(skills).containsExactly("x-assess-infrastructure-security");
         }
 
         @Test
         @DisplayName(
                 "pentest enabled does not add"
-                        + " x-security-pentest to scanning skills"
+                        + " x-run-pentest to scanning skills"
                         + " (delegated to selectPentestSkills)")
         void select_pentestEnabled_excludesPentest() {
             ProjectConfig config = TestConfigBuilder.builder().pentest(true).build();
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).doesNotContain("x-security-pentest");
+            assertThat(skills).doesNotContain("x-run-pentest");
         }
 
         @Test
-        @DisplayName("qualityGate sonarqube returns" + " x-security-sonar")
+        @DisplayName("qualityGate sonarqube returns" + " x-run-sonar-security")
         void select_sonarqubeProvider_returnsSonarGate() {
             ProjectConfig config =
                     TestConfigBuilder.builder().qualityGateProvider("sonarqube").build();
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-sonar");
+            assertThat(skills).containsExactly("x-run-sonar-security");
         }
 
         @Test
-        @DisplayName("qualityGate sonarcloud returns" + " x-security-sonar")
+        @DisplayName("qualityGate sonarcloud returns" + " x-run-sonar-security")
         void select_sonarcloudProvider_returnsSonarGate() {
             ProjectConfig config =
                     TestConfigBuilder.builder().qualityGateProvider("sonarcloud").build();
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-sonar");
+            assertThat(skills).containsExactly("x-run-sonar-security");
         }
 
         @Test
@@ -154,12 +154,12 @@ class SkillsSelectionScanningTest {
 
             assertThat(skills)
                     .containsExactlyInAnyOrder(
-                            "x-security-sast",
-                            "x-security-dast",
-                            "x-security-secrets",
-                            "x-security-container",
-                            "x-security-infra",
-                            "x-security-sonar");
+                            "x-run-sast",
+                            "x-run-dast",
+                            "x-scan-secrets",
+                            "x-scan-container-security",
+                            "x-assess-infrastructure-security",
+                            "x-run-sonar-security");
         }
 
         @Test
@@ -173,7 +173,7 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactlyInAnyOrder("x-security-sast", "x-security-secrets");
+            assertThat(skills).containsExactlyInAnyOrder("x-run-sast", "x-scan-secrets");
         }
     }
 
@@ -193,7 +193,7 @@ class SkillsSelectionScanningTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).contains("x-security-sast");
+            assertThat(skills).contains("x-run-sast");
         }
 
         @Test
@@ -206,13 +206,13 @@ class SkillsSelectionScanningTest {
 
             assertThat(skills)
                     .doesNotContain(
-                            "x-security-sast",
-                            "x-security-dast",
-                            "x-security-secrets",
-                            "x-security-container",
-                            "x-security-infra",
-                            "x-security-pentest",
-                            "x-security-sonar");
+                            "x-run-sast",
+                            "x-run-dast",
+                            "x-scan-secrets",
+                            "x-scan-container-security",
+                            "x-assess-infrastructure-security",
+                            "x-run-pentest",
+                            "x-run-sonar-security");
         }
     }
 }

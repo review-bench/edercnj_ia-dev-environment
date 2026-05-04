@@ -40,8 +40,8 @@ class StopHookExtendedTest {
         assertThat(body)
                 .as("hook must reference the EPIC-0057 extension")
                 .contains("EPIC-0057")
-                .contains("x-pr-watch-ci")
-                .contains("x-dependency-audit")
+                .contains("x-watch-pr-ci")
+                .contains("x-audit-dependencies")
                 .contains("Camada 2 soft");
     }
 
@@ -114,8 +114,8 @@ class StopHookExtendedTest {
 
         assertThat(p.exitValue()).as("missing dependency-audit must trigger exit 2").isEqualTo(2);
         assertThat(stderr)
-                .as("stderr must reference x-dependency-audit")
-                .contains("x-dependency-audit")
+                .as("stderr must reference x-audit-dependencies")
+                .contains("x-audit-dependencies")
                 .contains("dependency-audit-story-0057-0006.md");
     }
 

@@ -2,9 +2,9 @@
 # audit-regression-shell.sh — Camada 2 (CI) audit for EPIC-0073 (Regression Shell Gate).
 #
 # Verifies that every PR in a project with quality.regression.enabled=true AND
-# mode=service has evidence that x-test-regression-shell --service was executed.
+# mode=service has evidence that x-execute-shell-regression-tests --service was executed.
 # Evidence is detected via:
-#   1. Presence of telemetry NDJSON entry (tool.call for x-test-regression-shell) in
+#   1. Presence of telemetry NDJSON entry (tool.call for x-execute-shell-regression-tests) in
 #      ai/epics/epic-*/telemetry/events.ndjson for the story being merged.
 #   2. Presence of marker artifact ai/epics/epic-*/reports/regression-report-*.md
 #      for the story branch.
@@ -25,7 +25,7 @@
 #   audit-regression-shell.sh --story <STORY-ID>    # audit a single story
 #
 # Rule: .claude/rules/26-audit-gate-lifecycle.md (Camada 2)
-# Skill: .claude/skills/x-test-regression-shell/SKILL.md
+# Skill: .claude/skills/x-execute-shell-regression-tests/SKILL.md
 # Catalog: docs/audit-gates-catalog.md (Rule 26 §Catalog-before-Add)
 
 set -u
@@ -128,7 +128,7 @@ has_regression_evidence() {
     local ndjson
     ndjson="$(find ai/epics -name "events.ndjson" 2>/dev/null | head -5)"
     for f in ${ndjson}; do
-        if grep -q "x-test-regression-shell" "${f}" 2>/dev/null; then
+        if grep -q "x-execute-shell-regression-tests" "${f}" 2>/dev/null; then
             return 0
         fi
     done
@@ -191,8 +191,8 @@ main() {
         fi
 
         if ! has_regression_evidence "${story_id}"; then
-            echo "REGRESSION_SHELL_VIOLATION: story ${story_id} — quality.regression.mode=service declared but x-test-regression-shell not executed." >&2
-            echo "  Invoke: /x-test-regression-shell ${story_id} --service" >&2
+            echo "REGRESSION_SHELL_VIOLATION: story ${story_id} — quality.regression.mode=service declared but x-execute-shell-regression-tests not executed." >&2
+            echo "  Invoke: /x-execute-shell-regression-tests ${story_id} --service" >&2
             violations=$((violations + 1))
         fi
     done

@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
 class XReviewFrontmatterTest {
 
     private static final Path SKILL_PATH =
-            Path.of("src/main/resources/targets/claude/skills/core/review/x-review/SKILL.md");
+            Path.of(
+                    "src/main/resources/targets/claude/skills/core/review/x-review-codebase/SKILL.md");
 
     @Test
     @DisplayName("phase5_section_present_in_skillmd")
@@ -36,10 +37,10 @@ class XReviewFrontmatterTest {
         String content = Files.readString(SKILL_PATH);
         assertThat(content)
                 .as("Phase 5 must have telemetry phase.start marker")
-                .contains("telemetry-phase.sh start x-review Phase-5-Frontmatter");
+                .contains("telemetry-phase.sh start x-review-codebase Phase-5-Frontmatter");
         assertThat(content)
                 .as("Phase 5 must have telemetry phase.end marker")
-                .contains("telemetry-phase.sh end x-review Phase-5-Frontmatter ok");
+                .contains("telemetry-phase.sh end x-review-codebase Phase-5-Frontmatter ok");
     }
 
     @Test
@@ -56,13 +57,13 @@ class XReviewFrontmatterTest {
     void phase5_phase_gate_pre_and_post_invocations_present() throws IOException {
         String content = Files.readString(SKILL_PATH);
         assertThat(content)
-                .as("Phase 5 must invoke x-internal-phase-gate with --mode pre")
+                .as("Phase 5 must invoke x-internal-verify-phase-gates with --mode pre")
                 .containsPattern(
-                        "x-internal-phase-gate.*--mode pre.*--phase.*Phase 5.*--skill x-review");
+                        "x-internal-verify-phase-gates.*--mode pre.*--phase.*Phase 5.*--skill x-review-codebase");
         assertThat(content)
-                .as("Phase 5 must invoke x-internal-phase-gate with --mode post")
+                .as("Phase 5 must invoke x-internal-verify-phase-gates with --mode post")
                 .containsPattern(
-                        "x-internal-phase-gate.*--mode post.*--phase.*Phase 5.*--skill x-review");
+                        "x-internal-verify-phase-gates.*--mode post.*--phase.*Phase 5.*--skill x-review-codebase");
     }
 
     @Test

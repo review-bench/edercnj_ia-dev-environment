@@ -89,8 +89,8 @@ public final class HooksAssembler implements Assembler {
     /**
      * EPIC-0069 refinement gate PreToolUse hook — always copied, independent of telemetry. {@code
      * enforce-refinement-gate.sh} is the PreToolUse Camada 0 hook that blocks orchestrators ({@code
-     * x-story-implement}, {@code x-epic-implement}, {@code x-task-implement}, {@code
-     * x-epic-orchestrate}) when {@code refinementVerdict.status != "approved"} (Rule 29 — exit 33
+     * x-implement-story}, {@code x-epic-implement}, {@code x-implement-task}, {@code
+     * x-orchestrate-epic}) when {@code refinementVerdict.status != "approved"} (Rule 29 — exit 33
      * {@code REFINEMENT_REQUIRED}).
      */
     public static final List<String> RULE_69_SCRIPTS = List.of("enforce-refinement-gate.sh");

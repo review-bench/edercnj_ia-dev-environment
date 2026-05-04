@@ -28,7 +28,7 @@ public final class InterfaceGate implements SkillGateEvaluator {
         }
         if (ConditionEvaluator.hasAnyInterface(
                 config, "rest", "grpc", "event-consumer", "event-producer", "websocket")) {
-            skills.add("x-test-contract-lint");
+            skills.add("x-lint-contract-tests");
         }
         return skills;
     }

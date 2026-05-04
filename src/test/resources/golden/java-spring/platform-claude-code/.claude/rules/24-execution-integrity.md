@@ -22,10 +22,10 @@ The only legitimate way to not invoke a declared sub-skill is via an explicit `-
 
 | Flag | Skill it bypasses |
 | :--- | :--- |
-| `--skip-review` | `x-review` + `x-review-pr` |
-| `--skip-verification` | `x-internal-story-verify` |
+| `--skip-review` | `x-review-codebase` + `x-review-pr` |
+| `--skip-verification` | `x-internal-verify-story` |
 | `--skip-smoke` | smoke test inside verify gate |
-| `--skip-pr-comments` | `x-pr-fix-epic` post-gate |
+| `--skip-pr-comments` | `x-fix-epic-pr` post-gate |
 
 Every `--skip-*` usage outside a `## Recovery` block in the calling skill is a Rule 22 violation AND a Rule 24 violation — both caught by the audit.
 
@@ -35,22 +35,22 @@ Certain sub-skills MUST produce a persistent artifact as proof of execution. The
 
 | Sub-skill | Artifact path | Enforced by |
 | :--- | :--- | :--- |
-| `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
-| `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
+| `x-internal-verify-story` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
+| `x-review-codebase` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
 | `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
-| `x-internal-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
-| `x-arch-plan` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
-| `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
-| `x-pr-create` | telemetry NDJSON (evento `gh pr create` em `ai/epics/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
-| `x-test-tdd` / `x-test-run` | `ai/epics/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
-| `x-git-commit` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
-| `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
-| `x-threat-model` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
-| `x-doc-validate` | `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` | Camada 3 (EPIC-0071) |
-| `x-test-performance` | `ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.performance.enabled=true`, EPIC-0072) |
-| `x-test-mutation` | `ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.mutation.enabled=true`, EPIC-0072) |
-| `x-test-contract` | `ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.contract.enabled=true`, EPIC-0072) |
-| `x-dep-policy-validate` | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` | Camada 3 (soft — conditional: `dependencies.policy.enabled=true`, EPIC-0074) |
+| `x-internal-write-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
+| `x-plan-architecture` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-watch-pr-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
+| `x-create-pr` | telemetry NDJSON (evento `gh pr create` em `ai/epics/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
+| `x-drive-tdd` / `x-execute-tests` | `ai/epics/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
+| `x-commit-changes` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
+| `x-audit-dependencies` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
+| `x-model-threats` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
+| `x-validate-docs` | `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` | Camada 3 (EPIC-0071) |
+| `x-execute-performance-tests` | `ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.performance.enabled=true`, EPIC-0072) |
+| `x-execute-mutation-tests` | `ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.mutation.enabled=true`, EPIC-0072) |
+| `x-execute-contract-tests` | `ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.contract.enabled=true`, EPIC-0072) |
+| `x-validate-dependency-policy` | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` | Camada 3 (soft — conditional: `dependencies.policy.enabled=true`, EPIC-0074) |
 
 Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
 
@@ -60,11 +60,11 @@ Five defense-in-depth layers (extended by EPIC-0063 with Camada 0). A violation 
 
 ### Camada 0 — Local Pre-Flight (NEW — EPIC-0063)
 
-Gates that execute on the operator's machine BEFORE any remote operation (`git push`, `gh pr create`, `Skill x-pr-create`). This camada is the only one that can **prevent** a bad action from happening; Camadas 1-4 are detective (catch after the fact).
+Gates that execute on the operator's machine BEFORE any remote operation (`git push`, `gh pr create`, `Skill x-create-pr`). This camada is the only one that can **prevent** a bad action from happening; Camadas 1-4 are detective (catch after the fact).
 
 | Aspect | Detail |
 | :--- | :--- |
-| Trigger | PreToolUse hook (`enforce-preflight-gates.sh`) on `Bash`, `Skill x-pr-create`, etc. |
+| Trigger | PreToolUse hook (`enforce-preflight-gates.sh`) on `Bash`, `Skill x-create-pr`, etc. |
 | Vinculatividade | PreToolUse hook is physically blocking — `git push` is intercepted before reaching origin |
 | Único bypass | `CLAUDE_RECOVERY_MODE=1` env var (with visible WARNING). No silent escape. |
 | Scripts | `scripts/preflight.sh` orchestrates: `audit-review-content.sh`, `audit-verify-envelope.sh`, `audit-coverage-local.sh`, `audit-execution-integrity.sh --scope=telemetry` |
@@ -79,7 +79,7 @@ Gates that execute on the operator's machine BEFORE any remote operation (`git p
 
 - This rule is loaded into every conversation (rules are always active).
 - Root `CLAUDE.md` carries a top-level "EXECUTION INTEGRITY — NÃO NEGOCIÁVEL" block.
-- Orchestrator SKILL.md files (`x-story-implement`, `x-epic-implement`, `x-task-implement`) phrase every sub-skill invocation as **MANDATORY TOOL CALL** and reference this rule by exit code.
+- Orchestrator SKILL.md files (`x-implement-story`, `x-implement-epic`, `x-implement-task`) phrase every sub-skill invocation as **MANDATORY TOOL CALL** and reference this rule by exit code.
 
 ### Camada 2 — Runtime Stop hook
 

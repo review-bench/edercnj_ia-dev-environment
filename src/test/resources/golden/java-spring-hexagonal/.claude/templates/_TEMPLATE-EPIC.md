@@ -15,11 +15,11 @@ template-version: "2.0"
 > `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
 > O campo Status do Épico aqui é documental e reflete o estado
 > agregado das histórias filhas. Transições permitidas do enum:
-> `Pendente → Refinada` (via `/x-epic-refine`);
+> `Pendente → Refinada` (via `/x-refine-epic`);
 > `Refinada → Planejada | Em Andamento | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
-> reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
+> reabertura `Concluída → Em Andamento` (via `x-reconcile-status --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
 > Ver [`.claude/rules/29-refinement-gate.md`](../.claude/rules/29-refinement-gate.md).
 
@@ -29,7 +29,7 @@ template-version: "2.0"
 
 > **Cross-Epic Dependency Awareness (EPIC-0076)**
 > Epic-level dependencies are declared in this section and used by the implementation workflow as a Phase 0.5 gate.
-> If any dependency's `expectedStatus` is not met, `x-epic-implement` aborts synchronously with exit 1.
+> If any dependency's `expectedStatus` is not met, `x-implement-epic` aborts synchronously with exit 1.
 > TODO: link to the dedicated cross-epic dependency rule and ADR once those artifacts land in subsequent stories of EPIC-0076.
 
 ### Blocked By Epics
@@ -217,7 +217,7 @@ regen:
 ### Global Definition of Ready (DoR)
 
 - <Critério 1 que deve estar satisfeito para qualquer história entrar em desenvolvimento>
-- <Critério 2 — ex: "Refinement Verdict aprovado via `/x-story-refine`">
+- <Critério 2 — ex: "Refinement Verdict aprovado via `/x-refine-story`">
 - <Critério N>
 
 ### Global Definition of Done (DoD)
@@ -248,7 +248,7 @@ regen:
 ### Branching (EPIC-0065 — Feature Creation Chain)
 
 > Planning artifacts for this epic are committed on branch `docs/<epic-id>-<slug>`
-> (base: `epic/XXXX`, target: `epic/XXXX`) via `x-feature-create`.
+> (base: `epic/XXXX`, target: `epic/XXXX`) via `x-create-feature`.
 > The branch is auto-merged after CI passes (Rule 21 §Anti-Patterns EPIC-0065 exception).
 > The final epic-to-develop PR (`epic/XXXX → develop`) is always a **manual gate**.
 
@@ -256,6 +256,6 @@ regen:
 
 ## Refinement Verdict
 
-> _Slot reservado para `/x-epic-refine`. Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via verdictHash (Rule 29 §verdictHash)._
+> _Slot reservado para `/x-refine-epic`. Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via verdictHash (Rule 29 §verdictHash)._
 >
-> **Status:** TBD — execute `/x-epic-refine <epic-id>` para preencher.
+> **Status:** TBD — execute `/x-refine-epic <epic-id>` para preencher.

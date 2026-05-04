@@ -28,7 +28,7 @@ Rationale:
 ### Operator options when the gate fires
 
 1. **Add tests in the current PR** to close the gap. This is the default
-   and is what the review skills (`x-review`, `x-review-pr`) enforce.
+   and is what the review skills (`x-review-codebase`, `x-review-pr`) enforce.
 2. **Split the concerns:** open a separate PR that adds tests to reach the
    thresholds on `develop` first, then rebase the feature PR.
 3. **Document an explicit exception** via an ADR that temporarily lowers

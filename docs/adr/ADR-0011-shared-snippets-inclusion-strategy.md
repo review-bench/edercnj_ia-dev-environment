@@ -29,12 +29,12 @@ count of the skill catalog from ~50,191 lines (v3.9.0 baseline, re-measured
 2026-04-21) to ≤ 30,115 lines. One lever is **deduplicating cross-cutting
 text** that currently lives verbatim in multiple `SKILL.md` files:
 
-- A pre-commit error matrix duplicated in `x-git-commit`, `x-code-format`,
-  and `x-code-lint` (~10 rows × 3 files).
-- A TDD-tag glossary duplicated in `x-test-tdd`, `x-task-implement`, and
-  `x-story-implement`.
+- A pre-commit error matrix duplicated in `x-commit-changes`, `x-format-code`,
+  and `x-lint-code` (~10 rows × 3 files).
+- A TDD-tag glossary duplicated in `x-drive-tdd`, `x-implement-task`, and
+  `x-implement-story`.
 - `DEP_*` / `STATE_*` / `RULE_*` exit-code families duplicated in `x-release`,
-  `x-epic-implement`, and `x-story-implement`.
+  `x-implement-epic`, and `x-implement-story`.
 
 Story-0047-0001 introduces a new peer directory under the source of truth:
 `java/src/main/resources/targets/claude/skills/_shared/` (sibling of `core/`,
@@ -97,7 +97,7 @@ placeholder resolver is added to the assembler. No symlinks are created.
    `SnippetIncluder` class, no new path-traversal guard, no new unit tests,
    no risk of golden drift outside the intended cluster. The scope
    compression story ships faster and more safely.
-3. **Reviewer UX (source).** A reviewer reading `x-git-commit/SKILL.md` in
+3. **Reviewer UX (source).** A reviewer reading `x-commit-changes/SKILL.md` in
    the source tree sees `[Pre-commit error matrix](…_shared/…)` — an
    unambiguous cross-reference. Option (a)'s `{{INCLUDE:…}}` token requires
    the reviewer to mentally expand the placeholder or run the assembler

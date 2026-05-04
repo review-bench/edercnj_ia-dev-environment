@@ -82,7 +82,7 @@ clearest, subject to the usual coding-standards rules.
 | `dev.iadev.cli` | picocli entry commands outside the generator pipeline |
 | `dev.iadev.release` + sub-packages (`abort`, `changelog`, `dryrun`, `handoff`, `integrity`, `preflight`, `prompt`, `resume`, `state`, `status`, `summary`, `telemetry`, `validate`) | Release orchestration helpers (Git Flow, changelog, resume state) |
 | `dev.iadev.telemetry` + sub-packages (`analyze`, `trend`) | Telemetry CLI tools (`TelemetryAnalyzeCli`, `TelemetryTrendCli`, `PiiAudit`) and the shared scrubber |
-| `dev.iadev.parallelism` + `parallelism.cli` | `x-parallel-eval` supporting classes and CLI |
+| `dev.iadev.parallelism` + `parallelism.cli` | `x-evaluate-parallelism` supporting classes and CLI |
 | `dev.iadev.checkpoint` | Execution-state persistence for the generator pipeline (ADR-0001 Decision 4) |
 | `dev.iadev.progress` | Progress reporting (ADR-0001 Decision 4; ADR-0007 covers the stdout adapter) |
 | `dev.iadev.ci` | CI-only lint/validator entrypoints (e.g., telemetry marker lint) |

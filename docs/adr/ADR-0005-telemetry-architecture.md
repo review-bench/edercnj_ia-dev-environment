@@ -23,8 +23,8 @@ Accepted | 2026-04-17
 ## Context
 
 Before EPIC-0040, the ia-dev-env skill catalog had grown past 70 skills and
-several orchestrators (e.g., `x-epic-implement`, `x-story-implement`,
-`x-task-implement`, `x-story-plan`) now dispatch parallel subagents and
+several orchestrators (e.g., `x-implement-epic`, `x-implement-story`,
+`x-implement-task`, `x-plan-story`) now dispatch parallel subagents and
 multi-phase flows. Operators had no structured way to answer three
 operational questions:
 
@@ -49,8 +49,8 @@ A unified telemetry architecture was needed that:
 - **never aborts a running skill** if the telemetry pipeline fails (fail-open);
 - produces a format that is **safe to commit** to a public repository (no
   PII, no secrets);
-- supports both **point-in-time analysis** (`/x-telemetry-analyze`) and
-  **trend detection across epics** (`/x-telemetry-trend`);
+- supports both **point-in-time analysis** (`/x-analyze-telemetry`) and
+  **trend detection across epics** (`/x-analyze-telemetry-trends`);
 - adds **minimal token/time overhead** to each skill invocation.
 
 ## Decision
@@ -129,16 +129,16 @@ The per-epic NDJSON lives next to the story / plan artifacts it describes,
 so `git bisect` and pull-request review surface telemetry changes with the
 code they measure. The `.claude/telemetry/index.json` file is explicitly
 excluded from version control (`.gitignore`) because it is a rebuildable
-cache populated by `/x-telemetry-trend` on demand.
+cache populated by `/x-analyze-telemetry-trends` on demand.
 
 ### D5. Analysis surface
 
 Two single-responsibility skills consume the NDJSON:
 
-- `/x-telemetry-analyze` — point-in-time report for one or more epics.
+- `/x-analyze-telemetry` — point-in-time report for one or more epics.
   Aggregates by skill / phase / tool, renders a Mermaid Gantt timeline,
   and supports JSON / CSV export for downstream dashboards.
-- `/x-telemetry-trend` — cross-epic P95 regression detector. Ranks the
+- `/x-analyze-telemetry-trends` — cross-epic P95 regression detector. Ranks the
   top-10 slowest skills and flags deltas above a configurable threshold
   (default 20%).
 
@@ -165,12 +165,12 @@ value written to `events.ndjson` MUST have passed through
   required. Hooks install themselves through the standard `settings.json`
   flow (story-0040-0004).
 - **Uniform data format.** NDJSON with a single documented schema replaces
-  heterogeneous per-skill logging. `/x-telemetry-analyze` and `-trend`
+  heterogeneous per-skill logging. `/x-analyze-telemetry` and `-trend`
   operate on every new epic without per-skill adapters.
 - **Privacy-first by construction.** Rule 20 + `TelemetryScrubber` are on
   the write path, not an afterthought. Regressions are caught by
   scrubber unit tests before the event touches disk.
-- **Trend-capable.** `/x-telemetry-trend` answers "is this getting slower?"
+- **Trend-capable.** `/x-analyze-telemetry-trends` answers "is this getting slower?"
   questions against committed historical data, enabling evidence-based
   performance conversations.
 - **Fail-open.** Every layer (shell hooks, markers, Java writer) degrades
@@ -188,11 +188,11 @@ value written to `events.ndjson` MUST have passed through
   coordinating the Java record, the shell `build_event`, the
   `_TEMPLATE-TELEMETRY-EVENT.json` reference, the scrubber allow-list, and
   both analysis skills. Mitigated by the golden-file harness and the
-  `/x-telemetry-analyze` smoke tests.
+  `/x-analyze-telemetry` smoke tests.
 - **Learning curve for skill authors.** The "Telemetry (Optional)" section
   in `_TEMPLATE-SKILL.md` introduces new markers that new contributors must
   learn. Mitigated by copy-pastable snippets and the canonical example in
-  `x-story-implement`.
+  `x-implement-story`.
 
 ### Neutral
 
@@ -243,8 +243,8 @@ epic; NDJSON is strictly simpler.
 
 - ADR-0001 — Intentional Architectural Deviations for CLI Tool
   (cloud-agnostic constraint, Rule 01).
-- ADR-0003 — Skill Taxonomy and Naming (enables `/x-telemetry-analyze`
-  and `/x-telemetry-trend` to live in the `ops/` category).
+- ADR-0003 — Skill Taxonomy and Naming (enables `/x-analyze-telemetry`
+  and `/x-analyze-telemetry-trends` to live in the `ops/` category).
 - ADR-0004 — Worktree-First Branch Creation Policy (interacts with the
   context resolver in `telemetry-lib.sh`, which reads the current branch
   name to populate `epicId` / `storyId` / `taskId`).
@@ -270,6 +270,6 @@ invasiveness:
 - Stories 0040-0001 through 0040-0011 (phased delivery: schema, Java
   domain, shell hooks, settings wiring, privacy rule, phase markers in
   implementation / planning / creation skills, template section,
-  `/x-telemetry-analyze`, `/x-telemetry-trend`).
-- Skills shipped: `x-telemetry-analyze`, `x-telemetry-trend`.
+  `/x-analyze-telemetry`, `/x-analyze-telemetry-trends`).
+- Skills shipped: `x-analyze-telemetry`, `x-analyze-telemetry-trends`.
 - Rule introduced: Rule 20 — Telemetry Privacy.

@@ -120,13 +120,13 @@ REPORTS_DIR="${EPIC_DIR_CANDIDATE}/reports"
 MISSING=()
 
 if [[ ! -f "${REPORTS_DIR}/verify-envelope-${STORY_ID}.json" ]]; then
-    MISSING+=("x-internal-story-verify → ${REPORTS_DIR}/verify-envelope-${STORY_ID}.json")
+    MISSING+=("x-internal-verify-story → ${REPORTS_DIR}/verify-envelope-${STORY_ID}.json")
 fi
 
 if ! ls "${PLANS_DIR}/review-"*"-${STORY_ID}.md" >/dev/null 2>&1 \
         && ! [[ -f "${PLANS_DIR}/review-story-${STORY_ID}.md" ]] \
         && ! [[ -f "${PLANS_DIR}/review-${STORY_ID}.md" ]]; then
-    MISSING+=("x-review → ${PLANS_DIR}/review-story-${STORY_ID}.md")
+    MISSING+=("x-review-codebase → ${PLANS_DIR}/review-story-${STORY_ID}.md")
 fi
 
 if ! ls "${PLANS_DIR}/techlead-review-"*"-${STORY_ID}.md" >/dev/null 2>&1 \
@@ -136,44 +136,44 @@ if ! ls "${PLANS_DIR}/techlead-review-"*"-${STORY_ID}.md" >/dev/null 2>&1 \
 fi
 
 if [[ ! -f "${REPORTS_DIR}/story-completion-report-${STORY_ID}.md" ]]; then
-    MISSING+=("x-internal-story-report → ${REPORTS_DIR}/story-completion-report-${STORY_ID}.md")
+    MISSING+=("x-internal-write-story-report → ${REPORTS_DIR}/story-completion-report-${STORY_ID}.md")
 fi
 
 # EPIC-0071 story-0071-0006 — doc-validate evidence check (Rule 24 §Mandatory Evidence, Rule 31).
 if [[ ! -f "${REPORTS_DIR}/doc-validate-report-${STORY_ID}.md" ]]; then
-    MISSING+=("x-doc-validate → ${REPORTS_DIR}/doc-validate-report-${STORY_ID}.md")
+    MISSING+=("x-validate-docs → ${REPORTS_DIR}/doc-validate-report-${STORY_ID}.md")
 fi
 
 # EPIC-0057 story-0057-0006 — extended artefact checks (Rule 24 §32-42).
-# Hard artefacts: x-pr-watch-ci state file (only when PR exists for current
-# branch) and x-dependency-audit report. Soft artefacts: test-run + threat
+# Hard artefacts: x-watch-pr-ci state file (only when PR exists for current
+# branch) and x-audit-dependencies report. Soft artefacts: test-run + threat
 # model — logged as NOTICE but do not trigger exit 2.
 SOFT_NOTES=()
 
-# x-pr-watch-ci — derive PR number from current branch via gh; skip if gh
+# x-watch-pr-ci — derive PR number from current branch via gh; skip if gh
 # absent or PR not found (legitimate when story has not pushed yet).
 if command -v gh >/dev/null 2>&1; then
     PR_NUMBER="$(gh pr view --json number -q .number 2>/dev/null || true)"
     if [[ -n "${PR_NUMBER}" ]]; then
         if [[ ! -f ".claude/state/pr-watch-${PR_NUMBER}.json" ]]; then
-            MISSING+=("x-pr-watch-ci → .claude/state/pr-watch-${PR_NUMBER}.json")
+            MISSING+=("x-watch-pr-ci → .claude/state/pr-watch-${PR_NUMBER}.json")
         fi
     fi
 fi
 
-# x-dependency-audit — hard artefact; absence is a violation.
+# x-audit-dependencies — hard artefact; absence is a violation.
 if [[ ! -f "${REPORTS_DIR}/dependency-audit-${STORY_ID}.md" ]]; then
-    MISSING+=("x-dependency-audit → ${REPORTS_DIR}/dependency-audit-${STORY_ID}.md")
+    MISSING+=("x-audit-dependencies → ${REPORTS_DIR}/dependency-audit-${STORY_ID}.md")
 fi
 
-# x-test-tdd / x-test-run — soft artefact.
+# x-drive-tdd / x-execute-tests — soft artefact.
 if [[ ! -f "${REPORTS_DIR}/test-run-${STORY_ID}.txt" ]]; then
-    SOFT_NOTES+=("x-test-tdd/x-test-run → ${REPORTS_DIR}/test-run-${STORY_ID}.txt (soft)")
+    SOFT_NOTES+=("x-drive-tdd/x-execute-tests → ${REPORTS_DIR}/test-run-${STORY_ID}.txt (soft)")
 fi
 
-# x-threat-model — soft artefact.
+# x-model-threats — soft artefact.
 if [[ ! -f "${PLANS_DIR}/threat-model-story-${STORY_ID}.md" ]]; then
-    SOFT_NOTES+=("x-threat-model → ${PLANS_DIR}/threat-model-story-${STORY_ID}.md (soft)")
+    SOFT_NOTES+=("x-model-threats → ${PLANS_DIR}/threat-model-story-${STORY_ID}.md (soft)")
 fi
 
 # Emit soft notices (non-blocking)
@@ -209,10 +209,10 @@ EOF
 ACTION REQUIRED before proceeding:
   1. Go back to ${STORY_ID}
   2. Invoke the missing skills as REAL tool calls:
-     Skill(skill: "x-internal-story-verify", args: "--story-id ${STORY_ID} ...")
-     Skill(skill: "x-review", args: "${STORY_ID}")
+     Skill(skill: "x-internal-verify-story", args: "--story-id ${STORY_ID} ...")
+     Skill(skill: "x-review-codebase", args: "${STORY_ID}")
      Skill(skill: "x-review-pr", args: "${STORY_ID}")
-     Skill(skill: "x-internal-story-report", args: "...")
+     Skill(skill: "x-internal-write-story-report", args: "...")
   3. Each must produce its evidence file (listed above).
 
 LEGITIMATE BYPASS: pass --skip-review / --skip-verification explicitly via

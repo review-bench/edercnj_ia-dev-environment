@@ -18,7 +18,7 @@ requires-capabilities: []
 
 ## Purpose
 
-Execute a senior-level holistic review with a 53-point rubric. This is the standalone version of Phase 6 from x-story-implement. The Tech Lead reviews the consolidated PR diff for cross-file consistency and overall quality.
+Execute a senior-level holistic review with a 53-point rubric. This is the standalone version of Phase 6 from x-implement-story. The Tech Lead reviews the consolidated PR diff for cross-file consistency and overall quality.
 
 ## Triggers
 
@@ -30,7 +30,7 @@ Execute a senior-level holistic review with a 53-point rubric. This is the stand
 
 - Code must be committed
 - Branch should have changes relative to main
-- Ideally, specialist reviews (`/x-review`) have already been run
+- Ideally, specialist reviews (`/x-review-codebase`) have already been run
 
 ## Workflow
 
@@ -114,7 +114,7 @@ test -f .claude/templates/_TEMPLATE-TECH-LEAD-REVIEW.md && echo "TL_TEMPLATE_AVA
 
 Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
 
-    Skill(skill: "x-internal-status-update", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+    Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
 
 Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
 
@@ -124,12 +124,12 @@ Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE
 
 Open a phase tracker; PRE gate ensures Phase 0 completed:
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-1-Review")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-1-Review")
     TaskCreate(subject: "{STORY_ID} › Review-PR › Phase 1 - Review", activeForm: "Running 45-point tech-lead review")
 
 Close with `TaskUpdate(id: phase1TaskId, status: "completed")` + POST gate after Step 4 finishes (the rubric execution is the evidence):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-1-Review --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-1-Review --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md")
 
 ### Step 4 — Execute Tech Lead Review
 
@@ -191,25 +191,25 @@ The Tech Lead review covers:
 
 Open a phase tracker (PRE gate: Phase 1 must have completed):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-2-Verdict")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-2-Verdict")
     TaskCreate(subject: "{STORY_ID} › Review-PR › Phase 2 - Verdict", activeForm: "Compiling GO/NO-GO verdict")
 
 Close with `TaskUpdate(id: phase2TaskId, status: "completed")` + POST gate after Step 7:
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-2-Verdict --expected-artifacts ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-review-pr --phase Phase-2-Verdict --expected-artifacts ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md")
 
 ### Step 5 — Update Consolidated Dashboard
 
 After saving the Tech Lead report, update the consolidated dashboard (RULE-006).
 
-The dashboard is **cumulative** (RULE-006): created by `/x-review` (specialist scores), updated by `/x-review-pr` (Tech Lead Score).
+The dashboard is **cumulative** (RULE-006): created by `/x-review-codebase` (specialist scores), updated by `/x-review-pr` (Tech Lead Score).
 
 1. **Check if dashboard exists:**
    ```bash
    test -f ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md && echo "DASHBOARD_EXISTS" || echo "DASHBOARD_MISSING"
    ```
 
-2. **If dashboard exists (created by x-review):**
+2. **If dashboard exists (created by x-review-codebase):**
    - Read `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
    - Update the **Tech Lead Score** section: replace placeholder `--/53 | Status: Pending` with actual score `XX/53 | Status: GO/NO-GO`
    - Update the **Overall Score** to include Tech Lead score in the total
@@ -217,7 +217,7 @@ The dashboard is **cumulative** (RULE-006): created by `/x-review` (specialist s
    - Append a new **Round** to the **Review History** section with date, Tech Lead score, and status
    - Preserve all existing specialist scores and previous rounds
 
-3. **If dashboard does not exist (x-review was not executed):**
+3. **If dashboard does not exist (x-review-codebase was not executed):**
    - Log: `Dashboard not found, creating fresh dashboard`
    - Check dashboard template:
      ```bash
@@ -247,7 +247,7 @@ After updating the dashboard, update the remediation tracking file.
    test -f ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md && echo "REMEDIATION_EXISTS" || echo "REMEDIATION_MISSING"
    ```
 
-2. **If remediation exists (created by x-review):**
+2. **If remediation exists (created by x-review-codebase):**
    - Read `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
    - For each finding in the remediation tracker:
      - If the Tech Lead confirms the finding is fixed (code reviewed and issue resolved): update status from `Open` -> `Fixed`
@@ -255,7 +255,7 @@ After updating the dashboard, update the remediation tracking file.
    - Add new findings identified by the Tech Lead that are not present in the existing remediation tracker, with status `Open`
    - Update the **Remediation Summary** counts to reflect new statuses
 
-3. **If remediation does not exist (x-review was not executed):**
+3. **If remediation does not exist (x-review-codebase was not executed):**
    - Log: `Remediation not found, creating fresh remediation with Tech Lead findings`
    - Check remediation template:
      ```bash
@@ -268,12 +268,12 @@ After updating the dashboard, update the remediation tracking file.
 
 Open a phase tracker (PRE gate: Phase 2 verdict must be resolved; Phase 3 may have run):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-4-Approval")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-review-pr --phase Phase-4-Approval")
     TaskCreate(subject: "{STORY_ID} › Review-PR › Phase 4 - Approval", activeForm: "Finalizing approval and report")
 
 Close with `TaskUpdate(id: phase4TaskId, status: "completed")` + FINAL gate (composes with Rule 24 mandatory-artifact scan):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode final --skill x-review-pr --phase Phase-4-Approval --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode final --skill x-review-pr --phase Phase-4-Approval --expected-artifacts ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md,ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md")
 
 ### Step 7 — Process Result
 
@@ -317,7 +317,7 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
    Agent(
      subagent_type: "general-purpose",
      description: "Fix failing tests for NO-GO remediation",
-     prompt: "Read the failing test output from the review report at ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md. Identify the root cause of each failing test. Fix the IMPLEMENTATION (NOT the test) to make tests pass. Run {{TEST_COMMAND}} to verify the fix. Commit via Skill(skill: 'x-git-commit', args: '--type fix --subject \"fix failing tests from tech lead review\"')."
+     prompt: "Read the failing test output from the review report at ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md. Identify the root cause of each failing test. Fix the IMPLEMENTATION (NOT the test) to make tests pass. Run {{TEST_COMMAND}} to verify the fix. Commit via Skill(skill: 'x-commit-changes', args: '--type fix --subject \"fix failing tests from tech lead review\"')."
    )
    ```
 
@@ -327,7 +327,7 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
    Agent(
      subagent_type: "general-purpose",
      description: "Add test coverage for NO-GO remediation",
-     prompt: "Read the coverage report. Identify uncovered lines/branches. Write tests for the uncovered code paths following TDD discipline (test first). Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}} to verify coverage meets 95% line / 90% branch. Commit via Skill(skill: 'x-git-commit', args: '--type test --subject \"add test coverage for uncovered branches\"')."
+     prompt: "Read the coverage report. Identify uncovered lines/branches. Write tests for the uncovered code paths following TDD discipline (test first). Run {{TEST_COMMAND}} + {{COVERAGE_COMMAND}} to verify coverage meets 95% line / 90% branch. Commit via Skill(skill: 'x-commit-changes', args: '--type test --subject \"add test coverage for uncovered branches\"')."
    )
    ```
 
@@ -364,7 +364,7 @@ WHILE gateAttempts < 3:
     question: "Auto-remediation exhausted after 2 retry cycles. The Tech Lead review returned NO-GO. How would you like to proceed?"
     options:
       - { header: "Proceed", label: "Continue (Recommended)", description: "Re-dispatch auto-remediation (+2 loops). If the review converges to GO, the gate closes and the skill exits normally." }
-      - { header: "Fix PR", label: "Run x-pr-fix and retry", description: "Invokes x-pr-fix on the current PR; reapresents this menu on return." }
+      - { header: "Fix PR", label: "Run x-fix-pr and retry", description: "Invokes x-fix-pr on the current PR; reapresents this menu on return." }
       - { header: "Abort", label: "Cancel the operation", description: "Terminates the skill with REVIEW_REMEDIATION_EXHAUSTED. No further remediation is attempted." }
 
   On PROCEED (slot 1):
@@ -385,11 +385,11 @@ WHILE gateAttempts < 3:
       phase: "GATE_FIX_PR"
       lastPhaseCompletedAt: <ISO-8601 UTC now>
       lastGateDecision: "FIX_PR"
-      fixAttempts: [... previous ..., { at: <now>, delegateSkill: "x-pr-fix", prNumber: <PR>, outcome: "pending" }]
+      fixAttempts: [... previous ..., { at: <now>, delegateSkill: "x-fix-pr", prNumber: <PR>, outcome: "pending" }]
       schemaVersion: "1.0"
-    Invoke x-pr-fix via Rule 13 Pattern 1 INLINE-SKILL:
+    Invoke x-fix-pr via Rule 13 Pattern 1 INLINE-SKILL:
 
-        Skill(skill: "x-pr-fix", args: "<PR>")
+        Skill(skill: "x-fix-pr", args: "<PR>")
 
     Update last fixAttempt.outcome to "applied" (or appropriate outcome)
     Update state file: lastGateDecision = "FIX_PR", lastPhaseCompletedAt = <now>
@@ -443,13 +443,13 @@ TaskCreate(
 
 Invoke pre-gate (Rule 25 §Invariants 4):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-pr")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-pr")
 
 After Phase 4 has produced the prose body of `techlead-review-story-<STORY_ID>.md`,
 prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`.
 The full YAML template and field notes are in [`references/full-protocol.md §Phase 5`](references/full-protocol.md).
 
-Key fields: `schema-version: "1.0"`, `generated-by: x-review-pr@<40-hex SHA>` (matches schema pattern `^(x-review|x-review-pr)@[0-9a-f]{40}$`), `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
+Key fields: `schema-version: "1.0"`, `generated-by: x-review-pr@<40-hex SHA>` (matches schema pattern `^(x-review-codebase|x-review-pr)@[0-9a-f]{40}$`), `decision` (GO|NO-GO|GO-WITH-RESERVATIONS), `score`, `score-max: 55`, `severity-counts`, `blocking-findings`. The `reviewers` field is NOT emitted (Tech Lead is sole reviewer). Use `checklist:` with sub-fields `passed:` (integer), `total: 45`, and `failed-sections:` (YAML list) instead.
 
 After writing the artifact, validate:
 
@@ -459,7 +459,7 @@ If the script returns exit ≠ 0, abort with `REVIEW_FRONTMATTER_INVALID`. No fa
 
 Invoke post-gate (Rule 25 §Invariants 4):
 
-    Skill(skill: "x-internal-phase-gate", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-pr --expected-artifacts <path to techlead-review-story-XXXX-YYYY.md>")
+    Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-pr --expected-artifacts <path to techlead-review-story-XXXX-YYYY.md>")
 
 TaskUpdate(taskId: <id from TaskCreate above>, status: "completed")
 
@@ -514,11 +514,11 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-story-implement | called-by | Produces the same artifact as Phase 6 |
-| x-review | reads | Reads specialist review reports for cross-validation |
-| x-review | complements | `/x-review` = breadth (7 specialists), `/x-review-pr` = depth (1 Tech Lead) |
+| x-implement-story | called-by | Produces the same artifact as Phase 6 |
+| x-review-codebase | reads | Reads specialist review reports for cross-validation |
+| x-review-codebase | complements | `/x-review-codebase` = breadth (7 specialists), `/x-review-pr` = depth (1 Tech Lead) |
 
-- Dashboard (Step 5) is **cumulative** — created by `/x-review`, updated by `/x-review-pr` (RULE-006)
+- Dashboard (Step 5) is **cumulative** — created by `/x-review-codebase`, updated by `/x-review-pr` (RULE-006)
 - Remediation tracking (Step 6) enables FIXED status tracking after Tech Lead review
 - Templates in `.claude/templates/` are copied verbatim by `PlanTemplatesAssembler` — not rendered by the engine
 - Fallback (RULE-012 — Graceful template fallback): When templates are absent (pre-EPIC-0024 projects), inline format is used and dashboard/remediation updates are skipped

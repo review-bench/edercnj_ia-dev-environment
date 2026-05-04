@@ -23,7 +23,7 @@ class Epic0075MemoryLayerSmokeIT {
                     "core",
                     "internal",
                     "memory",
-                    "x-internal-epic-summary",
+                    "x-internal-summarize-epic",
                     "SKILL.md");
 
     private static final Path KNOWLEDGE_ROOT =
@@ -195,6 +195,6 @@ class Epic0075MemoryLayerSmokeIT {
     void scenario10_integrationNotes_referenceRule33() throws IOException {
         String skill = readSkill();
         assertThat(skill).as("Integration Notes must reference Rule 33").contains("Rule 33");
-        assertThat(skill).as("Must state invoked by x-epic-implement").contains("x-epic-implement");
+        assertThat(skill).as("Must state invoked by x-implement-epic").contains("x-implement-epic");
     }
 }

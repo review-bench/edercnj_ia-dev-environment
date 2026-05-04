@@ -50,7 +50,7 @@ WARN [flowVersion-fallback] execution-state.json has flowVersion=<value>;
 
 ## `--legacy-flow` Flag
 
-Orchestrators (`x-epic-implement`, `x-story-implement`, `x-epic-orchestrate`) accept `--legacy-flow` as an explicit opt-in to legacy mode:
+Orchestrators (`x-implement-epic`, `x-implement-story`, `x-orchestrate-epic`) accept `--legacy-flow` as an explicit opt-in to legacy mode:
 
 - Forces `flowVersion: "1"` on new state files regardless of defaults.
 - Overrides any explicit `flowVersion: "2"` in an existing state file (emits warning).
@@ -77,7 +77,7 @@ Release counting: each tagged release on `main` that includes EPIC-0049 or a suc
 Stories whose PR has already been merged into `develop` before the epic branch was introduced are treated as legacy:
 
 - Their `storyStatuses[storyId].flowVersion` field is set to `"1"` retroactively.
-- `x-status-reconcile` treats them as complete (not subject to epic-branch routing).
+- `x-reconcile-status` treats them as complete (not subject to epic-branch routing).
 - The epic's aggregate `flowVersion` remains `"2"` even when individual stories are `"1"` — mixed mode is supported during the window.
 
 ## Skill Renaming
@@ -100,10 +100,10 @@ A **hard-cut** (immediate removal with no deprecation window) is permitted when 
 
 | Old name (public) | New name | Condition | Release |
 | :--- | :--- | :--- | :--- |
-| `x-epic-decompose` | `x-feature-create` (public) + `x-internal-epic-create` / `x-internal-epic-map` / `x-internal-story-create` (internal) | Taxonomic merge + visibility change | EPIC-0065 |
-| `x-epic-create` | `x-internal-epic-create` | Visibility change (public → internal) | EPIC-0065 |
-| `x-epic-map` | `x-internal-epic-map` | Visibility change (public → internal) | EPIC-0065 |
-| `x-story-create` | `x-internal-story-create` | Visibility change (public → internal) | EPIC-0065 |
+| `x-epic-decompose` | `x-create-feature` (public) + `x-internal-create-epic` / `x-internal-map-epic` / `x-internal-create-story` (internal) | Taxonomic merge + visibility change | EPIC-0065 |
+| `x-epic-create` | `x-internal-create-epic` | Visibility change (public → internal) | EPIC-0065 |
+| `x-epic-map` | `x-internal-map-epic` | Visibility change (public → internal) | EPIC-0065 |
+| `x-story-create` | `x-internal-create-story` | Visibility change (public → internal) | EPIC-0065 |
 
 Hard-cuts MUST be documented in the CHANGELOG under `## Removed` with a migration note pointing to the new names. CI `audit-skill-visibility.sh` validates that no public alias remains for hard-cut skills.
 
@@ -117,7 +117,7 @@ New fields added to `execution-state.json` (e.g., `parallelismDowngrades` in EPI
 
 ### `taskTracking` Field (EPIC-0055 / EPIC-0059)
 
-Added by EPIC-0055 (Rule 25 — Task Hierarchy & Phase Gate Enforcement). Controls whether orchestrators emit `TaskCreate`/`TaskUpdate` calls and invoke `x-internal-phase-gate`.
+Added by EPIC-0055 (Rule 25 — Task Hierarchy & Phase Gate Enforcement). Controls whether orchestrators emit `TaskCreate`/`TaskUpdate` calls and invoke `x-internal-verify-phase-gates`.
 
 **EPIC-0059 enforcement:** `flowVersion=2` now requires `taskTracking.enabled=true`. Absence of `taskTracking` on a `flowVersion=2` state file is a `TASK_TRACKING_REQUIRED` error — no silent no-op. Run `scripts/migrate-task-tracking-v2.sh` before enabling `audit-flow-version.sh` to migrate all active epics.
 
@@ -169,7 +169,7 @@ WARN [interactiveMode-fallback] execution-state.json has interactiveMode=<value>
 
 ### `refinementVerdict` Field (EPIC-0069)
 
-Added by EPIC-0069 (Story Refinement & DoR Gate — Rule 29). Carries the output of `/x-story-refine` or `/x-epic-refine` — a multi-persona verdict indicating whether the story/epic has been approved for implementation.
+Added by EPIC-0069 (Story Refinement & DoR Gate — Rule 29). Carries the output of `/x-refine-story` or `/x-refine-epic` — a multi-persona verdict indicating whether the story/epic has been approved for implementation.
 
 #### Fallback Matrix
 
@@ -189,7 +189,7 @@ Added by EPIC-0069 (Story Refinement & DoR Gate — Rule 29). Carries the output
 
 ```
 WARN [refinementVerdict-absent] execution-state.json has no refinementVerdict;
-     defaulting to status=tbd. Run /x-story-refine <STORY-ID> to refine before implementing.
+     defaulting to status=tbd. Run /x-refine-story <STORY-ID> to refine before implementing.
      Gate: enforce-refinement-gate.sh (exit 33 REFINEMENT_REQUIRED).
 ```
 

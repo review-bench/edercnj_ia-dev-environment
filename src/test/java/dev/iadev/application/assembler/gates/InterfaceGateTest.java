@@ -14,14 +14,14 @@ class InterfaceGateTest {
     private final InterfaceGate gate = new InterfaceGate();
 
     @Test
-    @DisplayName("REST interface includes x-review-api and" + " x-test-contract-lint")
+    @DisplayName("REST interface includes x-review-api and" + " x-lint-contract-tests")
     void evaluate_rest_includesApiAndContract() {
         ProjectConfig config =
                 TestConfigBuilder.builder().clearInterfaces().addInterface("rest").build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-review-api").contains("x-test-contract-lint");
+        assertThat(skills).contains("x-review-api").contains("x-lint-contract-tests");
     }
 
     @Test
@@ -78,6 +78,6 @@ class InterfaceGateTest {
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-test-contract-lint").doesNotContain("x-review-api");
+        assertThat(skills).contains("x-lint-contract-tests").doesNotContain("x-review-api");
     }
 }

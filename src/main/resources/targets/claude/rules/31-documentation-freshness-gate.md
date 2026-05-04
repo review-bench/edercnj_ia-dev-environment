@@ -8,14 +8,14 @@
 
 ## Purpose
 
-Documentation that is not enforced as a gate becomes documentation that does not exist. Before EPIC-0071, the `x-doc-generate` skill was invoked "if time permits" in Phase 3 of `x-story-implement`, and no CI check verified that README, OpenAPI specs, ADRs, or skill-docs were kept current. The result: silent accumulation of documentation debt at a rate proportional to the velocity of code changes.
+Documentation that is not enforced as a gate becomes documentation that does not exist. Before EPIC-0071, the `x-generate-docs` skill was invoked "if time permits" in Phase 3 of `x-implement-story`, and no CI check verified that README, OpenAPI specs, ADRs, or skill-docs were kept current. The result: silent accumulation of documentation debt at a rate proportional to the velocity of code changes.
 
 Rule 31 makes documentation updates a **blocking gate** in the story lifecycle:
 
-1. **`x-doc-validate`** (EPIC-0071 story-0071-0002) verifies freshness of all configured documentation targets for the project's stack. Invocation is **MANDATORY** (Rule 24) in Phase 3 of `x-story-implement`.
-2. **`x-doc-generate` v2** (EPIC-0071 story-0071-0003) updates documentation in stack-aware mode before the validate gate runs.
+1. **`x-validate-docs`** (EPIC-0071 story-0071-0002) verifies freshness of all configured documentation targets for the project's stack. Invocation is **MANDATORY** (Rule 24) in Phase 3 of `x-implement-story`.
+2. **`x-generate-docs` v2** (EPIC-0071 story-0071-0003) updates documentation in stack-aware mode before the validate gate runs.
 3. **`audit-doc-freshness.sh`** (EPIC-0071 story-0071-0005) is the Camada 2 CI gate that verifies the same targets on every PR to `develop` or `epic/*`.
-4. The `--skip-doc` flag is removed from `x-story-implement`; it is only permitted inside `## Recovery` blocks of that skill.
+4. The `--skip-doc` flag is removed from `x-implement-story`; it is only permitted inside `## Recovery` blocks of that skill.
 
 ## Documentation Targets
 
@@ -67,29 +67,29 @@ When `freshness-window-hours > 0`, a target is stale only if the grace period ha
 
 | Camada | Mechanism | Trigger | Exit |
 | :--- | :--- | :--- | :--- |
-| **0 — PreToolUse** | `enforce-preflight-gates.sh` (EPIC-0063) | `git push`, `gh pr create`, `Skill x-pr-create` | Blocks if `x-doc-validate` evidence absent |
+| **0 — PreToolUse** | `enforce-preflight-gates.sh` (EPIC-0063) | `git push`, `gh pr create`, `Skill x-create-pr` | Blocks if `x-validate-docs` evidence absent |
 | **1 — Normative** | This rule + CLAUDE.md (EPIC-0071) | Every conversation | — |
 | **2 — CI Script** | `audit-doc-freshness.sh` | PR open/sync to `develop` or `epic/*` | 1 `DOC_FRESHNESS_VIOLATION` |
 | **3 — Java Test** | `Epic0071DocAsDoDSmokeIT` | `mvn verify` | JUnit assertion failure |
 
-## Mandatory Invocation in `x-story-implement`
+## Mandatory Invocation in `x-implement-story`
 
-Phase 3 of `x-story-implement` MUST invoke both:
+Phase 3 of `x-implement-story` MUST invoke both:
 
 ```
-Skill(skill: "x-doc-generate", model: "sonnet", args: "<STORY-ID> --target-stack-aware")  [required]
-Skill(skill: "x-doc-validate", model: "sonnet", args: "<STORY-ID>")                        [required]
+Skill(skill: "x-generate-docs", model: "sonnet", args: "<STORY-ID> --target-stack-aware")  [required]
+Skill(skill: "x-validate-docs", model: "sonnet", args: "<STORY-ID>")                        [required]
 ```
 
-Silent omission is a `PROTOCOL_VIOLATION` under Rule 24. The evidence artifact produced by `x-doc-validate` is `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (template `_TEMPLATE-DOC-VALIDATE-REPORT.md`, delivered in story-0071-0002).
+Silent omission is a `PROTOCOL_VIOLATION` under Rule 24. The evidence artifact produced by `x-validate-docs` is `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` (template `_TEMPLATE-DOC-VALIDATE-REPORT.md`, delivered in story-0071-0002).
 
 ## `--skip-doc` Constraint
 
-The `--skip-doc` flag on `x-story-implement` is permitted exclusively inside `## Recovery` blocks of the calling skill. Occurrence outside a Recovery block is caught by `scripts/audit-bypass-flags.sh` (Rule 45) and fails the CI build with `BYPASS_FLAG_VIOLATION`.
+The `--skip-doc` flag on `x-implement-story` is permitted exclusively inside `## Recovery` blocks of the calling skill. Occurrence outside a Recovery block is caught by `scripts/audit-bypass-flags.sh` (Rule 45) and fails the CI build with `BYPASS_FLAG_VIOLATION`.
 
 ## Forbidden
 
-- Invoking `x-story-implement` without a subsequent `x-doc-validate` call in Phase 3 (blocked at Camada 0 and Camada 2).
+- Invoking `x-implement-story` without a subsequent `x-validate-docs` call in Phase 3 (blocked at Camada 0 and Camada 2).
 - Maintaining documentation targets outside the `documentation.targets` YAML block or auto-detection (no per-story override mechanism).
 - Using `--skip-doc` outside a `## Recovery` block.
 - Declaring a target in `documentation.targets` that is not in the canonical list above.
@@ -99,7 +99,7 @@ The `--skip-doc` flag on `x-story-implement` is permitted exclusively inside `##
 `audit-doc-freshness.sh --self-check` MUST verify:
 1. This rule file (`31-documentation-freshness-gate.md`) exists.
 2. `capabilities/governance/doc-as-dod.yaml` exists and is valid against `governance/schemas/capabilities-1.0.json`.
-3. `x-doc-validate/SKILL.md` is registered and references `RULE-031`.
+3. `x-validate-docs/SKILL.md` is registered and references `RULE-031`.
 
 Failure → `RULE_31_ENFORCEMENT_BROKEN`.
 

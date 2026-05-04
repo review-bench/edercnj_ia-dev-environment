@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Aggregates telemetry NDJSON events by scope (story/task/epic) and emits
-# JSON, Markdown, or ASCII-table output consumed by x-internal-pr-body-render.
+# JSON, Markdown, or ASCII-table output consumed by x-internal-render-pr-body.
 # Exit codes: 0=OK  1=NO_TELEMETRY  2=OPERATIONAL_ERROR
 set -euo pipefail
 

@@ -16,7 +16,7 @@ Supplementary details carved out of SKILL.md to satisfy the orchestrator size co
   "fixAttempts": [
     {
       "at": "<ISO-8601 UTC>",
-      "delegateSkill": "x-pr-fix",
+      "delegateSkill": "x-fix-pr",
       "prNumber": 123,
       "outcome": "applied"
     }
@@ -33,7 +33,7 @@ Supplementary details carved out of SKILL.md to satisfy the orchestrator size co
 | `fixAttempts` | Array | Yes | Always present; `[]` before first fix; max 3 items |
 | `schemaVersion` | String | Yes | Literal `"1.0"` |
 
-**`fixAttempts` entry fields:** `at` (ISO-8601 UTC), `delegateSkill` (always `"x-pr-fix"`), `prNumber` (PR number), `outcome` (`applied` \| `no_comments` \| `compile_regression` \| `aborted`).
+**`fixAttempts` entry fields:** `at` (ISO-8601 UTC), `delegateSkill` (always `"x-fix-pr"`), `prNumber` (PR number), `outcome` (`applied` \| `no_comments` \| `compile_regression` \| `aborted`).
 
 **Lifecycle:**
 - Written atomically (write to `<path>.tmp`, rename) when slot 2 (FIX-PR) is selected

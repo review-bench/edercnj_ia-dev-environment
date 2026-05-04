@@ -207,7 +207,7 @@ class ReleaseApprovalGateTest {
             int stepEight = content.indexOf("### Step 8 \u2014 Approval Gate");
             int stepNine = content.indexOf("### Step 9 \u2014 Tag Creation");
             String stepBody = content.substring(stepEight, stepNine);
-            assertThat(stepBody).contains("x-pr-fix").contains("Fix PR");
+            assertThat(stepBody).contains("x-fix-pr").contains("Fix PR");
         }
 
         @Test

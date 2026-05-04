@@ -516,4 +516,4 @@ git rebase --abort
 **Resolution:**
 - Ensure Phase 1 (Planning) completes successfully, including the task decomposition (Phase 1C). The task breakdown file is required for split detection.
 - If task descriptions do not mention layer-specific paths, the detector cannot classify them. Ensure the task decomposer includes package path information.
-- If using G1-G7 fallback (no test plan), split mode is never used. Ensure `x-test-plan` runs successfully in Phase 1B-test to produce a test plan with TPP markers.
+- If using G1-G7 fallback (no test plan), split mode is never used. Ensure `x-plan-tests` runs successfully in Phase 1B-test to produce a test plan with TPP markers.
