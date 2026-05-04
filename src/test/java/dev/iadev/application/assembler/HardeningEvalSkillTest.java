@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0012: x-evaluate-hardening skill for application hardening evaluation against
- * CIS/OWASP benchmarks.
+ * Tests for story-0022-0012: x-evaluate-hardening skill for application hardening evaluation
+ * against CIS/OWASP benchmarks.
  *
  * <p>Validates that the x-evaluate-hardening skill template is generated correctly with proper
  * frontmatter, 7 hardening dimensions, weighted scoring, SARIF output, benchmark support, and ASVS

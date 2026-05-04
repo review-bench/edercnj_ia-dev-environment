@@ -17,8 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Tests for story-0022-0008: Infrastructure Security Scanner (x-assess-infrastructure-security).
  *
- * <p>Validates that the x-assess-infrastructure-security SKILL.md is generated when infraScan is enabled, follows
- * the security skill template, and contains all required sections.
+ * <p>Validates that the x-assess-infrastructure-security SKILL.md is generated when infraScan is
+ * enabled, follows the security skill template, and contains all required sections.
  */
 @DisplayName("x-assess-infrastructure-security Skill")
 class InfraScanSkillTest {
@@ -32,7 +32,8 @@ class InfraScanSkillTest {
         void assemble_infraScanEnabled_generatesSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = assembleWithInfraScan(tempDir, true);
 
-            assertThat(outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md")).exists();
+            assertThat(outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md"))
+                    .exists();
         }
 
         @Test
@@ -486,6 +487,7 @@ class InfraScanSkillTest {
 
     private String readSkillContent(Path outputDir) throws IOException {
         return Files.readString(
-                outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

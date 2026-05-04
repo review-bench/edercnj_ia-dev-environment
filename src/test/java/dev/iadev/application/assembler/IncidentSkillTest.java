@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0010: x-handle-incident skill for interactive incident response with severity
- * checklists.
+ * Tests for story-0013-0010: x-handle-incident skill for interactive incident response with
+ * severity checklists.
  *
  * <p>Validates that the x-handle-incident skill template is generated correctly with proper
  * frontmatter, severity definitions, communication templates, workflow steps, and error handling.
