@@ -98,18 +98,7 @@
     },
     "story-0077-0006": "Concluída",
     "story-0077-0007": "Concluída",
-    "story-0077-0008": {
-      "status": "Refinada",
-      "phase": "Phase 3",
-      "predecessors": [
-        "story-0077-0007"
-      ],
-      "refinementVerdict": {
-        "status": "approved",
-        "checkedAt": "2026-05-04T12:00:00Z",
-        "verdictHash": "d765a7972903d96b7b70948cc7f721e62e0941c10f0bc58625cbf9a246f0c505"
-      }
-    },
+    "story-0077-0008": "Concluída",
     "story-0077-0009": {
       "status": "Refinada",
       "phase": "Phase 3",
