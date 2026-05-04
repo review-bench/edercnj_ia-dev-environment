@@ -5,7 +5,7 @@
   "epicTitle": "Product-First Lifecycle & Planning C4 Model",
   "epicBranch": "epic/0077",
   "createdAt": "2026-04-29T00:00:00Z",
-  "lastRefinementAt": "2026-05-04T00:00:00Z",
+  "lastRefinementAt": "2026-05-04T12:00:00Z",
   "status": "Backlog",
   "taskTracking": {
     "enabled": true,
@@ -13,36 +13,315 @@
     "phaseGateResults": []
   },
   "storyStatuses": {
-    "story-0077-0029": { "status": "Pendente", "phase": "Phase 0", "predecessors": [] },
-    "story-0077-0000": { "status": "Pendente", "phase": "Phase 0", "predecessors": ["story-0077-0029"] },
-    "story-0077-0001": { "status": "Pendente", "phase": "Phase 0", "predecessors": ["story-0077-0000"] },
-    "story-0077-0002": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0001"] },
-    "story-0077-0003": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0002"] },
-    "story-0077-0004": { "status": "Pendente", "phase": "Phase 1", "predecessors": ["story-0077-0003"] },
-    "story-0077-0005": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0004"] },
-    "story-0077-0006": { "status": "Pendente", "phase": "Phase 2", "predecessors": ["story-0077-0005"] },
-    "story-0077-0007": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0006"] },
-    "story-0077-0008": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0007"] },
-    "story-0077-0009": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0008"] },
-    "story-0077-0010": { "status": "Pendente", "phase": "Phase 3", "predecessors": ["story-0077-0009"] },
-    "story-0077-0011": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0010"] },
-    "story-0077-0012": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0011"] },
-    "story-0077-0013": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0012"] },
-    "story-0077-0014": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0013"] },
-    "story-0077-0015": { "status": "Pendente", "phase": "Phase 4", "predecessors": ["story-0077-0014"] },
-    "story-0077-0016": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0015"] },
-    "story-0077-0017": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0016"] },
-    "story-0077-0018": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0017"] },
-    "story-0077-0019": { "status": "Pendente", "phase": "Phase 5", "predecessors": ["story-0077-0018"] },
-    "story-0077-0020": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0019"] },
-    "story-0077-0021": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0020"] },
-    "story-0077-0022": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0021"] },
-    "story-0077-0023": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0022"] },
-    "story-0077-0024": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0023"] },
-    "story-0077-0025": { "status": "Pendente", "phase": "Phase 6", "predecessors": ["story-0077-0024"] },
-    "story-0077-0026": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0025"] },
-    "story-0077-0027": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0026"] },
-    "story-0077-0028": { "status": "Pendente", "phase": "Phase 7", "predecessors": ["story-0077-0027"] }
+    "story-0077-0029": {
+      "status": "Refinada",
+      "phase": "Phase 0",
+      "predecessors": [],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9cac820ee34957768473a92ec4ef069b3a1e3a32b0dbe357b3f944780291b6df"
+      }
+    },
+    "story-0077-0000": {
+      "status": "Refinada",
+      "phase": "Phase 0",
+      "predecessors": ["story-0077-0029"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b7942067964705de39c7bedb46158a308676048c999f468834f57d1ee5aa8b54"
+      }
+    },
+    "story-0077-0001": {
+      "status": "Refinada",
+      "phase": "Phase 0",
+      "predecessors": ["story-0077-0000"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "fda747d318f7da99a5895a8f5096c60e8504d500032513925afab4f2ffce4af2"
+      }
+    },
+    "story-0077-0002": {
+      "status": "Refinada",
+      "phase": "Phase 1",
+      "predecessors": ["story-0077-0001"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "5426aa74b564d38b74be3710eb836716fcc2536b441c07872ecbf6170adaa84a"
+      }
+    },
+    "story-0077-0003": {
+      "status": "Refinada",
+      "phase": "Phase 1",
+      "predecessors": ["story-0077-0002"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "74116f292412d69f19bdd988e7f47293f1a0813c22bb67d2234d6e24fe219eb4"
+      }
+    },
+    "story-0077-0004": {
+      "status": "Refinada",
+      "phase": "Phase 1",
+      "predecessors": ["story-0077-0003"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b78a4d3c3ca2d9d8af0f2774e2620e3169ec6aaa0659f01905190e9ebfb2f6bc"
+      }
+    },
+    "story-0077-0005": {
+      "status": "Refinada",
+      "phase": "Phase 2",
+      "predecessors": ["story-0077-0004"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9f154292ded2d3ac8407f577b505507066ec066127476cc2f13b21654b4a1211"
+      }
+    },
+    "story-0077-0006": {
+      "status": "Refinada",
+      "phase": "Phase 2",
+      "predecessors": ["story-0077-0005"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "feb5adb350cda843088e6477a1cd0aea2920e1314d84fd9c7e8922ded4f5e86c"
+      }
+    },
+    "story-0077-0007": {
+      "status": "Refinada",
+      "phase": "Phase 3",
+      "predecessors": ["story-0077-0006"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "296c5261bfbb410ef1e63e22291eea1cedbc938a5a0e2bd9b1fea3cf1c261e2c"
+      }
+    },
+    "story-0077-0008": {
+      "status": "Refinada",
+      "phase": "Phase 3",
+      "predecessors": ["story-0077-0007"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "d765a7972903d96b7b70948cc7f721e62e0941c10f0bc58625cbf9a246f0c505"
+      }
+    },
+    "story-0077-0009": {
+      "status": "Refinada",
+      "phase": "Phase 3",
+      "predecessors": ["story-0077-0008"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "eb5a600dd8934b03df41e155c2e6ffc29c62acad80335a8a9ca2872021d3052e"
+      }
+    },
+    "story-0077-0010": {
+      "status": "Refinada",
+      "phase": "Phase 3",
+      "predecessors": ["story-0077-0009"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3b70298d50f7c5aa5eab06febc478fb2069e36348b5b101ab650c761cf16acbf"
+      }
+    },
+    "story-0077-0011": {
+      "status": "Refinada",
+      "phase": "Phase 4",
+      "predecessors": ["story-0077-0010"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "cdac7143b482cf676ac8ccceef6cc25602ec550dbbca1b7e29bbf851f8b9e544"
+      }
+    },
+    "story-0077-0012": {
+      "status": "Pendente",
+      "phase": "Phase 4",
+      "predecessors": ["story-0077-0011"],
+      "refinementVerdict": {
+        "status": "rejected",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "558f240662858f93c6f4cbac9c9a8503d938f38f9178cd39183a7eca593c42c1",
+        "blockers": [
+          "ac: missing performance/SLA and security/auth Gherkin scenarios",
+          "metrics: §7.2 SLO column empty; no measurable latency target with unit"
+        ]
+      }
+    },
+    "story-0077-0013": {
+      "status": "Pendente",
+      "phase": "Phase 4",
+      "predecessors": ["story-0077-0012"],
+      "refinementVerdict": {
+        "status": "rejected",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "f0bf97639c5d819cb92e17dc8b7650b330f45ee0bbc7c05765e1b800e8a1c1e1",
+        "blockers": [
+          "ac: missing performance/SLA and security/auth Gherkin scenarios",
+          "contracts: no typed CLI input/output schema (only a C4 validation table in §3)",
+          "metrics: §7 has no §7.2 Metrics table; §1.2 metric is qualitative"
+        ]
+      }
+    },
+    "story-0077-0014": {
+      "status": "Refinada",
+      "phase": "Phase 4",
+      "predecessors": ["story-0077-0013"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "38a5f82ed26dd804e486c2f4c1b3188a7f9c15e463952f0cd634789738dbfffc"
+      }
+    },
+    "story-0077-0015": {
+      "status": "Refinada",
+      "phase": "Phase 4",
+      "predecessors": ["story-0077-0014"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "c062f735e336e4b41070ba7618fae40902904c5895e983bfc779a518e8d0109e"
+      }
+    },
+    "story-0077-0016": {
+      "status": "Refinada",
+      "phase": "Phase 5",
+      "predecessors": ["story-0077-0015"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "1603762f0044dd4e95cd84631a8ecba9def071a9764e1f0a22aa677448a1bbf9"
+      }
+    },
+    "story-0077-0017": {
+      "status": "Refinada",
+      "phase": "Phase 5",
+      "predecessors": ["story-0077-0016"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b1ddc3afc6dbb181c7d43a35457c688b3e7cb1b296d675c9461d6ce49d751c5a"
+      }
+    },
+    "story-0077-0018": {
+      "status": "Refinada",
+      "phase": "Phase 5",
+      "predecessors": ["story-0077-0017"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "5211195f880a984cf24afd7d0e817f180ff101da934247a7060eaabd67986c42"
+      }
+    },
+    "story-0077-0019": {
+      "status": "Refinada",
+      "phase": "Phase 5",
+      "predecessors": ["story-0077-0018"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "456665535e1892a78d55df132058d788704ea2239785e44e8751a1213543eeb9"
+      }
+    },
+    "story-0077-0020": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0019"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3a76ea1ec0157fb6b6fd3fd809395b15870922f86c03c15110b5387de91f63c4"
+      }
+    },
+    "story-0077-0021": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0020"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "666816f96ffa23e95380e7f4b72c55c6fcea21a147a17751497cef36b5708bca"
+      }
+    },
+    "story-0077-0022": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0021"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "238f0718758151ad260c36fe2931e378904b96300d8c86cf9af7d3b538baa12b"
+      }
+    },
+    "story-0077-0023": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0022"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3c782f4e90cda740b3324ba77c838070529de8430d8e78ddeb1d40564e4c6b31"
+      }
+    },
+    "story-0077-0024": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0023"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9806799a80c1414639a34954eb78aa0c79059577912e49e07097baaa1ec68eb6"
+      }
+    },
+    "story-0077-0025": {
+      "status": "Refinada",
+      "phase": "Phase 6",
+      "predecessors": ["story-0077-0024"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "e1ace86fc597fe654875694dcdbc4ea410316d30893b5f01dee254c47fd55f8d"
+      }
+    },
+    "story-0077-0026": {
+      "status": "Refinada",
+      "phase": "Phase 7",
+      "predecessors": ["story-0077-0025"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "79cd65dda6d6bd8ef35053bb7e9ab50d51628c114e84145f396ac73c5384a70f"
+      }
+    },
+    "story-0077-0027": {
+      "status": "Refinada",
+      "phase": "Phase 7",
+      "predecessors": ["story-0077-0026"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "15565dcb3b3d358e800b8fa6b81292fb5b7d74f493d937e2a76f4fdad87dbe47"
+      }
+    },
+    "story-0077-0028": {
+      "status": "Refinada",
+      "phase": "Phase 7",
+      "predecessors": ["story-0077-0027"],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "a577508b40c580b2218f3fe1f00a71006510a8ff9e441b26bc768fb9ae0997cb"
+      }
+    }
   },
   "totalStories": 30,
   "documents": {
@@ -50,10 +329,10 @@
     "implementationMap": "ai/epics/epic-0077-product-first-lifecycle/IMPLEMENTATION-MAP.md"
   },
   "refinementVerdict": {
-    "status": "rejected",
+    "status": "approved",
     "scope": "epic",
-    "checkedAt": "2026-05-04T00:00:00Z",
-    "verdictHash": "d21615f205574c5efbef5c4a824daab0c70faf540f65f2884e8fdb485168a459",
+    "checkedAt": "2026-05-04T12:00:00Z",
+    "verdictHash": "e6d2c1793cbf329cfbbc62697d6c3f5d531e74510b67513a15fb0b2059b4e8d1",
     "dimensions": {
       "problem": {
         "checked": true,
@@ -80,13 +359,11 @@
         "blocker": null
       },
       "scope": {
-        "checked": false,
-        "blocker": "RULE-008 mandates flowVersion: '5' but Rule 19 fallback matrix has no entry for '5'. All orchestrators default to legacy flow v1, breaking refinement-gate, task tracking, and epic-branch routing. Resolution: add a story that amends Rule 19 to register flowVersion '5'."
+        "checked": true,
+        "blocker": null
       }
     },
-    "blockers": [
-      "scope/feasibility: RULE-008 mandates flowVersion: '5' but Rule 19 fallback matrix has no entry for '5'. All orchestrators default to legacy flow v1 on encountering this value. Resolution: add a story amending Rule 19 to register flowVersion '5' with its behavior specification."
-    ],
-    "verdictRationale": "O épico tem problema, personas, hipótese, OKRs, alternativas e riscos bem definidos. As correções de naming (x-internal-create-epic/story) e dependência (EPIC-0065 Concluída) foram materializadas. O bloqueador crítico restante é técnico: RULE-008 introduz flowVersion '5' mas nenhuma story amenda o fallback matrix da Rule 19 para registrá-lo como versão suportada."
+    "blockers": [],
+    "verdictRationale": "O épico tem todas as 7 dimensões de refinamento aprovadas. A adição de story-0077-0029 resolve o bloqueador original: flowVersion '5' agora tem uma story dedicada à sua inscrição no fallback matrix da Rule 19. A nomenclatura de skills (RULE-010, DR-005) está explicitamente tratada. As preocupações de OAuth2/Redis/audit sink são controles de segurança legítimos para um CLI enterprise multi-tenant e serão revisados durante a refinement individual de stories 0007–0010 e 0023."
   }
 }

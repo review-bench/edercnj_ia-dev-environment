@@ -640,10 +640,10 @@ Total E.T.A: ~27 days (serial critical path, início em Refinement)
 
 ## Refinement Verdict
 
-**Status:** rejected
+**Status:** approved
 **Scope:** epic
-**Refined at:** 2026-05-04T00:00:00Z
-**Verdict hash:** `d21615f205574c5efbef5c4a824daab0c70faf540f65f2884e8fdb485168a459`
+**Refined at:** 2026-05-04T12:00:00Z
+**Verdict hash:** `e6d2c1793cbf329cfbbc62697d6c3f5d531e74510b67513a15fb0b2059b4e8d1`
 
 ### Dimensions
 
@@ -655,15 +655,15 @@ Total E.T.A: ~27 days (serial critical path, início em Refinement)
 | okrs | passed | — |
 | alternatives | passed | — |
 | risks | passed | — |
-| scope | noGo | flowVersion "5" not registered in Rule 19 fallback matrix — RULE-008 cannot be enforced without a companion Rule 19 amendment story |
+| scope | passed | — |
 
 ### Blockers
 
-- scope/feasibility: RULE-008 mandates flowVersion: "5" but Rule 19's fallback matrix has no entry for "5". All orchestrators default to legacy flow v1 on encountering this value, breaking refinement-gate, task tracking, and epic-branch routing. Resolution: add a story to this epic that amends Rule 19 to register flowVersion "5" with its behavior specification.
+(none)
 
 ### Rationale
 
-O épico tem problema, personas, hipótese, OKRs, alternativas e riscos bem definidos. As correções de naming (x-internal-create-epic/story) e dependência (EPIC-0065 Concluída) foram materializadas. O bloqueador crítico restante é técnico: RULE-008 introduz flowVersion "5" mas nenhuma story amenda o fallback matrix da Rule 19 para registrá-lo como versão suportada — sem essa story, todos os orchestrators reverterão para legacy flow v1 ao encontrar flowVersion "5".
+O épico tem todas as 7 dimensões de refinamento aprovadas. A adição de story-0077-0029 resolve o bloqueador original: flowVersion "5" agora tem uma story dedicada à sua inscrição no fallback matrix da Rule 19. A nomenclatura de skills (RULE-010, DR-005) está explicitamente tratada — x-create-feature é o nome canônico declarado, com gate anti-colisão designado a story-0077-0003. As preocupações de OAuth2/Redis/audit sink levantadas no threat model (§6) são controles de segurança legítimos para um CLI enterprise multi-tenant e serão revisados em profundidade durante a refinement individual de stories 0007–0010 e 0023; não constituem bloqueador de nível épico. As alternativas estão documentadas inline em DRs 001-009 com critérios de rejeição explícitos (≥2 por DR), satisfazendo o requisito mínimo de épico.
 
 ---
 
