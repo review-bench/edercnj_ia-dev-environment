@@ -193,6 +193,7 @@ class ContainerScanSkillTest {
         SkillsAssembler assembler = new SkillsAssembler();
         assembler.assemble(config, new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve("skills/x-scan-container-security/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-scan-container-security/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

@@ -16,8 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Tests for story-0016-0004: x-detect-spec-drift skill for standalone spec drift detection.
  *
- * <p>Validates that the x-detect-spec-drift skill template is generated correctly with proper frontmatter,
- * drift check categories, output format, and exit code semantics.
+ * <p>Validates that the x-detect-spec-drift skill template is generated correctly with proper
+ * frontmatter, drift check categories, output format, and exit code semantics.
  */
 @DisplayName("x-detect-spec-drift Skill")
 class SpecDriftCheckSkillTest {
@@ -223,6 +223,7 @@ class SpecDriftCheckSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-detect-spec-drift" + "/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-detect-spec-drift" + "/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

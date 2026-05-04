@@ -17,9 +17,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <p>Validates the slim-rewrite contract for orchestrator skills: each SKILL.md body must be ≤ 500
  * lines (hard ADR-0012 limit) with a non-empty {@code references/full-protocol.md} sibling.
  * Assertions grow incrementally as stories are merged: story-0054-0001 covers PR-domain
- * (x-fix-epic-pr, x-manage-pr-merge-train); story-0054-0002 covers medium orchestrators (x-implement-task,
- * x-generate-security-pipeline, x-manage-worktrees); story-0054-0003 covers x-plan-story; story-0054-0004 covers
- * XL orchestrators (x-epic-implement, x-release).
+ * (x-fix-epic-pr, x-manage-pr-merge-train); story-0054-0002 covers medium orchestrators
+ * (x-implement-task, x-generate-security-pipeline, x-manage-worktrees); story-0054-0003 covers
+ * x-plan-story; story-0054-0004 covers XL orchestrators (x-epic-implement, x-release).
  *
  * @see Epic0047CompressionSmokeTest
  * @see SmokeTestBase
@@ -44,8 +44,8 @@ class Epic0054CompressionSmokeTest extends SmokeTestBase {
                     "## Full Protocol");
 
     /**
-     * PR-domain skills from story-0054-0001. x-fix-epic-pr: 1297 → ≤ 250 lines x-manage-pr-merge-train:
-     * 873 → ≤ 250 lines
+     * PR-domain skills from story-0054-0001. x-fix-epic-pr: 1297 → ≤ 250 lines
+     * x-manage-pr-merge-train: 873 → ≤ 250 lines
      */
     private static final List<String> STORY_0001_PR_DOMAIN_SKILLS =
             List.of("x-fix-epic-pr", "x-manage-pr-merge-train");

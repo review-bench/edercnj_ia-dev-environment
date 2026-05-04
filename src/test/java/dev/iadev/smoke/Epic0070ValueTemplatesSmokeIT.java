@@ -116,7 +116,8 @@ class Epic0070ValueTemplatesSmokeIT {
     @Test
     @DisplayName("scenario4_archSystemUpdate_presentWithIdempotencyContract")
     void scenario4_archSystemUpdate_presentWithIdempotencyContract() throws IOException {
-        Path skillFile = SKILLS_ROOT.resolve("plan/x-update-system-architecture/SKILL.md").toAbsolutePath();
+        Path skillFile =
+                SKILLS_ROOT.resolve("plan/x-update-system-architecture/SKILL.md").toAbsolutePath();
 
         assertThat(skillFile)
                 .as("x-arch-system-update SKILL.md must exist (story-0070-0006)")

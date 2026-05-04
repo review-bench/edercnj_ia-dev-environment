@@ -101,23 +101,13 @@ public final class SecurityBaselineWriter {
 
     private static List<String> buildSastRows() {
         return List.of(
-                "| Input deserialization "
-                        + "| x-run-sast "
-                        + "| `/x-run-sast --scope owasp` |",
-                "| String escaping "
-                        + "| x-run-sast "
-                        + "| `/x-run-sast --scope owasp` |",
-                "| Temp files/directories "
-                        + "| x-run-sast "
-                        + "| `/x-run-sast --scope owasp` |",
-                "| Path operations "
-                        + "| x-run-sast "
-                        + "| `/x-run-sast --scope owasp` |",
+                "| Input deserialization " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
+                "| String escaping " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
+                "| Temp files/directories " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
+                "| Path operations " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
                 "| Error messages " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
                 "| Crypto RNG " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |",
-                "| Symlink following "
-                        + "| x-run-sast "
-                        + "| `/x-run-sast --scope owasp` |");
+                "| Symlink following " + "| x-run-sast " + "| `/x-run-sast --scope owasp` |");
     }
 
     private static List<String> buildSecretScanRows() {
@@ -129,7 +119,9 @@ public final class SecurityBaselineWriter {
 
     private static List<String> buildDastRows() {
         return List.of(
-                "| HTTP security headers " + "| x-evaluate-hardening " + "| `/x-evaluate-hardening` |",
+                "| HTTP security headers "
+                        + "| x-evaluate-hardening "
+                        + "| `/x-evaluate-hardening` |",
                 "| TLS configuration " + "| x-evaluate-hardening " + "| `/x-evaluate-hardening` |");
     }
 }

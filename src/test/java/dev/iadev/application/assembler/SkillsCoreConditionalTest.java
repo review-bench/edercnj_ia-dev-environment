@@ -65,8 +65,7 @@ class SkillsCoreConditionalTest {
             SkillsAssembler assembler = new SkillsAssembler();
             TestConfigBuilder.minimal();
             assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve("skills/lib/x-lib-decompose-task" + "/SKILL.md"))
-                    .exists();
+            assertThat(outputDir.resolve("skills/lib/x-lib-decompose-task" + "/SKILL.md")).exists();
         }
 
         @Test
