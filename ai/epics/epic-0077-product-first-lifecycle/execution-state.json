@@ -45,7 +45,7 @@
       }
     },
     "story-0077-0002": {
-      "status": "Refinada",
+      "status": "done",
       "phase": "Phase 1",
       "predecessors": ["story-0077-0001"],
       "refinementVerdict": {
