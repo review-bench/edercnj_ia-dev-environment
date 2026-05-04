@@ -1,103 +1,103 @@
-# SPEC-flat-architecture-decision-engine-v1 — Product Architecture Profiles and Decision Engine
+# SPEC-flat-architecture-decision-engine-v1 — Perfis de Arquitetura de Produto e Motor de Decisão
 
-> **Status:** Draft  
-> **Author:** GitHub Copilot CLI  
+> **Status:** Rascunho  
+> **Autor:** GitHub Copilot CLI  
 > **Date:** 2026-05-04  
 > **Branch:** docs/feature-flat-architecture-decision-engine
 
 ---
 
-## System
+## Sistema
 
-This feature defines a governance model for **software product architecture** only. It explicitly excludes solution architecture, enterprise landscape design, platform architecture, and organization-wide integration blueprints. The goal is to classify how much internal architecture a software product, module, or service should carry, and to evolve that decision through measurable complexity instead of ideology, fashion, or framework bias.
+Esta feature define um modelo de governança apenas para **arquitetura de produto de software**. Ela exclui explicitamente solution architecture, desenho de landscape corporativo, platform architecture e blueprints de integração em nível organizacional. O objetivo é classificar quanta estrutura interna um produto de software, módulo ou serviço deve carregar e evoluir essa decisão com base em complexidade mensurável, e não em ideologia, moda ou viés de framework.
 
-The model separates two independent axes. The first axis is **product topology**: single application, modular monolith, service federation, or microservice. The second axis is **architecture intensity**: **Flat Architecture** for lean internals, **Structured Architecture** for balanced explicit structure, and **Hardened Architecture** for strongly isolated and highly governed internals. Because the axes are independent, a microservice may be Flat, Structured, or Hardened internally, and the same is true for modules inside a modular monolith.
+O modelo separa dois eixos independentes. O primeiro eixo é a **topologia do produto**: aplicação única, modular monolith, federação de serviços ou microservice. O segundo eixo é a **intensidade arquitetural**: **Flat Architecture** para estruturas internas enxutas, **Structured Architecture** para estrutura explícita e equilibrada, e **Hardened Architecture** para estruturas internas fortemente isoladas e altamente governadas. Como os eixos são independentes, um microservice pode ser Flat, Structured ou Hardened internamente, e o mesmo vale para módulos dentro de um modular monolith.
 
-To make the model operational, the feature also introduces **pattern packs** and **rules packs**. Hexagonal, Tactical DDD, CQRS, Event Sourcing, and similar approaches are treated as selective packs that can be attached to a topology and intensity combination when measurable signals justify them. SOLID and related design constraints remain cross-cutting rules rather than topology choices. A software product complexity score then drives the recommendation engine with explicit dimensions, thresholds, and promotion signals.
-
----
-
-## Scope
-
-### Included
-
-- Define three formal architecture intensity tiers: Flat Architecture, Structured Architecture, and Hardened Architecture.
-- Separate topology decisions from architecture intensity so that monoliths, modular monoliths, and microservices can each use different internal architecture profiles.
-- Establish explicit module standards for each tier, including allowed structure depth, public module API shape, permitted abstractions, and shared-kernel constraints.
-- Define pattern-pack contracts for Hexagonal, Tactical DDD, CQRS, Event Sourcing, and related approaches, including required building blocks, optional elements, and anti-goals.
-- Define cross-cutting rules packs for SOLID and similar design principles that apply independently of topology.
-- Introduce a measurable **Software Product Complexity Score (SPCS)** with weighted dimensions, thresholds, and recommendation logic.
-- Prepare configuration-ready profile outputs and decision artifacts that can later be represented in generator rules, YAML, or policy checklists.
-
-### Excluded
-
-- Treating solution architecture, enterprise architecture, or platform architecture as part of this model.
-- Making Hexagonal, DDD, Microservices, CQRS, or Event Sourcing mandatory defaults for every product or module.
-- Using topology names such as "microservice" or "monolith" as a proxy for how inflated or sophisticated the internal architecture must be.
+Para tornar o modelo operacional, a feature também introduz **pattern packs** e **rules packs**. Hexagonal, Tactical DDD, CQRS, Event Sourcing e abordagens similares são tratados como pacotes seletivos que podem ser associados a uma combinação de topologia e intensidade quando sinais mensuráveis justificarem isso. SOLID e restrições de design relacionadas continuam sendo regras transversais, e não escolhas de topologia. Em seguida, um score de complexidade de produto de software passa a alimentar o motor de recomendação com dimensões explícitas, thresholds e sinais de promoção.
 
 ---
 
-## Rules
+## Escopo
 
-| ID | Rule | Impact |
+### Incluído
+
+- Definir três faixas formais de intensidade arquitetural: Flat Architecture, Structured Architecture e Hardened Architecture.
+- Separar decisões de topologia da intensidade arquitetural para que monoliths, modular monoliths e microservices possam usar perfis internos distintos.
+- Estabelecer padrões explícitos de módulo para cada faixa, incluindo profundidade estrutural permitida, formato de API pública de módulo, abstrações permitidas e restrições de shared kernel.
+- Definir contratos de pattern packs para Hexagonal, Tactical DDD, CQRS, Event Sourcing e abordagens correlatas, incluindo componentes obrigatórios, elementos opcionais e anti-goals.
+- Definir rules packs transversais para SOLID e princípios de design semelhantes, aplicáveis independentemente da topologia.
+- Introduzir um **Software Product Complexity Score (SPCS)** mensurável, com dimensões ponderadas, thresholds e lógica de recomendação.
+- Preparar saídas de perfil prontas para configuração e artefatos de decisão que depois possam ser representados em regras do gerador, YAML ou checklists de policy.
+
+### Excluído
+
+- Tratar solution architecture, enterprise architecture ou platform architecture como parte deste modelo.
+- Tornar Hexagonal, DDD, Microservices, CQRS ou Event Sourcing defaults obrigatórios para todo produto ou módulo.
+- Usar nomes de topologia como "microservice" ou "monolith" como proxy para definir o quão inflada ou sofisticada a arquitetura interna deve ser.
+
+---
+
+## Regras
+
+| ID | Regra | Impacto |
 |----|------|--------|
-| RULE-001 | This model governs software product architecture only; it does not define solution architecture, platform architecture, or enterprise integration maps. | Prevents scope dilution and keeps recommendations focused on application internals. |
-| RULE-002 | Architecture selection must use two independent axes: product topology and architecture intensity. | Prevents false equivalence between deployment shape and internal design complexity. |
-| RULE-003 | The formal intensity tiers are Flat Architecture, Structured Architecture, and Hardened Architecture. | Creates a stable vocabulary for recommendation, governance, and profile definition. |
-| RULE-004 | Microservices, modular monoliths, and single-deploy systems may each use Flat, Structured, or Hardened internals depending on measured need. | Allows combinations such as flat microservices, structured monoliths, or hardened modules. |
-| RULE-005 | Each intensity tier must define a mandatory module standard covering naming, package depth, public API boundaries, shared-kernel constraints, and abstraction budget. | Makes module structure explicit and comparable across products and teams. |
-| RULE-006 | Pattern packs such as Hexagonal, Tactical DDD, CQRS, and Event Sourcing must declare required components, optional components, allowed contexts, promotion triggers, and anti-patterns. | Makes each approach operational instead of rhetorical or over-applied. |
-| RULE-007 | SOLID and similar design principles are cross-cutting rules packs, not topology choices and not architecture tiers by themselves. | Prevents mixing design discipline with deployment or layering decisions. |
-| RULE-008 | The Software Product Complexity Score (SPCS) must be computed from weighted product factors such as domain rules density, workflow coupling, integration volatility, compliance/audit pressure, runtime criticality, scale asymmetry, team autonomy, deployment independence, channel divergence, and read/write asymmetry. | Creates measurable input for architecture recommendations. |
-| RULE-009 | Recommendation logic must first calculate the intensity tier from SPCS and eliminatory conditions, then evaluate the appropriate topology separately. | Produces clearer guidance and avoids inflating architecture because of one isolated signal. |
-| RULE-010 | Architectural promotion, hardening, and exceptions must be documented with explicit signals, thresholds, and rationale. | Preserves traceability, reviewability, and disciplined evolution over time. |
+| RULE-001 | Este modelo governa apenas arquitetura de produto de software; ele não define solution architecture, platform architecture nem mapas de integração corporativa. | Evita diluição de escopo e mantém as recomendações focadas na estrutura interna da aplicação. |
+| RULE-002 | A seleção de arquitetura deve usar dois eixos independentes: topologia do produto e intensidade arquitetural. | Evita equivalência falsa entre forma de deploy e complexidade de design interno. |
+| RULE-003 | As faixas formais de intensidade são Flat Architecture, Structured Architecture e Hardened Architecture. | Cria um vocabulário estável para recomendação, governança e definição de perfis. |
+| RULE-004 | Microservices, modular monoliths e sistemas com deploy único podem usar estruturas internas Flat, Structured ou Hardened conforme a necessidade medida. | Permite combinações como flat microservices, structured monoliths ou módulos hardened. |
+| RULE-005 | Cada faixa de intensidade deve definir um padrão obrigatório de módulo cobrindo nomenclatura, profundidade de pacotes, fronteiras de API pública, restrições de shared kernel e orçamento de abstração. | Torna a estrutura modular explícita e comparável entre produtos e times. |
+| RULE-006 | Pattern packs como Hexagonal, Tactical DDD, CQRS e Event Sourcing devem declarar componentes obrigatórios, componentes opcionais, contextos permitidos, gatilhos de promoção e anti-patterns. | Torna cada abordagem operacional em vez de retórica ou excessivamente aplicada. |
+| RULE-007 | SOLID e princípios de design semelhantes são rules packs transversais, não escolhas de topologia nem faixas arquiteturais por si só. | Evita misturar disciplina de design com decisões de deploy ou camadas. |
+| RULE-008 | O Software Product Complexity Score (SPCS) deve ser calculado a partir de fatores ponderados do produto, como densidade de regras de domínio, acoplamento de workflow, volatilidade de integração, pressão de compliance/auditoria, criticidade de runtime, assimetria de escala, autonomia de times, independência de deploy, divergência de canais e assimetria entre leitura e escrita. | Cria uma entrada mensurável para recomendações arquiteturais. |
+| RULE-009 | A lógica de recomendação deve primeiro calcular a faixa de intensidade com base no SPCS e em condições eliminatórias, e só depois avaliar separadamente a topologia apropriada. | Produz orientação mais clara e evita inflar a arquitetura por causa de um único sinal isolado. |
+| RULE-010 | Promoções arquiteturais, hardening e exceções devem ser documentados com sinais explícitos, thresholds e rationale. | Preserva rastreabilidade, capacidade de revisão e evolução disciplinada ao longo do tempo. |
 
 ---
 
-## Stories
+## Histórias
 
-Preliminary backlog for later decomposition in `x-create-feature`:
+Backlog preliminar para decomposição posterior em `x-create-feature`:
 
-| # | Title | Stakeholder |
+| # | Título | Responsável |
 |---|-------|-------------|
-| 1 | Define the formal taxonomy for Flat, Structured, and Hardened architecture intensity tiers | Software Architect |
-| 2 | Separate product topology choices from internal architecture intensity in the decision engine | Tech Lead |
-| 3 | Define the module standard for Flat Architecture, including shallow capability modules and low abstraction budget | Developer |
-| 4 | Define the module standard for Structured Architecture, including explicit module APIs, selective ports, and balanced layering | Software Architect |
-| 5 | Define the module standard for Hardened Architecture, including strong boundaries, audited seams, and higher governance | Software Architect |
-| 6 | Create a pattern-pack contract template for Hexagonal, Tactical DDD, CQRS, Event Sourcing, and similar approaches | Platform Engineer |
-| 7 | Define cross-cutting rules packs for SOLID and related design constraints | Tech Lead |
-| 8 | Implement the Software Product Complexity Score with weighted dimensions, thresholds, and calibration examples | Software Architect |
-| 9 | Generate recommendation outputs that independently suggest topology and intensity tier | Platform Engineer |
-| 10 | Define promotion rules from Flat to Structured to Hardened and from single deploy to modular or distributed topology | Tech Lead |
-| 11 | Document how architectural exceptions, module deviations, and specialized packs are recorded and reviewed | Tech Lead |
+| 1 | Definir a taxonomia formal das faixas de intensidade arquitetural Flat, Structured e Hardened | Arquiteto de Software |
+| 2 | Separar escolhas de topologia do produto da intensidade arquitetural interna no motor de decisão | Líder Técnico |
+| 3 | Definir o padrão de módulo para Flat Architecture, incluindo módulos rasos por capacidade e baixo orçamento de abstração | Desenvolvedor |
+| 4 | Definir o padrão de módulo para Structured Architecture, incluindo APIs explícitas de módulo, ports seletivos e layering equilibrado | Arquiteto de Software |
+| 5 | Definir o padrão de módulo para Hardened Architecture, incluindo fronteiras fortes, seams auditáveis e governança mais rígida | Arquiteto de Software |
+| 6 | Criar um template de contrato de pattern pack para Hexagonal, Tactical DDD, CQRS, Event Sourcing e abordagens semelhantes | Engenheiro de Plataforma |
+| 7 | Definir rules packs transversais para SOLID e restrições de design relacionadas | Líder Técnico |
+| 8 | Implementar o Software Product Complexity Score com dimensões ponderadas, thresholds e exemplos de calibração | Arquiteto de Software |
+| 9 | Gerar saídas de recomendação que sugiram independentemente a topologia e a faixa de intensidade | Engenheiro de Plataforma |
+| 10 | Definir regras de promoção de Flat para Structured para Hardened e de deploy único para topologia modular ou distribuída | Líder Técnico |
+| 11 | Documentar como exceções arquiteturais, desvios de módulo e pacotes especializados são registrados e revisados | Líder Técnico |
 
 ---
 
 ## DoR / DoD
 
-### Definition of Ready
+### Definição de Pronto
 
-- [ ] Topology and architecture intensity are explicitly separated and named without ambiguity.
-- [ ] The proposed intensity-tier names and semantics are accepted by stakeholders.
-- [ ] The module-standard template is defined for both architecture tiers and pattern packs.
-- [ ] The SPCS dimensions, weights, thresholds, and calibration method are explicit enough to be reviewed objectively.
-- [ ] The intended operators of the recommendation engine and governance flow are identified.
+- [ ] Topologia e intensidade arquitetural estão explicitamente separadas e nomeadas sem ambiguidade.
+- [ ] Os nomes propostos das faixas de intensidade e suas semânticas foram aceitos pelos stakeholders.
+- [ ] O template de padrão de módulo está definido tanto para as faixas arquiteturais quanto para os pattern packs.
+- [ ] As dimensões, pesos, thresholds e método de calibração do SPCS estão explícitos o suficiente para revisão objetiva.
+- [ ] Os operadores pretendidos do motor de recomendação e do fluxo de governança foram identificados.
 
-### Definition of Done
+### Definição de Concluído
 
-- [ ] The feature distinguishes software product architecture from solution architecture in both language and recommendation logic.
-- [ ] The recommendation engine outputs topology and architecture intensity separately, with valid combinations such as flat microservices or hardened monolith modules.
-- [ ] Flat, Structured, and Hardened Architecture each have explicit module standards, abstraction budgets, and promotion signals.
-- [ ] Pattern packs and rules packs are defined with required elements, allowed contexts, and anti-pattern boundaries.
-- [ ] The SPCS is measurable, reviewable, and linked to explicit thresholds and recommendation outcomes.
+- [ ] A feature distingue arquitetura de produto de software de solution architecture tanto na linguagem quanto na lógica de recomendação.
+- [ ] O motor de recomendação produz separadamente topologia e intensidade arquitetural, com combinações válidas como flat microservices ou módulos hardened em monolith.
+- [ ] Flat Architecture, Structured Architecture e Hardened Architecture possuem padrões explícitos de módulo, orçamentos de abstração e sinais de promoção.
+- [ ] Pattern packs e rules packs estão definidos com elementos obrigatórios, contextos permitidos e limites de anti-patterns.
+- [ ] O SPCS é mensurável, revisável e vinculado a thresholds explícitos e resultados de recomendação.
 
 ---
 
-## Risks
+## Riscos
 
-| Risk | Impact | Mitigation |
+| Risco | Impacto | Mitigação |
 |------|--------|------------|
-| Teams confuse topology with architecture intensity and assume that every microservice must be heavily engineered internally. | High | Separate topology and intensity in the model, examples, and recommendation output so combinations remain explicit. |
-| Pattern packs and rules packs become bureaucratic catalogs that reintroduce architectural inflation. | High | Require each pack to declare when it should not be used, what problem it solves, and what signals justify promotion. |
-| The complexity score becomes subjective or easy to game. | Medium | Use weighted dimensions, calibration examples, evidence-based scoring, and explicit review criteria for each threshold. |
+| Times confundem topologia com intensidade arquitetural e assumem que todo microservice precisa ser fortemente sofisticado internamente. | Alto | Separar topologia e intensidade no modelo, nos exemplos e na saída de recomendação para que as combinações permaneçam explícitas. |
+| Pattern packs e rules packs tornam-se catálogos burocráticos que reintroduzem inflação arquitetural. | Alto | Exigir que cada pack declare quando não deve ser usado, qual problema resolve e quais sinais justificam sua promoção. |
+| O score de complexidade torna-se subjetivo ou fácil de manipular. | Médio | Usar dimensões ponderadas, exemplos de calibração, scoring baseado em evidência e critérios explícitos de revisão para cada threshold. |
