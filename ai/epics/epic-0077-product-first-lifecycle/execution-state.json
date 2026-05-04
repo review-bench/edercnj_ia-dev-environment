@@ -73,7 +73,7 @@
       }
     },
     "story-0077-0004": {
-      "status": "Concluída",
+      "status": "Conclu\u00edda",
       "phase": "Phase 1",
       "predecessors": [
         "story-0077-0003"
@@ -85,7 +85,7 @@
       }
     },
     "story-0077-0005": {
-      "status": "Concluída",
+      "status": "Conclu\u00edda",
       "phase": "Phase 2",
       "predecessors": [
         "story-0077-0004"
@@ -96,21 +96,10 @@
         "verdictHash": "9f154292ded2d3ac8407f577b505507066ec066127476cc2f13b21654b4a1211"
       }
     },
-    "story-0077-0006": "Concluída",
-    "story-0077-0007": "Concluída",
-    "story-0077-0008": "Concluída",
-    "story-0077-0009": {
-      "status": "Refinada",
-      "phase": "Phase 3",
-      "predecessors": [
-        "story-0077-0008"
-      ],
-      "refinementVerdict": {
-        "status": "approved",
-        "checkedAt": "2026-05-04T12:00:00Z",
-        "verdictHash": "eb5a600dd8934b03df41e155c2e6ffc29c62acad80335a8a9ca2872021d3052e"
-      }
-    },
+    "story-0077-0006": "Conclu\u00edda",
+    "story-0077-0007": "Conclu\u00edda",
+    "story-0077-0008": "Conclu\u00edda",
+    "story-0077-0009": "Conclu\u00edda",
     "story-0077-0010": {
       "status": "Refinada",
       "phase": "Phase 3",
@@ -147,7 +136,7 @@
         "verdictHash": "558f240662858f93c6f4cbac9c9a8503d938f38f9178cd39183a7eca593c42c1",
         "blockers": [
           "ac: missing performance/SLA and security/auth Gherkin scenarios",
-          "metrics: §7.2 SLO column empty; no measurable latency target with unit"
+          "metrics: \u00a77.2 SLO column empty; no measurable latency target with unit"
         ]
       }
     },
@@ -163,8 +152,8 @@
         "verdictHash": "f0bf97639c5d819cb92e17dc8b7650b330f45ee0bbc7c05765e1b800e8a1c1e1",
         "blockers": [
           "ac: missing performance/SLA and security/auth Gherkin scenarios",
-          "contracts: no typed CLI input/output schema (only a C4 validation table in §3)",
-          "metrics: §7 has no §7.2 Metrics table; §1.2 metric is qualitative"
+          "contracts: no typed CLI input/output schema (only a C4 validation table in \u00a73)",
+          "metrics: \u00a77 has no \u00a77.2 Metrics table; \u00a71.2 metric is qualitative"
         ]
       }
     },
@@ -390,6 +379,6 @@
       }
     },
     "blockers": [],
-    "verdictRationale": "O épico tem todas as 7 dimensões de refinamento aprovadas. A adição de story-0077-0029 resolve o bloqueador original: flowVersion '5' agora tem uma story dedicada à sua inscrição no fallback matrix da Rule 19. A nomenclatura de skills (RULE-010, DR-005) está explicitamente tratada. As preocupações de OAuth2/Redis/audit sink são controles de segurança legítimos para um CLI enterprise multi-tenant e serão revisados durante a refinement individual de stories 0007–0010 e 0023."
+    "verdictRationale": "O \u00e9pico tem todas as 7 dimens\u00f5es de refinamento aprovadas. A adi\u00e7\u00e3o de story-0077-0029 resolve o bloqueador original: flowVersion '5' agora tem uma story dedicada \u00e0 sua inscri\u00e7\u00e3o no fallback matrix da Rule 19. A nomenclatura de skills (RULE-010, DR-005) est\u00e1 explicitamente tratada. As preocupa\u00e7\u00f5es de OAuth2/Redis/audit sink s\u00e3o controles de seguran\u00e7a leg\u00edtimos para um CLI enterprise multi-tenant e ser\u00e3o revisados durante a refinement individual de stories 0007\u20130010 e 0023."
   }
 }
