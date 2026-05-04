@@ -33,6 +33,7 @@
 | ADR-0027 | [Dependency Policy & SCA Final Gate (EPIC-0074)](ADR-0027-dependency-policy-gate.md) | Accepted | 2026-05-01 |
 | ADR-0028 | [AI Memory Layer (EPIC-0075)](ADR-0028-ai-memory-layer.md) | Accepted | 2026-05-03 |
 | ADR-0029 | [Verb-First Skill Naming Convention (EPIC-0076)](ADR-0029-verb-first-skill-naming.md) | Accepted | 2026-05-03 |
+| ADR-0030 | [Rule 14 Extension for Product-First Runtime Domain (EPIC-0077)](ADR-0030-rule14-product-first-domain.md) | Accepted | 2026-05-04 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.
