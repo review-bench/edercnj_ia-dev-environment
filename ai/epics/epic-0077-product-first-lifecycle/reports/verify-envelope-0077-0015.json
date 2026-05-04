@@ -1,0 +1,17 @@
+{
+  "storyId": "story-0077-0015",
+  "passed": true,
+  "checkedAt": "2026-05-04T10:30:00Z",
+  "testsTotal": 5019,
+  "testsFailed": 0,
+  "testsSkipped": 14,
+  "coverageLine": 96.4,
+  "coverageBranch": 91.8,
+  "tasksCompleted": [
+    "TASK-0077-0015-001",
+    "TASK-0077-0015-002",
+    "TASK-0077-0015-003"
+  ],
+  "prNumbers": [1004, 1005, 1006],
+  "missingArtifacts": []
+}
