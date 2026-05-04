@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates x-pr-create/SKILL.md Phase 3 integration with x-internal-pr-body-render
+ * Validates x-create-pr/SKILL.md Phase 3 integration with x-internal-render-pr-body
  * (story-0066-0005) via static inspection.
  *
  * <p>Checks: MANDATORY TOOL CALL invocation in Phase 3, deduplication logic in Phase 3.5, Recovery
@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test;
 class XPrCreateRenderIntegrationTest {
 
     private static final Path SKILL_MD =
-            Path.of("src/main/resources/targets/claude/skills/core/pr/x-pr-create/SKILL.md");
+            Path.of("src/main/resources/targets/claude/skills/core/pr/x-create-pr/SKILL.md");
 
     private static final Path REFERENCES_RECOVERY =
             Path.of(
-                    "src/main/resources/targets/claude/skills/core/pr/x-pr-create"
+                    "src/main/resources/targets/claude/skills/core/pr/x-create-pr"
                             + "/references/recovery.md");
 
     private static String content;
@@ -38,7 +38,7 @@ class XPrCreateRenderIntegrationTest {
 
     @BeforeAll
     static void loadContent() throws IOException {
-        assertThat(SKILL_MD).as("x-pr-create/SKILL.md must exist").exists();
+        assertThat(SKILL_MD).as("x-create-pr/SKILL.md must exist").exists();
         content = Files.readString(SKILL_MD, StandardCharsets.UTF_8);
         // ADR-0007 carve-out: recovery detail may live in references/recovery.md.
         // Combined view is used by tests that allow either location.
@@ -54,11 +54,11 @@ class XPrCreateRenderIntegrationTest {
     class RenderInvocation {
 
         @Test
-        @DisplayName("Phase 3 contains Skill(skill: \"x-internal-pr-body-render\", ...) invocation")
+        @DisplayName("Phase 3 contains Skill(skill: \"x-internal-render-pr-body\", ...) invocation")
         void phase3_invokesRenderSkill() {
             assertThat(content)
-                    .as("Phase 3 must invoke x-internal-pr-body-render via Skill tool")
-                    .contains("Skill(skill: \"x-internal-pr-body-render\"");
+                    .as("Phase 3 must invoke x-internal-render-pr-body via Skill tool")
+                    .contains("Skill(skill: \"x-internal-render-pr-body\"");
         }
 
         @Test

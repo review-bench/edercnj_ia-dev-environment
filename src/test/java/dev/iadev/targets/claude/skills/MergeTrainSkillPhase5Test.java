@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * TDD tests for Phase 5 (Parallel Tail Orchestration) of x-pr-merge-train/SKILL.md
+ * TDD tests for Phase 5 (Parallel Tail Orchestration) of x-manage-pr-merge-train/SKILL.md
  * (story-0042-0002, TASK-0042-0002-003 and TASK-0042-0002-004).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that Phase 5 content
@@ -21,7 +21,7 @@ class MergeTrainSkillPhase5Test {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(

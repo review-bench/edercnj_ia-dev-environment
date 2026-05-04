@@ -10,7 +10,7 @@
 #      without a corresponding entry in perf-baseline-updates.log, exits 1.
 #
 # NOT this script's responsibility: detecting performance regressions at runtime
-#   (that is x-test-performance's job). This script guards baseline integrity only.
+#   (that is x-execute-performance-tests's job). This script guards baseline integrity only.
 #
 # Layer:   2 — CI Script (Rule 26 §Taxonomy)
 # Rule:    EPIC-0072 story-0072-0005

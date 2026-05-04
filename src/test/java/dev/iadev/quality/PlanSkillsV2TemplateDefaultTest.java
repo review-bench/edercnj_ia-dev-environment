@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Validates that x-internal-epic-create and x-internal-story-create emit v2 templates by default
+ * Validates that x-internal-create-epic and x-internal-create-story emit v2 templates by default
  * and declare the --legacy-template-v1 flag (EPIC-0070 / story-0070-0005).
  */
 @DisplayName("PlanSkillsV2TemplateDefaultTest")
@@ -30,7 +30,7 @@ class PlanSkillsV2TemplateDefaultTest {
                     "plan");
 
     @ParameterizedTest(name = "{0} declares --legacy-template-v1 parameter")
-    @ValueSource(strings = {"x-internal-epic-create", "x-internal-story-create"})
+    @ValueSource(strings = {"x-internal-create-epic", "x-internal-create-story"})
     @DisplayName("createSkill_hasLegacyTemplateV1Flag_inParametersTable")
     void createSkill_hasLegacyTemplateV1Flag_inParametersTable(String skillName)
             throws IOException {
@@ -47,7 +47,7 @@ class PlanSkillsV2TemplateDefaultTest {
     }
 
     @ParameterizedTest(name = "{0} references v2 template structure")
-    @ValueSource(strings = {"x-internal-epic-create", "x-internal-story-create"})
+    @ValueSource(strings = {"x-internal-create-epic", "x-internal-create-story"})
     @DisplayName("createSkill_referencesV2TemplateStructure")
     void createSkill_referencesV2TemplateStructure(String skillName) throws IOException {
         Path skillFile =
@@ -64,7 +64,7 @@ class PlanSkillsV2TemplateDefaultTest {
     }
 
     @ParameterizedTest(name = "{0} contains deprecation warning text")
-    @ValueSource(strings = {"x-internal-epic-create", "x-internal-story-create"})
+    @ValueSource(strings = {"x-internal-create-epic", "x-internal-create-story"})
     @DisplayName("createSkill_hasDeprecationWarning_forLegacyFlag")
     void createSkill_hasDeprecationWarning_forLegacyFlag(String skillName) throws IOException {
         Path skillFile =
@@ -81,7 +81,7 @@ class PlanSkillsV2TemplateDefaultTest {
     }
 
     @ParameterizedTest(name = "{0} has ## Examples section")
-    @ValueSource(strings = {"x-internal-epic-create", "x-internal-story-create"})
+    @ValueSource(strings = {"x-internal-create-epic", "x-internal-create-story"})
     @DisplayName("createSkill_hasExamplesSection")
     void createSkill_hasExamplesSection(String skillName) throws IOException {
         Path skillFile =

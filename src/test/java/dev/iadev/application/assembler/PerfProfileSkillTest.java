@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0019: x-perf-profile skill and x-test-perf extension with regression
+ * Tests for story-0013-0019: x-profile-performance skill and x-run-perf-tests extension with regression
  * detection.
  *
- * <p>Validates that the x-perf-profile skill template is generated correctly with proper
+ * <p>Validates that the x-profile-performance skill template is generated correctly with proper
  * frontmatter, workflow steps, profiler selection, and output modes. Also validates that
- * x-test-perf is extended with regression detection while preserving existing content.
+ * x-run-perf-tests is extended with regression detection while preserving existing content.
  */
-@DisplayName("x-perf-profile Skill and x-test-perf Extension")
+@DisplayName("x-profile-performance Skill and x-run-perf-tests Extension")
 class PerfProfileSkillTest {
 
     @Nested
@@ -29,18 +29,18 @@ class PerfProfileSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-perf-profile SKILL.md exists after" + " assembly")
+        @DisplayName("x-profile-performance SKILL.md exists after" + " assembly")
         void assemble_perfProfile_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-perf-profile/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-profile-performance/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-perf-profile")
+        @DisplayName("frontmatter contains name:" + " x-profile-performance")
         void assemble_perfProfile_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-perf-profile");
+            assertThat(content).contains("name: x-profile-performance");
         }
 
         @Test
@@ -199,67 +199,67 @@ class PerfProfileSkillTest {
     }
 
     @Nested
-    @DisplayName("x-test-perf Extension -- Regression" + " Detection")
+    @DisplayName("x-run-perf-tests Extension -- Regression" + " Detection")
     class RunPerfTestRegression {
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " Regression Detection section")
+        @DisplayName("extended x-run-perf-tests contains" + " Regression Detection section")
         void assemble_runPerfTest_hasRegressionDetection(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("Regression Detection");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " Baseline Management section")
+        @DisplayName("extended x-run-perf-tests contains" + " Baseline Management section")
         void assemble_runPerfTest_hasBaselineManagement(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("Baseline Management");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " Threshold Validation section")
+        @DisplayName("extended x-run-perf-tests contains" + " Threshold Validation section")
         void assemble_runPerfTest_hasThresholdValidation(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("Threshold Validation");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " Regression Detection section")
+        @DisplayName("extended x-run-perf-tests contains" + " Regression Detection section")
         void assemble_runPerfTest_hasComparisonReport(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("Regression Detection");
         }
 
         @Test
-        @DisplayName("extended x-test-perf references" + " baseline.json")
+        @DisplayName("extended x-run-perf-tests references" + " baseline.json")
         void assemble_runPerfTest_hasBaselineJson(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("baseline.json");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " --save-baseline flag")
+        @DisplayName("extended x-run-perf-tests contains" + " --save-baseline flag")
         void assemble_runPerfTest_hasSaveBaseline(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("--save-baseline");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " --compare-baseline flag")
+        @DisplayName("extended x-run-perf-tests contains" + " --compare-baseline flag")
         void assemble_runPerfTest_hasCompareBaseline(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("--compare-baseline");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " p99 threshold reference")
+        @DisplayName("extended x-run-perf-tests contains" + " p99 threshold reference")
         void assemble_runPerfTest_hasP99Threshold(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("p99");
         }
 
         @Test
-        @DisplayName("extended x-test-perf contains" + " throughput reference")
+        @DisplayName("extended x-run-perf-tests contains" + " throughput reference")
         void assemble_runPerfTest_hasThroughput(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("throughput");
@@ -267,39 +267,39 @@ class PerfProfileSkillTest {
     }
 
     @Nested
-    @DisplayName("x-test-perf Extension -- Preservation")
+    @DisplayName("x-run-perf-tests Extension -- Preservation")
     class RunPerfTestPreservation {
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " original name in frontmatter")
+        @DisplayName("extended x-run-perf-tests preserves" + " original name in frontmatter")
         void assemble_runPerfTest_preservesName(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
-            assertThat(content).contains("name: x-test-perf");
+            assertThat(content).contains("name: x-run-perf-tests");
         }
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " SLA Targets section")
+        @DisplayName("extended x-run-perf-tests preserves" + " SLA Targets section")
         void assemble_runPerfTest_preservesSlaTargets(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("SLA Targets");
         }
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " scenario definitions")
+        @DisplayName("extended x-run-perf-tests preserves" + " scenario definitions")
         void assemble_runPerfTest_preservesTestScenarios(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("Select and Run Scenario");
         }
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " workflow section")
+        @DisplayName("extended x-run-perf-tests preserves" + " workflow section")
         void assemble_runPerfTest_preservesExecutionFlow(@TempDir Path tempDir) throws IOException {
             String content = generateRunPerfTestContent(tempDir);
             assertThat(content).contains("## Workflow");
         }
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " Review Checklist section")
+        @DisplayName("extended x-run-perf-tests preserves" + " Review Checklist section")
         void assemble_runPerfTest_preservesReviewChecklist(@TempDir Path tempDir)
                 throws IOException {
             String content = generateRunPerfTestContent(tempDir);
@@ -307,7 +307,7 @@ class PerfProfileSkillTest {
         }
 
         @Test
-        @DisplayName("extended x-test-perf preserves" + " Data Generation section")
+        @DisplayName("extended x-run-perf-tests preserves" + " Data Generation section")
         void assemble_runPerfTest_preservesDataGeneration(@TempDir Path tempDir)
                 throws IOException {
             String content = generateRunPerfTestContent(tempDir);
@@ -329,12 +329,12 @@ class PerfProfileSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-perf-profile/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-profile-performance/SKILL.md"), StandardCharsets.UTF_8);
     }
 
     private String generateRunPerfTestContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-test-perf/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-run-perf-tests/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

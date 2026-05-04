@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <p>Validates the end-to-end contract introduced by story-0047-0001: the source-of-truth {@code
  * _shared/} directory (peer of {@code core/}, {@code conditional/}, {@code knowledge-packs/}) is
  * shipped to every generated profile at {@code .claude/skills/_shared/}, and the pilot pre-commit
- * cluster ({@code x-git-commit}, {@code x-code-format}, {@code x-code-lint}) carries a Markdown
+ * cluster ({@code x-commit-changes}, {@code x-code-format}, {@code x-code-lint}) carries a Markdown
  * relative link that resolves to {@code _shared/error-handling-pre-commit.md} in the output tree
  * per ADR-0011 (Option (b) — link-based inclusion).
  *
@@ -41,7 +41,7 @@ class Epic0047CompressionSmokeTest extends SmokeTestBase {
 
     /** Pilot consumer skills that link to _shared/ per ADR-0011. */
     private static final List<String> PILOT_CONSUMER_SKILLS =
-            List.of("x-git-commit", "x-code-format", "x-code-lint");
+            List.of("x-commit-changes", "x-format-code", "x-lint-code");
 
     /** Expected Markdown link target (from a consumer SKILL.md). */
     private static final String EXPECTED_LINK_TARGET = "(../_shared/error-handling-pre-commit.md)";
@@ -102,7 +102,7 @@ class Epic0047CompressionSmokeTest extends SmokeTestBase {
     void smoke_sharedLinkResolvesInOutput(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
-        Path consumerSkill = skillsDir.resolve("x-git-commit/SKILL.md");
+        Path consumerSkill = skillsDir.resolve("x-commit-changes/SKILL.md");
         // Link is ../_shared/error-handling-pre-commit.md
         // relative to the consumer SKILL.md's directory.
         Path resolved =
@@ -218,20 +218,20 @@ class Epic0047CompressionSmokeTest extends SmokeTestBase {
      * (§4):
      *
      * <ul>
-     *   <li>x-git-commit ≤ 200 lines
-     *   <li>x-code-format ≤ 200 lines
-     *   <li>x-code-lint ≤ 200 lines
-     *   <li>x-test-tdd ≤ 250 lines (larger surface)
-     *   <li>x-story-implement ≤ 250 lines (larger surface)
+     *   <li>x-commit-changes ≤ 200 lines
+     *   <li>x-format-code ≤ 200 lines
+     *   <li>x-lint-code ≤ 200 lines
+     *   <li>x-drive-tdd ≤ 250 lines (larger surface)
+     *   <li>x-implement-story ≤ 250 lines (larger surface)
      * </ul>
      */
     private static final List<String> FLIPPED_SKILLS =
             List.of(
-                    "x-git-commit",
-                    "x-code-format",
-                    "x-code-lint",
-                    "x-test-tdd",
-                    "x-story-implement");
+                    "x-commit-changes",
+                    "x-format-code",
+                    "x-lint-code",
+                    "x-drive-tdd",
+                    "x-implement-story");
 
     /**
      * Per-skill line-count limit for the slim SKILL.md, matching the DoD table in {@code
@@ -239,11 +239,11 @@ class Epic0047CompressionSmokeTest extends SmokeTestBase {
      */
     private static final java.util.Map<String, Integer> FLIPPED_LIMIT_BY_SKILL =
             java.util.Map.of(
-                    "x-git-commit", 200,
-                    "x-code-format", 200,
-                    "x-code-lint", 200,
-                    "x-test-tdd", 250,
-                    "x-story-implement", 410);
+                    "x-commit-changes", 200,
+                    "x-format-code", 200,
+                    "x-lint-code", 200,
+                    "x-drive-tdd", 250,
+                    "x-implement-story", 410);
 
     /**
      * Slim-contract mandatory section headers. ADR-0012 §Decision declares these 4 required markers

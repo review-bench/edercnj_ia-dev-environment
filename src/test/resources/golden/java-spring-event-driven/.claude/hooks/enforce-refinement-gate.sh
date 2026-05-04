@@ -10,7 +10,7 @@
 # Telemetry:  recovery_mode_used event appended when CLAUDE_RECOVERY_MODE=1
 #
 # Intercepted skills:
-#   x-story-implement, x-epic-implement, x-task-implement, x-epic-orchestrate
+#   x-implement-story, x-implement-epic, x-implement-task, x-orchestrate-epic
 #
 # Bypass exceptions:
 #   1. CLAUDE_RECOVERY_MODE=1 — sole accepted bypass variable (Rule 27 §RULE-059-07)
@@ -32,7 +32,7 @@ HOOK_NAME="enforce-refinement-gate.sh"
 EXIT_REFINEMENT_REQUIRED=33
 
 # Orchestrators guarded by the refinement gate
-GUARDED_SKILLS="x-story-implement x-epic-implement x-task-implement x-epic-orchestrate"
+GUARDED_SKILLS="x-implement-story x-implement-epic x-implement-task x-orchestrate-epic"
 
 # ── Self-check mode (Rule 26 §self-check) ─────────────────────────────────────
 
@@ -159,13 +159,13 @@ case "${VERDICT_STATUS}" in
     exit 0
     ;;
   "absent"|"tbd")
-    echo "REFINEMENT_REQUIRED: ${TARGET_ID} não refinada — rode /x-story-refine ${TARGET_ID} antes de implementar" >&2
+    echo "REFINEMENT_REQUIRED: ${TARGET_ID} não refinada — rode /x-refine-story ${TARGET_ID} antes de implementar" >&2
     echo "WARN [refinementVerdict-tbd] ${TARGET_ID}: refinementVerdict.status=${VERDICT_STATUS} — gate bloqueando (Rule 29)" >&2
     exit ${EXIT_REFINEMENT_REQUIRED}
     ;;
   "rejected")
     BLOCKERS=$(jq -r '.refinementVerdict.blockers // [] | join("; ")' "${STATE_FILE}" 2>/dev/null || true)
-    echo "REFINEMENT_REQUIRED: ${TARGET_ID} rejeitada no refinement — corrija os bloqueadores e rode /x-story-refine ${TARGET_ID}" >&2
+    echo "REFINEMENT_REQUIRED: ${TARGET_ID} rejeitada no refinement — corrija os bloqueadores e rode /x-refine-story ${TARGET_ID}" >&2
     if [ -n "${BLOCKERS}" ]; then
       echo "  Bloqueadores: ${BLOCKERS}" >&2
     fi
@@ -173,7 +173,7 @@ case "${VERDICT_STATUS}" in
     ;;
   *)
     echo "WARN [refinementVerdict-invalid] ${TARGET_ID}: refinementVerdict.status='${VERDICT_STATUS}' inválido — tratado como tbd (Rule 19)" >&2
-    echo "REFINEMENT_REQUIRED: ${TARGET_ID} — status inválido, rode /x-story-refine ${TARGET_ID}" >&2
+    echo "REFINEMENT_REQUIRED: ${TARGET_ID} — status inválido, rode /x-refine-story ${TARGET_ID}" >&2
     exit ${EXIT_REFINEMENT_REQUIRED}
     ;;
 esac

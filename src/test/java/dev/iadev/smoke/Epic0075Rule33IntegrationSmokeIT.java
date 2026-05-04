@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Epic0075Rule33IntegrationSmokeIT — Rule 33 + x-epic-implement Phase 5 integration")
+@DisplayName("Epic0075Rule33IntegrationSmokeIT — Rule 33 + x-implement-epic Phase 5 integration")
 class Epic0075Rule33IntegrationSmokeIT {
 
     private static final Path RULE_FILE =
@@ -32,7 +32,7 @@ class Epic0075Rule33IntegrationSmokeIT {
                     "skills",
                     "core",
                     "dev",
-                    "x-epic-implement",
+                    "x-implement-epic",
                     "SKILL.md");
 
     private static final Path CAPABILITY_FILE =
@@ -57,8 +57,8 @@ class Epic0075Rule33IntegrationSmokeIT {
         String rule = read(RULE_FILE);
         assertThat(rule).as("must declare mandatory invocation").contains("MANDATORY TOOL CALL");
         assertThat(rule)
-                .as("must reference x-internal-epic-summary")
-                .contains("x-internal-epic-summary");
+                .as("must reference x-internal-summarize-epic")
+                .contains("x-internal-summarize-epic");
         assertThat(rule).as("must state Rule 24 link").contains("Rule 24");
     }
 
@@ -83,19 +83,19 @@ class Epic0075Rule33IntegrationSmokeIT {
                 .contains("RULE_33_ENFORCEMENT_BROKEN");
     }
 
-    // ── x-epic-implement Phase 5 integration ─────────────────────────────────
+    // ── x-implement-epic Phase 5 integration ─────────────────────────────────
 
     @Test
     @DisplayName("scenario5_xEpicImplement_phase5HasMemorySummaryCall")
     void scenario5_xEpicImplement_phase5HasMemorySummaryCall() throws IOException {
         String skill = read(X_EPIC_IMPLEMENT_SKILL);
         int phase5Start = skill.indexOf("## Phase 5");
-        assertThat(phase5Start).as("Phase 5 must exist in x-epic-implement").isGreaterThan(0);
+        assertThat(phase5Start).as("Phase 5 must exist in x-implement-epic").isGreaterThan(0);
 
         String phase5Body = skill.substring(phase5Start);
         assertThat(phase5Body)
-                .as("Phase 5 must invoke x-internal-epic-summary")
-                .contains("x-internal-epic-summary");
+                .as("Phase 5 must invoke x-internal-summarize-epic")
+                .contains("x-internal-summarize-epic");
         assertThat(phase5Body)
                 .as("Phase 5 must declare MANDATORY TOOL CALL")
                 .contains("MANDATORY TOOL CALL");

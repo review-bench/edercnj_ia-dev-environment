@@ -478,7 +478,7 @@ class RulesAssemblerTest {
 
             assertThat(content)
                     .contains("## Automated Verification")
-                    .contains("x-security-sast")
+                    .contains("x-run-sast")
                     .contains("Input deserialization");
         }
 
@@ -506,9 +506,9 @@ class RulesAssemblerTest {
 
             assertThat(content)
                     .contains("## Automated Verification")
-                    .contains("x-security-sast")
-                    .contains("x-security-secrets")
-                    .contains("x-hardening-eval");
+                    .contains("x-run-sast")
+                    .contains("x-scan-secrets")
+                    .contains("x-evaluate-hardening");
         }
 
         @Test

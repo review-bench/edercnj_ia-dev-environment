@@ -14,63 +14,63 @@ class SecurityScanningGateTest {
     private final SecurityScanningGate gate = new SecurityScanningGate();
 
     @Test
-    @DisplayName("SAST enabled includes x-security-sast")
+    @DisplayName("SAST enabled includes x-run-sast")
     void evaluate_sast_includesSast() {
         ProjectConfig config = TestConfigBuilder.builder().scanningSast(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-sast");
+        assertThat(skills).contains("x-run-sast");
     }
 
     @Test
-    @DisplayName("DAST enabled includes x-security-dast")
+    @DisplayName("DAST enabled includes x-run-dast")
     void evaluate_dast_includesDast() {
         ProjectConfig config = TestConfigBuilder.builder().scanningDast(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-dast");
+        assertThat(skills).contains("x-run-dast");
     }
 
     @Test
-    @DisplayName("secretScan enabled includes" + " x-security-secrets")
+    @DisplayName("secretScan enabled includes" + " x-scan-secrets")
     void evaluate_secretScan_includesSecrets() {
         ProjectConfig config = TestConfigBuilder.builder().scanningSecretScan(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-secrets");
+        assertThat(skills).contains("x-scan-secrets");
     }
 
     @Test
-    @DisplayName("containerScan enabled includes" + " x-security-container")
+    @DisplayName("containerScan enabled includes" + " x-scan-container-security")
     void evaluate_containerScan_includesContainer() {
         ProjectConfig config = TestConfigBuilder.builder().containerScan(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-container");
+        assertThat(skills).contains("x-scan-container-security");
     }
 
     @Test
-    @DisplayName("infraScan enabled includes x-security-infra")
+    @DisplayName("infraScan enabled includes x-assess-infrastructure-security")
     void evaluate_infraScan_includesInfra() {
         ProjectConfig config = TestConfigBuilder.builder().infraScan(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-infra");
+        assertThat(skills).contains("x-assess-infrastructure-security");
     }
 
     @Test
-    @DisplayName("quality gate provider not 'none' includes" + " x-security-sonar")
+    @DisplayName("quality gate provider not 'none' includes" + " x-run-sonar-security")
     void evaluate_qgProvider_includesSonar() {
         ProjectConfig config = TestConfigBuilder.builder().qualityGateProvider("sonarqube").build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-security-sonar");
+        assertThat(skills).contains("x-run-sonar-security");
     }
 
     @Test

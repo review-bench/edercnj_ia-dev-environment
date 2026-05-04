@@ -35,7 +35,7 @@ class SharedSnippetsAssemblerTest {
     @DisplayName("degenerate — source has no _shared/ dir;" + " output has no _shared/ either")
     void assemble_whenSharedMissing_noOutputDir(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
 
@@ -51,7 +51,7 @@ class SharedSnippetsAssemblerTest {
             "constant — source has _shared/ with a single" + " file; output contains the same file")
     void assemble_whenSharedHasOneFile_copiedToOutput(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
         Path sharedSrc = tempDir.resolve("targets/claude/skills/_shared");
         Files.createDirectories(sharedSrc);
         Path singleFile = sharedSrc.resolve("error-handling-pre-commit.md");
@@ -77,7 +77,7 @@ class SharedSnippetsAssemblerTest {
                     + " files + README; all copied preserving layout")
     void assemble_whenSharedHasMultipleFiles_allCopied(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
         Path sharedSrc = tempDir.resolve("targets/claude/skills/_shared");
         Files.createDirectories(sharedSrc);
         Files.writeString(sharedSrc.resolve("README.md"), "# _shared/\n", StandardCharsets.UTF_8);
@@ -115,11 +115,11 @@ class SharedSnippetsAssemblerTest {
                     + " output tree (end-to-end validation)")
     void assemble_whenConsumerLinksShared_linkResolves(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        Path consumerSkillDir = core.resolve("git/x-git-commit");
+        Path consumerSkillDir = core.resolve("git/x-commit-changes");
         Files.createDirectories(consumerSkillDir);
         Files.writeString(
                 consumerSkillDir.resolve("SKILL.md"),
-                "---\nname: x-git-commit\n---\n"
+                "---\nname: x-commit-changes\n---\n"
                         + "## Error Handling\n"
                         + "See [`error-handling`]"
                         + "(../../../_shared/"
@@ -137,7 +137,7 @@ class SharedSnippetsAssemblerTest {
         Path outputDir = tempDir.resolve("output");
         runAssemble(tempDir, outputDir);
 
-        Path outSkill = outputDir.resolve("skills/x-git-commit/SKILL.md");
+        Path outSkill = outputDir.resolve("skills/x-commit-changes/SKILL.md");
         Path outSharedFile = outputDir.resolve("skills/_shared/error-handling-pre-commit.md");
         // Relative link from flat output is
         // ../_shared/error-handling-pre-commit.md
@@ -155,7 +155,7 @@ class SharedSnippetsAssemblerTest {
                     + " not delete _shared/ (prune respects it)")
     void assemble_whenRerun_sharedPreserved(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
         Path sharedSrc = tempDir.resolve("targets/claude/skills/_shared");
         Files.createDirectories(sharedSrc);
         Files.writeString(

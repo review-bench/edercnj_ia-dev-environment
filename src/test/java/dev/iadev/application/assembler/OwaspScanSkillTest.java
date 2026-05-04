@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0010: x-owasp-scan skill for OWASP Top 10 verification mapped to ASVS
+ * Tests for story-0022-0010: x-scan-owasp skill for OWASP Top 10 verification mapped to ASVS
  * levels.
  *
- * <p>Validates that the x-owasp-scan skill template is generated correctly with proper frontmatter,
+ * <p>Validates that the x-scan-owasp skill template is generated correctly with proper frontmatter,
  * all 10 OWASP categories, ASVS level mapping, delegation of A06, scoring, and SARIF output.
  */
-@DisplayName("x-owasp-scan Skill")
+@DisplayName("x-scan-owasp Skill")
 class OwaspScanSkillTest {
 
     @Nested
@@ -31,15 +31,15 @@ class OwaspScanSkillTest {
         @DisplayName("SKILL.md exists after assembly")
         void assemble_owaspScan_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-owasp-scan/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-scan-owasp/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-owasp-scan")
+        @DisplayName("frontmatter contains name:" + " x-scan-owasp")
         void assemble_owaspScan_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-owasp-scan");
+            assertThat(content).contains("name: x-scan-owasp");
         }
 
         @Test
@@ -227,10 +227,10 @@ class OwaspScanSkillTest {
     class A06Delegation {
 
         @Test
-        @DisplayName("A06 is DELEGATED to" + " x-dependency-audit")
+        @DisplayName("A06 is DELEGATED to" + " x-audit-dependencies")
         void assemble_owaspScan_a06Delegated(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("DELEGATED").contains("x-dependency-audit");
+            assertThat(content).contains("DELEGATED").contains("x-audit-dependencies");
         }
 
         @Test
@@ -330,6 +330,6 @@ class OwaspScanSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-owasp-scan/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-scan-owasp/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

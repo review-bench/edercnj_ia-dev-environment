@@ -58,23 +58,23 @@ class SkillsSelectionTestingTest {
         }
 
         @Test
-        @DisplayName("performance tests includes" + " x-test-perf")
+        @DisplayName("performance tests includes" + " x-run-perf-tests")
         void select_performance_includesPerfTest() {
             ProjectConfig config = TestConfigBuilder.builder().performanceTests(true).build();
 
             List<String> skills = SkillsSelection.selectTestingSkills(config);
 
-            assertThat(skills).contains("x-test-perf");
+            assertThat(skills).contains("x-run-perf-tests");
         }
 
         @Test
-        @DisplayName("contract tests includes" + " x-test-contract")
+        @DisplayName("contract tests includes" + " x-execute-contract-tests")
         void select_contract_includesContractTests() {
             ProjectConfig config = TestConfigBuilder.builder().contractTests(true).build();
 
             List<String> skills = SkillsSelection.selectTestingSkills(config);
 
-            assertThat(skills).contains("x-test-contract");
+            assertThat(skills).contains("x-execute-contract-tests");
         }
     }
 }

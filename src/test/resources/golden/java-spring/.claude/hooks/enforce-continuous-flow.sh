@@ -140,7 +140,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
   # Try Tool-Call Grammar derive (story-0068-0003); fall back to generic
   NEXT_CALL=""
-  SKILL_MD="$(find "$PROJECT_DIR/.claude/skills" -name "SKILL.md" -path "*x-epic-implement*" \
+  SKILL_MD="$(find "$PROJECT_DIR/.claude/skills" -name "SKILL.md" -path "*x-implement-epic*" \
               2>/dev/null | head -1 || true)"
   if [[ -n "$SKILL_MD" ]]; then
     NEXT_CALL="$(derive_next_mandatory_call "$SKILL_MD" "$CURRENT_PHASE" "$NDJSON" 2>/dev/null || true)"

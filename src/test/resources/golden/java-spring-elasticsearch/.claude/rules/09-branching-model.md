@@ -16,7 +16,7 @@
 
 > **Epic branches (Rule 21):** `epic/XXXX` branches are the single integration point for all story PRs of an epic. Stories auto-merge into `epic/XXXX` (not `develop`); the epic-to-develop PR is a manual gate. See Rule 21 for details.
 >
-> **Docs branches (EPIC-0065):** `docs/<epic-id>-<slug>` branches carry planning artifacts produced by the feature creation chain (`x-feature-create`). They auto-merge into `epic/XXXX` with label `docs`. `docs/feature-<slug>` branches carry ideation specs produced by `x-feature-ideate` and target `develop` via a **manual gate**.
+> **Docs branches (EPIC-0065):** `docs/<epic-id>-<slug>` branches carry planning artifacts produced by the feature creation chain (`x-create-feature`). They auto-merge into `epic/XXXX` with label `docs`. `docs/feature-<slug>` branches carry ideation specs produced by `x-ideate-feature` and target `develop` via a **manual gate**.
 
 ## Naming Conventions
 

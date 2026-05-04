@@ -126,7 +126,7 @@ class SkillsAssemblerTest {
 
         assertThat(content)
                 .as(
-                        "Generated x-story-implement/SKILL.md "
+                        "Generated x-implement-story/SKILL.md "
                                 + "must contain '"
                                 + REVIEW_SKIPPED_ERROR_CODE
                                 + "' error code (EPIC-0053 Review Policy)")

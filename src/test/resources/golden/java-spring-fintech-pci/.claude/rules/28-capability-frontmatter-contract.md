@@ -48,7 +48,7 @@ Internal skills (`x-internal-*`, Rule 22) seguem o mesmo contrato — não há e
 ### (a) Skill condicional
 ```yaml
 ---
-name: x-review-db
+name: x-review-database
 description: Database specialist review
 visibility: public
 model: sonnet
@@ -86,18 +86,18 @@ parameters-from: [data.database.name]
 ... expand/contract, forward-only, naming ...
 ```
 
-### (c) Composite skill `x-review`
+### (c) Composite skill `x-review-codebase`
 ```yaml
-# skills/review/x-review/SKILL.md
+# skills/review/x-review-codebase/SKILL.md
 ---
-name: x-review
+name: x-review-codebase
 description: Parallel review composed from active specialists
 visibility: public
 model: sonnet
 requires-capabilities: []
 fragment-slots: [{ slot: review-specialist, ordering: fragment-order }]
 ---
-# x-review — Orchestrator
+# x-review-codebase — Orchestrator
 Invokes specialists in parallel:
 {{ #each fragments.review-specialist }}
 - /{{ fragment-id }} — {{ description }}
@@ -153,7 +153,7 @@ Catálogo único em `docs/audit-gates-catalog.md` (Rule 26). ADR-0016 enumera os
 
 ## Migration
 
-EPIC-0064 Phase 2 (15 stories) migra os 182 artefatos para frontmatter v3.0. Pipeline híbrido AI-assisted + gate humano por categoria (12 PRs). Skill nova `/x-frontmatter-migrate` (story-0064-0202) infere `requires-capabilities` por keyword + heurística de path.
+EPIC-0064 Phase 2 (15 stories) migra os 182 artefatos para frontmatter v3.0. Pipeline híbrido AI-assisted + gate humano por categoria (12 PRs). Skill nova `/x-migrate-frontmatter` (story-0064-0202) infere `requires-capabilities` por keyword + heurística de path.
 
 Após Phase 2, audits são hard-fail; antes, advisory.
 

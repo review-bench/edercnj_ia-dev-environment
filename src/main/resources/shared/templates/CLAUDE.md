@@ -19,10 +19,10 @@ Sub-skills may be bypassed only with an explicit `--skip-review` / `--skip-verif
 
 | Sub-skill | Evidence required | Enforced by |
 | :--- | :--- | :--- |
-| `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | CI audit + Stop hook |
+| `x-review-codebase` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | CI audit + Stop hook |
 | `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | CI audit + Stop hook |
-| `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | CI audit |
-| `x-internal-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | CI audit |
+| `x-internal-verify-story` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | CI audit |
+| `x-internal-write-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | CI audit |
 
 ## Build
 

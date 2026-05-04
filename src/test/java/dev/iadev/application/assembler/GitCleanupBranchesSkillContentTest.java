@@ -14,16 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Content-assertion tests for x-git-cleanup-branches SKILL.md.
+ * Content-assertion tests for x-cleanup-git-branches SKILL.md.
  *
  * <p>Validates that the generated skill encodes the destructive- cleanup invariants: literal
  * protected set, flag mutual exclusion, worktree-context guard, and the HEAD-switch fallback
  * required when HEAD is a candidate branch.
  */
-@DisplayName("x-git-cleanup-branches — protection + flags + guards")
+@DisplayName("x-cleanup-git-branches — protection + flags + guards")
 class GitCleanupBranchesSkillContentTest {
 
-    private static final String SKILL_PATH = "skills/x-git-cleanup-branches/SKILL.md";
+    private static final String SKILL_PATH = "skills/x-cleanup-git-branches/SKILL.md";
 
     private String generateSkillContent(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");
@@ -41,7 +41,7 @@ class GitCleanupBranchesSkillContentTest {
         @DisplayName("name matches skill identifier")
         void assemble_frontmatter_declaresName(@TempDir Path tempDir) throws IOException {
             String content = generateSkillContent(tempDir);
-            assertThat(content).contains("name: x-git-cleanup-branches");
+            assertThat(content).contains("name: x-cleanup-git-branches");
         }
 
         @Test

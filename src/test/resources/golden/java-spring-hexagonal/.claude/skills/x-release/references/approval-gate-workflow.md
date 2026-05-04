@@ -26,7 +26,7 @@ sequenceDiagram
     participant User
     participant Release as x-release Phase 8
     participant AUQ as AskUserQuestion
-    participant PRFix as x-pr-fix (Rule 13 INLINE-SKILL)
+    participant PRFix as x-fix-pr (Rule 13 INLINE-SKILL)
     participant State as release-state-{VERSION}.json
 
     Release->>State: persist APPROVAL_PENDING + init gate fields
@@ -51,7 +51,7 @@ sequenceDiagram
         AUQ-->>Release: FIX_PR
         Release->>State: append FixAttempt, lastGateDecision="FIX_PR"
         alt fixAttempts.size < 3
-            Release->>PRFix: Skill(skill: "x-pr-fix", args: "<PR_NUMBER>")
+            Release->>PRFix: Skill(skill: "x-fix-pr", args: "<PR_NUMBER>")
             PRFix-->>Release: result (applied | no_comments | compile_regression | aborted)
             Release->>State: update outcome on last FixAttempt
             Release->>AUQ: reapresent menu (loop-back)
@@ -89,7 +89,7 @@ sequenceDiagram
 | Slot | `header` | `label` | Behavior |
 |:---|:---|:---|:---|
 | 1 -- PROCEED | `"Proceed"` | `"Continue (Recommended)"` | Verifies PR is MERGED via `gh pr view`, then proceeds to RESUME-AND-TAG (Step 9). If PR not merged: re-presents menu with `APPROVAL_PR_STILL_OPEN`. |
-| 2 -- FIX-PR | `"Fix PR"` | `"Run x-pr-fix and retry"` | Invokes `Skill(skill: "x-pr-fix", args: "<PR_NUMBER>")` via Rule 13 Pattern 1 INLINE-SKILL. Records `FixAttempt` in state file. Reapresents menu on return. Capped at 3 attempts (see guard-rail). |
+| 2 -- FIX-PR | `"Fix PR"` | `"Run x-fix-pr and retry"` | Invokes `Skill(skill: "x-fix-pr", args: "<PR_NUMBER>")` via Rule 13 Pattern 1 INLINE-SKILL. Records `FixAttempt` in state file. Reapresents menu on return. Capped at 3 attempts (see guard-rail). |
 | 3 -- ABORT | `"Abort"` | `"Cancel the operation"` | Double confirmation. On confirm: deletes state file, prints manual cleanup script, exits 2. On back: re-presents gate menu. |
 
 ## `--non-interactive` Path (CI/Automation)
@@ -141,14 +141,14 @@ pre-EPIC-0043 textual output.
    ```json
    {
      "at": "<ISO-8601 UTC>",
-     "delegateSkill": "x-pr-fix",
+     "delegateSkill": "x-fix-pr",
      "prNumber": "<PR_NUMBER>",
      "outcome": "pending"
    }
    ```
-3. Gate invokes `x-pr-fix` via Rule 13 Pattern 1 INLINE-SKILL:
+3. Gate invokes `x-fix-pr` via Rule 13 Pattern 1 INLINE-SKILL:
    ```
-   Skill(skill: "x-pr-fix", args: "<PR_NUMBER>")
+   Skill(skill: "x-fix-pr", args: "<PR_NUMBER>")
    ```
 4. On return, `outcome` is updated in the last `FixAttempt`.
 5. Gate **reapresents** the 3-option menu (unconditionally).

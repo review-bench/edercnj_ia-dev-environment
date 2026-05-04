@@ -116,17 +116,17 @@ scope string resolves to `compile` action (safe default for unknown scope).
 
 | Camada | Mechanism | Trigger | Exit |
 | :--- | :--- | :--- | :--- |
-| **0 — PreToolUse** | `enforce-preflight-gates.sh` (Rule 24 §Camada 0) | `git push`, `gh pr create`, `Skill x-pr-create` | Blocks if dep-policy evidence absent |
+| **0 — PreToolUse** | `enforce-preflight-gates.sh` (Rule 24 §Camada 0) | `git push`, `gh pr create`, `Skill x-create-pr` | Blocks if dep-policy evidence absent |
 | **1 — Normative** | This rule + CLAUDE.md | Every conversation | — |
 | **2 — CI Script** | `audit-dep-policy.sh` | PR open/sync to `develop` or `epic/*` | 1 `DEP_POLICY_VIOLATION` |
 | **3 — Java Test** | `Epic0074DepPolicySmokeIT` | `mvn verify` | JUnit assertion failure |
 
-## Mandatory Invocation in `x-story-implement`
+## Mandatory Invocation in `x-implement-story`
 
-Phase 3 of `x-story-implement` MUST conditionally invoke:
+Phase 3 of `x-implement-story` MUST conditionally invoke:
 
 ```
-Skill(skill: "x-dep-policy-validate", model: "haiku", args: "<STORY-ID>")
+Skill(skill: "x-validate-dependency-policy", model: "haiku", args: "<STORY-ID>")
 [conditional: flag.dep_policy_enabled]
 ```
 

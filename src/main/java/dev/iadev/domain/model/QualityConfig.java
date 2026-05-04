@@ -42,12 +42,12 @@ import java.util.Set;
  * }</pre>
  *
  * @param performance performance-testing SLO thresholds (stack-aware via {@code
- *     /x-test-performance})
+ *     /x-execute-performance-tests})
  * @param mutation mutation-testing threshold (stack-aware via {@code /x-test-mutation})
- * @param contract contract-breaking-change gate (stack-aware via {@code /x-test-contract})
- * @param regression regression-shell gate (stack-aware via {@code /x-test-regression-shell})
+ * @param contract contract-breaking-change gate (stack-aware via {@code /x-execute-contract-tests})
+ * @param regression regression-shell gate (stack-aware via {@code /x-execute-shell-regression-tests})
  * @param dast dynamic application security testing gate (stack-aware via {@code
- *     /x-pentest-dynamic})
+ *     /x-run-dynamic-pentest})
  * @see dev.iadev.domain.model.Governance
  */
 public record QualityConfig(

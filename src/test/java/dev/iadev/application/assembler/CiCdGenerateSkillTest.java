@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0005: x-ci-generate skill for interactive CI/CD pipeline generation.
+ * Tests for story-0013-0005: x-generate-ci skill for interactive CI/CD pipeline generation.
  *
- * <p>Validates that the x-ci-generate skill template is generated correctly with proper
+ * <p>Validates that the x-generate-ci skill template is generated correctly with proper
  * frontmatter, workflow steps, stack detection, capabilities, and integration notes referencing the
  * ci-cd-patterns KP.
  */
-@DisplayName("x-ci-generate Skill")
+@DisplayName("x-generate-ci Skill")
 class CiCdGenerateSkillTest {
 
     @Nested
@@ -28,18 +28,18 @@ class CiCdGenerateSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-ci-generate SKILL.md exists" + " after assembly")
+        @DisplayName("x-generate-ci SKILL.md exists" + " after assembly")
         void assemble_ciCdGenerate_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-ci-generate/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-generate-ci/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-ci-generate")
+        @DisplayName("frontmatter contains name:" + " x-generate-ci")
         void assemble_ciCdGenerate_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-ci-generate");
+            assertThat(content).contains("name: x-generate-ci");
         }
 
         @Test
@@ -289,6 +289,6 @@ class CiCdGenerateSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-ci-generate/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-generate-ci/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

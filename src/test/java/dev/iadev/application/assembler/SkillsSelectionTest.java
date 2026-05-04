@@ -143,17 +143,17 @@ class SkillsSelectionTest {
     class SelectPentestSkills {
 
         @Test
-        @DisplayName("pentestReadiness true includes" + " x-security-pentest")
+        @DisplayName("pentestReadiness true includes" + " x-run-pentest")
         void select_pentestTrue_includesPentest() {
             ProjectConfig config = TestConfigBuilder.builder().pentestReadiness(true).build();
 
             List<String> skills = SkillsSelection.selectPentestSkills(config);
 
-            assertThat(skills).containsExactly("x-security-pentest");
+            assertThat(skills).containsExactly("x-run-pentest");
         }
 
         @Test
-        @DisplayName("pentestReadiness false excludes" + " x-security-pentest")
+        @DisplayName("pentestReadiness false excludes" + " x-run-pentest")
         void select_pentestFalse_returnsEmpty() {
             ProjectConfig config = TestConfigBuilder.builder().pentestReadiness(false).build();
 
@@ -163,7 +163,7 @@ class SkillsSelectionTest {
         }
 
         @Test
-        @DisplayName("default config excludes x-security-pentest")
+        @DisplayName("default config excludes x-run-pentest")
         void select_defaultConfig_returnsEmpty() {
             ProjectConfig config = TestConfigBuilder.minimal();
 
@@ -179,7 +179,7 @@ class SkillsSelectionTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).contains("x-security-pentest");
+            assertThat(skills).contains("x-run-pentest");
         }
 
         @Test
@@ -189,7 +189,7 @@ class SkillsSelectionTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).doesNotContain("x-security-pentest");
+            assertThat(skills).doesNotContain("x-run-pentest");
         }
     }
 

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  * E2E smoke test for EPIC-0072 (Comprehensive Test Strategy).
  *
  * <p>Validates the end-to-end integration of the three quality gate skills ({@code
- * x-test-performance}, {@code x-test-mutation}, {@code x-test-contract}) by asserting structural
+ * x-execute-performance-tests}, {@code x-test-mutation}, {@code x-execute-contract-tests}) by asserting structural
  * invariants across SKILL.md files, audit scripts, and configuration templates. Each scenario maps
  * to a Gherkin acceptance criterion from story-0072-0009.
  */
@@ -31,7 +31,7 @@ class Epic0072TestStrategySmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-performance",
+                    "x-execute-performance-tests",
                     "SKILL.md");
 
     private static final Path MUTATION_SKILL =
@@ -44,7 +44,7 @@ class Epic0072TestStrategySmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-mutation",
+                    "x-execute-mutation-tests",
                     "SKILL.md");
 
     private static final Path CONTRACT_SKILL =
@@ -57,7 +57,7 @@ class Epic0072TestStrategySmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-contract",
+                    "x-execute-contract-tests",
                     "SKILL.md");
 
     private static final Path AUDIT_PERF =
@@ -104,7 +104,7 @@ class Epic0072TestStrategySmokeIT {
     @Test
     @DisplayName(
             "perfRegressionAboveToleranceBlocks_RESTStack — "
-                    + "x-test-performance blocks merge when p95/p99 exceeds baseline + tolerance")
+                    + "x-execute-performance-tests blocks merge when p95/p99 exceeds baseline + tolerance")
     void perfRegressionAboveToleranceBlocks_RESTStack() throws Exception {
         String content = Files.readString(PERF_SKILL.toAbsolutePath());
 
@@ -127,7 +127,7 @@ class Epic0072TestStrategySmokeIT {
     @Test
     @DisplayName(
             "perfWithinTolerancePasses_RESTStack — "
-                    + "x-test-performance exits 0 when regression within tolerance")
+                    + "x-execute-performance-tests exits 0 when regression within tolerance")
     void perfWithinTolerancePasses_RESTStack() throws Exception {
         String content = Files.readString(PERF_SKILL.toAbsolutePath());
 
@@ -192,7 +192,7 @@ class Epic0072TestStrategySmokeIT {
     @Test
     @DisplayName(
             "contractBreakingWithoutMigrationDocBlocks_OpenAPIStack — "
-                    + "x-test-contract blocks merge when breaking change lacks CHANGELOG entry (OpenAPI)")
+                    + "x-execute-contract-tests blocks merge when breaking change lacks CHANGELOG entry (OpenAPI)")
     void contractBreakingWithoutMigrationDocBlocks_OpenAPIStack() throws Exception {
         String content = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
@@ -218,7 +218,7 @@ class Epic0072TestStrategySmokeIT {
     @Test
     @DisplayName(
             "contractBreakingWithChangelogPasses_Proto3Stack — "
-                    + "x-test-contract exits 0 when breaking change documented in CHANGELOG (proto3/buf)")
+                    + "x-execute-contract-tests exits 0 when breaking change documented in CHANGELOG (proto3/buf)")
     void contractBreakingWithChangelogPasses_Proto3Stack() throws Exception {
         String content = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
@@ -251,10 +251,10 @@ class Epic0072TestStrategySmokeIT {
         String configContent = Files.readString(CONFIG_TEMPLATE.toAbsolutePath());
 
         assertThat(perfContent)
-                .as("x-test-performance must document PERF_DISABLED opt-out")
+                .as("x-execute-performance-tests must document PERF_DISABLED opt-out")
                 .contains("PERF_DISABLED");
         assertThat(perfContent)
-                .as("x-test-performance PERF_DISABLED must be exit 50 (no-op)")
+                .as("x-execute-performance-tests PERF_DISABLED must be exit 50 (no-op)")
                 .contains("50");
 
         assertThat(mutContent)
@@ -265,7 +265,7 @@ class Epic0072TestStrategySmokeIT {
                 .contains("50");
 
         assertThat(contractContent)
-                .as("x-test-contract must document WARN behavior when disabled")
+                .as("x-execute-contract-tests must document WARN behavior when disabled")
                 .containsAnyOf("WARN", "disabled", "enabled=false", "skip");
 
         assertThat(configContent)
@@ -294,14 +294,14 @@ class Epic0072TestStrategySmokeIT {
         String mutContent = Files.readString(MUTATION_SKILL.toAbsolutePath());
         String contractContent = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
-        // x-test-performance stack dispatch
-        assertThat(perfContent).as("x-test-performance: REST stack → Newman").contains("Newman");
-        assertThat(perfContent).as("x-test-performance: gRPC stack → ghz").contains("ghz");
+        // x-execute-performance-tests stack dispatch
+        assertThat(perfContent).as("x-execute-performance-tests: REST stack → Newman").contains("Newman");
+        assertThat(perfContent).as("x-execute-performance-tests: gRPC stack → ghz").contains("ghz");
         assertThat(perfContent)
-                .as("x-test-performance: CLI stack → hyperfine")
+                .as("x-execute-performance-tests: CLI stack → hyperfine")
                 .contains("hyperfine");
         assertThat(perfContent)
-                .as("x-test-performance: must contain stack dispatch matrix or table")
+                .as("x-execute-performance-tests: must contain stack dispatch matrix or table")
                 .containsAnyOf("Stack Dispatch", "stack dispatch", "## Stack");
 
         // x-test-mutation stack dispatch
@@ -315,10 +315,10 @@ class Epic0072TestStrategySmokeIT {
                 .as("x-test-mutation: must contain stack dispatch matrix")
                 .containsAnyOf("Stack Dispatch", "stack dispatch", "## Stack");
 
-        // x-test-contract stack dispatch
+        // x-execute-contract-tests stack dispatch
         assertThat(contractContent)
-                .as("x-test-contract: REST/OpenAPI → openapi-diff")
+                .as("x-execute-contract-tests: REST/OpenAPI → openapi-diff")
                 .contains("openapi-diff");
-        assertThat(contractContent).as("x-test-contract: gRPC/proto3 → buf").contains("buf");
+        assertThat(contractContent).as("x-execute-contract-tests: gRPC/proto3 → buf").contains("buf");
     }
 }

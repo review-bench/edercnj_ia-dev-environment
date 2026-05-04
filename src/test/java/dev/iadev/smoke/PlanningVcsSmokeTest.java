@@ -15,19 +15,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Smoke tests for STORY-0049-0022 (planning VCS lifecycle — P1-P5 versioning for {@code
- * x-story-create}, {@code x-task-plan}, {@code x-story-plan}, and {@code x-epic-orchestrate}).
+ * x-story-create}, {@code x-plan-task}, {@code x-plan-story}, and {@code x-orchestrate-epic}).
  * Final story of EPIC-0049.
  *
  * <p>Each of the 4 planning skills must expose the canonical P1-P5 markers introduced by EPIC-0049
  * / RULE-007:
  *
  * <ol>
- *   <li>P1 — Detect Worktree Context ({@code x-git-worktree detect-context})
+ *   <li>P1 — Detect Worktree Context ({@code x-manage-worktrees detect-context})
  *   <li>P2 — Ensure epic branch ({@code x-internal-epic-branch-ensure})
  *   <li>Existing phases (unchanged)
- *   <li>P4 — Planning commit ({@code x-planning-commit} — or alias section when delegated to the
- *       pre-existing {@code x-git-commit} flow in {@code x-task-plan})
- *   <li>P5 — Push to origin ({@code x-git-push --branch epic/...})
+ *   <li>P4 — Planning commit ({@code x-commit-planning} — or alias section when delegated to the
+ *       pre-existing {@code x-commit-changes} flow in {@code x-plan-task})
+ *   <li>P5 — Push to origin ({@code x-push-branch --branch epic/...})
  * </ol>
  *
  * <p>The tests assert source-of-truth presence at {@code src/main/resources/targets/claude/skills
@@ -48,15 +48,15 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
     // x-feature-create. The TARGET_SKILLS list now uses x-feature-create as the successor that
     // carries the P1-P5 convention for the planning VCS lifecycle.
     private static final List<String> TARGET_SKILLS =
-            List.of("x-feature-create", "x-task-plan", "x-story-plan", "x-epic-orchestrate");
+            List.of("x-create-feature", "x-plan-task", "x-plan-story", "x-orchestrate-epic");
 
     // x-feature-create uses Phase P1.5 — creates worktree (not detect-context like x-story-create)
-    private static final List<String> P1_MARKERS = List.of("x-git-worktree", "worktree");
+    private static final List<String> P1_MARKERS = List.of("x-manage-worktrees", "worktree");
 
-    private static final List<String> P2_MARKERS = List.of("x-internal-epic-branch-ensure");
+    private static final List<String> P2_MARKERS = List.of("x-internal-ensure-epic-branch");
 
     // x-feature-create uses raw "git push" in Phase P5; x-task/story/epic-orchestrate use
-    // x-git-push
+    // x-push-branch
     // "P5" is the common token present in all 4 skills
     private static final List<String> P5_MARKERS = List.of("P5", "push");
 
@@ -117,14 +117,14 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
     @Test
     @DisplayName(
             "smoke_storyPlan_delegatesTaskPlanWith"
-                    + "NoCommit — x-story-plan must pass "
-                    + "--no-commit to x-task-plan (batch contract)")
+                    + "NoCommit — x-plan-story must pass "
+                    + "--no-commit to x-plan-task (batch contract)")
     void smoke_storyPlan_delegatesTaskPlanWithNoCommit() throws IOException {
-        String content = readSkill("x-story-plan");
+        String content = readSkill("x-plan-story");
         assertThat(content)
                 .as(
-                        "x-story-plan Phase 4b must invoke "
-                                + "x-task-plan with --no-commit "
+                        "x-plan-story Phase 4b must invoke "
+                                + "x-plan-task with --no-commit "
                                 + "(EPIC-0049 batch contract)")
                 .contains("--task-file")
                 .contains("--no-commit");
@@ -136,13 +136,13 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
                     + "— Step P4 aggregates all artifacts "
                     + "(no N+1)")
     void smoke_storyPlan_usesPlanningCommitBatch() throws IOException {
-        String content = readSkill("x-story-plan");
+        String content = readSkill("x-plan-story");
         assertThat(content)
-                .as("x-story-plan must delegate its P4 " + "commit to x-planning-commit")
-                .contains("x-planning-commit");
+                .as("x-plan-story must delegate its P4 " + "commit to x-commit-planning")
+                .contains("x-commit-planning");
         assertThat(content)
                 .as(
-                        "x-story-plan batch commit subject "
+                        "x-plan-story batch commit subject "
                                 + "must mention 'add planning "
                                 + "artifacts'")
                 .contains("add planning artifacts");
@@ -154,39 +154,39 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
                     + "Step P4 commits per completed wave "
                     + "('planning orchestration cycle')")
     void smoke_epicOrchestrate_commitsPerWave() throws IOException {
-        String content = readSkill("x-epic-orchestrate");
+        String content = readSkill("x-orchestrate-epic");
         assertThat(content)
-                .as("x-epic-orchestrate wave commit " + "must go through " + "x-planning-commit")
-                .contains("x-planning-commit");
+                .as("x-orchestrate-epic wave commit " + "must go through " + "x-commit-planning")
+                .contains("x-commit-planning");
         assertThat(content)
                 .as(
-                        "x-epic-orchestrate wave commit "
+                        "x-orchestrate-epic wave commit "
                                 + "subject must match the "
                                 + "Gherkin scenario")
                 .contains("planning orchestration cycle");
         assertThat(content)
                 .as(
-                        "x-epic-orchestrate must propagate "
+                        "x-orchestrate-epic must propagate "
                                 + "--no-commit to child "
-                                + "x-story-plan invocations")
-                .contains("x-story-plan")
+                                + "x-plan-story invocations")
+                .contains("x-plan-story")
                 .contains("--no-commit");
     }
 
     @Test
     @DisplayName(
             "smoke_featureCreate_commitSubjectMentions"
-                    + "Decomposition — x-feature-create P4 uses x-planning-commit (EPIC-0065)")
+                    + "Decomposition — x-feature-create P4 uses x-commit-planning (EPIC-0065)")
     void smoke_storyCreate_commitSubjectMentionsUserStory() throws IOException {
         // x-story-create was hard-cut in EPIC-0065 and internalized as x-internal-story-create.
         // x-feature-create is the successor that owns the consolidated planning commit (Phase P4).
-        String content = readSkill("x-feature-create");
+        String content = readSkill("x-create-feature");
         assertThat(content)
                 .as(
                         "x-feature-create P4 must delegate "
-                                + "to x-planning-commit for "
+                                + "to x-commit-planning for "
                                 + "consolidated commit (EPIC-0065)")
-                .contains("x-planning-commit");
+                .contains("x-commit-planning");
         assertThat(content)
                 .as("x-feature-create P4 commit subject " + "must mention 'full decomposition'")
                 .contains("full decomposition");
@@ -198,17 +198,17 @@ class PlanningVcsSmokeTest extends SmokeTestBase {
                     + "P4 step is an alias over the existing "
                     + "Phase 5.4 planning-status commit gate")
     void smoke_taskPlan_hasPhase54CommitAlias() throws IOException {
-        String content = readSkill("x-task-plan");
+        String content = readSkill("x-plan-task");
         assertThat(content)
                 .as(
-                        "x-task-plan must retain the "
-                                + "existing x-git-commit gate "
+                        "x-plan-task must retain the "
+                                + "existing x-commit-changes gate "
                                 + "(story-0049-0017) under the "
                                 + "P4 alias")
-                .contains("x-git-commit");
+                .contains("x-commit-changes");
         assertThat(content)
                 .as(
-                        "x-task-plan must explicitly "
+                        "x-plan-task must explicitly "
                                 + "document Step P4 (alias) so "
                                 + "the P1-P5 convention is "
                                 + "readable end-to-end")

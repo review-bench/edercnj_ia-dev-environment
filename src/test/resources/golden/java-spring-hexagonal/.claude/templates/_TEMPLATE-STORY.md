@@ -11,11 +11,11 @@ template-version: "2.0"
 
 > **Status Transitions (Rule 29 — refinement-gate):**
 > valores permitidos `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
-> Transições válidas: `Pendente → Refinada` (via `/x-story-refine`);
+> Transições válidas: `Pendente → Refinada` (via `/x-refine-story`);
 > `Refinada → Planejada | Em Andamento | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
-> reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
+> reabertura `Concluída → Em Andamento` (via `x-reconcile-status --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
 > Ver [`.claude/rules/29-refinement-gate.md`](../.claude/rules/29-refinement-gate.md).
 
@@ -106,7 +106,7 @@ Cenario: Security — <autenticação, autorização ou sanitização>
 
 > **Interfaces tipadas — request, response, eventos.**
 > Use tabelas para campos escalares. Para schemas complexos, use bloco JSON/TypeScript.
-> Esses contratos são input para `x-spec-drift` (EPIC-0071) — seja preciso nos tipos.
+> Esses contratos são input para `x-detect-spec-drift` (EPIC-0071) — seja preciso nos tipos.
 
 ### 5.1 Request
 
@@ -220,7 +220,7 @@ regen:
 
 ## 9. Refinement Verdict
 
-<!-- CONTRACT: Este bloco é populado exclusivamente por `/x-story-refine` (EPIC-0069).
+<!-- CONTRACT: Este bloco é populado exclusivamente por `/x-refine-story` (EPIC-0069).
      Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via
      verdictHash (Rule 29 §verdictHash). Estrutura canônica:
 
@@ -233,6 +233,6 @@ regen:
      ### Rationale: paragraph
 -->
 
-> _Slot reservado para `/x-story-refine`. Não editar manualmente._
+> _Slot reservado para `/x-refine-story`. Não editar manualmente._
 >
-> **Status:** TBD — execute `/x-story-refine <story-id>` para preencher.
+> **Status:** TBD — execute `/x-refine-story <story-id>` para preencher.

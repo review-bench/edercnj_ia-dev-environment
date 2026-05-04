@@ -46,7 +46,7 @@ class Epic0069RefinementGateSmokeIT {
         ProcessResult r =
                 runHookWithPayload(
                         tmp,
-                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-story-implement\","
+                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-implement-story\","
                                 + "\"args\":\"story-0099-0001\"}}");
         assertThat(r.exitCode).as("exit 0 on approved").isEqualTo(0);
     }
@@ -60,7 +60,7 @@ class Epic0069RefinementGateSmokeIT {
         ProcessResult r =
                 runHookWithPayload(
                         tmp,
-                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-story-implement\","
+                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-implement-story\","
                                 + "\"args\":\"story-0099-0001\"}}");
         assertThat(r.exitCode).as("exit 33 REFINEMENT_REQUIRED").isEqualTo(33);
         assertThat(r.stderr).contains("REFINEMENT_REQUIRED");
@@ -86,7 +86,7 @@ class Epic0069RefinementGateSmokeIT {
         ProcessResult r =
                 runHookWithPayload(
                         tmp,
-                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-story-implement\","
+                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-implement-story\","
                                 + "\"args\":\"story-0099-0001\"}}");
         assertThat(r.exitCode).as("exit 0 on legacy flow").isEqualTo(0);
         assertThat(r.stderr).contains("Rule 19 legacy fallback");

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.io.TempDir;
 class LazyKpLoadingTest {
 
     @Nested
-    @DisplayName("x-story-implement — subagent prompts")
+    @DisplayName("x-implement-story — subagent prompts")
     class LifecyclePrompts {
 
         @Test
@@ -92,7 +92,7 @@ class LazyKpLoadingTest {
         }
 
         /**
-         * Reads the concatenated SKILL.md + references/full-protocol.md body for x-story-implement.
+         * Reads the concatenated SKILL.md + references/full-protocol.md body for x-implement-story.
          *
          * <p>Story-0047-0002 (flipped orientation per ADR-0012) moved the detailed subagent prompts
          * from SKILL.md to references/full-protocol.md. The lazy-KP-loading invariant
@@ -105,9 +105,9 @@ class LazyKpLoadingTest {
             SkillsAssembler assembler = new SkillsAssembler();
             ProjectConfig config = TestConfigBuilder.builder().build();
             assembler.assemble(config, new TemplateEngine(), outputDir);
-            Path skillMd = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String body = Files.readString(skillMd);
             if (Files.isRegularFile(fullProtocol)) {
                 body = body + "\n" + Files.readString(fullProtocol);
@@ -117,7 +117,7 @@ class LazyKpLoadingTest {
     }
 
     @Nested
-    @DisplayName("x-story-plan — subagent prompts")
+    @DisplayName("x-plan-story — subagent prompts")
     class StoryPlanPrompts {
 
         @Test
@@ -161,7 +161,7 @@ class LazyKpLoadingTest {
             SkillsAssembler assembler = new SkillsAssembler();
             ProjectConfig config = TestConfigBuilder.builder().build();
             assembler.assemble(config, new TemplateEngine(), outputDir);
-            return SkillContentReader.readSkillWithReferences(outputDir, "x-story-plan");
+            return SkillContentReader.readSkillWithReferences(outputDir, "x-plan-story");
         }
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * TDD tests for Phase 4 (Base PR Merge) of x-pr-merge-train/SKILL.md (story-0042-0002,
+ * TDD tests for Phase 4 (Base PR Merge) of x-manage-pr-merge-train/SKILL.md (story-0042-0002,
  * TASK-0042-0002-002).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that Phase 4 content
@@ -20,7 +20,7 @@ class MergeTrainSkillPhase4Test {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(

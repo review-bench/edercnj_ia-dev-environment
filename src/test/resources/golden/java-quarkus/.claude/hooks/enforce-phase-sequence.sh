@@ -39,7 +39,7 @@ if [ "${CLAUDE_PHASE_GATE_DISABLED:-0}" = "1" ]; then
 fi
 
 # Canonical 8 orchestrators — only these are enforced
-CANONICAL_ORCHESTRATORS="x-epic-implement x-story-implement x-task-implement x-release x-epic-orchestrate x-review x-review-pr x-pr-merge-train"
+CANONICAL_ORCHESTRATORS="x-implement-epic x-implement-story x-implement-task x-release x-orchestrate-epic x-review-codebase x-review-pr x-manage-pr-merge-train"
 
 # The hook receives the tool-call payload on stdin (JSON).
 # Schema (PreToolUse):

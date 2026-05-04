@@ -15,7 +15,7 @@ Rule 30 enforces three structural invariants:
 
 1. **`_TEMPLATE-EPIC.md` v2** — 9 business-value sections only. No Packages, Contracts-technical, SOLID Materialization sections. Technical architecture lives in `docs/architecture/system.md`.
 2. **`_TEMPLATE-STORY.md` v2** — 9 sections focused on value delivery. Contracts section is for typed API/event contracts (input for spec sync), not hexagonal structure.
-3. **`_TEMPLATE-ARCHITECTURE-SYSTEM.md` (NEW)** — single live document `docs/architecture/system.md` that captures the system-level technical decisions auto-filled from the project YAML and updated incrementally per epic via `/x-arch-system-update`.
+3. **`_TEMPLATE-ARCHITECTURE-SYSTEM.md` (NEW)** — single live document `docs/architecture/system.md` that captures the system-level technical decisions auto-filled from the project YAML and updated incrementally per epic via `/x-update-system-architecture`.
 
 ## Template Version Detection
 
@@ -55,7 +55,7 @@ Rule 30 enforces three structural invariants:
 6. **Tasks** — 3-8 tasks; `task-XXXX-YYYY-NNN` format
 7. **Dependências** — Blocked By / Blocks
 8. **Decision Rationale** — ≥ 1 micro-template (4-line format)
-9. **Refinement Verdict** — filled by `/x-story-refine` (EPIC-0069, Rule 29)
+9. **Refinement Verdict** — filled by `/x-refine-story` (EPIC-0069, Rule 29)
 
 ## Adoption Policy (Rule 19 — 2-release window)
 
@@ -68,8 +68,8 @@ Measurement: `audit-template-version.sh` (story-0070-0008) reports the percentag
 | Event | Action |
 | :--- | :--- |
 | Project initialization | `ia-dev-env generate` scaffolds `docs/architecture/system.md` from `_TEMPLATE-ARCHITECTURE-SYSTEM.md` with YAML auto-fill |
-| Epic implementation completes | `/x-arch-system-update` updates the Decision Log section + any YAML-driven fields that changed |
-| ADR merged | Operator optionally runs `/x-arch-system-update --adr ADR-NNNN` to surface the decision in system.md |
+| Epic implementation completes | `/x-update-system-architecture` updates the Decision Log section + any YAML-driven fields that changed |
+| ADR merged | Operator optionally runs `/x-update-system-architecture --adr ADR-NNNN` to surface the decision in system.md |
 
 Sections 1-5 of system.md (Stack, Persistência, Comunicação, Observabilidade, Resilience) are auto-filled from the project YAML on generation and MUST NOT be edited manually — edit the source YAML and regenerate. Sections 6-11 (Performance Budget, Security Baseline, Dependency Policy, Doc Targets, Integrations, Decision Log) are manually maintained.
 

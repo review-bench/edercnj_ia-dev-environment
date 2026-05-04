@@ -44,17 +44,17 @@ class SkillsCoreConditionalTest {
             ProjectConfig config = TestConfigBuilder.minimal();
             assembler.assemble(config, new TemplateEngine(), outputDir);
             Path skillsDir = outputDir.resolve("skills");
-            assertThat(skillsDir.resolve("x-story-implement/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-task-implement/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-review/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-implement-story/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-implement-task/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-review-codebase/SKILL.md")).exists();
             assertThat(skillsDir.resolve("x-review-pr/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-git-push/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-ops-troubleshoot/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-test-plan/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-test-run/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-jira-create-epic/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-jira-create-stories/SKILL.md")).exists();
-            assertThat(skillsDir.resolve("x-spec-drift/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-push-branch/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-troubleshoot-operations/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-plan-tests/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-execute-tests/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-create-jira-epic/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-create-jira-stories/SKILL.md")).exists();
+            assertThat(skillsDir.resolve("x-detect-spec-drift/SKILL.md")).exists();
         }
 
         @Test
@@ -65,7 +65,7 @@ class SkillsCoreConditionalTest {
             SkillsAssembler assembler = new SkillsAssembler();
             TestConfigBuilder.minimal();
             assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve("skills/lib/x-lib-task-decomposer" + "/SKILL.md"))
+            assertThat(outputDir.resolve("skills/lib/x-lib-decompose-task" + "/SKILL.md"))
                     .exists();
         }
 
@@ -76,7 +76,7 @@ class SkillsCoreConditionalTest {
             Files.createDirectories(outputDir);
             SkillsAssembler assembler = new SkillsAssembler();
             assembler.assemble(TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve("skills/x-story-implement/references")).exists();
+            assertThat(outputDir.resolve("skills/x-implement-story/references")).exists();
         }
 
         @Test
@@ -152,25 +152,25 @@ class SkillsCoreConditionalTest {
         }
 
         @Test
-        @DisplayName("pentestReadiness true generates" + " x-security-pentest")
+        @DisplayName("pentestReadiness true generates" + " x-run-pentest")
         void assemble_pentestTrue_generatesPentestSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
             SkillsAssembler assembler = new SkillsAssembler();
             ProjectConfig config = TestConfigBuilder.builder().pentestReadiness(true).build();
             assembler.assemble(config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve("skills/x-security-pentest/SKILL.md")).exists();
+            assertThat(outputDir.resolve("skills/x-run-pentest/SKILL.md")).exists();
         }
 
         @Test
-        @DisplayName("pentestReadiness false excludes" + " x-security-pentest")
+        @DisplayName("pentestReadiness false excludes" + " x-run-pentest")
         void assemble_pentestFalse_excludesPentestSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
             SkillsAssembler assembler = new SkillsAssembler();
             ProjectConfig config = TestConfigBuilder.builder().pentestReadiness(false).build();
             assembler.assemble(config, new TemplateEngine(), outputDir);
-            assertThat(outputDir.resolve("skills/x-security-pentest")).doesNotExist();
+            assertThat(outputDir.resolve("skills/x-run-pentest")).doesNotExist();
         }
     }
 }

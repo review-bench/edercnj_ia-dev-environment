@@ -25,7 +25,7 @@ class Epic0074DepPolicyValidateSmokeIT {
                     "skills",
                     "conditional",
                     "security",
-                    "x-dep-policy-validate");
+                    "x-validate-dependency-policy");
 
     private static final Path DEP_AUDIT_SKILL =
             Path.of(
@@ -37,7 +37,7 @@ class Epic0074DepPolicyValidateSmokeIT {
                     "skills",
                     "core",
                     "security",
-                    "x-dependency-audit",
+                    "x-audit-dependencies",
                     "SKILL.md");
 
     private static final Path TEMPLATES_ROOT =
@@ -113,7 +113,7 @@ class Epic0074DepPolicyValidateSmokeIT {
     }
 
     @Nested
-    @DisplayName("x-dependency-audit --policy flag integration")
+    @DisplayName("x-audit-dependencies --policy flag integration")
     class DepAuditPolicyFlag {
 
         @Test
@@ -124,8 +124,8 @@ class Epic0074DepPolicyValidateSmokeIT {
                     .as("must document --policy flag in argument-hint")
                     .contains("--policy");
             assertThat(content)
-                    .as("must reference x-dep-policy-validate delegation")
-                    .contains("x-dep-policy-validate");
+                    .as("must reference x-validate-dependency-policy delegation")
+                    .contains("x-validate-dependency-policy");
         }
     }
 
@@ -212,7 +212,7 @@ class Epic0074DepPolicyValidateSmokeIT {
     }
 
     @Nested
-    @DisplayName("x-story-implement Phase 3 integration (story-0074-0005)")
+    @DisplayName("x-implement-story Phase 3 integration (story-0074-0005)")
     class StoryImplementIntegration {
 
         private static final Path STORY_IMPLEMENT =
@@ -225,7 +225,7 @@ class Epic0074DepPolicyValidateSmokeIT {
                         "skills",
                         "core",
                         "dev",
-                        "x-story-implement",
+                        "x-implement-story",
                         "SKILL.md");
 
         private static final Path RULE_24 =
@@ -253,8 +253,8 @@ class Epic0074DepPolicyValidateSmokeIT {
         void scenario18_storyImplement_containsDepPolicyValidateSkillCall() throws Exception {
             String content = Files.readString(STORY_IMPLEMENT.toAbsolutePath());
             assertThat(content)
-                    .as("must invoke x-dep-policy-validate in Phase 3")
-                    .contains("x-dep-policy-validate");
+                    .as("must invoke x-validate-dependency-policy in Phase 3")
+                    .contains("x-validate-dependency-policy");
             assertThat(content)
                     .as("must mark invocation as conditional on dep_policy_enabled")
                     .contains("flag.dep_policy_enabled");
@@ -277,8 +277,8 @@ class Epic0074DepPolicyValidateSmokeIT {
         void scenario20_rule24_includesDepPolicyEvidenceArtifact() throws Exception {
             String content = Files.readString(RULE_24.toAbsolutePath());
             assertThat(content)
-                    .as("Rule 24 must register dep-policy-validate as mandatory evidence artifact")
-                    .contains("x-dep-policy-validate");
+                    .as("Rule 24 must register x-validate-dependency-policy as mandatory evidence artifact")
+                    .contains("x-validate-dependency-policy");
             assertThat(content)
                     .as("Rule 24 must reference dep-policy-validation-report artifact path")
                     .contains("dep-policy-validation-report-STORY-ID.md");

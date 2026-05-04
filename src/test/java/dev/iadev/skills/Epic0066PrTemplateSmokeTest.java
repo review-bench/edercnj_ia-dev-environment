@@ -47,7 +47,7 @@ class Epic0066PrTemplateSmokeTest {
         Path renderSkill =
                 REPO_ROOT.resolve(
                         "src/main/resources/targets/claude/skills/core/internal/pr/"
-                                + "x-internal-pr-body-render/SKILL.md");
+                                + "x-internal-render-pr-body/SKILL.md");
         assertThat(renderSkill).as("render skill SKILL.md must exist").exists();
         String content = Files.readString(renderSkill, StandardCharsets.UTF_8);
 

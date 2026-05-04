@@ -3,11 +3,11 @@
 #
 # Scans git history for merged story PRs (branches matching feat/story-*)
 # and verifies that each merged story has the mandatory evidence artifacts
-# produced by the x-story-implement pipeline:
-#   - ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-story-verify)
-#   - ai/epics/epic-XXXX/plans/review-story-STORY-ID.md         (x-review)
+# produced by the x-implement-story pipeline:
+#   - ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json  (x-internal-verify-story)
+#   - ai/epics/epic-XXXX/plans/review-story-STORY-ID.md         (x-review-codebase)
 #   - ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md (x-review-pr)
-#   - ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md (x-internal-story-report)
+#   - ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md (x-internal-write-story-report)
 #
 # Grandfathered stories (merged before Rule 24) listed in
 # audits/execution-integrity-baseline.txt are exempted. Per-story exemption
@@ -136,7 +136,7 @@ check_evidence() {
 
     if ! compgen -G "${plans_dir}/review-*${story_id}*.md" >/dev/null 2>&1 \
             && [[ ! -f "${plans_dir}/review-story-${story_id}.md" ]]; then
-        missing+=("review (x-review)")
+        missing+=("review (x-review-codebase)")
     fi
 
     if ! compgen -G "${plans_dir}/techlead-review-*${story_id}*.md" >/dev/null 2>&1 \
@@ -148,13 +148,13 @@ check_evidence() {
         missing+=("story-completion-report")
     fi
 
-    # EPIC-0057 — hard artefact for x-dependency-audit (Camada 3, Rule 24
+    # EPIC-0057 — hard artefact for x-audit-dependencies (Camada 3, Rule 24
     # §32-42 expanded). Mirrors the .conf HARD_DEPENDENCY_AUDIT pattern.
     if [[ ! -f "${reports_dir}/dependency-audit-${story_id}.md" ]]; then
-        missing+=("dependency-audit (x-dependency-audit)")
+        missing+=("dependency-audit (x-audit-dependencies)")
     fi
 
-    # EPIC-0057 — hard artefact for x-pr-watch-ci (Rule 45). State file
+    # EPIC-0057 — hard artefact for x-watch-pr-ci (Rule 45). State file
     # is keyed by PR number; we resolve it from execution-state.json
     # storyStatuses.<id>.prNumber when present and fall back to a
     # directory-presence check otherwise. The .claude/state/ directory
@@ -174,12 +174,12 @@ check_evidence() {
     if [[ -d "${pr_state_dir}" ]]; then
         if [[ -n "${pr_number}" ]]; then
             if [[ ! -f "${pr_state_dir}/pr-watch-${pr_number}.json" ]]; then
-                missing+=("pr-watch (x-pr-watch-ci) → ${pr_state_dir}/pr-watch-${pr_number}.json")
+                missing+=("pr-watch (x-watch-pr-ci) → ${pr_state_dir}/pr-watch-${pr_number}.json")
             fi
         else
             # PR number unknown — fall back to directory-level presence.
             if ! compgen -G "${pr_state_dir}/pr-watch-[0-9]*.json" >/dev/null 2>&1; then
-                missing+=("pr-watch (x-pr-watch-ci) — no pr-watch-*.json under ${pr_state_dir}")
+                missing+=("pr-watch (x-watch-pr-ci) — no pr-watch-*.json under ${pr_state_dir}")
             fi
         fi
     fi
@@ -190,17 +190,17 @@ check_evidence() {
     # All gates default to disabled for backward compatibility (Rule 19).
     if [[ "${QUALITY_PERFORMANCE_ENABLED:-false}" == "true" ]]; then
         if [[ ! -f "${reports_dir}/perf-report-${story_id}.md" ]]; then
-            missing+=("perf-report (x-test-performance, quality.performance.enabled=true)")
+            missing+=("perf-report (x-execute-performance-tests, quality.performance.enabled=true)")
         fi
     fi
     if [[ "${QUALITY_MUTATION_ENABLED:-false}" == "true" ]]; then
         if [[ ! -f "${reports_dir}/mutation-report-${story_id}.md" ]]; then
-            missing+=("mutation-report (x-test-mutation, quality.mutation.enabled=true)")
+            missing+=("mutation-report (x-execute-mutation-tests, quality.mutation.enabled=true)")
         fi
     fi
     if [[ "${QUALITY_CONTRACT_ENABLED:-false}" == "true" ]]; then
         if [[ ! -f "${reports_dir}/contract-report-${story_id}.md" ]]; then
-            missing+=("contract-report (x-test-contract, quality.contract.enabled=true)")
+            missing+=("contract-report (x-execute-contract-tests, quality.contract.enabled=true)")
         fi
     fi
 
@@ -238,9 +238,9 @@ emit_json_envelope() {
 
 # EPIC-0063 story-0063-0003 — Telemetry scope audit (RULE-003 dual-evidence)
 # Validates that each merged story has 3 mandatory tool.call events in NDJSON:
-#   - skill=x-review with matching storyId
+#   - skill=x-review-codebase with matching storyId
 #   - skill=x-review-pr with matching storyId
-#   - skill=x-internal-story-verify with matching storyId
+#   - skill=x-internal-verify-story with matching storyId
 # Plus NDJSON integrity: required fields + monotonic timestamps per session_id.
 audit_telemetry_scope() {
     local story_id="$1"
@@ -310,7 +310,7 @@ audit_telemetry_scope() {
     # Required event check: 3 skills must have at least one tool.call event matching story_id
     if [[ -n "${story_id}" ]]; then
         local missing=()
-        for required_skill in "x-review" "x-review-pr" "x-internal-story-verify"; do
+        for required_skill in "x-review-codebase" "x-review-pr" "x-internal-verify-story"; do
             local count
             count=$(jq -r --arg skill "${required_skill}" --arg sid "${story_id}" \
                 'select(.event=="tool.call" and .skill==$skill and .storyId==$sid) | .timestamp' \
@@ -521,7 +521,7 @@ EOF
 EIE_EVIDENCE_MISSING — ${violations} merged story(ies) lack mandatory evidence artifacts.
 
 Fix by either:
-  (a) Running x-internal-story-verify / x-review / x-review-pr / x-internal-story-report
+  (a) Running x-internal-verify-story / x-review-codebase / x-review-pr / x-internal-write-story-report
       as REAL Skill(...) tool calls on the affected story, committing the resulting
       artifacts, and amending the story PR.
   (b) Adding '<!-- audit-exempt: <reason> -->' to the story markdown (reviewed exceptions only).

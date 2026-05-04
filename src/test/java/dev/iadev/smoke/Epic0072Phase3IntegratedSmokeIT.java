@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 @DisplayName(
-        "Epic0072Phase3IntegratedSmokeIT — x-story-implement Phase 3 quality gates structural"
+        "Epic0072Phase3IntegratedSmokeIT — x-implement-story Phase 3 quality gates structural"
                 + " invariants")
 class Epic0072Phase3IntegratedSmokeIT {
 
@@ -23,7 +23,7 @@ class Epic0072Phase3IntegratedSmokeIT {
                     "skills",
                     "core",
                     "dev",
-                    "x-story-implement",
+                    "x-implement-story",
                     "SKILL.md");
 
     private static final Path RULE_24 =
@@ -55,14 +55,14 @@ class Epic0072Phase3IntegratedSmokeIT {
         void scenario1_skillMd_containsAllThreeQualityGateInvocations() throws Exception {
             String content = Files.readString(SKILL_MD.toAbsolutePath());
             assertThat(content)
-                    .as("SKILL.md must invoke x-test-performance in Phase 3")
-                    .contains("x-test-performance");
+                    .as("SKILL.md must invoke x-execute-performance-tests in Phase 3")
+                    .contains("x-execute-performance-tests");
             assertThat(content)
-                    .as("SKILL.md must invoke x-test-mutation in Phase 3")
-                    .contains("x-test-mutation");
+                    .as("SKILL.md must invoke x-execute-mutation-tests in Phase 3")
+                    .contains("x-execute-mutation-tests");
             assertThat(content)
-                    .as("SKILL.md must invoke x-test-contract in Phase 3")
-                    .contains("x-test-contract");
+                    .as("SKILL.md must invoke x-execute-contract-tests in Phase 3")
+                    .contains("x-execute-contract-tests");
         }
 
         @Test

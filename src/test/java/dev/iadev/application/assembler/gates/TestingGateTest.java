@@ -50,23 +50,23 @@ class TestingGateTest {
     }
 
     @Test
-    @DisplayName("performanceTests includes x-test-perf")
+    @DisplayName("performanceTests includes x-run-perf-tests")
     void evaluate_performanceTests_includesPerf() {
         ProjectConfig config = TestConfigBuilder.builder().performanceTests(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-test-perf");
+        assertThat(skills).contains("x-run-perf-tests");
     }
 
     @Test
-    @DisplayName("contractTests includes x-test-contract")
+    @DisplayName("contractTests includes x-execute-contract-tests")
     void evaluate_contractTests_includesContract() {
         ProjectConfig config = TestConfigBuilder.builder().contractTests(true).build();
 
         List<String> skills = gate.evaluate(config);
 
-        assertThat(skills).contains("x-test-contract");
+        assertThat(skills).contains("x-execute-contract-tests");
     }
 
     @Test

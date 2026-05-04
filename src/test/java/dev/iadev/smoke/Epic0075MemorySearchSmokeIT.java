@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Epic0075MemorySearchSmokeIT — x-memory-search structural invariants")
+@DisplayName("Epic0075MemorySearchSmokeIT — x-search-memory structural invariants")
 class Epic0075MemorySearchSmokeIT {
 
     private static final Path SKILL_FILE =
@@ -22,11 +22,11 @@ class Epic0075MemorySearchSmokeIT {
                     "skills",
                     "core",
                     "ops",
-                    "x-memory-search",
+                    "x-search-memory",
                     "SKILL.md");
 
     private String readSkill() throws IOException {
-        assertThat(SKILL_FILE).as("x-memory-search/SKILL.md must exist").exists();
+        assertThat(SKILL_FILE).as("x-search-memory/SKILL.md must exist").exists();
         return Files.readString(SKILL_FILE, StandardCharsets.UTF_8);
     }
 

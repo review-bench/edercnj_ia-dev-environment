@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for API-First Phase (Phase 0.5) in the lifecycle and x-test-contract-lint conditional skill
+ * Tests for API-First Phase (Phase 0.5) in the lifecycle and x-lint-contract-tests conditional skill
  * generation.
  *
  * <p>Covers story-0017-0007 acceptance criteria:
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.io.TempDir;
  *   <li>GK-2: REST sets has_contract_interfaces=True
  *   <li>GK-3: Event sets has_contract_interfaces=True
  *   <li>GK-4: Lifecycle template contains Phase 0.5 conditional with CONTRACT PENDING APPROVAL
- *   <li>GK-5: x-test-contract-lint generated conditionally
+ *   <li>GK-5: x-lint-contract-tests generated conditionally
  * </ul>
  */
 @DisplayName("API-First Phase (story-0017-0007)")
@@ -121,33 +121,33 @@ class ApiFirstPhaseTest {
     }
 
     @Nested
-    @DisplayName("SkillsSelection — x-test-contract-lint")
+    @DisplayName("SkillsSelection — x-lint-contract-tests")
     class ContractLintSelection {
 
         @Test
-        @DisplayName("REST interface includes" + " x-test-contract-lint")
+        @DisplayName("REST interface includes" + " x-lint-contract-tests")
         void select_rest_includesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder().clearInterfaces().addInterface("rest").build();
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).contains("x-test-contract-lint");
+            assertThat(skills).contains("x-lint-contract-tests");
         }
 
         @Test
-        @DisplayName("gRPC interface includes" + " x-test-contract-lint")
+        @DisplayName("gRPC interface includes" + " x-lint-contract-tests")
         void select_grpc_includesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder().clearInterfaces().addInterface("grpc").build();
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).contains("x-test-contract-lint");
+            assertThat(skills).contains("x-lint-contract-tests");
         }
 
         @Test
-        @DisplayName("event-consumer includes" + " x-test-contract-lint")
+        @DisplayName("event-consumer includes" + " x-lint-contract-tests")
         void select_eventConsumer_includesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -157,11 +157,11 @@ class ApiFirstPhaseTest {
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).contains("x-test-contract-lint");
+            assertThat(skills).contains("x-lint-contract-tests");
         }
 
         @Test
-        @DisplayName("event-producer includes" + " x-test-contract-lint")
+        @DisplayName("event-producer includes" + " x-lint-contract-tests")
         void select_eventProducer_includesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder()
@@ -171,29 +171,29 @@ class ApiFirstPhaseTest {
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).contains("x-test-contract-lint");
+            assertThat(skills).contains("x-lint-contract-tests");
         }
 
         @Test
-        @DisplayName("websocket includes" + " x-test-contract-lint")
+        @DisplayName("websocket includes" + " x-lint-contract-tests")
         void select_websocket_includesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder().clearInterfaces().addInterface("websocket").build();
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).contains("x-test-contract-lint");
+            assertThat(skills).contains("x-lint-contract-tests");
         }
 
         @Test
-        @DisplayName("CLI-only excludes x-test-contract-lint")
+        @DisplayName("CLI-only excludes x-lint-contract-tests")
         void select_cliOnly_excludesContractLint() {
             ProjectConfig config =
                     TestConfigBuilder.builder().clearInterfaces().addInterface("cli").build();
 
             List<String> skills = SkillsSelection.selectInterfaceSkills(config);
 
-            assertThat(skills).doesNotContain("x-test-contract-lint");
+            assertThat(skills).doesNotContain("x-lint-contract-tests");
         }
     }
 
@@ -213,15 +213,15 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
@@ -241,15 +241,15 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
@@ -271,15 +271,15 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
@@ -298,15 +298,15 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
@@ -325,15 +325,15 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
@@ -342,7 +342,7 @@ class ApiFirstPhaseTest {
         }
 
         @Test
-        @DisplayName("lifecycle template references" + " x-test-contract-lint skill")
+        @DisplayName("lifecycle template references" + " x-lint-contract-tests skill")
         void assemble_lifecycle_referencesContractLint(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -352,29 +352,29 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            // Story-0047-0002 flipped x-story-implement to slim
+            // Story-0047-0002 flipped x-implement-story to slim
             // orientation (ADR-0012). Phase 0.5 detailed content now
             // lives in references/full-protocol.md; the slim SKILL.md
             // keeps only the phase summary. Read both files so these
             // Phase 0.5 content assertions continue to validate the
             // full behavioral surface across the slim/full split.
-            Path lifecycle = outputDir.resolve("skills/x-story-implement/SKILL.md");
+            Path lifecycle = outputDir.resolve("skills/x-implement-story/SKILL.md");
             Path fullProtocol =
-                    outputDir.resolve("skills/x-story-implement/references/" + "full-protocol.md");
+                    outputDir.resolve("skills/x-implement-story/references/" + "full-protocol.md");
             String content = Files.readString(lifecycle);
             if (Files.isRegularFile(fullProtocol)) {
                 content = content + "\n" + Files.readString(fullProtocol);
             }
-            assertThat(content).contains("x-test-contract-lint");
+            assertThat(content).contains("x-lint-contract-tests");
         }
     }
 
     @Nested
-    @DisplayName("x-test-contract-lint skill generation")
+    @DisplayName("x-lint-contract-tests skill generation")
     class ContractLintSkillGeneration {
 
         @Test
-        @DisplayName("REST config generates" + " x-test-contract-lint skill")
+        @DisplayName("REST config generates" + " x-lint-contract-tests skill")
         void assemble_restConfig_generatesContractLint(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -384,11 +384,11 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            assertThat(outputDir.resolve("skills/x-test-contract-lint/SKILL.md")).exists();
+            assertThat(outputDir.resolve("skills/x-lint-contract-tests/SKILL.md")).exists();
         }
 
         @Test
-        @DisplayName("CLI-only config does NOT generate" + " x-test-contract-lint skill")
+        @DisplayName("CLI-only config does NOT generate" + " x-lint-contract-tests skill")
         void assemble_cliOnly_excludesContractLint(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -398,11 +398,11 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            assertThat(outputDir.resolve("skills/x-test-contract-lint")).doesNotExist();
+            assertThat(outputDir.resolve("skills/x-lint-contract-tests")).doesNotExist();
         }
 
         @Test
-        @DisplayName("x-test-contract-lint skill contains" + " contract validation content")
+        @DisplayName("x-lint-contract-tests skill contains" + " contract validation content")
         void assemble_restConfig_contractLintHasContent(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -412,9 +412,9 @@ class ApiFirstPhaseTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path skillMd = outputDir.resolve("skills/x-test-contract-lint/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-lint-contract-tests/SKILL.md");
             String content = Files.readString(skillMd);
-            assertThat(content).contains("x-test-contract-lint");
+            assertThat(content).contains("x-lint-contract-tests");
             assertThat(content).contains("OpenAPI 3.1");
             assertThat(content).contains("AsyncAPI 2.6");
             assertThat(content).contains("Protobuf 3");

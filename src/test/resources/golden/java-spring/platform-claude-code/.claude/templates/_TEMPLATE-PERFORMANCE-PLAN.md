@@ -1,6 +1,6 @@
 ---
 name: _TEMPLATE-PERFORMANCE-PLAN
-description: "Template for performance test plans produced by x-test-performance. Runtime-filled by LLM."
+description: "Template for performance test plans produced by x-execute-performance-tests. Runtime-filled by LLM."
 requires-capabilities:
   - quality.performance.rest
   - quality.performance.grpc

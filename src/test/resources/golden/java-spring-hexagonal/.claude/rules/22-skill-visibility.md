@@ -9,14 +9,14 @@ Skills in this repository fall into two visibility classes:
 
 | Class | Prefix | User-Invocable? | Shows in `/help`? |
 | :--- | :--- | :--- | :--- |
-| **Public** | `x-{subject}-{action}` (e.g., `x-pr-create`, `x-epic-implement`) | Yes | Yes |
-| **Internal** | `x-internal-{subject}-{action}` (e.g., `x-internal-status-update`) | **No** | **No** |
+| **Public** | `x-{subject}-{action}` (e.g., `x-create-pr`, `x-implement-epic`) | Yes | Yes |
+| **Internal** | `x-internal-{subject}-{action}` (e.g., `x-internal-update-status`) | **No** | **No** |
 
 Internal skills are implementation details extracted from orchestrators to reduce SKILL.md size, isolate concerns, and enable reuse. They are invoked **only** by other skills via the Skill tool — never typed by a user in chat. Rule 22 makes that boundary explicit, visible, and mechanically enforceable.
 
 ## Naming Convention
 
-- Public skills: `x-{subject}-{action}` — 2-to-3-token kebab-case name (e.g., `x-feature-create`, `x-task-implement`, `x-pr-watch-ci`).
+- Public skills: `x-{subject}-{action}` — 2-to-3-token kebab-case name (e.g., `x-create-feature`, `x-implement-task`, `x-watch-pr-ci`).
 - Internal skills: `x-internal-{subject}-{action}` — MUST carry the `x-internal-` prefix exactly. No exceptions.
 - Subdir convention (source of truth): `src/main/resources/targets/claude/skills/core/internal/{group}/x-internal-{name}/SKILL.md` where `{group}` is one of `plan`, `git`, `ops`.
 - Generated output: **flat** under `.claude/skills/` — the subdir structure exists only in source-of-truth to aid navigation.
@@ -25,9 +25,9 @@ Internal skills are implementation details extracted from orchestrators to reduc
 
 | Internal skill | Replaced public skill | Source path | Invoked by |
 | :--- | :--- | :--- | :--- |
-| `x-internal-epic-create` | `x-epic-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-epic-create/SKILL.md` | `x-feature-create` |
-| `x-internal-epic-map` | `x-epic-map` (hard-cut — Rule 19) | `core/internal/plan/x-internal-epic-map/SKILL.md` | `x-feature-create` |
-| `x-internal-story-create` | `x-story-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-story-create/SKILL.md` | `x-feature-create` |
+| `x-internal-create-epic` | `x-epic-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-create-epic/SKILL.md` | `x-create-feature` |
+| `x-internal-map-epic` | `x-epic-map` (hard-cut — Rule 19) | `core/internal/plan/x-internal-map-epic/SKILL.md` | `x-create-feature` |
+| `x-internal-create-story` | `x-story-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-create-story/SKILL.md` | `x-create-feature` |
 
 ## Frontmatter Contract
 
@@ -72,9 +72,9 @@ This makes the visibility class obvious when a human opens the file, independent
 
 - A public skill's INLINE-SKILL delegation (Rule 13 Pattern 1) invoking an internal skill:
   ```markdown
-  Invoke the `x-internal-status-update` skill via the Skill tool:
+  Invoke the `x-internal-update-status` skill via the Skill tool:
 
-      Skill(skill: "x-internal-status-update", args: "--key executionState --value ...")
+      Skill(skill: "x-internal-update-status", args: "--key executionState --value ...")
   ```
 - An internal skill invoking another internal skill via the same pattern.
 - `## Integration Notes` in a public SKILL.md listing internal skills it depends on (documents the call graph for maintainers).
@@ -104,7 +104,7 @@ Typical candidates for internal extraction: shared subroutines used by ≥ 2 pub
 
 ## Rationale
 
-Before EPIC-0049, `x-epic-implement` (~1100 lines) and `x-story-implement` (~900 lines) carried inline Bash for branch creation, status updates, plan construction, integrity gates, and report rendering. Every user-initiated `/x-story-implement` re-injected the full body into the LLM context, inflating token cost. Rule 22 codifies the extraction pattern so future size-reduction work has a stable convention to follow.
+Before EPIC-0049, `x-implement-epic` (~1100 lines) and `x-implement-story` (~900 lines) carried inline Bash for branch creation, status updates, plan construction, integrity gates, and report rendering. Every user-initiated `/x-implement-story` re-injected the full body into the LLM context, inflating token cost. Rule 22 codifies the extraction pattern so future size-reduction work has a stable convention to follow.
 
 ---
 

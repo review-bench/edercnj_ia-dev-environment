@@ -45,8 +45,8 @@ public final class TaskHierarchyAuditor implements Auditor {
         try {
             String content = Files.readString(skillPath);
             return content.contains("x-epic-implement")
-                    || content.contains("x-story-implement")
-                    || content.contains("x-task-implement");
+                    || content.contains("x-implement-story")
+                    || content.contains("x-implement-task");
         } catch (IOException e) {
             return false;
         }

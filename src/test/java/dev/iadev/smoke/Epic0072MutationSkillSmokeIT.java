@@ -26,7 +26,7 @@ class Epic0072MutationSkillSmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-mutation");
+                    "x-execute-mutation-tests");
 
     private static final Path KP_ROOT =
             Path.of("src", "main", "resources", "targets", "claude", "knowledge", "testing");
@@ -122,7 +122,7 @@ class Epic0072MutationSkillSmokeIT {
                                     dev.iadev.domain.model.DependencyPolicyConfig.DEFAULT,
                                     dev.iadev.domain.model.AiMemoryConfig.DEFAULT));
             List<String> skills = SkillsSelection.selectQualitySkills(configWithQuality);
-            assertThat(skills).contains("x-test-mutation");
+            assertThat(skills).contains("x-execute-mutation-tests");
         }
 
         @Test
@@ -131,7 +131,7 @@ class Epic0072MutationSkillSmokeIT {
             var config = TestConfigBuilder.builder().build();
             assertThat(config.quality().mutation().enabled()).isFalse();
             List<String> skills = SkillsSelection.selectQualitySkills(config);
-            assertThat(skills).doesNotContain("x-test-mutation");
+            assertThat(skills).doesNotContain("x-execute-mutation-tests");
         }
 
         @Test

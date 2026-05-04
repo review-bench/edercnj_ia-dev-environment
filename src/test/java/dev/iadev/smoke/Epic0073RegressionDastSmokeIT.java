@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
  * <p>Covers the 5 canonical scenarios declared in story-0073-0007 AC:
  *
  * <ol>
- *   <li>x-story-implement Phase 3 declares x-test-regression-shell as MANDATORY conditional gate
- *   <li>DAST is CI-only — x-story-implement Phase 3 does NOT invoke x-pentest-dynamic
+ *   <li>x-implement-story Phase 3 declares x-execute-shell-regression-tests as MANDATORY conditional gate
+ *   <li>DAST is CI-only — x-implement-story Phase 3 does NOT invoke x-run-dynamic-pentest
  *   <li>Regression gate has correct conditional marker and D-R11 fast-fail ordering
  *   <li>audit-regression-shell.sh + audit-dast-gate.sh exist with self-check contracts
  *   <li>opt-out: quality.regression+dast disabled produces no-op (ScriptsAssembler)
@@ -36,7 +36,7 @@ class Epic0073RegressionDastSmokeIT {
                     "skills",
                     "core",
                     "dev",
-                    "x-story-implement",
+                    "x-implement-story",
                     "SKILL.md");
 
     private static final Path REGRESSION_SHELL_SKILL =
@@ -49,7 +49,7 @@ class Epic0073RegressionDastSmokeIT {
                     "skills",
                     "conditional",
                     "test",
-                    "x-test-regression-shell",
+                    "x-execute-shell-regression-tests",
                     "SKILL.md");
 
     private static final Path DAST_SKILL =
@@ -62,7 +62,7 @@ class Epic0073RegressionDastSmokeIT {
                     "skills",
                     "core",
                     "security",
-                    "x-pentest-dynamic",
+                    "x-run-dynamic-pentest",
                     "SKILL.md");
 
     private static final Path AUDIT_REGRESSION =
@@ -96,15 +96,15 @@ class Epic0073RegressionDastSmokeIT {
     @Test
     @DisplayName(
             "scenario1_xStoryImplement_phase3_invokesRegressionShell_asMandatoryConditional — "
-                    + "Phase 3 declares x-test-regression-shell as MANDATORY conditional when"
+                    + "Phase 3 declares x-execute-shell-regression-tests as MANDATORY conditional when"
                     + " quality.regression.enabled=true")
     void scenario1_xStoryImplement_phase3_invokesRegressionShell_asMandatoryConditional()
             throws Exception {
         String content = Files.readString(STORY_IMPLEMENT_SKILL.toAbsolutePath());
 
         assertThat(content)
-                .as("SKILL.md must invoke x-test-regression-shell in Phase 3")
-                .contains("x-test-regression-shell");
+                .as("SKILL.md must invoke x-execute-shell-regression-tests in Phase 3")
+                .contains("x-execute-shell-regression-tests");
         assertThat(content)
                 .as("regression gate must carry conditional Rule 28 marker")
                 .contains("flag.quality_regression_enabled");
@@ -122,13 +122,13 @@ class Epic0073RegressionDastSmokeIT {
     @Test
     @DisplayName(
             "scenario2_xStoryImplement_phase3_doesNotInvokeDast — "
-                    + "DAST is CI-only: x-pentest-dynamic must NOT appear in Phase 3 SKILL.md")
+                    + "DAST is CI-only: x-run-dynamic-pentest must NOT appear in Phase 3 SKILL.md")
     void scenario2_xStoryImplement_phase3_doesNotInvokeDast() throws Exception {
         String content = Files.readString(STORY_IMPLEMENT_SKILL.toAbsolutePath());
 
         assertThat(content)
-                .as("x-story-implement SKILL.md must NOT invoke x-pentest-dynamic in Phase 3")
-                .doesNotContain("x-pentest-dynamic");
+                .as("x-implement-story SKILL.md must NOT invoke x-run-dynamic-pentest in Phase 3")
+                .doesNotContain("x-run-dynamic-pentest");
         assertThat(content)
                 .as("DAST must be documented as CI-only, not in Phase 3")
                 .doesNotContain("quality_dast_enabled");
@@ -207,11 +207,11 @@ class Epic0073RegressionDastSmokeIT {
     @Test
     @DisplayName(
             "scenario5_regressionShellSkill_declaresRequiresAny_andDastSkillExists — "
-                    + "x-test-regression-shell uses requires-any for capabilities;"
-                    + " x-pentest-dynamic exists as standalone skill")
+                    + "x-execute-shell-regression-tests uses requires-any for capabilities;"
+                    + " x-run-dynamic-pentest exists as standalone skill")
     void scenario5_regressionShellSkill_declaresRequiresAny_andDastSkillExists() throws Exception {
         assertThat(REGRESSION_SHELL_SKILL.toAbsolutePath())
-                .as("x-test-regression-shell SKILL.md must exist")
+                .as("x-execute-shell-regression-tests SKILL.md must exist")
                 .exists();
 
         String regressionContent = Files.readString(REGRESSION_SHELL_SKILL.toAbsolutePath());
@@ -227,7 +227,7 @@ class Epic0073RegressionDastSmokeIT {
                 .contains("service");
 
         assertThat(DAST_SKILL.toAbsolutePath())
-                .as("x-pentest-dynamic SKILL.md must exist (CI-only DAST skill)")
+                .as("x-run-dynamic-pentest SKILL.md must exist (CI-only DAST skill)")
                 .exists();
 
         String dastContent = Files.readString(DAST_SKILL.toAbsolutePath());

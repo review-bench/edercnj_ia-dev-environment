@@ -48,7 +48,7 @@ class SkillsAssemblerRecursiveTest {
         void select_multipleCategories_allDiscovered(@TempDir Path tempDir) throws IOException {
             Path coreDir = tempDir.resolve("targets/claude/skills/core");
             writeSkillMd(coreDir.resolve("plan/x-epic-create"), "x-epic-create");
-            writeSkillMd(coreDir.resolve("dev/x-task-implement"), "x-task-implement");
+            writeSkillMd(coreDir.resolve("dev/x-implement-task"), "x-implement-task");
             writeSkillMd(coreDir.resolve("review/x-review-pr"), "x-review-pr");
 
             SkillsAssembler assembler = new SkillsAssembler(tempDir);
@@ -56,7 +56,7 @@ class SkillsAssemblerRecursiveTest {
             List<String> skills = assembler.selectCoreSkills();
 
             assertThat(skills)
-                    .containsExactlyInAnyOrder("x-epic-create", "x-task-implement", "x-review-pr");
+                    .containsExactlyInAnyOrder("x-epic-create", "x-implement-task", "x-review-pr");
         }
 
         @Test
@@ -64,13 +64,13 @@ class SkillsAssemblerRecursiveTest {
         void select_libSubdir_preservesLibPrefix(@TempDir Path tempDir) throws IOException {
             Path coreDir = tempDir.resolve("targets/claude/skills/core");
             writeSkillMd(coreDir.resolve("lib/x-lib-tool"), "x-lib-tool");
-            writeSkillMd(coreDir.resolve("plan/x-task-plan"), "x-task-plan");
+            writeSkillMd(coreDir.resolve("plan/x-plan-task"), "x-plan-task");
 
             SkillsAssembler assembler = new SkillsAssembler(tempDir);
 
             List<String> skills = assembler.selectCoreSkills();
 
-            assertThat(skills).containsExactlyInAnyOrder("lib/x-lib-tool", "x-task-plan");
+            assertThat(skills).containsExactlyInAnyOrder("lib/x-lib-tool", "x-plan-task");
         }
 
         @Test

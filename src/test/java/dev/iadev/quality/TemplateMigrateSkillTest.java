@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates structural invariants of the {@code x-template-migrate} SKILL.md (EPIC-0070 /
+ * Validates structural invariants of the {@code x-migrate-templates} SKILL.md (EPIC-0070 /
  * story-0070-0007).
  *
  * <p>Checks: frontmatter contract (model: sonnet, requires-capabilities), error codes,
@@ -29,14 +29,14 @@ class TemplateMigrateSkillTest {
                     "skills",
                     "core",
                     "plan",
-                    "x-template-migrate",
+                    "x-migrate-templates",
                     "SKILL.md");
 
     @Test
     @DisplayName("skill_exists_atExpectedPath")
     void skill_exists_atExpectedPath() {
         assertThat(SKILL_FILE.toAbsolutePath())
-                .as("x-template-migrate SKILL.md must exist at core/plan/ (story-0070-0007)")
+                .as("x-migrate-templates SKILL.md must exist at core/plan/ (story-0070-0007)")
                 .exists()
                 .isRegularFile();
     }
@@ -47,7 +47,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST declare model: sonnet (Rule 23 — parser + diff render)")
+                        "x-migrate-templates MUST declare model: sonnet (Rule 23 — parser + diff render)")
                 .contains("model: sonnet");
     }
 
@@ -57,7 +57,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST declare requires-capabilities"
+                        "x-migrate-templates MUST declare requires-capabilities"
                                 + " [governance.value-driven-templates] (Rule 28)")
                 .contains("requires-capabilities")
                 .contains("governance.value-driven-templates");
@@ -69,7 +69,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST document PARSER_ERROR code (story-0070-0007 AC: Error)")
+                        "x-migrate-templates MUST document PARSER_ERROR code (story-0070-0007 AC: Error)")
                 .contains("PARSER_ERROR");
     }
 
@@ -79,7 +79,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST document --dry-run flag (story-0070-0007 AC: Boundary)")
+                        "x-migrate-templates MUST document --dry-run flag (story-0070-0007 AC: Boundary)")
                 .contains("--dry-run");
     }
 
@@ -89,7 +89,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST document atomic write (story-0070-0007 AC: Error — file not written on parse failure)")
+                        "x-migrate-templates MUST document atomic write (story-0070-0007 AC: Error — file not written on parse failure)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("atomic"),
                         c -> assertThat(c).contains("Atomic"));
@@ -101,7 +101,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST document recovery state-file (story-0070-0007 §4 task-007-008)")
+                        "x-migrate-templates MUST document recovery state-file (story-0070-0007 §4 task-007-008)")
                 .contains("template-migrate-")
                 .contains(".json");
     }
@@ -112,7 +112,7 @@ class TemplateMigrateSkillTest {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "x-template-migrate MUST handle already-v2 epic"
+                        "x-migrate-templates MUST handle already-v2 epic"
                                 + " (story-0070-0007 AC: Degenerate)")
                 .satisfiesAnyOf(
                         c -> assertThat(c).contains("already in v2"),
@@ -125,7 +125,7 @@ class TemplateMigrateSkillTest {
     void skill_hasExamplesSection() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-template-migrate MUST have ## Examples section (story-0070-0007)")
+                .as("x-migrate-templates MUST have ## Examples section (story-0070-0007)")
                 .contains("## Examples");
     }
 }

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * TDD tests for Phase 6 (Final Verification) and Phase 7 (Report + Cleanup) of
- * x-pr-merge-train/SKILL.md (story-0042-0003, TASK-0042-0003-001 and TASK-0042-0003-002).
+ * x-manage-pr-merge-train/SKILL.md (story-0042-0003, TASK-0042-0003-001 and TASK-0042-0003-002).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that Phases 6 and 7
  * content are present with the required error codes, report.md generation, and worktree cleanup.
@@ -20,7 +20,7 @@ class MergeTrainSkillPhase6Test {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(
@@ -75,6 +75,6 @@ class MergeTrainSkillPhase6Test {
         assertThat(content)
                 .as(
                         "Golden SKILL.md Phase 7 must document worktree cleanup via Skill tool (Rule 13)")
-                .contains("x-git-worktree");
+                .contains("x-manage-worktrees");
     }
 }

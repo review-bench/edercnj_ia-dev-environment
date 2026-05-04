@@ -70,7 +70,7 @@ No divergences detected. All scenarios matched baseline.
 
 {{#if REGRESSION_DETECTED}}
 1. Review divergences above — determine if they represent regressions or expected changes.
-2. If expected: run `/x-test-regression-shell {{STORY_ID}} --update-baseline` to record new baseline.
+2. If expected: run `/x-execute-shell-regression-tests {{STORY_ID}} --update-baseline` to record new baseline.
 3. If regression: investigate and fix before merging.
 {{/if}}
 

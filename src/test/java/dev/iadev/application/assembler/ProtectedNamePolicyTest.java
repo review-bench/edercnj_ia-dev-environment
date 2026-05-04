@@ -30,7 +30,7 @@ class ProtectedNamePolicyTest {
     @Test
     @DisplayName("arbitrary skill name is not reserved")
     void isProtected_whenArbitrarySkillName_returnsFalse() {
-        assertThat(ProtectedNamePolicy.isProtected("x-task-implement")).isFalse();
+        assertThat(ProtectedNamePolicy.isProtected("x-implement-task")).isFalse();
     }
 
     @Test
