@@ -85,7 +85,7 @@
       }
     },
     "story-0077-0005": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 2",
       "predecessors": [
         "story-0077-0004"
