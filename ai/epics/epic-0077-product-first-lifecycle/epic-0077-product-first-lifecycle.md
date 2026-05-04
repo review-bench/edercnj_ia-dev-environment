@@ -107,7 +107,7 @@ Essa hipótese é fundamentada na evidência operacional qualitativa observada e
 - 4 scripts audit com prefixo `audit-` (product-upstream, c4-completeness, rnf-gates, pentest-coverage)
 - 10 SOLID rules (RULE-001 até RULE-010)
 - 30 stories distribuídas em 8 phases (0-7, incluindo story-0077-0029 e story-0077-0000, seriais)
-- Quality gates (DoR 6-item, DoD 28-story + cobertura + audits)
+- Quality gates (DoR 6-item, DoD 30-story + cobertura + audits)
 
 ### 1.5 Fora do Escopo
 
@@ -570,15 +570,15 @@ write:
   - /.claude/rules/c4-model-architecture.md
   - /ai/planning/c4-validation/_TEMPLATE-C4-VALIDATION.md
   - /ai/planning/rnf-validation/_TEMPLATE-RNF-VALIDATION.md
-  - /ai/epics/epic-0077-product-first-lifecycle/story-0077-000[0-9].md (29 stories)
-  - /java/src/main/resources/targets/claude/rules/19-backward-compatibility.md (story-0077-0029)
-  - /scripts/audit-flow-version.sh (story-0077-0029)
-  - /java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh
+  - /ai/epics/epic-0077-product-first-lifecycle/story-0077-000[0-9].md (30 stories)
+  - /src/main/resources/targets/claude/rules/19-backward-compatibility.md (story-0077-0029)
+  - /src/main/resources/targets/claude/scripts/<stack>/audit-flow-version.sh.tpl (story-0077-0029)
+  - /src/main/resources/targets/claude/scripts/<stack>/audit-*.sh
   - /skills/x-create-product/
   - /skills/x-create-capability/
   - /skills/x-create-feature/
   - /skills/x-promote-ideation/
-  - /CHANGELOG.md (append 29 items)
+  - /CHANGELOG.md (append 30 items)
 
 read:
   - /ai/epics/epic-0064-capability-driven-composition/epic-0064-*.md
