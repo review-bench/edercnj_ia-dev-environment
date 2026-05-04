@@ -74,3 +74,12 @@ categories:
       - quality.dast.zap-passive
       - quality.dast.zap-active
       - quality.dast.nuclei
+
+  - name: product-first
+    description: Product-First Lifecycle planning hierarchy capabilities
+    capabilities:
+      - product-first.product-capability-transformation
+      - product-first.c4-model-mandatory
+      - product-first.rnf-validation
+      - product-first.pentest-always-on
+      - product-first.story-planning-v5

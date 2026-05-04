@@ -1,0 +1,7 @@
+id: product-first.rnf-validation
+name: RNF Validation Gate
+description: Activates non-functional requirements (RNF) gate configuration inherited by epics and stories. When active, x-refine-story and x-refine-epic enforce RnfGate acceptance criteria on performance, security, and availability dimensions before implementation can begin.
+category: product-first
+universal: false
+requires: []
+excludes: []

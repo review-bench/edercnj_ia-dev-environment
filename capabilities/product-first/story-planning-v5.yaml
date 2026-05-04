@@ -1,0 +1,7 @@
+id: product-first.story-planning-v5
+name: Story Planning v5 (Product-First Multi-Agent)
+description: Activates the Product-First multi-agent story planning protocol (flowVersion 5). When active, x-refine-story dispatches 7 specialist personas (PO, Tech Lead, Architect, Security, QA, Performance, SRE) and enforces the full 7-dimension refinement verdict required by EPIC-0077.
+category: product-first
+universal: false
+requires: []
+excludes: []
