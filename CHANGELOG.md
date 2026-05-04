@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-05-04
+
 ### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)
 
 Antes desta release, a convenção de nomes das ~100 skills do repositório misturava padrões noun-first (`x-epic-implement`, `x-story-plan`) e verb-first (`x-create-pr`, `x-run-sast`), gerando inconsistência cognitiva na hora de invocar, descobrir ou documentar skills.
