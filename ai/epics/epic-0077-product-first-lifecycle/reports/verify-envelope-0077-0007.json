@@ -1,0 +1,21 @@
+{
+  "storyId": "story-0077-0007",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-04T21:05:00Z",
+  "passed": true,
+  "tasksExecuted": [
+    {"taskId": "TASK-0077-0007-001", "status": "DONE", "prNumber": 980, "merged": true},
+    {"taskId": "TASK-0077-0007-002", "status": "DONE", "prNumber": 981, "merged": true},
+    {"taskId": "TASK-0077-0007-003", "status": "DONE", "prNumber": 982, "merged": true},
+    {"taskId": "TASK-0077-0007-004", "status": "DONE", "prNumber": 983, "merged": true}
+  ],
+  "testResults": {
+    "totalTests": 4802,
+    "newFeatureTests": 8,
+    "failures": 0,
+    "errors": 0,
+    "build": "SUCCESS"
+  },
+  "specialistVerdict": "GO",
+  "techLeadVerdict": "GO"
+}
