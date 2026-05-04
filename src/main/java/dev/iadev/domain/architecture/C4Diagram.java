@@ -9,7 +9,8 @@ public record C4Diagram(
     public enum C4Level {
         CONTEXT,
         CONTAINER,
-        COMPONENT
+        COMPONENT,
+        CODE
     }
 
     public C4Diagram {
