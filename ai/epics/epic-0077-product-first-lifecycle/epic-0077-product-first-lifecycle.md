@@ -36,7 +36,7 @@
 
 | Epic ID   | Title                              | Expected Status | Reason                                              |
 | --------- | ---------------------------------- | ---------------- | --------------------------------------------------- |
-| EPIC-0065 | Feature Creation Chain Refactor    | Backlog          | Gate explícito de anti-colisão em `story-0077-0003`; `story-0077-0011` permanece bloqueada até o naming contract estar fechado |
+| EPIC-0065 | Feature Creation Chain Refactor    | Concluída        | Hard-cut de `x-epic-create` → `x-internal-create-epic` e `x-story-create` → `x-internal-create-story` já entregues (Rule 19 §Hard-cut autorizado); gate anti-colisão em `story-0077-0003`; `story-0077-0011` e `story-0077-0012` refatoram as internal skills pós-hard-cut |
 | EPIC-0070 | Value-Driven Templates v2          | Concluída        | Template Epic v3 refator sobre v2 (Phase 1)        |
 | EPIC-0072 | Comprehensive Test Strategy        | Concluída        | RNF table popula de quality.* YAML (Phase 7)       |
 
@@ -102,11 +102,11 @@ Essa hipótese é fundamentada na evidência operacional qualitativa observada e
 - 4 templates novos (Product, Capability, Feature, RNF-Validation)
 - 1 template refatorado (Epic v3)
 - 4 skills novas (x-create-product, x-create-capability, x-create-feature, x-promote-ideation)
-- 5 skills refatoradas (x-epic-create, x-story-create, x-plan-architecture, x-plan-task, x-plan-story)
+- 5 skills refatoradas (x-internal-create-epic, x-internal-create-story, x-plan-architecture, x-plan-task, x-plan-story)
 - 2 agents refatorados (planning-refinement, planning-decompose)
 - 4 scripts audit com prefixo `audit-` (product-upstream, c4-completeness, rnf-gates, pentest-coverage)
 - 10 SOLID rules (RULE-001 até RULE-010)
-- 28 stories distribuídas em 7 phases (0-7, seriais)
+- 30 stories distribuídas em 8 phases (0-7, incluindo story-0077-0029 e story-0077-0000, seriais)
 - Quality gates (DoR 6-item, DoD 28-story + cobertura + audits)
 
 ### 1.5 Fora do Escopo
@@ -261,8 +261,8 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | `x-create-capability` | `--product-id <ID> --title <str> --description <str>` | `capability.yaml` (v1 schema) | Criar nova Capability sob Product |
 | `x-create-feature` | `--capability-id <ID> --title <str> --ac <str>` | `feature.yaml` (v1 schema) | Criar nova Feature sob Capability |
 | `x-promote-ideation` | `--ideation-id <ID> [--product-create]` | `product.yaml` (v1 schema) | Promover Ideation → Product (ou fail se existe) |
-| `x-epic-create` | `--feature-id <ID> --title <str> --c4-system <str>` | `epic-0XXX-*.md` (v3 schema + C4) | Criar Epic, validar C4 system diagram obrigatório |
-| `x-story-create` | `--epic-id <ID> --title <str> --rnf <yaml>` | `story-XXXX-YYYY.md` (v4 schema + RNF) | Criar Story, validar RNF schema against epic gate |
+| `x-internal-create-epic` | `--feature-id <ID> --title <str> --c4-system <str>` | `epic-0XXX-*.md` (v3 schema + C4) | Internal skill pós-EPIC-0065 hard-cut (era `x-epic-create`); criar Epic, validar C4 system diagram obrigatório (RULE-003) |
+| `x-internal-create-story` | `--epic-id <ID> --title <str> --rnf <yaml>` | `story-XXXX-YYYY.md` (v4 schema + RNF) | Internal skill pós-EPIC-0065 hard-cut (era `x-story-create`); criar Story, validar RNF schema against epic gate (RULE-004) |
 | `x-plan-architecture` | `--epic-id <ID> --c4-container <str>` | `arch-plan-epic-XXXX.md` | Validar C4 Container obrigatório antes de arch plan |
 | `x-plan-task` | `--story-id <ID> --rnf-inherit <yaml>` | `task-plan-story-XXXX-YYYY.md` | Herdar RNF de story, validar SLO + success metrics |
 | `x-plan-story` | `--story-id <ID> [--verify-rnf]` | `story-plan-XXXX-YYYY.md` | RNF validation optional (default), escalate to epic if fails |
@@ -510,13 +510,27 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 
 ---
 
+### DR-009: Rule 14 Extension — Domínio de Negócio Product-First
+
+**Decisão:** Este épico requer uma story dedicada (`story-0077-0000`) que amenda Rule 14 para autorizar explicitamente as classes de domínio de negócio introduzidas pela hierarquia Product-First (Product, Capability, Feature, RNF entities) no projeto ia-dev-env, via ADR formal.
+
+**Motivo:** Rule 14 proíbe explicitamente adicionar código Java que não serve ao pipeline de geração CLI. As entidades `domain/products/`, `domain/capabilities/`, `domain/features/` e `domain/planning/rnf-validation/` representam modelo de domínio de negócio que não existia antes. Sem emenda normativa + ADR, qualquer PR contendo essas classes seria bloqueado pela Rule 14 scope guard, já que elas não se enquadram nas categorias permitidas de `domain/model/` existentes (que modelam configuração de projeto, não hierarquia de produto). A story-0077-0000 deve preceder todas as demais para que o fundamento normativo esteja presente antes de qualquer implementação.
+
+**Alternativa descartada:** Tratar as novas entidades como extensões do `domain/model/` existente sem emenda de Rule 14 (viola o princípio de single source of truth; Rule 14 seria silenciosamente contornada). Incluir a emenda no escopo de story-0077-0001 (confunde fundação normativa com fundação técnica; a revisão de Rule 14 é pré-requisito, não co-entregável).
+
+**Consequência:** story-0077-0029 (Rule 19 Amendment) é a nova raiz da cadeia Phase 0 — precede story-0077-0000 (Rule 14 ADR) que precede story-0077-0001. O total de stories passa de 28 para 30. O índice de histórias em §9 foi atualizado para refletir essa dependência em cadeia.
+
+---
+
 ## 9. Dependências & File Footprint
 
 ### Índice de Histórias
 
 | ID | Título | Dependências (Blocked By) | Entrega de Valor | Phase |
 | :--- | :--- | :--- | :--- | :--- |
-| [story-0077-0001](./story-0077-0001.md) | Setup: Epic Template v3 + RNF-Validation Schema | - | Fundação para templates novos | 0 |
+| [story-0077-0029](./story-0077-0029.md) | Rule 19 Amendment — flowVersion "5" Fallback Matrix Registration | - | Pré-requisito normativo: registrar flowVersion "5" no fallback matrix da Rule 19 | 0 |
+| [story-0077-0000](./story-0077-0000.md) | ADR Amendment: Rule 14 Extension for Product-First Runtime Domain | story-0077-0029 | Fundação normativa para classes de domínio de negócio | 0 |
+| [story-0077-0001](./story-0077-0001.md) | Setup: Epic Template v3 + RNF-Validation Schema | story-0077-0000 | Fundação para templates novos | 0 |
 | [story-0077-0002](./story-0077-0002.md) | Template: _TEMPLATE-PRODUCT.md v1 | story-0077-0001 | Product artifact padrão + validação | 1 |
 | [story-0077-0003](./story-0077-0003.md) | Template: _TEMPLATE-CAPABILITY.md v1 | story-0077-0002 | Capability artifact padrão | 1 |
 | [story-0077-0004](./story-0077-0004.md) | Template: _TEMPLATE-FEATURE.md v1 | story-0077-0003 | Feature artifact padrão | 1 |
@@ -526,8 +540,8 @@ Domain MUST NOT import CLI or framework code (Rule 04).
 | [story-0077-0008](./story-0077-0008.md) | Skill NEW: x-create-capability UnicodeScript wrapper | story-0077-0007 | Capability creation CLI | 3 |
 | [story-0077-0009](./story-0077-0009.md) | Skill NEW: x-create-feature UnicodeScript wrapper | story-0077-0008 | Feature creation CLI | 3 |
 | [story-0077-0010](./story-0077-0010.md) | Skill NEW: x-promote-ideation UnicodeScript wrapper | story-0077-0009 | Ideation → Product promotion CLI | 3 |
-| [story-0077-0011](./story-0077-0011.md) | Skill REFACTOR: x-epic-create (C4 required, RULE-003) | story-0077-0010 | Epic creation com C4 mandatory | 4 |
-| [story-0077-0012](./story-0077-0012.md) | Skill REFACTOR: x-story-create (RNF validation, RULE-004) | story-0077-0011 | Story creation com RNF gate | 4 |
+| [story-0077-0011](./story-0077-0011.md) | Skill REFACTOR: x-internal-create-epic (C4 required, RULE-003) — refatora a internal skill pós-EPIC-0065 hard-cut | story-0077-0010 | Epic creation com C4 mandatory | 4 |
+| [story-0077-0012](./story-0077-0012.md) | Skill REFACTOR: x-internal-create-story (RNF validation, RULE-004) — refatora a internal skill pós-EPIC-0065 hard-cut | story-0077-0011 | Story creation com RNF gate | 4 |
 | [story-0077-0013](./story-0077-0013.md) | Skill REFACTOR: x-plan-architecture (C4 Container validation) | story-0077-0012 | Architecture planning com C4 rigor | 4 |
 | [story-0077-0014](./story-0077-0014.md) | Skill REFACTOR: x-plan-task (RNF inheritance, SLO) | story-0077-0013 | Task planning com SLO context | 4 |
 | [story-0077-0015](./story-0077-0015.md) | Skill REFACTOR: x-plan-story (RNF validation layer) | story-0077-0014 | Story planning com RNF verify | 4 |
@@ -556,13 +570,15 @@ write:
   - /.claude/rules/c4-model-architecture.md
   - /ai/planning/c4-validation/_TEMPLATE-C4-VALIDATION.md
   - /ai/planning/rnf-validation/_TEMPLATE-RNF-VALIDATION.md
-  - /ai/epics/epic-0077-product-first-lifecycle/story-0077-000[1-9].md (28 stories)
+  - /ai/epics/epic-0077-product-first-lifecycle/story-0077-000[0-9].md (29 stories)
+  - /java/src/main/resources/targets/claude/rules/19-backward-compatibility.md (story-0077-0029)
+  - /scripts/audit-flow-version.sh (story-0077-0029)
   - /java/src/main/resources/targets/claude/scripts/<stack>/audit-*.sh
   - /skills/x-create-product/
   - /skills/x-create-capability/
   - /skills/x-create-feature/
   - /skills/x-promote-ideation/
-  - /CHANGELOG.md (append 28 items)
+  - /CHANGELOG.md (append 29 items)
 
 read:
   - /ai/epics/epic-0064-capability-driven-composition/epic-0064-*.md
@@ -578,7 +594,7 @@ regen:
   - /golden/products/*.md (subset, 5-10 fixtures)
   - /golden/capabilities/*.md (subset, 5-10 fixtures)
   - /golden/features/*.md (subset, 5-10 fixtures)
-  - /golden/epics/epic-0077-product-first-lifecycle/*.md (28 story outputs)
+  - /golden/epics/epic-0077-product-first-lifecycle/*.md (29 story outputs)
   - /golden/scripts/audit/product-validate-output.json (4 scenarios)
 ```
 
@@ -586,7 +602,7 @@ regen:
 
 ```
 Phase 0 (Setup):
-  story-0077-0001 ▁ (E.T.A 1 day)
+  story-0077-0029 ▬ story-0077-0000 ▬ story-0077-0001 ▁ (E.T.A 2-3 days)
 
 Phase 1 (Templates):
   story-0077-0002 ▬ story-0077-0003 ▬ story-0077-0004
@@ -617,17 +633,17 @@ Phase 7 (Docs + QA):
   story-0077-0026 ▬ story-0077-0027 ▬ story-0077-0028
   (Serial, E.T.A 2 days)
 
-Total E.T.A: ~26 days (serial critical path, início em Refinement)
+Total E.T.A: ~27 days (serial critical path, início em Refinement)
 ```
 
 ---
 
 ## Refinement Verdict
 
-**Status:** approved  
-**Scope:** epic  
-**Refined at:** 2026-05-03T20:03:14Z  
-**Verdict hash:** `3bce87d04a0a1e0baf869e201c5779257b88ead7034a35ce92e561547bbbd6c8`
+**Status:** rejected
+**Scope:** epic
+**Refined at:** 2026-05-04T00:00:00Z
+**Verdict hash:** `d21615f205574c5efbef5c4a824daab0c70faf540f65f2884e8fdb485168a459`
 
 ### Dimensions
 
@@ -639,15 +655,15 @@ Total E.T.A: ~26 days (serial critical path, início em Refinement)
 | okrs | passed | — |
 | alternatives | passed | — |
 | risks | passed | — |
-| scope | passed | — |
+| scope | noGo | flowVersion "5" not registered in Rule 19 fallback matrix — RULE-008 cannot be enforced without a companion Rule 19 amendment story |
 
 ### Blockers
 
-none
+- scope/feasibility: RULE-008 mandates flowVersion: "5" but Rule 19's fallback matrix has no entry for "5". All orchestrators default to legacy flow v1 on encountering this value, breaking refinement-gate, task tracking, and epic-branch routing. Resolution: add a story to this epic that amends Rule 19 to register flowVersion "5" with its behavior specification.
 
 ### Rationale
 
-O épico agora explicita problema observável com evidências, personas afetadas, hipótese de valor, KPIs mensuráveis, alternativas estratégicas, riscos produto+técnicos e escopo/out-of-scope suficiente. As decisões de rerun foram materializadas no documento e não resta lacuna estratégica bloqueante para aprovação.
+O épico tem problema, personas, hipótese, OKRs, alternativas e riscos bem definidos. As correções de naming (x-internal-create-epic/story) e dependência (EPIC-0065 Concluída) foram materializadas. O bloqueador crítico restante é técnico: RULE-008 introduz flowVersion "5" mas nenhuma story amenda o fallback matrix da Rule 19 para registrá-lo como versão suportada — sem essa story, todos os orchestrators reverterão para legacy flow v1 ao encontrar flowVersion "5".
 
 ---
 
