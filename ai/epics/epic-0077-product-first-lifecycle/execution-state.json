@@ -96,18 +96,7 @@
         "verdictHash": "9f154292ded2d3ac8407f577b505507066ec066127476cc2f13b21654b4a1211"
       }
     },
-    "story-0077-0006": {
-      "status": "Refinada",
-      "phase": "Phase 2",
-      "predecessors": [
-        "story-0077-0005"
-      ],
-      "refinementVerdict": {
-        "status": "approved",
-        "checkedAt": "2026-05-04T12:00:00Z",
-        "verdictHash": "feb5adb350cda843088e6477a1cd0aea2920e1314d84fd9c7e8922ded4f5e86c"
-      }
-    },
+    "story-0077-0006": "Concluída",
     "story-0077-0007": {
       "status": "Refinada",
       "phase": "Phase 3",
