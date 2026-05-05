@@ -40,9 +40,13 @@ class Epic0065SmokeIT extends SmokeTestBase {
     private static final List<String> EXPECTED_INTERNAL_SKILLS =
             List.of("x-internal-create-epic", "x-internal-map-epic", "x-internal-create-story");
 
-    // Skills that must NOT exist as public skills after EPIC-0065 hard-cut
+    // Skills that must NOT exist as public skills after EPIC-0065 hard-cut.
+    // NOTE: x-epic-create and x-story-create were removed here (EPIC-0077) — both were
+    // re-introduced by EPIC-0077 as Product-First lifecycle skills with narrower responsibilities
+    // (Feature-derived creation only), completely different from the old orchestrators hard-cut
+    // by EPIC-0065. x-epic-map and x-epic-decompose remain hard-cut.
     private static final List<String> HARD_CUT_SKILLS =
-            List.of("x-epic-decompose", "x-epic-create", "x-epic-map", "x-story-create");
+            List.of("x-epic-decompose", "x-epic-map");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
@@ -136,7 +140,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
-            "smoke_hardCutSkillsAbsent — 4 removed public skills NOT present (Rule 19 hard-cut)")
+            "smoke_hardCutSkillsAbsent — hard-cut public skills NOT present as public (Rule 19 EPIC-0065)")
     void smoke_hardCutSkillsAbsent(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
