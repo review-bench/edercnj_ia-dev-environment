@@ -25,9 +25,9 @@ Internal skills are implementation details extracted from orchestrators to reduc
 
 | Internal skill | Replaced public skill | Source path | Invoked by |
 | :--- | :--- | :--- | :--- |
-| `x-internal-create-epic` | `x-epic-create` (hard-cut in EPIC-0065; focused public wrapper reintroduced in EPIC-0077) | `core/internal/plan/x-internal-create-epic/SKILL.md` | `x-create-feature`, `x-epic-create` |
+| `x-internal-create-epic` | `x-epic-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-create-epic/SKILL.md` | `x-create-feature` |
 | `x-internal-map-epic` | `x-epic-map` (hard-cut — Rule 19) | `core/internal/plan/x-internal-map-epic/SKILL.md` | `x-create-feature` |
-| `x-internal-create-story` | `x-story-create` (hard-cut in EPIC-0065; focused public wrapper reintroduced in EPIC-0077) | `core/internal/plan/x-internal-create-story/SKILL.md` | `x-create-feature`, `x-story-create` |
+| `x-internal-create-story` | `x-story-create` (hard-cut — Rule 19) | `core/internal/plan/x-internal-create-story/SKILL.md` | `x-create-feature` |
 
 ## Frontmatter Contract
 
@@ -109,3 +109,4 @@ Before EPIC-0049, `x-implement-epic` (~1100 lines) and `x-implement-story` (~900
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
+

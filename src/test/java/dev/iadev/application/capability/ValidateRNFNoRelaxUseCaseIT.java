@@ -1,6 +1,5 @@
 package dev.iadev.application.capability;
 
-import dev.iadev.domain.capability.ApprovalStatus;
 import dev.iadev.domain.capability.RNFOverride;
 import dev.iadev.domain.product.RNFCategory;
 import dev.iadev.domain.product.RNFRootValidationResult;
@@ -29,15 +28,9 @@ class ValidateRNFNoRelaxUseCaseIT {
     }
 
     @Test
-    void execute_relaxedWithApproval_passes() {
+    void execute_relaxedWithJustification_passes() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.PERFORMANCE,
-                        "P99 < 200ms",
-                        "P99 < 500ms",
-                        "Batch processing path",
-                        ApprovalStatus.APPROVED,
-                        "cto@example.com")
+                RNFOverride.withOverride(RNFCategory.PERFORMANCE, "P99 < 200ms", "P99 < 500ms", "Batch processing path")
         );
 
         RNFRootValidationResult result = useCase.execute(overrides);
@@ -49,13 +42,7 @@ class ValidateRNFNoRelaxUseCaseIT {
     @Test
     void execute_securityRelaxed_fails() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.SECURITY,
-                        "TLS 1.3",
-                        "TLS 1.2",
-                        "Legacy client support",
-                        ApprovalStatus.APPROVED,
-                        "security@example.com")
+                RNFOverride.withOverride(RNFCategory.SECURITY, "TLS 1.3", "TLS 1.2", "Legacy client support")
         );
 
         RNFRootValidationResult result = useCase.execute(overrides);
@@ -67,13 +54,7 @@ class ValidateRNFNoRelaxUseCaseIT {
     @Test
     void execute_complianceRelaxed_fails() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.COMPLIANCE,
-                        "PCI DSS Level 1",
-                        "PCI DSS Level 2",
-                        "Cost reduction",
-                        ApprovalStatus.APPROVED,
-                        "risk@example.com")
+                RNFOverride.withOverride(RNFCategory.COMPLIANCE, "PCI DSS Level 1", "PCI DSS Level 2", "Cost reduction")
         );
 
         RNFRootValidationResult result = useCase.execute(overrides);
@@ -92,22 +73,6 @@ class ValidateRNFNoRelaxUseCaseIT {
 
         assertThat(result.passed()).isFalse();
         assertThat(result.errors()).anyMatch(e -> e.contains("PERFORMANCE"));
-    }
-
-    @Test
-    void execute_relaxedWithoutApproval_fails() {
-        List<RNFOverride> overrides = List.of(
-                RNFOverride.withOverride(
-                        RNFCategory.PERFORMANCE,
-                        "P99 < 200ms",
-                        "P99 < 1s",
-                        "Migration tradeoff")
-        );
-
-        RNFRootValidationResult result = useCase.execute(overrides);
-
-        assertThat(result.passed()).isFalse();
-        assertThat(result.errors()).anyMatch(e -> e.contains("without approval"));
     }
 
     @Test

@@ -1,6 +1,6 @@
 ---
 name: x-internal-create-story
-description: "Generate Story files from Epic or from an existing Feature artifact: data contracts, inherited RNFs, dependency declarations, sub-tasks, quality validation, optional Jira integration. Invoked by orchestrators and focused public wrappers."
+description: "Generate Story files from Epic: data contracts, Gherkin, Mermaid diagrams, dependency declarations, sub-tasks, quality validation, optional Jira integration. Invoked only by x-create-feature (Phase 3)."
 visibility: internal
 user-invocable: false
 model: sonnet
@@ -21,12 +21,11 @@ context-budget: heavy
 
 ## Purpose
 
-Generate individual story files from an Epic and system specification **or from an existing Feature artifact**. Each story is self-contained: a developer can implement it without going back to the original source. Stories include data contracts, inherited RNFs, dependency declarations, tagged sub-tasks, and quality gate validation.
+Generate individual story files from an Epic and system specification. Each story is self-contained: a developer can implement it without going back to the original spec. Stories include data contracts, Gherkin acceptance criteria, Mermaid sequence diagrams, dependency declarations, tagged sub-tasks, and quality gate validation.
 
 ## Triggers
 
 - `/x-story-create <spec_file> <epic_file>` — generate all stories from the epic index
-- `/x-story-create --from-feature <feature-file|feature-id> --epic-id <EPIC-NNNN|NNNN>` — generate focused stories from a feature artifact
 - User asks to create stories, generate user stories from an epic, or break an epic into implementable stories
 - User mentions writing acceptance criteria, detailing technical stories, or creating story files with contracts and diagrams
 
@@ -36,10 +35,6 @@ Generate individual story files from an Epic and system specification **or from 
 |-----------|------|----------|---------|-------------|
 | `<SPEC_FILE>` | Path | Yes | — | Path to the system specification file |
 | `<EPIC_FILE>` | Path | Yes | — | Path to the Epic file (with story index and rules table) |
-| `--from-feature <feature-file\|feature-id>` | String | No | — | Feature artifact source for Product-First Feature → Story generation |
-| `--epic-id <EPIC-NNNN\|NNNN>` | String | No | — | Epic linkage required in `--from-feature` mode |
-| `--capability-file <path>` | Path | No | — | Capability artifact used to enrich inherited RNFs in `--from-feature` mode |
-| `--product-file <path>` | Path | No | — | Product artifact used to enrich inherited RNFs in `--from-feature` mode |
 | `--quality-threshold` | int | No | 70 | Minimum score (0-100) required for a story to be saved |
 | `--jira` | String | No | — | Jira project key (e.g., PROJ). When provided, skip AskUserQuestion and create stories in Jira directly (EPIC-0042). |
 | `--no-jira` | Boolean | No | false | Skip Jira integration entirely, no prompting (EPIC-0042). |
@@ -111,16 +106,13 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-1-Context-Gathering`
 
-Read the source inputs completely.
-
-- **Epic mode (default):** read both the Epic and Spec. From the Epic, extract:
+Read both files completely. From the Epic, extract:
 - The story index (IDs, titles, dependencies)
 - The rules table (RULE-001..N) — stories reference these by ID
 - The DoD (copied into each story for quick reference)
 
-- **Feature mode (`--from-feature`):** read the Feature artifact and target `--epic-id`. In this mode, derive stories from the feature use cases, render inherited RNFs into `## 2. RNFs Herdadas`, and intentionally omit `## 2. Persona & Cenário`, `## 4. AC (...)`, and `## 8. Decision Rationale`.
-
-From the upstream source, understand the technical context: journeys, data contracts, protocol mappings, state machines, error codes, and metrics.
+From the spec, understand the full technical context: journeys, data contracts, protocol
+mappings, state machines, error codes, metrics.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-1-Context-Gathering ok`

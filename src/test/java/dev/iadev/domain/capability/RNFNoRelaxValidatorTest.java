@@ -25,16 +25,10 @@ class RNFNoRelaxValidatorTest {
     }
 
     @Test
-    void oneRelaxed_withApproval_passes() {
+    void oneRelaxed_withJustification_passes() {
         List<RNFOverride> overrides = List.of(
                 RNFOverride.noRelax(RNFCategory.SECURITY, "ICP-Brasil Nível 2"),
-                RNFOverride.withApproval(
-                        RNFCategory.PERFORMANCE,
-                        "P99 < 3s",
-                        "P99 < 500ms",
-                        "Auth path requires stricter SLA",
-                        ApprovalStatus.APPROVED,
-                        "cto@example.com")
+                RNFOverride.withOverride(RNFCategory.PERFORMANCE, "P99 < 3s", "P99 < 500ms", "Auth path requires stricter SLA")
         );
 
         var result = validator.validate(overrides);
@@ -56,31 +50,9 @@ class RNFNoRelaxValidatorTest {
     }
 
     @Test
-    void oneRelaxed_withoutApproval_rejects() {
-        List<RNFOverride> overrides = List.of(
-                RNFOverride.withOverride(
-                        RNFCategory.PERFORMANCE,
-                        "P99 < 3s",
-                        "P99 < 10s",
-                        "Temporary downgrade for migration")
-        );
-
-        var result = validator.validate(overrides);
-
-        assertThat(result.passed()).isFalse();
-        assertThat(result.errors()).anyMatch(e -> e.contains("without approval"));
-    }
-
-    @Test
     void security_relaxed_rejectsEvenWithJustification() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.SECURITY,
-                        "ICP-Brasil Nível 2",
-                        "basic TLS only",
-                        "legacy system",
-                        ApprovalStatus.APPROVED,
-                        "cto@example.com")
+                RNFOverride.withOverride(RNFCategory.SECURITY, "ICP-Brasil Nível 2", "basic TLS only", "legacy system")
         );
 
         var result = validator.validate(overrides);
@@ -92,13 +64,7 @@ class RNFNoRelaxValidatorTest {
     @Test
     void compliance_relaxed_rejectsEvenWithJustification() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.COMPLIANCE,
-                        "LGPD Art.46",
-                        "best effort",
-                        "startup exemption",
-                        ApprovalStatus.APPROVED,
-                        "risk@example.com")
+                RNFOverride.withOverride(RNFCategory.COMPLIANCE, "LGPD Art.46", "best effort", "startup exemption")
         );
 
         var result = validator.validate(overrides);
@@ -110,19 +76,13 @@ class RNFNoRelaxValidatorTest {
     @Test
     void multipleViolations_reportsAll() {
         List<RNFOverride> overrides = List.of(
-                RNFOverride.withApproval(
-                        RNFCategory.SECURITY,
-                        "ICP-Brasil",
-                        "TLS only",
-                        "legacy",
-                        ApprovalStatus.APPROVED,
-                        "cto@example.com"),
+                RNFOverride.withOverride(RNFCategory.SECURITY, "ICP-Brasil", "TLS only", "legacy"),
                 RNFOverride.withOverride(RNFCategory.PERFORMANCE, "P99 < 3s", "P99 < 10s", null)
         );
 
         var result = validator.validate(overrides);
 
         assertThat(result.passed()).isFalse();
-        assertThat(result.errors()).hasSize(3);
+        assertThat(result.errors()).hasSize(2);
     }
 }

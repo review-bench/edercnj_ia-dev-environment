@@ -6,7 +6,6 @@ import dev.iadev.domain.architecture.C4Diagram;
 import dev.iadev.domain.architecture.C4Diagram.C4Level;
 import dev.iadev.domain.architecture.C4OutputFormat;
 import dev.iadev.domain.architecture.CapabilityC4Planner;
-import dev.iadev.domain.architecture.FeatureC4Planner;
 import dev.iadev.domain.architecture.ProductC4Planner;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ class XArchPlanC4SmokeTest {
 
     private final ProductC4Planner productPlanner = new ProductC4Planner();
     private final CapabilityC4Planner capabilityPlanner = new CapabilityC4Planner();
-    private final FeatureC4Planner featurePlanner = new FeatureC4Planner();
 
     @Test
     void product_mermaid_generatesContextAndContainerDiagrams() {
@@ -38,17 +36,6 @@ class XArchPlanC4SmokeTest {
         assertThat(component.level()).isEqualTo(C4Level.COMPONENT);
         assertThat(container.content()).contains("C4Container");
         assertThat(component.content()).contains("C4Component");
-    }
-
-    @Test
-    void feature_mermaid_generatesContextAndContainerDiagrams() {
-        C4Diagram context = featurePlanner.planContext("feature-oauth2", C4OutputFormat.MERMAID);
-        C4Diagram container = featurePlanner.planContainer("feature-oauth2", C4OutputFormat.MERMAID);
-
-        assertThat(context.level()).isEqualTo(C4Level.CONTEXT);
-        assertThat(container.level()).isEqualTo(C4Level.CONTAINER);
-        assertThat(context.content()).contains("OAuth2 Provider");
-        assertThat(container.content()).contains("auth-service");
     }
 
     @Test

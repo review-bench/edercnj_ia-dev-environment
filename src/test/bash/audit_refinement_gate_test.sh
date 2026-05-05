@@ -56,31 +56,6 @@ EOF
   fi
 }
 
-write_story_md() {
-  # $1=tmpdir  $2=epic-num  $3=story-id  $4=rnf_row(optional)
-  local tmpdir="$1" epic_num="$2" story_id="$3" rnf_row="${4:-}"
-  local story_file="${tmpdir}/ai/epics/epic-${epic_num}-test/${story_id}.md"
-  cat > "${story_file}" <<'EOF'
-# Story fixture
-
-## 9. Refinement Verdict
-
-> approved fixture
-EOF
-  if [[ -n "${rnf_row}" ]]; then
-    cat >> "${story_file}" <<EOF
-
-## 2. RNFs Herdadas
-
-| Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-${rnf_row}
-
-## 3. Next Section
-EOF
-  fi
-}
-
 # ─── scenarios ─────────────────────────────────────────────────────────────
 
 echo "=============================================="
@@ -161,20 +136,6 @@ cat > "$TMP/ai/epics/epic-0099-test/execution-state.json" <<'EOF'
 EOF
 RC=0; OUT=$(cd "$TMP" && bash "$SCRIPT_SRC" --story story-0099-0001 2>&1) || RC=$?
 if [[ "$RC" -eq 0 ]]; then pass "exit 0 on flowVersion=1"; else fail "flowVersion=1" "got $RC: $OUT"; fi
-rm -rf "$TMP"
-
-# Scenario 8: approved verdict still fails on RNF inheritance violation
-echo "--- Scenario 8: approved verdict fails on RNF inheritance violation ---"
-TMP=$(mktemp -d); (setup_repo "$TMP" "0099" "approved")
-write_story_md "$TMP" "0099" "story-0099-0001" \
-"| SECURITY | encrypt-data | false | tls-optional | rollout exception | APPROVED | security-team |"
-RC=0; STDERR=$(cd "$TMP" && bash "$SCRIPT_SRC" --story story-0099-0001 2>&1 >/dev/null) || RC=$?
-if [[ "$RC" -eq 1 ]]; then pass "exit 1 on RNF inheritance violation"; else fail "exit 1 on RNF inheritance violation" "got $RC: $STDERR"; fi
-if echo "$STDERR" | grep -q "rnf-inheritance-violation"; then
-  pass "stderr contains rnf-inheritance-violation sub-code"
-else
-  fail "rnf-inheritance-violation sub-code" "stderr: $STDERR"
-fi
 rm -rf "$TMP"
 
 # ─── summary ───────────────────────────────────────────────────────────────

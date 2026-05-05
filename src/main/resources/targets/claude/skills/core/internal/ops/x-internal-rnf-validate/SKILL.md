@@ -14,10 +14,10 @@ requires-capabilities: []
 
 ## Purpose
 
-Validates RNF inheritance from either explicit override specs or a capability/story artifact markdown table:
+Validates a list of RNF override specs against the no-relax marker and justification gate rules:
 
 - `SECURITY` and `COMPLIANCE` are **hard-blocked** — cannot be relaxed even with justification.
-- All other categories that are relaxed **require a non-blank justification and formal approval**.
+- All other categories that are relaxed **require a non-blank justification**.
 - Categories marked `norelax` pass unconditionally.
 
 Delegates to `XInternalRnfValidateCommand` (CLI adapter) and `ValidateRNFNoRelaxUseCase` (application layer) which calls `RNFNoRelaxValidator` (domain).
@@ -26,7 +26,6 @@ Delegates to `XInternalRnfValidateCommand` (CLI adapter) and `ValidateRNFNoRelax
 
 | Flag | Required | Format | Description |
 | :--- | :--- | :--- | :--- |
-| `--artifact` | No | file path | Capability/story artifact containing the `## 2. RNFs Herdadas` markdown table |
 | `--override` | No (repeatable) | See formats below | One RNF override spec per flag |
 | `--dry-run` | No | flag | Parse and report only; always returns exit 0 |
 
@@ -36,7 +35,7 @@ Delegates to `XInternalRnfValidateCommand` (CLI adapter) and `ValidateRNFNoRelax
 | :--- | :--- | :--- |
 | `CATEGORY:norelax` | `PERFORMANCE:norelax` | RNF carried forward unchanged |
 | `CATEGORY:norelax:originalValue` | `SECURITY:norelax:TLS 1.3` | Same, with original value context |
-| `CATEGORY:relaxed:originalValue:newValue:justification[:approvalStatus:approver]` | `PERFORMANCE:relaxed:P99<200ms:P99<500ms:Batch path:approved:cto@example.com` | Relaxed RNF with mandatory justification and formal approval |
+| `CATEGORY:relaxed:originalValue:newValue:justification` | `PERFORMANCE:relaxed:P99<200ms:P99<500ms:Batch path` | Relaxed RNF with mandatory justification |
 
 `CATEGORY` must be a valid `RNFCategory` enum value (case-insensitive): `PERFORMANCE`, `SCALABILITY`, `RELIABILITY`, `SECURITY`, `COMPLIANCE`, `OBSERVABILITY`, `DATA_INTEGRITY`, `MAINTAINABILITY`, `PORTABILITY`, `USABILITY`.
 
@@ -58,10 +57,10 @@ x-internal-rnf-validate \
 # exit 0
 ```
 
-### Relaxed with approval (passes)
+### Relaxed with justification (passes)
 ```bash
 x-internal-rnf-validate \
-  --override PERFORMANCE:relaxed:P99<200ms:P99<500ms:Batch processing path:approved:cto@example.com
+  --override PERFORMANCE:relaxed:P99<200ms:P99<500ms:Batch processing path
 # exit 0
 ```
 
@@ -84,13 +83,6 @@ x-internal-rnf-validate \
 x-internal-rnf-validate --dry-run \
   --override COMPLIANCE:relaxed:PCI-DSS-L1:PCI-DSS-L2:Cost reduction
 # exit 0 (violations printed but not blocking)
-```
-
-### Validate from artifact markdown table
-```bash
-x-internal-rnf-validate \
-  --artifact ai/examples/example-capability-auth.md
-# exit 0
 ```
 
 ## Integration Notes

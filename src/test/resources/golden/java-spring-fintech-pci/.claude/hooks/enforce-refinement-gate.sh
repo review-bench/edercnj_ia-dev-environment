@@ -5,7 +5,7 @@
 # Layer:      0 (preventive — fires during LLM turn)
 # Trigger:    PreToolUse
 # Event:      PreToolUse (tool_name=Skill)
-# Exit codes: 0=OK (allow), 33=REFINEMENT_REQUIRED (block), 34=RNF_INHERITANCE_VIOLATION (block)
+# Exit codes: 0=OK (allow), 33=REFINEMENT_REQUIRED (block)
 # Latency:    < 500ms p95
 # Telemetry:  recovery_mode_used event appended when CLAUDE_RECOVERY_MODE=1
 #
@@ -30,7 +30,6 @@ set -uo pipefail
 
 HOOK_NAME="enforce-refinement-gate.sh"
 EXIT_REFINEMENT_REQUIRED=33
-EXIT_RNF_INHERITANCE_VIOLATION=34
 
 # Orchestrators guarded by the refinement gate
 GUARDED_SKILLS="x-implement-story x-implement-epic x-implement-task x-orchestrate-epic"
@@ -141,63 +140,6 @@ if [ -z "${STATE_FILE}" ] || [ ! -f "${STATE_FILE}" ]; then
   exit 0
 fi
 
-resolve_story_md() {
-  local target_id="$1"
-  find "${PROJECT_DIR}/ai/epics" -maxdepth 3 -name "${target_id}.md" 2>/dev/null | head -1 || true
-}
-
-trim_cell() {
-  printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
-}
-
-normalize_cell() {
-  local value
-  value=$(trim_cell "$1")
-  if [ -z "${value}" ] || [ "${value}" = "—" ]; then
-    printf ''
-    return 0
-  fi
-  printf '%s' "${value}"
-}
-
-validate_rnf_inheritance() {
-  local md_file="$1"
-  [[ -z "${md_file}" || ! -f "${md_file}" ]] && return 0
-  grep -q '^## 2\. RNFs Herdadas' "${md_file}" || return 0
-
-  while IFS= read -r row; do
-    IFS='|' read -r _ raw_category _raw_original raw_no_relax _raw_override raw_justification raw_approval raw_approver _ <<< "${row}"
-    local category no_relax justification approval approver
-    category=$(normalize_cell "${raw_category}")
-    no_relax=$(normalize_cell "${raw_no_relax}")
-    justification=$(normalize_cell "${raw_justification}")
-    approval=$(normalize_cell "${raw_approval}")
-    approver=$(normalize_cell "${raw_approver}")
-    category=$(printf '%s' "${category}" | tr '[:lower:]' '[:upper:]')
-    approval=$(printf '%s' "${approval}" | tr '[:lower:]' '[:upper:]')
-
-    if [ "${no_relax}" = "true" ]; then
-      continue
-    fi
-    if [ "${category}" = "SECURITY" ] || [ "${category}" = "COMPLIANCE" ]; then
-      echo "RNF_INHERITANCE_VIOLATION: ${TARGET_ID} category ${category} cannot be relaxed; resolve before starting work" >&2
-      return 1
-    fi
-    if [ -z "${justification}" ] || [ "${approval}" != "APPROVED" ] || [ -z "${approver}" ]; then
-      echo "RNF_INHERITANCE_VIOLATION: ${TARGET_ID} has unapproved RNF relaxation in ${category}; resolve before starting work" >&2
-      return 1
-    fi
-  done < <(
-    awk '
-      /^## 2\. RNFs Herdadas/ { in_section=1; next }
-      in_section && /^## / { exit }
-      in_section && /^\|/ && $0 !~ /Categoria/ && $0 !~ /:---/ { print }
-    ' "${md_file}"
-  )
-
-  return 0
-}
-
 # ── Read flowVersion ──────────────────────────────────────────────────────────
 
 FLOW_VERSION=$(jq -r '.flowVersion // "1"' "${STATE_FILE}" 2>/dev/null || echo "1")
@@ -214,12 +156,6 @@ VERDICT_STATUS=$(jq -r '.refinementVerdict.status // "absent"' "${STATE_FILE}" 2
 
 case "${VERDICT_STATUS}" in
   "approved")
-    if [[ "${TARGET_ID}" =~ ^story- ]]; then
-      STORY_MD=$(resolve_story_md "${TARGET_ID}")
-      if ! validate_rnf_inheritance "${STORY_MD}"; then
-        exit ${EXIT_RNF_INHERITANCE_VIOLATION}
-      fi
-    fi
     exit 0
     ;;
   "absent"|"tbd")

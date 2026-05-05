@@ -1,11 +1,8 @@
 package dev.iadev.adapter.inbound.cli;
 
-import dev.iadev.adapter.outbound.documentation.C4DiagramGenerator;
-import dev.iadev.application.architecture.ArchitectureRefactoringUseCase;
 import dev.iadev.domain.architecture.C4Diagram;
-import dev.iadev.domain.architecture.C4LevelValidator;
 import dev.iadev.domain.architecture.C4OutputFormat;
-import dev.iadev.domain.architecture.ProductC4Model;
+import dev.iadev.domain.architecture.ProductC4Planner;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
@@ -37,37 +34,35 @@ public class XArchPlanProductCommand implements Callable<Integer> {
             description = "Output format: mermaid (default), plantuml.")
     String outputFormat;
 
-    private final ArchitectureRefactoringUseCase useCase =
-            new ArchitectureRefactoringUseCase(new C4DiagramGenerator(), new C4LevelValidator());
-
     @Override
     public Integer call() {
         PrintWriter out = spec.commandLine().getOut();
+
+        C4OutputFormat format;
         try {
-            ProductC4Model model = useCase.planProduct(productId, resolveFormat());
-            writeSummary(out, model);
-            return EXIT_SUCCESS;
+            format = C4OutputFormat.fromString(outputFormat);
         } catch (IllegalArgumentException e) {
-            out.println("Validation error: " + e.getMessage());
+            out.println("Error: " + e.getMessage());
             return EXIT_VALIDATION;
+        }
+
+        if (productId == null || productId.isBlank()) {
+            out.println("Error: --product-id must not be blank");
+            return EXIT_VALIDATION;
+        }
+
+        try {
+            ProductC4Planner planner = new ProductC4Planner();
+            C4Diagram context = planner.planContext(productId, format);
+            C4Diagram container = planner.planContainer(productId, format);
+            out.println("C4 Context diagram generated for: " + productId);
+            out.println(context.content());
+            out.println("C4 Container diagram generated for: " + productId);
+            out.println(container.content());
+            return EXIT_SUCCESS;
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
             return EXIT_EXECUTION;
         }
-    }
-
-    private C4OutputFormat resolveFormat() {
-        return C4OutputFormat.fromString(outputFormat);
-    }
-
-    private void writeSummary(PrintWriter out, ProductC4Model model) {
-        out.println("C4 diagrams generated for " + model.productId() + ":");
-        writeLine(out, model.contextDiagram(), model.isPlaceholder("CONTEXT"));
-        writeLine(out, model.containerDiagram(), model.isPlaceholder("CONTAINER"));
-        writeLine(out, model.componentDiagram(), model.isPlaceholder("COMPONENT"));
-    }
-
-    private void writeLine(PrintWriter out, C4Diagram diagram, boolean placeholder) {
-        out.printf("  %-10s: %s  [%s]%n", diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
     }
 }

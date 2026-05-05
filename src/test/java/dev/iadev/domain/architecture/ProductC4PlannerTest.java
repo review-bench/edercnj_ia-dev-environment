@@ -48,14 +48,6 @@ class ProductC4PlannerTest {
     }
 
     @Test
-    void planContext_plantumlDirectiveInput_isNeutralized() {
-        C4Diagram diagram = planner.planContext("@startjson", C4OutputFormat.PLANTUML);
-
-        assertThat(diagram.content()).doesNotContain("@startjson");
-        assertThat(diagram.content()).contains("startjson");
-    }
-
-    @Test
     void planContext_nullProductId_throws() {
         assertThatThrownBy(() -> planner.planContext(null, C4OutputFormat.MERMAID))
                 .isInstanceOf(IllegalArgumentException.class)

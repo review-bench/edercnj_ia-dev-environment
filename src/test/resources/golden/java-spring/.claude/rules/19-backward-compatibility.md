@@ -3,7 +3,7 @@
 > **Related:** Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 08 (Release Process).
 > **Introduced by:** EPIC-0049 (Refatoração do Fluxo de Épico) — RULE-008 (`flowVersion` + `--legacy-flow`).
 > **Extended by:** EPIC-0060 (Folder Reorganization v4) — `flowVersion: "4"` for v4 layout (`ai/epics/`).
-> **Extended by:** EPIC-0077 (Product-First Lifecycle) — `flowVersion: "5"` for Product-First lifecycle with `productFirstLifecycle: true` in state file (stories 0077-0029, 0077-0028).
+> **Extended by:** EPIC-0077 (Product-First Lifecycle) — `flowVersion: "5"` for Product-First lifecycle with `productFirstLifecycle: true` in state file (story-0077-0029).
 
 ## Purpose
 
@@ -28,16 +28,6 @@ Every `execution-state.json` produced by the orchestrators carries a top-level d
 | `"3"` | **Local-First (EPIC-0061+)** — same flow as `"2"` with: non-interactive as default (menus opt-in via `--interactive`), Java audits in generator CI (`mvn verify`), bash audit templates per stack for generated projects. `localFirstLifecycle: true` in state file. |
 | `"4"` | New layout (EPIC-0060+) — same flow as `"2"` but artifacts live under `ai/epics/<epic>-<slug>/` (v4 layout). PathResolver auto-detects via filesystem probe. |
 | `"5"` | **Product-First (EPIC-0077+)** — same flow as `"4"` with: task tracking mandatory, refinement-gate active, epic-branch routing active, and `productFirstLifecycle: true` in state file. Introduces the Product-First Lifecycle hierarchy (Ideation → Product → Capability → Feature → Epic → Story → Task). |
-
-## Normative Status for `flowVersion: "5"`
-
-`flowVersion: "5"` is the **canonical** lifecycle for every epic created from a Product-First hierarchy. The backward-compatibility guarantees in this rule still protect legacy epics, but they do **not** dilute the normative expectation for new Product-First work:
-
-- new Product-First epics MUST persist `flowVersion: "5"` and `productFirstLifecycle: true`;
-- Product-First lineage (`Ideation → Product → Capability → Feature → Epic → Story → Task`) is the reference hierarchy for planning, gating, and audit scripts;
-- C4 mandatory checks, RNF inheritance gates, and Product-First audit scripts are part of the standard v5 contract, not optional extensions.
-
-For EPIC-0077 and successor epics, older flow versions remain relevant only for historical resume / migration scenarios covered by the fallback matrix below.
 
 ## Fallback Matrix
 
@@ -119,12 +109,6 @@ A **hard-cut** (immediate removal with no deprecation window) is permitted when 
 | `x-story-create` | `x-internal-create-story` | Visibility change (public → internal) | EPIC-0065 |
 
 Hard-cuts MUST be documented in the CHANGELOG under `## Removed` with a migration note pointing to the new names. CI `audit-skill-visibility.sh` validates that no public alias remains for hard-cut skills.
-
-### EPIC-0077 exception — semantic reintroduction
-
-EPIC-0077 story-0024 reintroduces `x-epic-create` as a **new public skill with narrower semantics**: it only supports **Feature → Epic** generation (`--from-feature`) and does not recreate the removed generic public epic generator. This is allowed under condition 3 (**semantic redefinition**): the legacy public skill and the new Product-First wrapper do not share the same responsibility or argument contract.
-
-EPIC-0077 story-0025 reintroduces `x-story-create` under the same principle: it only supports **Feature → Story** generation linked to an existing epic (`--from-feature --epic-id`) and does not recreate the removed generic public story generator.
 
 ## Field Additions to `execution-state.json`
 
@@ -262,3 +246,4 @@ Violations fail the CI build with `FLOW_VERSION_VIOLATION`.
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
+

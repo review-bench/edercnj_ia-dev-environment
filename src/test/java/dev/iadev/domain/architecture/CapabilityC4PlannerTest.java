@@ -48,14 +48,6 @@ class CapabilityC4PlannerTest {
     }
 
     @Test
-    void planContainer_plantumlDirectiveInput_isNeutralized() {
-        C4Diagram diagram = planner.planContainer("@startjson", C4OutputFormat.PLANTUML);
-
-        assertThat(diagram.content()).doesNotContain("@startjson");
-        assertThat(diagram.content()).contains("startjson");
-    }
-
-    @Test
     void planContainer_nullCapabilityId_throws() {
         assertThatThrownBy(() -> planner.planContainer(null, C4OutputFormat.MERMAID))
                 .isInstanceOf(IllegalArgumentException.class)

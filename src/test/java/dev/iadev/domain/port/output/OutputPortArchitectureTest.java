@@ -112,7 +112,7 @@ class OutputPortArchitectureTest {
 
         @Test
         @DisplayName(
-                "Output port interfaces should exist (including C4DiagramPort)")
+                "Output port interfaces should exist (including EPIC-0064 CapabilityCatalogRepository)")
         void fourOutputPortsShouldExist() {
             var outputPortClasses =
                     importedClasses.stream()
@@ -125,15 +125,14 @@ class OutputPortArchitectureTest {
                             .toList();
 
             assertThat(outputPortClasses)
-                    .hasSize(6)
+                    .hasSize(5)
                     .extracting(jc -> jc.getSimpleName())
                     .containsExactlyInAnyOrder(
                             "StackProfileRepository",
                             "TemplateRenderer",
                             "FileSystemWriter",
                             "ProgressReporter",
-                            "CapabilityCatalogRepository",
-                            "C4DiagramPort");
+                            "CapabilityCatalogRepository");
         }
     }
 
