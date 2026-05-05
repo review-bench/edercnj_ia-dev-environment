@@ -4,6 +4,7 @@ description: "Generates a detailed per-task implementation plan (plan-task-TASK-
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--task-file <path> [--output-dir <dir>] [--no-commit] [--dry-run]  |  [STORY-ID] --task [TASK-ID] [--force] [--no-commit] [--dry-run]"
+context-budget: heavy
 requires-capabilities: []
 ---
 

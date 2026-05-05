@@ -138,6 +138,8 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-evaluate-runtime** | `/x-evaluate-runtime` | Evaluate runtime protection controls: rate limiting, WAF rules, bot protection, DDoS mitigation, account lockout, brute force protection, CSP enforcement, and permissions policy. Produce SARIF 2.1.0 output with ASVS compliance mapping and scored Markdown report. |
 | **x-execute-contract-tests** | `/x-execute-contract-tests` | Stack-aware contract breaking-change detection: openapi-diff (REST), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), schema registry compat (events). Pact opt-in via quality.contract.pact=true. |
 | **x-execute-tests** | `/x-execute-tests` | Runs tests with coverage reporting and threshold validation. Use whenever writing, running, or analyzing tests. Triggers on: test, coverage, TDD, unit test, integration test, test failure, coverage gap, or Definition of Done validation. |
+| **x-feature-create** | `/x-feature-create` | Create a complete feature (Epic + N Stories + Implementation Map) from a spec file, with a worktree-isolated docs/ branch, consolidated commit, and auto-merged PR into epic/XXXX. |
+| **x-feature-ideate** | `/x-feature-ideate` | Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-feature-create. |
 | **x-fix-epic-pr** | `/x-fix-epic-pr` | Discovers all PRs from an epic via execution-state.json, fetches and classifies review comments in batch, generates a consolidated findings report, applies fixes, and creates a single correction PR. Supports dry-run, explicit PR list fallback, and idempotent re-execution. |
 | **x-fix-pr** | `/x-fix-pr` | Reads PR review comments and fixes actionable ones automatically. Detects PR from argument or branch, classifies comments (actionable/suggestion/question/praise), implements fixes, and commits with proper conventional commit messages. |
 | **x-format-code** | `/x-format-code` | Formats source code using the appropriate formatter for {{LANGUAGE}}. First step of the pre-commit chain (format -> lint -> compile -> commit). Supports --check (dry-run) and --changed-only modes. |
@@ -193,7 +195,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-validate-docs** | `/x-validate-docs` | Documentation freshness gate: validates 6 dimensions (readme, api-specs, grpc-proto, adr, skill-docs, system-architecture) against code changes in a PR. Stack-aware — only validates targets declared/auto-detected from ProjectConfig.documentation.targets. Returns exit non-zero on staleness; produces structured report. |
 | **x-watch-pr-ci** | `/x-watch-pr-ci` | Polls a PR's CI checks and Copilot review status, blocking until checks complete or timeout. Returns one of 8 stable exit codes (SUCCESS=0, CI_PENDING_PROCEED=10, CI_FAILED=20, TIMEOUT=30, PR_ALREADY_MERGED=40, NO_CI_CONFIGURED=50, PR_CLOSED=60, PR_NOT_FOUND=70). Writes a versioned state-file for session resume. |
 
-**Total: 100 skills**
+**Total: 103 skills**
 
 ### Usage Examples
 
@@ -223,6 +225,7 @@ to inject domain knowledge. Configured with `user-invocable: false`.
 | `x-internal-load-story-context` | Referenced internally by agents |
 | `x-internal-map-epic` | Referenced internally by agents |
 | `x-internal-normalize-args` | Referenced internally by agents |
+| `x-internal-pr-body-render` | Referenced internally by agents |
 | `x-internal-precheck-worktree` | Referenced internally by agents |
 | `x-internal-render-pr-body` | Referenced internally by agents |
 | `x-internal-resume-story` | Referenced internally by agents |
@@ -357,8 +360,8 @@ See the files directly for current configuration.
 | Component | Count |
 |-----------|-------|
 | Rules (.claude) | 30 |
-| Skills (.claude) | 80 |
-| Knowledge Packs (.claude) | 20 |
+| Skills (.claude) | 82 |
+| Knowledge Packs (.claude) | 21 |
 | Agents (.claude) | 14 |
 | Hooks (.claude) | 17 |
 | Settings (.claude) | 2 |
