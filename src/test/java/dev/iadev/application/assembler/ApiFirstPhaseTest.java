@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for API-First Phase (Phase 0.5) in the lifecycle and x-lint-contract-tests conditional skill
- * generation.
+ * Tests for API-First Phase (Phase 0.5) in the lifecycle and x-lint-contract-tests conditional
+ * skill generation.
  *
  * <p>Covers story-0017-0007 acceptance criteria:
  *

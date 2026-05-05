@@ -6,6 +6,7 @@ user-invocable: false
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 requires-capabilities: []
+context-budget: heavy
 ---
 
 > 🔒 **INTERNAL SKILL** — Invoked only by other skills via the Skill tool. Not user-invocable.

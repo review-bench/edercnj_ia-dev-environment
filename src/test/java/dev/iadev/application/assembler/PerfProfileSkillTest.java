@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0013-0019: x-profile-performance skill and x-run-perf-tests extension with regression
- * detection.
+ * Tests for story-0013-0019: x-profile-performance skill and x-run-perf-tests extension with
+ * regression detection.
  *
  * <p>Validates that the x-profile-performance skill template is generated correctly with proper
  * frontmatter, workflow steps, profiler selection, and output modes. Also validates that

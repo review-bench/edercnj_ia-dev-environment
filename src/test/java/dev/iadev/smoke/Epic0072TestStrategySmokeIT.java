@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
  * E2E smoke test for EPIC-0072 (Comprehensive Test Strategy).
  *
  * <p>Validates the end-to-end integration of the three quality gate skills ({@code
- * x-execute-performance-tests}, {@code x-test-mutation}, {@code x-execute-contract-tests}) by asserting structural
- * invariants across SKILL.md files, audit scripts, and configuration templates. Each scenario maps
- * to a Gherkin acceptance criterion from story-0072-0009.
+ * x-execute-performance-tests}, {@code x-test-mutation}, {@code x-execute-contract-tests}) by
+ * asserting structural invariants across SKILL.md files, audit scripts, and configuration
+ * templates. Each scenario maps to a Gherkin acceptance criterion from story-0072-0009.
  */
 @Tag("smoke")
 @Tag("e2e")
@@ -295,7 +295,9 @@ class Epic0072TestStrategySmokeIT {
         String contractContent = Files.readString(CONTRACT_SKILL.toAbsolutePath());
 
         // x-execute-performance-tests stack dispatch
-        assertThat(perfContent).as("x-execute-performance-tests: REST stack → Newman").contains("Newman");
+        assertThat(perfContent)
+                .as("x-execute-performance-tests: REST stack → Newman")
+                .contains("Newman");
         assertThat(perfContent).as("x-execute-performance-tests: gRPC stack → ghz").contains("ghz");
         assertThat(perfContent)
                 .as("x-execute-performance-tests: CLI stack → hyperfine")
@@ -319,6 +321,8 @@ class Epic0072TestStrategySmokeIT {
         assertThat(contractContent)
                 .as("x-execute-contract-tests: REST/OpenAPI → openapi-diff")
                 .contains("openapi-diff");
-        assertThat(contractContent).as("x-execute-contract-tests: gRPC/proto3 → buf").contains("buf");
+        assertThat(contractContent)
+                .as("x-execute-contract-tests: gRPC/proto3 → buf")
+                .contains("buf");
     }
 }

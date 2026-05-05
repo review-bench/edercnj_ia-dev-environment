@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
  * <p>Covers the 5 canonical scenarios declared in story-0073-0007 AC:
  *
  * <ol>
- *   <li>x-implement-story Phase 3 declares x-execute-shell-regression-tests as MANDATORY conditional gate
+ *   <li>x-implement-story Phase 3 declares x-execute-shell-regression-tests as MANDATORY
+ *       conditional gate
  *   <li>DAST is CI-only — x-implement-story Phase 3 does NOT invoke x-run-dynamic-pentest
  *   <li>Regression gate has correct conditional marker and D-R11 fast-fail ordering
  *   <li>audit-regression-shell.sh + audit-dast-gate.sh exist with self-check contracts

@@ -36,7 +36,8 @@ class ArchSystemUpdateSkillTest {
     @DisplayName("skill_exists_atExpectedPath")
     void skill_exists_atExpectedPath() {
         assertThat(SKILL_FILE.toAbsolutePath())
-                .as("x-update-system-architecture SKILL.md must exist at core/plan/ (story-0070-0006)")
+                .as(
+                        "x-update-system-architecture SKILL.md must exist at core/plan/ (story-0070-0006)")
                 .exists()
                 .isRegularFile();
     }
@@ -46,7 +47,8 @@ class ArchSystemUpdateSkillTest {
     void skill_frontmatter_hasModelSonnet() throws IOException {
         String content = Files.readString(SKILL_FILE.toAbsolutePath(), StandardCharsets.UTF_8);
         assertThat(content)
-                .as("x-update-system-architecture MUST declare model: sonnet (Rule 23 — Reviewer tier)")
+                .as(
+                        "x-update-system-architecture MUST declare model: sonnet (Rule 23 — Reviewer tier)")
                 .contains("model: sonnet");
     }
 

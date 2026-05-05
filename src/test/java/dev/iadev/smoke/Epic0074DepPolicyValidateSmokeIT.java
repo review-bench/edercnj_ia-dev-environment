@@ -277,7 +277,8 @@ class Epic0074DepPolicyValidateSmokeIT {
         void scenario20_rule24_includesDepPolicyEvidenceArtifact() throws Exception {
             String content = Files.readString(RULE_24.toAbsolutePath());
             assertThat(content)
-                    .as("Rule 24 must register x-validate-dependency-policy as mandatory evidence artifact")
+                    .as(
+                            "Rule 24 must register x-validate-dependency-policy as mandatory evidence artifact")
                     .contains("x-validate-dependency-policy");
             assertThat(content)
                     .as("Rule 24 must reference dep-policy-validation-report artifact path")

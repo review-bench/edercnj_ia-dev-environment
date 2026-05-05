@@ -433,8 +433,7 @@ class SastScanSkillTest {
     private String generateAndRead(Path tempDir) throws IOException {
         generateSastOutput(tempDir);
         return Files.readString(
-                tempDir.resolve("output/skills/x-run-sast" + "/SKILL.md"),
-                StandardCharsets.UTF_8);
+                tempDir.resolve("output/skills/x-run-sast" + "/SKILL.md"), StandardCharsets.UTF_8);
     }
 
     private void generateSastOutput(Path tempDir) throws IOException {

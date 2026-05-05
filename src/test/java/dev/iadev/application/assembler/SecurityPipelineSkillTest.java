@@ -17,8 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
  * Tests for story-0022-0020: x-generate-security-pipeline skill for CI/CD pipeline generation with
  * conditional security stages.
  *
- * <p>Validates that the x-generate-security-pipeline skill template is generated correctly with proper
- * frontmatter, stage definitions, platform support, composability, and conditional stage
+ * <p>Validates that the x-generate-security-pipeline skill template is generated correctly with
+ * proper frontmatter, stage definitions, platform support, composability, and conditional stage
  * evaluation.
  */
 @DisplayName("x-generate-security-pipeline Skill")
@@ -386,6 +386,7 @@ class SecurityPipelineSkillTest {
 
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
-        return SkillContentReader.readSkillWithReferences(outputDir, "x-generate-security-pipeline");
+        return SkillContentReader.readSkillWithReferences(
+                outputDir, "x-generate-security-pipeline");
     }
 }

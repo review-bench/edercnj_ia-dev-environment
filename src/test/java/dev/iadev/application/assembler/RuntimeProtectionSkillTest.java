@@ -391,6 +391,7 @@ class RuntimeProtectionSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-evaluate-runtime" + "/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-evaluate-runtime" + "/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

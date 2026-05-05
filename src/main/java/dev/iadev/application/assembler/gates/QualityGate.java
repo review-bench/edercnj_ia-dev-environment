@@ -8,8 +8,8 @@ import java.util.List;
  * Contributes quality-gate skills based on {@code quality.*} config (EPIC-0072).
  *
  * <p>Adds {@code x-execute-performance-tests} when {@code quality.performance.enabled=true}, {@code
- * x-execute-mutation-tests} when {@code quality.mutation.enabled=true}, and {@code x-execute-contract-tests} when
- * {@code quality.contract.enabled=true} (EPIC-0072).
+ * x-execute-mutation-tests} when {@code quality.mutation.enabled=true}, and {@code
+ * x-execute-contract-tests} when {@code quality.contract.enabled=true} (EPIC-0072).
  */
 public final class QualityGate implements SkillGateEvaluator {
 

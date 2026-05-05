@@ -5,6 +5,7 @@ description: "Thin orchestrator (~460 lines — story-0049-0018 refactor) that d
 user-invocable: true
 allowed-tools: Read, Write, Glob, Skill, Agent, AskUserQuestion, TaskCreate, TaskUpdate
 argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--non-interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"
+context-budget: medium
 requires-capabilities: []
 ---
 

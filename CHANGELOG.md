@@ -18,6 +18,8 @@ EPIC-0077 introduz a hierarquia de planejamento **Product → Capability → Fea
 - **ADR-0030** `docs/adr/ADR-0030-rule14-product-first-domain.md`: amenda a Rule 14 para autorizar os 4 pacotes do domínio Product-First com critério de eligibilidade de 3 condições.
 - **Rule 14 §Product-First Domain Extension**: seção adicionada à Rule 14 documentando os pacotes autorizados, suas entidades e seu papel no pipeline de geração.
 
+## [5.2.0] - 2026-05-04
+
 ### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)
 
 Antes desta release, a convenção de nomes das ~100 skills do repositório misturava padrões noun-first (`x-epic-implement`, `x-story-plan`) e verb-first (`x-create-pr`, `x-run-sast`), gerando inconsistência cognitiva na hora de invocar, descobrir ou documentar skills.
