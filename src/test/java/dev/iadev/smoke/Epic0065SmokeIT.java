@@ -45,8 +45,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
     // re-introduced by EPIC-0077 as Product-First lifecycle skills with narrower responsibilities
     // (Feature-derived creation only), completely different from the old orchestrators hard-cut
     // by EPIC-0065. x-epic-map and x-epic-decompose remain hard-cut.
-    private static final List<String> HARD_CUT_SKILLS =
-            List.of("x-epic-decompose", "x-epic-map");
+    private static final List<String> HARD_CUT_SKILLS = List.of("x-epic-decompose", "x-epic-map");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
