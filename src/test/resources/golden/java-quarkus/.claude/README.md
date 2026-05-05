@@ -162,7 +162,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-model-threats** | `/x-model-threats` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 | **x-orchestrate-epic** | `/x-orchestrate-epic` | Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support. |
 | **x-plan-architecture** | `/x-plan-architecture` | Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions. |
-| **x-plan-story** | `/x-plan-story` | Multi-agent story planning: launches 5 specialized agents (Architect, QA, Security, Tech Lead, Product Owner) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel. |
+| **x-plan-story** | `/x-plan-story` | Multi-agent story planning: launches 7 specialized agents (Architect, QA, Security, PentestEngineer, TechLead, ProductOwner, PerformanceEngineer) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel. |
 | **x-plan-task** | `/x-plan-task` | Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-plan-story (future). |
 | **x-plan-tests** | `/x-plan-tests` | Generates a Double-Loop TDD test plan with TPP-ordered scenarios before implementation. Delegates KP reading to a context-gathering subagent, then produces structured Acceptance Tests (outer loop) and Unit Tests in Transformation Priority Premise order (inner loop). |
 | **x-profile-performance** | `/x-profile-performance` | Automated profiling: detect language/runtime, select appropriate profiler, execute session, generate flamegraph, identify hotspots, and suggest optimizations referencing the performance-engineering knowledge pack. |
@@ -252,6 +252,7 @@ they are used by skills (via Task tool) to delegate work to agents with specific
 | **devsecops-engineer** | `devsecops-engineer.md` |
 | **event-engineer** | `event-engineer.md` |
 | **java-developer** | `java-developer.md` |
+| **pentest-engineer** | `pentest-engineer.md` |
 | **performance-engineer** | `performance-engineer.md` |
 | **product-owner** | `product-owner.md` |
 | **qa-engineer** | `qa-engineer.md` |
@@ -259,7 +260,7 @@ they are used by skills (via Task tool) to delegate work to agents with specific
 | **sre-engineer** | `sre-engineer.md` |
 | **tech-lead** | `tech-lead.md` |
 
-**Total: 14 agents**
+**Total: 15 agents**
 
 ---
 
@@ -359,7 +360,7 @@ See the files directly for current configuration.
 | Rules (.claude) | 30 |
 | Skills (.claude) | 80 |
 | Knowledge Packs (.claude) | 20 |
-| Agents (.claude) | 14 |
+| Agents (.claude) | 15 |
 | Hooks (.claude) | 17 |
 | Settings (.claude) | 2 |
 | Plan Templates (.claude) | 29 |

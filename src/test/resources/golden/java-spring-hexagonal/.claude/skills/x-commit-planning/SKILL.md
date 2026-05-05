@@ -32,7 +32,7 @@ RULE-007 of EPIC-0049 requires every planning skill to delegate to this skill at
 | Argument | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `--epic-id` | String (4 digits) | Yes | — | Epic number used in the commit scope (`docs(epic-0049): ...`). Regex `^\d{4}$`. |
-| `--paths` | Comma-separated list | Yes | — | Paths to stage + commit. Each path MUST exist AND be inside the whitelist (`plans/**` or `.claude/templates/**`). NEVER `git add .`. |
+| `--paths` | Comma-separated list | Yes | — | Paths to stage + commit. Each path MUST exist AND be inside the whitelist (`plans/**`, `.claude/templates/**`, `ai/epics/**`, `ai/products/**`, `ai/memory/**`, or `ai/releases/**`). NEVER `git add .`. |
 | `--subject` | String (≤ 72 chars) | Yes | — | Conventional Commits subject (imperative mood, no trailing period). |
 | `--scope` | Enum | No | `docs` | Conventional Commits type: `chore` or `docs`. |
 | `--body` | String (≤ 4096 chars) | No | — | Optional multi-line commit body. |
@@ -53,6 +53,10 @@ Allowed path prefixes (enforced before any `git add`):
 
 - `plans/` (any depth — epic / story / task plans, reports, execution-state, implementation map)
 - `.claude/templates/` (when a planning skill ships an updated template)
+- `ai/epics/` (v4 layout — epic/story/task plans and reports under ai/epics/epic-XXXX-slug/)
+- `ai/products/` (product artifact directory — capabilities, features, stories per product)
+- `ai/memory/` (AI memory layer artifacts — epic summaries, index)
+- `ai/releases/` (release state files — release-state-X.Y.Z.json)
 
 Any `--paths` entry that resolves outside this whitelist FAILS with `PATH_NOT_WHITELISTED`.
 
@@ -61,7 +65,7 @@ Any `--paths` entry that resolves outside this whitelist FAILS with `PATH_NOT_WH
 1. Parse args. Validate `--epic-id` matches `^\d{4}$`; else `INVALID_EPIC_ID` (exit 3).
 2. Split `--paths` on comma. For each path:
    - Reject if it does not exist on disk → `PATH_NOT_EXISTS` (exit 2).
-   - Reject if it does not start with `plans/` nor `.claude/templates/` → `PATH_NOT_WHITELISTED` (exit 1).
+   - Reject if it does not start with any whitelisted prefix (`plans/`, `.claude/templates/`, `ai/epics/`, `ai/products/`, `ai/memory/`, `ai/releases/`) → `PATH_NOT_WHITELISTED` (exit 1).
 3. Validate `--subject` length ≤ 72 chars; reject non-imperative with a WARN but proceed (soft validation).
 4. If `--dry-run`: print `{"dryRun": true, "commitSha": null, "filesCommitted": [<paths>], "noOp": false}` and exit 0.
 5. Execute `git add <paths...>` (explicit list; NEVER `git add .`).
@@ -82,7 +86,7 @@ Any `--paths` entry that resolves outside this whitelist FAILS with `PATH_NOT_WH
 
 | Exit Code | Error Code | Condition | Message |
 |-----------|------------|-----------|---------|
-| 1 | `PATH_NOT_WHITELISTED` | Path outside `plans/**` or `.claude/templates/**` | `"Path '<p>' not in whitelist (plans/** or .claude/templates/**)"` |
+| 1 | `PATH_NOT_WHITELISTED` | Path outside all whitelisted prefixes | `"Path '<p>' not in whitelist (plans/**, .claude/templates/**, ai/epics/**, ai/products/**, ai/memory/**, ai/releases/**)"` |
 | 2 | `PATH_NOT_EXISTS` | Path does not exist on disk | `"Path '<p>' does not exist"` |
 | 3 | `INVALID_EPIC_ID` | `--epic-id` does not match `^\d{4}$` | `"Epic ID must be 4 digits, got '<value>'"` |
 | 4 | `COMMIT_FAILED` | `git commit` returned non-zero | `"git commit failed: <stderr>"` |
