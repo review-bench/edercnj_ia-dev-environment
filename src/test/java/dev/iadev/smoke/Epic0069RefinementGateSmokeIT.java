@@ -51,6 +51,24 @@ class Epic0069RefinementGateSmokeIT {
         assertThat(r.exitCode).as("exit 0 on approved").isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("hook exits 34 when approved story relaxes inherited SECURITY RNF")
+    void hook_blocksWhen_rnfInheritanceViolation(@TempDir Path tmp) throws Exception {
+        setupEpic(tmp, "0099", "4", "approved");
+        writeStoryMd(
+                tmp,
+                "0099",
+                "story-0099-0001",
+                "| SECURITY | encrypt-data | false | tls-optional | rollout exception | APPROVED | security-team |");
+        ProcessResult r =
+                runHookWithPayload(
+                        tmp,
+                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-implement-story\","
+                                + "\"args\":\"story-0099-0001\"}}");
+        assertThat(r.exitCode).as("exit 34 on RNF inheritance violation").isEqualTo(34);
+        assertThat(r.stderr).contains("RNF_INHERITANCE_VIOLATION");
+    }
+
     // ─── Scenario 2: absent verdict blocks (REFINEMENT_REQUIRED) ───────────
 
     @Test
@@ -75,6 +93,22 @@ class Epic0069RefinementGateSmokeIT {
         ProcessResult r = runAudit(tmp, "--story", "story-0099-0001");
         assertThat(r.exitCode).as("exit 1 on rejected").isEqualTo(1);
         assertThat(r.stderr).contains("REFINEMENT_GATE_VIOLATION").contains("rejected-verdict");
+    }
+
+    @Test
+    @DisplayName("audit exits 1 when approved story has RNF inheritance violation")
+    void audit_failsWhen_rnfInheritanceViolation(@TempDir Path tmp) throws Exception {
+        setupRepoForAudit(tmp, "0099", "approved");
+        writeStoryMd(
+                tmp,
+                "0099",
+                "story-0099-0001",
+                "| SECURITY | encrypt-data | false | tls-optional | rollout exception | APPROVED | security-team |");
+        ProcessResult r = runAudit(tmp, "--story", "story-0099-0001");
+        assertThat(r.exitCode).as("exit 1 on RNF inheritance violation").isEqualTo(1);
+        assertThat(r.stderr)
+                .contains("REFINEMENT_GATE_VIOLATION")
+                .contains("rnf-inheritance-violation");
     }
 
     // ─── Scenario 4: legacy flowVersion=1 is no-op ─────────────────────────
@@ -107,7 +141,7 @@ class Epic0069RefinementGateSmokeIT {
     //                 but NOT epic ────────────────────────────────────────────
 
     @Test
-    @DisplayName("epic-scope approved verdict allows x-epic-implement at epic level")
+    @DisplayName("epic-scope approved verdict allows x-implement-epic at epic level")
     void hook_allowsEpicWhen_epicScopeApproved(@TempDir Path tmp) throws Exception {
         Path epicDir = tmp.resolve("ai/epics/epic-0099-test");
         Files.createDirectories(epicDir);
@@ -123,7 +157,7 @@ class Epic0069RefinementGateSmokeIT {
         ProcessResult r =
                 runHookWithPayload(
                         tmp,
-                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-epic-implement\","
+                        "{\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"x-implement-epic\","
                                 + "\"args\":\"epic-0099\"}}");
         assertThat(r.exitCode).as("exit 0 on epic-scope approved").isEqualTo(0);
     }
@@ -204,6 +238,34 @@ class Epic0069RefinementGateSmokeIT {
                 tmp.resolve("governance/baselines/refinement-gate-baseline.txt"),
                 "# refinement-gate-baseline.txt\n");
         setupEpic(tmp, epicNum, "4", verdictStatus);
+    }
+
+    private void writeStoryMd(Path tmp, String epicNum, String storyId, String rnfRow)
+            throws IOException {
+        StringBuilder content =
+                new StringBuilder(
+                        """
+                        # Story fixture
+
+                        ## 9. Refinement Verdict
+
+                        > approved fixture
+                        """);
+        if (rnfRow != null && !rnfRow.isBlank()) {
+            content.append(
+                    """
+
+                    ## 2. RNFs Herdadas
+
+                    | Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |
+                    | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+                    """);
+            content.append(rnfRow).append(System.lineSeparator()).append(System.lineSeparator());
+            content.append("## 3. Next Section").append(System.lineSeparator());
+        }
+        Files.writeString(
+                tmp.resolve("ai/epics/epic-" + epicNum + "-test/" + storyId + ".md"),
+                content.toString());
     }
 
     private ProcessResult runHookWithPayload(Path projectDir, String payload) throws Exception {

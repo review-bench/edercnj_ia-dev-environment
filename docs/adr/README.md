@@ -35,6 +35,7 @@
 | ADR-0029 | [Verb-First Skill Naming Convention (EPIC-0076)](ADR-0029-verb-first-skill-naming.md) | Accepted | 2026-05-03 |
 | ADR-0030 | [Rule 14 Extension for Product-First Runtime Domain (EPIC-0077)](ADR-0030-rule14-product-first-domain.md) | Accepted | 2026-05-04 |
 | ADR-0031 | [Product-First Capability Registration (EPIC-0077)](ADR-0031-product-first-capability-registration.md) | Accepted | 2026-05-04 |
+| ADR-0032 | [Product-First Lifecycle Finalization (EPIC-0077)](ADR-0032-product-first-lifecycle-finalization.md) | Accepted | 2026-05-05 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.

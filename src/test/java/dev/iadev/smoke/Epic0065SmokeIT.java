@@ -21,8 +21,12 @@ import org.junit.jupiter.params.provider.MethodSource;
  *   <li>{@code x-feature-create} is present as a public skill (replaces x-epic-decompose)
  *   <li>{@code x-internal-epic-create}, {@code x-internal-epic-map}, {@code
  *       x-internal-story-create} are present as internal skills
- *   <li>{@code x-epic-decompose}, {@code x-epic-create}, {@code x-epic-map}, {@code x-story-create}
+ *   <li>{@code x-epic-decompose}, {@code x-epic-map}
  *       are NOT present as public skills (hard-cut per Rule 19 §Hard-cut autorizado)
+ *   <li>{@code x-epic-create} remains absent until EPIC-0077 story-0024, where it is reintroduced
+ *       with narrower Feature → Epic semantics
+ *   <li>{@code x-story-create} remains absent until EPIC-0077 story-0025, where it is reintroduced
+ *       with narrower Feature → Story semantics
  *   <li>Rule 09 contains the {@code docs/} branch type addition
  *   <li>Rule 19 contains the "Hard-cut autorizado" clause
  *   <li>Rule 22 contains the 3 new internal skills table
@@ -42,7 +46,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     // Skills that must NOT exist as public skills after EPIC-0065 hard-cut
     private static final List<String> HARD_CUT_SKILLS =
-            List.of("x-epic-decompose", "x-epic-create", "x-epic-map", "x-story-create");
+            List.of("x-epic-decompose", "x-epic-map");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
