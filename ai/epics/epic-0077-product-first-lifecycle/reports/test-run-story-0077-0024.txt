@@ -1,0 +1,18 @@
+Test run — story-0077-0024
+Executed: 2026-05-05T22:00:00Z
+Suite: XEpicCreateCommandTest, EpicFromFeatureArtifactWriterTest, FeatureEpicSourceLoaderTest, FeatureMarkdownParserTest
+
+PASS  XEpicCreateCommandTest.help_displaysUsage
+PASS  XEpicCreateCommandTest.missingFromFeature_exitsWith2
+PASS  XEpicCreateCommandTest.dryRun_printsEpicWithoutWriting
+PASS  XEpicCreateCommandTest.validFeatureFile_writesEpicArtifact
+PASS  EpicFromFeatureArtifactWriterTest.write_producesEpicWithSourceFeatureAndInheritedRnfs
+PASS  FeatureEpicSourceLoaderTest.load_happyPath_returnsFullSourceWithRnfChain
+PASS  FeatureEpicSourceLoaderTest.load_missingFeatureFile_throwsIllegalArgument
+PASS  FeatureMarkdownParserTest.parse_extractsSectionsCorrectly
+
+Results: 8 passed, 0 failed, 0 skipped
+
+Supporting tests also passing:
+PASS  Epic0077ProductFirstSmokeIT (1 scenario — end-to-end lifecycle)
+PASS  GoldenFileTest (9 profiles — x-epic-create SKILL.md included)
