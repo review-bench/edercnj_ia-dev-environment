@@ -367,7 +367,7 @@
       ]
     },
     "story-0077-0023": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 6",
       "predecessors": [
         "story-0077-0022"
@@ -376,10 +376,12 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "3c782f4e90cda740b3324ba77c838070529de8430d8e78ddeb1d40564e4c6b31"
-      }
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1035]
     },
     "story-0077-0024": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 6",
       "predecessors": [
         "story-0077-0023"
@@ -388,10 +390,12 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "9806799a80c1414639a34954eb78aa0c79059577912e49e07097baaa1ec68eb6"
-      }
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1036]
     },
     "story-0077-0025": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 6",
       "predecessors": [
         "story-0077-0024"
@@ -400,10 +404,12 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "e1ace86fc597fe654875694dcdbc4ea410316d30893b5f01dee254c47fd55f8d"
-      }
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1037]
     },
     "story-0077-0026": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 7",
       "predecessors": [
         "story-0077-0025"
@@ -412,10 +418,12 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "79cd65dda6d6bd8ef35053bb7e9ab50d51628c114e84145f396ac73c5384a70f"
-      }
+      },
+      "completedAt": "2026-05-05T19:15:00Z",
+      "prNumbers": [1038]
     },
     "story-0077-0027": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 7",
       "predecessors": [
         "story-0077-0026"
@@ -424,10 +432,12 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "15565dcb3b3d358e800b8fa6b81292fb5b7d74f493d937e2a76f4fdad87dbe47"
-      }
+      },
+      "completedAt": "2026-05-05T19:30:00Z",
+      "prNumbers": [1039]
     },
     "story-0077-0028": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 7",
       "predecessors": [
         "story-0077-0027"
@@ -436,7 +446,9 @@
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
         "verdictHash": "a577508b40c580b2218f3fe1f00a71006510a8ff9e441b26bc768fb9ae0997cb"
-      }
+      },
+      "completedAt": "2026-05-05T19:45:00Z",
+      "prNumbers": [1040]
     }
   },
   "totalStories": 30,
