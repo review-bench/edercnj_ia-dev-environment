@@ -1,6 +1,6 @@
 ---
 name: x-plan-story
-description: "Multi-agent story planning: launches 5 specialized agents (Architect, QA, Security, Tech Lead, Product Owner) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel."
+description: "Multi-agent story planning: launches 7 specialized agents (Architect, QA, Security, PentestEngineer, TechLead, ProductOwner, PerformanceEngineer) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[STORY-ID] [--force] [--skip-dor] [--dry-run] [--no-commit]"
@@ -17,7 +17,7 @@ requires-capabilities: []
 ## Triggers
 
 ```
-/x-plan-story STORY-ID             — plan story with 5 parallel agents
+/x-plan-story STORY-ID             — plan story with 7 parallel agents
 /x-plan-story STORY-ID --force     — regenerate even if artifacts are fresh
 /x-plan-story STORY-ID --skip-dor  — skip Phase 5 DoR validation
 /x-plan-story STORY-ID --dry-run   — write artifacts but skip subagent/commit steps
@@ -89,7 +89,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-s
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-story Phase-2-Parallel-Planning`
 
-**Phase 2 (Parallel Planning):** Dispatch 5 subagents in a **single message** (Rule 13 Pattern 2 — SUBAGENT-GENERAL) for true parallelism.
+**Phase 2 (Parallel Planning):** Dispatch 7 subagents in a **single message** (Rule 13 Pattern 2 — SUBAGENT-GENERAL) for true parallelism.
 
 <!-- TELEMETRY: subagent.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story Architect`
@@ -98,17 +98,23 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 <!-- TELEMETRY: subagent.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story Security`
 <!-- TELEMETRY: subagent.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story PentestEngineer`
+<!-- TELEMETRY: subagent.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story TechLead`
 <!-- TELEMETRY: subagent.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story PO`
+<!-- TELEMETRY: subagent.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-start x-plan-story PerformanceEngineer`
 
-Dispatch all 5 in ONE assistant message:
+Dispatch all 7 in ONE assistant message:
 
     Agent(subagent_type: "general-purpose", model: "opus", description: "Architect — story {STORY_ID}", prompt: "You are a Senior Architect. Read context files. Analyze story {STORY_ID}. Produce TASK_PROPOSAL entries (architecture, layers, dependencies). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "general-purpose", model: "sonnet", description: "QA — story {STORY_ID}", prompt: "You are a QA Specialist. Read context files. Produce TASK_PROPOSAL entries (tests, coverage, acceptance criteria). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "general-purpose", model: "sonnet", description: "Security — story {STORY_ID}", prompt: "You are a Security Specialist. Read knowledge/security/application-security.md, knowledge/security/security-principles.md, and context files. Produce TASK_PROPOSAL entries (security, OWASP, threat model). Follow TASK_PROPOSAL format in references/full-protocol.md.")
+    Agent(subagent_type: "general-purpose", model: "sonnet", description: "PentestEngineer — story {STORY_ID}", prompt: "You are a Penetration Test Engineer. Read capabilities/quality/pentest/pentest-always-on.yaml and context files. Produce TASK_PROPOSAL entries (pentest scenarios, CVSS-rated vulnerabilities, exploitation paths). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "general-purpose", model: "sonnet", description: "TechLead — story {STORY_ID}", prompt: "You are a Tech Lead. Read context files. Produce TASK_PROPOSAL entries (code quality, SOLID, complexity). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "general-purpose", model: "sonnet", description: "PO — story {STORY_ID}", prompt: "You are a Product Owner. Read knowledge/compliance.md and context files. Produce TASK_PROPOSAL entries (business value, acceptance, DoD, compliance). Follow TASK_PROPOSAL format in references/full-protocol.md.")
+    Agent(subagent_type: "general-purpose", model: "sonnet", description: "PerformanceEngineer — story {STORY_ID}", prompt: "You are a Performance Engineer. Read context files. Produce TASK_PROPOSAL entries (latency SLAs, throughput targets, load testing scenarios). Follow TASK_PROPOSAL format in references/full-protocol.md.")
 
 <!-- TELEMETRY: subagent.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story Architect ok`
@@ -117,9 +123,13 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end
 <!-- TELEMETRY: subagent.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story Security ok`
 <!-- TELEMETRY: subagent.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story PentestEngineer ok`
+<!-- TELEMETRY: subagent.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story TechLead ok`
 <!-- TELEMETRY: subagent.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story PO ok`
+<!-- TELEMETRY: subagent.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end x-plan-story PerformanceEngineer ok`
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-story Phase-2-Parallel-Planning ok`

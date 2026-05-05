@@ -1,0 +1,22 @@
+{
+  "storyId": "story-0077-0009",
+  "epicId": "epic-0077",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "testsTotal": 4861,
+  "testsFailed": 0,
+  "tasksCompleted": ["TASK-0077-0009-001", "TASK-0077-0009-002", "TASK-0077-0009-003", "TASK-0077-0009-004"],
+  "artifactsPresent": [
+    "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/security-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/compliance-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/review-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/techlead-review-story-0077-0009.md",
+    "ai/epics/epic-0077-product-first-lifecycle/reports/story-completion-report-0077-0009.md"
+  ],
+  "verifiedAt": "2026-05-04T00:00:00Z"
+}

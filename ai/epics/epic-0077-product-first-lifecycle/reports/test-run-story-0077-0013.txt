@@ -1,0 +1,21 @@
+Test run — story-0077-0013
+Executed: 2026-05-05T14:30:00Z
+Suite: XArchPlanC4SmokeTest (src/test/java/dev/iadev/adapter/inbound/cli/XArchPlanC4SmokeTest.java)
+
+PASS  product_mermaid_generatesContextAndContainerDiagrams
+PASS  capability_mermaid_generatesContainerAndComponentDiagrams
+PASS  defaultFormat_isMermaid
+PASS  plantumlFormat_producesDifferentContent
+PASS  product_htmlEscapingInDiagrams
+PASS  capability_htmlEscapingInDiagrams
+
+Results: 6 passed, 0 failed, 0 skipped
+
+Supporting tests also passing:
+PASS  C4IntegrityValidatorTest (8 scenarios)
+PASS  C4OutputFormatTest (4 scenarios)
+PASS  ProductC4PlannerTest
+PASS  CapabilityC4PlannerTest
+
+Note: Tests for C4LevelValidator, ArchitectureRefactoringUseCase, ProductC4Model,
+CapabilityC4Model are pending TASK-0077-0013-001 and TASK-0077-0013-002.

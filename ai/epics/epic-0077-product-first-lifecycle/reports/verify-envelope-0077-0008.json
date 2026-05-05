@@ -1,0 +1,20 @@
+{
+  "storyId": "story-0077-0008",
+  "epicId": "epic-0077",
+  "status": "passed",
+  "verifiedAt": "2026-05-04T21:34:19Z",
+  "headSha": "0ec45061189516f62d95038de224df071888934a",
+  "tasks": [
+    { "id": "TASK-0077-0008-001", "status": "DONE", "prNumber": 985, "commitSha": "8e3ad552d" },
+    { "id": "TASK-0077-0008-002", "status": "DONE", "prNumber": 986, "commitSha": "9d4e540f6" },
+    { "id": "TASK-0077-0008-003", "status": "DONE", "prNumber": 987, "commitSha": "207e11e75" }
+  ],
+  "testCount": 4811,
+  "coverageLine": 96.2,
+  "coverageBranch": 91.5,
+  "qualityGates": {
+    "review": "GO",
+    "techLeadReview": "GO",
+    "smokeTest": "PASS"
+  }
+}

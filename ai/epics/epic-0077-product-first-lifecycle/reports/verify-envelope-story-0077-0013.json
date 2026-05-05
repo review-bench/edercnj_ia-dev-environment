@@ -1,0 +1,40 @@
+{
+  "storyId": "story-0077-0013",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T14:30:00Z",
+  "status": "partial",
+  "note": "Story partially implemented. C4 diagram generation (ProductC4Planner, CapabilityC4Planner, XArchPlanProductCommand, XArchPlanCapabilityCommand) delivered and tested. C4LevelValidator (mandatory 3-level check), ArchitectureRefactoringUseCase, ProductC4Model, CapabilityC4Model, and C4DiagramGenerator are pending TASK-0077-0013-001 and TASK-0077-0013-002.",
+  "coverage": {
+    "lineThreshold": 95,
+    "branchThreshold": 90,
+    "status": "pending_full_implementation"
+  },
+  "implementedFiles": [
+    "src/main/java/dev/iadev/domain/architecture/C4Diagram.java",
+    "src/main/java/dev/iadev/domain/architecture/C4OutputFormat.java",
+    "src/main/java/dev/iadev/domain/architecture/ProductC4Planner.java",
+    "src/main/java/dev/iadev/domain/architecture/CapabilityC4Planner.java",
+    "src/main/java/dev/iadev/adapter/inbound/cli/XArchPlanProductCommand.java",
+    "src/main/java/dev/iadev/adapter/inbound/cli/XArchPlanCapabilityCommand.java",
+    "src/test/java/dev/iadev/adapter/inbound/cli/XArchPlanC4SmokeTest.java"
+  ],
+  "pendingFiles": [
+    "domain/architecture/C4LevelValidator.java",
+    "domain/architecture/ProductC4Model.java",
+    "domain/architecture/CapabilityC4Model.java",
+    "application/architecture/ArchitectureRefactoringUseCase.java",
+    "adapter/outbound/documentation/C4DiagramGenerator.java",
+    "adapter/outbound/documentation/C4PlaceholderGenerator.java"
+  ],
+  "smokeTests": {
+    "XArchPlanC4SmokeTest": "passed",
+    "scenarios": [
+      "product_mermaid_generatesContextAndContainerDiagrams",
+      "capability_mermaid_generatesContainerAndComponentDiagrams",
+      "defaultFormat_isMermaid",
+      "plantumlFormat_producesDifferentContent",
+      "product_htmlEscapingInDiagrams",
+      "capability_htmlEscapingInDiagrams"
+    ]
+  }
+}

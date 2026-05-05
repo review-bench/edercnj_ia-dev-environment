@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Highlights — EPIC-0077 (Product-First Lifecycle & Planning C4 Model)
+
+EPIC-0077 introduz a hierarquia de planejamento **Product → Capability → Feature → Epic → Story → Task** como domain model de primeira classe no pipeline do `ia-dev-env`. Uma declaração `Product` no YAML do projeto determina quais capability bundles são ativados; cada `Capability` mapeia para skills, rules e templates que são incluídos ou excluídos do `.claude/` gerado.
+
+**ADR-0030** estende a Rule 14 (Project Scope Guard) para autorizar os pacotes `domain/products/`, `domain/capabilities/`, `domain/features/` e `domain/planning/rnf-validation/` — todos servem o pipeline de geração e não contradizem o scope guard original.
+
+### Added — EPIC-0077 story-0077-0000 (Rule 14 Amendment & ADR-0030)
+
+- **ADR-0030** `docs/adr/ADR-0030-rule14-product-first-domain.md`: amenda a Rule 14 para autorizar os 4 pacotes do domínio Product-First com critério de eligibilidade de 3 condições.
+- **Rule 14 §Product-First Domain Extension**: seção adicionada à Rule 14 documentando os pacotes autorizados, suas entidades e seu papel no pipeline de geração.
+
 ## [5.2.0] - 2026-05-04
 
 ### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)

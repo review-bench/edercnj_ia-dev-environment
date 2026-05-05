@@ -1,6 +1,6 @@
 ---
 requires-capabilities: [governance.value-driven-templates]
-template-version: "2.0"
+template-version: "3.0"
 ---
 
 # Épico: <Título do Épico>
@@ -9,6 +9,8 @@ template-version: "2.0"
 **Data:** <Data de criação>
 **Versão:** <Versão do documento>
 **Status:** <Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada>
+**Source Feature:** <feature-id or N/A>  _(optional — N/A when epic was not originated from a Feature)_
+**Source Feature Link:** <url or —>
 
 > **Status Transitions (Rule 29 — refinement-gate):**
 > artifacts lifecycle-controlados (Story/Task) usam o enum canônico
@@ -47,6 +49,20 @@ template-version: "2.0"
 ### In-Flight Reference Allowance
 
 (Nenhuma dependência em voo declarada.)
+
+---
+
+## 0.6 Inherited RNFs
+
+> **Read-only — inherited from Feature → Capability → Product chain.**
+> These non-functional requirements are propagated from the source feature declared above (field `Source Feature`).
+> They cannot be overridden at the epic level — contact the product owner to change them at source.
+> If this epic has no source feature (`Source Feature: N/A`), mark all rows as `(none)`.
+
+| RNF ID | Source Level | Requirement | Waivable? |
+| :--- | :--- | :--- | :--- |
+| <RNF-ID — ex: SEC-001> | Product / Capability / Feature | <Non-functional requirement text> | No |
+| (none — source feature N/A) | — | — | — |
 
 ---
 

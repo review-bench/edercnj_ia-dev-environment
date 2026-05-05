@@ -1,0 +1,26 @@
+{
+  "storyId": "story-0077-0023",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T18:30:00Z",
+  "passed": true,
+  "coverageLine": 96.2,
+  "coverageBranch": 91.5,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0023.md",
+    "implementationFiles": [
+      "src/main/resources/targets/claude/hooks/enforce-refinement-gate.sh",
+      "src/test/bash/enforce_refinement_gate_test.sh"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story implements RNF_INHERITANCE_VIOLATION gate (exit 34) in enforce-refinement-gate.sh Camada 0 hook"
+}

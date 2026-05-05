@@ -1,0 +1,30 @@
+{
+  "storyId": "story-0077-0025",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T19:00:00Z",
+  "passed": true,
+  "coverageLine": 96.1,
+  "coverageBranch": 91.2,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0025.md",
+    "implementationFiles": [
+      "src/main/java/dev/iadev/adapter/inbound/cli/XStoryCreateCommand.java",
+      "src/main/java/dev/iadev/adapter/outbound/feature/StoryFromFeatureArtifactWriter.java",
+      "src/main/java/dev/iadev/application/feature/CreateStoriesFromFeatureUseCase.java",
+      "src/main/java/dev/iadev/application/feature/CreateStoriesFromFeatureResult.java",
+      "src/main/resources/targets/claude/skills/core/plan/x-story-create/SKILL.md",
+      "src/main/resources/targets/claude/skills/core/internal/plan/x-internal-create-story/SKILL.md"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story implements x-story-create --from-feature with v2 template, dropping sections 2/4/8"
+}

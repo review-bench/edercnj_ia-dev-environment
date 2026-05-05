@@ -1,0 +1,28 @@
+{
+  "storyId": "story-0077-0000",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-04T15:30:00Z",
+  "passed": true,
+  "phase1Artifacts": {
+    "arch": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0000.md", "exists": true },
+    "impl": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0000.md", "exists": true },
+    "tests": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0000.md", "exists": true },
+    "tasks": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0000.md", "exists": true },
+    "security": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/security-story-0077-0000.md", "exists": true },
+    "compliance": { "path": "ai/epics/epic-0077-product-first-lifecycle/plans/compliance-story-0077-0000.md", "exists": true }
+  },
+  "taskPRs": [
+    { "taskId": "TASK-0077-0000-001", "pr": 959, "status": "MERGED", "branch": "feat/task-0077-0000-001-rule14-adr" },
+    { "taskId": "TASK-0077-0000-002", "pr": 960, "status": "MERGED", "branch": "feat/task-0077-0000-002-rule14-extension" }
+  ],
+  "mvnTest": "PASS",
+  "testCount": 4711,
+  "failures": 0,
+  "ruleCompliance": {
+    "rule14_ocp": "PASS — Product-First Domain Extension is additive; existing scope guard unchanged",
+    "rule14_adr_cross_reference": "PASS — ADR-0030 cited in Rule 14 §Product-First Domain Extension",
+    "adr_format": "PASS — ADR-0030 follows standard template with Status, Date, Context, Decision, Alternatives, Consequences",
+    "changelog_updated": "PASS — CHANGELOG.md [Unreleased] section updated with EPIC-0077 story-0077-0000 entries"
+  },
+  "summary": "story-0077-0000 delivered ADR-0030 authorizing the 4 Product-First domain packages and extended Rule 14 source of truth with the §Product-First Domain Extension section. Both task PRs merged to epic/0077. All tests pass."
+}

@@ -1,0 +1,28 @@
+{
+  "storyId": "story-0077-0024",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T18:45:00Z",
+  "passed": true,
+  "coverageLine": 96.4,
+  "coverageBranch": 91.8,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0024.md",
+    "implementationFiles": [
+      "src/main/java/dev/iadev/adapter/inbound/cli/XEpicCreateCommand.java",
+      "src/main/java/dev/iadev/application/feature/CreateEpicFromFeatureUseCase.java",
+      "src/main/java/dev/iadev/adapter/outbound/feature/EpicFromFeatureArtifactWriter.java",
+      "src/main/resources/targets/claude/skills/core/plan/x-epic-create/SKILL.md"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story implements x-epic-create --from-feature with v5 template, dropping sections 2/4/8"
+}

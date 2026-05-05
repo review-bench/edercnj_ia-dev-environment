@@ -1,0 +1,7 @@
+id: product-first.c4-model-mandatory
+name: C4 Model Mandatory Planning
+description: Enforces C4 model (Context, Container, Component, Code) diagrams as a mandatory artifact in feature and epic planning. When active, x-create-feature and x-internal-map-epic require a C4 diagram section in generated planning artifacts.
+category: product-first
+universal: false
+requires: []
+excludes: []

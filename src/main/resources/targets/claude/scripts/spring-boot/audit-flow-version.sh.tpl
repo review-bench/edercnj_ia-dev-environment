@@ -11,7 +11,7 @@ esac
 violations=0
 while IFS= read -r -d '' state; do
   fv=$(jq -r '.flowVersion // empty' "$state" 2>/dev/null)
-  case "$fv" in "1"|"2"|"4") ;; *)
+  case "$fv" in "1"|"2"|"3"|"4"|"5") ;; *)
     echo "FLOW_VERSION_VIOLATION: $state has flowVersion='$fv'" >&2
     violations=$((violations + 1)) ;;
   esac

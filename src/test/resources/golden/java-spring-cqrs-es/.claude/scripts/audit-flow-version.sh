@@ -36,7 +36,7 @@ REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 # AUDIT_FLOW_VERSION_PLANS_GLOB env var overrides the default scan target.
 # Used by bats tests and CI workflows that need to point at fixture dirs.
 PLANS_GLOB="${AUDIT_FLOW_VERSION_PLANS_GLOB:-${REPO_ROOT}/ai/epics/epic-*/execution-state.json}"
-VALID_VALUES=("1" "2")
+VALID_VALUES=("1" "2" "3" "4" "5")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -154,7 +154,7 @@ for file in "${files[@]}"; do
       warnings=$((warnings + 1))
     fi
   elif ! is_valid_flow_version "$flow_version"; then
-    echo "${file}: FLOW_VERSION_VIOLATION: flowVersion=\"${flow_version}\" not in {1,2}" >&2
+    echo "${file}: FLOW_VERSION_VIOLATION: flowVersion=\"${flow_version}\" not in {1,2,3,4,5}" >&2
     violations=$((violations + 1))
   fi
 done

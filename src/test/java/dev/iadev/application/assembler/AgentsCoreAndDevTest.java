@@ -36,7 +36,7 @@ class AgentsCoreAndDevTest {
     class CoreAgents {
 
         @Test
-        @DisplayName("generates 7 core agents")
+        @DisplayName("generates 8 core agents")
         void assemble_whenCalled_generatesCoreAgents(@TempDir Path tempDir) throws IOException {
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -56,6 +56,7 @@ class AgentsCoreAndDevTest {
 
             Path agentsDir = outputDir.resolve("agents");
             assertThat(agentsDir.resolve("architect.md")).exists();
+            assertThat(agentsDir.resolve("pentest-engineer.md")).exists();
             assertThat(agentsDir.resolve("performance-engineer.md")).exists();
             assertThat(agentsDir.resolve("product-owner.md")).exists();
             assertThat(agentsDir.resolve("qa-engineer.md")).exists();
@@ -84,6 +85,7 @@ class AgentsCoreAndDevTest {
             assertThat(coreAgents)
                     .containsExactly(
                             "architect.md",
+                            "pentest-engineer.md",
                             "performance-engineer.md",
                             "product-owner.md",
                             "qa-engineer.md",
