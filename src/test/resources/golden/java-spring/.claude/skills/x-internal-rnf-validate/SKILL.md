@@ -6,6 +6,7 @@ user-invocable: false
 model: haiku
 allowed-tools: [Bash]
 requires-capabilities: []
+context-budget: light
 ---
 
 > 🔒 **INTERNAL SKILL** — Invoked only by other skills via the Skill tool. Not user-invocable.

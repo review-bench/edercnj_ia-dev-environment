@@ -1,0 +1,30 @@
+{
+  "storyId": "story-0077-0028",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T19:45:00Z",
+  "passed": true,
+  "coverageLine": 96.3,
+  "coverageBranch": 91.4,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0028.md",
+    "implementationFiles": [
+      "src/main/resources/targets/claude/rules/19-backward-compatibility.md",
+      "src/main/resources/targets/claude/rules/22-skill-visibility.md",
+      "src/main/resources/targets/claude/skills/core/internal/ops/x-internal-rnf-validate/SKILL.md",
+      "src/main/java/dev/iadev/adapter/inbound/cli/RNFOverrideArtifactParser.java",
+      "src/main/java/dev/iadev/domain/capability/RNFOverride.java",
+      "docs/adr/ADR-0032-product-first-lifecycle-finalization.md"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story finalizes normative layer: Rule 19 flowVersion=5, ADR-0032, x-internal-rnf-validate, Epic0077ProductFirstSmokeIT, golden files"
+}
