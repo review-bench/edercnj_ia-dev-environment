@@ -9,11 +9,15 @@ import java.util.stream.Collectors;
 public final class RNFRootValidator {
 
     private static final int MIN_MANDATORY_CATEGORIES = 6;
+    private static final int MIN_TOTAL_CATEGORIES = 10;
+    static final String MIN_TOTAL_CATEGORIES_ERROR =
+            "Minimum 10 RNF categories required (6 mandatory + 4 optional minimum)";
 
     public RNFRootValidationResult validate(Product product) {
         List<String> errors = new ArrayList<>();
         validateDescriptions(product, errors);
         validateMandatoryCategories(product, errors);
+        validateTotalCount(product, errors);
         if (errors.isEmpty()) {
             return RNFRootValidationResult.success();
         }
@@ -45,6 +49,12 @@ public final class RNFRootValidator {
         long mandatoryPresent = presentCategories.stream().filter(RNFCategory::isMandatory).count();
         if (mandatoryPresent < MIN_MANDATORY_CATEGORIES) {
             errors.add("Product must have minimum 6 mandatory RNF categories, found: " + mandatoryPresent);
+        }
+    }
+
+    private void validateTotalCount(Product product, List<String> errors) {
+        if (product.rnfRoots().size() < MIN_TOTAL_CATEGORIES) {
+            errors.add(MIN_TOTAL_CATEGORIES_ERROR);
         }
     }
 }
