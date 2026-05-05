@@ -259,11 +259,13 @@
       }
     },
     "story-0077-0021": {
-      "status": "Refinada",
+      "status": "Concluída",
       "phase": "Phase 6",
       "predecessors": [
         "story-0077-0020"
       ],
+      "completedAt": "2026-05-05T14:00:00Z",
+      "prNumbers": [1022, 1023, 1024, 1025],
       "refinementVerdict": {
         "status": "approved",
         "checkedAt": "2026-05-04T12:00:00Z",
