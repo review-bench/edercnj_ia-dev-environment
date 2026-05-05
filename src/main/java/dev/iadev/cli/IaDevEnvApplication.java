@@ -1,5 +1,8 @@
 package dev.iadev.cli;
 
+import dev.iadev.adapter.inbound.cli.XCreateCapabilityCommand;
+import dev.iadev.adapter.inbound.cli.XCreateProductCommand;
+import dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -30,7 +33,13 @@ import picocli.CommandLine.Spec;
                         + "AI-assisted development environments.",
         mixinStandardHelpOptions = true,
         versionProvider = CliVersionProvider.class,
-        subcommands = {GenerateCommand.class, ValidateCommand.class})
+        subcommands = {
+            GenerateCommand.class,
+            ValidateCommand.class,
+            XCreateProductCommand.class,
+            XCreateCapabilityCommand.class,
+            XPromoteIdeationCommand.class
+        })
 public class IaDevEnvApplication implements Runnable {
 
     @Spec CommandSpec spec;
