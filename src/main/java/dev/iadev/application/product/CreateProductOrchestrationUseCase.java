@@ -7,20 +7,25 @@ import dev.iadev.domain.ideation.IdeationToProductTransformer;
 import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
 import dev.iadev.domain.product.Product;
+import dev.iadev.domain.product.RNFRootValidationResult;
+import dev.iadev.domain.product.RNFRootValidator;
 
 public final class CreateProductOrchestrationUseCase {
 
     private final IdeationValidator validator;
     private final IdeationToProductTransformer transformer;
     private final CapabilityStubFactory capabilityStubFactory;
+    private final RNFRootValidator rnfValidator;
 
     public CreateProductOrchestrationUseCase(
             IdeationValidator validator,
             IdeationToProductTransformer transformer,
-            CapabilityStubFactory capabilityStubFactory) {
+            CapabilityStubFactory capabilityStubFactory,
+            RNFRootValidator rnfValidator) {
         this.validator = validator;
         this.transformer = transformer;
         this.capabilityStubFactory = capabilityStubFactory;
+        this.rnfValidator = rnfValidator;
     }
 
     public CreateProductResult execute(String productId, IdeationTemplate ideation) {
@@ -39,8 +44,13 @@ public final class CreateProductOrchestrationUseCase {
         }
 
         Product product = transformer.transform(ideation);
-        Capability c1Stub = capabilityStubFactory.createC1Stub(productId);
 
+        RNFRootValidationResult rnfResult = rnfValidator.validate(product);
+        if (!rnfResult.passed()) {
+            return CreateProductResult.failure(rnfResult.errors());
+        }
+
+        Capability c1Stub = capabilityStubFactory.createC1Stub(productId);
         long elapsed = System.currentTimeMillis() - start;
         return CreateProductResult.success(product, c1Stub, elapsed);
     }

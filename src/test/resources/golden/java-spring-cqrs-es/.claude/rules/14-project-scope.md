@@ -55,6 +55,29 @@ Before adding a new package or class, ask:
 
 If the answer to all three is NO, the code does not belong in this project.
 
+## Product-First Domain Extension (EPIC-0077)
+
+> **ADR:** [ADR-0030 — Rule 14 Extension for Product-First Runtime Domain](../../docs/adr/ADR-0030-rule14-product-first-domain.md)
+> **Introduced by:** EPIC-0077 (Product-First Lifecycle & Planning C4 Model), story-0077-0000
+
+The following additional packages are explicitly authorized under this amendment. They serve the `ia-dev-env generate` pipeline by modeling the Product-First planning hierarchy that drives capability resolution and composition:
+
+| Package | Entities | Pipeline role |
+| :--- | :--- | :--- |
+| `domain/products/` | `Product`, `ProductId`, `ProductStatus` | Root of planning hierarchy; determines which capability bundles are resolved during generation |
+| `domain/capabilities/` | `Capability`, `CapabilityId` | Intermediate layer between Product and Feature; drives `CapabilityResolver` during composition |
+| `domain/features/` | `Feature`, `FeatureId` | Maps to epic/epic cluster; used by `x-create-feature` and `x-internal-map-epic` to scope planning artifacts |
+| `domain/planning/rnf-validation/` | `RnfValidationConfig`, `RnfGate` | Non-functional requirements gate configuration inherited by epics/stories; consumed by `x-refine-story` and `x-refine-epic` |
+
+**Eligibility criterion for future packages under this amendment:** Code is eligible when it satisfies ALL three conditions:
+1. Serves the `ia-dev-env generate` or `ia-dev-env validate` pipeline.
+2. Models entities of the Product-First hierarchy required for generation of `.claude/` artifacts.
+3. Is read during composition by `CapabilityResolver`, `CapabilityAwareComposer`, or their immediate collaborators.
+
+Code that does not satisfy all three conditions remains subject to the original Rule 14 scope guard above.
+
+---
+
 ## Worktree Lifecycle (EPIC-0049)
 
 Git worktrees enable parallel task / story / epic execution by creating additional working trees for the same repository. They live under `.claude/worktrees/{identifier}/` and are managed exclusively by the `x-manage-worktrees` skill.
