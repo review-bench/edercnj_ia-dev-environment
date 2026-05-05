@@ -35,7 +35,7 @@
 
 ### §1.1. Visão
 
-Construir o **Forge**: uma plataforma local-first, CLI-first, **multi-LLM e multi-IDE** que controla determinísticamente o lifecycle de entrega assistida por IA — da ideação ao release — produzindo evidências verificáveis, auditáveis e replayáveis. O LLM gera conteúdo; o **Forge controla o fluxo**.
+Construir o **Forge**: uma plataforma local-first, CLI-first, **multi-LLM e multi-IDE** que controla deterministicamente o lifecycle de entrega assistida por IA — da ideação ao release — produzindo evidências verificáveis, auditáveis e replayáveis. O LLM gera conteúdo; o **Forge controla o fluxo**.
 
 ### §1.2. Tese (4 princípios inegociáveis)
 
@@ -93,7 +93,7 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 
 | Premissa | Detalhe |
 | :--- | :--- |
-| `x-validate-docs` | MANDATORY TOOL CALL em Phase 3 de `x-story-implement` (ex-`x-implement-story`). |
+| `x-validate-docs` | MANDATORY TOOL CALL em Phase 3 de `x-implement-story` (ex-`x-implement-story`). |
 | Targets stack-aware | README always; OpenAPI/asyncapi/gRPC condicional via `documentation.targets`. |
 | `x-generate-release-changelog` v2 | Hybrid format (Highlights + Keep-a-Changelog). |
 | `audit-doc-freshness.sh` | Gate Camada 2. |
@@ -103,7 +103,7 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 
 | Premissa | Detalhe |
 | :--- | :--- |
-| 3 gates condicionais | `x-execute-performance-tests` → `x-execute-mutation-tests` → `x-execute-contract-tests` (D-R11 fast-fail) em Phase 3 de `x-story-implement`. |
+| 3 gates condicionais | `x-execute-performance-tests` → `x-execute-mutation-tests` → `x-execute-contract-tests` (D-R11 fast-fail) em Phase 3 de `x-implement-story`. |
 | `quality.{performance,mutation,contract}.enabled` | Opt-in YAML; safe default `false`. |
 | Stack-aware dispatchers | Newman/ghz/hyperfine/Artillery; PIT/Stryker/mutmut/go-mutesting; openapi-diff/buf/SCC/schema-registry. |
 | `audit-perf-baseline.sh`, `audit-mutation-score.sh`, `audit-contract-breaking.sh` | Gates Camada 2. |
@@ -113,7 +113,7 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 
 | Premissa | Detalhe |
 | :--- | :--- |
-| `x-validate-dependency-policy` | MANDATORY TOOL CALL em Phase 3 de `x-story-implement` quando `dependencies.policy.enabled=true`. |
+| `x-validate-dependency-policy` | MANDATORY TOOL CALL em Phase 3 de `x-implement-story` quando `dependencies.policy.enabled=true`. |
 | 5 dimensões | CVEs hard-block (`denied-cves`), severidade CVE, whitelist SPDX, cross-stack version constraints, freshness window. |
 | `DependencyPolicyConfig` Java | Domain record com parser. |
 | Rule 32, ADR-0027, `audit-dep-policy.sh` | Camada 2 + smoke. |
@@ -122,20 +122,21 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 
 | Premissa | Detalhe |
 | :--- | :--- |
-| `ai/memory/epic-XXXX-summary.md` | Compact, ≤200 lines, gerado por `x-internal-summarize-epic` (haiku, deterministic) em Phase 5 de `x-epic-implement`. |
+| `ai/memory/epic-XXXX-summary.md` | Compact, ≤200 lines, gerado por `x-internal-summarize-epic` (haiku, deterministic) em Phase 5 de `x-implement-epic`. |
 | `/x-search-memory` | 5 modos (`--by-tag`, `--by-capability`, `--by-rule`, `--by-pattern`, `--by-epic`). |
 | Rule 33, `audit-memory-coverage.sh` | Gate Camada 2 + ADR-0028. |
 | 27 épicos seedados retroativamente | range 0040-0075. |
 
-### §2.7. Verb-First Naming (EPIC-0076 — Concluído pre-Forge)
+### §2.7. Verb-First Naming (EPIC-0076 — alvo de padronização)
 
 | Premissa | Detalhe |
 | :--- | :--- |
-| Padrão `x-<verbo>-<objeto>` | públicas: `x-<verbo>-<objeto>`; internas: `x-internal-<verbo>-<objeto>`; libs: `x-lib-<verbo>-<objeto>`. |
-| Renomes-chave | `x-implement-story` → `x-story-implement`; `x-implement-epic` → `x-epic-implement`; `x-implement-task` → `x-task-implement`; `x-refine-story` → `x-story-refine`; `x-refine-epic` → `x-epic-refine`; `x-create-pr` → `x-pr-create`; `x-fix-pr` → `x-pr-fix`; `x-merge-pr` → `x-pr-merge`; `x-watch-pr-ci` → `x-pr-ci-watch`; `x-create-feature` → `x-feature-create`; `x-ideate-feature` → `x-feature-ideate`; `x-plan-architecture` → `x-arch-plan`; `x-update-architecture` → `x-arch-update`; `x-update-system-architecture` → `x-arch-system-update`; `x-search-memory` → `x-memory-search`; `x-internal-summarize-epic` → `x-internal-epic-summary`; `x-internal-update-status` → `x-internal-status-update`; `x-internal-write-report` → `x-internal-report-write`; `x-internal-normalize-args` → `x-internal-args-normalize`; etc. |
-| Sem aliases permanentes | Hard-cut (Rule 19 §Hard-cut autorizado, condições 1-3). |
+| Padrão alvo `x-<verbo>-<objeto>` | públicas: `x-<verbo>-<objeto>`; internas: `x-internal-<verbo>-<objeto>`; libs: `x-lib-<verbo>-<objeto>`. |
+| Estado atual no repo | A maioria das skills canônicas **já está em verb-first**: `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-refine-story`, `x-refine-epic`, `x-plan-story`, `x-plan-task`, `x-plan-architecture`, `x-create-pr`, `x-fix-pr`, `x-merge-pr`, `x-watch-pr-ci`, `x-create-feature`, `x-ideate-feature`, `x-search-memory`, `x-drive-tdd`, `x-analyze-telemetry`, `x-analyze-telemetry-trends`, `x-update-architecture`, `x-update-system-architecture`, `x-generate-adr`, `x-generate-docs`, `x-validate-docs`, `x-orchestrate-epic`, `x-recommend-mcp`, `x-internal-update-status`, `x-internal-write-report`, `x-internal-normalize-args`, `x-internal-summarize-epic`, `x-commit-changes`, `x-push-branch`, `x-create-git-branch`, `x-manage-worktrees`, `x-merge-branches`, `x-cleanup-git-branches`, `x-commit-planning`, `x-fix-epic-pr`, `x-manage-pr-merge-train`, `x-model-threats`, `x-execute-tests`, `x-plan-tests`, `x-execute-e2e-tests`. |
+| Renames pendentes em EPIC-0076 | Skills hoje em forma noun-first (`x-epic-implement`, `x-arch-plan`, `x-pr-fix`, `x-feature-create`, `x-feature-ideate`, ...) coexistem com a forma verb-first; EPIC-0076 ainda em **Backlog** consolidará para verb-first com hard-cut (Rule 19 §Hard-cut autorizado). |
+| Exceções permanentes | Skills com escopo declarado preservam ordem `x-<contexto>-<verbo>-<objeto>` (ex.: `x-arch-plan-product`, `x-arch-plan-capability` introduzidas em EPIC-0077). |
 
-> **Implicação para Forge:** todos os mapeamentos do roadmap original (`x-implement-story`, `x-create-pr`, …) devem ser lidos com os **nomes pós-0076**. Esta seção e §8 abaixo já refletem o estado canônico.
+> **Implicação para Forge:** este documento adota como **canônicas as formas verb-first já presentes no repo hoje**. Os nomes podem ser usados como entrada direta para os comandos atuais e mapeiam diretamente para os comandos `forge` futuros (§7-§8).
 
 ### §2.8. Product-First Lifecycle (EPIC-0077 — Em andamento)
 
@@ -180,7 +181,7 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 
 - **Layout v4** (`ai/epics/epic-XXXX-<slug>/`) consolidado.
 - **Telemetria NDJSON** (5 hooks SessionStart/PreToolUse/PostToolUse/SubagentStop/Stop + `telemetry-phase.sh` markers + `TelemetryScrubber`) operacional, com `/x-analyze-telemetry` + `/x-analyze-telemetry-trends`.
-- **Camada 0 — preflight gates** (`enforce-preflight-gates.sh` + `scripts/preflight.sh`) já bloqueia `git push`/`gh pr create`/`Skill x-pr-create` quando preflight falha.
+- **Camada 0 — preflight gates** (`enforce-preflight-gates.sh` + `scripts/preflight.sh`) já bloqueia `git push`/`gh pr create`/`Skill x-create-pr` quando preflight falha.
 - **Bypass único** documentado: `CLAUDE_RECOVERY_MODE=1`.
 
 ---
@@ -303,7 +304,7 @@ Runtime determinístico
 | ID | Nome | Escopo | Herdado de `ia-dev-env`? | Wave |
 | :--- | :--- | :--- | :--- | :-: |
 | P-1.C01 | **Project Bootstrap** | `forge` binário (Picocli + GraalVM ou JVM); `forge init` cria control repo (`projects/`, `ai/`, `.forge/`); detecção automática de stack; `forge doctor` health-check. | Parte de `x-setup-env`. | W0 |
-| P-1.C02 | **Storage Primitives** | Git canônico + SQLite operational index + blob store comprimido (zstd) + atomic write/flock + sync journal append-only + `forge sync` + `forge index rebuild`. | Parcial (`flock` em `x-internal-status-update`). | W0 |
+| P-1.C02 | **Storage Primitives** | Git canônico + SQLite operational index + blob store comprimido (zstd) + atomic write/flock + sync journal append-only + `forge sync` + `forge index rebuild`. | Parcial (`flock` em `x-internal-update-status`). | W0 |
 | P-1.C03 | **Identity, Schemas & Artifact Registry** | Frontmatter v4 (evolução do v3.0 herdado de EPIC-0064); registry tipado de `artifact_kind`; lineage graph DAG; registry linter; `forge explain <id>`. | **Sim — frontmatter v3.0 (Rule 28) já é base.** | W0 |
 | P-1.C04 | **Profile & Capability Composition** | Profile schema v3 com herança/overlays; CapabilityResolver/Composer/OutputPruner; **Template Registry tipado** (template_id + JSON Schemas de input/output); KP Loader on-demand; `forge migrate --from-iadev`. | **Sim — `CapabilityResolver`/`Composer`/`OutputPruner` reutilizáveis (EPIC-0064).** Falta Template Registry strict. | W0 |
 | P-1.C05 | **Output, Telemetry & Audit Log** | `--output text/json/ndjson` com schema por command; in-process telemetry NDJSON (substitui 8 hooks shell); OTel adapter opcional; audit log local imutável (`.forge/audit/audit-log.ndjson` com hash chain SHA-256); session resume. | Parcial (telemetria via hooks; `TelemetryScrubber` já existe). | W0 |
@@ -328,7 +329,7 @@ Runtime determinístico
 | :--- | :--- | :--- | :--- | :-: |
 | P1.C1 | **Project & Product Lifecycle** | `forge project create/approve` (NOVO no Forge); `forge product create/approve`; `forge product propose-capabilities` (worker que sugere candidatas). | Parcial (templates `_TEMPLATE-PRODUCT.md` em EPIC-0077). | W10 |
 | P1.C2 | **Capability & Feature Lifecycle** | `forge capability create/approve`; `forge feature create/approve`; predecessor remote gate; `forge ideate --kind product/capability/feature` (multi-round, personas, comparação de alternativas). | Parcial (`x-feature-create`, `x-feature-ideate` já existem; falta capability/product). | W10 |
-| P1.C3 | **Architecture Planning (3 níveis)** | `forge arch plan product/capability/feature`; coleta de NFRs mínimos (usuários, simultaneidade, latência, disponibilidade, volume, segurança); architecture decision log; **Feature → Epic gate** (`architecture-feature` aprovado + remote-clean); `forge arch system update` incremental. | **Sim — `x-arch-plan-product` + `x-arch-plan-capability` em EPIC-0077; `x-arch-plan` (feature), `x-arch-update`, `x-arch-system-update` já existem; C4 obrigatório.** | W10 |
+| P1.C3 | **Architecture Planning (3 níveis)** | `forge arch plan product/capability/feature`; coleta de NFRs mínimos (usuários, simultaneidade, latência, disponibilidade, volume, segurança); architecture decision log; **Feature → Epic gate** (`architecture-feature` aprovado + remote-clean); `forge arch system update` incremental. | **Sim — `x-arch-plan-product` + `x-arch-plan-capability` em EPIC-0077; `x-plan-architecture` (feature), `x-update-architecture`, `x-update-system-architecture` já existem; C4 obrigatório.** | W10 |
 | P1.C4 | **Feature → Epic Generation** | `forge epic create <FEATURE>` gera epic + stories + IMPLEMENTATION-MAP a partir da feature e do `architecture-feature` aprovado; bidirectional linking; backlog versioning (commit/PR); replanejamento incremental quando arquitetura/feature mudam; **bug/change → change-epic correction-story** (Post-Delivery); effort scoring misto humano/IA. | Parcial (`x-internal-create-epic`/`x-internal-create-story`/`x-internal-map-epic` já existem). | W10 |
 | P1.C5 | **Post-Delivery Lifecycle** | Taxonomia tipada de entradas pós-entrega: `Bug`, `FeatureChange`, `FeatureDeprecation`, `FeatureRemoval`, `SecurityFinding`, `SpecDrift`, `Maintenance`, `DependencyUpgrade`, `Rollback`, `Experiment`, `SupportRequest`. State machines, lineage, impact assessment, comandos `forge bug/feature change/feature deprecate/feature remove/security finding/spec drift/maintenance/dependency upgrade/rollback/experiment/support`. | Não. (V3 §9 inteira é nova.) | W10/W11 |
 
@@ -345,9 +346,9 @@ Runtime determinístico
 
 | ID | Nome | Escopo | Herdado de `ia-dev-env`? | Wave |
 | :--- | :--- | :--- | :--- | :-: |
-| P3.C1 | **Story / Epic / Task Implementation** | `forge story implement`, `forge epic implement`, `forge task implement`, `forge story refine`, `forge epic refine`, `forge story plan`, `forge task plan`, `forge test tdd`. | **Sim — `x-story-implement`, `x-epic-implement`, `x-task-implement`, `x-story-refine`, `x-epic-refine`, `x-story-plan`, `x-task-plan`, `x-test-tdd-drive` (?ex-`x-drive-tdd`).** Migra para Java. | W5 |
-| P3.C2 | **Release & Merge Train** | `forge release [--patch/--minor/--major]`, `forge merge-train`, `forge epic orchestrate`. | **Sim — `x-release`, `x-pr-merge-train` (?ex-`x-manage-pr-merge-train`), `x-epic-orchestrate`.** Migra para Java. | W5 |
-| P3.C3 | **PR Lifecycle Commands** | `forge pr create`, `forge pr merge`, `forge pr fix`, `forge pr fix --epic`, `forge pr watch`. | **Sim — `x-pr-create`, `x-pr-merge`, `x-pr-fix`, `x-pr-fix-epic` (?), `x-pr-ci-watch`.** Migra para Java. | W2 |
+| P3.C1 | **Story / Epic / Task Implementation** | `forge story implement`, `forge epic implement`, `forge task implement`, `forge story refine`, `forge epic refine`, `forge story plan`, `forge task plan`, `forge test tdd`. | **Sim — `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-refine-story`, `x-refine-epic`, `x-plan-story`, `x-plan-task`, `x-drive-tdd`.** Migra para Java. | W5 |
+| P3.C2 | **Release & Merge Train** | `forge release [--patch/--minor/--major]`, `forge merge-train`, `forge epic orchestrate`. | **Sim — `x-release`, `x-manage-pr-merge-train`, `x-orchestrate-epic`.** Migra para Java. | W5 |
+| P3.C3 | **PR Lifecycle Commands** | `forge pr create`, `forge pr merge`, `forge pr fix`, `forge pr fix --epic`, `forge pr watch`. | **Sim — `x-create-pr`, `x-merge-pr`, `x-fix-pr`, `x-fix-epic-pr` (?), `x-watch-pr-ci`.** Migra para Java. | W2 |
 | P3.C4 | **Reliability & Replay** | Determinismo controlado; snapshot de contexto local; idempotência por comando/skill; file locking local. | Parcial (parte vem de P-1.C02). | W5 |
 
 ### §6.6. P4 — Quality, Reviews, Docs & Release
@@ -355,9 +356,9 @@ Runtime determinístico
 | ID | Nome | Escopo | Herdado de `ia-dev-env`? | Wave |
 | :--- | :--- | :--- | :--- | :-: |
 | P4.C1 | **Quality Gates** | `forge test {run,plan,e2e,contract,mutation,performance,regression-shell,smoke api/socket}`; `forge code {format,lint,audit}`. | **Sim — todos os 9 conditional/test + core/test + core/code já existem como skills.** Migra para adapters/commands. | W6 |
-| P4.C2 | **Review Workers** | `forge review <STORY>` (parallel dispatcher) + `forge review pr <PR>` (Tech Lead) + 14 specialists (api, compliance, data-modeling, database, devops, events, gateway, graphql, grpc, observability, security, performance, qa, codebase). | **Sim — `x-codebase-review`, `x-pr-review`, e os 11 conditional/review + 3 core/review.** Migra para command + workers. | W7 |
+| P4.C2 | **Review Workers** | `forge review <STORY>` (parallel dispatcher) + `forge review pr <PR>` (Tech Lead) + 14 specialists (api, compliance, data-modeling, database, devops, events, gateway, graphql, grpc, observability, security, performance, qa, codebase). | **Sim — `x-review-codebase`, `x-review-pr`, e os 11 conditional/review + 3 core/review.** Migra para command + workers. | W7 |
 | P4.C3 | **Documentation** | `forge doc {generate,validate}`, `forge adr generate`, `forge release changelog`, `forge arch update`, `forge arch system update`. | **Sim — todos já existem.** Migra. | W6 |
-| P4.C4 | **Security Suite** | `forge security {owasp,dependency,supply-chain,dashboard,pipeline,hardening,runtime,pentest,dep-policy validate,container,dast,infra,sast,secrets,sonar,threat-model}`. | **Sim — todos os 8 core/security + 8 conditional/security + `x-threat-model` (?ex-`x-model-threats`).** Migra. | W8 |
+| P4.C4 | **Security Suite** | `forge security {owasp,dependency,supply-chain,dashboard,pipeline,hardening,runtime,pentest,dep-policy validate,container,dast,infra,sast,secrets,sonar,threat-model}`. | **Sim — todos os 8 core/security + 8 conditional/security + `x-model-threats`.** Migra. | W8 |
 
 ### §6.7. P5 — Developer Experience
 
@@ -377,13 +378,13 @@ Runtime determinístico
 | P6.C2 | **Rule & Governance Library** | Rule packs por domínio; rule simulator; rule conflict detector; custom rule authoring. | Não. | W11 |
 | P6.C3 | **Template & Profile Catalog** | Catálogo profiles oficial/community; rating + usage stats; `forge profile fork`; profile lineage. | Não. | W11 |
 | P6.C4 | **Cross-Project Intelligence** | Padrões agregados anonimizados; recommendation engine; drift detection cross-repo; knowledge graph navegável. | Não. | W11 |
-| P6.C5 | **Plugins V0** | `forge jira create-epic`, `forge jira create-stories`, `forge mcp recommend`, MCP marketplace cache. | Parcial (Jira skills + `x-mcp-recommend` (?ex-`x-recommend-mcp`)). | W11 |
+| P6.C5 | **Plugins V0** | `forge jira create-epic`, `forge jira create-stories`, `forge mcp recommend`, MCP marketplace cache. | Parcial (Jira skills + `x-recommend-mcp`). | W11 |
 
 ### §6.9. P7 — Observability, Analytics & FinOps
 
 | ID | Nome | Escopo | Herdado de `ia-dev-env`? | Wave |
 | :--- | :--- | :--- | :--- | :-: |
-| P7.C1 | **Local & Real-Time Telemetry** | Captura local NDJSON + queries CLI; streaming opt-in OTLP/Datadog/HTTP custom; dashboard live; alerting; trace OTel-compatible. | Parcial (NDJSON local + `x-telemetry-analyze`/`x-telemetry-trend`). | W11 |
+| P7.C1 | **Local & Real-Time Telemetry** | Captura local NDJSON + queries CLI; streaming opt-in OTLP/Datadog/HTTP custom; dashboard live; alerting; trace OTel-compatible. | Parcial (NDJSON local + `x-analyze-telemetry`/`x-analyze-telemetry-trends`). | W11 |
 | P7.C2 | **Quality & Compliance Metrics** | Coverage longitudinal; refinement quality score; doc freshness heatmap; compliance posture report. | Parcial. | W11 |
 | P7.C3 | **FinOps & Cost Insights** | Custo de LLM por skill/story/epic/org; sugestão de model downgrade; budget guardrails locais; comparativo por provider. | Não. | W11 |
 | P7.C4 | **Research & Benchmarking** | A/B testing de skills; benchmark suite; regression detection; public leaderboard opt-in. | Não. | W11 |
@@ -394,7 +395,7 @@ Runtime determinístico
 | :--- | :--- | :--- | :--- | :-: |
 | P8.C1 | **Audit & Compliance Engine** | Audit log local imutável (em P-1.C05); evidence vault; reports SOC2/ISO 27001/LGPD; forensics; **`forge ci verify` em P0.C6**. | Parcial. | W11 |
 | P8.C2 | **Refinement & Quality Gates v2** | AI-assisted refinement; refinement memory; refinement templates por domínio; NO-GO library. | Parcial (Rule 29 base). | W11 |
-| P8.C3 | **Security Posture & Threat Modeling** | Continuous threat modeling; SBOM gerado e validado; secret scanning integrado; supply chain trust score. | Parcial (`x-threat-model` + dep audit). | W11 |
+| P8.C3 | **Security Posture & Threat Modeling** | Continuous threat modeling; SBOM gerado e validado; secret scanning integrado; supply chain trust score. | Parcial (`x-model-threats` + dep audit). | W11 |
 | P8.C4 | **Privacy, Multi-Tenancy & RBAC** | Multi-tenant; RBAC; data residency; PII scrubbing para telemetria remota. | Parcial (`TelemetryScrubber`). | W11 |
 
 ---
@@ -421,7 +422,7 @@ Runtime determinístico
 - **F3 `[V0]`** — Blob store local comprimido/dedup (`.forge/blobs/sha256/<aa>/<sha>.zst`).
 - **F4 `[V0]`** — `forge sync` (reindex incremental do working tree).
 - **F5 `[V0]`** — `forge index rebuild` (recriação completa do índice — recovery).
-- **F6 `[V0]`** — Atomic write + flock substitutos do flock shell de `x-internal-status-update`.
+- **F6 `[V0]`** — Atomic write + flock substitutos do flock shell de `x-internal-update-status`.
 - **F7 `[V0]`** — Sync journal append-only (`.forge/state/sync-journal.ndjson`) para resume cross-machine.
 
 #### P-1.C03 — Identity, Schemas & Artifact Registry
@@ -437,7 +438,7 @@ Runtime determinístico
 - **F1 `[V0]`** — Profile schema v3 com herança e overlays. **Herdado:** ProjectConfig Java.
 - **F2 `[V0]`** — CapabilityResolver evoluído (cache local, plug-in externo). **Herdado:** sim.
 - **F3 `[V0]`** — Composition diff & dry-run.
-- **F4 `[V0]`** — **Template Registry strict** (`template_id`, `schema_version`, JSON Schema input/output, consumidores declarados). **Herdado:** templates já existem; faltam schemas estrictos.
+- **F4 `[V0]`** — **Template Registry strict** (`template_id`, `schema_version`, JSON Schema input/output, consumidores declarados). **Herdado:** templates já existem; faltam schemas estritos.
 - **F5 `[V0]`** — KP Loader on-demand por fase/worker.
 - **F6 `[V0]`** — `forge migrate --from-iadev` (migração assistida v5 → v6 do profile).
 
@@ -464,11 +465,11 @@ Runtime determinístico
 
 #### P-1.C07 — Git & GitHub Adapters
 
-- **F1 `[V0]`** — `GitAdapter.branch()` (idempotente, naming validation). **Herdado:** `x-git-branch-create` (?ex-`x-create-git-branch`).
-- **F2 `[V0]`** — `GitAdapter.commit()` (Conventional Commits + pre-commit chain format→lint→compile). **Herdado:** `x-git-commit` (?ex-`x-commit-changes`).
-- **F3 `[V0]`** — `GitAdapter.push()` (idempotente + retry tipado). **Herdado:** `x-git-push` (?).
-- **F4 `[V0]`** — `GitAdapter.merge()` (strategy + rollback automático em conflito). **Herdado:** `x-git-merge` (?ex-`x-merge-branches`).
-- **F5 `[V0]`** — `GitAdapter.worktree()` (lifecycle Rule 14 sob `.forge/worktrees/`). **Herdado:** `x-git-worktree-manage` (?ex-`x-manage-worktrees`).
+- **F1 `[V0]`** — `GitAdapter.branch()` (idempotente, naming validation). **Herdado:** `x-create-git-branch`.
+- **F2 `[V0]`** — `GitAdapter.commit()` (Conventional Commits + pre-commit chain format→lint→compile). **Herdado:** `x-commit-changes`.
+- **F3 `[V0]`** — `GitAdapter.push()` (idempotente + retry tipado). **Herdado:** `x-push-branch` (?).
+- **F4 `[V0]`** — `GitAdapter.merge()` (strategy + rollback automático em conflito). **Herdado:** `x-merge-branches`.
+- **F5 `[V0]`** — `GitAdapter.worktree()` (lifecycle Rule 14 sob `.forge/worktrees/`). **Herdado:** `x-manage-worktrees`.
 - **F6 `[V0]`** — `GitAdapter.cleanup()` (prune origin + remove worktrees + branches obsoletas).
 - **F7 `[V0]`** — `GitAdapter.precheck()` (CLEAN/DIRTY/DIVERGENT/AMBIGUOUS).
 - **F8 `[V0]`** — `GitAdapter.epicBranch()` (idempotência da convenção `epic/<ID>` — Rule 21).
@@ -484,7 +485,7 @@ Runtime determinístico
 - **F3 `[V0]`** — `FormatAdapter` (Spotless/prettier/black/gofmt).
 - **F4 `[V0]`** — `LintAdapter` (Checkstyle/eslint/ruff/golangci-lint).
 - **F5 `[V0]`** — `DocAdapter` (OpenAPI lint, asyncapi, gRPC proto, README freshness).
-- **F6 `[V0]`** — Stack catalog + `forge mcp recommend` (?ex-`x-recommend-mcp`).
+- **F6 `[V0]`** — Stack catalog + `forge mcp recommend` (herda `x-recommend-mcp`).
 
 ### §7.2. P0 Spine — Features
 
@@ -526,7 +527,7 @@ Runtime determinístico
 - **F2 `[V0]`** — Refinement verdict schema (`refinementVerdict.{status,scope,checkedAt,verdictHash,dimensions,blockers}`).
 - **F3 `[V0]`** — Hash divergence detection (state ↔ markdown).
 - **F4 `[V0]`** — Recovery escape via `CLAUDE_RECOVERY_MODE=1` com WARNING.
-- **F5 `[V0]`** — Multi-persona dispatcher (PO + Tech Lead + Architect + Security + QA + perf/SRE conditional). **Herdado:** `x-story-refine` / `x-epic-refine`.
+- **F5 `[V0]`** — Multi-persona dispatcher (PO + Tech Lead + Architect + Security + QA + perf/SRE conditional). **Herdado:** `x-refine-story` / `x-refine-epic`.
 
 #### P0.C6 — Execution Integrity (built-in)
 
@@ -561,12 +562,12 @@ Runtime determinístico
 
 - **F1 `[V0]`** — `forge arch plan product <PRODUCT-CODE>`. **Herdado:** `x-arch-plan-product` em EPIC-0077.
 - **F2 `[V0]`** — `forge arch plan capability <CAPABILITY-CODE>`. **Herdado:** `x-arch-plan-capability` em EPIC-0077.
-- **F3 `[V0]`** — `forge arch plan feature <FEATURE-CODE>`. **Herdado:** `x-arch-plan` (?ex-`x-plan-architecture`).
+- **F3 `[V0]`** — `forge arch plan feature <FEATURE-CODE>`. **Herdado:** `x-plan-architecture`.
 - **F4 `[V0]`** — Coleta obrigatória de NFRs mínimos (usuários, simultaneidade, latência, disponibilidade, volume, segurança).
 - **F5 `[V0]`** — **C4 model obrigatório** (C1 System Context + C2 Container + C3 Component + C4 Code) em planning artifacts. **Herdado:** EPIC-0077.
 - **F6 `[V0]`** — Architecture decision log + mini-ADRs por nível.
 - **F7 `[V0]`** — Feature → Epic gate (`architecture-feature` aprovado + remote-clean).
-- **F8 `[V0]`** — `forge arch system update` (incremental, idempotente). **Herdado:** `x-arch-system-update`.
+- **F8 `[V0]`** — `forge arch system update` (incremental, idempotente). **Herdado:** `x-update-system-architecture`.
 
 #### P1.C4 — Feature → Epic Generation
 
@@ -628,26 +629,26 @@ Runtime determinístico
 
 #### P3.C1 — Story / Epic / Task Implementation
 
-- **F1 `[V0]`** — `forge story implement <ID>`. **Herdado:** `x-story-implement`.
-- **F2 `[V0]`** — `forge epic implement <ID>`. **Herdado:** `x-epic-implement`.
-- **F3 `[V0]`** — `forge task implement <ID>`. **Herdado:** `x-task-implement`.
-- **F4 `[V0]`** — `forge story refine <ID>` / `forge epic refine <ID>`. **Herdado:** `x-story-refine` / `x-epic-refine`.
-- **F5 `[V0]`** — `forge story plan <ID>` / `forge task plan <ID>`. **Herdado:** `x-story-plan` / `x-task-plan`.
-- **F6 `[V0]`** — `forge test tdd <TASK>` (RED/GREEN/REFACTOR cycles). **Herdado:** `x-test-tdd-drive` (?ex-`x-drive-tdd`).
-- **F7 `[V0]`** — `forge epic orchestrate <ID>`. **Herdado:** `x-epic-orchestrate`.
+- **F1 `[V0]`** — `forge story implement <ID>`. **Herdado:** `x-implement-story`.
+- **F2 `[V0]`** — `forge epic implement <ID>`. **Herdado:** `x-implement-epic`.
+- **F3 `[V0]`** — `forge task implement <ID>`. **Herdado:** `x-implement-task`.
+- **F4 `[V0]`** — `forge story refine <ID>` / `forge epic refine <ID>`. **Herdado:** `x-refine-story` / `x-refine-epic`.
+- **F5 `[V0]`** — `forge story plan <ID>` / `forge task plan <ID>`. **Herdado:** `x-plan-story` / `x-plan-task`.
+- **F6 `[V0]`** — `forge test tdd <TASK>` (RED/GREEN/REFACTOR cycles). **Herdado:** `x-drive-tdd`.
+- **F7 `[V0]`** — `forge epic orchestrate <ID>`. **Herdado:** `x-orchestrate-epic`.
 
 #### P3.C2 — Release & Merge Train
 
 - **F1 `[V0]`** — `forge release [--patch/--minor/--major]`. **Herdado:** `x-release`.
-- **F2 `[V0]`** — `forge merge-train`. **Herdado:** `x-pr-merge-train` (?ex-`x-manage-pr-merge-train`).
+- **F2 `[V0]`** — `forge merge-train`. **Herdado:** `x-manage-pr-merge-train`.
 - **F3 `[V0]`** — `forge feature create` / `forge feature ideate` (já em P1.C2, listado aqui para visibilidade).
 
 #### P3.C3 — PR Lifecycle Commands
 
-- **F1 `[V0]`** — `forge pr create`. **Herdado:** `x-pr-create`.
-- **F2 `[V0]`** — `forge pr fix <PR>` / `forge pr fix --epic <EPIC>`. **Herdado:** `x-pr-fix` / `x-pr-fix-epic` (?).
-- **F3 `[V0]`** — `forge pr merge`. **Herdado:** `x-pr-merge`.
-- **F4 `[V0]`** — `forge pr watch`. **Herdado:** `x-pr-ci-watch`.
+- **F1 `[V0]`** — `forge pr create`. **Herdado:** `x-create-pr`.
+- **F2 `[V0]`** — `forge pr fix <PR>` / `forge pr fix --epic <EPIC>`. **Herdado:** `x-fix-pr` / `x-fix-epic-pr` (?).
+- **F3 `[V0]`** — `forge pr merge`. **Herdado:** `x-merge-pr`.
+- **F4 `[V0]`** — `forge pr watch`. **Herdado:** `x-watch-pr-ci`.
 
 #### P3.C4 — Reliability & Replay
 
@@ -660,9 +661,9 @@ Runtime determinístico
 
 #### P4.C1 — Quality Gates
 
-- **F1 `[V0]`** — `forge test run` (coverage filtering). **Herdado:** `x-test-execute` (?ex-`x-execute-tests`).
-- **F2 `[V0]`** — `forge test plan`. **Herdado:** `x-test-plan` (?ex-`x-plan-tests`).
-- **F3 `[V0]`** — `forge test e2e`. **Herdado:** `x-test-e2e-execute` (?).
+- **F1 `[V0]`** — `forge test run` (coverage filtering). **Herdado:** `x-execute-tests`.
+- **F2 `[V0]`** — `forge test plan`. **Herdado:** `x-plan-tests`.
+- **F3 `[V0]`** — `forge test e2e`. **Herdado:** `x-execute-e2e-tests` (?).
 - **F4 `[V0]`** — `forge test contract` + `forge test contract lint`. **Herdado:** EPIC-0072.
 - **F5 `[V0]`** — `forge test mutation`. **Herdado:** EPIC-0072.
 - **F6 `[V0]`** — `forge test performance`. **Herdado:** EPIC-0072.
@@ -678,9 +679,9 @@ Runtime determinístico
 
 #### P4.C3 — Documentation
 
-- **F1 `[V0]`** — `forge doc generate`. **Herdado:** `x-doc-generate` (?).
-- **F2 `[V0]`** — `forge doc validate` (Rule 31). **Herdado:** `x-doc-validate` (?).
-- **F3 `[V0]`** — `forge adr generate`. **Herdado:** `x-adr-generate` (?ex-`x-generate-adr`).
+- **F1 `[V0]`** — `forge doc generate`. **Herdado:** `x-generate-docs` (?).
+- **F2 `[V0]`** — `forge doc validate` (Rule 31). **Herdado:** `x-validate-docs` (?).
+- **F3 `[V0]`** — `forge adr generate`. **Herdado:** `x-generate-adr`.
 - **F4 `[V0]`** — `forge release changelog`. **Herdado:** sim.
 - **F5 `[V0]`** — `forge arch update` / `forge arch system update`. **Herdado:** sim.
 
@@ -696,7 +697,7 @@ Runtime determinístico
 - **F8 `[V0]`** — `forge security pentest` (+ `--dynamic` para DAST gate).
 - **F9 `[V0]`** — `forge security {container,dast,infra,sast,secrets,sonar}` (conditional adapters).
 - **F10 `[V0]`** — `forge security dep-policy validate` (Rule 32).
-- **F11 `[V0]`** — `forge security threat-model`. **Herdado:** `x-threat-model` (?ex-`x-model-threats`).
+- **F11 `[V0]`** — `forge security threat-model`. **Herdado:** `x-model-threats`.
 
 ### §7.7. P5 Developer Experience — Features
 
@@ -865,18 +866,18 @@ Runtime determinístico
 
 | Skill atual (pós-0076) | Destino Forge | Wave | Bloqueia |
 | :--- | :--- | :-: | :-: |
-| `x-internal-args-normalize` | `service ArgsNormalizer` | W1 | TODOS comandos |
-| `x-internal-status-update` | `service StateRepository` | W1 | 22 skills |
-| `x-internal-report-write` | `service TemplateRenderer` | W1 | 14 skills |
-| `x-git-commit` (ex-`x-commit-changes`) | `GitAdapter.commit()` + `forge git commit` | W1 | 16 skills |
-| `x-git-worktree-manage` (ex-`x-manage-worktrees`) | `GitAdapter.worktree()` + `forge git worktree` | W1 | 13 skills |
-| `x-git-push` (ex-`x-push-branch`) | `GitAdapter.push()` + `forge git push` | W1 | 11 skills |
+| `x-internal-normalize-args` | `service ArgsNormalizer` | W1 | TODOS comandos |
+| `x-internal-update-status` | `service StateRepository` | W1 | 22 skills |
+| `x-internal-write-report` | `service TemplateRenderer` | W1 | 14 skills |
+| `x-commit-changes` (ex-`x-commit-changes`) | `GitAdapter.commit()` + `forge git commit` | W1 | 16 skills |
+| `x-manage-worktrees` (ex-`x-manage-worktrees`) | `GitAdapter.worktree()` + `forge git worktree` | W1 | 13 skills |
+| `x-push-branch` (ex-`x-push-branch`) | `GitAdapter.push()` + `forge git push` | W1 | 11 skills |
 | `x-internal-ensure-epic-branch` | `service EpicBranchPolicy` | W1 | 10 skills |
 | `x-internal-load-story-context` | `service StoryContextLoader` | W3 | story-implement |
 | `x-internal-build-story-plan` | `service StoryPlanBuilder` | W3 | story-implement |
 | `x-internal-verify-story` | `service StoryVerifyGate` | W3 | story-implement |
-| `x-task-implement` | `command forge task implement` | W5 | 14 skills |
-| `x-story-implement` | `command forge story implement` | W5 | **44 skills (hub central)** |
+| `x-implement-task` | `command forge task implement` | W5 | 14 skills |
+| `x-implement-story` | `command forge story implement` | W5 | **44 skills (hub central)** |
 
 ### §8.3. Mapeamento `x-*` → comando/serviço Forge (resumo categórico)
 
@@ -990,10 +991,10 @@ Runtime determinístico
 ### §11.1. Caminho crítico (10 skills bloqueadoras)
 
 ```text
-W1: x-internal-args-normalize, x-internal-status-update, x-internal-report-write,
+W1: x-internal-normalize-args, x-internal-update-status, x-internal-write-report,
     x-git-{commit,push,branch,worktree-manage}, x-internal-ensure-epic-branch
 W3: x-internal-load-story-context, x-internal-build-story-plan, x-internal-verify-story
-W5: x-task-implement, x-story-implement (hub central — bloqueia 44 outras)
+W5: x-implement-task, x-implement-story (hub central — bloqueia 44 outras)
 ```
 
 ### §11.2. Phase gates de wave (Rule 25 aplicada ao Forge)
@@ -1012,8 +1013,8 @@ W5: x-task-implement, x-story-implement (hub central — bloqueia 44 outras)
 | Tema | Roadmap original | Este plano | Razão |
 | :--- | :--- | :--- | :--- |
 | **Terminologia** | "Capacity" | **Capability** | Alinhamento com EPIC-0064 (capability composition) e EPIC-0077 (Product-First). Evita dois termos para o mesmo conceito. |
-| **Skill names** | `x-implement-story`, `x-create-pr`, `x-plan-architecture`, `x-create-feature`, ... | `x-story-implement`, `x-pr-create`, `x-arch-plan`, `x-feature-create`, ... | Padrão verb-first pós-EPIC-0076. |
-| **Architecture planning** | "Worker `x-plan-architecture` parametrizado por nível" (P1.C3) | **3 commands distintos** (`x-arch-plan-product`, `x-arch-plan-capability`, `x-arch-plan` para feature) já existindo em EPIC-0077. | EPIC-0077 já materializou. |
+| **Skill names** | Mistura de noun-first (ex.: `x-epic-implement`, `x-arch-plan`, `x-pr-fix`) e verb-first | **Verb-first canônico já presente no repo** (`x-implement-story`, `x-create-pr`, `x-plan-architecture`, `x-create-feature`, ...); EPIC-0076 (Backlog) consolidará as exceções remanescentes. | Padrão verb-first é o estado atual majoritário do repo. |
+| **Architecture planning** | "Worker `x-plan-architecture` parametrizado por nível" (P1.C3) | **3 commands distintos** (`x-arch-plan-product`, `x-arch-plan-capability` em EPIC-0077; `x-plan-architecture` para feature) | EPIC-0077 já materializou. Variantes `x-arch-plan-*` são exceções permanentes (escopo declarado). |
 | **Templates Product/Capability** | "Templates novos" implícitos | `_TEMPLATE-PRODUCT.md` (8 seções), `_TEMPLATE-CAPABILITY.md` (7 seções) **já existem em EPIC-0077**. | EPIC-0077 já materializou. |
 | **C4 model** | Não citado explicitamente | **Obrigatório** (C1-C4 Mermaid) em planning artifacts. | EPIC-0077 contrato. |
 | **RNF inheritance gate** | "Refinement gate" genérico | **No-relax gate** explícito (`x-internal-rnf-validate`). | EPIC-0077 já materializou. |
@@ -1039,7 +1040,7 @@ W5: x-task-implement, x-story-implement (hub central — bloqueia 44 outras)
 
 ## §13. Open Questions a resolver (antes de virar épicos)
 
-> 14 questões herdadas do roadmap §22, ainda válidas. ADR para cada antes de decompor.
+> 16 questões (14 herdadas do roadmap §22 + 2 adicionadas em §13.5). ADR para cada antes de decompor.
 
 ### §13.1. Plataforma
 
@@ -1076,12 +1077,12 @@ W5: x-task-implement, x-story-implement (hub central — bloqueia 44 outras)
 
 ## §14. Próximos passos imediatos
 
-1. **Refinement multi-persona deste plano** com PO + Tech Lead + Architect + Security + QA + SRE/DevOps. Use `/x-refine-epic` ou `/x-story-refine` (atualmente `x-refine-story`/`x-refine-epic`) com este documento como spec.
+1. **Refinement multi-persona deste plano** com PO + Tech Lead + Architect + Security + QA + SRE/DevOps. Use `/x-refine-epic` ou `/x-refine-story` (atualmente `x-refine-story`/`x-refine-epic`) com este documento como spec.
 2. **Resolver 16 open questions de §13**, criando ADRs para cada decisão.
 3. **Spike de inversão de controle** usando o caminho crítico W1 + um command stub:
    - Implementar `ArgsNormalizer` + `StateRepository` + `TemplateRenderer` em Java.
    - Stub `forge story refine` que use os três + chame Anthropic via `LlmProvider`.
-   - Comparar com `x-story-refine` markdown atual: tempo, taxa de bypass, qualidade, debuggability.
+   - Comparar com `x-refine-story` markdown atual: tempo, taxa de bypass, qualidade, debuggability.
 4. **Spike de target adapter Cursor** em paralelo (P2.C3).
 5. **Decompor W0 + W1** em épicos concretos do Forge usando este documento como entrada de `forge epic create` (atualmente via `x-feature-create` → `x-internal-create-epic`).
 6. **Criar Project `Forge`** com este documento como artefato fundador. Cadeia: `forge project create FORGE` → `forge product create FORGE-FOUNDATIONS` → `forge capability create FORGE-FOUNDATIONS-PROJECT-BOOTSTRAP` → `forge feature create FORGE-FOUNDATIONS-PROJECT-BOOTSTRAP-CLI-BINARY` → `forge arch plan feature ...` → `forge epic create ...`.
