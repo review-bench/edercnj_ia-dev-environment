@@ -1,8 +1,11 @@
 package dev.iadev.adapter.inbound.cli;
 
+import dev.iadev.adapter.outbound.documentation.C4DiagramGenerator;
+import dev.iadev.application.architecture.ArchitectureRefactoringUseCase;
 import dev.iadev.domain.architecture.C4Diagram;
+import dev.iadev.domain.architecture.C4LevelValidator;
 import dev.iadev.domain.architecture.C4OutputFormat;
-import dev.iadev.domain.architecture.CapabilityC4Planner;
+import dev.iadev.domain.architecture.CapabilityC4Model;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
@@ -34,35 +37,37 @@ public class XArchPlanCapabilityCommand implements Callable<Integer> {
             description = "Output format: mermaid (default), plantuml.")
     String outputFormat;
 
+    private final ArchitectureRefactoringUseCase useCase =
+            new ArchitectureRefactoringUseCase(new C4DiagramGenerator(), new C4LevelValidator());
+
     @Override
     public Integer call() {
         PrintWriter out = spec.commandLine().getOut();
-
-        C4OutputFormat format;
         try {
-            format = C4OutputFormat.fromString(outputFormat);
-        } catch (IllegalArgumentException e) {
-            out.println("Error: " + e.getMessage());
-            return EXIT_VALIDATION;
-        }
-
-        if (capabilityId == null || capabilityId.isBlank()) {
-            out.println("Error: --capability-id must not be blank");
-            return EXIT_VALIDATION;
-        }
-
-        try {
-            CapabilityC4Planner planner = new CapabilityC4Planner();
-            C4Diagram container = planner.planContainer(capabilityId, format);
-            C4Diagram component = planner.planComponent(capabilityId, format);
-            out.println("C4 Container diagram generated for: " + capabilityId);
-            out.println(container.content());
-            out.println("C4 Component diagram generated for: " + capabilityId);
-            out.println(component.content());
+            CapabilityC4Model model = useCase.planCapability(capabilityId, resolveFormat());
+            writeSummary(out, model);
             return EXIT_SUCCESS;
+        } catch (IllegalArgumentException e) {
+            out.println("Validation error: " + e.getMessage());
+            return EXIT_VALIDATION;
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
             return EXIT_EXECUTION;
         }
+    }
+
+    private C4OutputFormat resolveFormat() {
+        return C4OutputFormat.fromString(outputFormat);
+    }
+
+    private void writeSummary(PrintWriter out, CapabilityC4Model model) {
+        out.println("C4 diagrams generated for " + model.capabilityId() + ":");
+        writeLine(out, model.contextDiagram(), model.isPlaceholder("CONTEXT"));
+        writeLine(out, model.containerDiagram(), model.isPlaceholder("CONTAINER"));
+        writeLine(out, model.componentDiagram(), model.isPlaceholder("COMPONENT"));
+    }
+
+    private void writeLine(PrintWriter out, C4Diagram diagram, boolean placeholder) {
+        out.printf("  %-10s: %s  [%s]%n", diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
     }
 }

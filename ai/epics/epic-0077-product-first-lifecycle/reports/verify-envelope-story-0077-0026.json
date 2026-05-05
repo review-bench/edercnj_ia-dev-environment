@@ -1,0 +1,38 @@
+{
+  "storyId": "story-0077-0026",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T19:15:00Z",
+  "passed": true,
+  "coverageLine": 95.8,
+  "coverageBranch": 90.5,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0026.md",
+    "implementationFiles": [
+      "src/main/java/dev/iadev/adapter/inbound/cli/XArchPlanCapabilityCommand.java",
+      "src/main/java/dev/iadev/adapter/inbound/cli/XArchPlanFeatureCommand.java",
+      "src/main/java/dev/iadev/adapter/inbound/cli/XArchPlanProductCommand.java",
+      "src/main/java/dev/iadev/adapter/outbound/documentation/C4DiagramGenerator.java",
+      "src/main/java/dev/iadev/application/architecture/ArchitectureRefactoringUseCase.java",
+      "src/main/java/dev/iadev/domain/architecture/C4LevelValidator.java",
+      "src/main/java/dev/iadev/domain/architecture/C4TextSanitizer.java",
+      "src/main/java/dev/iadev/domain/architecture/CapabilityC4Model.java",
+      "src/main/java/dev/iadev/domain/architecture/CapabilityC4Planner.java",
+      "src/main/java/dev/iadev/domain/architecture/FeatureC4Model.java",
+      "src/main/java/dev/iadev/domain/architecture/FeatureC4Planner.java",
+      "src/main/java/dev/iadev/domain/architecture/ProductC4Model.java",
+      "src/main/java/dev/iadev/domain/architecture/ProductC4Planner.java",
+      "src/main/java/dev/iadev/domain/port/output/C4DiagramPort.java"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story implements mandatory C4 diagram generation for Feature/Capability/Product levels via x-arch-plan refactor"
+}
