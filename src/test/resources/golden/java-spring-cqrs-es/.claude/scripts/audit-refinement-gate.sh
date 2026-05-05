@@ -108,6 +108,57 @@ resolve_story_md() {
     find ai/epics -maxdepth 3 -name "${target_id}.md" 2>/dev/null | head -1 || true
 }
 
+trim_cell() {
+    printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+
+normalize_cell() {
+    local value
+    value=$(trim_cell "$1")
+    if [[ -z "${value}" || "${value}" == "—" ]]; then
+        printf ''
+        return 0
+    fi
+    printf '%s' "${value}"
+}
+
+check_rnf_inheritance() {
+    local target_id="$1"
+    local md_file="$2"
+    [[ -z "${md_file}" || ! -f "${md_file}" ]] && return 0
+    grep -q '^## 2\. RNFs Herdadas' "${md_file}" || return 0
+
+    while IFS= read -r row; do
+        IFS='|' read -r _ raw_category _raw_original raw_no_relax _raw_override raw_justification raw_approval raw_approver _ <<< "${row}"
+        local category no_relax justification approval approver
+        category=$(normalize_cell "${raw_category}")
+        no_relax=$(normalize_cell "${raw_no_relax}")
+        justification=$(normalize_cell "${raw_justification}")
+        approval=$(normalize_cell "${raw_approval}")
+        approver=$(normalize_cell "${raw_approver}")
+        category=$(printf '%s' "${category}" | tr '[:lower:]' '[:upper:]')
+        approval=$(printf '%s' "${approval}" | tr '[:lower:]' '[:upper:]')
+
+        [[ "${no_relax}" == "true" ]] && continue
+        if [[ "${category}" == "SECURITY" || "${category}" == "COMPLIANCE" ]]; then
+            echo "REFINEMENT_GATE_VIOLATION (rnf-inheritance-violation): ${target_id} category='${category}' cannot be relaxed" >&2
+            return 1
+        fi
+        if [[ -z "${justification}" || "${approval}" != "APPROVED" || -z "${approver}" ]]; then
+            echo "REFINEMENT_GATE_VIOLATION (rnf-inheritance-violation): ${target_id} category='${category}' has unapproved relaxation" >&2
+            return 1
+        fi
+    done < <(
+        awk '
+            /^## 2\. RNFs Herdadas/ { in_section=1; next }
+            in_section && /^## / { exit }
+            in_section && /^\|/ && $0 !~ /Categoria/ && $0 !~ /:---/ { print }
+        ' "${md_file}"
+    )
+
+    return 0
+}
+
 has_audit_exempt() {
     local md_file="$1"
     [[ -z "${md_file}" || ! -f "${md_file}" ]] && return 1
@@ -135,6 +186,7 @@ audit_target() {
     local violations=0
     local state_file
     state_file=$(resolve_state_file "${target_id}")
+    local md_file=""
 
     if [[ -z "${state_file}" ]]; then
         # No state file → cannot verify; skip silently (story may not be tracked yet)
@@ -154,7 +206,6 @@ audit_target() {
         approved)
             ;;
         *)
-            local md_file
             md_file=$(resolve_story_md "${target_id}")
             local exempt_rc=1
             has_audit_exempt "${md_file}" && exempt_rc=0 || exempt_rc=$?
@@ -175,11 +226,18 @@ audit_target() {
     local declared_hash
     declared_hash=$(jq -r '.refinementVerdict.verdictHash // empty' "${state_file}" 2>/dev/null || true)
     if [[ -n "${declared_hash}" ]]; then
-        local md_file actual_hash
-        md_file=$(resolve_story_md "${target_id}")
+        local actual_hash
+        [[ -z "${md_file}" ]] && md_file=$(resolve_story_md "${target_id}")
         actual_hash=$(extract_verdict_block_hash "${md_file}" 2>/dev/null || echo "")
         if [[ -n "${actual_hash}" && "${declared_hash}" != "${actual_hash}" ]]; then
             echo "REFINEMENT_GATE_VIOLATION (verdict-mismatch): ${target_id} state=${declared_hash} markdown=${actual_hash}" >&2
+            violations=1
+        fi
+    fi
+
+    if [[ "${target_id}" =~ ^story- ]]; then
+        [[ -z "${md_file}" ]] && md_file=$(resolve_story_md "${target_id}")
+        if ! check_rnf_inheritance "${target_id}" "${md_file}"; then
             violations=1
         fi
     fi
