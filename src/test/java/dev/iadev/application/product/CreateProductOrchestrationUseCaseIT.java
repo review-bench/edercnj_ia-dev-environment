@@ -9,6 +9,7 @@ import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationToProductTransformer;
 import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
+import dev.iadev.domain.product.RNFRootValidator;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,8 +21,9 @@ class CreateProductOrchestrationUseCaseIT {
     private final IdeationValidator validator = new IdeationValidator();
     private final IdeationToProductTransformer transformer = new IdeationToProductTransformer();
     private final CapabilityStubFactory capabilityStubFactory = new CapabilityStubFactory();
+    private final RNFRootValidator rnfValidator = new RNFRootValidator();
     private final CreateProductOrchestrationUseCase useCase =
-            new CreateProductOrchestrationUseCase(validator, transformer, capabilityStubFactory);
+            new CreateProductOrchestrationUseCase(validator, transformer, capabilityStubFactory, rnfValidator);
 
     private static IdeationTemplate validIdeation() {
         return IdeationTemplate.builder()
@@ -108,6 +110,18 @@ class CreateProductOrchestrationUseCaseIT {
         void execute_withInvalidIdeation_productIsNull() {
             var result = useCase.execute("product-0001", invalidIdeation());
             assertThat(result.product()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("RNF gate")
+    class RnfGate {
+
+        @Test
+        void execute_withValidIdeation_rnfGatePassesBecauseTransformerProducesTwelvePlusRnfs() {
+            var result = useCase.execute("product-0001", validIdeation());
+            assertThat(result.successful()).isTrue();
+            assertThat(result.product().rnfRoots()).hasSizeGreaterThanOrEqualTo(10);
         }
     }
 

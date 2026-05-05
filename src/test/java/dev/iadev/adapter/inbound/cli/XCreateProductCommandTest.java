@@ -142,6 +142,27 @@ class XCreateProductCommandTest {
     }
 
     @Nested
+    @DisplayName("Non-dry-run execution")
+    class NonDryRunExecution {
+
+        @Test
+        void call_withEmptyIdeationFile_returnsValidationExitCode() throws Exception {
+            Path ideation = Files.createTempFile(tempDir, "idea", ".md");
+            var sw = new StringWriter();
+            int exit = buildCommandLine(sw).execute("--ideation-file", ideation.toString());
+            assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_VALIDATION);
+        }
+
+        @Test
+        void call_withEmptyIdeationFile_outputContainsValidationError() throws Exception {
+            Path ideation = Files.createTempFile(tempDir, "idea", ".md");
+            var sw = new StringWriter();
+            buildCommandLine(sw).execute("--ideation-file", ideation.toString());
+            assertThat(sw.toString()).containsIgnoringCase("error");
+        }
+    }
+
+    @Nested
     @DisplayName("Argument parser — unit tests")
     class ArgumentParserUnit {
 

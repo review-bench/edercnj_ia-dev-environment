@@ -11,6 +11,7 @@ import dev.iadev.domain.ideation.IdeationSection;
 import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationToProductTransformer;
 import dev.iadev.domain.ideation.IdeationValidator;
+import dev.iadev.domain.product.RNFRootValidator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +50,7 @@ class XCreateProductE2ETest {
     void fullPipeline_validIdeation_writesProductAndCapabilityArtifacts() throws IOException {
         var useCase = new CreateProductOrchestrationUseCase(
                 new IdeationValidator(), new IdeationToProductTransformer(),
-                new CapabilityStubFactory());
+                new CapabilityStubFactory(), new RNFRootValidator());
 
         CreateProductResult result = useCase.execute("product-0001", validIdeation());
 
@@ -69,7 +70,7 @@ class XCreateProductE2ETest {
     void fullPipeline_rerun_secondExecutionSkipsWrite() throws IOException {
         var useCase = new CreateProductOrchestrationUseCase(
                 new IdeationValidator(), new IdeationToProductTransformer(),
-                new CapabilityStubFactory());
+                new CapabilityStubFactory(), new RNFRootValidator());
 
         CreateProductResult result = useCase.execute("product-0001", validIdeation());
         ProductArtifactWriter.write(result.product(), "product-0001", outputDir);
@@ -88,7 +89,7 @@ class XCreateProductE2ETest {
     void fullPipeline_productArtifactContainsExpectedRnfRoots() throws IOException {
         var useCase = new CreateProductOrchestrationUseCase(
                 new IdeationValidator(), new IdeationToProductTransformer(),
-                new CapabilityStubFactory());
+                new CapabilityStubFactory(), new RNFRootValidator());
 
         CreateProductResult result = useCase.execute("product-0001", validIdeation());
         ProductArtifactWriter.write(result.product(), "product-0001", outputDir);
@@ -106,7 +107,7 @@ class XCreateProductE2ETest {
     void fullPipeline_invalidIdeation_noArtifactsWritten() {
         var useCase = new CreateProductOrchestrationUseCase(
                 new IdeationValidator(), new IdeationToProductTransformer(),
-                new CapabilityStubFactory());
+                new CapabilityStubFactory(), new RNFRootValidator());
 
         IdeationTemplate invalid = IdeationTemplate.builder()
                 .title("Broken")

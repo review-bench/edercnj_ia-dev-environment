@@ -1,12 +1,26 @@
 package dev.iadev.adapter.inbound.cli;
 
+import dev.iadev.application.product.CreateProductOrchestrationUseCase;
+import dev.iadev.application.product.CreateProductResult;
+import dev.iadev.domain.capability.CapabilityStubFactory;
+import dev.iadev.domain.ideation.IdeationSection;
+import dev.iadev.domain.ideation.IdeationTemplate;
+import dev.iadev.domain.ideation.IdeationToProductTransformer;
+import dev.iadev.domain.ideation.IdeationValidator;
+import dev.iadev.domain.product.RNFRootValidator;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
-import picocli.CommandLine.Model.CommandSpec;
 
 @Command(
         name = "x-create-product",
@@ -65,7 +79,67 @@ public class XCreateProductCommand implements Callable<Integer> {
             return EXIT_SUCCESS;
         }
 
-        out.println("Product creation initiated for: " + request.ideationFile());
+        IdeationTemplate ideation = parseIdeation(request.ideationFile());
+        String resolvedProductId = request.productId().orElse("product-0001");
+
+        var useCase = new CreateProductOrchestrationUseCase(
+                new IdeationValidator(),
+                new IdeationToProductTransformer(),
+                new CapabilityStubFactory(),
+                new RNFRootValidator());
+
+        CreateProductResult result = useCase.execute(resolvedProductId, ideation);
+
+        if (!result.successful()) {
+            result.validationErrors().forEach(error -> out.println("Error: " + error));
+            return EXIT_VALIDATION;
+        }
+
+        out.println("Product created: " + result.product().name() + " [" + resolvedProductId + "]");
         return EXIT_SUCCESS;
+    }
+
+    private static IdeationTemplate parseIdeation(Path file) {
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        String title = "";
+        Map<IdeationSection, String> sections = new EnumMap<>(IdeationSection.class);
+        IdeationSection currentSection = null;
+        StringBuilder sectionBody = new StringBuilder();
+
+        for (String line : lines) {
+            if (line.startsWith("# ") && title.isEmpty()) {
+                title = line.substring(2).trim();
+            } else if (line.startsWith("## ")) {
+                if (currentSection != null) {
+                    sections.put(currentSection, sectionBody.toString().trim());
+                }
+                currentSection = parseSectionHeading(line);
+                sectionBody = new StringBuilder();
+            } else if (currentSection != null) {
+                sectionBody.append(line).append("\n");
+            }
+        }
+
+        if (currentSection != null) {
+            sections.put(currentSection, sectionBody.toString().trim());
+        }
+
+        return IdeationTemplate.builder().title(title).sections(sections).build();
+    }
+
+    private static IdeationSection parseSectionHeading(String line) {
+        String heading = line.substring(3).trim();
+        for (IdeationSection section : IdeationSection.values()) {
+            if (heading.startsWith(section.number() + ".") || heading.startsWith(section.number() + " ")) {
+                return section;
+            }
+        }
+        return null;
     }
 }
