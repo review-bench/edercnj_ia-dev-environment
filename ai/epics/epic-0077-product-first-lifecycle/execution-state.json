@@ -148,12 +148,29 @@
       ],
       "refinementVerdict": {
         "status": "rejected",
-        "checkedAt": "2026-05-04T12:00:00Z",
-        "verdictHash": "f0bf97639c5d819cb92e17dc8b7650b330f45ee0bbc7c05765e1b800e8a1c1e1",
+        "scope": "story",
+        "checkedAt": "2026-05-05T13:48:01Z",
+        "verdictHash": "e0ad2fd8f2497cf94df54e312fae5cdaa83775b0369a15a1a810619675f21d37",
+        "dimensions": {
+          "persona": {"checked": true, "blocker": null},
+          "value": {"checked": true, "blocker": null},
+          "ac": {"checked": true, "blocker": "Injection scenario missing for --capability-id; SVG injection not covered"},
+          "contracts": {"checked": true, "blocker": "C4Diagram type undeclared; enums undeclared; CLI-skill boundary undefined; mutable VO fields; conditional null in VO"},
+          "metrics": {"checked": true, "blocker": null},
+          "alternatives": {"checked": true, "blocker": null},
+          "risks": {"checked": true, "blocker": "No risk register; schema drift risk absent; PlantUML injection unanalyzed"}
+        },
         "blockers": [
-          "ac: missing performance/SLA and security/auth Gherkin scenarios",
-          "contracts: no typed CLI input/output schema (only a C4 validation table in \u00a73)",
-          "metrics: \u00a77 has no \u00a77.2 Metrics table; \u00a71.2 metric is qualitative"
+          "contracts: C4Diagram type undeclared",
+          "contracts: C4OutputFormat/C4Level enum members undeclared",
+          "contracts: Skill-vs-CLI integration boundary undefined",
+          "contracts: C4ModelMandatory VO conditional null field pattern",
+          "contracts: completeness.placeholders mutable List in immutable VO",
+          "risks: No risk register in \u00a76",
+          "risks: Upstream schema drift from story-0077-0008 not mitigated",
+          "risks: PlantUML directive injection unanalyzed",
+          "ac: Injection scenario missing for --capability-id",
+          "ac: SVG injection has no Gherkin coverage"
         ]
       }
     },
