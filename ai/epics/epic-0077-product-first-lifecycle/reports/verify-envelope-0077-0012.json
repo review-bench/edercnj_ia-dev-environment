@@ -1,0 +1,16 @@
+{
+  "storyId": "story-0077-0012",
+  "epicId": "epic-0077",
+  "passed": true,
+  "testsTotal": 5078,
+  "testsFailed": 0,
+  "testsSkipped": 14,
+  "coverageLine": 97,
+  "coverageBranch": 93,
+  "prNumbers": [1018, 1019, 1020],
+  "tasks": [
+    { "id": "TASK-0077-0012-001", "status": "DONE", "prNumber": 1018 },
+    { "id": "TASK-0077-0012-002", "status": "DONE", "prNumber": 1019 },
+    { "id": "TASK-0077-0012-003", "status": "DONE", "prNumber": 1020 }
+  ]
+}
