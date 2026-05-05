@@ -1,8 +1,15 @@
 package dev.iadev.cli;
 
+import dev.iadev.adapter.inbound.cli.XArchPlanCapabilityCommand;
+import dev.iadev.adapter.inbound.cli.XArchPlanFeatureCommand;
+import dev.iadev.adapter.inbound.cli.XArchPlanProductCommand;
 import dev.iadev.adapter.inbound.cli.XCreateCapabilityCommand;
+import dev.iadev.adapter.inbound.cli.XCreateFeatureCommand;
 import dev.iadev.adapter.inbound.cli.XCreateProductCommand;
+import dev.iadev.adapter.inbound.cli.XEpicCreateCommand;
+import dev.iadev.adapter.inbound.cli.XInternalRnfValidateCommand;
 import dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand;
+import dev.iadev.adapter.inbound.cli.XStoryCreateCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -38,7 +45,14 @@ import picocli.CommandLine.Spec;
             ValidateCommand.class,
             XCreateProductCommand.class,
             XCreateCapabilityCommand.class,
-            XPromoteIdeationCommand.class
+            XCreateFeatureCommand.class,
+            XPromoteIdeationCommand.class,
+            XEpicCreateCommand.class,
+            XStoryCreateCommand.class,
+            XArchPlanProductCommand.class,
+            XArchPlanCapabilityCommand.class,
+            XArchPlanFeatureCommand.class,
+            XInternalRnfValidateCommand.class
         })
 public class IaDevEnvApplication implements Runnable {
 
