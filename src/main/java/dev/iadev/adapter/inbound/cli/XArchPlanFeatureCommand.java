@@ -5,19 +5,19 @@ import dev.iadev.application.architecture.ArchitectureRefactoringUseCase;
 import dev.iadev.domain.architecture.C4Diagram;
 import dev.iadev.domain.architecture.C4LevelValidator;
 import dev.iadev.domain.architecture.C4OutputFormat;
-import dev.iadev.domain.architecture.ProductC4Model;
+import dev.iadev.domain.architecture.FeatureC4Model;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
-import picocli.CommandLine.Model.CommandSpec;
 
 @Command(
-        name = "x-arch-plan-product",
+        name = "x-arch-plan-feature",
         mixinStandardHelpOptions = true,
-        description = "Generate C4 Context + Container diagrams for a product.")
-public class XArchPlanProductCommand implements Callable<Integer> {
+        description = "Generate C4 Context + Container diagrams for a feature.")
+public class XArchPlanFeatureCommand implements Callable<Integer> {
 
     static final int EXIT_SUCCESS = 0;
     static final int EXIT_VALIDATION = 1;
@@ -27,10 +27,10 @@ public class XArchPlanProductCommand implements Callable<Integer> {
     CommandSpec spec;
 
     @Option(
-            names = {"--product-id"},
+            names = {"--feature-id"},
             required = true,
-            description = "Product identifier (e.g. product-0001).")
-    String productId;
+            description = "Feature identifier (e.g. feature-oauth2 or oauth2-integration).")
+    String featureId;
 
     @Option(
             names = {"--output-format"},
@@ -44,7 +44,7 @@ public class XArchPlanProductCommand implements Callable<Integer> {
     public Integer call() {
         PrintWriter out = spec.commandLine().getOut();
         try {
-            ProductC4Model model = useCase.planProduct(productId, resolveFormat());
+            FeatureC4Model model = useCase.planFeature(featureId, resolveFormat());
             writeSummary(out, model);
             return EXIT_SUCCESS;
         } catch (IllegalArgumentException e) {
@@ -60,8 +60,8 @@ public class XArchPlanProductCommand implements Callable<Integer> {
         return C4OutputFormat.fromString(outputFormat);
     }
 
-    private void writeSummary(PrintWriter out, ProductC4Model model) {
-        out.println("C4 diagrams generated for " + model.productId() + ":");
+    private void writeSummary(PrintWriter out, FeatureC4Model model) {
+        out.println("C4 diagrams generated for " + model.featureId() + ":");
         writeLine(out, model.contextDiagram(), model.isPlaceholder("CONTEXT"));
         writeLine(out, model.containerDiagram(), model.isPlaceholder("CONTAINER"));
         writeLine(out, model.componentDiagram(), model.isPlaceholder("COMPONENT"));
