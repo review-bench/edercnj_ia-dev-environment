@@ -125,14 +125,15 @@ class OutputPortArchitectureTest {
                             .toList();
 
             assertThat(outputPortClasses)
-                    .hasSize(5)
+                    .hasSize(6)
                     .extracting(jc -> jc.getSimpleName())
                     .containsExactlyInAnyOrder(
                             "StackProfileRepository",
                             "TemplateRenderer",
                             "FileSystemWriter",
                             "ProgressReporter",
-                            "CapabilityCatalogRepository");
+                            "CapabilityCatalogRepository",
+                            "C4DiagramPort");
         }
     }
 
