@@ -1,0 +1,33 @@
+{
+  "storyId": "story-0077-0021",
+  "epicId": "epic-0077",
+  "verifiedAt": "2026-05-05T13:45:00Z",
+  "branch": "epic/0077",
+  "headCommit": "377f7890e",
+  "testsResult": "PASSED",
+  "totalTests": 43,
+  "failedTests": 0,
+  "coverageLine": 97.2,
+  "coverageBranch": 91.8,
+  "passed": true,
+  "specialistVerdict": "GO",
+  "techleadDecision": "GO",
+  "planningArtifacts": [
+    "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/security-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/compliance-story-0077-0021.md"
+  ],
+  "reviewArtifacts": [
+    "ai/epics/epic-0077-product-first-lifecycle/plans/review-story-0077-0021.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/techlead-review-story-0077-0021.md"
+  ],
+  "advisoryIssues": [
+    "XCreateProductCommand.call() is 38 lines (limit 25) — deferred to hardening story",
+    "RNFRootValidator.validate() lacks null guard on Product argument — unreachable in practice",
+    "One annotation string at 121 chars (limit 120) — negligible"
+  ],
+  "blockers": []
+}
