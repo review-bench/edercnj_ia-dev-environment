@@ -1,6 +1,7 @@
 {
   "schemaVersion": "1.0",
   "flowVersion": "5",
+  "productFirstLifecycle": true,
   "epicId": "EPIC-0077",
   "epicTitle": "Product-First Lifecycle & Planning C4 Model",
   "epicBranch": "epic/0077",
