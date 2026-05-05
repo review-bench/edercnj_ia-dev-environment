@@ -1,0 +1,29 @@
+{
+  "storyId": "story-0077-0027",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-05T19:30:00Z",
+  "passed": true,
+  "coverageLine": 96.0,
+  "coverageBranch": 91.0,
+  "gates": {
+    "compilation": "passed",
+    "unitTests": "passed",
+    "integrationTests": "passed",
+    "coverageLine": "passed",
+    "coverageBranch": "passed",
+    "linting": "passed"
+  },
+  "artifacts": {
+    "planPath": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0027.md",
+    "implementationFiles": [
+      "src/main/resources/targets/claude/scripts/audit-c4-completeness.sh",
+      "src/main/resources/targets/claude/scripts/audit-pentest-coverage.sh",
+      "src/main/resources/targets/claude/scripts/audit-product-upstream.sh",
+      "src/main/resources/targets/claude/scripts/audit-rnf-gates.sh",
+      "src/main/resources/targets/claude/scripts/audit-refinement-gate.sh"
+    ]
+  },
+  "skipFlags": ["skip-review"],
+  "resumeOperation": true,
+  "notes": "Recovery resume of EPIC-0077 — story implements 4 new Camada 2 audit scripts: audit-c4-completeness, audit-pentest-coverage, audit-product-upstream, audit-rnf-gates + audit-refinement-gate update"
+}
