@@ -32,5 +32,8 @@ public final class RNFNoRelaxValidator {
         if (override.justification() == null || override.justification().isBlank()) {
             errors.add("RNF category " + override.category() + " override requires justification");
         }
+        if (!override.hasFormalApproval()) {
+            errors.add("RNF override detected without approval: " + override.category());
+        }
     }
 }

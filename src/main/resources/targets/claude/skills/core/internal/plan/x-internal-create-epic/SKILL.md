@@ -1,6 +1,6 @@
 ---
 name: x-internal-create-epic
-description: "Generate an Epic document from spec analysis: cross-cutting rules, story index, DoR/DoD, optional Jira. Invoked only by x-create-feature (Phase 2). Not user-invocable."
+description: "Generate an Epic document from spec analysis or from an existing Feature artifact: cross-cutting rules, story index, DoR/DoD, optional Jira, sourceFeature lineage, and inherited RNFs. Invoked by orchestrators and focused public wrappers. Not user-invocable."
 visibility: internal
 user-invocable: false
 model: sonnet
@@ -20,11 +20,12 @@ requires-capabilities: []
 
 ## Purpose
 
-Read a system specification document and generate an Epic file — the top-level artifact that defines scope, cross-cutting rules, quality criteria, and story index for a development effort. The Epic is the single source of truth for a decomposition: it captures rules spanning multiple stories, defines quality gates, and provides the complete story index with dependency relationships.
+Read a system specification document **or an existing Feature artifact** and generate an Epic file — the top-level artifact that defines scope, cross-cutting rules, quality criteria, and story index for a development effort. The Epic is the single source of truth for a decomposition: it captures rules spanning multiple stories, defines quality gates, and provides the complete story index with dependency relationships.
 
 ## Triggers
 
 - `/x-epic-create <spec_file>` — generate an epic from the specification
+- `/x-epic-create --from-feature <feature-file|feature-id>` — generate an epic from an existing feature artifact
 - User asks to create an epic, generate an epic from a spec, or decompose a specification into an epic
 - User mentions extracting cross-cutting rules, defining quality gates, or building a story backlog from a technical document
 
@@ -33,6 +34,9 @@ Read a system specification document and generate an Epic file — the top-level
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `<SPEC_FILE>` | Path | Yes | — | Path to the system specification file |
+| `--from-feature <feature-file\|feature-id>` | String | No | — | Feature artifact source for Product-First Feature → Epic generation |
+| `--capability-file <path>` | Path | No | — | Capability artifact used to enrich inherited RNFs in `--from-feature` mode |
+| `--product-file <path>` | Path | No | — | Product artifact used to enrich inherited RNFs in `--from-feature` mode |
 | `--epic-id` | String | No | auto | Epic number (auto-increments from existing epics in `plans/`) |
 | `--jira` | String | No | — | Jira project key (e.g., PROJ). When provided, skip AskUserQuestion and create in Jira directly (EPIC-0042). |
 | `--no-jira` | Boolean | No | false | Skip Jira integration entirely, no prompting (EPIC-0042). |
@@ -104,11 +108,12 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-create Phase-1-Spec-Analysis`
 
-Read the entire system specification file provided by the user. This file follows the `_TEMPLATE.md`
-format with sections like Overview, Business Rules, Platform Specs, Data Contracts, Journeys,
-Sync Journeys, Dependencies, and Interfaces.
+Read the entire source artifact provided by the user.
 
-Understand the full scope before starting extraction.
+- **Spec mode (default):** the file follows `_TEMPLATE.md` with sections like Overview, Business Rules, Platform Specs, Data Contracts, Journeys, Dependencies, and Interfaces.
+- **Feature mode (`--from-feature`):** the file is an existing Feature markdown artifact. In this mode, preserve `Source Feature`, load inherited RNFs from Feature → Capability → Product, and intentionally omit sections `2`, `4`, and `8` from the generated epic because that context already exists upstream in the Product-First chain.
+
+Understand the full source scope before starting extraction.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-create Phase-1-Spec-Analysis ok`

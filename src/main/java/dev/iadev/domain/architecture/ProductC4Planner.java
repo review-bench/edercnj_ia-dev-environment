@@ -63,6 +63,6 @@ public final class ProductC4Planner {
     }
 
     private static String escape(String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+        return C4TextSanitizer.sanitize(text);
     }
 }

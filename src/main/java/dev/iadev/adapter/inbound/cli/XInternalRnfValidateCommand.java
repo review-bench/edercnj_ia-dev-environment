@@ -1,6 +1,7 @@
 package dev.iadev.adapter.inbound.cli;
 
 import dev.iadev.application.capability.ValidateRNFNoRelaxUseCase;
+import dev.iadev.domain.capability.ApprovalStatus;
 import dev.iadev.domain.capability.RNFOverride;
 import dev.iadev.domain.product.RNFCategory;
 import dev.iadev.domain.product.RNFRootValidationResult;
@@ -9,9 +10,11 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.nio.file.Path;
 
 @Command(
         name = "x-internal-rnf-validate",
@@ -28,9 +31,14 @@ public class XInternalRnfValidateCommand implements Callable<Integer> {
 
     @Option(
             names = {"--override"},
-            description = "RNF override spec: CATEGORY:norelax[:originalValue] or CATEGORY:relaxed:originalValue:newValue:justification",
+            description = "RNF override spec: CATEGORY:norelax[:originalValue] or CATEGORY:relaxed:originalValue:newValue:justification[:approvalStatus:approver]",
             arity = "0..*")
     List<String> overrideSpecs = new ArrayList<>();
+
+    @Option(
+            names = {"--artifact"},
+            description = "Path to capability/story artifact with an 'RNFs Herdadas' markdown table.")
+    Path artifactPath;
 
     @Option(
             names = {"--dry-run"},
@@ -38,21 +46,23 @@ public class XInternalRnfValidateCommand implements Callable<Integer> {
     boolean dryRun;
 
     private final ValidateRNFNoRelaxUseCase useCase;
+    private final RNFOverrideArtifactParser artifactParser;
 
     public XInternalRnfValidateCommand() {
-        this.useCase = new ValidateRNFNoRelaxUseCase();
+        this(new ValidateRNFNoRelaxUseCase(), new RNFOverrideArtifactParser());
     }
 
-    XInternalRnfValidateCommand(ValidateRNFNoRelaxUseCase useCase) {
+    XInternalRnfValidateCommand(ValidateRNFNoRelaxUseCase useCase, RNFOverrideArtifactParser artifactParser) {
         this.useCase = useCase;
+        this.artifactParser = artifactParser;
     }
 
     @Override
     public Integer call() {
         List<RNFOverride> overrides;
         try {
-            overrides = parseOverrides(overrideSpecs);
-        } catch (IllegalArgumentException e) {
+            overrides = collectOverrides();
+        } catch (IllegalArgumentException | IOException e) {
             spec.commandLine().getErr().println("Error: " + e.getMessage());
             return EXIT_EXECUTION_ERROR;
         }
@@ -68,6 +78,15 @@ public class XInternalRnfValidateCommand implements Callable<Integer> {
         }
 
         return EXIT_SUCCESS;
+    }
+
+    List<RNFOverride> collectOverrides() throws IOException {
+        List<RNFOverride> overrides = new ArrayList<>();
+        if (artifactPath != null) {
+            overrides.addAll(artifactParser.parse(artifactPath));
+        }
+        overrides.addAll(parseOverrides(overrideSpecs));
+        return overrides;
     }
 
     List<RNFOverride> parseOverrides(List<String> specs) {
@@ -94,7 +113,9 @@ public class XInternalRnfValidateCommand implements Callable<Integer> {
                 throw new IllegalArgumentException(
                         "Relaxed spec requires CATEGORY:relaxed:originalValue:newValue:justification but got: " + spec);
             }
-            return RNFOverride.withOverride(category, parts[2], parts[3], parts[4]);
+            ApprovalStatus approvalStatus = parts.length >= 6 ? ApprovalStatus.fromString(parts[5]) : null;
+            String approver = parts.length >= 7 ? parts[6] : null;
+            return RNFOverride.withApproval(category, parts[2], parts[3], parts[4], approvalStatus, approver);
         }
         throw new IllegalArgumentException("Unknown mode '" + mode + "' in spec: " + spec);
     }

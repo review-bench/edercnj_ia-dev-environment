@@ -23,10 +23,9 @@ class PlanSkillsRa9ReferenceTest {
             Path.of("src", "main", "resources", "targets", "claude", "skills", "core", "plan");
 
     @ParameterizedTest(name = "{0} references planning-standards-kp")
-    // x-epic-create and x-epic-decompose were hard-cut in EPIC-0065 (Rule 19 §Hard-cut autorizado).
-    // x-create-feature is the successor public orchestrator; x-plan-story and x-plan-task
-    // unchanged.
-    @ValueSource(strings = {"x-create-feature", "x-plan-story", "x-plan-task"})
+    // x-epic-decompose was hard-cut in EPIC-0065 (Rule 19 §Hard-cut autorizado).
+    // x-epic-create was reintroduced in EPIC-0077 story-0024 with focused Feature → Epic semantics.
+    @ValueSource(strings = {"x-create-feature", "x-epic-create", "x-story-create", "x-plan-story", "x-plan-task"})
     @DisplayName("planSkill_referencesKp_inPrerequisitesOrIntegration")
     void planSkill_referencesKp_inPrerequisitesOrIntegration(String skillName) throws IOException {
         Path skillFile = PLAN_SKILLS_ROOT.resolve(skillName).resolve("SKILL.md").toAbsolutePath();
@@ -43,7 +42,7 @@ class PlanSkillsRa9ReferenceTest {
     }
 
     @ParameterizedTest(name = "{0} has RA9 section guidance")
-    @ValueSource(strings = {"x-create-feature", "x-plan-story", "x-plan-task"})
+    @ValueSource(strings = {"x-create-feature", "x-epic-create", "x-story-create", "x-plan-story", "x-plan-task"})
     @DisplayName("planSkill_hasRa9SectionGuidance")
     void planSkill_hasRa9SectionGuidance(String skillName) throws IOException {
         Path skillFile = PLAN_SKILLS_ROOT.resolve(skillName).resolve("SKILL.md").toAbsolutePath();
