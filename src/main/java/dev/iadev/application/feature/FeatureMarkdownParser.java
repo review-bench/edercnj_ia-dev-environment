@@ -10,11 +10,13 @@ import java.util.regex.Pattern;
 
 public final class FeatureMarkdownParser {
 
-    private static final Pattern FEATURE_ID = Pattern.compile("^\\*\\*Feature ID:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
+    private static final Pattern FEATURE_ID =
+            Pattern.compile("^\\*\\*Feature ID:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
     private static final Pattern CAPABILITY_ID =
             Pattern.compile("^\\*\\*Capability:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
     private static final Pattern USE_CASE_BLOCK =
-            Pattern.compile("### UC-[^\\n]+\\n\\n\\| Campo \\| Valor \\|\\n\\| :--- \\| :--- \\|\\n\\| \\*\\*Ator\\*\\* \\| ([^|]+)\\|\\n\\| \\*\\*Ação\\*\\* \\| ([^|]+)\\|\\n\\| \\*\\*Benefício\\*\\* \\| ([^|]+)\\|",
+            Pattern.compile(
+                    "### UC-[^\\n]+\\n\\n\\| Campo \\| Valor \\|\\n\\| :--- \\| :--- \\|\\n\\| \\*\\*Ator\\*\\* \\| ([^|]+)\\|\\n\\| \\*\\*Ação\\*\\* \\| ([^|]+)\\|\\n\\| \\*\\*Benefício\\*\\* \\| ([^|]+)\\|",
                     Pattern.MULTILINE);
     private static final Pattern SCENARIO = Pattern.compile("Cenário:\\s+(.+)$", Pattern.MULTILINE);
 
@@ -38,7 +40,11 @@ public final class FeatureMarkdownParser {
         List<UseCase> useCases = new ArrayList<>();
         Matcher matcher = USE_CASE_BLOCK.matcher(content);
         while (matcher.find()) {
-            useCases.add(new UseCase(matcher.group(1).trim(), matcher.group(2).trim(), matcher.group(3).trim()));
+            useCases.add(
+                    new UseCase(
+                            matcher.group(1).trim(),
+                            matcher.group(2).trim(),
+                            matcher.group(3).trim()));
         }
         return useCases;
     }

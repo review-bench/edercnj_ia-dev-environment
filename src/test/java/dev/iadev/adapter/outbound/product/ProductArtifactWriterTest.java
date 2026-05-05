@@ -18,13 +18,15 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("ProductArtifactWriter")
 class ProductArtifactWriterTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private static Product testProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "p99 < 100ms", "Load test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.9% uptime", "SLO monitoring", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(RNFCategory.PERFORMANCE, "p99 < 100ms", "Load test", true),
+                        new RNFRoot(
+                                RNFCategory.RELIABILITY, "99.9% uptime", "SLO monitoring", true)));
     }
 
     @Test
@@ -66,8 +68,10 @@ class ProductArtifactWriterTest {
     @DisplayName("write_differentProduct_overwrites")
     void write_differentProduct_overwrites() throws IOException {
         ProductArtifactWriter.write(testProduct(), "product-0001", tempDir);
-        Product updated = new Product("Updated Platform", List.of(
-                new RNFRoot(RNFCategory.SECURITY, "TLS 1.3", "Audit", true)));
+        Product updated =
+                new Product(
+                        "Updated Platform",
+                        List.of(new RNFRoot(RNFCategory.SECURITY, "TLS 1.3", "Audit", true)));
         var result2 = ProductArtifactWriter.write(updated, "product-0001", tempDir);
         assertThat(result2.skipped()).isFalse();
     }

@@ -14,7 +14,8 @@ class XArchPlanC4MandatorySmokeTest {
     @Test
     void productCommand_whenExecuted_marksComponentAsPlaceholder() {
         var out = new StringWriter();
-        int exit = command(new XArchPlanProductCommand(), out).execute("--product-id", "product-0001");
+        int exit =
+                command(new XArchPlanProductCommand(), out).execute("--product-id", "product-0001");
 
         assertThat(exit).isZero();
         assertThat(out.toString()).contains("COMPONENT").contains("[placeholder]");
@@ -23,7 +24,9 @@ class XArchPlanC4MandatorySmokeTest {
     @Test
     void capabilityCommand_whenExecuted_marksContextAsPlaceholder() {
         var out = new StringWriter();
-        int exit = command(new XArchPlanCapabilityCommand(), out).execute("--capability-id", "capability-auth");
+        int exit =
+                command(new XArchPlanCapabilityCommand(), out)
+                        .execute("--capability-id", "capability-auth");
 
         assertThat(exit).isZero();
         assertThat(out.toString()).contains("CONTEXT").contains("[placeholder]");
@@ -32,7 +35,9 @@ class XArchPlanC4MandatorySmokeTest {
     @Test
     void featureCommand_whenExecuted_marksComponentAsPlaceholder() {
         var out = new StringWriter();
-        int exit = command(new XArchPlanFeatureCommand(), out).execute("--feature-id", "feature-oauth2");
+        int exit =
+                command(new XArchPlanFeatureCommand(), out)
+                        .execute("--feature-id", "feature-oauth2");
 
         assertThat(exit).isZero();
         assertThat(out.toString()).contains("COMPONENT").contains("[placeholder]");

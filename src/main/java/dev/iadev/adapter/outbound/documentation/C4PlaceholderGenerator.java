@@ -9,10 +9,16 @@ final class C4PlaceholderGenerator {
     C4Diagram generate(C4Level level, String entityId, C4OutputFormat format) {
         String title = "Placeholder — " + entityId + " (" + level.name() + ")";
         String hint = "refine in story-0077-0015";
-        String content = switch (format) {
-            case PLANTUML -> "@startuml\ntitle " + title + "\nnote as N1\n  Diagram not yet generated.\n  " + hint + "\nend note\n@enduml";
-            case MERMAID -> "graph TD\n    N1[\"" + title + "\"]\n    N2[\"" + hint + "\"]";
-        };
+        String content =
+                switch (format) {
+                    case PLANTUML ->
+                            "@startuml\ntitle "
+                                    + title
+                                    + "\nnote as N1\n  Diagram not yet generated.\n  "
+                                    + hint
+                                    + "\nend note\n@enduml";
+                    case MERMAID -> "graph TD\n    N1[\"" + title + "\"]\n    N2[\"" + hint + "\"]";
+                };
         return new C4Diagram(title, level, format, content);
     }
 }

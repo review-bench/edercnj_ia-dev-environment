@@ -2,9 +2,9 @@ package dev.iadev.application.feature;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.iadev.domain.feature.GherkinACGenerator;
 import dev.iadev.domain.feature.AutoDecomposeFeatureHeuristic;
 import dev.iadev.domain.feature.CapabilityToFeatureTransformer;
+import dev.iadev.domain.feature.GherkinACGenerator;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -15,8 +15,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("CreateFeaturesOrchestrationUseCase")
 class CreateFeaturesOrchestrationUseCaseTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private final CreateFeaturesOrchestrationUseCase useCase =
             new CreateFeaturesOrchestrationUseCase(
@@ -34,8 +33,11 @@ class CreateFeaturesOrchestrationUseCaseTest {
 
     @Test
     void execute_explicitNames_writesExactCount() throws IOException {
-        var result = useCase.execute("capability-c1",
-                List.of("BasicAuth", "OAuth2", "MFA", "Session"), outputDir);
+        var result =
+                useCase.execute(
+                        "capability-c1",
+                        List.of("BasicAuth", "OAuth2", "MFA", "Session"),
+                        outputDir);
         assertThat(result.featuresCreated()).isEqualTo(4);
         assertThat(outputDir.resolve("capability-c1-feature-0001.json")).exists();
     }

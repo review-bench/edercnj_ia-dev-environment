@@ -1,12 +1,11 @@
 package dev.iadev.adapter.inbound.cli;
 
-import org.junit.jupiter.api.Test;
-import picocli.CommandLine;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import picocli.CommandLine;
 
 class XPromoteIdeationCommandTest {
 

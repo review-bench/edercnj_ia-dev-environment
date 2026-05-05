@@ -1,4 +1,3 @@
 package dev.iadev.application.feature;
 
-public record CreateFeaturesResult(int featuresCreated, int skippedCount) {
-}
+public record CreateFeaturesResult(int featuresCreated, int skippedCount) {}

@@ -12,7 +12,10 @@ class FeatureMarkdownParserTest {
 
     @Test
     void parse_withExampleFeature_extractsUseCasesAndAcceptanceCriteria() throws Exception {
-        var feature = parser.parse(Files.readString(Path.of("ai/examples/example-feature-oauth2-integration.md")));
+        var feature =
+                parser.parse(
+                        Files.readString(
+                                Path.of("ai/examples/example-feature-oauth2-integration.md")));
 
         assertThat(feature.featureId()).isEqualTo("oauth2-integration");
         assertThat(feature.useCases()).hasSize(3);

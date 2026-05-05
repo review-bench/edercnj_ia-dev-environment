@@ -36,8 +36,9 @@ public final class RNFInheritanceWriter {
                 return false;
             }
         }
-        String withHash = content.replace("\"idempotencyHash\": \"\"",
-                "\"idempotencyHash\": \"" + hash + "\"");
+        String withHash =
+                content.replace(
+                        "\"idempotencyHash\": \"\"", "\"idempotencyHash\": \"" + hash + "\"");
         Files.writeString(target, withHash, StandardCharsets.UTF_8);
         return true;
     }
@@ -59,8 +60,11 @@ public final class RNFInheritanceWriter {
         var roots = product.rnfRoots();
         for (int i = 0; i < roots.size(); i++) {
             RNFRoot r = roots.get(i);
-            sb.append("    {\"category\": \"").append(r.category().name())
-                    .append("\", \"mandatory\": ").append(r.mandatory()).append("}");
+            sb.append("    {\"category\": \"")
+                    .append(r.category().name())
+                    .append("\", \"mandatory\": ")
+                    .append(r.mandatory())
+                    .append("}");
             if (i < roots.size() - 1) sb.append(",");
             sb.append("\n");
         }

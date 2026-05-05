@@ -2,7 +2,6 @@ package dev.iadev.adapter.inbound.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.iadev.adapter.inbound.cli.FeatureInputParser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.junit.jupiter.api.DisplayName;
@@ -100,22 +99,29 @@ class XCreateFeatureCommandTest {
 
         @Test
         void validFeaturesJson_returnsSuccess() {
-            int exit = execute("--capability-id", "capability-c1",
-                    "--features", "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"},{\"name\":\"Session\"}]");
+            int exit =
+                    execute(
+                            "--capability-id",
+                            "capability-c1",
+                            "--features",
+                            "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"},{\"name\":\"Session\"}]");
             assertThat(exit).isEqualTo(XCreateFeatureCommand.EXIT_SUCCESS);
         }
 
         @Test
         void tooFewFeatures_returnsValidationError() {
-            int exit = execute("--capability-id", "capability-c1",
-                    "--features", "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"}]");
+            int exit =
+                    execute(
+                            "--capability-id",
+                            "capability-c1",
+                            "--features",
+                            "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"}]");
             assertThat(exit).isEqualTo(XCreateFeatureCommand.EXIT_VALIDATION);
         }
 
         @Test
         void invalidFeaturesFormat_returnsValidationError() {
-            int exit = execute("--capability-id", "capability-c1",
-                    "--features", "not-json");
+            int exit = execute("--capability-id", "capability-c1", "--features", "not-json");
             assertThat(exit).isEqualTo(XCreateFeatureCommand.EXIT_VALIDATION);
         }
     }
@@ -126,15 +132,17 @@ class XCreateFeatureCommandTest {
 
         @Test
         void parseFeatures_fourNames_returnsFour() {
-            var result = FeatureInputParser.parseFeatures(
-                    "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"},{\"name\":\"Session\"}]");
+            var result =
+                    FeatureInputParser.parseFeatures(
+                            "[{\"name\":\"BasicAuth\"},{\"name\":\"OAuth2\"},{\"name\":\"MFA\"},{\"name\":\"Session\"}]");
             assertThat(result).hasSize(4).containsExactly("BasicAuth", "OAuth2", "MFA", "Session");
         }
 
         @Test
         void parseFeatures_eightNames_returnsEight() {
-            String json = "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"},{\"name\":\"d\"},"
-                    + "{\"name\":\"e\"},{\"name\":\"f\"},{\"name\":\"g\"},{\"name\":\"h\"}]";
+            String json =
+                    "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"},{\"name\":\"d\"},"
+                            + "{\"name\":\"e\"},{\"name\":\"f\"},{\"name\":\"g\"},{\"name\":\"h\"}]";
             var result = FeatureInputParser.parseFeatures(json);
             assertThat(result).hasSize(8);
         }
@@ -142,25 +150,25 @@ class XCreateFeatureCommandTest {
         @Test
         void parseFeatures_nullInput_throwsIllegalArgument() {
             org.junit.jupiter.api.Assertions.assertThrows(
-                    IllegalArgumentException.class,
-                    () -> FeatureInputParser.parseFeatures(null));
+                    IllegalArgumentException.class, () -> FeatureInputParser.parseFeatures(null));
         }
 
         @Test
         void parseFeatures_tooFew_throwsIllegalArgument() {
             org.junit.jupiter.api.Assertions.assertThrows(
                     IllegalArgumentException.class,
-                    () -> FeatureInputParser.parseFeatures(
-                            "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"}]"));
+                    () ->
+                            FeatureInputParser.parseFeatures(
+                                    "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"}]"));
         }
 
         @Test
         void parseFeatures_tooMany_throwsIllegalArgument() {
-            String json = "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"},{\"name\":\"d\"},"
-                    + "{\"name\":\"e\"},{\"name\":\"f\"},{\"name\":\"g\"},{\"name\":\"h\"},{\"name\":\"i\"}]";
+            String json =
+                    "[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"},{\"name\":\"d\"},"
+                            + "{\"name\":\"e\"},{\"name\":\"f\"},{\"name\":\"g\"},{\"name\":\"h\"},{\"name\":\"i\"}]";
             org.junit.jupiter.api.Assertions.assertThrows(
-                    IllegalArgumentException.class,
-                    () -> FeatureInputParser.parseFeatures(json));
+                    IllegalArgumentException.class, () -> FeatureInputParser.parseFeatures(json));
         }
     }
 }

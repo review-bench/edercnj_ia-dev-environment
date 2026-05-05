@@ -23,7 +23,8 @@ class C4DiagramGeneratorTest {
 
     @Test
     void generate_whenCapabilityComponent_returnsComponentDiagram() {
-        var diagram = generator.generate(C4Level.COMPONENT, "capability-auth", C4OutputFormat.MERMAID);
+        var diagram =
+                generator.generate(C4Level.COMPONENT, "capability-auth", C4OutputFormat.MERMAID);
 
         assertThat(diagram.level()).isEqualTo(C4Level.COMPONENT);
         assertThat(diagram.content()).contains("C4Component");
@@ -31,14 +32,19 @@ class C4DiagramGeneratorTest {
 
     @Test
     void generatePlaceholder_whenComponentRequested_containsRefinementHint() {
-        var diagram = generator.generatePlaceholder(C4Level.COMPONENT, "product-0001", C4OutputFormat.MERMAID);
+        var diagram =
+                generator.generatePlaceholder(
+                        C4Level.COMPONENT, "product-0001", C4OutputFormat.MERMAID);
 
         assertThat(diagram.content()).contains("refine in story-0077-0015");
     }
 
     @Test
     void generate_whenEntityPrefixUnknown_throws() {
-        assertThatThrownBy(() -> generator.generate(C4Level.CONTEXT, "unknown-1", C4OutputFormat.MERMAID))
+        assertThatThrownBy(
+                        () ->
+                                generator.generate(
+                                        C4Level.CONTEXT, "unknown-1", C4OutputFormat.MERMAID))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("entityId");
     }

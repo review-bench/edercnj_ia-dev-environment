@@ -10,10 +10,16 @@ public record ApprovalRequest(
         String justification,
         String approver,
         ApprovalStatus status,
-        String note
-) {
+        String note) {
     public ApprovalRequest withStatus(ApprovalStatus newStatus, String newNote) {
-        return new ApprovalRequest(requestId, category, originalValue, overrideValue,
-                justification, approver, newStatus, newNote);
+        return new ApprovalRequest(
+                requestId,
+                category,
+                originalValue,
+                overrideValue,
+                justification,
+                approver,
+                newStatus,
+                newNote);
     }
 }

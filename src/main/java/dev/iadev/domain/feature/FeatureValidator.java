@@ -13,7 +13,9 @@ public class FeatureValidator {
         List<String> errors = new ArrayList<>();
         validateUseCases(feature.useCases(), errors);
         validateAcceptanceCriteria(feature.acceptanceCriteria(), errors);
-        return errors.isEmpty() ? FeatureValidationResult.success() : FeatureValidationResult.failure(errors);
+        return errors.isEmpty()
+                ? FeatureValidationResult.success()
+                : FeatureValidationResult.failure(errors);
     }
 
     private void validateUseCases(List<UseCase> useCases, List<String> errors) {
@@ -22,16 +24,27 @@ public class FeatureValidator {
             return;
         }
         if (useCases.size() < MIN_USE_CASES) {
-            errors.add("Feature must have at least " + MIN_USE_CASES + " use cases, found " + useCases.size());
+            errors.add(
+                    "Feature must have at least "
+                            + MIN_USE_CASES
+                            + " use cases, found "
+                            + useCases.size());
         }
         if (useCases.size() > MAX_USE_CASES) {
-            errors.add("Feature must have at most " + MAX_USE_CASES + " use cases, found " + useCases.size());
+            errors.add(
+                    "Feature must have at most "
+                            + MAX_USE_CASES
+                            + " use cases, found "
+                            + useCases.size());
         }
     }
 
     private void validateAcceptanceCriteria(List<AcceptanceCriterion> acs, List<String> errors) {
         if (acs.isEmpty()) {
-            errors.add("Feature must have at least " + MIN_ACCEPTANCE_CRITERIA + " acceptance criteria");
+            errors.add(
+                    "Feature must have at least "
+                            + MIN_ACCEPTANCE_CRITERIA
+                            + " acceptance criteria");
         }
     }
 }

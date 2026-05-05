@@ -1,7 +1,6 @@
 package dev.iadev.domain.ideation;
 
 public enum IdeationSection {
-
     VISION_AND_SCOPE(1, "Visão & Escopo"),
     STAKEHOLDERS(2, "Stakeholders & Personas"),
     BUSINESS_REQUIREMENTS(3, "Requisitos de Negócio"),

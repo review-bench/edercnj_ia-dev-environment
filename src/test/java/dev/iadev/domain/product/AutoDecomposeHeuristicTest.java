@@ -13,11 +13,15 @@ class AutoDecomposeHeuristicTest {
     private final AutoDecomposeHeuristic heuristic = new AutoDecomposeHeuristic();
 
     private Product sampleProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
-                new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true),
-                new RNFRoot(RNFCategory.COMPLIANCE, "GDPR compliant", "legal review", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(
+                                RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
+                        new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true),
+                        new RNFRoot(
+                                RNFCategory.COMPLIANCE, "GDPR compliant", "legal review", true)));
     }
 
     @Test

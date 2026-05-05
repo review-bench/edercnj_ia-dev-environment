@@ -1,10 +1,9 @@
 package dev.iadev.domain.product;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class RNFRootValidatorTest {
 
@@ -42,10 +41,10 @@ class RNFRootValidatorTest {
 
     @Test
     void onlyTwoMandatoryCategories_reportsCountError() {
-        List<RNFRoot> rnfs = List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "load test", true),
-                new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true)
-        );
+        List<RNFRoot> rnfs =
+                List.of(
+                        new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "load test", true),
+                        new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true));
         Product product = new Product("Test Product", rnfs);
 
         var result = validator.validate(product);
@@ -56,14 +55,14 @@ class RNFRootValidatorTest {
 
     @Test
     void allSixMandatoryOnly_noOptionals_failsTotalCountGate() {
-        List<RNFRoot> rnfs = List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
-                new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
-                new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
-                new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
-                new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true)
-        );
+        List<RNFRoot> rnfs =
+                List.of(
+                        new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
+                        new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
+                        new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
+                        new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
+                        new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true));
         Product product = new Product("Minimal Mandatory Only Product", rnfs);
 
         var result = validator.validate(product);
@@ -74,17 +73,23 @@ class RNFRootValidatorTest {
 
     @Test
     void nineCategories_failsTotalCountGate() {
-        List<RNFRoot> rnfs = List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
-                new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
-                new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
-                new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
-                new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true),
-                new RNFRoot(RNFCategory.DATA_INTEGRITY, "atomic", "integration test", false),
-                new RNFRoot(RNFCategory.MAINTAINABILITY, "coverage>=95%", "static analysis", false),
-                new RNFRoot(RNFCategory.PORTABILITY, "docker image", "container test", false)
-        );
+        List<RNFRoot> rnfs =
+                List.of(
+                        new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
+                        new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
+                        new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
+                        new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
+                        new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true),
+                        new RNFRoot(
+                                RNFCategory.DATA_INTEGRITY, "atomic", "integration test", false),
+                        new RNFRoot(
+                                RNFCategory.MAINTAINABILITY,
+                                "coverage>=95%",
+                                "static analysis",
+                                false),
+                        new RNFRoot(
+                                RNFCategory.PORTABILITY, "docker image", "container test", false));
         Product product = new Product("Nine Category Product", rnfs);
 
         var result = validator.validate(product);
@@ -95,18 +100,28 @@ class RNFRootValidatorTest {
 
     @Test
     void tenCategories_sixMandatoryFourOptional_passes() {
-        List<RNFRoot> rnfs = List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
-                new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
-                new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
-                new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
-                new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true),
-                new RNFRoot(RNFCategory.DATA_INTEGRITY, "atomic", "integration test", false),
-                new RNFRoot(RNFCategory.MAINTAINABILITY, "coverage>=95%", "static analysis", false),
-                new RNFRoot(RNFCategory.PORTABILITY, "docker image", "container test", false),
-                new RNFRoot(RNFCategory.USABILITY, "WCAG 2.1 AA", "accessibility audit", false)
-        );
+        List<RNFRoot> rnfs =
+                List.of(
+                        new RNFRoot(RNFCategory.PERFORMANCE, "P99 < 200ms", "k6", true),
+                        new RNFRoot(RNFCategory.SCALABILITY, "10x peak", "chaos test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.9% SLA", "uptime", true),
+                        new RNFRoot(RNFCategory.SECURITY, "OAuth 2.0", "pen test", true),
+                        new RNFRoot(RNFCategory.COMPLIANCE, "LGPD", "audit", true),
+                        new RNFRoot(RNFCategory.OBSERVABILITY, "trace_id", "Grafana", true),
+                        new RNFRoot(
+                                RNFCategory.DATA_INTEGRITY, "atomic", "integration test", false),
+                        new RNFRoot(
+                                RNFCategory.MAINTAINABILITY,
+                                "coverage>=95%",
+                                "static analysis",
+                                false),
+                        new RNFRoot(
+                                RNFCategory.PORTABILITY, "docker image", "container test", false),
+                        new RNFRoot(
+                                RNFCategory.USABILITY,
+                                "WCAG 2.1 AA",
+                                "accessibility audit",
+                                false));
         Product product = new Product("Minimal Compliant Product", rnfs);
 
         var result = validator.validate(product);
@@ -124,7 +139,8 @@ class RNFRootValidatorTest {
         var result = validator.validate(product);
 
         assertThat(result.passed()).isFalse();
-        assertThat(result.errors()).anyMatch(e -> e.contains("PERFORMANCE") && e.contains("description"));
+        assertThat(result.errors())
+                .anyMatch(e -> e.contains("PERFORMANCE") && e.contains("description"));
     }
 
     @Test
@@ -140,7 +156,9 @@ class RNFRootValidatorTest {
     private Product productWithAllMandatory() {
         java.util.ArrayList<RNFRoot> list = mandatoryRnfs();
         list.add(new RNFRoot(RNFCategory.DATA_INTEGRITY, "atomic", "integration test", false));
-        list.add(new RNFRoot(RNFCategory.MAINTAINABILITY, "coverage>=95%", "static analysis", false));
+        list.add(
+                new RNFRoot(
+                        RNFCategory.MAINTAINABILITY, "coverage>=95%", "static analysis", false));
         list.add(new RNFRoot(RNFCategory.PORTABILITY, "docker image", "container test", false));
         list.add(new RNFRoot(RNFCategory.USABILITY, "WCAG 2.1 AA", "accessibility audit", false));
         return new Product("Full Product", list);

@@ -14,8 +14,7 @@ import picocli.CommandLine;
 @DisplayName("XStoryCreateCommand")
 class XStoryCreateCommandTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Test
     void help_whenRequested_mentionsEpicIdAndFromFeature() {

@@ -2,7 +2,6 @@ package dev.iadev.application.product;
 
 import dev.iadev.domain.product.RNFInheritanceContext;
 import dev.iadev.domain.product.RNFRoot;
-
 import java.util.List;
 
 public final class RNFInheritanceUseCase {

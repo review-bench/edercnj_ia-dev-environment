@@ -4,7 +4,8 @@ import java.util.List;
 
 public final class CapabilityToFeatureTransformer {
 
-    public CapabilityFeatureDecomposition transform(String capabilityId, List<String> featureNames) {
+    public CapabilityFeatureDecomposition transform(
+            String capabilityId, List<String> featureNames) {
         if (capabilityId == null || capabilityId.isBlank()) {
             throw new IllegalArgumentException("capabilityId must not be null or blank");
         }

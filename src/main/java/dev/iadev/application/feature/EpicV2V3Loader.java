@@ -1,7 +1,6 @@
 package dev.iadev.application.feature;
 
 import dev.iadev.domain.feature.SourceFeatureReference;
-
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,7 +8,8 @@ import java.util.regex.Pattern;
 public class EpicV2V3Loader {
 
     private static final Pattern SOURCE_FEATURE_PATTERN =
-            Pattern.compile("^\\*\\*Source Feature:\\*\\*\\s+(.+?)\\s*(?:_.*)?$", Pattern.MULTILINE);
+            Pattern.compile(
+                    "^\\*\\*Source Feature:\\*\\*\\s+(.+?)\\s*(?:_.*)?$", Pattern.MULTILINE);
     private static final Pattern SOURCE_FEATURE_LINK_PATTERN =
             Pattern.compile("^\\*\\*Source Feature Link:\\*\\*\\s+(.+?)\\s*$", Pattern.MULTILINE);
 

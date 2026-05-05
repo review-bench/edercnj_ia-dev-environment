@@ -15,9 +15,12 @@ public record CapabilityC4Model(
             throw new IllegalArgumentException("capabilityId must not be blank");
         }
         if (format == null) throw new IllegalArgumentException("format must not be null");
-        if (contextDiagram == null) throw new IllegalArgumentException("contextDiagram must not be null");
-        if (containerDiagram == null) throw new IllegalArgumentException("containerDiagram must not be null");
-        if (componentDiagram == null) throw new IllegalArgumentException("componentDiagram must not be null");
+        if (contextDiagram == null)
+            throw new IllegalArgumentException("contextDiagram must not be null");
+        if (containerDiagram == null)
+            throw new IllegalArgumentException("containerDiagram must not be null");
+        if (componentDiagram == null)
+            throw new IllegalArgumentException("componentDiagram must not be null");
         placeholders = List.copyOf(placeholders);
     }
 

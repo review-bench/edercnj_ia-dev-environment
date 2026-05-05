@@ -16,14 +16,17 @@ import org.junit.jupiter.api.Test;
 @DisplayName("CapabilityDecompositionUseCase")
 class CapabilityDecompositionUseCaseTest {
 
-    private final CapabilityDecompositionUseCase useCase = new CapabilityDecompositionUseCase(
-            new AutoDecomposeHeuristic(),
-            new ProductToCapabilityTransformer());
+    private final CapabilityDecompositionUseCase useCase =
+            new CapabilityDecompositionUseCase(
+                    new AutoDecomposeHeuristic(), new ProductToCapabilityTransformer());
 
     private Product sampleProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(
+                                RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true)));
     }
 
     @Test
@@ -56,7 +59,8 @@ class CapabilityDecompositionUseCaseTest {
 
     @Test
     void execute_tooFewExplicitNames_throwsIllegalArgument() {
-        assertThatThrownBy(() -> useCase.execute("product-0001", sampleProduct(), List.of("a", "b")))
+        assertThatThrownBy(
+                        () -> useCase.execute("product-0001", sampleProduct(), List.of("a", "b")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

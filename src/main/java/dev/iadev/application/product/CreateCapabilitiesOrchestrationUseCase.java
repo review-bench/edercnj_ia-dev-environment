@@ -35,8 +35,6 @@ public final class CreateCapabilitiesOrchestrationUseCase {
                 CapabilityArtifactWriter.write(decomposition, outputDir);
         boolean rnfWritten = RNFInheritanceWriter.write(product, decomposition, outputDir);
         return new CreateCapabilitiesResult(
-                capResult.writtenCount(),
-                capResult.skippedCount(),
-                rnfWritten);
+                capResult.writtenCount(), capResult.skippedCount(), rnfWritten);
     }
 }

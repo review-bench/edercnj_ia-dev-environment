@@ -23,7 +23,8 @@ public record FeatureEpicSource(
         if (capabilityId == null || capabilityId.isBlank()) {
             throw new IllegalArgumentException("capabilityId must not be null or blank");
         }
-        sourceFeatureLink = sourceFeatureLink == null || sourceFeatureLink.isBlank() ? "—" : sourceFeatureLink;
+        sourceFeatureLink =
+                sourceFeatureLink == null || sourceFeatureLink.isBlank() ? "—" : sourceFeatureLink;
         inScope = List.copyOf(inScope);
         outOfScope = List.copyOf(outOfScope);
         storyTitles = List.copyOf(storyTitles);

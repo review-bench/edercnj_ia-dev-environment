@@ -39,17 +39,20 @@ public final class IdeationToProductTransformer {
 
     private RNFRoot buildPerformanceRnf(String requirements) {
         String desc = extractLatencyRequirement(requirements);
-        return new RNFRoot(RNFCategory.PERFORMANCE, desc, "Load test p99 latency measurement", true);
+        return new RNFRoot(
+                RNFCategory.PERFORMANCE, desc, "Load test p99 latency measurement", true);
     }
 
     private RNFRoot buildScalabilityRnf(String requirements) {
         String desc = extractScalabilityRequirement(requirements);
-        return new RNFRoot(RNFCategory.SCALABILITY, desc, "Load test concurrent user benchmark", true);
+        return new RNFRoot(
+                RNFCategory.SCALABILITY, desc, "Load test concurrent user benchmark", true);
     }
 
     private RNFRoot buildReliabilityRnf(String requirements) {
         String desc = extractUptimeRequirement(requirements);
-        return new RNFRoot(RNFCategory.RELIABILITY, desc, "SLO monitoring + alert validation", true);
+        return new RNFRoot(
+                RNFCategory.RELIABILITY, desc, "SLO monitoring + alert validation", true);
     }
 
     private RNFRoot buildSecurityRnf(String requirements) {
@@ -72,28 +75,41 @@ public final class IdeationToProductTransformer {
 
     private List<RNFRoot> buildOptionalRnfs() {
         return List.of(
-                new RNFRoot(RNFCategory.DATA_INTEGRITY,
+                new RNFRoot(
+                        RNFCategory.DATA_INTEGRITY,
                         "All data mutations are atomic and consistent",
-                        "Integration test suite validation", false),
-                new RNFRoot(RNFCategory.MAINTAINABILITY,
+                        "Integration test suite validation",
+                        false),
+                new RNFRoot(
+                        RNFCategory.MAINTAINABILITY,
                         "Code coverage ≥ 95%, cyclomatic complexity ≤ 10 per method",
-                        "Static analysis report", false),
-                new RNFRoot(RNFCategory.PORTABILITY,
+                        "Static analysis report",
+                        false),
+                new RNFRoot(
+                        RNFCategory.PORTABILITY,
                         "Cloud-agnostic deployment: Docker + Kubernetes compatible",
-                        "Multi-cloud deployment test", false),
-                new RNFRoot(RNFCategory.USABILITY,
+                        "Multi-cloud deployment test",
+                        false),
+                new RNFRoot(
+                        RNFCategory.USABILITY,
                         "CLI response time < 2s for all commands",
-                        "UX benchmarking", false),
-                new RNFRoot(RNFCategory.PERFORMANCE,
+                        "UX benchmarking",
+                        false),
+                new RNFRoot(
+                        RNFCategory.PERFORMANCE,
                         "Startup time < 5s under normal load",
-                        "Startup benchmark test", true),
-                new RNFRoot(RNFCategory.RELIABILITY,
+                        "Startup benchmark test",
+                        true),
+                new RNFRoot(
+                        RNFCategory.RELIABILITY,
                         "Graceful degradation under 2x peak load",
-                        "Chaos engineering validation", true));
+                        "Chaos engineering validation",
+                        true));
     }
 
     private String extractLatencyRequirement(String requirements) {
-        return requirements.lines()
+        return requirements
+                .lines()
                 .filter(l -> l.toLowerCase().contains("latency") || l.toLowerCase().contains("ms"))
                 .map(l -> "Latency SLA: " + l.replaceFirst("^BIZ-\\d+\\s*", "").trim())
                 .findFirst()
@@ -101,36 +117,54 @@ public final class IdeationToProductTransformer {
     }
 
     private String extractScalabilityRequirement(String requirements) {
-        return requirements.lines()
-                .filter(l -> l.toLowerCase().contains("user") || l.toLowerCase().contains("events")
-                        || l.toLowerCase().contains("100k") || l.toLowerCase().contains("1m"))
+        return requirements
+                .lines()
+                .filter(
+                        l ->
+                                l.toLowerCase().contains("user")
+                                        || l.toLowerCase().contains("events")
+                                        || l.toLowerCase().contains("100k")
+                                        || l.toLowerCase().contains("1m"))
                 .map(l -> "Scalability: " + l.replaceFirst("^BIZ-\\d+\\s*", "").trim())
                 .findFirst()
                 .orElse("System must scale to 10K concurrent users without degradation");
     }
 
     private String extractUptimeRequirement(String requirements) {
-        return requirements.lines()
-                .filter(l -> l.toLowerCase().contains("uptime") || l.toLowerCase().contains("sla")
-                        || l.toLowerCase().contains("99."))
+        return requirements
+                .lines()
+                .filter(
+                        l ->
+                                l.toLowerCase().contains("uptime")
+                                        || l.toLowerCase().contains("sla")
+                                        || l.toLowerCase().contains("99."))
                 .map(l -> "Reliability: " + l.replaceFirst("^BIZ-\\d+\\s*", "").trim())
                 .findFirst()
                 .orElse("System availability ≥ 99.9% monthly (≤ 43.8 min downtime/month)");
     }
 
     private String extractSecurityRequirement(String requirements) {
-        return requirements.lines()
-                .filter(l -> l.toLowerCase().contains("encrypt") || l.toLowerCase().contains("pii")
-                        || l.toLowerCase().contains("secur"))
+        return requirements
+                .lines()
+                .filter(
+                        l ->
+                                l.toLowerCase().contains("encrypt")
+                                        || l.toLowerCase().contains("pii")
+                                        || l.toLowerCase().contains("secur"))
                 .map(l -> "Security: " + l.replaceFirst("^BIZ-\\d+\\s*", "").trim())
                 .findFirst()
                 .orElse("All PII encrypted at rest (AES-256) and in transit (TLS 1.3+)");
     }
 
     private String extractComplianceRequirement(String requirements) {
-        return requirements.lines()
-                .filter(l -> l.toLowerCase().contains("gdpr") || l.toLowerCase().contains("complian")
-                        || l.toLowerCase().contains("pci") || l.toLowerCase().contains("sox"))
+        return requirements
+                .lines()
+                .filter(
+                        l ->
+                                l.toLowerCase().contains("gdpr")
+                                        || l.toLowerCase().contains("complian")
+                                        || l.toLowerCase().contains("pci")
+                                        || l.toLowerCase().contains("sox"))
                 .map(l -> "Compliance: " + l.replaceFirst("^BIZ-\\d+\\s*", "").trim())
                 .findFirst()
                 .orElse("GDPR and LGPD compliant; data residency controls enforced");

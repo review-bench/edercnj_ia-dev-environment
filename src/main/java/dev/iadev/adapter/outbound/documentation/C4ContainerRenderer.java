@@ -9,16 +9,23 @@ public final class C4ContainerRenderer {
 
     public static String render(C4Diagram diagram) {
         if (diagram.level() != C4Level.CONTAINER) {
-            throw new IllegalArgumentException("Expected CONTAINER diagram, got: " + diagram.level());
+            throw new IllegalArgumentException(
+                    "Expected CONTAINER diagram, got: " + diagram.level());
         }
         return diagram.content();
     }
 
     public static String renderHeader(C4Diagram diagram) {
-        return "# " + escapeMarkdown(diagram.title()) + "\n\n"
+        return "# "
+                + escapeMarkdown(diagram.title())
+                + "\n\n"
                 + "**Level:** Container\n"
-                + "**Format:** " + diagram.format().name().toLowerCase() + "\n\n"
-                + "```\n" + diagram.content() + "\n```";
+                + "**Format:** "
+                + diagram.format().name().toLowerCase()
+                + "\n\n"
+                + "```\n"
+                + diagram.content()
+                + "\n```";
     }
 
     private static String escapeMarkdown(String text) {

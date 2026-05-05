@@ -1,10 +1,10 @@
 package dev.iadev.infrastructure.qa;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.iadev.infrastructure.qa.SLOHarness.SLOResult;
 import dev.iadev.infrastructure.qa.SLOHarness.SLOSpec;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SLOHarnessTest {
 
@@ -50,14 +50,12 @@ class SLOHarnessTest {
 
     @Test
     void sloSpec_blankId_throwsException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new SLOSpec("", 99.95, "last 7 days"));
+        assertThrows(IllegalArgumentException.class, () -> new SLOSpec("", 99.95, "last 7 days"));
     }
 
     @Test
     void sloSpec_blankWindow_throwsException() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new SLOSpec("uptime-sla", 99.95, ""));
+        assertThrows(IllegalArgumentException.class, () -> new SLOSpec("uptime-sla", 99.95, ""));
     }
 
     @Test

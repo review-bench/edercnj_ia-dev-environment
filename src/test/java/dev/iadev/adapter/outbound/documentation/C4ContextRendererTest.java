@@ -12,8 +12,12 @@ import org.junit.jupiter.api.Test;
 @DisplayName("C4ContextRenderer")
 class C4ContextRendererTest {
 
-    private final C4Diagram contextDiagram = new C4Diagram(
-            "product-0001 — C4 Context", C4Level.CONTEXT, C4OutputFormat.MERMAID, "C4Context\n  title test");
+    private final C4Diagram contextDiagram =
+            new C4Diagram(
+                    "product-0001 — C4 Context",
+                    C4Level.CONTEXT,
+                    C4OutputFormat.MERMAID,
+                    "C4Context\n  title test");
 
     @Test
     void render_returnsContent() {
@@ -29,7 +33,8 @@ class C4ContextRendererTest {
 
     @Test
     void render_wrongLevel_throws() {
-        var container = new C4Diagram("t", C4Level.CONTAINER, C4OutputFormat.MERMAID, "C4Container\n  x");
+        var container =
+                new C4Diagram("t", C4Level.CONTAINER, C4OutputFormat.MERMAID, "C4Container\n  x");
         assertThatThrownBy(() -> C4ContextRenderer.render(container))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("CONTEXT");

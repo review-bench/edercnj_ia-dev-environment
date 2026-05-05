@@ -1,15 +1,14 @@
 package dev.iadev.application.capability;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.adapter.outbound.approval.RNFOverrideApprovalAdapter;
 import dev.iadev.domain.capability.ApprovalRequest;
 import dev.iadev.domain.capability.ApprovalStatus;
 import dev.iadev.domain.capability.RNFOverride;
 import dev.iadev.domain.product.RNFCategory;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class RNFOverrideApprovalIT {
 
@@ -18,9 +17,9 @@ class RNFOverrideApprovalIT {
 
     @Test
     void requestApproval_setsToPending() {
-        RNFOverride override = RNFOverride.withOverride(
-                RNFCategory.PERFORMANCE, "P99 < 3s", "P99 < 1s", "Stricter SLA needed"
-        );
+        RNFOverride override =
+                RNFOverride.withOverride(
+                        RNFCategory.PERFORMANCE, "P99 < 3s", "P99 < 1s", "Stricter SLA needed");
 
         useCase.requestApproval(override, "approver@example.com");
 
@@ -33,9 +32,9 @@ class RNFOverrideApprovalIT {
 
     @Test
     void approveOverride_changesStatusToApproved() {
-        RNFOverride override = RNFOverride.withOverride(
-                RNFCategory.RELIABILITY, "99.9%", "99.5%", "Gateway dependency"
-        );
+        RNFOverride override =
+                RNFOverride.withOverride(
+                        RNFCategory.RELIABILITY, "99.9%", "99.5%", "Gateway dependency");
         useCase.requestApproval(override, "cto@example.com");
         List<ApprovalRequest> pending = useCase.listByStatus(ApprovalStatus.PENDING);
         String requestId = pending.get(0).requestId();
@@ -49,9 +48,9 @@ class RNFOverrideApprovalIT {
 
     @Test
     void rejectOverride_changesStatusToRejected() {
-        RNFOverride override = RNFOverride.withOverride(
-                RNFCategory.OBSERVABILITY, "full trace", "sampled 10%", "Cost concern"
-        );
+        RNFOverride override =
+                RNFOverride.withOverride(
+                        RNFCategory.OBSERVABILITY, "full trace", "sampled 10%", "Cost concern");
         useCase.requestApproval(override, "vp@example.com");
         List<ApprovalRequest> pending = useCase.listByStatus(ApprovalStatus.PENDING);
         String requestId = pending.get(0).requestId();

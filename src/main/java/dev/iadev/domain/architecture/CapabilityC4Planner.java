@@ -26,8 +26,12 @@ public final class CapabilityC4Planner {
         if (format == C4OutputFormat.PLANTUML) {
             return "@startuml\n"
                     + "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n"
-                    + "title Container — " + escape(capabilityId) + "\n"
-                    + "System_Boundary(cap, \"" + escape(capabilityId) + "\") {\n"
+                    + "title Container — "
+                    + escape(capabilityId)
+                    + "\n"
+                    + "System_Boundary(cap, \""
+                    + escape(capabilityId)
+                    + "\") {\n"
                     + "  Container(handler, \"Handler\", \"Java\", \"Entry point\")\n"
                     + "  Container(service, \"Service\", \"Java\", \"Business logic\")\n"
                     + "  ContainerDb(store, \"Store\", \"PostgreSQL\", \"Persistence\")\n"
@@ -35,8 +39,12 @@ public final class CapabilityC4Planner {
                     + "@enduml";
         }
         return "C4Container\n"
-                + "  title Container — " + escape(capabilityId) + "\n"
-                + "  System_Boundary(cap, \"" + escape(capabilityId) + "\") {\n"
+                + "  title Container — "
+                + escape(capabilityId)
+                + "\n"
+                + "  System_Boundary(cap, \""
+                + escape(capabilityId)
+                + "\") {\n"
                 + "    Container(handler, \"Handler\", \"Java\", \"Entry point\")\n"
                 + "    Container(service, \"Service\", \"Java\", \"Business logic\")\n"
                 + "    ContainerDb(store, \"Store\", \"PostgreSQL\", \"Persistence\")\n"
@@ -47,7 +55,9 @@ public final class CapabilityC4Planner {
         if (format == C4OutputFormat.PLANTUML) {
             return "@startuml\n"
                     + "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\n"
-                    + "title Component — " + escape(capabilityId) + "\n"
+                    + "title Component — "
+                    + escape(capabilityId)
+                    + "\n"
                     + "Container_Boundary(service, \"Service\") {\n"
                     + "  Component(domain, \"Domain\", \"Java\", \"Entities and rules\")\n"
                     + "  Component(app, \"Application\", \"Java\", \"Use cases\")\n"
@@ -56,7 +66,9 @@ public final class CapabilityC4Planner {
                     + "@enduml";
         }
         return "C4Component\n"
-                + "  title Component — " + escape(capabilityId) + "\n"
+                + "  title Component — "
+                + escape(capabilityId)
+                + "\n"
                 + "  Container_Boundary(service, \"Service\") {\n"
                 + "    Component(domain, \"Domain\", \"Java\", \"Entities and rules\")\n"
                 + "    Component(app, \"Application\", \"Java\", \"Use cases\")\n"

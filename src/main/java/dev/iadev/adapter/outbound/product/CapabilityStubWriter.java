@@ -20,8 +20,9 @@ public final class CapabilityStubWriter {
         }
 
         Files.createDirectories(outputDir);
-        Path target = outputDir.resolve(capability.productId() + "-" + capability.capabilityId()
-                + "-stub.json");
+        Path target =
+                outputDir.resolve(
+                        capability.productId() + "-" + capability.capabilityId() + "-stub.json");
 
         String content = serialize(capability);
         String hash = IdempotencyHash.compute(capability.productId(), content);
@@ -34,16 +35,21 @@ public final class CapabilityStubWriter {
             }
         }
 
-        String withHash = content.replace("\"idempotencyHash\": \"\"",
-                "\"idempotencyHash\": \"" + hash + "\"");
+        String withHash =
+                content.replace(
+                        "\"idempotencyHash\": \"\"", "\"idempotencyHash\": \"" + hash + "\"");
         Files.writeString(target, withHash, StandardCharsets.UTF_8);
         return WriteResult.written(target, hash);
     }
 
     private static String serialize(Capability capability) {
         return "{\n"
-                + "  \"capabilityId\": \"" + capability.capabilityId() + "\",\n"
-                + "  \"productId\": \"" + capability.productId() + "\",\n"
+                + "  \"capabilityId\": \""
+                + capability.capabilityId()
+                + "\",\n"
+                + "  \"productId\": \""
+                + capability.productId()
+                + "\",\n"
                 + "  \"idempotencyHash\": \"\",\n"
                 + "  \"rnfOverrides\": []\n"
                 + "}\n";

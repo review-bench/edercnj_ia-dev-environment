@@ -1,12 +1,11 @@
 package dev.iadev.domain.products;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Product domain — ProductId, ProductStatus, Product")
 class ProductTest {
@@ -109,32 +108,29 @@ class ProductTest {
         @Test
         @DisplayName("isActive() is true only for ACTIVE status")
         void isActive_activeStatus_returnsTrue() {
-            var product = new Product(
-                    ProductId.of("p1"), "P One", ProductStatus.ACTIVE, Set.of());
+            var product = new Product(ProductId.of("p1"), "P One", ProductStatus.ACTIVE, Set.of());
             assertThat(product.isActive()).isTrue();
         }
 
         @Test
         @DisplayName("isActive() is false for DRAFT status")
         void isActive_draftStatus_returnsFalse() {
-            var product = new Product(
-                    ProductId.of("p2"), "P Two", ProductStatus.DRAFT, Set.of());
+            var product = new Product(ProductId.of("p2"), "P Two", ProductStatus.DRAFT, Set.of());
             assertThat(product.isActive()).isFalse();
         }
 
         @Test
         @DisplayName("isActive() is false for DEPRECATED status")
         void isActive_deprecatedStatus_returnsFalse() {
-            var product = new Product(
-                    ProductId.of("p3"), "P Three", ProductStatus.DEPRECATED, Set.of());
+            var product =
+                    new Product(ProductId.of("p3"), "P Three", ProductStatus.DEPRECATED, Set.of());
             assertThat(product.isActive()).isFalse();
         }
 
         @Test
         @DisplayName("capabilityIds is immutable even when constructed with null")
         void capabilityIds_null_treatedAsEmptyImmutableSet() {
-            var product = new Product(
-                    ProductId.of("p4"), "P Four", ProductStatus.ACTIVE, null);
+            var product = new Product(ProductId.of("p4"), "P Four", ProductStatus.ACTIVE, null);
             assertThat(product.capabilityIds()).isEmpty();
             assertThatExceptionOfType(UnsupportedOperationException.class)
                     .isThrownBy(() -> product.capabilityIds().add("x"));
@@ -144,8 +140,7 @@ class ProductTest {
         @DisplayName("capabilityIds is a defensive copy of the input set")
         void capabilityIds_defensiveCopy() {
             var mutable = new java.util.HashSet<>(Set.of("cap.a", "cap.b"));
-            var product = new Product(
-                    ProductId.of("p5"), "P Five", ProductStatus.ACTIVE, mutable);
+            var product = new Product(ProductId.of("p5"), "P Five", ProductStatus.ACTIVE, mutable);
             mutable.clear();
             assertThat(product.capabilityIds()).containsExactlyInAnyOrder("cap.a", "cap.b");
         }
@@ -161,14 +156,26 @@ class ProductTest {
         @DisplayName("constructor rejects null name")
         void constructor_nullName_throwsNullPointer() {
             assertThatNullPointerException()
-                    .isThrownBy(() -> new Product(ProductId.of("x"), null, ProductStatus.DRAFT, Set.of()));
+                    .isThrownBy(
+                            () ->
+                                    new Product(
+                                            ProductId.of("x"),
+                                            null,
+                                            ProductStatus.DRAFT,
+                                            Set.of()));
         }
 
         @Test
         @DisplayName("constructor rejects blank name")
         void constructor_blankName_throwsIllegalArgument() {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> new Product(ProductId.of("x"), "  ", ProductStatus.DRAFT, Set.of()));
+                    .isThrownBy(
+                            () ->
+                                    new Product(
+                                            ProductId.of("x"),
+                                            "  ",
+                                            ProductStatus.DRAFT,
+                                            Set.of()));
         }
 
         @Test

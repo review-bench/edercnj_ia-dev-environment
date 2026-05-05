@@ -12,8 +12,7 @@ public final class CapabilityDecompositionUseCase {
     private final ProductToCapabilityTransformer transformer;
 
     public CapabilityDecompositionUseCase(
-            AutoDecomposeHeuristic heuristic,
-            ProductToCapabilityTransformer transformer) {
+            AutoDecomposeHeuristic heuristic, ProductToCapabilityTransformer transformer) {
         this.heuristic = heuristic;
         this.transformer = transformer;
     }
@@ -26,9 +25,10 @@ public final class CapabilityDecompositionUseCase {
         if (product == null) {
             throw new IllegalArgumentException("product must not be null");
         }
-        List<String> names = (explicitNames == null || explicitNames.isEmpty())
-                ? heuristic.decompose(product)
-                : explicitNames;
+        List<String> names =
+                (explicitNames == null || explicitNames.isEmpty())
+                        ? heuristic.decompose(product)
+                        : explicitNames;
         return transformer.transform(productId, product, names);
     }
 }

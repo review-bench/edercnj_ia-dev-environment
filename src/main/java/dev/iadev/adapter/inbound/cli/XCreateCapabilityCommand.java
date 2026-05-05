@@ -1,10 +1,10 @@
 package dev.iadev.adapter.inbound.cli;
 
+import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
-import java.util.concurrent.Callable;
 
 @Command(
         name = "x-create-capability",
@@ -16,8 +16,7 @@ public class XCreateCapabilityCommand implements Callable<Integer> {
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--product-id"},
@@ -32,7 +31,8 @@ public class XCreateCapabilityCommand implements Callable<Integer> {
 
     @Option(
             names = {"--capabilities"},
-            description = "JSON array of capability names to create (e.g. '[\"ingest\",\"query\"]')")
+            description =
+                    "JSON array of capability names to create (e.g. '[\"ingest\",\"query\"]')")
     String capabilitiesJson;
 
     @Option(
@@ -43,8 +43,9 @@ public class XCreateCapabilityCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         if (!autoDecompose && (capabilitiesJson == null || capabilitiesJson.isBlank())) {
-            spec.commandLine().getErr().println(
-                    "Error: either --auto-decompose or --capabilities must be specified");
+            spec.commandLine()
+                    .getErr()
+                    .println("Error: either --auto-decompose or --capabilities must be specified");
             return EXIT_VALIDATION;
         }
         if (!autoDecompose) {
@@ -55,8 +56,13 @@ public class XCreateCapabilityCommand implements Callable<Integer> {
                 return EXIT_VALIDATION;
             }
         }
-        spec.commandLine().getOut().println("x-create-capability: product-id=" + productId
-                + ", auto-decompose=" + autoDecompose);
+        spec.commandLine()
+                .getOut()
+                .println(
+                        "x-create-capability: product-id="
+                                + productId
+                                + ", auto-decompose="
+                                + autoDecompose);
         return EXIT_SUCCESS;
     }
 }

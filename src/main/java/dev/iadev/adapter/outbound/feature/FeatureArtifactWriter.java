@@ -12,19 +12,18 @@ import java.util.Map;
 
 public final class FeatureArtifactWriter {
 
-    private FeatureArtifactWriter() {
-    }
+    private FeatureArtifactWriter() {}
 
-    public static WriteResult write(
-            CapabilityFeatureDecomposition decomposition,
-            Path outputDir) throws IOException {
+    public static WriteResult write(CapabilityFeatureDecomposition decomposition, Path outputDir)
+            throws IOException {
         return write(decomposition, new GherkinACGenerator(), outputDir);
     }
 
     public static WriteResult write(
             CapabilityFeatureDecomposition decomposition,
             GherkinACGenerator gherkinGenerator,
-            Path outputDir) throws IOException {
+            Path outputDir)
+            throws IOException {
         Map<String, String> ids = FeatureNumbering.assignIds(decomposition.featureNames());
         int written = 0;
         int skipped = 0;
@@ -33,7 +32,8 @@ public final class FeatureArtifactWriter {
             String fileName = decomposition.capabilityId() + "-" + featureId + ".json";
             Path target = outputDir.resolve(fileName);
             List<String> scenarios = gherkinGenerator.generate(featureName);
-            String content = buildJson(featureId, featureName, decomposition.capabilityId(), scenarios);
+            String content =
+                    buildJson(featureId, featureName, decomposition.capabilityId(), scenarios);
             if (Files.exists(target) && content.equals(Files.readString(target))) {
                 skipped++;
                 continue;
@@ -44,10 +44,11 @@ public final class FeatureArtifactWriter {
         return new WriteResult(written, skipped);
     }
 
-    static String buildJson(String featureId, String featureName, String capabilityId,
-            List<String> scenarios) {
-        String hash = IdempotencyHash.compute(featureId + "|" + featureName,
-                featureId + featureName + capabilityId);
+    static String buildJson(
+            String featureId, String featureName, String capabilityId, List<String> scenarios) {
+        String hash =
+                IdempotencyHash.compute(
+                        featureId + "|" + featureName, featureId + featureName + capabilityId);
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append("  \"featureId\": \"").append(featureId).append("\",\n");
@@ -67,6 +68,5 @@ public final class FeatureArtifactWriter {
         return sb.toString();
     }
 
-    public record WriteResult(int writtenCount, int skippedCount) {
-    }
+    public record WriteResult(int writtenCount, int skippedCount) {}
 }

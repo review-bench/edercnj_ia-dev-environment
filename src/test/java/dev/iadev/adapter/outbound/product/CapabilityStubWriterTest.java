@@ -16,8 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("CapabilityStubWriter")
 class CapabilityStubWriterTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     private static Capability testCapability() {
         return new Capability("capability-c1", "product-0001", List.of());

@@ -21,15 +21,15 @@ class GherkinACGeneratorTest {
     @Test
     void generate_scenariosContainGivenWhenThen() {
         List<String> scenarios = generator.generate("BasicAuth");
-        assertThat(scenarios).allSatisfy(scenario ->
-                assertThat(scenario).containsAnyOf("Given", "When", "Then"));
+        assertThat(scenarios)
+                .allSatisfy(
+                        scenario -> assertThat(scenario).containsAnyOf("Given", "When", "Then"));
     }
 
     @Test
     void generate_scenariosContainScenarioKeyword() {
         List<String> scenarios = generator.generate("MFA");
-        assertThat(scenarios).allSatisfy(scenario ->
-                assertThat(scenario).startsWith("Scenario:"));
+        assertThat(scenarios).allSatisfy(scenario -> assertThat(scenario).startsWith("Scenario:"));
     }
 
     @Test

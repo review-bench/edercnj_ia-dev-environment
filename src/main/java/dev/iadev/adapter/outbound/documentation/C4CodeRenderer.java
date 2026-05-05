@@ -18,11 +18,18 @@ public final class C4CodeRenderer {
             throw new IllegalArgumentException("Expected CODE diagram, got: " + diagram.level());
         }
         String fenceLabel = diagram.format() == C4OutputFormat.PLANTUML ? "plantuml" : "mermaid";
-        return "# " + escapeMarkdown(diagram.title()) + "\n"
+        return "# "
+                + escapeMarkdown(diagram.title())
+                + "\n"
                 + "**Level:** Code\n"
-                + "**Format:** " + diagram.format().name() + "\n"
-                + "```" + fenceLabel + "\n"
-                + diagram.content() + "\n"
+                + "**Format:** "
+                + diagram.format().name()
+                + "\n"
+                + "```"
+                + fenceLabel
+                + "\n"
+                + diagram.content()
+                + "\n"
                 + "```";
     }
 

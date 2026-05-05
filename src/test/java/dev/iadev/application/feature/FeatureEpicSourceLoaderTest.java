@@ -20,7 +20,8 @@ class FeatureEpicSourceLoaderTest {
         assertThat(source.featureId()).isEqualTo("oauth2-integration");
         assertThat(source.capabilityId()).isEqualTo("auth");
         assertThat(source.storyTitles()).hasSize(3);
-        assertThat(source.inheritedRnfs()).extracting(InheritedRnfLine::sourceLevel)
+        assertThat(source.inheritedRnfs())
+                .extracting(InheritedRnfLine::sourceLevel)
                 .contains("Product", "Capability");
         assertThat(source.inheritedRnfs())
                 .filteredOn(line -> line.id().equals("CAP-PERFORMANCE"))
@@ -39,7 +40,8 @@ class FeatureEpicSourceLoaderTest {
         FeatureEpicSource source =
                 loader.load(Path.of("ai/examples/example-feature-mfa-support.md"), null, null);
 
-        assertThat(source.inheritedRnfs()).singleElement()
+        assertThat(source.inheritedRnfs())
+                .singleElement()
                 .extracting(InheritedRnfLine::id)
                 .isEqualTo("RNF-N/A");
     }

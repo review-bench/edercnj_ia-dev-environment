@@ -12,9 +12,12 @@ import org.junit.jupiter.api.Test;
 @DisplayName("C4ComponentRenderer")
 class C4ComponentRendererTest {
 
-    private final C4Diagram componentDiagram = new C4Diagram(
-            "capability-auth — C4 Component", C4Level.COMPONENT, C4OutputFormat.PLANTUML,
-            "@startuml\nComponent(x)\n@enduml");
+    private final C4Diagram componentDiagram =
+            new C4Diagram(
+                    "capability-auth — C4 Component",
+                    C4Level.COMPONENT,
+                    C4OutputFormat.PLANTUML,
+                    "@startuml\nComponent(x)\n@enduml");
 
     @Test
     void render_returnsContent() {
@@ -30,7 +33,8 @@ class C4ComponentRendererTest {
 
     @Test
     void render_wrongLevel_throws() {
-        var container = new C4Diagram("t", C4Level.CONTAINER, C4OutputFormat.MERMAID, "C4Container\n  x");
+        var container =
+                new C4Diagram("t", C4Level.CONTAINER, C4OutputFormat.MERMAID, "C4Container\n  x");
         assertThatThrownBy(() -> C4ComponentRenderer.render(container))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("COMPONENT");

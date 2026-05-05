@@ -1,11 +1,9 @@
 package dev.iadev.domain.ideation;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class IdeationValidatorTest {
 
@@ -23,23 +21,23 @@ class IdeationValidatorTest {
 
     @Test
     void missingSection5_reportsSpecificError() {
-        IdeationTemplate ideation = IdeationTemplate.builder()
-                .title("Test Ideation")
-                .sections(sectionsWithout(IdeationSection.SUCCESS_CRITERIA))
-                .build();
+        IdeationTemplate ideation =
+                IdeationTemplate.builder()
+                        .title("Test Ideation")
+                        .sections(sectionsWithout(IdeationSection.SUCCESS_CRITERIA))
+                        .build();
 
         IdeationValidationResult result = validator.validate(ideation);
 
         assertThat(result.passed()).isFalse();
-        assertThat(result.errors()).anyMatch(e -> e.contains("Section 5 missing: SUCCESS_CRITERIA"));
+        assertThat(result.errors())
+                .anyMatch(e -> e.contains("Section 5 missing: SUCCESS_CRITERIA"));
     }
 
     @Test
     void emptyTitle_reportsError() {
-        IdeationTemplate ideation = IdeationTemplate.builder()
-                .title("")
-                .sections(allSections())
-                .build();
+        IdeationTemplate ideation =
+                IdeationTemplate.builder().title("").sections(allSections()).build();
 
         IdeationValidationResult result = validator.validate(ideation);
 
@@ -52,10 +50,11 @@ class IdeationValidatorTest {
         Map<IdeationSection, String> sections = allSections();
         sections.put(IdeationSection.BUSINESS_REQUIREMENTS, "BIZ-001: req1\nBIZ-002: req2");
 
-        IdeationTemplate ideation = IdeationTemplate.builder()
-                .title("Short Requirements Ideation")
-                .sections(sections)
-                .build();
+        IdeationTemplate ideation =
+                IdeationTemplate.builder()
+                        .title("Short Requirements Ideation")
+                        .sections(sections)
+                        .build();
 
         IdeationValidationResult result = validator.validate(ideation);
 
@@ -68,14 +67,18 @@ class IdeationValidatorTest {
         Map<IdeationSection, String> sections = allSections();
         StringBuilder stakeholders = new StringBuilder();
         for (int i = 1; i <= 105; i++) {
-            stakeholders.append("| Stakeholder ").append(i).append(" | Role | Decisions | Daily |\n");
+            stakeholders
+                    .append("| Stakeholder ")
+                    .append(i)
+                    .append(" | Role | Decisions | Daily |\n");
         }
         sections.put(IdeationSection.STAKEHOLDERS, stakeholders.toString());
 
-        IdeationTemplate ideation = IdeationTemplate.builder()
-                .title("Large Stakeholder Ideation")
-                .sections(sections)
-                .build();
+        IdeationTemplate ideation =
+                IdeationTemplate.builder()
+                        .title("Large Stakeholder Ideation")
+                        .sections(sections)
+                        .build();
 
         IdeationValidationResult result = validator.validate(ideation);
 
@@ -94,10 +97,11 @@ class IdeationValidatorTest {
 
     @Test
     void multipleViolations_reportsAll() {
-        IdeationTemplate ideation = IdeationTemplate.builder()
-                .title("")
-                .sections(sectionsWithout(IdeationSection.RISKS))
-                .build();
+        IdeationTemplate ideation =
+                IdeationTemplate.builder()
+                        .title("")
+                        .sections(sectionsWithout(IdeationSection.RISKS))
+                        .build();
 
         IdeationValidationResult result = validator.validate(ideation);
 
@@ -115,10 +119,12 @@ class IdeationValidatorTest {
     }
 
     private Map<IdeationSection, String> allSections() {
-        java.util.EnumMap<IdeationSection, String> sections = new java.util.EnumMap<>(IdeationSection.class);
+        java.util.EnumMap<IdeationSection, String> sections =
+                new java.util.EnumMap<>(IdeationSection.class);
         sections.put(IdeationSection.VISION_AND_SCOPE, "Vision content for testing purposes");
         sections.put(IdeationSection.STAKEHOLDERS, "Stakeholder list for testing");
-        sections.put(IdeationSection.BUSINESS_REQUIREMENTS,
+        sections.put(
+                IdeationSection.BUSINESS_REQUIREMENTS,
                 "BIZ-001: req one\nBIZ-002: req two\nBIZ-003: req three\nBIZ-004: req four\nBIZ-005: req five");
         sections.put(IdeationSection.CONSTRAINTS, "Constraints and assumptions content");
         sections.put(IdeationSection.SUCCESS_CRITERIA, "KPIs and success metrics");

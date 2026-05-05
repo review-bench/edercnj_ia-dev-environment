@@ -1,13 +1,12 @@
 package dev.iadev.domain.products;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("CommitPathWhitelist")
 class CommitPathWhitelistTest {
@@ -23,27 +22,36 @@ class CommitPathWhitelistTest {
 
         @Test
         void standard_containsClaudeTemplatesPrefix() {
-            assertThat(CommitPathWhitelist.standard().isAllowed(".claude/templates/FOO.md")).isTrue();
+            assertThat(CommitPathWhitelist.standard().isAllowed(".claude/templates/FOO.md"))
+                    .isTrue();
         }
 
         @Test
         void standard_containsAiEpicsPrefix() {
-            assertThat(CommitPathWhitelist.standard().isAllowed("ai/epics/epic-0077/plans/arch.md")).isTrue();
+            assertThat(CommitPathWhitelist.standard().isAllowed("ai/epics/epic-0077/plans/arch.md"))
+                    .isTrue();
         }
 
         @Test
         void standard_containsAiProductsPrefix() {
-            assertThat(CommitPathWhitelist.standard().isAllowed("ai/products/product-0001/capabilities/cap.md")).isTrue();
+            assertThat(
+                            CommitPathWhitelist.standard()
+                                    .isAllowed("ai/products/product-0001/capabilities/cap.md"))
+                    .isTrue();
         }
 
         @Test
         void standard_containsAiMemoryPrefix() {
-            assertThat(CommitPathWhitelist.standard().isAllowed("ai/memory/epic-0077-summary.md")).isTrue();
+            assertThat(CommitPathWhitelist.standard().isAllowed("ai/memory/epic-0077-summary.md"))
+                    .isTrue();
         }
 
         @Test
         void standard_containsAiReleasesPrefix() {
-            assertThat(CommitPathWhitelist.standard().isAllowed("ai/releases/release-state-5.2.0.json")).isTrue();
+            assertThat(
+                            CommitPathWhitelist.standard()
+                                    .isAllowed("ai/releases/release-state-5.2.0.json"))
+                    .isTrue();
         }
     }
 
@@ -53,7 +61,8 @@ class CommitPathWhitelistTest {
 
         @Test
         void isAllowed_srcMainPath_returnsFalse() {
-            assertThat(CommitPathWhitelist.standard().isAllowed("src/main/java/Foo.java")).isFalse();
+            assertThat(CommitPathWhitelist.standard().isAllowed("src/main/java/Foo.java"))
+                    .isFalse();
         }
 
         @Test
@@ -85,8 +94,7 @@ class CommitPathWhitelistTest {
 
         @Test
         void of_nullPrefixes_throwsIllegalArgument() {
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> CommitPathWhitelist.of(null));
+            assertThatIllegalArgumentException().isThrownBy(() -> CommitPathWhitelist.of(null));
         }
 
         @Test

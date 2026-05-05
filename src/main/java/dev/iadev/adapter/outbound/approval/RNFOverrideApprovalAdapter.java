@@ -3,10 +3,8 @@ package dev.iadev.adapter.outbound.approval;
 import dev.iadev.domain.capability.ApprovalRequest;
 import dev.iadev.domain.capability.ApprovalStatus;
 import dev.iadev.domain.capability.RNFOverrideApprovalPort;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public final class RNFOverrideApprovalAdapter implements RNFOverrideApprovalPort {
 

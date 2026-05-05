@@ -17,15 +17,15 @@ import picocli.CommandLine.Spec;
 @Command(
         name = "x-epic-create",
         mixinStandardHelpOptions = true,
-        description = "Create an Epic artifact from a Feature with source lineage and inherited RNFs.")
+        description =
+                "Create an Epic artifact from a Feature with source lineage and inherited RNFs.")
 public class XEpicCreateCommand implements Callable<Integer> {
 
     static final int EXIT_SUCCESS = 0;
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--from-feature"},
@@ -65,14 +65,21 @@ public class XEpicCreateCommand implements Callable<Integer> {
             Path featureFile = resolveFeature(fromFeature);
             Path capabilityFile = resolveOptional(capabilityFilePath);
             Path productFile = resolveOptional(productFilePath);
-            Path outputDir = outputDirPath == null ? Path.of("ai", "epics") : Path.of(outputDirPath);
+            Path outputDir =
+                    outputDirPath == null ? Path.of("ai", "epics") : Path.of(outputDirPath);
             if (dryRun) {
                 out.println("Validation OK [dry-run]; source-feature=" + featureFile);
                 return EXIT_SUCCESS;
             }
-            CreateEpicFromFeatureResult result = new CreateEpicFromFeatureUseCase(new FeatureEpicSourceLoader())
-                    .execute(epicId, featureFile, capabilityFile, productFile, outputDir);
-            out.println("Epic created: " + result.epicFile() + " (inheritedRnfs=" + result.inheritedRnfCount() + ")");
+            CreateEpicFromFeatureResult result =
+                    new CreateEpicFromFeatureUseCase(new FeatureEpicSourceLoader())
+                            .execute(epicId, featureFile, capabilityFile, productFile, outputDir);
+            out.println(
+                    "Epic created: "
+                            + result.epicFile()
+                            + " (inheritedRnfs="
+                            + result.inheritedRnfCount()
+                            + ")");
             return EXIT_SUCCESS;
         } catch (IllegalArgumentException e) {
             out.println("Error: " + e.getMessage());
@@ -93,7 +100,8 @@ public class XEpicCreateCommand implements Callable<Integer> {
                     .filter(path -> path.getFileName().toString().endsWith(".md"))
                     .filter(path -> path.getFileName().toString().contains(reference))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("feature not found: " + reference));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("feature not found: " + reference));
         }
     }
 

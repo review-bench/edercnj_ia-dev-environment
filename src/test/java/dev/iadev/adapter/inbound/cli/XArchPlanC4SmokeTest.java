@@ -31,8 +31,10 @@ class XArchPlanC4SmokeTest {
 
     @Test
     void capability_mermaid_generatesContainerAndComponentDiagrams() {
-        C4Diagram container = capabilityPlanner.planContainer("capability-auth", C4OutputFormat.MERMAID);
-        C4Diagram component = capabilityPlanner.planComponent("capability-auth", C4OutputFormat.MERMAID);
+        C4Diagram container =
+                capabilityPlanner.planContainer("capability-auth", C4OutputFormat.MERMAID);
+        C4Diagram component =
+                capabilityPlanner.planComponent("capability-auth", C4OutputFormat.MERMAID);
 
         assertThat(container.level()).isEqualTo(C4Level.CONTAINER);
         assertThat(component.level()).isEqualTo(C4Level.COMPONENT);
@@ -43,7 +45,8 @@ class XArchPlanC4SmokeTest {
     @Test
     void feature_mermaid_generatesContextAndContainerDiagrams() {
         C4Diagram context = featurePlanner.planContext("feature-oauth2", C4OutputFormat.MERMAID);
-        C4Diagram container = featurePlanner.planContainer("feature-oauth2", C4OutputFormat.MERMAID);
+        C4Diagram container =
+                featurePlanner.planContainer("feature-oauth2", C4OutputFormat.MERMAID);
 
         assertThat(context.level()).isEqualTo(C4Level.CONTEXT);
         assertThat(container.level()).isEqualTo(C4Level.CONTAINER);
@@ -53,7 +56,8 @@ class XArchPlanC4SmokeTest {
 
     @Test
     void defaultFormat_isMermaid() {
-        C4Diagram diagram = productPlanner.planContext("product-0001", C4OutputFormat.fromString(null));
+        C4Diagram diagram =
+                productPlanner.planContext("product-0001", C4OutputFormat.fromString(null));
 
         assertThat(diagram.format()).isEqualTo(C4OutputFormat.MERMAID);
     }
@@ -78,7 +82,8 @@ class XArchPlanC4SmokeTest {
 
     @Test
     void capability_htmlEscapingInDiagrams() {
-        C4Diagram diagram = capabilityPlanner.planContainer("capability-<xss>", C4OutputFormat.MERMAID);
+        C4Diagram diagram =
+                capabilityPlanner.planContainer("capability-<xss>", C4OutputFormat.MERMAID);
 
         assertThat(diagram.content()).contains("&lt;xss&gt;");
         assertThat(diagram.content()).doesNotContain("<xss>");

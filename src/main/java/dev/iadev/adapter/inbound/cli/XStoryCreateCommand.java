@@ -19,15 +19,15 @@ import picocli.CommandLine.Spec;
 @Command(
         name = "x-story-create",
         mixinStandardHelpOptions = true,
-        description = "Create 1-N Story artifacts from an existing Feature markdown with epic linkage.")
+        description =
+                "Create 1-N Story artifacts from an existing Feature markdown with epic linkage.")
 public class XStoryCreateCommand implements Callable<Integer> {
 
     static final int EXIT_SUCCESS = 0;
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--from-feature"},
@@ -69,16 +69,27 @@ public class XStoryCreateCommand implements Callable<Integer> {
             Path capabilityFile = resolveOptional(capabilityFilePath);
             Path productFile = resolveOptional(productFilePath);
             String normalizedEpicId = normalizeEpicId(epicId);
-            Path outputDir = outputDirPath == null ? Path.of("ai", "epics") : Path.of(outputDirPath);
+            Path outputDir =
+                    outputDirPath == null ? Path.of("ai", "epics") : Path.of(outputDirPath);
             if (dryRun) {
-                out.println("Validation OK [dry-run]; feature=" + featureFile + ", epicId=" + normalizedEpicId);
+                out.println(
+                        "Validation OK [dry-run]; feature="
+                                + featureFile
+                                + ", epicId="
+                                + normalizedEpicId);
                 return EXIT_SUCCESS;
             }
-            CreateStoriesFromFeatureResult result = new CreateStoriesFromFeatureUseCase(
-                    new FeatureMarkdownParser(),
-                    new FeatureEpicSourceLoader(),
-                    new FeatureToStoryDecompositionUseCase())
-                    .execute(normalizedEpicId, featureFile, capabilityFile, productFile, outputDir);
+            CreateStoriesFromFeatureResult result =
+                    new CreateStoriesFromFeatureUseCase(
+                                    new FeatureMarkdownParser(),
+                                    new FeatureEpicSourceLoader(),
+                                    new FeatureToStoryDecompositionUseCase())
+                            .execute(
+                                    normalizedEpicId,
+                                    featureFile,
+                                    capabilityFile,
+                                    productFile,
+                                    outputDir);
             out.println("Stories created: " + result.storyFiles().size());
             return EXIT_SUCCESS;
         } catch (IllegalArgumentException e) {
@@ -100,7 +111,8 @@ public class XStoryCreateCommand implements Callable<Integer> {
                     .filter(path -> path.getFileName().toString().endsWith(".md"))
                     .filter(path -> path.getFileName().toString().contains(reference))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("feature not found: " + reference));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("feature not found: " + reference));
         }
     }
 

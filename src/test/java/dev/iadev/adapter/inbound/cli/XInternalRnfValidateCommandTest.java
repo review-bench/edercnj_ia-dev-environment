@@ -1,18 +1,14 @@
 package dev.iadev.adapter.inbound.cli;
 
-import dev.iadev.application.capability.ValidateRNFNoRelaxUseCase;
-import dev.iadev.domain.capability.RNFOverride;
-import dev.iadev.domain.product.RNFCategory;
-import dev.iadev.domain.product.RNFRootValidationResult;
-import org.junit.jupiter.api.Test;
-import picocli.CommandLine;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import dev.iadev.domain.capability.RNFOverride;
+import dev.iadev.domain.product.RNFCategory;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import org.junit.jupiter.api.Test;
+import picocli.CommandLine;
 
 class XInternalRnfValidateCommandTest {
 
@@ -46,7 +42,8 @@ class XInternalRnfValidateCommandTest {
 
     @Test
     void parseOne_relaxedSpec_returnsRelaxedOverride() {
-        RNFOverride override = command().parseOne("PERFORMANCE:relaxed:P99<200ms:P99<500ms:justified");
+        RNFOverride override =
+                command().parseOne("PERFORMANCE:relaxed:P99<200ms:P99<500ms:justified");
 
         assertThat(override.category()).isEqualTo(RNFCategory.PERFORMANCE);
         assertThat(override.isRelaxed()).isTrue();
@@ -88,7 +85,8 @@ class XInternalRnfValidateCommandTest {
         var cmd = new XInternalRnfValidateCommand();
         var cli = buildCommandLine(cmd, err);
 
-        int exit = cli.execute("--dry-run", "--override", "SECURITY:relaxed:TLS 1.3:TLS 1.2:legacy");
+        int exit =
+                cli.execute("--dry-run", "--override", "SECURITY:relaxed:TLS 1.3:TLS 1.2:legacy");
 
         assertThat(exit).isEqualTo(0);
     }

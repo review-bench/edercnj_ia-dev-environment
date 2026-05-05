@@ -19,8 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("XCreateFeature E2E Smoke")
 class XCreateFeatureE2ETest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private final CreateFeaturesOrchestrationUseCase useCase =
             new CreateFeaturesOrchestrationUseCase(
@@ -68,9 +67,13 @@ class XCreateFeatureE2ETest {
 
     @Test
     void gherkinScenarios_coverAllFourCategories() throws IOException {
-        useCase.execute("capability-payment", List.of("Checkout", "Refund", "Invoice", "Subscription"), outputDir);
+        useCase.execute(
+                "capability-payment",
+                List.of("Checkout", "Refund", "Invoice", "Subscription"),
+                outputDir);
 
-        String content = Files.readString(outputDir.resolve("capability-payment-feature-0001.json"));
+        String content =
+                Files.readString(outputDir.resolve("capability-payment-feature-0001.json"));
         assertThat(content).contains("degenerate");
         assertThat(content).contains("happy path");
         assertThat(content).contains("error");

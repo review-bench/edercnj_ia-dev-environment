@@ -1,4 +1,3 @@
 package dev.iadev.domain.feature;
 
-public record AcceptanceCriterion(String scenario) {
-}
+public record AcceptanceCriterion(String scenario) {}

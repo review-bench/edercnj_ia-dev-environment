@@ -21,21 +21,23 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("XCreateCapability E2E Smoke")
 class XCreateCapabilityE2ETest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private final CreateCapabilitiesOrchestrationUseCase useCase =
             new CreateCapabilitiesOrchestrationUseCase(
                     new CapabilityDecompositionUseCase(
-                            new AutoDecomposeHeuristic(),
-                            new ProductToCapabilityTransformer()));
+                            new AutoDecomposeHeuristic(), new ProductToCapabilityTransformer()));
 
     private static Product analyticsProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
-                new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true),
-                new RNFRoot(RNFCategory.COMPLIANCE, "GDPR compliant", "legal review", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(
+                                RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
+                        new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true),
+                        new RNFRoot(
+                                RNFCategory.COMPLIANCE, "GDPR compliant", "legal review", true)));
     }
 
     @Test
@@ -47,9 +49,10 @@ class XCreateCapabilityE2ETest {
         assertThat(result.capabilityCount()).isGreaterThanOrEqualTo(3);
         assertThat(result.rnfInheritanceWritten()).isTrue();
 
-        long capabilityFiles = Files.list(outputDir)
-                .filter(p -> p.getFileName().toString().contains("capability-c"))
-                .count();
+        long capabilityFiles =
+                Files.list(outputDir)
+                        .filter(p -> p.getFileName().toString().contains("capability-c"))
+                        .count();
         assertThat(capabilityFiles).isGreaterThanOrEqualTo(3);
         assertThat(outputDir.resolve("product-0001-rnf-inheritance.json")).exists();
     }
@@ -57,9 +60,12 @@ class XCreateCapabilityE2ETest {
     @Test
     @DisplayName("explicitCapabilities_writesExactThreeArtifacts")
     void explicitCapabilities_writesExactThreeArtifacts() throws IOException {
-        CreateCapabilitiesResult result = useCase.execute(
-                "product-0001", analyticsProduct(),
-                List.of("ingest", "query", "storage"), outputDir);
+        CreateCapabilitiesResult result =
+                useCase.execute(
+                        "product-0001",
+                        analyticsProduct(),
+                        List.of("ingest", "query", "storage"),
+                        outputDir);
 
         assertThat(result.capabilityCount()).isEqualTo(3);
         assertThat(outputDir.resolve("product-0001-capability-c1.json")).exists();
@@ -70,8 +76,11 @@ class XCreateCapabilityE2ETest {
     @Test
     @DisplayName("capabilityArtifact_containsCapabilityNameAndProductId")
     void capabilityArtifact_containsCapabilityNameAndProductId() throws IOException {
-        useCase.execute("product-0001", analyticsProduct(),
-                List.of("ingest", "query", "storage"), outputDir);
+        useCase.execute(
+                "product-0001",
+                analyticsProduct(),
+                List.of("ingest", "query", "storage"),
+                outputDir);
 
         String content = Files.readString(outputDir.resolve("product-0001-capability-c1.json"));
         assertThat(content).contains("ingest").contains("product-0001");
@@ -93,8 +102,11 @@ class XCreateCapabilityE2ETest {
     @Test
     @DisplayName("rnfInheritanceArtifact_containsAllCategories")
     void rnfInheritanceArtifact_containsAllCategories() throws IOException {
-        useCase.execute("product-0001", analyticsProduct(),
-                List.of("ingest", "query", "storage"), outputDir);
+        useCase.execute(
+                "product-0001",
+                analyticsProduct(),
+                List.of("ingest", "query", "storage"),
+                outputDir);
 
         String content = Files.readString(outputDir.resolve("product-0001-rnf-inheritance.json"));
         assertThat(content).contains("PERFORMANCE", "RELIABILITY", "SECURITY", "COMPLIANCE");

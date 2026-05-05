@@ -28,7 +28,9 @@ class XArchPlanProductCommandTest {
     @Test
     void call_whenFormatInvalid_returnsValidationExit() {
         var out = new StringWriter();
-        int exit = command(out, new StringWriter()).execute("--product-id", "product-0001", "--output-format", "svg");
+        int exit =
+                command(out, new StringWriter())
+                        .execute("--product-id", "product-0001", "--output-format", "svg");
 
         assertThat(exit).isEqualTo(XArchPlanProductCommand.EXIT_VALIDATION);
         assertThat(out.toString()).contains("Validation error:");

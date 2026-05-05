@@ -6,7 +6,6 @@ import dev.iadev.domain.architecture.C4CodeLevelValidator.ValidationResult;
 import dev.iadev.domain.architecture.C4IntegrityValidator.Severity;
 import dev.iadev.domain.architecture.C4IntegrityValidator.Violation;
 import dev.iadev.domain.architecture.C4IntegrityValidator.ViolationType;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,12 +25,17 @@ public final class HexagonalArchitectureValidator {
             return ArchResult.ok();
         }
 
-        List<Violation> violations = result.violations().stream()
-                .map(message -> new Violation(
-                        message,
-                        message.contains("outward") ? ViolationType.OUTWARD_DEPENDENCY : ViolationType.LAYER_CROSSING,
-                        Severity.ERROR))
-                .collect(Collectors.toList());
+        List<Violation> violations =
+                result.violations().stream()
+                        .map(
+                                message ->
+                                        new Violation(
+                                                message,
+                                                message.contains("outward")
+                                                        ? ViolationType.OUTWARD_DEPENDENCY
+                                                        : ViolationType.LAYER_CROSSING,
+                                                Severity.ERROR))
+                        .collect(Collectors.toList());
 
         return new ArchResult(false, violations);
     }

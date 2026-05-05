@@ -12,8 +12,12 @@ import org.junit.jupiter.api.Test;
 @DisplayName("C4ContainerRenderer")
 class C4ContainerRendererTest {
 
-    private final C4Diagram containerDiagram = new C4Diagram(
-            "product-0001 — C4 Container", C4Level.CONTAINER, C4OutputFormat.MERMAID, "C4Container\n  title test");
+    private final C4Diagram containerDiagram =
+            new C4Diagram(
+                    "product-0001 — C4 Container",
+                    C4Level.CONTAINER,
+                    C4OutputFormat.MERMAID,
+                    "C4Container\n  title test");
 
     @Test
     void render_returnsContent() {

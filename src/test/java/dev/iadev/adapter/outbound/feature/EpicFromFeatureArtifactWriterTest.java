@@ -21,7 +21,9 @@ class EpicFromFeatureArtifactWriterTest {
                         List.of("SAML federation"),
                         List.of("Login com Google Workspace", "Login com GitHub Organizations"),
                         List.of("file:///feature.md", "file:///capability.md"),
-                        List.of(new InheritedRnfLine("CAP-PERFORMANCE", "Capability", "P99 < 500ms", false)));
+                        List.of(
+                                new InheritedRnfLine(
+                                        "CAP-PERFORMANCE", "Capability", "P99 < 500ms", false)));
 
         String content = EpicFromFeatureArtifactWriter.render("0077", source);
 

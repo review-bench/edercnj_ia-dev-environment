@@ -1,15 +1,14 @@
 package dev.iadev.domain.architecture;
 
-import dev.iadev.domain.architecture.C4CodeLevelValidator.CodeEntry;
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.iadev.domain.architecture.C4CodeLevelValidator.ClassType;
+import dev.iadev.domain.architecture.C4CodeLevelValidator.CodeEntry;
 import dev.iadev.domain.architecture.C4CodeLevelValidator.Dependency;
 import dev.iadev.domain.architecture.C4CodeLevelValidator.LayerType;
 import dev.iadev.domain.architecture.C4CodeLevelValidator.ValidationResult;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class C4CodeLevelValidatorTest {
 
@@ -31,8 +30,13 @@ class C4CodeLevelValidatorTest {
 
     @Test
     void validate_withNoDomainClass_returnsViolation() {
-        List<CodeEntry> classes = List.of(
-                new CodeEntry("MyCommand", "adapter.inbound.cli", LayerType.ADAPTER_INBOUND, ClassType.COMMAND));
+        List<CodeEntry> classes =
+                List.of(
+                        new CodeEntry(
+                                "MyCommand",
+                                "adapter.inbound.cli",
+                                LayerType.ADAPTER_INBOUND,
+                                ClassType.COMMAND));
         ValidationResult result = validator.validate(classes, null);
         assertFalse(result.valid());
         assertTrue(result.violations().stream().anyMatch(v -> v.contains("DOMAIN")));
@@ -40,13 +44,24 @@ class C4CodeLevelValidatorTest {
 
     @Test
     void validate_withValidHexagonalClasses_returnsOk() {
-        List<CodeEntry> classes = List.of(
-                new CodeEntry("MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
-                new CodeEntry("MyUseCase", "application", LayerType.APPLICATION, ClassType.USE_CASE),
-                new CodeEntry("MyRenderer", "adapter.outbound", LayerType.ADAPTER_OUTBOUND, ClassType.RENDERER));
-        List<Dependency> deps = List.of(
-                new Dependency("MyUseCase", "MyEntity"),
-                new Dependency("MyRenderer", "MyEntity"));
+        List<CodeEntry> classes =
+                List.of(
+                        new CodeEntry(
+                                "MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
+                        new CodeEntry(
+                                "MyUseCase",
+                                "application",
+                                LayerType.APPLICATION,
+                                ClassType.USE_CASE),
+                        new CodeEntry(
+                                "MyRenderer",
+                                "adapter.outbound",
+                                LayerType.ADAPTER_OUTBOUND,
+                                ClassType.RENDERER));
+        List<Dependency> deps =
+                List.of(
+                        new Dependency("MyUseCase", "MyEntity"),
+                        new Dependency("MyRenderer", "MyEntity"));
         ValidationResult result = validator.validate(classes, deps);
         assertTrue(result.valid());
         assertTrue(result.violations().isEmpty());
@@ -54,9 +69,15 @@ class C4CodeLevelValidatorTest {
 
     @Test
     void validate_withOutwardDependencyDomainToAdapter_returnsViolation() {
-        List<CodeEntry> classes = List.of(
-                new CodeEntry("MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
-                new CodeEntry("MyRenderer", "adapter.outbound", LayerType.ADAPTER_OUTBOUND, ClassType.RENDERER));
+        List<CodeEntry> classes =
+                List.of(
+                        new CodeEntry(
+                                "MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
+                        new CodeEntry(
+                                "MyRenderer",
+                                "adapter.outbound",
+                                LayerType.ADAPTER_OUTBOUND,
+                                ClassType.RENDERER));
         List<Dependency> deps = List.of(new Dependency("MyEntity", "MyRenderer"));
         ValidationResult result = validator.validate(classes, deps);
         assertFalse(result.valid());
@@ -65,10 +86,20 @@ class C4CodeLevelValidatorTest {
 
     @Test
     void validate_withApplicationDependingOnAdapter_returnsViolation() {
-        List<CodeEntry> classes = List.of(
-                new CodeEntry("MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
-                new CodeEntry("MyUseCase", "application", LayerType.APPLICATION, ClassType.USE_CASE),
-                new CodeEntry("MyCommand", "adapter.inbound", LayerType.ADAPTER_INBOUND, ClassType.COMMAND));
+        List<CodeEntry> classes =
+                List.of(
+                        new CodeEntry(
+                                "MyEntity", "domain.model", LayerType.DOMAIN, ClassType.ENTITY),
+                        new CodeEntry(
+                                "MyUseCase",
+                                "application",
+                                LayerType.APPLICATION,
+                                ClassType.USE_CASE),
+                        new CodeEntry(
+                                "MyCommand",
+                                "adapter.inbound",
+                                LayerType.ADAPTER_INBOUND,
+                                ClassType.COMMAND));
         List<Dependency> deps = List.of(new Dependency("MyUseCase", "MyCommand"));
         ValidationResult result = validator.validate(classes, deps);
         assertFalse(result.valid());
@@ -77,7 +108,8 @@ class C4CodeLevelValidatorTest {
 
     @Test
     void codeEntry_withBlankClassName_throwsException() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> new CodeEntry("", "domain.model", LayerType.DOMAIN, ClassType.ENTITY));
     }
 }

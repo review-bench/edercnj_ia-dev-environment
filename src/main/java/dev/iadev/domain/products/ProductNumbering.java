@@ -35,7 +35,11 @@ public final class ProductNumbering {
     public ProductNumbering next() {
         if (sequence == MAX) {
             throw new IllegalStateException(
-                    "ProductNumbering sequence overflow: max is " + MAX + " (current: " + sequence + ")");
+                    "ProductNumbering sequence overflow: max is "
+                            + MAX
+                            + " (current: "
+                            + sequence
+                            + ")");
         }
         return new ProductNumbering(sequence + 1);
     }

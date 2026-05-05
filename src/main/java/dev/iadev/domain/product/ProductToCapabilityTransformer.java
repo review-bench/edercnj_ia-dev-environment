@@ -18,10 +18,15 @@ public final class ProductToCapabilityTransformer {
         if (capabilityNames == null) {
             throw new IllegalArgumentException("capabilityNames must not be null");
         }
-        if (capabilityNames.size() < MIN_CAPABILITIES || capabilityNames.size() > MAX_CAPABILITIES) {
+        if (capabilityNames.size() < MIN_CAPABILITIES
+                || capabilityNames.size() > MAX_CAPABILITIES) {
             throw new IllegalArgumentException(
-                    "capabilityNames must contain between " + MIN_CAPABILITIES
-                            + " and " + MAX_CAPABILITIES + " entries, got: " + capabilityNames.size());
+                    "capabilityNames must contain between "
+                            + MIN_CAPABILITIES
+                            + " and "
+                            + MAX_CAPABILITIES
+                            + " entries, got: "
+                            + capabilityNames.size());
         }
         return new ProductCapabilityDecomposition(productId, capabilityNames);
     }

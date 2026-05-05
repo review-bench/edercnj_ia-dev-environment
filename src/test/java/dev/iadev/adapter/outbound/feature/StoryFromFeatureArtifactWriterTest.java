@@ -23,14 +23,19 @@ class StoryFromFeatureArtifactWriterTest {
                         List.of("SAML federation"),
                         List.of("Login com Google Workspace"),
                         List.of("file:///feature.md"),
-                        List.of(new InheritedRnfLine("CAP-PERFORMANCE", "Capability", "P99 < 500ms", false)));
+                        List.of(
+                                new InheritedRnfLine(
+                                        "CAP-PERFORMANCE", "Capability", "P99 < 500ms", false)));
         StoryProposal proposal =
                 new StoryProposal(
                         "Login com Google Workspace",
                         "Engenheiro de Software",
-                        List.of(new AcceptanceCriterion("Login bem-sucedido com Google Workspace")));
+                        List.of(
+                                new AcceptanceCriterion(
+                                        "Login bem-sucedido com Google Workspace")));
 
-        String content = StoryFromFeatureArtifactWriter.render("story-0077-0001", "0077", source, proposal);
+        String content =
+                StoryFromFeatureArtifactWriter.render("story-0077-0001", "0077", source, proposal);
 
         assertThat(content).contains("**Epic ID:** EPIC-0077");
         assertThat(content).contains("## 2. RNFs Herdadas");

@@ -3,17 +3,16 @@ package dev.iadev.domain.products;
 import java.util.Objects;
 import java.util.Set;
 
-
 public final class CommitPathWhitelist {
 
-    private static final Set<String> STANDARD_PREFIXES = Set.of(
-            "plans/",
-            ".claude/templates/",
-            "ai/epics/",
-            "ai/products/",
-            "ai/memory/",
-            "ai/releases/"
-    );
+    private static final Set<String> STANDARD_PREFIXES =
+            Set.of(
+                    "plans/",
+                    ".claude/templates/",
+                    "ai/epics/",
+                    "ai/products/",
+                    "ai/memory/",
+                    "ai/releases/");
 
     private final Set<String> prefixes;
 

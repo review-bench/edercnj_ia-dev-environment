@@ -9,15 +9,18 @@ public record RNFOverride(
         boolean noRelaxed,
         String justification,
         ApprovalStatus approvalStatus,
-        String approver
-) {
+        String approver) {
     public static RNFOverride noRelax(RNFCategory category, String originalValue) {
         return new RNFOverride(category, originalValue, null, true, null, null, null);
     }
 
-    public static RNFOverride withOverride(RNFCategory category, String originalValue,
-                                           String overrideValue, String justification) {
-        return new RNFOverride(category, originalValue, overrideValue, false, justification, null, null);
+    public static RNFOverride withOverride(
+            RNFCategory category,
+            String originalValue,
+            String overrideValue,
+            String justification) {
+        return new RNFOverride(
+                category, originalValue, overrideValue, false, justification, null, null);
     }
 
     public static RNFOverride withApproval(
@@ -27,7 +30,14 @@ public record RNFOverride(
             String justification,
             ApprovalStatus approvalStatus,
             String approver) {
-        return new RNFOverride(category, originalValue, overrideValue, false, justification, approvalStatus, approver);
+        return new RNFOverride(
+                category,
+                originalValue,
+                overrideValue,
+                false,
+                justification,
+                approvalStatus,
+                approver);
     }
 
     public boolean isRelaxed() {

@@ -1,10 +1,10 @@
 package dev.iadev.domain.capabilities;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Product-First capabilities domain — ProductCapabilityId, ProductCapability")
 class ProductCapabilityTest {
@@ -53,7 +53,8 @@ class ProductCapabilityTest {
         @DisplayName("hashCode() consistent with equals()")
         void hashCode_equalIds_sameHash() {
             assertThat(ProductCapabilityId.of("product-first.story-planning-v5").hashCode())
-                    .isEqualTo(ProductCapabilityId.of("product-first.story-planning-v5").hashCode());
+                    .isEqualTo(
+                            ProductCapabilityId.of("product-first.story-planning-v5").hashCode());
         }
 
         @Test
@@ -77,7 +78,9 @@ class ProductCapabilityTest {
         @Test
         @DisplayName("record holds all fields correctly")
         void record_allFields_accessible() {
-            var cap = new ProductCapability(id(), "C4 Model Mandatory", "Enforces C4 diagrams", false);
+            var cap =
+                    new ProductCapability(
+                            id(), "C4 Model Mandatory", "Enforces C4 diagrams", false);
             assertThat(cap.id().value()).isEqualTo("product-first.c4-model-mandatory");
             assertThat(cap.name()).isEqualTo("C4 Model Mandatory");
             assertThat(cap.description()).isEqualTo("Enforces C4 diagrams");

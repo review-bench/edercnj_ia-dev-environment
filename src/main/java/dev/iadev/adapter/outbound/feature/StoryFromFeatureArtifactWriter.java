@@ -28,7 +28,8 @@ public final class StoryFromFeatureArtifactWriter {
         return List.copyOf(written);
     }
 
-    static String render(String storyId, String epicId, FeatureEpicSource source, StoryProposal proposal) {
+    static String render(
+            String storyId, String epicId, FeatureEpicSource source, StoryProposal proposal) {
         StringBuilder sb = new StringBuilder();
         appendHeader(sb, storyId, epicId, source);
         appendVision(sb, proposal);
@@ -42,40 +43,59 @@ public final class StoryFromFeatureArtifactWriter {
         return sb.toString();
     }
 
-    private static void appendHeader(StringBuilder sb, String storyId, String epicId, FeatureEpicSource source) {
-        sb.append("# História: ").append(source.title()).append(" — ").append(proposalTitleSuffix(source.featureId()))
+    private static void appendHeader(
+            StringBuilder sb, String storyId, String epicId, FeatureEpicSource source) {
+        sb.append("# História: ")
+                .append(source.title())
+                .append(" — ")
+                .append(proposalTitleSuffix(source.featureId()))
                 .append("\n\n");
         sb.append("**ID:** ").append(storyId).append("\n");
         sb.append("**Chave Jira:** —\n");
         sb.append("**Status:** Pendente\n");
         sb.append("**Epic ID:** EPIC-").append(epicId).append("\n");
         sb.append("**Source Feature:** ").append(source.featureId()).append("\n");
-        sb.append("**Source Feature Link:** ").append(source.sourceFeatureLink()).append("\n\n---\n\n");
+        sb.append("**Source Feature Link:** ")
+                .append(source.sourceFeatureLink())
+                .append("\n\n---\n\n");
     }
 
     private static void appendVision(StringBuilder sb, StoryProposal proposal) {
         sb.append("## 1. Visão\n\n");
-        sb.append("Como **").append(proposal.actor()).append("**, eu quero ").append(proposal.title())
-                .append(", para que o fluxo derivado da feature seja executável em nível de story.\n\n---\n\n");
+        sb.append("Como **")
+                .append(proposal.actor())
+                .append("**, eu quero ")
+                .append(proposal.title())
+                .append(
+                        ", para que o fluxo derivado da feature seja executável em nível de story.\n\n---\n\n");
     }
 
     private static void appendRnfs(StringBuilder sb, List<InheritedRnfLine> rnfs) {
         sb.append("## 2. RNFs Herdadas\n\n");
-        sb.append("| Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |\n");
+        sb.append(
+                "| Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |\n");
         sb.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n");
         for (InheritedRnfLine rnf : rnfs) {
             String category = normalizeCategory(rnf.id());
-            sb.append("| ").append(category).append(" | ").append(rnf.requirement()).append(" | ")
-                    .append(rnf.waivable() ? "false" : "true").append(" | — | — | — | — |\n");
+            sb.append("| ")
+                    .append(category)
+                    .append(" | ")
+                    .append(rnf.requirement())
+                    .append(" | ")
+                    .append(rnf.waivable() ? "false" : "true")
+                    .append(" | — | — | — | — |\n");
         }
         sb.append("\n---\n\n");
     }
 
     private static void appendValue(StringBuilder sb, StoryProposal proposal) {
         sb.append("## 3. Entrega de Valor\n\n");
-        sb.append("- **Valor Principal:** Story executável derivada de uma capability já refinada\n");
+        sb.append(
+                "- **Valor Principal:** Story executável derivada de uma capability já refinada\n");
         sb.append("- **Métrica de Sucesso:** Backlog da feature avança sem perder ACs herdados\n");
-        sb.append("- **Impacto no Negócio:** ").append(proposal.title()).append(" pode seguir para implementação com rastreabilidade\n\n");
+        sb.append("- **Impacto no Negócio:** ")
+                .append(proposal.title())
+                .append(" pode seguir para implementação com rastreabilidade\n\n");
         sb.append("---\n\n");
     }
 
@@ -95,20 +115,26 @@ public final class StoryFromFeatureArtifactWriter {
         if (!proposal.inheritedAcs().isEmpty()) {
             sb.append("### 5.4 Acceptance Criteria Herdados\n\n");
             for (int i = 0; i < proposal.inheritedAcs().size(); i++) {
-                sb.append(i + 1).append(". ").append(proposal.inheritedAcs().get(i).scenario()).append("\n");
+                sb.append(i + 1)
+                        .append(". ")
+                        .append(proposal.inheritedAcs().get(i).scenario())
+                        .append("\n");
             }
             sb.append("\n");
         }
         sb.append("---\n\n");
     }
 
-    private static void appendC4Sections(StringBuilder sb, FeatureEpicSource source, StoryProposal proposal) {
+    private static void appendC4Sections(
+            StringBuilder sb, FeatureEpicSource source, StoryProposal proposal) {
         appendC4Section(
                 sb,
                 "Context",
                 "C4Context",
                 proposal.title(),
-                "System(story, \"" + source.featureId() + "\", \"Story slice of the derived feature\")");
+                "System(story, \""
+                        + source.featureId()
+                        + "\", \"Story slice of the derived feature\")");
         appendC4Section(
                 sb,
                 "Container",
@@ -142,9 +168,17 @@ public final class StoryFromFeatureArtifactWriter {
     private static void appendTasks(StringBuilder sb, String epicId, StoryProposal proposal) {
         sb.append("## 6. Tasks\n\n");
         appendTask(sb, epicId, "001", "Modelar fluxo derivado", "—");
-        appendTask(sb, epicId, "002", "Implementar contratos e adapters",
+        appendTask(
+                sb,
+                epicId,
+                "002",
+                "Implementar contratos e adapters",
                 "TASK-" + epicId + "-" + epicId + "-001");
-        appendTask(sb, epicId, "003", "Cobrir cenários herdados",
+        appendTask(
+                sb,
+                epicId,
+                "003",
+                "Cobrir cenários herdados",
                 "TASK-" + epicId + "-" + epicId + "-002");
         sb.append("---\n\n");
     }
@@ -157,7 +191,11 @@ public final class StoryFromFeatureArtifactWriter {
         sb.append("- **Test Type:** Unit\n");
         sb.append("- **Size:** M\n");
         sb.append("- **Dependencies:** ").append(dependency).append("\n");
-        sb.append("- **Branch:** `feat/task-").append(epicId).append("-").append(suffix).append("-derived-story`\n");
+        sb.append("- **Branch:** `feat/task-")
+                .append(epicId)
+                .append("-")
+                .append(suffix)
+                .append("-derived-story`\n");
         sb.append("- **Files:**\n");
         sb.append("  - `src/main/java/dev/iadev/...`\n");
         sb.append("- **Acceptance Criteria:**\n");
@@ -188,8 +226,11 @@ public final class StoryFromFeatureArtifactWriter {
     }
 
     private static String slugify(String value) {
-        String sanitized = value.toLowerCase().replaceAll("[^a-z0-9-]+", "-").replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+        String sanitized =
+                value.toLowerCase()
+                        .replaceAll("[^a-z0-9-]+", "-")
+                        .replaceAll("-{2,}", "-")
+                        .replaceAll("^-|-$", "");
         return sanitized.isEmpty() ? "untitled" : sanitized;
     }
 }

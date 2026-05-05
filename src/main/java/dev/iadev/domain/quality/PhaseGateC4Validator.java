@@ -6,7 +6,6 @@ import dev.iadev.domain.architecture.C4Diagram;
 import dev.iadev.domain.architecture.C4IntegrityValidator;
 import dev.iadev.domain.architecture.C4IntegrityValidator.IntegrityResult;
 import dev.iadev.domain.architecture.C4IntegrityValidator.Violation;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +19,8 @@ public final class PhaseGateC4Validator {
         }
     }
 
-    public PhaseGateResult validate(List<C4Diagram> diagrams, List<CodeEntry> classes,
-            List<Dependency> deps) {
+    public PhaseGateResult validate(
+            List<C4Diagram> diagrams, List<CodeEntry> classes, List<Dependency> deps) {
         if (diagrams == null || diagrams.isEmpty()) {
             throw new IllegalArgumentException("diagrams must not be null or empty");
         }

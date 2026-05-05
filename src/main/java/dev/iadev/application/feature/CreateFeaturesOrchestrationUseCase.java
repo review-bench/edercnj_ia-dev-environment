@@ -12,14 +12,13 @@ public final class CreateFeaturesOrchestrationUseCase {
     private final GherkinACGenerator gherkinGenerator;
 
     public CreateFeaturesOrchestrationUseCase(
-            FeatureDecompositionUseCase decompositionUseCase,
-            GherkinACGenerator gherkinGenerator) {
+            FeatureDecompositionUseCase decompositionUseCase, GherkinACGenerator gherkinGenerator) {
         this.decompositionUseCase = decompositionUseCase;
         this.gherkinGenerator = gherkinGenerator;
     }
 
-    public CreateFeaturesResult execute(String capabilityId, List<String> featureNames, Path outputDir)
-            throws IOException {
+    public CreateFeaturesResult execute(
+            String capabilityId, List<String> featureNames, Path outputDir) throws IOException {
         var decomposition = decompositionUseCase.execute(capabilityId, featureNames);
         var result = FeatureArtifactWriter.write(decomposition, gherkinGenerator, outputDir);
         return new CreateFeaturesResult(result.writtenCount(), result.skippedCount());

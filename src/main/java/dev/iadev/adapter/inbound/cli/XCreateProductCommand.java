@@ -25,15 +25,15 @@ import picocli.CommandLine.Spec;
 @Command(
         name = "x-create-product",
         mixinStandardHelpOptions = true,
-        description = "Transform an ideation file into a Product artifact with RNF roots and C1 capability stub.")
+        description =
+                "Transform an ideation file into a Product artifact with RNF roots and C1 capability stub.")
 public class XCreateProductCommand implements Callable<Integer> {
 
     static final int EXIT_SUCCESS = 0;
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--ideation-file"},
@@ -43,12 +43,14 @@ public class XCreateProductCommand implements Callable<Integer> {
 
     @Option(
             names = {"--output-dir"},
-            description = "Output directory for generated product artifacts (default: ai/products/).")
+            description =
+                    "Output directory for generated product artifacts (default: ai/products/).")
     String outputDirPath;
 
     @Option(
             names = {"--product-id"},
-            description = "Override product identifier (format: product-NNNN, max 15 chars). Auto-generated if omitted.")
+            description =
+                    "Override product identifier (format: product-NNNN, max 15 chars). Auto-generated if omitted.")
     String productId;
 
     @Option(
@@ -67,7 +69,9 @@ public class XCreateProductCommand implements Callable<Integer> {
             return EXIT_VALIDATION;
         }
 
-        var request = XCreateProductArgumentParser.parse(ideationFilePath, outputDirPath, productId, dryRun);
+        var request =
+                XCreateProductArgumentParser.parse(
+                        ideationFilePath, outputDirPath, productId, dryRun);
 
         if (!Files.exists(request.ideationFile())) {
             out.println("Error: ideation-file not found: " + request.ideationFile());
@@ -82,11 +86,12 @@ public class XCreateProductCommand implements Callable<Integer> {
         IdeationTemplate ideation = parseIdeation(request.ideationFile());
         String resolvedProductId = request.productId().orElse("product-0001");
 
-        var useCase = new CreateProductOrchestrationUseCase(
-                new IdeationValidator(),
-                new IdeationToProductTransformer(),
-                new CapabilityStubFactory(),
-                new RNFRootValidator());
+        var useCase =
+                new CreateProductOrchestrationUseCase(
+                        new IdeationValidator(),
+                        new IdeationToProductTransformer(),
+                        new CapabilityStubFactory(),
+                        new RNFRootValidator());
 
         CreateProductResult result = useCase.execute(resolvedProductId, ideation);
 
@@ -136,7 +141,8 @@ public class XCreateProductCommand implements Callable<Integer> {
     private static IdeationSection parseSectionHeading(String line) {
         String heading = line.substring(3).trim();
         for (IdeationSection section : IdeationSection.values()) {
-            if (heading.startsWith(section.number() + ".") || heading.startsWith(section.number() + " ")) {
+            if (heading.startsWith(section.number() + ".")
+                    || heading.startsWith(section.number() + " ")) {
                 return section;
             }
         }

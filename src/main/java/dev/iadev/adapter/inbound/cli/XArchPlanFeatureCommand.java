@@ -23,8 +23,7 @@ public class XArchPlanFeatureCommand implements Callable<Integer> {
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--feature-id"},
@@ -68,6 +67,8 @@ public class XArchPlanFeatureCommand implements Callable<Integer> {
     }
 
     private void writeLine(PrintWriter out, C4Diagram diagram, boolean placeholder) {
-        out.printf("  %-10s: %s  [%s]%n", diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
+        out.printf(
+                "  %-10s: %s  [%s]%n",
+                diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
     }
 }

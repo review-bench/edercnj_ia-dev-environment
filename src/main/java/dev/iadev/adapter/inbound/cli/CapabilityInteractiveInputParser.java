@@ -22,8 +22,11 @@ public final class CapabilityInteractiveInputParser {
         String inner = trimmed.substring(1, trimmed.length() - 1).trim();
         if (inner.isEmpty()) {
             throw new IllegalArgumentException(
-                    "capabilities array must contain between " + MIN_CAPABILITIES
-                            + " and " + MAX_CAPABILITIES + " entries");
+                    "capabilities array must contain between "
+                            + MIN_CAPABILITIES
+                            + " and "
+                            + MAX_CAPABILITIES
+                            + " entries");
         }
         List<String> names = new ArrayList<>();
         for (String token : inner.split(",")) {
@@ -37,8 +40,12 @@ public final class CapabilityInteractiveInputParser {
         }
         if (names.size() < MIN_CAPABILITIES || names.size() > MAX_CAPABILITIES) {
             throw new IllegalArgumentException(
-                    "capabilities must contain between " + MIN_CAPABILITIES
-                            + " and " + MAX_CAPABILITIES + " entries, got: " + names.size());
+                    "capabilities must contain between "
+                            + MIN_CAPABILITIES
+                            + " and "
+                            + MAX_CAPABILITIES
+                            + " entries, got: "
+                            + names.size());
         }
         return List.copyOf(names);
     }

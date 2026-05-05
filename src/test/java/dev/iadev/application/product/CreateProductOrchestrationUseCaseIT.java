@@ -7,7 +7,6 @@ import dev.iadev.domain.capability.CapabilityStubFactory;
 import dev.iadev.domain.ideation.IdeationSection;
 import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationToProductTransformer;
-import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
 import dev.iadev.domain.product.RNFRootValidator;
 import java.util.Map;
@@ -23,32 +22,34 @@ class CreateProductOrchestrationUseCaseIT {
     private final CapabilityStubFactory capabilityStubFactory = new CapabilityStubFactory();
     private final RNFRootValidator rnfValidator = new RNFRootValidator();
     private final CreateProductOrchestrationUseCase useCase =
-            new CreateProductOrchestrationUseCase(validator, transformer, capabilityStubFactory, rnfValidator);
+            new CreateProductOrchestrationUseCase(
+                    validator, transformer, capabilityStubFactory, rnfValidator);
 
     private static IdeationTemplate validIdeation() {
         return IdeationTemplate.builder()
                 .title("Analytics Platform")
-                .sections(Map.of(
-                        IdeationSection.VISION_AND_SCOPE, "Real-time analytics for enterprises",
-                        IdeationSection.STAKEHOLDERS, "Data analysts, engineers",
-                        IdeationSection.BUSINESS_REQUIREMENTS,
-                                "BIZ-001 system must process 1M events/sec\n"
-                                + "BIZ-002 99.99% uptime SLA\n"
-                                + "BIZ-003 data encrypted at rest\n"
-                                + "BIZ-004 GDPR compliant\n"
-                                + "BIZ-005 p99 query latency < 100ms",
-                        IdeationSection.CONSTRAINTS, "On-prem first, cloud optional",
-                        IdeationSection.SUCCESS_CRITERIA, "50K events/sec in MVP",
-                        IdeationSection.RISKS, "Vendor lock-in, data migration complexity",
-                        IdeationSection.ROADMAP, "Q1: ingest, Q2: query engine"))
+                .sections(
+                        Map.of(
+                                IdeationSection.VISION_AND_SCOPE,
+                                        "Real-time analytics for enterprises",
+                                IdeationSection.STAKEHOLDERS, "Data analysts, engineers",
+                                IdeationSection.BUSINESS_REQUIREMENTS,
+                                        "BIZ-001 system must process 1M events/sec\n"
+                                                + "BIZ-002 99.99% uptime SLA\n"
+                                                + "BIZ-003 data encrypted at rest\n"
+                                                + "BIZ-004 GDPR compliant\n"
+                                                + "BIZ-005 p99 query latency < 100ms",
+                                IdeationSection.CONSTRAINTS, "On-prem first, cloud optional",
+                                IdeationSection.SUCCESS_CRITERIA, "50K events/sec in MVP",
+                                IdeationSection.RISKS, "Vendor lock-in, data migration complexity",
+                                IdeationSection.ROADMAP, "Q1: ingest, Q2: query engine"))
                 .build();
     }
 
     private static IdeationTemplate invalidIdeation() {
         return IdeationTemplate.builder()
                 .title("Broken")
-                .sections(Map.of(
-                        IdeationSection.VISION_AND_SCOPE, "X"))
+                .sections(Map.of(IdeationSection.VISION_AND_SCOPE, "X"))
                 .build();
     }
 

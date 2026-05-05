@@ -13,16 +13,14 @@ public final class XCreateProductArgumentParser {
     private XCreateProductArgumentParser() {}
 
     public static CreateProductRequest parse(
-            String ideationFilePath,
-            String outputDirPath,
-            String productId,
-            boolean dryRun) {
+            String ideationFilePath, String outputDirPath, String productId, boolean dryRun) {
 
         Path ideationFile = Paths.get(ideationFilePath).normalize();
 
-        Path outputDir = outputDirPath != null
-                ? Paths.get(outputDirPath).normalize()
-                : Paths.get(DEFAULT_OUTPUT_DIR);
+        Path outputDir =
+                outputDirPath != null
+                        ? Paths.get(outputDirPath).normalize()
+                        : Paths.get(DEFAULT_OUTPUT_DIR);
 
         Optional<String> resolvedProductId = Optional.ofNullable(productId);
 
@@ -35,7 +33,10 @@ public final class XCreateProductArgumentParser {
         }
         if (productId.length() > MAX_PRODUCT_ID_LENGTH) {
             throw new IllegalArgumentException(
-                    "product-id exceeds maximum length of " + MAX_PRODUCT_ID_LENGTH + ": " + productId);
+                    "product-id exceeds maximum length of "
+                            + MAX_PRODUCT_ID_LENGTH
+                            + ": "
+                            + productId);
         }
         if (!productId.matches(PRODUCT_ID_PATTERN)) {
             throw new IllegalArgumentException(

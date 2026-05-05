@@ -15,8 +15,7 @@ import picocli.CommandLine;
 @DisplayName("XCreateProductCommand — argument parsing + help")
 class XCreateProductCommandTest {
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Nested
     @DisplayName("Help text")
@@ -77,8 +76,7 @@ class XCreateProductCommandTest {
         @Test
         void nonExistentIdeationFile_returnsValidationExitCode() {
             var sw = new StringWriter();
-            int exit = buildCommandLine(sw).execute(
-                    "--ideation-file", "/nonexistent/idea.md");
+            int exit = buildCommandLine(sw).execute("--ideation-file", "/nonexistent/idea.md");
             assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_VALIDATION);
         }
 
@@ -86,9 +84,13 @@ class XCreateProductCommandTest {
         void invalidProductIdFormat_returnsValidationExitCode() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
             var sw = new StringWriter();
-            int exit = buildCommandLine(sw).execute(
-                    "--ideation-file", ideation.toString(),
-                    "--product-id", "INVALID-FORMAT-TOO-LONG-123456789012345");
+            int exit =
+                    buildCommandLine(sw)
+                            .execute(
+                                    "--ideation-file",
+                                    ideation.toString(),
+                                    "--product-id",
+                                    "INVALID-FORMAT-TOO-LONG-123456789012345");
             assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_VALIDATION);
         }
     }
@@ -101,9 +103,9 @@ class XCreateProductCommandTest {
         void dryRunWithValidFile_returnsSuccessExitCode() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
             var sw = new StringWriter();
-            int exit = buildCommandLine(sw).execute(
-                    "--ideation-file", ideation.toString(),
-                    "--dry-run");
+            int exit =
+                    buildCommandLine(sw)
+                            .execute("--ideation-file", ideation.toString(), "--dry-run");
             assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_SUCCESS);
         }
 
@@ -111,9 +113,7 @@ class XCreateProductCommandTest {
         void dryRunWithValidFile_outputContainsDryRunMessage() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
             var sw = new StringWriter();
-            buildCommandLine(sw).execute(
-                    "--ideation-file", ideation.toString(),
-                    "--dry-run");
+            buildCommandLine(sw).execute("--ideation-file", ideation.toString(), "--dry-run");
             assertThat(sw.toString()).containsIgnoringCase("dry-run");
         }
 
@@ -122,10 +122,14 @@ class XCreateProductCommandTest {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
             Path outputDir = Files.createTempDirectory(tempDir, "products");
             var sw = new StringWriter();
-            int exit = buildCommandLine(sw).execute(
-                    "--ideation-file", ideation.toString(),
-                    "--output-dir", outputDir.toString(),
-                    "--dry-run");
+            int exit =
+                    buildCommandLine(sw)
+                            .execute(
+                                    "--ideation-file",
+                                    ideation.toString(),
+                                    "--output-dir",
+                                    outputDir.toString(),
+                                    "--dry-run");
             assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_SUCCESS);
         }
 
@@ -133,10 +137,14 @@ class XCreateProductCommandTest {
         void dryRunWithProductIdOverride_acceptsValidProductId() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
             var sw = new StringWriter();
-            int exit = buildCommandLine(sw).execute(
-                    "--ideation-file", ideation.toString(),
-                    "--product-id", "product-0042",
-                    "--dry-run");
+            int exit =
+                    buildCommandLine(sw)
+                            .execute(
+                                    "--ideation-file",
+                                    ideation.toString(),
+                                    "--product-id",
+                                    "product-0042",
+                                    "--dry-run");
             assertThat(exit).isEqualTo(XCreateProductCommand.EXIT_SUCCESS);
         }
     }
@@ -169,40 +177,39 @@ class XCreateProductCommandTest {
         @Test
         void parse_withRequiredArg_setsIdeationFile() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
-            var result = XCreateProductArgumentParser.parse(
-                    ideation.toString(), null, null, false);
+            var result = XCreateProductArgumentParser.parse(ideation.toString(), null, null, false);
             assertThat(result.ideationFile()).isEqualTo(ideation);
         }
 
         @Test
         void parse_withDefaultOutputDir_usesAiProductsDefault() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
-            var result = XCreateProductArgumentParser.parse(
-                    ideation.toString(), null, null, false);
+            var result = XCreateProductArgumentParser.parse(ideation.toString(), null, null, false);
             assertThat(result.outputDir().toString()).endsWith("ai/products");
         }
 
         @Test
         void parse_withCustomOutputDir_usesProvidedDir() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
-            var result = XCreateProductArgumentParser.parse(
-                    ideation.toString(), tempDir.toString(), null, true);
+            var result =
+                    XCreateProductArgumentParser.parse(
+                            ideation.toString(), tempDir.toString(), null, true);
             assertThat(result.outputDir()).isEqualTo(tempDir);
         }
 
         @Test
         void parse_withProductId_capturesIt() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
-            var result = XCreateProductArgumentParser.parse(
-                    ideation.toString(), null, "product-0007", false);
+            var result =
+                    XCreateProductArgumentParser.parse(
+                            ideation.toString(), null, "product-0007", false);
             assertThat(result.productId()).contains("product-0007");
         }
 
         @Test
         void parse_withDryRunTrue_setsDryRun() throws Exception {
             Path ideation = Files.createTempFile(tempDir, "idea", ".md");
-            var result = XCreateProductArgumentParser.parse(
-                    ideation.toString(), null, null, true);
+            var result = XCreateProductArgumentParser.parse(ideation.toString(), null, null, true);
             assertThat(result.dryRun()).isTrue();
         }
     }

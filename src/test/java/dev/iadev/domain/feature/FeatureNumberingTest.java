@@ -13,8 +13,8 @@ class FeatureNumberingTest {
 
     @Test
     void assignIds_fourNames_returnsFeature0001To0004() {
-        Map<String, String> result = FeatureNumbering.assignIds(
-                List.of("BasicAuth", "OAuth2", "MFA", "Session"));
+        Map<String, String> result =
+                FeatureNumbering.assignIds(List.of("BasicAuth", "OAuth2", "MFA", "Session"));
         assertThat(result.get("BasicAuth")).isEqualTo("feature-0001");
         assertThat(result.get("OAuth2")).isEqualTo("feature-0002");
         assertThat(result.get("MFA")).isEqualTo("feature-0003");
@@ -23,8 +23,8 @@ class FeatureNumberingTest {
 
     @Test
     void assignIds_preservesInsertionOrder() {
-        Map<String, String> result = FeatureNumbering.assignIds(
-                List.of("z-feat", "a-feat", "m-feat", "b-feat"));
+        Map<String, String> result =
+                FeatureNumbering.assignIds(List.of("z-feat", "a-feat", "m-feat", "b-feat"));
         assertThat(result.get("z-feat")).isEqualTo("feature-0001");
         assertThat(result.get("a-feat")).isEqualTo("feature-0002");
         assertThat(result.get("m-feat")).isEqualTo("feature-0003");

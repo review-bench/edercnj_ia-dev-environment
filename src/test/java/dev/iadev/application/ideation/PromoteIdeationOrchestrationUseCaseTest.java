@@ -1,15 +1,14 @@
 package dev.iadev.application.ideation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import dev.iadev.domain.ideation.IdeationSection;
 import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
-import org.junit.jupiter.api.Test;
-
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class PromoteIdeationOrchestrationUseCaseTest {
 
@@ -20,7 +19,8 @@ class PromoteIdeationOrchestrationUseCaseTest {
     }
 
     private IdeationTemplate validTemplate() {
-        String bizRequirements = """
+        String bizRequirements =
+                """
                 BIZ-001 requirement one
                 BIZ-002 requirement two
                 BIZ-003 requirement three
@@ -29,14 +29,15 @@ class PromoteIdeationOrchestrationUseCaseTest {
                 """;
         return IdeationTemplate.builder()
                 .title("My Feature Idea")
-                .sections(Map.of(
-                        IdeationSection.VISION_AND_SCOPE, "vision content",
-                        IdeationSection.STAKEHOLDERS, "stakeholders content",
-                        IdeationSection.BUSINESS_REQUIREMENTS, bizRequirements,
-                        IdeationSection.CONSTRAINTS, "constraints content",
-                        IdeationSection.SUCCESS_CRITERIA, "success criteria content",
-                        IdeationSection.RISKS, "risks content",
-                        IdeationSection.ROADMAP, "roadmap content"))
+                .sections(
+                        Map.of(
+                                IdeationSection.VISION_AND_SCOPE, "vision content",
+                                IdeationSection.STAKEHOLDERS, "stakeholders content",
+                                IdeationSection.BUSINESS_REQUIREMENTS, bizRequirements,
+                                IdeationSection.CONSTRAINTS, "constraints content",
+                                IdeationSection.SUCCESS_CRITERIA, "success criteria content",
+                                IdeationSection.RISKS, "risks content",
+                                IdeationSection.ROADMAP, "roadmap content"))
                 .build();
     }
 
@@ -62,10 +63,11 @@ class PromoteIdeationOrchestrationUseCaseTest {
 
     @Test
     void validate_missingTitle_returnsFailure() {
-        IdeationTemplate noTitle = IdeationTemplate.builder()
-                .title("")
-                .sections(Map.of(IdeationSection.VISION_AND_SCOPE, "content"))
-                .build();
+        IdeationTemplate noTitle =
+                IdeationTemplate.builder()
+                        .title("")
+                        .sections(Map.of(IdeationSection.VISION_AND_SCOPE, "content"))
+                        .build();
         IdeationValidationResult result = useCase().validate(noTitle);
         assertThat(result.passed()).isFalse();
     }

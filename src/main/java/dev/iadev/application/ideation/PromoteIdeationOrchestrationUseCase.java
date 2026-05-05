@@ -3,7 +3,6 @@ package dev.iadev.application.ideation;
 import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
-
 import java.util.List;
 
 public class PromoteIdeationOrchestrationUseCase {
@@ -28,9 +27,10 @@ public class PromoteIdeationOrchestrationUseCase {
         if (!validation.passed()) {
             return IdeationPromotionResult.failed(String.join("; ", validation.errors()));
         }
-        String resolvedId = requestedId != null && !requestedId.isBlank()
-                ? requestedId
-                : String.format("ideation-%04d", nextSequence);
+        String resolvedId =
+                requestedId != null && !requestedId.isBlank()
+                        ? requestedId
+                        : String.format("ideation-%04d", nextSequence);
         return IdeationPromotionResult.success(resolvedId);
     }
 }

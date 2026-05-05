@@ -9,9 +9,9 @@ import dev.iadev.domain.architecture.CapabilityC4Model;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
-import picocli.CommandLine.Model.CommandSpec;
 
 @Command(
         name = "x-arch-plan-capability",
@@ -23,8 +23,7 @@ public class XArchPlanCapabilityCommand implements Callable<Integer> {
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--capability-id"},
@@ -68,6 +67,8 @@ public class XArchPlanCapabilityCommand implements Callable<Integer> {
     }
 
     private void writeLine(PrintWriter out, C4Diagram diagram, boolean placeholder) {
-        out.printf("  %-10s: %s  [%s]%n", diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
+        out.printf(
+                "  %-10s: %s  [%s]%n",
+                diagram.level(), diagram.title(), placeholder ? "placeholder" : "OK");
     }
 }

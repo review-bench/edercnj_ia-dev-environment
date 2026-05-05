@@ -15,10 +15,16 @@ public final class C4ContextRenderer {
     }
 
     public static String renderHeader(C4Diagram diagram) {
-        return "# " + escapeMarkdown(diagram.title()) + "\n\n"
+        return "# "
+                + escapeMarkdown(diagram.title())
+                + "\n\n"
                 + "**Level:** Context\n"
-                + "**Format:** " + diagram.format().name().toLowerCase() + "\n\n"
-                + "```\n" + diagram.content() + "\n```";
+                + "**Format:** "
+                + diagram.format().name().toLowerCase()
+                + "\n\n"
+                + "```\n"
+                + diagram.content()
+                + "\n```";
     }
 
     private static String escapeMarkdown(String text) {

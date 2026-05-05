@@ -14,8 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("FeatureArtifactWriter")
 class FeatureArtifactWriterTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private CapabilityFeatureDecomposition decomposition() {
         return new CapabilityFeatureDecomposition(

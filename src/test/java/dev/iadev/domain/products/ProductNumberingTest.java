@@ -1,10 +1,10 @@
 package dev.iadev.domain.products;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ProductNumbering")
 class ProductNumberingTest {
@@ -21,20 +21,17 @@ class ProductNumberingTest {
 
         @Test
         void of_null_throwsIllegalArgument() {
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> ProductNumbering.of(null));
+            assertThatIllegalArgumentException().isThrownBy(() -> ProductNumbering.of(null));
         }
 
         @Test
         void of_zero_throwsIllegalArgument() {
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> ProductNumbering.of(0));
+            assertThatIllegalArgumentException().isThrownBy(() -> ProductNumbering.of(0));
         }
 
         @Test
         void of_negativeSequence_throwsIllegalArgument() {
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> ProductNumbering.of(-1));
+            assertThatIllegalArgumentException().isThrownBy(() -> ProductNumbering.of(-1));
         }
 
         @Test
@@ -45,8 +42,7 @@ class ProductNumberingTest {
 
         @Test
         void of_overMaxSequence_throwsIllegalArgument() {
-            assertThatIllegalArgumentException()
-                    .isThrownBy(() -> ProductNumbering.of(10000));
+            assertThatIllegalArgumentException().isThrownBy(() -> ProductNumbering.of(10000));
         }
     }
 

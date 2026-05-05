@@ -7,7 +7,6 @@ import dev.iadev.domain.architecture.C4Diagram.C4Level;
 import dev.iadev.domain.architecture.C4LevelValidator;
 import dev.iadev.domain.architecture.C4OutputFormat;
 import dev.iadev.domain.port.output.C4DiagramPort;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,8 @@ class ArchitectureRefactoringUseCaseTest {
         }
 
         @Override
-        public C4Diagram generatePlaceholder(C4Level level, String entityId, C4OutputFormat format) {
+        public C4Diagram generatePlaceholder(
+                C4Level level, String entityId, C4OutputFormat format) {
             return new C4Diagram(entityId + " " + level, level, format, "placeholder " + level);
         }
     }

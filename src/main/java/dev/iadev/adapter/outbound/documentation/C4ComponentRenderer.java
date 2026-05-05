@@ -9,16 +9,23 @@ public final class C4ComponentRenderer {
 
     public static String render(C4Diagram diagram) {
         if (diagram.level() != C4Level.COMPONENT) {
-            throw new IllegalArgumentException("Expected COMPONENT diagram, got: " + diagram.level());
+            throw new IllegalArgumentException(
+                    "Expected COMPONENT diagram, got: " + diagram.level());
         }
         return diagram.content();
     }
 
     public static String renderHeader(C4Diagram diagram) {
-        return "# " + escapeMarkdown(diagram.title()) + "\n\n"
+        return "# "
+                + escapeMarkdown(diagram.title())
+                + "\n\n"
                 + "**Level:** Component\n"
-                + "**Format:** " + diagram.format().name().toLowerCase() + "\n\n"
-                + "```\n" + diagram.content() + "\n```";
+                + "**Format:** "
+                + diagram.format().name().toLowerCase()
+                + "\n\n"
+                + "```\n"
+                + diagram.content()
+                + "\n```";
     }
 
     private static String escapeMarkdown(String text) {

@@ -8,14 +8,25 @@ import java.util.stream.Collectors;
 public final class C4CodeLevelValidator {
 
     public enum LayerType {
-        DOMAIN, APPLICATION, ADAPTER_INBOUND, ADAPTER_OUTBOUND
+        DOMAIN,
+        APPLICATION,
+        ADAPTER_INBOUND,
+        ADAPTER_OUTBOUND
     }
 
     public enum ClassType {
-        ENTITY, VALUE_OBJECT, SERVICE, PORT, USE_CASE, COMMAND, RENDERER, REPOSITORY
+        ENTITY,
+        VALUE_OBJECT,
+        SERVICE,
+        PORT,
+        USE_CASE,
+        COMMAND,
+        RENDERER,
+        REPOSITORY
     }
 
-    public record CodeEntry(String className, String packageName, LayerType layer, ClassType classType) {
+    public record CodeEntry(
+            String className, String packageName, LayerType layer, ClassType classType) {
         public CodeEntry {
             if (className == null || className.isBlank())
                 throw new IllegalArgumentException("className must not be blank");
@@ -55,17 +66,27 @@ public final class C4CodeLevelValidator {
         }
 
         if (dependencies != null && !dependencies.isEmpty()) {
-            Map<String, LayerType> layerMap = classes.stream()
-                    .collect(Collectors.toMap(CodeEntry::className, CodeEntry::layer, (a, b) -> a));
+            Map<String, LayerType> layerMap =
+                    classes.stream()
+                            .collect(
+                                    Collectors.toMap(
+                                            CodeEntry::className, CodeEntry::layer, (a, b) -> a));
 
             for (Dependency dep : dependencies) {
                 LayerType fromLayer = layerMap.get(dep.fromClass());
                 LayerType toLayer = layerMap.get(dep.toClass());
                 if (fromLayer == null || toLayer == null) continue;
                 if (isOutwardDependency(fromLayer, toLayer)) {
-                    violations.add("outward dependency: " + dep.fromClass()
-                            + " (" + fromLayer + ") -> " + dep.toClass()
-                            + " (" + toLayer + ") violates hexagonal architecture");
+                    violations.add(
+                            "outward dependency: "
+                                    + dep.fromClass()
+                                    + " ("
+                                    + fromLayer
+                                    + ") -> "
+                                    + dep.toClass()
+                                    + " ("
+                                    + toLayer
+                                    + ") violates hexagonal architecture");
                 }
             }
         }
@@ -78,7 +99,8 @@ public final class C4CodeLevelValidator {
     private boolean isOutwardDependency(LayerType from, LayerType to) {
         if (from == LayerType.DOMAIN && to != LayerType.DOMAIN) return true;
         if (from == LayerType.APPLICATION
-                && (to == LayerType.ADAPTER_INBOUND || to == LayerType.ADAPTER_OUTBOUND)) return true;
+                && (to == LayerType.ADAPTER_INBOUND || to == LayerType.ADAPTER_OUTBOUND))
+            return true;
         return false;
     }
 }

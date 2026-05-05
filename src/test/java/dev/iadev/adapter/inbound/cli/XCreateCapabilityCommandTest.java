@@ -78,25 +78,31 @@ class XCreateCapabilityCommandTest {
     class CapabilitiesJson {
         @Test
         void validCapabilitiesJson_returnsSuccess() {
-            int exit = buildCli().execute(
-                    "--product-id", "product-0001",
-                    "--capabilities", "[\"ingest\",\"query\",\"storage\"]");
+            int exit =
+                    buildCli()
+                            .execute(
+                                    "--product-id", "product-0001",
+                                    "--capabilities", "[\"ingest\",\"query\",\"storage\"]");
             assertThat(exit).isEqualTo(XCreateCapabilityCommand.EXIT_SUCCESS);
         }
 
         @Test
         void invalidCapabilitiesJson_returnsValidation() {
-            int exit = buildCli().execute(
-                    "--product-id", "product-0001",
-                    "--capabilities", "not-json");
+            int exit =
+                    buildCli()
+                            .execute(
+                                    "--product-id", "product-0001",
+                                    "--capabilities", "not-json");
             assertThat(exit).isEqualTo(XCreateCapabilityCommand.EXIT_VALIDATION);
         }
 
         @Test
         void tooFewCapabilities_returnsValidation() {
-            int exit = buildCli().execute(
-                    "--product-id", "product-0001",
-                    "--capabilities", "[\"ingest\",\"query\"]");
+            int exit =
+                    buildCli()
+                            .execute(
+                                    "--product-id", "product-0001",
+                                    "--capabilities", "[\"ingest\",\"query\"]");
             assertThat(exit).isEqualTo(XCreateCapabilityCommand.EXIT_VALIDATION);
         }
     }
@@ -106,37 +112,42 @@ class XCreateCapabilityCommandTest {
     class ParserUnit {
         @Test
         void parse_validThreeElements_returnsList() {
-            var result = CapabilityInteractiveInputParser.parseCapabilities(
-                    "[\"ingest\",\"query\",\"storage\"]");
+            var result =
+                    CapabilityInteractiveInputParser.parseCapabilities(
+                            "[\"ingest\",\"query\",\"storage\"]");
             assertThat(result).containsExactly("ingest", "query", "storage");
         }
 
         @Test
         void parse_sevenElements_returnsList() {
-            var result = CapabilityInteractiveInputParser.parseCapabilities(
-                    "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
+            var result =
+                    CapabilityInteractiveInputParser.parseCapabilities(
+                            "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
             assertThat(result).hasSize(7);
         }
 
         @Test
         void parse_notArray_throwsIllegalArgument() {
             org.assertj.core.api.Assertions.assertThatThrownBy(
-                    () -> CapabilityInteractiveInputParser.parseCapabilities("{\"key\":\"val\"}"))
+                            () ->
+                                    CapabilityInteractiveInputParser.parseCapabilities(
+                                            "{\"key\":\"val\"}"))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void parse_tooMany_throwsIllegalArgument() {
             org.assertj.core.api.Assertions.assertThatThrownBy(
-                    () -> CapabilityInteractiveInputParser.parseCapabilities(
-                            "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\",\"h\"]"))
+                            () ->
+                                    CapabilityInteractiveInputParser.parseCapabilities(
+                                            "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\",\"h\"]"))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void parse_nullInput_throwsIllegalArgument() {
             org.assertj.core.api.Assertions.assertThatThrownBy(
-                    () -> CapabilityInteractiveInputParser.parseCapabilities(null))
+                            () -> CapabilityInteractiveInputParser.parseCapabilities(null))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

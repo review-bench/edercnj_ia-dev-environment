@@ -51,7 +51,8 @@ class Epic0077ProductFirstSmokeIT {
     private static final Path AUDIT_PENTEST_COVERAGE = auditScript("audit-pentest-coverage.sh");
 
     @Test
-    void endToEnd_productFirstLifecycle_createsArtifactsAndPassesGates(@TempDir Path tmp) throws Exception {
+    void endToEnd_productFirstLifecycle_createsArtifactsAndPassesGates(@TempDir Path tmp)
+            throws Exception {
         Path productsDir = tmp.resolve("ai/products");
         Path featuresDir = tmp.resolve("ai/features");
         Path epicsDir = tmp.resolve("ai/epics");
@@ -63,15 +64,27 @@ class Epic0077ProductFirstSmokeIT {
         Path capabilityMarkdown = writeCapabilityMarkdown(tmp);
         Path featureMarkdown = writeFeatureMarkdown(tmp);
 
-        Path epicFile = new CreateEpicFromFeatureUseCase(new FeatureEpicSourceLoader())
-                .execute("0077", featureMarkdown, capabilityMarkdown, productMarkdown, epicsDir)
-                .epicFile();
-        List<Path> stories = new CreateStoriesFromFeatureUseCase(
-                new FeatureMarkdownParser(),
-                new FeatureEpicSourceLoader(),
-                new FeatureToStoryDecompositionUseCase())
-                .execute("0077", featureMarkdown, capabilityMarkdown, productMarkdown, epicsDir)
-                .storyFiles();
+        Path epicFile =
+                new CreateEpicFromFeatureUseCase(new FeatureEpicSourceLoader())
+                        .execute(
+                                "0077",
+                                featureMarkdown,
+                                capabilityMarkdown,
+                                productMarkdown,
+                                epicsDir)
+                        .epicFile();
+        List<Path> stories =
+                new CreateStoriesFromFeatureUseCase(
+                                new FeatureMarkdownParser(),
+                                new FeatureEpicSourceLoader(),
+                                new FeatureToStoryDecompositionUseCase())
+                        .execute(
+                                "0077",
+                                featureMarkdown,
+                                capabilityMarkdown,
+                                productMarkdown,
+                                epicsDir)
+                        .storyFiles();
 
         writePentestPlans(stories);
         assertDerivedArtifacts(epicFile, stories);
@@ -83,11 +96,12 @@ class Epic0077ProductFirstSmokeIT {
     }
 
     private Product createProduct(Path productsDir) throws IOException {
-        var useCase = new CreateProductOrchestrationUseCase(
-                new IdeationValidator(),
-                new IdeationToProductTransformer(),
-                new dev.iadev.domain.capability.CapabilityStubFactory(),
-                new RNFRootValidator());
+        var useCase =
+                new CreateProductOrchestrationUseCase(
+                        new IdeationValidator(),
+                        new IdeationToProductTransformer(),
+                        new dev.iadev.domain.capability.CapabilityStubFactory(),
+                        new RNFRootValidator());
         var result = useCase.execute("product-0001", validIdeation());
         assertThat(result.successful()).isTrue();
         ProductArtifactWriter.write(result.product(), "product-0001", productsDir);
@@ -95,29 +109,38 @@ class Epic0077ProductFirstSmokeIT {
     }
 
     private void createCapability(Path productsDir, Product product) throws IOException {
-        var useCase = new CreateCapabilitiesOrchestrationUseCase(
-                new CapabilityDecompositionUseCase(
-                        new AutoDecomposeHeuristic(),
-                        new ProductToCapabilityTransformer()));
-        var result = useCase.execute("product-0001", product, List.of("auth", "access", "audit"), productsDir);
+        var useCase =
+                new CreateCapabilitiesOrchestrationUseCase(
+                        new CapabilityDecompositionUseCase(
+                                new AutoDecomposeHeuristic(),
+                                new ProductToCapabilityTransformer()));
+        var result =
+                useCase.execute(
+                        "product-0001", product, List.of("auth", "access", "audit"), productsDir);
         assertThat(result.capabilityCount()).isEqualTo(3);
         assertThat(productsDir.resolve("product-0001-capability-c1.json")).exists();
     }
 
     private void createFeatures(Path featuresDir) throws IOException {
         Files.createDirectories(featuresDir);
-        var useCase = new CreateFeaturesOrchestrationUseCase(
-                new dev.iadev.application.feature.FeatureDecompositionUseCase(
-                        new AutoDecomposeFeatureHeuristic(),
-                        new CapabilityToFeatureTransformer()),
-                new GherkinACGenerator());
+        var useCase =
+                new CreateFeaturesOrchestrationUseCase(
+                        new dev.iadev.application.feature.FeatureDecompositionUseCase(
+                                new AutoDecomposeFeatureHeuristic(),
+                                new CapabilityToFeatureTransformer()),
+                        new GherkinACGenerator());
         var result = 0;
         for (String capabilityId : List.of("capability-c1", "capability-c2", "capability-c3")) {
-            result += useCase.execute(
-                            capabilityId,
-                            List.of("OAuth2 Login", "GitHub Login", "Auto Provisioning", "Session Audit"),
-                            featuresDir)
-                    .featuresCreated();
+            result +=
+                    useCase.execute(
+                                    capabilityId,
+                                    List.of(
+                                            "OAuth2 Login",
+                                            "GitHub Login",
+                                            "Auto Provisioning",
+                                            "Session Audit"),
+                                    featuresDir)
+                            .featuresCreated();
         }
         assertThat(result).isEqualTo(12);
         assertThat(featuresDir.resolve("capability-c1-feature-0001.json")).exists();
@@ -135,10 +158,15 @@ class Epic0077ProductFirstSmokeIT {
             if (!rnf.mandatory()) {
                 continue;
             }
-            content.append("| ").append(rnf.category().name()).append(" | ")
-                    .append(rnf.description()).append(" | ")
-                    .append(rnf.verificationMethod()).append(" | ")
-                    .append(rnf.mandatory() ? "Sim" : "Não").append(" | audit |\n");
+            content.append("| ")
+                    .append(rnf.category().name())
+                    .append(" | ")
+                    .append(rnf.description())
+                    .append(" | ")
+                    .append(rnf.verificationMethod())
+                    .append(" | ")
+                    .append(rnf.mandatory() ? "Sim" : "Não")
+                    .append(" | audit |\n");
         }
         Files.writeString(file, content.toString());
         return file;
@@ -146,7 +174,8 @@ class Epic0077ProductFirstSmokeIT {
 
     private Path writeCapabilityMarkdown(Path root) throws IOException {
         Path file = root.resolve("capability-product-first.md");
-        String content = """
+        String content =
+                """
                 # Capability: Authentication
 
                 ## 2. RNFs Herdadas
@@ -164,7 +193,8 @@ class Epic0077ProductFirstSmokeIT {
 
     private Path writeFeatureMarkdown(Path root) throws IOException {
         Path file = root.resolve("feature-product-first.md");
-        String content = """
+        String content =
+                """
                 # Feature: OAuth2 Login
 
                 **Feature ID:** feature-0001
@@ -237,15 +267,19 @@ class Epic0077ProductFirstSmokeIT {
     }
 
     private void assertC4PhaseGatePasses() {
-        var planner = new ArchitectureRefactoringUseCase(new C4DiagramGenerator(), new C4LevelValidator());
+        var planner =
+                new ArchitectureRefactoringUseCase(
+                        new C4DiagramGenerator(), new C4LevelValidator());
         var featureModel = planner.planFeature("feature-0001", C4OutputFormat.MERMAID);
-        var result = new ExecuteC4PhaseGateUseCase().execute(
-                List.of(
-                        featureModel.contextDiagram(),
-                        featureModel.containerDiagram(),
-                        featureModel.componentDiagram()),
-                null,
-                null);
+        var result =
+                new ExecuteC4PhaseGateUseCase()
+                        .execute(
+                                List.of(
+                                        featureModel.contextDiagram(),
+                                        featureModel.containerDiagram(),
+                                        featureModel.componentDiagram()),
+                                null,
+                                null);
         assertThat(result.passed()).isTrue();
     }
 
@@ -253,7 +287,9 @@ class Epic0077ProductFirstSmokeIT {
         ProcessBuilder pb = new ProcessBuilder("bash", script.toString());
         pb.directory(workingDir.toFile());
         ProcessResult result = waitProcess(pb);
-        assertThat(result.exitCode).as(script.getFileName() + " stderr=" + result.stderr).isEqualTo(0);
+        assertThat(result.exitCode)
+                .as(script.getFileName() + " stderr=" + result.stderr)
+                .isEqualTo(0);
     }
 
     private static ProcessResult waitProcess(ProcessBuilder pb) throws Exception {
@@ -272,21 +308,28 @@ class Epic0077ProductFirstSmokeIT {
     private static IdeationTemplate validIdeation() {
         return IdeationTemplate.builder()
                 .title("Product First Platform")
-                .sections(Map.of(
-                        IdeationSection.VISION_AND_SCOPE, "vision",
-                        IdeationSection.STAKEHOLDERS, "stakeholders",
-                        IdeationSection.BUSINESS_REQUIREMENTS,
-                        """
+                .sections(
+                        Map.of(
+                                IdeationSection.VISION_AND_SCOPE,
+                                "vision",
+                                IdeationSection.STAKEHOLDERS,
+                                "stakeholders",
+                                IdeationSection.BUSINESS_REQUIREMENTS,
+                                """
                                 BIZ-001 process 1M events/sec
                                 BIZ-002 99.99%% uptime SLA
                                 BIZ-003 data encrypted at rest AES-256
                                 BIZ-004 GDPR and LGPD compliant
                                 BIZ-005 p99 latency < 100ms
                                 """,
-                        IdeationSection.CONSTRAINTS, "constraints",
-                        IdeationSection.SUCCESS_CRITERIA, "success",
-                        IdeationSection.RISKS, "risks",
-                        IdeationSection.ROADMAP, "roadmap"))
+                                IdeationSection.CONSTRAINTS,
+                                "constraints",
+                                IdeationSection.SUCCESS_CRITERIA,
+                                "success",
+                                IdeationSection.RISKS,
+                                "risks",
+                                IdeationSection.ROADMAP,
+                                "roadmap"))
                 .build();
     }
 
@@ -298,6 +341,5 @@ class Epic0077ProductFirstSmokeIT {
         return Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
     }
 
-    private record ProcessResult(int exitCode, String stdout, String stderr) {
-    }
+    private record ProcessResult(int exitCode, String stdout, String stderr) {}
 }

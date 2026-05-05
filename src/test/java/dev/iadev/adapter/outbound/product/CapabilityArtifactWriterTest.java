@@ -14,8 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("CapabilityArtifactWriter")
 class CapabilityArtifactWriterTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private ProductCapabilityDecomposition decomposition() {
         return new ProductCapabilityDecomposition(
@@ -39,8 +38,10 @@ class CapabilityArtifactWriterTest {
 
     @Test
     void write_secondRun_skipsExistingArtifacts() throws IOException {
-        CapabilityArtifactWriter.WriteResult first = CapabilityArtifactWriter.write(decomposition(), outputDir);
-        CapabilityArtifactWriter.WriteResult second = CapabilityArtifactWriter.write(decomposition(), outputDir);
+        CapabilityArtifactWriter.WriteResult first =
+                CapabilityArtifactWriter.write(decomposition(), outputDir);
+        CapabilityArtifactWriter.WriteResult second =
+                CapabilityArtifactWriter.write(decomposition(), outputDir);
         assertThat(first.writtenCount()).isEqualTo(3);
         assertThat(second.writtenCount()).isEqualTo(0);
         assertThat(second.skippedCount()).isEqualTo(3);

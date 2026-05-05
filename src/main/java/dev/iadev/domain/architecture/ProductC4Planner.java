@@ -26,18 +26,26 @@ public final class ProductC4Planner {
         if (format == C4OutputFormat.PLANTUML) {
             return "@startuml\n"
                     + "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n"
-                    + "title System Context — " + escape(productId) + "\n"
+                    + "title System Context — "
+                    + escape(productId)
+                    + "\n"
                     + "Person(user, \"User\", \"Product user\")\n"
-                    + "System(product, \"" + escape(productId) + "\", \"Product system\")\n"
+                    + "System(product, \""
+                    + escape(productId)
+                    + "\", \"Product system\")\n"
                     + "System_Ext(ext, \"External System\", \"Third-party integration\")\n"
                     + "Rel(user, product, \"Uses\")\n"
                     + "Rel(product, ext, \"Calls\")\n"
                     + "@enduml";
         }
         return "C4Context\n"
-                + "  title System Context — " + escape(productId) + "\n"
+                + "  title System Context — "
+                + escape(productId)
+                + "\n"
                 + "  Person(user, \"User\", \"Product user\")\n"
-                + "  System(product, \"" + escape(productId) + "\", \"Product system\")\n"
+                + "  System(product, \""
+                + escape(productId)
+                + "\", \"Product system\")\n"
                 + "  System_Ext(ext, \"External System\", \"Third-party integration\")\n"
                 + "  Rel(user, product, \"Uses\")\n"
                 + "  Rel(product, ext, \"Calls\")";
@@ -47,16 +55,24 @@ public final class ProductC4Planner {
         if (format == C4OutputFormat.PLANTUML) {
             return "@startuml\n"
                     + "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n"
-                    + "title Container — " + escape(productId) + "\n"
-                    + "System_Boundary(product, \"" + escape(productId) + "\") {\n"
+                    + "title Container — "
+                    + escape(productId)
+                    + "\n"
+                    + "System_Boundary(product, \""
+                    + escape(productId)
+                    + "\") {\n"
                     + "  Container(api, \"API\", \"Java\", \"Handles requests\")\n"
                     + "  ContainerDb(db, \"Database\", \"PostgreSQL\", \"Stores data\")\n"
                     + "}\n"
                     + "@enduml";
         }
         return "C4Container\n"
-                + "  title Container — " + escape(productId) + "\n"
-                + "  System_Boundary(product, \"" + escape(productId) + "\") {\n"
+                + "  title Container — "
+                + escape(productId)
+                + "\n"
+                + "  System_Boundary(product, \""
+                + escape(productId)
+                + "\") {\n"
                 + "    Container(api, \"API\", \"Java\", \"Handles requests\")\n"
                 + "    ContainerDb(db, \"Database\", \"PostgreSQL\", \"Stores data\")\n"
                 + "  }";

@@ -25,7 +25,13 @@ public final class ArchitectureRefactoringUseCase {
         C4Diagram container = diagramPort.generate(C4Level.CONTAINER, productId, format);
         C4Diagram component = diagramPort.generatePlaceholder(C4Level.COMPONENT, productId, format);
         validate(List.of(context, container, component));
-        return new ProductC4Model(productId, format, context, container, component, List.of(C4Level.COMPONENT.name()));
+        return new ProductC4Model(
+                productId,
+                format,
+                context,
+                container,
+                component,
+                List.of(C4Level.COMPONENT.name()));
     }
 
     public CapabilityC4Model planCapability(String capabilityId, C4OutputFormat format) {
@@ -46,7 +52,8 @@ public final class ArchitectureRefactoringUseCase {
         String normalizedFeatureId = normalizeFeatureId(featureId);
         C4Diagram context = diagramPort.generate(C4Level.CONTEXT, normalizedFeatureId, format);
         C4Diagram container = diagramPort.generate(C4Level.CONTAINER, normalizedFeatureId, format);
-        C4Diagram component = diagramPort.generatePlaceholder(C4Level.COMPONENT, normalizedFeatureId, format);
+        C4Diagram component =
+                diagramPort.generatePlaceholder(C4Level.COMPONENT, normalizedFeatureId, format);
         validate(List.of(context, container, component));
         return new FeatureC4Model(
                 featureId,

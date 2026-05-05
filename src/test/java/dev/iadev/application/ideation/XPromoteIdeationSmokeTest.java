@@ -1,22 +1,22 @@
 package dev.iadev.application.ideation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.ideation.IdeationSection;
 import dev.iadev.domain.ideation.IdeationTemplate;
 import dev.iadev.domain.ideation.IdeationValidationResult;
 import dev.iadev.domain.ideation.IdeationValidator;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("x-promote-ideation smoke — CLI + orchestration round-trip")
 class XPromoteIdeationSmokeTest {
 
     private static IdeationTemplate minimalValidTemplate() {
-        String biz = """
+        String biz =
+                """
                 BIZ-001 req one
                 BIZ-002 req two
                 BIZ-003 req three
@@ -25,38 +25,42 @@ class XPromoteIdeationSmokeTest {
                 """;
         return IdeationTemplate.builder()
                 .title("Smoke Feature Idea")
-                .sections(Map.of(
-                        IdeationSection.VISION_AND_SCOPE, "vision",
-                        IdeationSection.STAKEHOLDERS, "stakeholders",
-                        IdeationSection.BUSINESS_REQUIREMENTS, biz,
-                        IdeationSection.CONSTRAINTS, "constraints",
-                        IdeationSection.SUCCESS_CRITERIA, "success",
-                        IdeationSection.RISKS, "risks",
-                        IdeationSection.ROADMAP, "roadmap"))
+                .sections(
+                        Map.of(
+                                IdeationSection.VISION_AND_SCOPE, "vision",
+                                IdeationSection.STAKEHOLDERS, "stakeholders",
+                                IdeationSection.BUSINESS_REQUIREMENTS, biz,
+                                IdeationSection.CONSTRAINTS, "constraints",
+                                IdeationSection.SUCCESS_CRITERIA, "success",
+                                IdeationSection.RISKS, "risks",
+                                IdeationSection.ROADMAP, "roadmap"))
                 .build();
     }
 
     @Test
     @DisplayName("CLI --from-stdin --validate exits 0 for valid input")
     void cli_fromStdin_validate_exits0() {
-        int exit = new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
-                .execute("--from-stdin", "--validate");
+        int exit =
+                new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
+                        .execute("--from-stdin", "--validate");
         assertThat(exit).isEqualTo(0);
     }
 
     @Test
     @DisplayName("CLI --ideation-id format validated by command")
     void cli_invalidIdeationId_exits1() {
-        int exit = new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
-                .execute("--from-stdin", "--ideation-id", "bad-id");
+        int exit =
+                new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
+                        .execute("--from-stdin", "--ideation-id", "bad-id");
         assertThat(exit).isEqualTo(1);
     }
 
     @Test
     @DisplayName("CLI --ideation-id ideation-0001 accepted")
     void cli_validIdeationId_exits0() {
-        int exit = new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
-                .execute("--from-stdin", "--ideation-id", "ideation-0001");
+        int exit =
+                new CommandLine(new dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand())
+                        .execute("--from-stdin", "--ideation-id", "ideation-0001");
         assertThat(exit).isEqualTo(0);
     }
 
@@ -66,7 +70,8 @@ class XPromoteIdeationSmokeTest {
         PromoteIdeationOrchestrationUseCase useCase =
                 new PromoteIdeationOrchestrationUseCase(new IdeationValidator());
 
-        IdeationPromotionResult result = useCase.promote(minimalValidTemplate(), "ideation-0001", 1);
+        IdeationPromotionResult result =
+                useCase.promote(minimalValidTemplate(), "ideation-0001", 1);
 
         assertThat(result.success()).isTrue();
         assertThat(result.resolvedId()).isEqualTo("ideation-0001");

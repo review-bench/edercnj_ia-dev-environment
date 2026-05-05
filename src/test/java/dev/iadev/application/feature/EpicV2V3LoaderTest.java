@@ -1,9 +1,9 @@
 package dev.iadev.application.feature;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.iadev.domain.feature.SourceFeatureReference;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class EpicV2V3LoaderTest {
 
@@ -11,7 +11,8 @@ class EpicV2V3LoaderTest {
 
     @Test
     void parseSourceFeature_withLinkedFeature_returnsLinkedReference() {
-        String epicContent = """
+        String epicContent =
+                """
                 **Status:** Em Andamento
                 **Source Feature:** feature-oauth2-integration
                 **Source Feature Link:** https://example.com/features/oauth2
@@ -24,7 +25,8 @@ class EpicV2V3LoaderTest {
 
     @Test
     void parseSourceFeature_withNaSentinel_returnsNotApplicable() {
-        String epicContent = """
+        String epicContent =
+                """
                 **Status:** Em Andamento
                 **Source Feature:** N/A
                 **Source Feature Link:** —
@@ -35,7 +37,8 @@ class EpicV2V3LoaderTest {
 
     @Test
     void parseSourceFeature_withMissingField_returnsNotApplicable() {
-        String epicContent = """
+        String epicContent =
+                """
                 **Status:** Em Andamento
                 ## 1. Visão & Problema
                 """;
@@ -45,7 +48,8 @@ class EpicV2V3LoaderTest {
 
     @Test
     void parseSourceFeature_withV2EpicNoSourceFeatureField_returnsNotApplicable() {
-        String v2EpicContent = """
+        String v2EpicContent =
+                """
                 **Autor:** Eder
                 **Data:** 2026-01-01
                 **Versão:** 1.0

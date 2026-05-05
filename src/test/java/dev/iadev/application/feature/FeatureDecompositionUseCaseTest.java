@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 @DisplayName("FeatureDecompositionUseCase")
 class FeatureDecompositionUseCaseTest {
 
-    private final FeatureDecompositionUseCase useCase = new FeatureDecompositionUseCase(
-            new AutoDecomposeFeatureHeuristic(),
-            new CapabilityToFeatureTransformer());
+    private final FeatureDecompositionUseCase useCase =
+            new FeatureDecompositionUseCase(
+                    new AutoDecomposeFeatureHeuristic(), new CapabilityToFeatureTransformer());
 
     @Test
     void execute_autoDecompose_returnsBetweenFourAndEightFeatures() {

@@ -26,18 +26,18 @@ class XPlanStory7AgentsSmokeTest {
     private static final Path CLAUDE_SKILL =
             REPO_ROOT.resolve(".claude/skills/x-plan-story/SKILL.md");
 
-    private static final List<String> GOLDEN_PROFILES = List.of(
-            "java-quarkus",
-            "java-spring",
-            "java-spring-clickhouse",
-            "java-spring-cqrs-es",
-            "java-spring-elasticsearch",
-            "java-spring-event-driven",
-            "java-spring-fintech-pci",
-            "java-spring-hexagonal",
-            "java-spring-neo4j",
-            "parallelism-heuristics"
-    );
+    private static final List<String> GOLDEN_PROFILES =
+            List.of(
+                    "java-quarkus",
+                    "java-spring",
+                    "java-spring-clickhouse",
+                    "java-spring-cqrs-es",
+                    "java-spring-elasticsearch",
+                    "java-spring-event-driven",
+                    "java-spring-fintech-pci",
+                    "java-spring-hexagonal",
+                    "java-spring-neo4j",
+                    "parallelism-heuristics");
 
     @Test
     @DisplayName("sourceSkill_describes7Agents_inDescription")
@@ -104,22 +104,26 @@ class XPlanStory7AgentsSmokeTest {
     }
 
     @ParameterizedTest(name = "golden/{0} contains 7-agent x-plan-story")
-    @ValueSource(strings = {
-            "java-quarkus",
-            "java-spring",
-            "java-spring-clickhouse",
-            "java-spring-cqrs-es",
-            "java-spring-elasticsearch",
-            "java-spring-event-driven",
-            "java-spring-fintech-pci",
-            "java-spring-hexagonal",
-            "java-spring-neo4j",
-            "parallelism-heuristics"
-    })
+    @ValueSource(
+            strings = {
+                "java-quarkus",
+                "java-spring",
+                "java-spring-clickhouse",
+                "java-spring-cqrs-es",
+                "java-spring-elasticsearch",
+                "java-spring-event-driven",
+                "java-spring-fintech-pci",
+                "java-spring-hexagonal",
+                "java-spring-neo4j",
+                "parallelism-heuristics"
+            })
     @DisplayName("goldenFile_contains7Agents")
     void goldenFile_contains7Agents(String profile) throws IOException {
-        Path goldenSkill = REPO_ROOT.resolve(
-                "src/test/resources/golden/" + profile + "/.claude/skills/x-plan-story/SKILL.md");
+        Path goldenSkill =
+                REPO_ROOT.resolve(
+                        "src/test/resources/golden/"
+                                + profile
+                                + "/.claude/skills/x-plan-story/SKILL.md");
 
         if (!Files.exists(goldenSkill)) {
             return;

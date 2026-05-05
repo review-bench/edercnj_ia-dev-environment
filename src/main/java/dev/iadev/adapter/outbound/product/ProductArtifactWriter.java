@@ -38,8 +38,9 @@ public final class ProductArtifactWriter {
             }
         }
 
-        String withHash = content.replace("\"idempotencyHash\": \"\"",
-                "\"idempotencyHash\": \"" + hash + "\"");
+        String withHash =
+                content.replace(
+                        "\"idempotencyHash\": \"\"", "\"idempotencyHash\": \"" + hash + "\"");
         Files.writeString(target, withHash, StandardCharsets.UTF_8);
         return WriteResult.written(target, hash);
     }
@@ -57,7 +58,8 @@ public final class ProductArtifactWriter {
             sb.append("    {\n");
             sb.append("      \"category\": \"").append(r.category().name()).append("\",\n");
             sb.append("      \"description\": \"").append(escape(r.description())).append("\",\n");
-            sb.append("      \"verificationMethod\": \"").append(escape(r.verificationMethod()))
+            sb.append("      \"verificationMethod\": \"")
+                    .append(escape(r.verificationMethod()))
                     .append("\",\n");
             sb.append("      \"mandatory\": ").append(r.mandatory()).append("\n");
             sb.append("    }");

@@ -14,21 +14,23 @@ class C4LevelValidatorTest {
 
     @Test
     void validate_whenMandatoryLevelsPresent_returnsValid() {
-        var result = validator.validate(List.of(
-                diagram(C4Level.CONTEXT),
-                diagram(C4Level.CONTAINER),
-                diagram(C4Level.COMPONENT)));
+        var result =
+                validator.validate(
+                        List.of(
+                                diagram(C4Level.CONTEXT),
+                                diagram(C4Level.CONTAINER),
+                                diagram(C4Level.COMPONENT)));
 
         assertThat(result.valid()).isTrue();
         assertThat(result.missingLevels()).isEmpty();
-        assertThat(result.presentLevels()).containsExactly(C4Level.CONTEXT, C4Level.CONTAINER, C4Level.COMPONENT);
+        assertThat(result.presentLevels())
+                .containsExactly(C4Level.CONTEXT, C4Level.CONTAINER, C4Level.COMPONENT);
     }
 
     @Test
     void validate_whenComponentMissing_returnsInvalid() {
-        var result = validator.validate(List.of(
-                diagram(C4Level.CONTEXT),
-                diagram(C4Level.CONTAINER)));
+        var result =
+                validator.validate(List.of(diagram(C4Level.CONTEXT), diagram(C4Level.CONTAINER)));
 
         assertThat(result.valid()).isFalse();
         assertThat(result.missingLevels()).containsExactly(C4Level.COMPONENT);
@@ -40,7 +42,8 @@ class C4LevelValidatorTest {
         var result = validator.validate(null);
 
         assertThat(result.valid()).isFalse();
-        assertThat(result.missingLevels()).containsExactly(C4Level.CONTEXT, C4Level.CONTAINER, C4Level.COMPONENT);
+        assertThat(result.missingLevels())
+                .containsExactly(C4Level.CONTEXT, C4Level.CONTAINER, C4Level.COMPONENT);
     }
 
     private C4Diagram diagram(C4Level level) {

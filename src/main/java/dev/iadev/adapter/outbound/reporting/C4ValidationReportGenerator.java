@@ -14,8 +14,13 @@ public final class C4ValidationReportGenerator {
         }
         sb.append("**Status:** FAILED\n\n## Violations\n\n");
         for (Violation v : result.violations()) {
-            sb.append("- [").append(v.severity()).append("] ")
-              .append(v.type()).append(": ").append(v.message()).append("\n");
+            sb.append("- [")
+                    .append(v.severity())
+                    .append("] ")
+                    .append(v.type())
+                    .append(": ")
+                    .append(v.message())
+                    .append("\n");
         }
         return sb.toString();
     }

@@ -26,7 +26,8 @@ public final class C4DiagramGenerator implements C4DiagramPort {
         if (entityId.startsWith("feature-")) {
             return generateFeature(level, entityId, format);
         }
-        throw new IllegalArgumentException("entityId must start with product-, capability-, or feature-");
+        throw new IllegalArgumentException(
+                "entityId must start with product-, capability-, or feature-");
     }
 
     @Override
@@ -38,7 +39,9 @@ public final class C4DiagramGenerator implements C4DiagramPort {
         return switch (level) {
             case CONTEXT -> productPlanner.planContext(entityId, format);
             case CONTAINER -> productPlanner.planContainer(entityId, format);
-            default -> throw new IllegalArgumentException("product diagrams support only CONTEXT and CONTAINER");
+            default ->
+                    throw new IllegalArgumentException(
+                            "product diagrams support only CONTEXT and CONTAINER");
         };
     }
 
@@ -46,7 +49,9 @@ public final class C4DiagramGenerator implements C4DiagramPort {
         return switch (level) {
             case CONTAINER -> capabilityPlanner.planContainer(entityId, format);
             case COMPONENT -> capabilityPlanner.planComponent(entityId, format);
-            default -> throw new IllegalArgumentException("capability diagrams support only CONTAINER and COMPONENT");
+            default ->
+                    throw new IllegalArgumentException(
+                            "capability diagrams support only CONTAINER and COMPONENT");
         };
     }
 
@@ -54,7 +59,9 @@ public final class C4DiagramGenerator implements C4DiagramPort {
         return switch (level) {
             case CONTEXT -> featurePlanner.planContext(entityId, format);
             case CONTAINER -> featurePlanner.planContainer(entityId, format);
-            default -> throw new IllegalArgumentException("feature diagrams support only CONTEXT and CONTAINER");
+            default ->
+                    throw new IllegalArgumentException(
+                            "feature diagrams support only CONTEXT and CONTAINER");
         };
     }
 }

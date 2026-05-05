@@ -37,11 +37,11 @@ public final class IdeationValidator {
             return;
         }
         String content = ideation.sectionContent(IdeationSection.BUSINESS_REQUIREMENTS);
-        long count = content.lines()
-                .filter(line -> line.startsWith("BIZ-"))
-                .count();
+        long count = content.lines().filter(line -> line.startsWith("BIZ-")).count();
         if (count < MIN_BUSINESS_REQUIREMENTS) {
-            errors.add("Section 3 (BUSINESS_REQUIREMENTS): minimum 5 requirements required, found " + count);
+            errors.add(
+                    "Section 3 (BUSINESS_REQUIREMENTS): minimum 5 requirements required, found "
+                            + count);
         }
     }
 }

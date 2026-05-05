@@ -1,23 +1,23 @@
 package dev.iadev.adapter.inbound.cli;
 
+import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
-import java.util.concurrent.Callable;
 
 @Command(
         name = "x-promote-ideation",
         mixinStandardHelpOptions = true,
-        description = "Promote transient x-feature-ideate output to a persistent ideation artifact.")
+        description =
+                "Promote transient x-feature-ideate output to a persistent ideation artifact.")
 public class XPromoteIdeationCommand implements Callable<Integer> {
 
     static final int EXIT_SUCCESS = 0;
     static final int EXIT_VALIDATION = 1;
     static final int EXIT_EXECUTION = 2;
 
-    @Spec
-    CommandSpec spec;
+    @Spec CommandSpec spec;
 
     @Option(
             names = {"--from-file"},
@@ -31,7 +31,8 @@ public class XPromoteIdeationCommand implements Callable<Integer> {
 
     @Option(
             names = {"--ideation-id"},
-            description = "Explicit ideation identifier (e.g. ideation-0001); auto-assigned if absent")
+            description =
+                    "Explicit ideation identifier (e.g. ideation-0001); auto-assigned if absent")
     String ideationId;
 
     @Option(
@@ -42,20 +43,28 @@ public class XPromoteIdeationCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         if (!fromStdin && (fromFile == null || fromFile.isBlank())) {
-            spec.commandLine().getErr().println(
-                    "Error: either --from-file or --from-stdin must be specified");
+            spec.commandLine()
+                    .getErr()
+                    .println("Error: either --from-file or --from-stdin must be specified");
             return EXIT_VALIDATION;
         }
         if (ideationId != null && !ideationId.matches("ideation-\\d{4}")) {
-            spec.commandLine().getErr().println(
-                    "Error: --ideation-id must match pattern ideation-NNNN (e.g. ideation-0001)");
+            spec.commandLine()
+                    .getErr()
+                    .println(
+                            "Error: --ideation-id must match pattern ideation-NNNN (e.g. ideation-0001)");
             return EXIT_VALIDATION;
         }
         String source = fromStdin ? "stdin" : fromFile;
         String mode = validateOnly ? "validate-only" : "persist";
-        spec.commandLine().getOut().println(
-                "x-promote-ideation: source=" + source + ", mode=" + mode
-                        + (ideationId != null ? ", id=" + ideationId : ""));
+        spec.commandLine()
+                .getOut()
+                .println(
+                        "x-promote-ideation: source="
+                                + source
+                                + ", mode="
+                                + mode
+                                + (ideationId != null ? ", id=" + ideationId : ""));
         return EXIT_SUCCESS;
     }
 }

@@ -12,8 +12,7 @@ public final class FeatureInputParser {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("\"name\"\\s*:\\s*\"([^\"]+)\"");
 
-    private FeatureInputParser() {
-    }
+    private FeatureInputParser() {}
 
     public static List<String> parseFeatures(String json) {
         if (json == null) {
@@ -31,7 +30,9 @@ public final class FeatureInputParser {
         }
         if (names.isEmpty()) {
             throw new IllegalArgumentException(
-                    "features JSON must contain at least " + MIN_FEATURES + " objects with \"name\" field");
+                    "features JSON must contain at least "
+                            + MIN_FEATURES
+                            + " objects with \"name\" field");
         }
         if (names.size() < MIN_FEATURES) {
             throw new IllegalArgumentException(

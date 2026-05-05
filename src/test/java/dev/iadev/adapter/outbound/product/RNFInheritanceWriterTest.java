@@ -17,13 +17,15 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("RNFInheritanceWriter")
 class RNFInheritanceWriterTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private Product sampleProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
-                new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(
+                                RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
+                        new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true)));
     }
 
     private ProductCapabilityDecomposition decomposition() {

@@ -7,8 +7,7 @@ import java.util.Map;
 
 public final class FeatureNumbering {
 
-    private FeatureNumbering() {
-    }
+    private FeatureNumbering() {}
 
     public static Map<String, String> assignIds(List<String> featureNames) {
         if (featureNames == null || featureNames.isEmpty()) {

@@ -5,8 +5,8 @@ import java.util.Objects;
 /**
  * Value object identifying a Product in the Product-First hierarchy.
  *
- * <p>Canonical format: lowercase, hyphen-separated (e.g., {@code my-product}).
- * Validated at construction time — no null or blank values allowed.
+ * <p>Canonical format: lowercase, hyphen-separated (e.g., {@code my-product}). Validated at
+ * construction time — no null or blank values allowed.
  *
  * <p>Introduced by EPIC-0077 (Product-First Lifecycle) via ADR-0030 (Rule 14 extension).
  */

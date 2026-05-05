@@ -1,7 +1,5 @@
 package dev.iadev.domain.capability;
 
-import dev.iadev.domain.capability.ApprovalRequest;
-
 import java.util.List;
 
 public interface RNFOverrideApprovalPort {

@@ -1,6 +1,7 @@
 package dev.iadev.application.feature;
 
-public record InheritedRnfLine(String id, String sourceLevel, String requirement, boolean waivable) {
+public record InheritedRnfLine(
+        String id, String sourceLevel, String requirement, boolean waivable) {
 
     public InheritedRnfLine {
         if (id == null || id.isBlank()) {

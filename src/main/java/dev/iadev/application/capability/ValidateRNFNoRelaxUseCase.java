@@ -3,7 +3,6 @@ package dev.iadev.application.capability;
 import dev.iadev.domain.capability.RNFNoRelaxValidator;
 import dev.iadev.domain.capability.RNFOverride;
 import dev.iadev.domain.product.RNFRootValidationResult;
-
 import java.util.List;
 
 public class ValidateRNFNoRelaxUseCase {

@@ -11,11 +11,15 @@ public record ProductC4Model(
         List<String> placeholders) {
 
     public ProductC4Model {
-        if (productId == null || productId.isBlank()) throw new IllegalArgumentException("productId must not be blank");
+        if (productId == null || productId.isBlank())
+            throw new IllegalArgumentException("productId must not be blank");
         if (format == null) throw new IllegalArgumentException("format must not be null");
-        if (contextDiagram == null) throw new IllegalArgumentException("contextDiagram must not be null");
-        if (containerDiagram == null) throw new IllegalArgumentException("containerDiagram must not be null");
-        if (componentDiagram == null) throw new IllegalArgumentException("componentDiagram must not be null");
+        if (contextDiagram == null)
+            throw new IllegalArgumentException("contextDiagram must not be null");
+        if (containerDiagram == null)
+            throw new IllegalArgumentException("containerDiagram must not be null");
+        if (componentDiagram == null)
+            throw new IllegalArgumentException("componentDiagram must not be null");
         placeholders = List.copyOf(placeholders);
     }
 

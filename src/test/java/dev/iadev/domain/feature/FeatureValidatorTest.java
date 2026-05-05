@@ -1,11 +1,10 @@
 package dev.iadev.domain.feature;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class FeatureValidatorTest {
 
@@ -13,8 +12,12 @@ class FeatureValidatorTest {
 
     @Test
     void noUseCases_fails() {
-        Feature feature = new Feature("feat-001", "cap-auth", Collections.emptyList(),
-                List.of(new AcceptanceCriterion("Given X When Y Then Z")));
+        Feature feature =
+                new Feature(
+                        "feat-001",
+                        "cap-auth",
+                        Collections.emptyList(),
+                        List.of(new AcceptanceCriterion("Given X When Y Then Z")));
 
         FeatureValidationResult result = validator.validate(feature);
 
@@ -25,8 +28,12 @@ class FeatureValidatorTest {
     @Test
     void oneUseCase_belowMinimum_fails() {
         List<UseCase> useCases = List.of(new UseCase("Dev", "I want to login", "so that I access"));
-        Feature feature = new Feature("feat-001", "cap-auth", useCases,
-                List.of(new AcceptanceCriterion("Given X When Y Then Z")));
+        Feature feature =
+                new Feature(
+                        "feat-001",
+                        "cap-auth",
+                        useCases,
+                        List.of(new AcceptanceCriterion("Given X When Y Then Z")));
 
         FeatureValidationResult result = validator.validate(feature);
 
@@ -77,7 +84,15 @@ class FeatureValidatorTest {
 
     private List<AcceptanceCriterion> buildAcs(int count) {
         return java.util.stream.IntStream.range(0, count)
-                .mapToObj(i -> new AcceptanceCriterion("Given state " + i + " When action " + i + " Then result " + i))
+                .mapToObj(
+                        i ->
+                                new AcceptanceCriterion(
+                                        "Given state "
+                                                + i
+                                                + " When action "
+                                                + i
+                                                + " Then result "
+                                                + i))
                 .toList();
     }
 }

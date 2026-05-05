@@ -14,14 +14,16 @@ class RNFOverrideArtifactParserTest {
 
     @Test
     void parse_whenInheritanceTablePresent_returnsOverrides() {
-        List<RNFOverride> overrides = parser.parse(List.of(
-                "# Capability",
-                "## 2. RNFs Herdadas (no-relax override)",
-                "| Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |",
-                "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
-                "| PERFORMANCE | P99 < 3s | false | P99 < 500ms | Critical auth path | approved | cto@example.com |",
-                "| SECURITY | TLS 1.3 | true | — | — | — | — |",
-                "## 3. Another section"));
+        List<RNFOverride> overrides =
+                parser.parse(
+                        List.of(
+                                "# Capability",
+                                "## 2. RNFs Herdadas (no-relax override)",
+                                "| Categoria | RNF Original (Produto) | no-relax? | Override Value | Justificação | Approval Status | Approver |",
+                                "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+                                "| PERFORMANCE | P99 < 3s | false | P99 < 500ms | Critical auth path | approved | cto@example.com |",
+                                "| SECURITY | TLS 1.3 | true | — | — | — | — |",
+                                "## 3. Another section"));
 
         assertThat(overrides).hasSize(2);
         assertThat(overrides.get(0).category()).isEqualTo(RNFCategory.PERFORMANCE);

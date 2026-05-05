@@ -2,11 +2,6 @@ package dev.iadev.application.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dev.iadev.domain.capability.CapabilityStubFactory;
-import dev.iadev.domain.ideation.IdeationSection;
-import dev.iadev.domain.ideation.IdeationTemplate;
-import dev.iadev.domain.ideation.IdeationToProductTransformer;
-import dev.iadev.domain.ideation.IdeationValidator;
 import dev.iadev.domain.product.AutoDecomposeHeuristic;
 import dev.iadev.domain.product.Product;
 import dev.iadev.domain.product.ProductToCapabilityTransformer;
@@ -15,7 +10,6 @@ import dev.iadev.domain.product.RNFRoot;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -23,20 +17,21 @@ import org.junit.jupiter.api.io.TempDir;
 @DisplayName("CreateCapabilitiesOrchestrationUseCase")
 class CreateCapabilitiesOrchestrationUseCaseTest {
 
-    @TempDir
-    Path outputDir;
+    @TempDir Path outputDir;
 
     private final CreateCapabilitiesOrchestrationUseCase useCase =
             new CreateCapabilitiesOrchestrationUseCase(
                     new CapabilityDecompositionUseCase(
-                            new AutoDecomposeHeuristic(),
-                            new ProductToCapabilityTransformer()));
+                            new AutoDecomposeHeuristic(), new ProductToCapabilityTransformer()));
 
     private Product sampleProduct() {
-        return new Product("Analytics Platform", List.of(
-                new RNFRoot(RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
-                new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
-                new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true)));
+        return new Product(
+                "Analytics Platform",
+                List.of(
+                        new RNFRoot(
+                                RNFCategory.PERFORMANCE, "sub-second latency", "load test", true),
+                        new RNFRoot(RNFCategory.RELIABILITY, "99.99% uptime", "chaos test", true),
+                        new RNFRoot(RNFCategory.SECURITY, "AES-256 at rest", "audit", true)));
     }
 
     @Test

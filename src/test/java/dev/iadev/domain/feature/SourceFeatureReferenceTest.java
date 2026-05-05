@@ -1,9 +1,9 @@
 package dev.iadev.domain.feature;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.Test;
 
 class SourceFeatureReferenceTest {
 
@@ -17,7 +17,9 @@ class SourceFeatureReferenceTest {
 
     @Test
     void of_withValidId_createsLinkedReference() {
-        SourceFeatureReference ref = SourceFeatureReference.of("feature-oauth2-integration", "https://example.com/features/oauth2");
+        SourceFeatureReference ref =
+                SourceFeatureReference.of(
+                        "feature-oauth2-integration", "https://example.com/features/oauth2");
         assertThat(ref.featureId()).isEqualTo("feature-oauth2-integration");
         assertThat(ref.sourceFeatureLink()).isEqualTo("https://example.com/features/oauth2");
         assertThat(ref.isLinked()).isTrue();

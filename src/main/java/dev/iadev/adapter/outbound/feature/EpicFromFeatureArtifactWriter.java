@@ -12,7 +12,8 @@ public final class EpicFromFeatureArtifactWriter {
 
     private EpicFromFeatureArtifactWriter() {}
 
-    public static Path write(String epicId, FeatureEpicSource source, Path outputDir) throws IOException {
+    public static Path write(String epicId, FeatureEpicSource source, Path outputDir)
+            throws IOException {
         Path epicDir = outputDir.resolve("epic-" + epicId + "-" + slugify(source.title()));
         Files.createDirectories(epicDir);
         Path epicFile = epicDir.resolve("epic-" + epicId + ".md");
@@ -43,15 +44,20 @@ public final class EpicFromFeatureArtifactWriter {
         sb.append("**Versão:** 5.0\n");
         sb.append("**Status:** Pendente\n");
         sb.append("**Source Feature:** ").append(source.featureId()).append("\n");
-        sb.append("**Source Feature Link:** ").append(source.sourceFeatureLink()).append("\n\n---\n\n");
+        sb.append("**Source Feature Link:** ")
+                .append(source.sourceFeatureLink())
+                .append("\n\n---\n\n");
     }
 
     private static void appendDependencies(StringBuilder sb) {
         sb.append("## 0.5 Cross-Epic Dependencies\n\n");
-        sb.append("### Blocked By Epics\n\n| Epic ID | Title | Expected Status @ Start | Reason / Surface Touched |\n");
-        sb.append("| --------- | -------------------------- | ----------------------- | ------------------------------------------------------ |\n");
+        sb.append(
+                "### Blocked By Epics\n\n| Epic ID | Title | Expected Status @ Start | Reason / Surface Touched |\n");
+        sb.append(
+                "| --------- | -------------------------- | ----------------------- | ------------------------------------------------------ |\n");
         sb.append("| (none) | — | — | — |\n\n");
-        sb.append("### Blocks (informational, derived)\n\n| Epic ID |\n| --------- |\n| (none) |\n\n---\n\n");
+        sb.append(
+                "### Blocks (informational, derived)\n\n| Epic ID |\n| --------- |\n| (none) |\n\n---\n\n");
     }
 
     private static void appendInheritedRnfs(StringBuilder sb, List<InheritedRnfLine> rnfs) {
@@ -59,8 +65,14 @@ public final class EpicFromFeatureArtifactWriter {
         sb.append("| RNF ID | Source Level | Requirement | Waivable? |\n");
         sb.append("| :--- | :--- | :--- | :--- |\n");
         for (InheritedRnfLine rnf : rnfs) {
-            sb.append("| ").append(rnf.id()).append(" | ").append(rnf.sourceLevel()).append(" | ")
-                    .append(rnf.requirement()).append(" | ").append(rnf.waivable() ? "Yes" : "No")
+            sb.append("| ")
+                    .append(rnf.id())
+                    .append(" | ")
+                    .append(rnf.sourceLevel())
+                    .append(" | ")
+                    .append(rnf.requirement())
+                    .append(" | ")
+                    .append(rnf.waivable() ? "Yes" : "No")
                     .append(" |\n");
         }
         sb.append("\n---\n\n");
@@ -69,10 +81,13 @@ public final class EpicFromFeatureArtifactWriter {
     private static void appendVision(StringBuilder sb, FeatureEpicSource source) {
         sb.append("## 1. Visão & Problema\n\n");
         sb.append("**Chave Jira:** —\n\n");
-        sb.append("Este épico deriva diretamente da feature `").append(source.featureId())
+        sb.append("Este épico deriva diretamente da feature `")
+                .append(source.featureId())
                 .append("` e preserva sua linhagem Product → Capability → Feature → Epic.\n\n");
-        sb.append("O objetivo é transformar a feature `").append(source.title())
-                .append("` em backlog executável de épico, sem reescrever contexto já estabilizado em níveis anteriores.\n\n");
+        sb.append("O objetivo é transformar a feature `")
+                .append(source.title())
+                .append(
+                        "` em backlog executável de épico, sem reescrever contexto já estabilizado em níveis anteriores.\n\n");
         sb.append("### 1.1 Referências e Contexto\n\n");
         for (String reference : source.references()) {
             sb.append("- ").append(reference).append("\n");
@@ -83,14 +98,18 @@ public final class EpicFromFeatureArtifactWriter {
     private static void appendHypothesis(StringBuilder sb, FeatureEpicSource source) {
         sb.append("## 3. Hipótese & OKRs\n\n");
         sb.append("### Hipótese de Valor\n\n");
-        sb.append("**Se** convertermos a feature `").append(source.featureId())
+        sb.append("**Se** convertermos a feature `")
+                .append(source.featureId())
                 .append("` em um épico rastreável,\n");
-        sb.append("**então** a execução posterior de stories preservará contexto, RNFs herdadas e origem funcional,\n");
-        sb.append("**porque** a cadeia Product-First reduz retranscrição manual e perda de contexto entre níveis.\n\n");
+        sb.append(
+                "**então** a execução posterior de stories preservará contexto, RNFs herdadas e origem funcional,\n");
+        sb.append(
+                "**porque** a cadeia Product-First reduz retranscrição manual e perda de contexto entre níveis.\n\n");
         sb.append("### OKRs\n\n");
         sb.append("| Objetivo | Key Result | Métrica | Valor Atual | Meta | Prazo |\n");
         sb.append("| :--- | :--- | :--- | :--- | :--- | :--- |\n");
-        sb.append("| Materializar backlog da feature | Épico criado com sourceFeature e RNFs herdadas | artefato gerado | 0 | 1 | próximo ciclo |\n\n");
+        sb.append(
+                "| Materializar backlog da feature | Épico criado com sourceFeature e RNFs herdadas | artefato gerado | 0 | 1 | próximo ciclo |\n\n");
         sb.append("---\n\n");
     }
 
@@ -102,8 +121,11 @@ public final class EpicFromFeatureArtifactWriter {
         sb.append("\n### Dependências Técnicas\n\n");
         sb.append("| Dependência | Tipo | Épico/Ticket | Status |\n");
         sb.append("| :--- | :--- | :--- | :--- |\n");
-        sb.append("| ").append(source.capabilityId()).append(" | Bloqueante | ")
-                .append(source.sourceFeatureLink()).append(" | known |\n\n---\n\n");
+        sb.append("| ")
+                .append(source.capabilityId())
+                .append(" | Bloqueante | ")
+                .append(source.sourceFeatureLink())
+                .append(" | known |\n\n---\n\n");
     }
 
     private static void appendC4Sections(StringBuilder sb, FeatureEpicSource source) {
@@ -147,18 +169,26 @@ public final class EpicFromFeatureArtifactWriter {
         sb.append("## 6. Riscos\n\n");
         sb.append("| # | Risco | Tipo | Probabilidade | Impacto | Mitigação |\n");
         sb.append("| :--- | :--- | :--- | :--- | :--- | :--- |\n");
-        sb.append("| R1 | Divergência entre artefatos pai e épico derivado | Produto | Média | Alto | Regenerar a partir da source feature quando a origem mudar |\n");
-        sb.append("| R2 | RNF herdada não refletida no backlog | Técnico | Média | Alto | Gatear validação nas stories filhas com base nesta herança |\n\n");
+        sb.append(
+                "| R1 | Divergência entre artefatos pai e épico derivado | Produto | Média | Alto | Regenerar a partir da source feature quando a origem mudar |\n");
+        sb.append(
+                "| R2 | RNF herdada não refletida no backlog | Técnico | Média | Alto | Gatear validação nas stories filhas com base nesta herança |\n\n");
         sb.append("---\n\n");
     }
 
-    private static void appendStoryIndex(StringBuilder sb, String epicId, List<String> storyTitles) {
+    private static void appendStoryIndex(
+            StringBuilder sb, String epicId, List<String> storyTitles) {
         sb.append("## 7. Índice de Histórias\n\n");
-        sb.append("| ID | Título | Dependências (Blocked By) | Entrega de Valor | Planejamento |\n");
+        sb.append(
+                "| ID | Título | Dependências (Blocked By) | Entrega de Valor | Planejamento |\n");
         sb.append("| :--- | :--- | :--- | :--- | :--- |\n");
         if (storyTitles.isEmpty()) {
-            sb.append("| [story-").append(epicId).append("-0001](./story-").append(epicId)
-                    .append("-0001.md) | Backlog derivado da feature | — | Rastreabilidade completa da feature | Pendente |\n");
+            sb.append("| [story-")
+                    .append(epicId)
+                    .append("-0001](./story-")
+                    .append(epicId)
+                    .append(
+                            "-0001.md) | Backlog derivado da feature | — | Rastreabilidade completa da feature | Pendente |\n");
         } else {
             appendStoryRows(sb, epicId, storyTitles);
         }
@@ -169,8 +199,14 @@ public final class EpicFromFeatureArtifactWriter {
         for (int i = 0; i < storyTitles.size(); i++) {
             String storyId = "story-" + epicId + "-" + "%04d".formatted(i + 1);
             String dependency = i == 0 ? "—" : "story-" + epicId + "-" + "%04d".formatted(i);
-            sb.append("| [").append(storyId).append("](./").append(storyId).append(".md) | ")
-                    .append(storyTitles.get(i)).append(" | ").append(dependency)
+            sb.append("| [")
+                    .append(storyId)
+                    .append("](./")
+                    .append(storyId)
+                    .append(".md) | ")
+                    .append(storyTitles.get(i))
+                    .append(" | ")
+                    .append(dependency)
                     .append(" | Entregar fatia executável da feature derivada | Pendente |\n");
         }
     }
@@ -201,8 +237,11 @@ public final class EpicFromFeatureArtifactWriter {
     }
 
     private static String slugify(String value) {
-        String sanitized = value.toLowerCase().replaceAll("[^a-z0-9-]+", "-").replaceAll("-{2,}", "-")
-                .replaceAll("^-|-$", "");
+        String sanitized =
+                value.toLowerCase()
+                        .replaceAll("[^a-z0-9-]+", "-")
+                        .replaceAll("-{2,}", "-")
+                        .replaceAll("^-|-$", "");
         return sanitized.isEmpty() ? "untitled" : sanitized;
     }
 }

@@ -16,7 +16,8 @@ public record SourceFeatureReference(String featureId, String sourceFeatureLink)
     }
 
     public static SourceFeatureReference of(String featureId, String sourceFeatureLink) {
-        return new SourceFeatureReference(featureId, sourceFeatureLink == null ? NOT_APPLICABLE_LINK : sourceFeatureLink);
+        return new SourceFeatureReference(
+                featureId, sourceFeatureLink == null ? NOT_APPLICABLE_LINK : sourceFeatureLink);
     }
 
     public boolean isLinked() {

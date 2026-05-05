@@ -11,7 +11,8 @@ public record CreateProductResult(
         List<String> validationErrors,
         long executionTimeMs) {
 
-    public static CreateProductResult success(Product product, Capability c1Stub, long executionTimeMs) {
+    public static CreateProductResult success(
+            Product product, Capability c1Stub, long executionTimeMs) {
         return new CreateProductResult(true, product, c1Stub, List.of(), executionTimeMs);
     }
 

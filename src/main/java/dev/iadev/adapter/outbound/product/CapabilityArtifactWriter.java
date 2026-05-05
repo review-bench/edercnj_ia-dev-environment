@@ -39,8 +39,9 @@ public final class CapabilityArtifactWriter {
                     continue;
                 }
             }
-            String withHash = content.replace("\"idempotencyHash\": \"\"",
-                    "\"idempotencyHash\": \"" + hash + "\"");
+            String withHash =
+                    content.replace(
+                            "\"idempotencyHash\": \"\"", "\"idempotencyHash\": \"" + hash + "\"");
             Files.writeString(target, withHash, StandardCharsets.UTF_8);
             written++;
         }
@@ -49,9 +50,15 @@ public final class CapabilityArtifactWriter {
 
     private static String serialize(String capabilityId, String capabilityName, String productId) {
         return "{\n"
-                + "  \"capabilityId\": \"" + capabilityId + "\",\n"
-                + "  \"capabilityName\": \"" + capabilityName + "\",\n"
-                + "  \"productId\": \"" + productId + "\",\n"
+                + "  \"capabilityId\": \""
+                + capabilityId
+                + "\",\n"
+                + "  \"capabilityName\": \""
+                + capabilityName
+                + "\",\n"
+                + "  \"productId\": \""
+                + productId
+                + "\",\n"
                 + "  \"idempotencyHash\": \"\"\n"
                 + "}\n";
     }

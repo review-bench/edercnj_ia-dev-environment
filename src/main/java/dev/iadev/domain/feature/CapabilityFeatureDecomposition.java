@@ -16,11 +16,17 @@ public record CapabilityFeatureDecomposition(String capabilityId, List<String> f
         }
         if (featureNames.size() < MIN_FEATURES) {
             throw new IllegalArgumentException(
-                    "featureNames requires at least " + MIN_FEATURES + " entries; got " + featureNames.size());
+                    "featureNames requires at least "
+                            + MIN_FEATURES
+                            + " entries; got "
+                            + featureNames.size());
         }
         if (featureNames.size() > MAX_FEATURES) {
             throw new IllegalArgumentException(
-                    "featureNames allows at most " + MAX_FEATURES + " entries; got " + featureNames.size());
+                    "featureNames allows at most "
+                            + MAX_FEATURES
+                            + " entries; got "
+                            + featureNames.size());
         }
         featureNames = List.copyOf(featureNames);
     }

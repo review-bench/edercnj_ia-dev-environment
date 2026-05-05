@@ -14,8 +14,8 @@ class CapabilityToFeatureTransformerTest {
 
     @Test
     void transform_validArgs_returnsDecomposition() {
-        var result = transformer.transform("cap-c1",
-                List.of("BasicAuth", "OAuth2", "MFA", "Session"));
+        var result =
+                transformer.transform("cap-c1", List.of("BasicAuth", "OAuth2", "MFA", "Session"));
         assertThat(result.capabilityId()).isEqualTo("cap-c1");
         assertThat(result.featureNames()).containsExactly("BasicAuth", "OAuth2", "MFA", "Session");
     }
@@ -47,8 +47,11 @@ class CapabilityToFeatureTransformerTest {
 
     @Test
     void transform_tooManyNames_throwsIllegalArgument() {
-        assertThatThrownBy(() -> transformer.transform("cap-c1",
-                List.of("a", "b", "c", "d", "e", "f", "g", "h", "i")))
+        assertThatThrownBy(
+                        () ->
+                                transformer.transform(
+                                        "cap-c1",
+                                        List.of("a", "b", "c", "d", "e", "f", "g", "h", "i")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -13,18 +13,23 @@ import java.util.regex.Pattern;
 
 public final class FeatureEpicSourceLoader {
 
-    private static final Pattern FEATURE_TITLE = Pattern.compile("^# Feature:\\s+(.+)$", Pattern.MULTILINE);
-    private static final Pattern FEATURE_ID = Pattern.compile("^\\*\\*Feature ID:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
+    private static final Pattern FEATURE_TITLE =
+            Pattern.compile("^# Feature:\\s+(.+)$", Pattern.MULTILINE);
+    private static final Pattern FEATURE_ID =
+            Pattern.compile("^\\*\\*Feature ID:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
     private static final Pattern CAPABILITY_ID =
             Pattern.compile("^\\*\\*Capability:\\*\\*\\s+([^\\s]+)", Pattern.MULTILINE);
     private static final Pattern PRODUCT_RNF_ROW =
-            Pattern.compile("^\\|\\s*([A-Z_]+)\\s*\\|\\s*([^|]+)\\|\\s*([^|]+)\\|\\s*(Sim|Não)\\s*\\|",
+            Pattern.compile(
+                    "^\\|\\s*([A-Z_]+)\\s*\\|\\s*([^|]+)\\|\\s*([^|]+)\\|\\s*(Sim|Não)\\s*\\|",
                     Pattern.MULTILINE);
     private static final Pattern CAPABILITY_RNF_ROW =
-            Pattern.compile("^\\|\\s*([A-Z_]+)\\s*\\|\\s*([^|]+)\\|\\s*(true|false)\\s*\\|\\s*([^|]+)\\|",
+            Pattern.compile(
+                    "^\\|\\s*([A-Z_]+)\\s*\\|\\s*([^|]+)\\|\\s*(true|false)\\s*\\|\\s*([^|]+)\\|",
                     Pattern.MULTILINE);
 
-    public FeatureEpicSource load(Path featureFile, Path capabilityFile, Path productFile) throws IOException {
+    public FeatureEpicSource load(Path featureFile, Path capabilityFile, Path productFile)
+            throws IOException {
         String featureContent = Files.readString(featureFile);
         String capabilityContent = capabilityFile == null ? "" : Files.readString(capabilityFile);
         String productContent = productFile == null ? "" : Files.readString(productFile);
@@ -48,7 +53,8 @@ public final class FeatureEpicSourceLoader {
         throw new IllegalArgumentException(label + " not found in feature artifact");
     }
 
-    private static List<String> extractBulletList(String content, String sectionMarker, String listMarker) {
+    private static List<String> extractBulletList(
+            String content, String sectionMarker, String listMarker) {
         int sectionIndex = content.indexOf(sectionMarker);
         int listIndex = content.indexOf(listMarker, Math.max(sectionIndex, 0));
         if (listIndex < 0) {
@@ -76,7 +82,8 @@ public final class FeatureEpicSourceLoader {
         return storyTitles;
     }
 
-    private static List<String> buildReferences(Path featureFile, Path capabilityFile, Path productFile) {
+    private static List<String> buildReferences(
+            Path featureFile, Path capabilityFile, Path productFile) {
         List<String> references = new ArrayList<>();
         references.add(featureFile.toUri().toString());
         if (capabilityFile != null) {
@@ -88,7 +95,8 @@ public final class FeatureEpicSourceLoader {
         return references;
     }
 
-    private static List<InheritedRnfLine> mergeRnfs(String productContent, String capabilityContent) {
+    private static List<InheritedRnfLine> mergeRnfs(
+            String productContent, String capabilityContent) {
         Map<String, InheritedRnfLine> merged = new LinkedHashMap<>();
         appendProductRnfs(merged, productContent);
         appendCapabilityRnfs(merged, capabilityContent);
@@ -98,17 +106,27 @@ public final class FeatureEpicSourceLoader {
         return List.copyOf(new LinkedHashSet<>(merged.values()));
     }
 
-    private static void appendProductRnfs(Map<String, InheritedRnfLine> merged, String productContent) {
+    private static void appendProductRnfs(
+            Map<String, InheritedRnfLine> merged, String productContent) {
         Matcher matcher = PRODUCT_RNF_ROW.matcher(productContent);
         while (matcher.find()) {
             String category = matcher.group(1).trim();
-            String requirement = category + " — " + matcher.group(2).trim() + " (" + matcher.group(3).trim() + ")";
+            String requirement =
+                    category
+                            + " — "
+                            + matcher.group(2).trim()
+                            + " ("
+                            + matcher.group(3).trim()
+                            + ")";
             boolean waivable = "Não".equalsIgnoreCase(matcher.group(4).trim());
-            merged.put("PROD-" + category, new InheritedRnfLine("PROD-" + category, "Product", requirement, waivable));
+            merged.put(
+                    "PROD-" + category,
+                    new InheritedRnfLine("PROD-" + category, "Product", requirement, waivable));
         }
     }
 
-    private static void appendCapabilityRnfs(Map<String, InheritedRnfLine> merged, String capabilityContent) {
+    private static void appendCapabilityRnfs(
+            Map<String, InheritedRnfLine> merged, String capabilityContent) {
         Matcher matcher = CAPABILITY_RNF_ROW.matcher(capabilityContent);
         while (matcher.find()) {
             String category = matcher.group(1).trim();
@@ -118,7 +136,11 @@ public final class FeatureEpicSourceLoader {
             boolean waivable = !Boolean.parseBoolean(matcher.group(3).trim());
             merged.put(
                     "CAP-" + category,
-                    new InheritedRnfLine("CAP-" + category, "Capability", category + " — " + effective, waivable));
+                    new InheritedRnfLine(
+                            "CAP-" + category,
+                            "Capability",
+                            category + " — " + effective,
+                            waivable));
         }
     }
 }
