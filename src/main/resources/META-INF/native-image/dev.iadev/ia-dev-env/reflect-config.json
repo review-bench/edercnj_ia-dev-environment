@@ -18,6 +18,66 @@
     "allDeclaredFields": true
   },
   {
+    "name": "dev.iadev.adapter.inbound.cli.XCreateProductCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XCreateCapabilityCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XCreateFeatureCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XPromoteIdeationCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XEpicCreateCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XStoryCreateCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XArchPlanProductCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XArchPlanCapabilityCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XArchPlanFeatureCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.iadev.adapter.inbound.cli.XInternalRnfValidateCommand",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
     "name": "dev.iadev.cli.GenerateCommand$ConfigSource",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
