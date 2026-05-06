@@ -66,7 +66,7 @@ SESSION_ISO="$(date -d "@${SESSION_EPOCH}" --iso-8601=seconds 2>/dev/null \
 HAS_PR_CREATE=0
 if [[ -n "${SESSION_ISO}" ]]; then
     SESSION_STORY_COMMITS="$(git log --since="${SESSION_ISO}" --format=%B 2>/dev/null \
-        | grep -cE "feat\(story-|chore\(story-|fix\(story-" 2>/dev/null || echo 0)"
+        | grep -cE "feat\(story-|chore\(story-|fix\(story-" 2>/dev/null || true)"
     if [[ "${SESSION_STORY_COMMITS}" -gt 0 ]]; then
         HAS_PR_CREATE=1
     fi
