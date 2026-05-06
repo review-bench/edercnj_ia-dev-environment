@@ -311,6 +311,8 @@ Privacy threat modeling covering:
 | 1 | Security | `knowledge/security/index.md` | Mitigation recommendations and OWASP references |
 | 2 | Security References | `knowledge/security/application-security.md` | Detailed security controls and patterns |
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Integration Notes
 
 | Skill | Relationship | Context |
