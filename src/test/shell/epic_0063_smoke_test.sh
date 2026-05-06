@@ -18,7 +18,7 @@
 #   T12: audit-recovery-mode.sh --self-check passes
 #   T13: audit-epic-review-reconciliation.sh --self-check passes
 #   T14: audit-rollout-status.sh --self-check passes
-#   T15: .claude/rules/28-tool-call-grammar.md exists
+#   T15: .claude/rules/30-tool-call-grammar.md exists
 #   T16: docs/audit-bypass-catalog.md exists and lists 11 skills
 #   T17: docs/branch-protection.md exists
 #   T18: docs/adr/ADR-0016-preflight-warn-to-fail-rollout.md exists
@@ -396,16 +396,16 @@ assert_exit "T14: audit-rollout-status.sh --self-check exits 0" 0 \
     "$CLAUDE_SCRIPTS/audit-rollout-status.sh" --self-check
 
 # ─────────────────────────────────────────────────────────────────────────────
-# T15: .claude/rules/28-tool-call-grammar.md exists
+# T15: .claude/rules/30-tool-call-grammar.md exists
 # ─────────────────────────────────────────────────────────────────────────────
 echo ""
-echo "--- T15: .claude/rules/28-tool-call-grammar.md exists ---"
-assert_file_exists "T15: 28-tool-call-grammar.md exists" \
-    "$REPO_ROOT/.claude/rules/28-tool-call-grammar.md"
+echo "--- T15: .claude/rules/30-tool-call-grammar.md exists ---"
+assert_file_exists "T15: 30-tool-call-grammar.md exists" \
+    "$REPO_ROOT/.claude/rules/30-tool-call-grammar.md"
 
 # Verify it contains the Rule 28 marker
 assert_file_contains "T15b: Rule 28 file contains grammar marker" \
-    "$REPO_ROOT/.claude/rules/28-tool-call-grammar.md" \
+    "$REPO_ROOT/.claude/rules/30-tool-call-grammar.md" \
     "required|optional|conditional"
 
 # ─────────────────────────────────────────────────────────────────────────────

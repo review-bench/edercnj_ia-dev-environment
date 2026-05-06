@@ -66,7 +66,7 @@ class Epic0063LocalFirstSmokeTest {
     // ── Rule files ────────────────────────────────────────────────────────────
 
     private static final Path RULE_28_TOOL_CALL_GRAMMAR =
-            Path.of("src/main/resources/targets/claude/rules/28-tool-call-grammar.md");
+            Path.of("src/main/resources/targets/claude/rules/30-tool-call-grammar.md");
 
     // ── Documentation paths ───────────────────────────────────────────────────
 

@@ -89,8 +89,8 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle |
 | 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
-| 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 29 | `29-refinement-gate.md` | refinement gate |
+| 30 | `30-tool-call-grammar.md` | tool call grammar |
 | 30 | `30-value-driven-templates.md` | value driven templates |
 | 31 | `31-documentation-freshness-gate.md` | documentation freshness gate |
 | 32 | `32-dependency-policy-gate.md` | dependency policy gate |
