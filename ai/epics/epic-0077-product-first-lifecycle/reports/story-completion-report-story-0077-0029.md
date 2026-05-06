@@ -19,7 +19,7 @@
 | Compliance assessment | `plans/compliance-story-0077-0029.md` | ✅ |
 | Specialist review | `plans/review-story-0077-0029.md` | ✅ |
 | Tech-lead review | `plans/techlead-review-story-0077-0029.md` | ✅ |
-| Verify envelope | `reports/verify-envelope-0077-0029.json` | ✅ |
+| Verify envelope | `reports/verify-envelope-story-0077-0029.json` | ✅ |
 
 ## Task PRs
 

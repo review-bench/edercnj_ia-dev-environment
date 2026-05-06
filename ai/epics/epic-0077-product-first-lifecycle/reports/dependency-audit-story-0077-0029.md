@@ -20,9 +20,9 @@ module changes.
 
 | GroupId | ArtifactId | Version | License | CVEs |
 | :--- | :--- | :--- | :--- | :--- |
-| `info.picocli` | `picocli` | `4.7.6` | Apache-2.0 | None known |
+| `info.picocli` | `picocli` | `4.7.7` | Apache-2.0 | None known |
 | `org.junit.jupiter` | `junit-jupiter` | `5.11.4` | EPL-2.0 | None known |
-| `org.assertj` | `assertj-core` | `3.27.3` | Apache-2.0 | None known |
+| `org.assertj` | `assertj-core` | `3.27.7` | Apache-2.0 | None known |
 
 All versions comply with project policy. No CVEs detected for used versions.
 

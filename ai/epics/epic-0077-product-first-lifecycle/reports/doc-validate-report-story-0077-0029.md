@@ -20,7 +20,7 @@
 | File | Category | Doc impact |
 | :--- | :--- | :--- |
 | `.claude/rules/19-backward-compatibility.md` | Normative rule amendment | Updated with `flowVersion: "5"` row in the Fallback Matrix and `productFirstLifecycle` field entry — the rule IS the documentation |
-| `scripts/audit-flow-version.sh` | Bash audit script | Extended to recognize `"5"` in the valid set `{"1","2","3","4","5"}` |
+| `src/main/resources/targets/claude/scripts/audit-flow-version.sh` | Bash audit script (source-of-truth) | Extended to recognize `"5"` in the valid set `{"1","2","3","4","5"}`; generated output at `.claude/scripts/audit-flow-version.sh` |
 | `ai/epics/epic-0077-product-first-lifecycle/execution-state.json` | Epic state file | `flowVersion` updated to `"5"` and `productFirstLifecycle: true` field added |
 
 ## Justification for PASS on `readme`
