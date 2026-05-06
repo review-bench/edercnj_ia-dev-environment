@@ -31,7 +31,7 @@
 | :--------------- | :---------------------------------------------------------------------------------- | :--------- | :---------------------------------- | :---------------------------------------------- | :------- |
 | story-0078-0001  | Baseline tooling: measure-context-budget.sh + audit advisory                         | TBD        | —                                   | 0002, 0003, 0004, 0010                          | Pendente |
 | story-0078-0002  | Remove `02-domain.md` from `RulesAssembler`                                          | TBD        | 0001                                | —                                               | Pendente |
-| story-0078-0003  | Renumerar `28-tool-call-grammar.md` → `30-tool-call-grammar.md` (atomic)            | TBD        | 0001                                | 0009                                            | Pendente |
+| story-0078-0003  | Renumerar `30-tool-call-grammar.md` → `30-tool-call-grammar.md` (atomic)            | TBD        | 0001                                | 0009                                            | Pendente |
 | story-0078-0004  | Extrair histórico de epics do CLAUDE.md → `docs/epics-history.md`                   | TBD        | 0001                                | —                                               | Pendente |
 | story-0078-0005  | Slim Rule 12 → KP `knowledge/security/anti-patterns/`                                | TBD        | 0010                                | —                                               | Pendente |
 | story-0078-0006  | Slim Rule 25 → KP `knowledge/lifecycle/task-hierarchy.md`                            | TBD        | 0010                                | —                                               | Pendente |

@@ -53,7 +53,7 @@ if "$SELF_CHECK"; then
     # Verify Rule 28 file exists (Camada 1)
     SCRIPT_DIR_SC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     REPO_ROOT_SC="$(cd "$SCRIPT_DIR_SC/.." && pwd)"
-    RULE_FILE="$REPO_ROOT_SC/.claude/rules/28-tool-call-grammar.md"
+    RULE_FILE="$REPO_ROOT_SC/.claude/rules/30-tool-call-grammar.md"
     if [[ ! -f "$RULE_FILE" ]]; then
         printf 'OPERATIONAL_ERROR: Rule 28 file not found at %s\n' "$RULE_FILE" >&2
         PREREQ_OK=false

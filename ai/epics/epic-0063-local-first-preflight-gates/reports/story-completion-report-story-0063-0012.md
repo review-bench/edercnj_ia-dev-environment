@@ -13,11 +13,11 @@ Story story-0063-0012 implemented Rule 28 (Tool-Call Grammar) and `audit-tool-ca
 
 | AC | Status | Evidence |
 | :--- | :--- | :--- |
-| AC1 — Rule 28 normative document published | ✓ PASS | `.claude/rules/28-tool-call-grammar.md` created |
+| AC1 — Rule 28 normative document published | ✓ PASS | `.claude/rules/30-tool-call-grammar.md` created |
 | AC2 — audit-tool-call-grammar.sh static mode | ✓ PASS | `scripts/audit-tool-call-grammar.sh` with --self-check, --skill-file, --skills-root |
 | AC3 — Shell tests T1-T7 all passing | ✓ PASS | `src/test/shell/audit_tool_call_grammar_test.sh`: 7 passed, 0 failed |
 | AC4 — Baseline file initialized | ✓ PASS | `audits/tool-call-grammar-baseline.txt` with grandfather mechanism explained |
-| AC5 — Source-of-truth copy | ✓ PASS | `java/src/main/resources/targets/claude/rules/28-tool-call-grammar.md` |
+| AC5 — Source-of-truth copy | ✓ PASS | `java/src/main/resources/targets/claude/rules/30-tool-call-grammar.md` |
 | AC6 — Backward compatibility | ✓ PASS | Empty baseline; Anexo B markers pending TASK-0063-0012-004 |
 
 ## Tasks Executed

@@ -1021,7 +1021,7 @@ Legenda:
 | 26 | `26-audit-gate-lifecycle.md` | Audit Gate Lifecycle | `policy+kp` | `forge.policy.audit-gate-lifecycle@1` | Camada-B (master taxonomy) + KP | W3 (P0.C3) |
 | 27 | `27-zero-bypass-lifecycle.md` | Zero-Bypass Lifecycle | `policy_executable` | `forge.policy.zero-bypass@1` | Camada-A (sem `--skip-*`) + Camada-B (audit-bypass-flags) | W3 (P0.C6) |
 | 28a | `28-capability-frontmatter-contract.md` | Capability Frontmatter Contract | `policy_executable` | `forge.policy.capability-frontmatter@1` | compose-time + Camada-B | W3 (P-1.C03) |
-| 28b | `28-tool-call-grammar.md` | Tool-Call Grammar | `policy_executable` | `forge.policy.tool-call-grammar@1` | Camada-A + Camada-B | W3 |
+| 28b | `30-tool-call-grammar.md` | Tool-Call Grammar | `policy_executable` | `forge.policy.tool-call-grammar@1` | Camada-A + Camada-B | W3 |
 | 29 | `29-refinement-gate.md` | Refinement Gate | `policy_executable` | `forge.policy.refinement-gate@1` | Camada-A (built-in dos commands) + Camada-B | W3 (P0.C5) |
 | 30 | `30-value-driven-templates.md` | Value-Driven Templates | `policy+kp` | `forge.policy.value-driven-templates@1` | compose-time + Camada-B + KP | W4 (P-1.C04) |
 | 31 | `31-documentation-freshness-gate.md` | Documentation Freshness Gate | `policy_executable` | `forge.policy.doc-freshness@1` | Camada-A (forge doc validate) + Camada-B | W6 |

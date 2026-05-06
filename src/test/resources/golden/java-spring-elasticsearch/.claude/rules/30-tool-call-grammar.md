@@ -197,7 +197,7 @@ generation, before the SKILL.md artifact is committed.
 
 Self-check: `scripts/audit-tool-call-grammar.sh --self-check` MUST verify:
 1. `grep` and `jq` are present on `PATH`.
-2. This rule file (`28-tool-call-grammar.md`) exists at `.claude/rules/`.
+2. This rule file (`30-tool-call-grammar.md`) exists at `.claude/rules/`.
 3. Exit 0 when all prerequisites satisfied; exit 2 on any failure.
 
 The full static audit runs on every PR touching any SKILL.md under `src/main/resources/targets/claude/skills/`. The dynamic audit runs on every PR targeting `develop` from an `epic/*` branch.
