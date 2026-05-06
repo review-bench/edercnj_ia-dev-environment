@@ -408,6 +408,18 @@
 
 ---
 
+### audit-kp-references.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0078 RULE-002 (KP Orphan Detector) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Each `.md` under `knowledge/` is referenced by ≥1 skill SKILL.md via `Read knowledge/<path>`. Optionally verifies security KP coverage when `--security-strict` is active. |
+| **Introduced** | story-0078-0015 (EPIC-0078) |
+| **Exit Codes** | `0` = OK · `1` = `KP_ORPHAN` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` · `4` = `SECURITY_KP_MISSING` · `5` = `KP_READ_MALFORMED` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

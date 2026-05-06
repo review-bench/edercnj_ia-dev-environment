@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0078 story-0078-0015 (KP Orphan Detector)
+
+- **`audit-kp-references.sh`** (`src/main/resources/targets/claude/scripts/`): CI audit script that detects Knowledge Pack orphans — KPs not referenced by any skill. Exit codes: `0=OK`, `1=KP_ORPHAN`, `2=OPERATIONAL_ERROR`, `3=BASELINE_CORRUPT`, `4=SECURITY_KP_MISSING`. Supports `--self-check`, `--security-strict`, `--mode`, `--format`.
+- **`KpReferencesAuditorTest`** (`dev.iadev.audit`): Maven CI-blocking Java harness (7 scenarios) for the audit script.
+- **`governance/baselines/kp-references-baseline.txt`**: Baseline of 99 pre-existing orphan KPs grandfathered at EPIC-0078 merge. Immutable post-EPIC-0078.
+- **`docs/audit-gates-catalog.md`**: Added `audit-kp-references.sh` entry (Layer 2, 5 exit codes).
+
 ## [5.3.0] - 2026-05-06
 
 ### Highlights — EPIC-0077 (Product-First Lifecycle & Planning C4 Model)
