@@ -45,6 +45,8 @@ Include this skill when the project has compliance frameworks configured (PCI-DS
 | security | `skills/security/references/cryptography.md` | TLS, hashing, key management |
 | compliance | `skills/compliance/SKILL.md` and `skills/compliance/references/` | Active framework requirements |
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Workflow
 
 ### Step 1 — Identify Active Frameworks

@@ -311,6 +311,11 @@ Progress logs go to **stderr**. The final JSON summary is the **last line** on *
 | PR closed during polling | Exit 60 immediately |
 | PR merged during polling | Exit 40 immediately |
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md
+Read src/main/resources/targets/claude/knowledge/lifecycle/ci-watch-integrity.md
+
 ## Rule Compliance
 
 - **Rule 13**: orchestrators invoke via `Skill(skill: "x-watch-pr-ci", args: "...")` — no bare-slash in delegation

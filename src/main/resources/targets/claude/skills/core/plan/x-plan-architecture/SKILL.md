@@ -406,6 +406,8 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 **Minimum KPs for Full Plan:** 7 (all except Compliance, which is conditional).
 **Minimum KPs for Simplified Plan:** 1 (Architecture only; add others as relevant).
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Error Handling
 
 | Scenario | Action |

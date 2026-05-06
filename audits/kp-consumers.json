@@ -1,0 +1,50 @@
+{
+  "knowledge/security/anti-patterns/index.md": [
+    "x-plan-architecture",
+    "x-plan-task",
+    "x-plan-tests",
+    "x-review-security",
+    "x-scan-owasp",
+    "x-model-threats"
+  ],
+  "knowledge/lifecycle/task-hierarchy.md": [
+    "x-implement-epic",
+    "x-implement-story",
+    "x-implement-task",
+    "x-internal-verify-phase-gates"
+  ],
+  "knowledge/lifecycle/backward-compatibility.md": [
+    "x-implement-epic",
+    "x-implement-story",
+    "x-internal-update-status"
+  ],
+  "knowledge/lifecycle/execution-integrity.md": [
+    "x-internal-verify-story",
+    "x-watch-pr-ci",
+    "x-internal-write-story-report"
+  ],
+  "knowledge/lifecycle/zero-bypass.md": [
+    "x-create-pr",
+    "x-manage-pr-merge-train"
+  ],
+  "knowledge/lifecycle/refinement-gate.md": [
+    "x-refine-story",
+    "x-refine-epic",
+    "x-internal-update-status"
+  ],
+  "knowledge/lifecycle/ci-watch-integrity.md": [
+    "x-watch-pr-ci",
+    "x-manage-pr-merge-train"
+  ],
+  "knowledge/governance/audit-gate-lifecycle.md": [
+    "x-internal-verify-phase-gates"
+  ],
+  "knowledge/governance/capability-composition.md": [
+    "x-migrate-frontmatter"
+  ],
+  "knowledge/governance/tool-call-grammar.md": [
+    "x-implement-epic",
+    "x-implement-story",
+    "x-implement-task"
+  ]
+}

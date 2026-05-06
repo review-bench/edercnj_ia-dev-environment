@@ -577,6 +577,10 @@ x-refine-story completed for {STORY_ID}
 
 ---
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/refinement-gate.md
+
 ## Integration Notes
 
 - **Consumed by:** `x-implement-story` (Phase 0: checks `refinementVerdict.status == "approved"` via `enforce-refinement-gate.sh` hook).

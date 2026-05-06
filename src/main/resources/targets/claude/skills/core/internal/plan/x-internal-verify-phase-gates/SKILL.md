@@ -335,6 +335,11 @@ Internal skills DO NOT emit `phase.start` / `phase.end` markers — the calling 
 | `.claude/hooks/verify-phase-gates.sh` | consumer (Stop hook) | Reads `phaseGateResults[]` this skill writes; emits WARNING + exit 2 on gate failure at end of LLM turn. |
 | `.claude/hooks/enforce-phase-sequence.sh` | consumer (PreToolUse hook) | Reads `phaseGateResults[]` to block `Skill(...)` of an orchestrator whose predecessor phase has no `passed=true` entry. |
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
+Read src/main/resources/targets/claude/knowledge/governance/audit-gate-lifecycle.md
+
 ## Rule References
 
 - Rule 25 — the specification this skill enforces.

@@ -344,6 +344,8 @@ This ensures backward compatibility with projects that have not yet adopted temp
 | testing | `knowledge/testing.md` | {{LANGUAGE}}-specific test patterns |
 | architecture | `knowledge/architecture/architecture-principles.md` | Exception hierarchy, layer boundaries |
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Integration Notes
 
 | Skill | Relationship | Context |
