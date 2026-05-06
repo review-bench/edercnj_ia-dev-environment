@@ -610,6 +610,10 @@
       }
     },
     "story-0078-0017": {
+      "status": "Bloqueada",
+      "blockReason": "RELEASE_WINDOW_NOT_REACHED",
+      "blockDetail": "story-0078-0013 merge commit e6a097900 is not yet an ancestor of any release tag on main; 0 of 2 required tags elapsed",
+      "blockedAt": "2026-05-06T00:00:00Z",
       "refinementVerdict": {
         "status": "approved",
         "scope": "story",
