@@ -42,9 +42,9 @@ public final class CapabilityAwareComposer {
     private final CapabilityMatcher matcher;
     private final PruningMode mode;
 
-    /** Creates a composer in {@link PruningMode#ADVISORY} mode (default for story-0078-0014). */
+    /** Creates a composer in {@link PruningMode#HARD} mode (default since story-0078-0016). */
     public CapabilityAwareComposer() {
-        this(PruningMode.ADVISORY);
+        this(PruningMode.HARD);
     }
 
     /** Creates a composer with an explicit pruning mode. */

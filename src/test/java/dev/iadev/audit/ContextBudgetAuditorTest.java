@@ -17,7 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
  * Maven CI-blocking audit harness for measure-context-budget.sh and
  * audit-context-budget.sh (EPIC-0078 story-0078-0001).
  *
- * <p>Validates exit codes 0/2/3 per Rule 26 §Standardized Exit Codes contract.
+ * <p>Validates exit codes 0/1/2/3 per Rule 26 §Standardized Exit Codes + story-0078-0016
+ * hard-fail contract.
  */
 @DisplayName("ContextBudgetAuditorTest (Maven CI-blocking)")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
@@ -171,5 +172,67 @@ class ContextBudgetAuditorTest {
         String stderr = new String(proc.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
         assertThat(proc.exitValue()).as("corrupt baseline must exit 3: " + stderr).isEqualTo(3);
         assertThat(stderr).as("stderr must contain BASELINE_CORRUPT").contains("BASELINE_CORRUPT");
+    }
+
+    @Test
+    @DisplayName("--hard exits 1 when alwaysLoaded exceeds limit (story-0078-0016)")
+    void audit_hardExitsOneWhenLimitExceeded(@TempDir Path tempDir)
+            throws IOException, InterruptedException {
+        // Baseline with limit so low that any .claude directory will exceed it
+        Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
+        Files.writeString(tinyBaseline,
+                """
+                {
+                  "alwaysLoaded": 1,
+                  "measuredAt": "2026-05-06T00:00:00Z",
+                  "ref": "test",
+                  "limit": 1,
+                  "tolerancePct": 0
+                }
+                """,
+                StandardCharsets.UTF_8);
+
+        ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--hard");
+        pb.directory(new java.io.File(REPO_DIR));
+        pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
+        pb.environment().put("BASELINE_PATH", tinyBaseline.toString());
+        pb.redirectErrorStream(true);
+        Process proc = pb.start();
+        String output = new String(proc.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        proc.waitFor(30, TimeUnit.SECONDS);
+        assertThat(proc.exitValue())
+                .as("--hard with exceeded limit must exit 1: " + output)
+                .isEqualTo(1);
+        assertThat(output).as("must contain CONTEXT_BUDGET_VIOLATION").contains("CONTEXT_BUDGET_VIOLATION");
+    }
+
+    @Test
+    @DisplayName("default mode is hard-fail (no flag → exit 1 when limit exceeded)")
+    void audit_defaultIsHardFail(@TempDir Path tempDir)
+            throws IOException, InterruptedException {
+        Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
+        Files.writeString(tinyBaseline,
+                """
+                {
+                  "alwaysLoaded": 1,
+                  "measuredAt": "2026-05-06T00:00:00Z",
+                  "ref": "test",
+                  "limit": 1,
+                  "tolerancePct": 0
+                }
+                """,
+                StandardCharsets.UTF_8);
+
+        // No --advisory flag — default must now be hard-fail
+        ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString());
+        pb.directory(new java.io.File(REPO_DIR));
+        pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
+        pb.environment().put("BASELINE_PATH", tinyBaseline.toString());
+        pb.redirectErrorStream(true);
+        Process proc = pb.start();
+        proc.waitFor(30, TimeUnit.SECONDS);
+        assertThat(proc.exitValue())
+                .as("default (no flag) must hard-fail when limit exceeded")
+                .isEqualTo(1);
     }
 }

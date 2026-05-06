@@ -10,7 +10,8 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 BASELINE_PATH="${BASELINE_PATH:-${REPO_ROOT}/governance/baselines/context-budget.json}"
-ADVISORY="${ADVISORY:-true}"
+# story-0078-0016: default switched from advisory to hard-fail
+ADVISORY="${ADVISORY:-false}"
 
 log_info()  { echo "[audit-context-budget] INFO  $*" >&2; }
 log_warn()  { echo "[audit-context-budget] WARN  $*" >&2; }

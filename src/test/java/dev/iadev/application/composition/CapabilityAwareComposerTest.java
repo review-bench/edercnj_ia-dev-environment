@@ -141,9 +141,11 @@ class CapabilityAwareComposerTest {
         @Test
         @DisplayName("artifact with non-matching capability emits warning in ADVISORY mode")
         void nonMatchingCapabilityAdvisoryWarning(@TempDir Path root) throws IOException {
+            CapabilityAwareComposer advisory =
+                    new CapabilityAwareComposer(CapabilityAwareComposer.PruningMode.ADVISORY);
             writeArtifact(root, "java-rule.md", "lang.java.*");
             ResolvedCapabilitySet active = activeSet(List.of());
-            CompositionPlan plan = composer.plan(active, root);
+            CompositionPlan plan = advisory.plan(active, root);
             assertThat(plan.included()).hasSize(1);
             assertThat(plan.excluded()).isEmpty();
             assertThat(plan.warnings()).hasSize(1);
