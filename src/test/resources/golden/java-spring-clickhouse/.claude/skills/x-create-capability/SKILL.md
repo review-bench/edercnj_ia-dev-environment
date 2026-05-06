@@ -82,7 +82,7 @@ ia-dev-env x-create-capability --capability-id capability-c1 --auto-decompose
 | :--- | :--- |
 | `x-create-product` | Produces the product artifact this skill reads |
 | `x-create-feature` | Next step — decomposes a capability into features |
-| `x-internal-rnf-validate` | Validates no-relax markers on capability RNFs |
+| `x-internal-validate-rnf` | Validates no-relax markers on capability RNFs |
 
 ## References
 

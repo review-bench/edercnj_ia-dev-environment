@@ -29,10 +29,10 @@ import picocli.CommandLine.Spec;
  *   <li>{@code x-promote-ideation} — persists a transient ideation to {@code ai/ideations/}
  *   <li>{@code x-epic-create} — creates an Epic artifact from a Feature
  *   <li>{@code x-story-create} — creates Story artifacts from a Feature or Epic
- *   <li>{@code x-arch-plan-product} — generates C4 diagrams for a Product
- *   <li>{@code x-arch-plan-capability} — generates C4 diagrams for a Capability
- *   <li>{@code x-arch-plan-feature} — generates C4 diagrams for a Feature
- *   <li>{@code x-internal-rnf-validate} — validates RNF no-relax markers
+ *   <li>{@code x-plan-arch-product} — generates C4 diagrams for a Product
+ *   <li>{@code x-plan-arch-capability} — generates C4 diagrams for a Capability
+ *   <li>{@code x-plan-arch-feature} — generates C4 diagrams for a Feature
+ *   <li>{@code x-internal-validate-rnf} — validates RNF no-relax markers
  * </ul>
  *
  * <p>Usage examples:
@@ -42,7 +42,7 @@ import picocli.CommandLine.Spec;
  * ia-dev-env generate -c config.yaml
  * ia-dev-env validate -c config.yaml
  * ia-dev-env x-create-product --ideation-file ai/ideations/ideation-0001.md
- * ia-dev-env x-arch-plan-product --product-id product-0001
+ * ia-dev-env x-plan-arch-product --product-id product-0001
  * }</pre>
  */
 @Command(

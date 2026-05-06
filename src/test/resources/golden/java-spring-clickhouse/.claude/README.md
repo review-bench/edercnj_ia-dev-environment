@@ -120,9 +120,6 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **spring-controller** | `/spring-controller` | Generate a Spring Boot @RestController with matching DTOs, mappers, @ControllerAdvice handler, and unit tests following hexagonal architecture. |
 | **x-analyze-telemetry** | `/x-analyze-telemetry` | Analyze telemetry NDJSON for one or more epics and produce a Markdown report with skill/phase/tool aggregates, Mermaid Gantt timeline, and optional JSON/CSV exports. Use to answer 'which phase is the bottleneck?' and 'is skill X getting slower?' questions for operator visibility. |
 | **x-analyze-telemetry-trends** | `/x-analyze-telemetry-trends` | Detect cross-epic P95 regressions (>= threshold %) and rank top-10 slowest skills from the global telemetry index. Single-responsibility partner of /x-analyze-telemetry focused on trend detection, not point-in-time reporting. Use to answer 'is skill X getting slower over the last N epics?' with evidence. |
-| **x-arch-plan-capability** | `/x-arch-plan-capability` | Generate C4 Container + Component diagrams for a capability in Mermaid or PlantUML. |
-| **x-arch-plan-feature** | `/x-arch-plan-feature` | Generate C4 Context + Container diagrams for a feature in Mermaid or PlantUML. |
-| **x-arch-plan-product** | `/x-arch-plan-product` | Generate C4 Context + Container + Component diagrams for a product in Mermaid or PlantUML. |
 | **x-audit-code** | `/x-audit-code` | Full codebase review against all project standards. Launches parallel subagents per audit dimension (Clean Code, SOLID, Architecture, Tests, Security, Cross-file), consolidates findings into a severity-categorized report with score. Use for periodic quality validation. |
 | **x-audit-dependencies** | `/x-audit-dependencies` | Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report. |
 | **x-audit-supply-chain** | `/x-audit-supply-chain` | Enhanced supply chain security audit beyond x-audit-dependencies. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring. |
@@ -168,6 +165,9 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-migrate-templates** | `/x-migrate-templates` | Assists migration of a v1 epic document to the v2 value-driven template (EPIC-0070). Parses v1 technical blocks (Packages, Contratos, SOLID, Observabilidade), classifies each block with a safe default heuristic, and optionally asks the operator for confirmation per block (--interactive). Side-effects: writes epic.md in v2 format atomically, creates ADRs for 'virar ADR' decisions, updates system.md via x-update-system-architecture. Supports --dry-run and recovery from interrupted sessions. |
 | **x-model-threats** | `/x-model-threats` | Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document. |
 | **x-orchestrate-epic** | `/x-orchestrate-epic` | Orchestrates multi-agent planning for all stories in an epic, respecting dependency order, with checkpoint and resume support. |
+| **x-plan-arch-capability** | `/x-plan-arch-capability` | Generate C4 Container + Component diagrams for a capability in Mermaid or PlantUML. |
+| **x-plan-arch-feature** | `/x-plan-arch-feature` | Generate C4 Context + Container diagrams for a feature in Mermaid or PlantUML. |
+| **x-plan-arch-product** | `/x-plan-arch-product` | Generate C4 Context + Container + Component diagrams for a product in Mermaid or PlantUML. |
 | **x-plan-architecture** | `/x-plan-architecture` | Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions. |
 | **x-plan-story** | `/x-plan-story` | Multi-agent story planning: launches 7 specialized agents (Architect, QA, Security, PentestEngineer, TechLead, ProductOwner, PerformanceEngineer) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel. |
 | **x-plan-task** | `/x-plan-task` | Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-plan-story (future). |
@@ -231,9 +231,9 @@ to inject domain knowledge. Configured with `user-invocable: false`.
 | `x-internal-precheck-worktree` | Referenced internally by agents |
 | `x-internal-render-pr-body` | Referenced internally by agents |
 | `x-internal-resume-story` | Referenced internally by agents |
-| `x-internal-rnf-validate` | Referenced internally by agents |
 | `x-internal-summarize-epic` | Referenced internally by agents |
 | `x-internal-update-status` | Referenced internally by agents |
+| `x-internal-validate-rnf` | Referenced internally by agents |
 | `x-internal-verify-epic-integrity` | Referenced internally by agents |
 | `x-internal-verify-phase-gates` | Referenced internally by agents |
 | `x-internal-verify-story` | Referenced internally by agents |

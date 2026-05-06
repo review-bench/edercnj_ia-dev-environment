@@ -14,7 +14,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 @Command(
-        name = "x-arch-plan-product",
+        name = "x-plan-arch-product",
         mixinStandardHelpOptions = true,
         description = "Generate C4 Context + Container diagrams for a product.")
 public class XArchPlanProductCommand implements Callable<Integer> {
