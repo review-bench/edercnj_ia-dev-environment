@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 24 — Execution Integrity
 
 > **Consolidated by:** EPIC-0078 (Context Budget Optimization). **Authoritative contract:** Rule 19 (Lifecycle Integrity Contract).

@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 03 — Coding Standards (Quick Reference)
 
 > **Full reference:** Read `knowledge/coding-standards.md` before writing code.

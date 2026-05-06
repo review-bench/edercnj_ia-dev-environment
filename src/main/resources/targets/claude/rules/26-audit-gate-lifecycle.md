@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 26 — Audit Gate Lifecycle
 
 > **Related:** Rule 13, Rule 14, Rule 19, Rule 21, Rule 22, Rule 23, Rule 24, Rule 25, Rule 45.

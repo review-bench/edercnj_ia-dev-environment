@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 25 — Task Hierarchy & Phase Gate Contract
 
 > **Related:** Rule 13, Rule 22, Rule 24, Rule 19.

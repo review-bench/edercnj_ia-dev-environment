@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 20 — Interactive Gates Convention
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 09 (Branching Model).

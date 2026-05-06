@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 08 — Release Process
 
 > **Full reference:** Read `knowledge/protocols.md` for detailed release management procedures.

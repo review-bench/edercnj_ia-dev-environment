@@ -1,3 +1,6 @@
+---
+requires-capabilities: [lang.java.*]
+---
 # Rule 12 — Security Anti-Patterns (Java)
 
 > Full vulnerable/fixed examples in KP: `Read src/main/resources/targets/claude/knowledge/security/anti-patterns/<jN-name>.md`

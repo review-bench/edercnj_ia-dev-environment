@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 28 — Capability Frontmatter Contract
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility), Rule 26 (Audit Gate Lifecycle).

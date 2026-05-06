@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 19 — Lifecycle Integrity Contract
 
 > **Related:** Rule 08 (Release Process), Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 24 (Execution Integrity), Rule 27 (Zero-Bypass), Rule 29 (Refinement Gate), Rule 45 (CI-Watch).
