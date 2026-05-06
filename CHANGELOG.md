@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-05-06
+
 ### Highlights — EPIC-0077 (Product-First Lifecycle & Planning C4 Model)
 
 EPIC-0077 introduz a hierarquia de planejamento **Product → Capability → Feature → Epic → Story → Task** como domain model de primeira classe no pipeline do `ia-dev-env`. Uma declaração `Product` no YAML do projeto determina quais capability bundles são ativados; cada `Capability` mapeia para skills, rules e templates que são incluídos ou excluídos do `.claude/` gerado.
