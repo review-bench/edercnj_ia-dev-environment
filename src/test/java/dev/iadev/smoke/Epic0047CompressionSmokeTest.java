@@ -237,13 +237,14 @@ class Epic0047CompressionSmokeTest extends SmokeTestBase {
      * Per-skill line-count limit for the slim SKILL.md, matching the DoD table in {@code
      * plans/epic-0047/story-0047-0002.md} §4.
      */
+    // EPIC-0078 story-0078-0013 added KP references to x-implement-story (+2 lines).
     private static final java.util.Map<String, Integer> FLIPPED_LIMIT_BY_SKILL =
             java.util.Map.of(
                     "x-commit-changes", 200,
                     "x-format-code", 200,
                     "x-lint-code", 200,
                     "x-drive-tdd", 250,
-                    "x-implement-story", 410);
+                    "x-implement-story", 420);
 
     /**
      * Slim-contract mandatory section headers. ADR-0012 §Decision declares these 4 required markers

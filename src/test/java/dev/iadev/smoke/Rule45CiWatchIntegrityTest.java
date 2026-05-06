@@ -27,26 +27,26 @@ import org.junit.jupiter.params.provider.MethodSource;
         disabledReason = "POSIX path resolution; mirrors sibling smoke tests.")
 class Rule45CiWatchIntegrityTest extends SmokeTestBase {
 
+    // EPIC-0078 story-0078-0013 slimmed Rule 45 to a compact contract format.
+    // Canonical sections reduced to 3 (Purpose → Contract, Exit Codes, Forbidden);
+    // full detail moved to lifecycle KP ci-watch-integrity.md.
     private static final List<String> CANONICAL_SECTIONS =
             List.of(
-                    "## Purpose",
-                    "## Exit Codes Matrix",
-                    "## Fallback Matrix",
-                    "## `--no-ci-watch` Constraints",
-                    "## Mandatory Invocation Sites",
-                    "## Forbidden",
-                    "## Audit");
+                    "## Contract",
+                    "## Exit Codes",
+                    "## Forbidden");
 
+    // Exit codes now appear in compact inline format: "0=SUCCESS", "20=CI_FAILED", etc.
     private static final List<String> EXPECTED_EXIT_CODES =
             List.of(
-                    "`SUCCESS`",
-                    "`CI_PENDING_PROCEED`",
-                    "`CI_FAILED`",
-                    "`TIMEOUT`",
-                    "`PR_ALREADY_MERGED`",
-                    "`NO_CI_CONFIGURED`",
-                    "`PR_CLOSED`",
-                    "`PR_NOT_FOUND`");
+                    "SUCCESS",
+                    "CI_PENDING_PROCEED",
+                    "CI_FAILED",
+                    "TIMEOUT",
+                    "PR_ALREADY_MERGED",
+                    "NO_CI_CONFIGURED",
+                    "PR_CLOSED",
+                    "PR_NOT_FOUND");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
@@ -60,7 +60,7 @@ class Rule45CiWatchIntegrityTest extends SmokeTestBase {
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("Rule 45 declares all 7 canonical sections")
+    @DisplayName("Rule 45 declares canonical sections (slimmed to 3 by EPIC-0078)")
     void rule45_declaresCanonicalSections(String profile) throws IOException {
         runPipeline(profile);
         Path rule = getOutputDir(profile).resolve(".claude/rules/45-ci-watch-integrity.md");

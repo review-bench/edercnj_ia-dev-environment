@@ -38,11 +38,13 @@ class Rule45SmokeTest {
 
         String body = Files.readString(rule, StandardCharsets.UTF_8);
 
-        assertThat(body).as("Rule 45 must reference SUCCESS").contains("`SUCCESS`");
-        assertThat(body).as("Rule 45 must reference CI_FAILED").contains("`CI_FAILED`");
+        // EPIC-0078 story-0078-0013 slimmed Rule 45: exit codes now appear in compact form
+        // "0=SUCCESS ... 20=CI_FAILED ..." and the header is "## Exit Codes (8 Stable — ...)".
+        assertThat(body).as("Rule 45 must reference SUCCESS exit code").contains("SUCCESS");
+        assertThat(body).as("Rule 45 must reference CI_FAILED exit code").contains("CI_FAILED");
         assertThat(body)
-                .as("Rule 45 must declare the Exit Codes Matrix header")
-                .contains("## Exit Codes Matrix");
+                .as("Rule 45 must declare the Exit Codes section header")
+                .contains("## Exit Codes");
     }
 
     private Path repoRoot() {

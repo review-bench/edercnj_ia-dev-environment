@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Smoke tests for EPIC-0058, Story 0058-0001: Rule 26 Audit Gate Lifecycle.
  *
- * <p>Validates that Rule 26 exists in the source-of-truth (classpath) with all 8 mandatory
- * sections, that the taxonomy table lists all 4 layers, and that the exit-code table covers codes
- * 0–3.
+ * <p>EPIC-0078 story-0078-0011 slimmed Rule 26 to a compact contract stub (Purpose/Audit/Related
+ * moved to governance KP). Validates that the slimmed Rule 26 exists on the classpath with the
+ * retained mandatory sections, that the taxonomy table lists all 5 Camada layers, and that the
+ * exit-code table covers codes 0–3.
  */
 @DisplayName("Epic0058Rule26SmokeTest — Rule 26 Audit Gate Lifecycle")
 class Epic0058Rule26SmokeTest {
@@ -22,19 +23,20 @@ class Epic0058Rule26SmokeTest {
     private static final String RULE_26_CLASSPATH =
             "targets/claude/rules/26-audit-gate-lifecycle.md";
 
+    // EPIC-0078 story-0078-0011 slimmed Rule 26: Purpose/Audit/Related sections moved to
+    // governance KP; Naming & Exit Codes split into separate headings; --self-check Flag
+    // renamed to --self-check Contract; taxonomy keywords adapted to compact table form.
     private static final List<String> MANDATORY_SECTIONS =
             List.of(
-                    "## Purpose",
                     "## Taxonomy",
-                    "## Naming & Exit Codes",
-                    "## `--self-check` Flag",
+                    "## Naming Summary",
+                    "## Exit Codes",
+                    "## `--self-check`",
                     "## Catalog-before-Add",
-                    "## Forbidden",
-                    "## Audit",
-                    "## Related");
+                    "## Forbidden");
 
     private static final List<String> TAXONOMY_LAYER_KEYWORDS =
-            List.of("Hook runtime", "CI script", "Java test", "CI workflow");
+            List.of("Local Hooks Preventivos", "CI Script", "Java Test", "CI Workflow");
 
     private static final List<String> EXIT_CODE_ROWS = List.of("| 0 |", "| 1 |", "| 2 |", "| 3 |");
 
@@ -60,7 +62,7 @@ class Epic0058Rule26SmokeTest {
     }
 
     @Test
-    @DisplayName("Rule 26 has all 8 mandatory sections")
+    @DisplayName("Rule 26 has all mandatory sections (slimmed by EPIC-0078)")
     void rule26_hasAllMandatorySections() throws IOException {
         String body = loadRule26();
         for (String section : MANDATORY_SECTIONS) {
@@ -69,7 +71,7 @@ class Epic0058Rule26SmokeTest {
     }
 
     @Test
-    @DisplayName("Rule 26 taxonomy table lists all 4 layers")
+    @DisplayName("Rule 26 taxonomy table lists all 5 Camada layers (EPIC-0061 Camada 0 added)")
     void rule26_taxonomyTableHasFourLayers() throws IOException {
         String body = loadRule26();
         for (String layer : TAXONOMY_LAYER_KEYWORDS) {

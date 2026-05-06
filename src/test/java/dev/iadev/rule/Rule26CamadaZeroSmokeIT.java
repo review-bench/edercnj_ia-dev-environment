@@ -34,13 +34,15 @@ class Rule26CamadaZeroSmokeIT {
     private static final Path ADR_DIR = REPO_ROOT.resolve("docs/adr");
 
     @Test
-    @DisplayName("Rule 26 contains ## Camada 0 section (RULE-006)")
+    @DisplayName("Rule 26 references Camada 0 (Local Hooks Preventivos) in taxonomy")
     void rule26_containsCamadaZeroSection() throws IOException {
+        // EPIC-0078 story-0078-0011 slimmed Rule 26: dedicated ## Camada 0 section moved to KP.
+        // The compact stub retains Camada 0 in the taxonomy table row.
         String content = Files.readString(RULE_26_PATH);
 
         assertThat(content)
-                .as("Rule 26 must have ## Camada 0 — Local Hooks Preventivos section")
-                .contains("## Camada 0 — Local Hooks Preventivos");
+                .as("Rule 26 taxonomy must reference Camada 0 — Local Hooks Preventivos")
+                .contains("Local Hooks Preventivos");
     }
 
     @Test

@@ -248,6 +248,30 @@ class Epic0074DepPolicyValidateSmokeIT {
                         "rules",
                         "27-zero-bypass-lifecycle.md");
 
+        // EPIC-0078 story-0078-0013 slimmed Rules 24/27; full evidence table + 13 surfaces
+        // moved to lifecycle KPs execution-integrity.md and zero-bypass.md.
+        private static final Path EXECUTION_INTEGRITY_KP =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "knowledge",
+                        "lifecycle",
+                        "execution-integrity.md");
+
+        private static final Path ZERO_BYPASS_KP =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "knowledge",
+                        "lifecycle",
+                        "zero-bypass.md");
+
         @Test
         @DisplayName("scenario18_storyImplement_containsDepPolicyValidateSkillCall")
         void scenario18_storyImplement_containsDepPolicyValidateSkillCall() throws Exception {
@@ -275,23 +299,36 @@ class Epic0074DepPolicyValidateSmokeIT {
         @Test
         @DisplayName("scenario20_rule24_includesDepPolicyEvidenceArtifact")
         void scenario20_rule24_includesDepPolicyEvidenceArtifact() throws Exception {
-            String content = Files.readString(RULE_24.toAbsolutePath());
-            assertThat(content)
+            // EPIC-0078 story-0078-0013 slimmed Rule 24: evidence table moved to lifecycle KP.
+            // Rule 24 retains a pointer to the KP; the KP holds the full artifact table.
+            String rule24Content = Files.readString(RULE_24.toAbsolutePath());
+            assertThat(rule24Content)
+                    .as("Rule 24 must reference execution-integrity KP (source of evidence table)")
+                    .contains("execution-integrity.md");
+
+            String kpContent = Files.readString(EXECUTION_INTEGRITY_KP.toAbsolutePath());
+            assertThat(kpContent)
                     .as(
-                            "Rule 24 must register x-validate-dependency-policy as mandatory evidence artifact")
+                            "execution-integrity KP must register x-validate-dependency-policy as mandatory evidence artifact")
                     .contains("x-validate-dependency-policy");
-            assertThat(content)
-                    .as("Rule 24 must reference dep-policy-validation-report artifact path")
+            assertThat(kpContent)
+                    .as("execution-integrity KP must reference dep-policy-validation-report artifact path")
                     .contains("dep-policy-validation-report-STORY-ID.md");
         }
 
         @Test
         @DisplayName("scenario21_rule27_includesSurface13")
         void scenario21_rule27_includesSurface13() throws Exception {
-            String content = Files.readString(RULE_27.toAbsolutePath());
-            assertThat(content).as("Rule 27 must enumerate 13 surfaces").contains("13 surfaces");
-            assertThat(content)
-                    .as("Rule 27 must list dep-policy-validation-report as Surface 13")
+            // EPIC-0078 story-0078-0013 slimmed Rule 27: 13-surfaces table moved to lifecycle KP.
+            // Rule 27 retains a pointer "13 surfaces" in its KP reference line.
+            String rule27Content = Files.readString(RULE_27.toAbsolutePath());
+            assertThat(rule27Content)
+                    .as("Rule 27 must enumerate 13 surfaces (pointer to KP)")
+                    .contains("13 surfaces");
+
+            String kpContent = Files.readString(ZERO_BYPASS_KP.toAbsolutePath());
+            assertThat(kpContent)
+                    .as("zero-bypass KP must list dep-policy-validation-report as Surface 13")
                     .contains("dep-policy-validation-report-STORY-ID.md");
         }
     }
