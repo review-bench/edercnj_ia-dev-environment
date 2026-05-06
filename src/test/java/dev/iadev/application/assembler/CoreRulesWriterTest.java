@@ -159,8 +159,26 @@ class CoreRulesWriterTest {
     class CopyDomainTemplate {
 
         @Test
-        @DisplayName("copies from template when present")
-        void write_whenCalled_copiesFromTemplate(@TempDir Path tempDir) throws IOException {
+        @DisplayName("returns null — 02-domain.md removed by EPIC-0078")
+        void write_whenCalled_returnsNull(@TempDir Path tempDir) throws IOException {
+            Path resourceDir = tempDir.resolve("res");
+            Files.createDirectories(resourceDir);
+            Path rulesDir = tempDir.resolve("rules");
+            Files.createDirectories(rulesDir);
+
+            CoreRulesWriter writer = new CoreRulesWriter(resourceDir);
+            ProjectConfig config = TestConfigBuilder.minimal();
+
+            String path =
+                    writer.copyDomainTemplate(config, rulesDir, new TemplateEngine(), Map.of());
+
+            assertThat(path).isNull();
+            assertThat(rulesDir.resolve("02-domain.md")).doesNotExist();
+        }
+
+        @Test
+        @DisplayName("02-domain.md not created regardless of template presence")
+        void write_withTemplate_stillSkips(@TempDir Path tempDir) throws IOException {
             Path resourceDir = tempDir.resolve("res");
             Path templates = resourceDir.resolve("shared/templates");
             Files.createDirectories(templates);
@@ -176,30 +194,8 @@ class CoreRulesWriterTest {
             String path =
                     writer.copyDomainTemplate(config, rulesDir, new TemplateEngine(), Map.of());
 
-            assertThat(path).contains("02-domain.md");
-            String content =
-                    Files.readString(rulesDir.resolve("02-domain.md"), StandardCharsets.UTF_8);
-            assertThat(content).contains("{DOMAIN_NAME}");
-        }
-
-        @Test
-        @DisplayName("uses fallback when template missing")
-        void write_whenCalled_usesFallback(@TempDir Path tempDir) throws IOException {
-            Path resourceDir = tempDir.resolve("res");
-            Files.createDirectories(resourceDir);
-            Path rulesDir = tempDir.resolve("rules");
-            Files.createDirectories(rulesDir);
-
-            CoreRulesWriter writer = new CoreRulesWriter(resourceDir);
-            ProjectConfig config = TestConfigBuilder.builder().projectName("fallback-proj").build();
-
-            String path =
-                    writer.copyDomainTemplate(config, rulesDir, new TemplateEngine(), Map.of());
-
-            assertThat(path).contains("02-domain.md");
-            String content =
-                    Files.readString(rulesDir.resolve("02-domain.md"), StandardCharsets.UTF_8);
-            assertThat(content).contains("fallback-proj");
+            assertThat(path).isNull();
+            assertThat(rulesDir.resolve("02-domain.md")).doesNotExist();
         }
     }
 

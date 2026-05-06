@@ -32,4 +32,4 @@ Populated at setup time. See `knowledge/coding-standards.md` for language-specif
 
 ## Domain
 
-> Detailed domain rules are in `rules/02-domain.md`. Read it before any domain-related work.
+Document domain-specific rules in `docs/domain.md` within the project (outside the generator scope).
