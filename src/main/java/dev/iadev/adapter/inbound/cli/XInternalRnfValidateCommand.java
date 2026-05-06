@@ -13,7 +13,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 @Command(
-        name = "x-internal-rnf-validate",
+        name = "x-internal-validate-rnf",
         mixinStandardHelpOptions = true,
         description =
                 "Validate RNF no-relax markers and justification gate for override inheritance.")

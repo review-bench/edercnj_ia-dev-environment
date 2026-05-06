@@ -1,0 +1,36 @@
+{
+  "storyId": "story-0077-0029",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-04T15:05:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "smokeTests": {
+    "ran": true,
+    "passed": 4,
+    "failed": 0,
+    "scriptPath": "src/test/bash/audit-flow-version-v5.sh"
+  },
+  "artifactChecks": {
+    "arch-story-0077-0029.md": true,
+    "plan-story-0077-0029.md": true,
+    "tests-story-0077-0029.md": true,
+    "tasks-story-0077-0029.md": true,
+    "security-story-0077-0029.md": true,
+    "compliance-story-0077-0029.md": true
+  },
+  "taskPRs": [
+    { "taskId": "TASK-0077-0029-001", "pr": 957, "status": "MERGED", "branch": "feat/task-0077-0029-001-rule19-flowversion5" },
+    { "taskId": "TASK-0077-0029-002", "pr": 958, "status": "MERGED", "branch": "feat/task-0077-0029-002-audit-flow-version-v5" }
+  ],
+  "ruleCompliance": {
+    "rule19": "OCP satisfied — new flowVersion=5 row additive-only; productFirstLifecycle field registered in fallback matrix",
+    "rule08": "MINOR bump warranted (new recognized flowVersion)",
+    "rule19-backward-compatibility": "All existing flowVersion values 1-4 resolve identically"
+  },
+  "phaseGateResults": [
+    { "phase": "Phase 1", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": [] },
+    { "phase": "Phase 2", "mode": "post", "passed": true, "missingArtifacts": [], "missingTasks": [] },
+    { "phase": "Phase 3", "mode": "final", "passed": true, "missingArtifacts": [], "missingTasks": [] }
+  ]
+}

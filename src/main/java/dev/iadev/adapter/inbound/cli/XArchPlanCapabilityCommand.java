@@ -14,7 +14,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 @Command(
-        name = "x-arch-plan-capability",
+        name = "x-plan-arch-capability",
         mixinStandardHelpOptions = true,
         description = "Generate C4 Container + Component diagrams for a capability.")
 public class XArchPlanCapabilityCommand implements Callable<Integer> {
