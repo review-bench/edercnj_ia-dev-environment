@@ -34,15 +34,18 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     // Public skills that must exist after EPIC-0065
     private static final List<String> EXPECTED_PUBLIC_SKILLS =
-            List.of("x-feature-ideate", "x-feature-create");
+            List.of("x-ideate-feature", "x-create-feature");
 
     // Internal skills that must exist (under x-internal-* naming)
     private static final List<String> EXPECTED_INTERNAL_SKILLS =
-            List.of("x-internal-epic-create", "x-internal-epic-map", "x-internal-story-create");
+            List.of("x-internal-create-epic", "x-internal-map-epic", "x-internal-create-story");
 
-    // Skills that must NOT exist as public skills after EPIC-0065 hard-cut
-    private static final List<String> HARD_CUT_SKILLS =
-            List.of("x-epic-decompose", "x-epic-create", "x-epic-map", "x-story-create");
+    // Skills that must NOT exist as public skills after EPIC-0065 hard-cut.
+    // NOTE: x-epic-create and x-story-create were removed here (EPIC-0077) — both were
+    // re-introduced by EPIC-0077 as Product-First lifecycle skills with narrower responsibilities
+    // (Feature-derived creation only), completely different from the old orchestrators hard-cut
+    // by EPIC-0065. x-epic-map and x-epic-decompose remain hard-cut.
+    private static final List<String> HARD_CUT_SKILLS = List.of("x-epic-decompose", "x-epic-map");
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
@@ -50,7 +53,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
     void smoke_featureIdeateExists(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
-        Path ideateSkill = skillsDir.resolve("x-feature-ideate/SKILL.md");
+        Path ideateSkill = skillsDir.resolve("x-ideate-feature/SKILL.md");
 
         assertThat(Files.isRegularFile(ideateSkill))
                 .as("profile %s: x-feature-ideate/SKILL.md must exist (story-0065-0002)", profile)
@@ -76,7 +79,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
     void smoke_featureCreateExists(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
-        Path createSkill = skillsDir.resolve("x-feature-create/SKILL.md");
+        Path createSkill = skillsDir.resolve("x-create-feature/SKILL.md");
 
         assertThat(Files.isRegularFile(createSkill))
                 .as("profile %s: x-feature-create/SKILL.md must exist (story-0065-0003)", profile)
@@ -92,7 +95,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
                 .as(
                         "profile %s: x-feature-create must declare Phase P7 (CI-watch, Rule 45)",
                         profile)
-                .contains("x-pr-watch-ci");
+                .contains("x-watch-pr-ci");
         assertThat(content)
                 .as("profile %s: x-feature-create must reference docs/ branch", profile)
                 .contains("docs/");
@@ -136,7 +139,7 @@ class Epic0065SmokeIT extends SmokeTestBase {
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
-            "smoke_hardCutSkillsAbsent — 4 removed public skills NOT present (Rule 19 hard-cut)")
+            "smoke_hardCutSkillsAbsent — hard-cut public skills NOT present as public (Rule 19 EPIC-0065)")
     void smoke_hardCutSkillsAbsent(String profile) throws IOException {
         runPipeline(profile);
         Path skillsDir = getOutputDir(profile).resolve(".claude/skills");
@@ -226,14 +229,14 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
         String content = Files.readString(rule22, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-epic-create", profile)
-                .contains("x-internal-epic-create");
+                .as("profile %s: Rule 22 must document x-internal-create-epic", profile)
+                .contains("x-internal-create-epic");
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-epic-map", profile)
-                .contains("x-internal-epic-map");
+                .as("profile %s: Rule 22 must document x-internal-map-epic", profile)
+                .contains("x-internal-map-epic");
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-story-create", profile)
-                .contains("x-internal-story-create");
+                .as("profile %s: Rule 22 must document x-internal-create-story", profile)
+                .contains("x-internal-create-story");
     }
 
     @ParameterizedTest(name = "[{0}]")
@@ -278,20 +281,20 @@ class Epic0065SmokeIT extends SmokeTestBase {
                     .isTrue();
         }
 
-        // x-epic-orchestrate still exists (planning-only, not hard-cut)
-        assertThat(Files.isRegularFile(skillsDir.resolve("x-epic-orchestrate/SKILL.md")))
+        // x-orchestrate-epic still exists (planning-only, not hard-cut)
+        assertThat(Files.isRegularFile(skillsDir.resolve("x-orchestrate-epic/SKILL.md")))
                 .as(
-                        "profile %s: x-epic-orchestrate/SKILL.md must still exist (story-0065-0007, RULE-006)",
+                        "profile %s: x-orchestrate-epic/SKILL.md must still exist (story-0065-0007, RULE-006)",
                         profile)
                 .isTrue();
 
-        // x-epic-orchestrate SKILL.md must warn about not creating epic/stories
+        // x-orchestrate-epic SKILL.md must warn about not creating epic/stories
         String orchContent =
                 Files.readString(
-                        skillsDir.resolve("x-epic-orchestrate/SKILL.md"), StandardCharsets.UTF_8);
+                        skillsDir.resolve("x-orchestrate-epic/SKILL.md"), StandardCharsets.UTF_8);
         assertThat(orchContent)
                 .as(
-                        "profile %s: x-epic-orchestrate must warn it does NOT create epic/stories (story-0065-0007)",
+                        "profile %s: x-orchestrate-epic must warn it does NOT create epic/stories (story-0065-0007)",
                         profile)
                 .contains("NÃO cria épico nem stories");
     }

@@ -22,7 +22,16 @@ class GovernanceTest {
         void ctor_allFields_allSet() {
             Set<Platform> platforms = Set.of(Platform.CLAUDE_CODE);
 
-            Governance gov = new Governance("pci-dss", platforms, BranchingModel.TRUNK, false);
+            Governance gov =
+                    new Governance(
+                            "pci-dss",
+                            platforms,
+                            BranchingModel.TRUNK,
+                            false,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.compliance()).isEqualTo("pci-dss");
             assertThat(gov.platforms()).containsExactly(Platform.CLAUDE_CODE);
@@ -33,7 +42,16 @@ class GovernanceTest {
         @Test
         @DisplayName("null platforms coerces to empty set")
         void ctor_nullPlatforms_emptySet() {
-            Governance gov = new Governance("none", null, BranchingModel.GITFLOW, true);
+            Governance gov =
+                    new Governance(
+                            "none",
+                            null,
+                            BranchingModel.GITFLOW,
+                            true,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.platforms()).isEmpty();
         }
@@ -41,7 +59,16 @@ class GovernanceTest {
         @Test
         @DisplayName("null branchingModel defaults to GITFLOW")
         void ctor_nullBranchingModel_defaultsGitFlow() {
-            Governance gov = new Governance("none", Set.of(), null, true);
+            Governance gov =
+                    new Governance(
+                            "none",
+                            Set.of(),
+                            null,
+                            true,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThat(gov.branchingModel()).isEqualTo(BranchingModel.GITFLOW);
         }
@@ -52,7 +79,16 @@ class GovernanceTest {
             Set<Platform> mutable = new HashSet<>();
             mutable.add(Platform.CLAUDE_CODE);
 
-            Governance gov = new Governance("none", mutable, BranchingModel.GITFLOW, true);
+            Governance gov =
+                    new Governance(
+                            "none",
+                            mutable,
+                            BranchingModel.GITFLOW,
+                            true,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             mutable.add(Platform.SHARED);
 
@@ -64,7 +100,14 @@ class GovernanceTest {
         void ctor_returnedPlatforms_isUnmodifiable() {
             Governance gov =
                     new Governance(
-                            "none", Set.of(Platform.CLAUDE_CODE), BranchingModel.GITFLOW, true);
+                            "none",
+                            Set.of(Platform.CLAUDE_CODE),
+                            BranchingModel.GITFLOW,
+                            true,
+                            DocumentationConfig.DEFAULT,
+                            QualityConfig.DEFAULT,
+                            DependencyPolicyConfig.DEFAULT,
+                            AiMemoryConfig.DEFAULT);
 
             assertThatThrownBy(() -> gov.platforms().add(Platform.SHARED))
                     .isInstanceOf(UnsupportedOperationException.class);

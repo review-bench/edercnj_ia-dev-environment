@@ -42,7 +42,7 @@ Orchestrates Git Flow release with approval gate and PR-flow.
 | 2 | VALIDATE_DEEP | 8 checks (tests, coverage, golden, consistency) | -- |
 | 3 | BRANCH | Create release/* or hotfix/* | -- |
 | 4 | UPDATE | Update version in pom.xml etc. | -- |
-| 5 | CHANGELOG | Delegate to x-release-changelog | -- |
+| 5 | CHANGELOG | Delegate to x-generate-release-changelog | -- |
 | 6 | COMMIT | Create release commit | -- |
 | 7 | OPEN_RELEASE_PR | gh pr create --base main | -- |
 | **8** | **APPROVAL_GATE** | **Persist state, halt** | **HUMAN** |
@@ -70,6 +70,6 @@ See `references/state-file-schema.md` for the full schema.
 
 ## See Also
 
-- `x-release-changelog` -- invoked in Phase 5
-- `x-git-push` -- Conventional Commits reference
+- `x-generate-release-changelog` -- invoked in Phase 5
+- `x-push-branch` -- Conventional Commits reference
 - `x-review-pr` -- optional integration in Phase 7

@@ -1,0 +1,25 @@
+id: quality.performance.socket
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  WebSocket / raw socket performance gate — runs k6 WebSocket scenario to validate
+  connection latency and message throughput. Invoked by /x-test-performance when
+  interfaces[].type = websocket.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [k6]
+    default: k6
+  slo:
+    connect_p95_ms:
+      type: integer
+      default: 200
+    message_p95_ms:
+      type: integer
+      default: 100

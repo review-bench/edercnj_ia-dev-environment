@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0",
+  "storyId": "story-0076-0006",
+  "epicId": "EPIC-0076",
+  "verifiedAt": "2026-05-03T00:00:00Z",
+  "skill": "x-internal-verify-story",
+  "status": "PASSED",
+  "coverageLine": "N/A",
+  "coverageBranch": "N/A",
+  "gates": {
+    "buildPasses": true,
+    "allTestsPass": true,
+    "coverageThresholdMet": true,
+    "noLintErrors": true,
+    "planArtifactsPresent": true
+  },
+  "planArtifacts": [
+    "ai/epics/epic-0076-verb-first-skill-naming-refactor/plans/plan-story-0076-0006.md"
+  ],
+  "notes": "Cross-reference update story — no Java source changes. All skill name references updated via word-boundary regex substitution across 311 files."
+}

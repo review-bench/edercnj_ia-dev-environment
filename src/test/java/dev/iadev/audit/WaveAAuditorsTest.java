@@ -150,11 +150,11 @@ class WaveAAuditorsTest {
 
         @Test
         void bypassFlagInRecovery_returnsOk() throws IOException {
-            Path skillDir = tempDir.resolve("x-story-implement");
+            Path skillDir = tempDir.resolve("x-implement-story");
             writeSkill(
                     skillDir,
                     "SKILL.md",
-                    "---\nname: x-story-implement\n---\n## Phase 2\n\nNormal flow.\n\n## Recovery\n\nUse --no-ci-watch here.\n");
+                    "---\nname: x-implement-story\n---\n## Phase 2\n\nNormal flow.\n\n## Recovery\n\nUse --no-ci-watch here.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
             AuditResult result = auditor.audit(corpus);
@@ -306,11 +306,11 @@ class WaveAAuditorsTest {
 
         @Test
         void orchestratorWithXStoryImplement_isDetected() throws IOException {
-            Path skillDir = tempDir.resolve("x-story-implement");
+            Path skillDir = tempDir.resolve("x-implement-story");
             writeSkill(
                     skillDir,
                     "SKILL.md",
-                    "---\nname: x-story-implement\n---\n"
+                    "---\nname: x-implement-story\n---\n"
                             + "## Phase 1 - Plan\n\nTaskCreate(subject: \"p1\")\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -594,7 +594,7 @@ class WaveAAuditorsTest {
             writeSkill(
                     skillDir,
                     "SKILL.md",
-                    "---\nname: x-epic-th-multi\n---\nx-story-implement\n"
+                    "---\nname: x-epic-th-multi\n---\nx-implement-story\n"
                             + "## Phase 1\n\nTaskCreate(subject: \"Phase 1\")\n"
                             + "## Phase 2\n\nNo task create here.\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
@@ -607,12 +607,12 @@ class WaveAAuditorsTest {
 
         @Test
         void xTaskImplementReference_isOrchestrator() throws IOException {
-            // Skill referencing x-task-implement is treated as orchestrator
+            // Skill referencing x-implement-task is treated as orchestrator
             Path skillDir = tempDir.resolve("x-epic-taskimpl");
             writeSkill(
                     skillDir,
                     "SKILL.md",
-                    "---\nname: x-epic-taskimpl\n---\nx-task-implement\n"
+                    "---\nname: x-epic-taskimpl\n---\nx-implement-task\n"
                             + "## Phase 1\n\nTaskCreate(subject: \"Phase 1\")\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);
 
@@ -645,7 +645,7 @@ class WaveAAuditorsTest {
             writeSkill(
                     skillDir,
                     "SKILL.md",
-                    "---\nname: x-epic-firstnotask\n---\nx-story-implement\n"
+                    "---\nname: x-epic-firstnotask\n---\nx-implement-story\n"
                             + "## Phase 1\n\nNo task here.\n"
                             + "## Phase 2\n\nTaskCreate(subject: \"Phase 2\")\n");
             AuditCorpus corpus = new AuditCorpus(tempDir);

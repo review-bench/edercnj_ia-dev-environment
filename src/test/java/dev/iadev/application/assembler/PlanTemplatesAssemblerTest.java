@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for PlanTemplatesAssembler -- copies 23 planning and review templates to
+ * Tests for PlanTemplatesAssembler -- copies 28 planning and review templates to
  * .claude/templates/.
  *
- * <p>TPP order: degenerate (empty source) -> constant (single template) -> collection (all 23) ->
+ * <p>TPP order: degenerate (empty source) -> constant (single template) -> collection (all 28) ->
  * conditional (section validation) -> error (missing template).
  */
 @DisplayName("PlanTemplatesAssembler")
@@ -49,7 +49,12 @@ class PlanTemplatesAssemblerTest {
                     "_TEMPLATE-STORY.md",
                     "_TEMPLATE-IMPLEMENTATION-MAP.md",
                     "_TEMPLATE-PR-BACKLOG.md",
-                    "_TEMPLATE-PR-IMPLEMENTATION.md");
+                    "_TEMPLATE-PR-IMPLEMENTATION.md",
+                    "_TEMPLATE-PERFORMANCE-PLAN.md",
+                    "_TEMPLATE-MUTATION-PLAN.md",
+                    "_TEMPLATE-CONTRACT-PLAN.md",
+                    "_TEMPLATE-DEP-POLICY-REPORT.md",
+                    "_TEMPLATE-DEP-POLICY-DECLARATION.md");
 
     @Nested
     @DisplayName("implements Assembler interface")
@@ -68,15 +73,15 @@ class PlanTemplatesAssemblerTest {
     class ConstantsValidation {
 
         @Test
-        @DisplayName("TEMPLATE_COUNT equals 23")
-        void templateCount_equals23() {
-            assertThat(PlanTemplatesAssembler.TEMPLATE_COUNT).isEqualTo(23);
+        @DisplayName("TEMPLATE_COUNT equals 28")
+        void templateCount_equals26() {
+            assertThat(PlanTemplatesAssembler.TEMPLATE_COUNT).isEqualTo(28);
         }
 
         @Test
-        @DisplayName("TEMPLATE_SECTIONS has exactly 23" + " entries")
-        void templateSections_has23Entries() {
-            assertThat(PlanTemplatesAssembler.TEMPLATE_SECTIONS).hasSize(23);
+        @DisplayName("TEMPLATE_SECTIONS has exactly 27" + " entries")
+        void templateSections_has26Entries() {
+            assertThat(PlanTemplatesAssembler.TEMPLATE_SECTIONS).hasSize(28);
         }
 
         @Test
@@ -123,8 +128,8 @@ class PlanTemplatesAssemblerTest {
     class HappyPath {
 
         @Test
-        @DisplayName("copies 23 templates to .claude/templates/")
-        void assemble_allValid_copies23Files(@TempDir Path tempDir) throws IOException {
+        @DisplayName("copies 28 templates to .claude/templates/")
+        void assemble_allValid_copies27Files(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -135,12 +140,12 @@ class PlanTemplatesAssemblerTest {
             AssemblerResult result =
                     assembler.assembleWithResult(config, new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(23);
+            assertThat(result.files()).hasSize(28);
             assertThat(result.warnings()).isEmpty();
         }
 
         @Test
-        @DisplayName("all 23 templates exist in" + " .claude/templates/")
+        @DisplayName("all 28 templates exist in" + " .claude/templates/")
         void assemble_allValid_existsInClaude(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
@@ -245,7 +250,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(22);
+            assertThat(result.files()).hasSize(27);
             assertThat(result.warnings())
                     .anyMatch(w -> w.contains("_TEMPLATE-TEST-PLAN.md"))
                     .anyMatch(w -> w.contains("Missing mandatory section"));
@@ -272,7 +277,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(22);
+            assertThat(result.files()).hasSize(27);
 
             assertThat(
                             outputDir.resolve(
@@ -303,7 +308,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assembleWithResult(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(result.files()).hasSize(22);
+            assertThat(result.files()).hasSize(27);
             assertThat(result.warnings())
                     .anyMatch(w -> w.contains("Template not found"))
                     .anyMatch(w -> w.contains("_TEMPLATE-ARCHITECTURE" + "-PLAN.md"));
@@ -353,7 +358,7 @@ class PlanTemplatesAssemblerTest {
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
             assertThat(result).isNotNull();
-            assertThat(result.files()).hasSize(23);
+            assertThat(result.files()).hasSize(28);
             assertThat(result.warnings()).isEmpty();
         }
     }
@@ -363,8 +368,8 @@ class PlanTemplatesAssemblerTest {
     class AssembleFileList {
 
         @Test
-        @DisplayName("assemble returns 23 file paths")
-        void assemble_allValid_returns23Paths(@TempDir Path tempDir) throws IOException {
+        @DisplayName("assemble returns 28 file paths")
+        void assemble_allValid_returns27Paths(@TempDir Path tempDir) throws IOException {
             Path resourcesDir = setupAllTemplates(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -374,7 +379,7 @@ class PlanTemplatesAssemblerTest {
                     assembler.assemble(
                             TestConfigBuilder.minimal(), new TemplateEngine(), outputDir);
 
-            assertThat(files).hasSize(23);
+            assertThat(files).hasSize(28);
         }
 
         @Test
@@ -397,7 +402,7 @@ class PlanTemplatesAssemblerTest {
     // -- Helpers ------------------------------------------------
 
     /**
-     * Creates all 23 templates with valid mandatory sections in {tempDir}/res/shared/templates/.
+     * Creates all 28 templates with valid mandatory sections in {tempDir}/res/shared/templates/.
      */
     private static Path setupAllTemplates(Path tempDir) throws IOException {
         Path resourcesDir = tempDir.resolve("res");
@@ -687,15 +692,15 @@ class PlanTemplatesAssemblerTest {
                 buildContent(
                         "Epic",
                         List.of(
-                                "1. Contexto & Escopo",
-                                "2. Packages (Hexagonal)",
-                                "3. Contratos & Endpoints",
-                                "4. Materialização SOLID",
-                                "5. Quality Gates",
-                                "6. Segurança",
-                                "7. Observabilidade",
-                                "8. Decision Rationale",
-                                "9. Dependências" + " & File Footprint"),
+                                "1. Visão & Problema",
+                                "2. Persona & Stakeholders",
+                                "3. Hipótese & OKRs",
+                                "4. Alternativas Consideradas",
+                                "5. Escopo",
+                                "6. Riscos",
+                                "7. Índice de Histórias",
+                                "8. Quality Gates",
+                                "Refinement Verdict"),
                         false));
 
         writeTemplate(
@@ -704,15 +709,15 @@ class PlanTemplatesAssemblerTest {
                 buildContent(
                         "Story",
                         List.of(
-                                "1. Contexto & Escopo",
-                                "2. Packages (Hexagonal)",
-                                "3. Contratos & Endpoints",
-                                "4. Materialização SOLID",
-                                "5. Quality Gates",
-                                "6. Segurança",
-                                "7. Observabilidade",
+                                "1. Visão",
+                                "2. Persona & Cenário",
+                                "3. Entrega de Valor",
+                                "4. AC (Gherkin — 4 categorias mandatórias)",
+                                "5. Contratos",
+                                "6. Tasks",
+                                "7. Dependências",
                                 "8. Decision Rationale",
-                                "9. Dependências" + " & File Footprint"),
+                                "9. Refinement Verdict"),
                         false));
 
         writeTemplate(
@@ -761,6 +766,84 @@ class PlanTemplatesAssemblerTest {
                                 "Telemetry",
                                 "Changes",
                                 "Orchestrator Evidence"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-PERFORMANCE-PLAN.md",
+                buildContent(
+                        "Performance Plan",
+                        List.of(
+                                "Header",
+                                "Summary",
+                                "Load Scenarios",
+                                "Results per Endpoint",
+                                "Baseline Comparison",
+                                "Tooling",
+                                "Risks and Gaps",
+                                "Recommended Action"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-MUTATION-PLAN.md",
+                buildContent(
+                        "Mutation Plan",
+                        List.of(
+                                "Header",
+                                "Summary",
+                                "Scope",
+                                "Surviving Mutants",
+                                "Configuration",
+                                "Tooling",
+                                "Risks and Gaps",
+                                "Recommended Action"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-CONTRACT-PLAN.md",
+                buildContent(
+                        "Contract Plan",
+                        List.of(
+                                "Header",
+                                "Summary",
+                                "Changes Detected",
+                                "CHANGELOG Integration",
+                                "Tooling",
+                                "Risks and Gaps",
+                                "Recommended Action"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-DEP-POLICY-REPORT.md",
+                buildContent(
+                        "Dep Policy Report",
+                        List.of(
+                                "Header",
+                                "Summary",
+                                "Blocking Violations",
+                                "Warning Violations",
+                                "Suppressed",
+                                "Policy Snapshot",
+                                "Tooling"),
+                        false));
+
+        writeTemplate(
+                templateDir,
+                "_TEMPLATE-DEP-POLICY-DECLARATION.md",
+                buildContent(
+                        "Dep Policy Declaration",
+                        List.of(
+                                "Policy Status",
+                                "Enforcement Matrix",
+                                "Scope Policy",
+                                "Denied CVEs",
+                                "License Whitelist",
+                                "Version Constraints",
+                                "YAML Configuration Reference",
+                                "Validation"),
                         false));
 
         return resourcesDir;

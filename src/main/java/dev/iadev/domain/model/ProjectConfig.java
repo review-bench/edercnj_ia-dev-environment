@@ -58,7 +58,15 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
         this(
                 new CoreStack(project, architecture, interfaces, language, framework),
                 new TechStack(data, infrastructure, security, testing, mcp),
-                new Governance(compliance, platforms, branchingModel, telemetryEnabled));
+                new Governance(
+                        compliance,
+                        platforms,
+                        branchingModel,
+                        telemetryEnabled,
+                        DocumentationConfig.DEFAULT,
+                        QualityConfig.DEFAULT,
+                        DependencyPolicyConfig.DEFAULT,
+                        AiMemoryConfig.DEFAULT));
     }
 
     /**
@@ -152,6 +160,14 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
 
     public boolean telemetryEnabled() {
         return governance.telemetryEnabled();
+    }
+
+    public DocumentationConfig documentation() {
+        return governance.documentation();
+    }
+
+    public QualityConfig quality() {
+        return governance.quality();
     }
 
     // --- Convenience accessors (Law of Demeter) ---
@@ -304,5 +320,43 @@ public record ProjectConfig(CoreStack core, TechStack tech, Governance governanc
     /** Delegates to {@link PlatformParser} for parsing the optional {@code platform} YAML field. */
     static Set<Platform> parsePlatforms(Map<String, Object> map) {
         return PlatformParser.parse(map);
+    }
+
+    /**
+     * Parses the optional {@code documentation} block.
+     *
+     * <p>Defaults to {@link DocumentationConfig#DEFAULT} (auto-detect, zero freshness window) when
+     * the {@code documentation} section is absent. Introduced by EPIC-0071 story-0071-0001.
+     *
+     * @param map the root config map
+     * @return the parsed DocumentationConfig, never null
+     */
+    static DocumentationConfig parseDocumentation(Map<String, Object> map) {
+        return DocumentationConfig.fromMap(MapHelper.optionalMap(map, "documentation"));
+    }
+
+    static QualityConfig parseQuality(Map<String, Object> map) {
+        return QualityConfig.fromMap(MapHelper.optionalMap(map, "quality"));
+    }
+
+    public DependencyPolicyConfig dependencyPolicy() {
+        return governance.dependencyPolicy();
+    }
+
+    @SuppressWarnings("unchecked")
+    static DependencyPolicyConfig parseDependencyPolicy(Map<String, Object> map) {
+        Map<String, Object> deps = MapHelper.optionalMap(map, "dependencies");
+        Map<String, Object> policy = MapHelper.optionalMap(deps, "policy");
+        return DependencyPolicyConfig.fromMap(policy);
+    }
+
+    public AiMemoryConfig aiMemory() {
+        return governance.aiMemory();
+    }
+
+    static AiMemoryConfig parseAiMemory(Map<String, Object> map) {
+        Map<String, Object> governance = MapHelper.optionalMap(map, "governance");
+        Map<String, Object> aiMemory = MapHelper.optionalMap(governance, "ai-memory");
+        return AiMemoryConfig.fromMap(aiMemory);
     }
 }

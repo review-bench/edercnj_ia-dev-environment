@@ -1,0 +1,498 @@
+{
+  "schemaVersion": "1.0",
+  "flowVersion": "5",
+  "productFirstLifecycle": true,
+  "epicId": "EPIC-0077",
+  "epicTitle": "Product-First Lifecycle & Planning C4 Model",
+  "epicBranch": "epic/0077",
+  "createdAt": "2026-04-29T00:00:00Z",
+  "lastRefinementAt": "2026-05-04T12:00:00Z",
+  "status": "Em Andamento",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "storyStatuses": {
+    "story-0077-0029": {
+      "status": "done",
+      "phase": "Phase 0",
+      "predecessors": [],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9cac820ee34957768473a92ec4ef069b3a1e3a32b0dbe357b3f944780291b6df"
+      }
+    },
+    "story-0077-0000": {
+      "status": "done",
+      "phase": "Phase 0",
+      "predecessors": [
+        "story-0077-0029"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b7942067964705de39c7bedb46158a308676048c999f468834f57d1ee5aa8b54"
+      }
+    },
+    "story-0077-0001": {
+      "status": "done",
+      "phase": "Phase 0",
+      "predecessors": [
+        "story-0077-0000"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "fda747d318f7da99a5895a8f5096c60e8504d500032513925afab4f2ffce4af2"
+      }
+    },
+    "story-0077-0002": {
+      "status": "done",
+      "phase": "Phase 1",
+      "predecessors": [
+        "story-0077-0001"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "5426aa74b564d38b74be3710eb836716fcc2536b441c07872ecbf6170adaa84a"
+      }
+    },
+    "story-0077-0003": {
+      "status": "done",
+      "phase": "Phase 1",
+      "predecessors": [
+        "story-0077-0002"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "74116f292412d69f19bdd988e7f47293f1a0813c22bb67d2234d6e24fe219eb4"
+      }
+    },
+    "story-0077-0004": {
+      "status": "Concluída",
+      "phase": "Phase 1",
+      "predecessors": [
+        "story-0077-0003"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b78a4d3c3ca2d9d8af0f2774e2620e3169ec6aaa0659f01905190e9ebfb2f6bc"
+      }
+    },
+    "story-0077-0005": {
+      "status": "Concluída",
+      "phase": "Phase 2",
+      "predecessors": [
+        "story-0077-0004"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9f154292ded2d3ac8407f577b505507066ec066127476cc2f13b21654b4a1211"
+      }
+    },
+    "story-0077-0006": "Concluída",
+    "story-0077-0007": "Concluída",
+    "story-0077-0008": "Concluída",
+    "story-0077-0009": "Concluída",
+    "story-0077-0010": {
+      "status": "Concluída",
+      "phase": "Phase 3",
+      "predecessors": [
+        "story-0077-0009"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3b70298d50f7c5aa5eab06febc478fb2069e36348b5b101ab650c761cf16acbf"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        992,
+        993,
+        994,
+        995
+      ]
+    },
+    "story-0077-0011": {
+      "status": "Concluída",
+      "phase": "Phase 4",
+      "predecessors": [
+        "story-0077-0010"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "cdac7143b482cf676ac8ccceef6cc25602ec550dbbca1b7e29bbf851f8b9e544"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        996,
+        997,
+        998,
+        999
+      ]
+    },
+    "story-0077-0012": {
+      "status": "Concluída",
+      "phase": "Phase 4",
+      "predecessors": [
+        "story-0077-0011"
+      ],
+      "refinementVerdict": {
+        "status": "rejected",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "558f240662858f93c6f4cbac9c9a8503d938f38f9178cd39183a7eca593c42c1",
+        "blockers": [
+          "ac: missing performance/SLA and security/auth Gherkin scenarios",
+          "metrics: §7.2 SLO column empty; no measurable latency target with unit"
+        ]
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1018,
+        1019,
+        1020
+      ]
+    },
+    "story-0077-0013": {
+      "status": "Concluída",
+      "phase": "Phase 4",
+      "predecessors": [
+        "story-0077-0012"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-05-05T17:00:00Z",
+        "verdictHash": "98403a48a9a59620d51770ecf8a6a8408f740c891a1af8b0e7615c955adf5807",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      },
+      "completedAt": "2026-05-05T18:00:00Z"
+    },
+    "story-0077-0014": {
+      "status": "Concluída",
+      "phase": "Phase 4",
+      "predecessors": [
+        "story-0077-0013"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "38a5f82ed26dd804e486c2f4c1b3188a7f9c15e463952f0cd634789738dbfffc"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1000,
+        1001,
+        1002,
+        1003
+      ]
+    },
+    "story-0077-0015": {
+      "status": "Concluída",
+      "phase": "Phase 4",
+      "predecessors": [
+        "story-0077-0014"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "c062f735e336e4b41070ba7618fae40902904c5895e983bfc779a518e8d0109e"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1004,
+        1005,
+        1006
+      ]
+    },
+    "story-0077-0016": {
+      "status": "Concluída",
+      "phase": "Phase 5",
+      "predecessors": [
+        "story-0077-0015"
+      ],
+      "completedAt": "2026-05-05T14:30:00Z",
+      "prNumbers": [
+        1007,
+        1008,
+        1009
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "1603762f0044dd4e95cd84631a8ecba9def071a9764e1f0a22aa677448a1bbf9"
+      }
+    },
+    "story-0077-0017": {
+      "status": "Concluída",
+      "phase": "Phase 5",
+      "predecessors": [
+        "story-0077-0016"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "b1ddc3afc6dbb181c7d43a35457c688b3e7cb1b296d675c9461d6ce49d751c5a"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1010,
+        1011,
+        1012
+      ]
+    },
+    "story-0077-0018": {
+      "status": "Concluída",
+      "phase": "Phase 5",
+      "predecessors": [
+        "story-0077-0017"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "5211195f880a984cf24afd7d0e817f180ff101da934247a7060eaabd67986c42"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1013,
+        1014,
+        1015
+      ]
+    },
+    "story-0077-0019": {
+      "status": "Concluída",
+      "phase": "Phase 5",
+      "predecessors": [
+        "story-0077-0018"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "456665535e1892a78d55df132058d788704ea2239785e44e8751a1213543eeb9"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1016,
+        1017
+      ]
+    },
+    "story-0077-0020": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0019"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3a76ea1ec0157fb6b6fd3fd809395b15870922f86c03c15110b5387de91f63c4"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1021
+      ]
+    },
+    "story-0077-0021": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0020"
+      ],
+      "completedAt": "2026-05-05T14:00:00Z",
+      "prNumbers": [
+        1022,
+        1023,
+        1024,
+        1025
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "666816f96ffa23e95380e7f4b72c55c6fcea21a147a17751497cef36b5708bca"
+      }
+    },
+    "story-0077-0022": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0021"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "238f0718758151ad260c36fe2931e378904b96300d8c86cf9af7d3b538baa12b"
+      },
+      "completedAt": "2026-05-05T18:00:00Z",
+      "prNumbers": [
+        1028,
+        1029,
+        1030
+      ]
+    },
+    "story-0077-0023": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0022"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "3c782f4e90cda740b3324ba77c838070529de8430d8e78ddeb1d40564e4c6b31"
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1035]
+    },
+    "story-0077-0024": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0023"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "9806799a80c1414639a34954eb78aa0c79059577912e49e07097baaa1ec68eb6"
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1036]
+    },
+    "story-0077-0025": {
+      "status": "Concluída",
+      "phase": "Phase 6",
+      "predecessors": [
+        "story-0077-0024"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "e1ace86fc597fe654875694dcdbc4ea410316d30893b5f01dee254c47fd55f8d"
+      },
+      "completedAt": "2026-05-05T19:00:00Z",
+      "prNumbers": [1037]
+    },
+    "story-0077-0026": {
+      "status": "Concluída",
+      "phase": "Phase 7",
+      "predecessors": [
+        "story-0077-0025"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "79cd65dda6d6bd8ef35053bb7e9ab50d51628c114e84145f396ac73c5384a70f"
+      },
+      "completedAt": "2026-05-05T19:15:00Z",
+      "prNumbers": [1038]
+    },
+    "story-0077-0027": {
+      "status": "Concluída",
+      "phase": "Phase 7",
+      "predecessors": [
+        "story-0077-0026"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "15565dcb3b3d358e800b8fa6b81292fb5b7d74f493d937e2a76f4fdad87dbe47"
+      },
+      "completedAt": "2026-05-05T19:30:00Z",
+      "prNumbers": [1039]
+    },
+    "story-0077-0028": {
+      "status": "Concluída",
+      "phase": "Phase 7",
+      "predecessors": [
+        "story-0077-0027"
+      ],
+      "refinementVerdict": {
+        "status": "approved",
+        "checkedAt": "2026-05-04T12:00:00Z",
+        "verdictHash": "a577508b40c580b2218f3fe1f00a71006510a8ff9e441b26bc768fb9ae0997cb"
+      },
+      "completedAt": "2026-05-05T19:45:00Z",
+      "prNumbers": [1040]
+    }
+  },
+  "totalStories": 30,
+  "documents": {
+    "epic": "ai/epics/epic-0077-product-first-lifecycle/epic-0077-product-first-lifecycle.md",
+    "implementationMap": "ai/epics/epic-0077-product-first-lifecycle/IMPLEMENTATION-MAP.md"
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-05-04T12:00:00Z",
+    "verdictHash": "e6d2c1793cbf329cfbbc62697d6c3f5d531e74510b67513a15fb0b2059b4e8d1",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": [],
+    "verdictRationale": "O épico tem todas as 7 dimensões de refinamento aprovadas. A adição de story-0077-0029 resolve o bloqueador original: flowVersion '5' agora tem uma story dedicada à sua inscrição no fallback matrix da Rule 19. A nomenclatura de skills (RULE-010, DR-005) está explicitamente tratada. As preocupações de OAuth2/Redis/audit sink são controles de segurança legítimos para um CLI enterprise multi-tenant e serão revisados durante a refinement individual de stories 0007–0010 e 0023."
+  }
+}

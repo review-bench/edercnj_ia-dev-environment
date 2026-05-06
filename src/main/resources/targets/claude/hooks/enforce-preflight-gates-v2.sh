@@ -33,8 +33,8 @@
 #
 # Merge bypass vectors:
 #   - gh pr merge --rebase --admin (combined flags)
-#   - Skill x-pr-merge (merging PRs without review)
-#   - Skill x-pr-merge-train (merge train bypass)
+#   - Skill x-merge-pr (merging PRs without review)
+#   - Skill x-manage-pr-merge-train (merge train bypass)
 #
 # Note on gh pr close: handled in warn-mode (exit 0 + WARNING) per §Decision Rationale
 # (PREFLIGHT_PHASE rollout: warn before blocking to calibrate false positives)
@@ -204,35 +204,35 @@ if [ "$TOOL_NAME" = "Bash" ] && [ -n "$CMD" ]; then
     if echo "$CMD" | grep -qE 'mvn\b.*-DskipTests(=true)?(\s|$)'; then
         DETECTED_VECTOR="mvn-skipTests"
         DETECTED_DETAIL="mvn -DskipTests bypasses the test execution quality gate"
-        DETECTED_ALTERNATIVE="invoke /x-test-run for scoped test execution"
+        DETECTED_ALTERNATIVE="invoke /x-execute-tests for scoped test execution"
     fi
 
     # Vector: mvn-skipITs
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE 'mvn\b.*-DskipITs(=true)?(\s|$)'; then
         DETECTED_VECTOR="mvn-skipITs"
         DETECTED_DETAIL="mvn -DskipITs skips integration tests — bypasses Camada 0 gate"
-        DETECTED_ALTERNATIVE="run integration tests via /x-test-e2e"
+        DETECTED_ALTERNATIVE="run integration tests via /x-execute-e2e-tests"
     fi
 
     # Vector: mvn-spotlessSkip
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE 'mvn\b.*-Dspotless\.check\.skip=true'; then
         DETECTED_VECTOR="mvn-spotlessSkip"
         DETECTED_DETAIL="skipping Spotless check bypasses the format quality gate"
-        DETECTED_ALTERNATIVE="fix formatting via /x-code-format before committing"
+        DETECTED_ALTERNATIVE="fix formatting via /x-format-code before committing"
     fi
 
     # Vector: mvn-testSkip
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE 'mvn\b.*-Dmaven\.test\.skip=true'; then
         DETECTED_VECTOR="mvn-testSkip"
         DETECTED_DETAIL="mvn -Dmaven.test.skip=true disables all tests — bypasses quality gate"
-        DETECTED_ALTERNATIVE="invoke /x-test-run for scoped test execution"
+        DETECTED_ALTERNATIVE="invoke /x-execute-tests for scoped test execution"
     fi
 
     # Vector: mvn-noTestsProfile
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE 'mvn\b.*-Pno-tests(\s|$)'; then
         DETECTED_VECTOR="mvn-noTestsProfile"
         DETECTED_DETAIL="mvn -Pno-tests activates a test-bypass profile — prohibited"
-        DETECTED_ALTERNATIVE="remove -Pno-tests and run tests via /x-test-run"
+        DETECTED_ALTERNATIVE="remove -Pno-tests and run tests via /x-execute-tests"
     fi
 
     # ── Commit bypass vectors ────────────────────────────────────────────────
@@ -241,7 +241,7 @@ if [ "$TOOL_NAME" = "Bash" ] && [ -n "$CMD" ]; then
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE '^\s*git commit\s.*--amend'; then
         DETECTED_VECTOR="git-amend-pushed"
         DETECTED_DETAIL="git commit --amend may rewrite pushed history — prohibited"
-        DETECTED_ALTERNATIVE="create a new commit with the fix and use /x-git-commit"
+        DETECTED_ALTERNATIVE="create a new commit with the fix and use /x-commit-changes"
     fi
 
     # Vector: git-rebase-skip
@@ -299,7 +299,7 @@ if [ "$TOOL_NAME" = "Bash" ] && [ -n "$CMD" ]; then
     if [ -z "$DETECTED_VECTOR" ] && echo "$CMD" | grep -qE '^\s*gh pr merge\b.*--rebase\b.*--admin\b'; then
         DETECTED_VECTOR="gh-pr-merge-rebase-admin"
         DETECTED_DETAIL="combining --rebase and --admin bypasses review and approval"
-        DETECTED_ALTERNATIVE="use standard PR merge via /x-pr-merge without --admin"
+        DETECTED_ALTERNATIVE="use standard PR merge via /x-merge-pr without --admin"
     fi
 
     # Vector: gh-pr-close-merged (warn-mode: log but allow in phase=warn)
@@ -316,7 +316,7 @@ if [ "$TOOL_NAME" = "Bash" ] && [ -n "$CMD" ]; then
         # In block mode: treat as bypass
         DETECTED_VECTOR="gh-pr-close-merged"
         DETECTED_DETAIL="closing a PR may conceal a merged-PR revert"
-        DETECTED_ALTERNATIVE="verify the PR status and use /x-pr-merge for standard merge flow"
+        DETECTED_ALTERNATIVE="verify the PR status and use /x-merge-pr for standard merge flow"
     fi
 
 fi
@@ -326,17 +326,17 @@ fi
 if [ "$TOOL_NAME" = "Skill" ] && [ -n "$SKILL_NAME" ]; then
 
     # Vector: skill-x-pr-merge (direct skill invocation bypassing CI watch)
-    if [ -z "$DETECTED_VECTOR" ] && [ "$SKILL_NAME" = "x-pr-merge" ]; then
+    if [ -z "$DETECTED_VECTOR" ] && [ "$SKILL_NAME" = "x-merge-pr" ]; then
         DETECTED_VECTOR="skill-x-pr-merge"
-        DETECTED_DETAIL="x-pr-merge invoked directly — bypasses CI-watch gate (Rule 45)"
-        DETECTED_ALTERNATIVE="use /x-story-implement or /x-epic-implement orchestrators which enforce CI-watch"
+        DETECTED_DETAIL="x-merge-pr invoked directly — bypasses CI-watch gate (Rule 45)"
+        DETECTED_ALTERNATIVE="use /x-implement-story or /x-implement-epic orchestrators which enforce CI-watch"
     fi
 
     # Vector: skill-x-pr-merge-train (direct invocation without proper review)
-    if [ -z "$DETECTED_VECTOR" ] && [ "$SKILL_NAME" = "x-pr-merge-train" ]; then
+    if [ -z "$DETECTED_VECTOR" ] && [ "$SKILL_NAME" = "x-manage-pr-merge-train" ]; then
         DETECTED_VECTOR="skill-x-pr-merge-train"
-        DETECTED_DETAIL="x-pr-merge-train invoked directly — may bypass per-PR review gates"
-        DETECTED_ALTERNATIVE="invoke merge train via /x-epic-implement Phase 5 which includes review gates"
+        DETECTED_DETAIL="x-manage-pr-merge-train invoked directly — may bypass per-PR review gates"
+        DETECTED_ALTERNATIVE="invoke merge train via /x-implement-epic Phase 5 which includes review gates"
     fi
 
 fi

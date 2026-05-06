@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Per-project performance baseline. Populated on first run of x-test-performance --update-baseline. Keys: stack → endpoint/method/command → {p50Ms, p95Ms, p99Ms, throughputRps, measuredAt, gitSha}. Append-only contract: never remove entries for a git SHA already recorded.",
+  "_format_version": "1.0"
+}

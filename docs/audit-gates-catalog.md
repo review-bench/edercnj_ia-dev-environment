@@ -110,7 +110,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 21 §Audit |
 | **Layer** | 2 — CI Script |
-| **Validates** | `epic/*` PRs carry `flowVersion: "2"` in `execution-state.json`; no force-push after first merge; `x-git-cleanup-branches` excludes `epic/*` |
+| **Validates** | `epic/*` PRs carry `flowVersion: "2"` in `execution-state.json`; no force-push after first merge; `x-cleanup-git-branches` excludes `epic/*` |
 | **Introduced** | story-0058-0004 (EPIC-0058) |
 | **Exit Codes** | `0` = OK · `1` = `EPIC_BRANCH_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
 
@@ -194,7 +194,7 @@
 | :--- | :--- |
 | **Rule Anchor** | Rule 25 §Enforcement Layers (Layer 4) |
 | **Layer** | 2 — CI Script |
-| **Validates** | Every numbered `## Phase N` in Anexo B orchestrators has a PRE gate and a POST-family gate invocation of `x-internal-phase-gate` |
+| **Validates** | Every numbered `## Phase N` in Anexo B orchestrators has a PRE gate and a POST-family gate invocation of `x-internal-verify-phase-gates` |
 | **Introduced** | story-0055-0003 (EPIC-0055) |
 | **Exit Codes** | `0` = OK · `26` = `PHASE_GATE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
 
@@ -209,6 +209,30 @@
 | **Validates** | PR bodies targeting `develop` or `epic/*` contain `## Orchestrator Evidence` section |
 | **Introduced** | EPIC-0059 |
 | **Exit Codes** | `0` = OK · `1` = `PR_TEMPLATE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
+
+---
+
+### audit-refinement-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 29 §Audit (Camada 2), Rule 27 (zero-bypass for refinement) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Every merged story/epic on PRs to `develop` or `epic/*` has `refinementVerdict.status="approved"` in `execution-state.json`; detects state↔markdown divergence via `verdictHash`; honors hotfix exception (Rule 27 Exception 2), `audit-exempt` markers, and `governance/baselines/refinement-gate-baseline.txt` |
+| **Introduced** | story-0069-0006 (EPIC-0069) |
+| **Exit Codes** | `0` = OK · `1` = `REFINEMENT_GATE_VIOLATION` (sub-codes: `missing-verdict`, `rejected-verdict`, `verdict-mismatch`) · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT`/`INVALID_EXEMPTION` · `4` = `RULE_29_ENFORCEMENT_BROKEN` |
+
+---
+
+### enforce-refinement-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 29 §Camada 0, Rule 26 §Camada 0 |
+| **Layer** | 0 — Local PreToolUse Hook (preventive) |
+| **Validates** | Blocks invocations of `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-orchestrate-epic` when target's `refinementVerdict.status != "approved"`. Bypasses: `CLAUDE_RECOVERY_MODE=1` (Rule 27), hotfix branches (Rule 27 Exception 2), `flowVersion=1` (Rule 19) |
+| **Introduced** | story-0069-0005 (EPIC-0069) |
+| **Exit Codes** | `0` = OK (allow) · `33` = `REFINEMENT_REQUIRED` (block) · `2` = `OPERATIONAL_ERROR` (self-check) |
 
 ---
 
@@ -250,13 +274,25 @@
 
 ---
 
+### audit-template-version.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 26 §Camada 2, EPIC-0070 (Value-Driven Templates v2) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Epics created after rollout date 2026-04-30 use v2 value-driven template format (contain `## 3. Hipótese & OKRs` or `## Refinement Verdict`), OR are exempt via baseline file, `audit-exempt` marker, or `legacyTemplateV1: true` in execution-state.json |
+| **Introduced** | story-0070-0008 (EPIC-0070) |
+| **Exit Codes** | `0` = OK · `1` = `TEMPLATE_VERSION_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ### audit-task-hierarchy.sh
 
 | Field | Value |
 | :--- | :--- |
 | **Rule Anchor** | Rule 25 §Enforcement Layers (Layer 4) |
 | **Layer** | 2 — CI Script |
-| **Validates** | Anexo B orchestrators emit `TaskCreate`/`TaskUpdate` per phase; `subject:` matches hierarchy regex; `x-internal-phase-gate` PRE invocation present |
+| **Validates** | Anexo B orchestrators emit `TaskCreate`/`TaskUpdate` per phase; `subject:` matches hierarchy regex; `x-internal-verify-phase-gates` PRE invocation present |
 | **Introduced** | story-0055-0002 (EPIC-0055) |
 | **Exit Codes** | `0` = OK · `25` = `TASK_HIERARCHY_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
 
@@ -283,6 +319,92 @@
 | **Validates** | `verify-envelope-*.json` has `acCheckResults.length >= acCheckCount` when `passed=true` (prevents schema stubs) |
 | **Introduced** | story-0063-0002 (EPIC-0063) |
 | **Exit Codes** | `0` = OK · `1` = `VERIFY_ENVELOPE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
+
+---
+
+---
+
+### audit-template-version.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 30 §Audit (EPIC-0070) |
+| **Layer** | 2 — CI Script |
+| **Validates** | New epic/story markdown files under `ai/epics/` use v2 template structure OR carry `--legacy-template-v1` annotation |
+| **Introduced** | story-0070-0008 (EPIC-0070) — **RESERVED; script not yet delivered** |
+| **Exit Codes** | `0` = OK · `1` = `TEMPLATE_VERSION_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-doc-freshness.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 31 (Documentation Freshness Gate, EPIC-0071) |
+| **Layer** | 2 — CI Script |
+| **Validates** | PRs that modify code requiring a documentation update (REST endpoints → OpenAPI; new ADR refs → ADR file; new SKILL.md → README; new Java packages → system.md) have the corresponding doc targets updated in the same change-set |
+| **Introduced** | story-0071-0005 (EPIC-0071) |
+| **Exit Codes** | `0` = OK · `1` = `DOC_FRESHNESS_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` or `INVALID_EXEMPTION` |
+
+---
+
+### audit-contract-breaking.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 26 §Audit Gate Lifecycle (EPIC-0072 story-0072-0007) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Contract artifacts (OpenAPI YAML, proto, Avro AVSC) changed in a PR are classified as breaking vs non-breaking. Breaking changes without a `## Breaking` entry in `CHANGELOG.md` (or `BREAKING CHANGE:` footer in a commit message per Conventional Commits Rule 08) are blocked. Breaking changes with documented migration are passed with WARN and appended to `governance/audits/contract-breaking-history.log`. Rejects path traversal and command injection in artifact filenames. |
+| **Introduced** | story-0072-0007 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (no breaking, or breaking with documented migration — WARN emitted) · `1` = `CONTRACT_BREAKING_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-mutation-score.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rule 05 §Mutation Score Threshold (EPIC-0072 story-0072-0006) |
+| **Layer** | 2 — CI Script |
+| **Validates** | Mutation score from `mutation-report.json` meets `quality.mutation.threshold` AND does not regress vs `governance/baselines/mutation-baseline.json` beyond `quality.mutation.regression-tolerance-pct`. Stage policy: first release with `mutation.enabled=true` emits WARN only (baseline `release_count=0→1`); subsequent releases enforce FAIL. Rejects symlinks and path traversal on report path. |
+| **Introduced** | story-0072-0006 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or first-release WARN) · `1` = `MUTATION_SCORE_VIOLATION` or `MUTATION_REGRESSION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-perf-baseline.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0072 (Comprehensive Test Strategy) story-0072-0005 |
+| **Layer** | 2 — CI Script |
+| **Validates** | Integrity of `governance/baselines/performance-baseline.json`: JSON parse-valid, `_format_version` field present, no silent overwrite (baseline modified in PR without corresponding entry in `perf-baseline-updates.log`), symlink rejection, path traversal rejection, file size ≤ 1MB |
+| **Introduced** | story-0072-0005 (EPIC-0072) |
+| **Exit Codes** | `0` = OK (or baseline absent on first run) · `1` = `PERF_BASELINE_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-regression-shell.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rules 05, 24 (EPIC-0073 — Regression Shell + DAST) |
+| **Layer** | 2 — CI Script |
+| **Validates** | When `quality.regression.enabled=true`: scenario file exists, scenario execution results meet pass-rate threshold, no regression vs baseline. Mode `self` validates generator's own output; mode `service` validates client project services. |
+| **Introduced** | story-0073-0005 (EPIC-0073) |
+| **Exit Codes** | `0` = OK · `1` = `REGRESSION_SHELL_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
+### audit-dast-gate.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | Rules 05, 06, 24 (EPIC-0073 — Regression Shell + DAST) |
+| **Layer** | 2 — CI Script |
+| **Validates** | When `quality.dast.enabled=true`: SARIF 2.1.0 report exists for the PR; no HIGH/CRITICAL findings above threshold; target is not `production`; Nuclei templates-version is pinned (not `latest`/`master`/`HEAD`). |
+| **Introduced** | story-0073-0006 (EPIC-0073) |
+| **Exit Codes** | `0` = OK · `1` = `DAST_GATE_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
 
 ---
 

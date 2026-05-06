@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Every orchestrator that declares numbered `## Phase N` sections in its `SKILL.md` MUST expose its execution granularity to the operator as a structured, hierarchical task list, and MUST wrap each phase with a `x-internal-phase-gate` invocation. Before EPIC-0055 only `x-review` emitted `TaskCreate`/`TaskUpdate` — every other orchestrator delegated silently via `Skill(...)` calls, leaving the operator blind to which phase failed, which subagent of a wave was still running, or which TDD cycle was in flight. Rule 25 restores 4-level visibility (Root › Story › Phase › Wave/Cycle) and makes phase transitions explicit, auditable, and blockable.
+Every orchestrator that declares numbered `## Phase N` sections in its `SKILL.md` MUST expose its execution granularity to the operator as a structured, hierarchical task list, and MUST wrap each phase with a `x-internal-verify-phase-gates` invocation. Before EPIC-0055 only `x-review-codebase` emitted `TaskCreate`/`TaskUpdate` — every other orchestrator delegated silently via `Skill(...)` calls, leaving the operator blind to which phase failed, which subagent of a wave was still running, or which TDD cycle was in flight. Rule 25 restores 4-level visibility (Root › Story › Phase › Wave/Cycle) and makes phase transitions explicit, auditable, and blockable.
 
 ## Scope
 
@@ -14,14 +14,14 @@ Applies to the 8 canonical orchestrators (the **Anexo B** set of EPIC-0055):
 
 | Orchestrator | Layer |
 | :--- | :--- |
-| `x-epic-implement` | Epic (6 phases) |
-| `x-story-implement` | Story (4 phases, 10 sub-phases) |
-| `x-task-implement` | Task (5 steps + 4 numbered interludes) |
+| `x-implement-epic` | Epic (6 phases) |
+| `x-implement-story` | Story (4 phases, 10 sub-phases) |
+| `x-implement-task` | Task (5 steps + 4 numbered interludes) |
 | `x-release` | Release (10+ phases) |
-| `x-epic-orchestrate` | Epic planning loop |
-| `x-review` | Specialist review wave |
+| `x-orchestrate-epic` | Epic planning loop |
+| `x-review-codebase` | Specialist review wave |
 | `x-review-pr` | Tech-lead 45-point review |
-| `x-pr-merge-train` | Sequential PR loop |
+| `x-manage-pr-merge-train` | Sequential PR loop |
 
 Internal skills (`x-internal-*`) are **exempt** (see Invariant 6 below) — they are invoked by orchestrators that already own the task tracking boundary.
 
@@ -30,10 +30,10 @@ Internal skills (`x-internal-*`) are **exempt** (see Invariant 6 below) — they
 1. **`TaskCreate` per phase.** Every orchestrator MUST emit exactly one `TaskCreate(...)` upon entering each numbered `## Phase N` section, and a matching `TaskUpdate(status: "completed")` upon leaving it.
 2. **`TaskCreate` per wave member.** When a phase dispatches a parallel wave (Batch A/B pattern — Rule 13 Pattern 2 used to launch N sibling subagents in one assistant message), the orchestrator MUST emit one `TaskCreate` per wave member in Batch A and one `TaskUpdate(status: "completed")` per member in Batch B.
 3. **`TaskCreate` per sequential iteration.** When a phase iterates sequentially over items (stories, tasks, PRs), the orchestrator MUST emit one `TaskCreate` per iteration and chain them via `TaskUpdate(addBlockedBy: [previousId])` so the CLI renders "blocked by #N" between iterations.
-4. **Phase gates PRE/POST mandatory.** Every numbered phase MUST invoke `Skill(skill: "x-internal-phase-gate", args: "--mode pre --phase N …")` before dispatch and a POST-family gate (`--mode post`, `--mode wave`, or `--mode final`) after completion. `wave` and `final` are reinforced POST variants (see §Integration with Rule 24 below): both validate everything `post` does and add extra checks (wave = Batch-B parallel completeness; final = Rule-24 mandatory-artifact scan). A phase that carries any one of the three satisfies the POST requirement. Exceptions MUST be marked with `<!-- phase-no-gate: <reason> -->` on the line immediately preceding the phase header.
+4. **Phase gates PRE/POST mandatory.** Every numbered phase MUST invoke `Skill(skill: "x-internal-verify-phase-gates", args: "--mode pre --phase N …")` before dispatch and a POST-family gate (`--mode post`, `--mode wave`, or `--mode final`) after completion. `wave` and `final` are reinforced POST variants (see §Integration with Rule 24 below): both validate everything `post` does and add extra checks (wave = Batch-B parallel completeness; final = Rule-24 mandatory-artifact scan). A phase that carries any one of the three satisfies the POST requirement. Exceptions MUST be marked with `<!-- phase-no-gate: <reason> -->` on the line immediately preceding the phase header.
 5. **`subject` hierarchy.** Every `TaskCreate` `subject` MUST use the triangle separator `›` (U+203A) to express hierarchy. Maximum depth: 4 levels. Contract regex in §3 below.
-6. **Internal skills DO NOT emit tasks.** Skills under `x-internal-*` are silent by design — their calling orchestrator owns the task boundary. Single exception: `x-internal-phase-gate --mode wave --emit-tracker true` MAY emit one tracker task to surface wave-level timing.
-7. **Gate failure aborts with exit 12.** `x-internal-phase-gate` returns exit `12` (`PHASE_GATE_FAILED`) on any failed gate. The calling orchestrator propagates via its already-documented exit code (e.g., `x-story-implement` → `VERIFY_FAILED`; `x-epic-implement` → `INTEGRITY_GATE_FAILED`). Exit 12 is reserved for the gate sub-skill itself.
+6. **Internal skills DO NOT emit tasks.** Skills under `x-internal-*` are silent by design — their calling orchestrator owns the task boundary. Single exception: `x-internal-verify-phase-gates --mode wave --emit-tracker true` MAY emit one tracker task to surface wave-level timing.
+7. **Gate failure aborts with exit 12.** `x-internal-verify-phase-gates` returns exit `12` (`PHASE_GATE_FAILED`) on any failed gate. The calling orchestrator propagates via its already-documented exit code (e.g., `x-implement-story` → `VERIFY_FAILED`; `x-implement-epic` → `INTEGRITY_GATE_FAILED`). Exit 12 is reserved for the gate sub-skill itself.
 
 ## `subject` Contract
 
@@ -52,7 +52,7 @@ Internal skills (`x-internal-*`) are **exempt** (see Invariant 6 below) — they
 - `story-0060-0001 › Phase 1 › Arch plan` (3 levels)
 - `TASK-0060-0001-003 › Step 2 › Cycle 1 › Red` (4 levels, max depth)
 - `EPIC-0060 › Phase 3 › story-0060-0001` (3 levels, epic→story transition)
-- `QA › Review story-0060-0001` (2 levels, x-review legacy pattern — tolerated via Rule 19)
+- `QA › Review story-0060-0001` (2 levels, x-review-codebase legacy pattern — tolerated via Rule 19)
 
 ### Invalid examples
 
@@ -72,12 +72,12 @@ Internal skills (`x-internal-*`) are **exempt** (see Invariant 6 below) — they
 
 ## `metadata` Convention
 
-The `TaskCreate` `metadata` field carries structured context that `x-internal-phase-gate` reads via `TaskGet(taskId)`:
+The `TaskCreate` `metadata` field carries structured context that `x-internal-verify-phase-gates` reads via `TaskGet(taskId)`:
 
 ```json
 {
   "phase": "Phase 1",
-  "parentSkill": "x-story-implement",
+  "parentSkill": "x-implement-story",
   "storyId": "story-0060-0001",
   "epicId": "EPIC-0060",
   "expectedArtifacts": [
@@ -136,7 +136,7 @@ Four layers — a violation caught by any layer fails the lifecycle.
 
 1. An orchestrator in the Scope table above lacks a `TaskCreate(` inside any `## Phase N` section.
 2. A `TaskCreate(` has no matching `TaskUpdate(..., status: "completed")` downstream in the same file (unless `<!-- audit-exempt -->` precedes it).
-3. A `## Phase N` section lacks a `--mode pre` invocation OR any POST-family gate (`--mode post`, `--mode wave`, or `--mode final`) of `x-internal-phase-gate` (unless `<!-- phase-no-gate: <reason> -->` precedes it).
+3. A `## Phase N` section lacks a `--mode pre` invocation OR any POST-family gate (`--mode post`, `--mode wave`, or `--mode final`) of `x-internal-verify-phase-gates` (unless `<!-- phase-no-gate: <reason> -->` precedes it).
 4. A `subject:` literal does not match the regex in §3.
 
 Escape hatches:
@@ -151,14 +151,14 @@ The `--mode post` gate of the **last evidence-producing phase** of each orchestr
 
 | Orchestrator | Phase | Required artifacts |
 | :--- | :--- | :--- |
-| `x-story-implement` | Phase 3 | `verify-envelope-STORY-ID.json`, `review-story-STORY-ID.md`, `techlead-review-story-STORY-ID.md`, `story-completion-report-STORY-ID.md` |
+| `x-implement-story` | Phase 3 | `verify-envelope-STORY-ID.json`, `review-story-STORY-ID.md`, `techlead-review-story-STORY-ID.md`, `story-completion-report-STORY-ID.md` |
 
 This promotes Rule 24 enforcement from "Stop-hook notices afterwards" to **synchronous gate before the phase is marked completed**. Stop-hook + CI audit remain as defense in depth (Layers 2+3).
 
 ## Backward Compatibility
 
 - Epics created before EPIC-0055 merged have `taskTracking` absent from `execution-state.json`. Under the new default, orchestrators treat absence as `taskTracking.enabled=true` — task emission and phase-gate enforcement become active automatically. To preserve pre-Rule-25 behavior on a specific legacy epic, add `{"taskTracking": {"enabled": false}}` explicitly to its state file.
-- `--legacy-flow` on `x-epic-implement` forces `taskTracking.enabled=false` even on new epics.
+- `--legacy-flow` on `x-implement-epic` forces `taskTracking.enabled=false` even on new epics.
 - Default flip: `taskTracking` absence now resolves to `enabled=true` (was `false`). Explicit `enabled=false` remains the documented opt-out.
 
 ## Forbidden
@@ -171,7 +171,7 @@ This promotes Rule 24 enforcement from "Stop-hook notices afterwards" to **synch
 
 ## Audit
 
-The audit itself is self-verified: `scripts/audit-task-hierarchy.sh --self-check` asserts that this rule file, the baseline file (`governance/baselines/task-hierarchy-baseline.txt`), and the skills root directory are present. If any of those expected paths are missing, the build fails with `RULE_25_ENFORCEMENT_BROKEN`. Deeper wiring assertions (CLAUDE.md references, `x-internal-phase-gate` presence) are intentionally out of scope for the self-check — they live inside the full audit pass.
+The audit itself is self-verified: `scripts/audit-task-hierarchy.sh --self-check` asserts that this rule file, the baseline file (`governance/baselines/task-hierarchy-baseline.txt`), and the skills root directory are present. If any of those expected paths are missing, the build fails with `RULE_25_ENFORCEMENT_BROKEN`. Deeper wiring assertions (CLAUDE.md references, `x-internal-verify-phase-gates` presence) are intentionally out of scope for the self-check — they live inside the full audit pass.
 
 ---
 

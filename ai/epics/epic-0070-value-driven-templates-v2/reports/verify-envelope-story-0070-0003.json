@@ -1,0 +1,23 @@
+{
+  "storyId": "story-0070-0003",
+  "epicId": "EPIC-0070",
+  "verifiedAt": "2026-04-30T00:00:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "acCheckResults": [
+    { "scenario": "Happy — 9 v2 sections present", "passed": true },
+    { "scenario": "Degenerate — 0 v1 technical sections", "passed": true },
+    { "scenario": "Performance/SLA — rendering advisory documented", "passed": true, "note": "Enforced at rendering layer (Pebble), not template content" },
+    { "scenario": "Security — placeholder sanitization documented", "passed": true, "note": "Contract comment in §9 Refinement Verdict slot" },
+    { "scenario": "Frontmatter v3.0 present", "passed": true },
+    { "scenario": "5 Gherkin categories present (degenerate/happy/error/perf/security)", "passed": true }
+  ],
+  "acCheckCount": 6,
+  "artifacts": [
+    "src/main/resources/shared/templates/_TEMPLATE-STORY.md (REWRITTEN v2)"
+  ],
+  "prNumber": 886,
+  "prMergeStatus": "MERGED",
+  "commitSha": "abd4e86de"
+}

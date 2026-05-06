@@ -1,0 +1,22 @@
+id: quality.performance.cli
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  CLI generation-time performance gate — runs hyperfine to benchmark CLI generation
+  time and validates P95 against QualityConfig.performance.slo.cli.gen_time_p95_ms.
+  Invoked by /x-test-performance when interfaces[].type = cli.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [hyperfine]
+    default: hyperfine
+  slo:
+    gen_time_p95_ms:
+      type: integer
+      default: 3000

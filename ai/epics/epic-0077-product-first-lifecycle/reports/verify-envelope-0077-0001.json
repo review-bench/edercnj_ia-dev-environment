@@ -1,0 +1,42 @@
+{
+  "storyId": "story-0077-0001",
+  "epicId": "epic-0077",
+  "verifiedAt": "2026-05-04T18:40:00Z",
+  "passed": true,
+  "tasksExecuted": [
+    {
+      "taskId": "TASK-0077-0001-001",
+      "status": "DONE",
+      "prNumber": 961,
+      "prMergeStatus": "MERGED",
+      "commitSha": "5d7498a1a"
+    },
+    {
+      "taskId": "TASK-0077-0001-002",
+      "status": "DONE",
+      "prNumber": 962,
+      "prMergeStatus": "MERGED",
+      "commitSha": "96074d65f"
+    },
+    {
+      "taskId": "TASK-0077-0001-003",
+      "status": "DONE",
+      "prNumber": 963,
+      "prMergeStatus": "MERGED",
+      "commitSha": "64890c867"
+    }
+  ],
+  "coverageLine": 95.2,
+  "coverageBranch": 91.4,
+  "buildStatus": "SUCCESS",
+  "testsRun": 4745,
+  "testsFailed": 0,
+  "gates": {
+    "allTasksMerged": true,
+    "coverageLine": "PASS",
+    "coverageBranch": "PASS",
+    "buildSuccess": true,
+    "domainPurity": "PASS",
+    "noExternalImports": true
+  }
+}

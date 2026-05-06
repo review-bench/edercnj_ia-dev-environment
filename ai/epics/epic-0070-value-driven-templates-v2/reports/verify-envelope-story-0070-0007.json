@@ -1,0 +1,27 @@
+{
+  "storyId": "story-0070-0007",
+  "epicId": "epic-0070",
+  "passed": true,
+  "checkedAt": "2026-04-30T22:30:00-03:00",
+  "coverageLine": 96.2,
+  "coverageBranch": 91.8,
+  "thresholds": {
+    "line": 95,
+    "branch": 90
+  },
+  "artifacts": {
+    "specialistReview": "ai/epics/epic-0070-value-driven-templates-v2/plans/review-story-0070-0007.md",
+    "techLeadReview": "ai/epics/epic-0070-value-driven-templates-v2/plans/techlead-review-story-0070-0007.md"
+  },
+  "goldenFiles": {
+    "expected": 492,
+    "generated": 492,
+    "diff": 0
+  },
+  "testResults": {
+    "total": 4557,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 14
+  }
+}

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates x-internal-pr-body-render/SKILL.md backlog extension (story-0066-0004) via static
+ * Validates x-internal-render-pr-body/SKILL.md backlog extension (story-0066-0004) via static
  * inspection.
  *
  * <p>Checks: Phase 1.5 BACKLOG-GATHER presence + fail-open placeholders for backlog sources,
@@ -28,7 +28,7 @@ class XInternalPrBodyRenderBacklogTest {
     private static final Path SKILL_MD =
             Path.of(
                     "src/main/resources/targets/claude/skills/core/internal/pr"
-                            + "/x-internal-pr-body-render/SKILL.md");
+                            + "/x-internal-render-pr-body/SKILL.md");
 
     private static String content;
 

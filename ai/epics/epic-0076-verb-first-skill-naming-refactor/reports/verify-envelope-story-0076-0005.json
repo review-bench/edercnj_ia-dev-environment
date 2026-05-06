@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "storyId": "story-0076-0005",
+  "epicId": "EPIC-0076",
+  "verifiedAt": "2026-05-03T00:00:00Z",
+  "skill": "x-internal-verify-story",
+  "status": "PASSED",
+  "gates": {
+    "buildPasses": true,
+    "allTestsPass": true,
+    "coverageThresholdMet": true,
+    "noLintErrors": true,
+    "planArtifactsPresent": true
+  },
+  "notes": "Skill rename story — source tree changes only, no Java/test changes."
+}

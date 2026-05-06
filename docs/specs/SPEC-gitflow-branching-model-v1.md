@@ -56,7 +56,7 @@ model where:
 1. **New rule `09-branching-model.md`** — Documents the Git Flow branching model as the project
    standard, defining branch types, naming conventions, and merge direction.
 
-2. **Skill `x-git-push` update** — Change default base branch from `main` to `develop` for
+2. **Skill `x-push-branch` update** — Change default base branch from `main` to `develop` for
    feature/fix branches. Add `hotfix/*` flow branching from `main` with dual merge targets.
 
 3. **Skill `x-dev-lifecycle` update** — Phase 0 branches from `develop`, Phase 6 PR targets
@@ -84,7 +84,7 @@ The following generated SKILL.md files contain hardcoded `main` branch reference
 
 | Skill | File | Approx. `main` refs |
 |:---|:---|:---|
-| x-git-push | `.claude/skills/x-git-push/SKILL.md` | 6 |
+| x-push-branch | `.claude/skills/x-push-branch/SKILL.md` | 6 |
 | x-dev-lifecycle | `.claude/skills/x-dev-lifecycle/SKILL.md` | 4 |
 | x-dev-epic-implement | `.claude/skills/x-dev-epic-implement/SKILL.md` | 15+ |
 | x-release | `.claude/skills/x-release/SKILL.md` | 5 |
@@ -181,9 +181,9 @@ project standard. Update rule `08-release-process.md` to reference the new branc
 
 ---
 
-### STORY-0002: x-git-push Skill — Develop as Default Base Branch
+### STORY-0002: x-push-branch Skill — Develop as Default Base Branch
 
-**Scope**: Update the `x-git-push` skill to use `develop` as the default base branch for
+**Scope**: Update the `x-push-branch` skill to use `develop` as the default base branch for
 feature and fix branches. Add hotfix workflow support.
 
 **Details**:
@@ -200,7 +200,7 @@ feature and fix branches. Add hotfix workflow support.
 - Update "Integration Notes": document interaction with x-dev-lifecycle phases
 
 **Acceptance Criteria**:
-- All 6 references to `main` in x-git-push replaced with `develop` (feature flow)
+- All 6 references to `main` in x-push-branch replaced with `develop` (feature flow)
 - Hotfix workflow documented with dual merge (main + develop)
 - PR creation always includes explicit `--base develop` (or `--base main` for hotfix)
 - Branch strategy diagram shows: `develop → feat/* → develop`, `main → hotfix/* → main + develop`
@@ -411,7 +411,7 @@ in all generated artifacts.
 **Details**:
 - Update golden files for all 8 profiles to reflect `develop` as default base branch
 - Add test cases for `branching-model: gitflow` (default) vs `branching-model: trunk`
-- Verify generated x-git-push skill references `develop`
+- Verify generated x-push-branch skill references `develop`
 - Verify generated x-dev-lifecycle references `develop`
 - Verify generated x-dev-epic-implement references `develop` and has `--no-merge` default
 - Verify generated x-release skill has release branch workflow

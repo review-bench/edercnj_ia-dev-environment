@@ -18,10 +18,10 @@ import java.util.Map;
  *
  * @see PlanTemplatesAssembler
  */
-final class PlanTemplateDefinitions {
+public final class PlanTemplateDefinitions {
 
     /** Number of templates currently managed. */
-    static final int TEMPLATE_COUNT = 23;
+    public static final int TEMPLATE_COUNT = 28;
 
     private static final List<Map.Entry<String, List<String>>> STORY_PLANNING_TEMPLATES =
             List.of(
@@ -230,27 +230,27 @@ final class PlanTemplateDefinitions {
                     Map.entry(
                             "_TEMPLATE-EPIC.md",
                             List.of(
-                                    "1. Contexto & Escopo",
-                                    "2. Packages (Hexagonal)",
-                                    "3. Contratos & Endpoints",
-                                    "4. Materialização SOLID",
-                                    "5. Quality Gates",
-                                    "6. Segurança",
-                                    "7. Observabilidade",
-                                    "8. Decision Rationale",
-                                    "9. Dependências & File Footprint")),
+                                    "1. Visão & Problema",
+                                    "2. Persona & Stakeholders",
+                                    "3. Hipótese & OKRs",
+                                    "4. Alternativas Consideradas",
+                                    "5. Escopo",
+                                    "6. Riscos",
+                                    "7. Índice de Histórias",
+                                    "8. Quality Gates",
+                                    "Refinement Verdict")),
                     Map.entry(
                             "_TEMPLATE-STORY.md",
                             List.of(
-                                    "1. Contexto & Escopo",
-                                    "2. Packages (Hexagonal)",
-                                    "3. Contratos & Endpoints",
-                                    "4. Materialização SOLID",
-                                    "5. Quality Gates",
-                                    "6. Segurança",
-                                    "7. Observabilidade",
+                                    "1. Visão",
+                                    "2. Persona & Cenário",
+                                    "3. Entrega de Valor",
+                                    "4. AC (Gherkin — 4 categorias mandatórias)",
+                                    "5. Contratos",
+                                    "6. Tasks",
+                                    "7. Dependências",
                                     "8. Decision Rationale",
-                                    "9. Dependências & File Footprint")),
+                                    "9. Refinement Verdict")),
                     Map.entry(
                             "_TEMPLATE-IMPLEMENTATION-MAP.md",
                             List.of(
@@ -261,6 +261,62 @@ final class PlanTemplateDefinitions {
                                     "5. Resumo por Fase",
                                     "6. Detalhamento por Fase",
                                     "7. Observações Estratégicas")));
+
+    private static final List<Map.Entry<String, List<String>>> QUALITY_TEMPLATES =
+            List.of(
+                    Map.entry(
+                            "_TEMPLATE-PERFORMANCE-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Load Scenarios",
+                                    "Results per Endpoint",
+                                    "Baseline Comparison",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-MUTATION-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Scope",
+                                    "Surviving Mutants",
+                                    "Configuration",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-CONTRACT-PLAN.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Changes Detected",
+                                    "CHANGELOG Integration",
+                                    "Tooling",
+                                    "Risks and Gaps",
+                                    "Recommended Action")),
+                    Map.entry(
+                            "_TEMPLATE-DEP-POLICY-REPORT.md",
+                            List.of(
+                                    "Header",
+                                    "Summary",
+                                    "Blocking Violations",
+                                    "Warning Violations",
+                                    "Suppressed",
+                                    "Policy Snapshot",
+                                    "Tooling")),
+                    Map.entry(
+                            "_TEMPLATE-DEP-POLICY-DECLARATION.md",
+                            List.of(
+                                    "Policy Status",
+                                    "Enforcement Matrix",
+                                    "Scope Policy",
+                                    "Denied CVEs",
+                                    "License Whitelist",
+                                    "Version Constraints",
+                                    "YAML Configuration Reference",
+                                    "Validation")));
 
     private static final List<Map.Entry<String, List<String>>> PR_BODY_TEMPLATES =
             List.of(
@@ -288,14 +344,42 @@ final class PlanTemplateDefinitions {
                                     "Changes",
                                     "Orchestrator Evidence")));
 
+    private static final List<Map.Entry<String, List<String>>> AI_MEMORY_TEMPLATES =
+            List.of(
+                    Map.entry(
+                            "_TEMPLATE-EPIC-MEMORY-SUMMARY.md",
+                            List.of(
+                                    "Why this epic existed",
+                                    "Hypothesis tested",
+                                    "Decisions taken (with why)",
+                                    "Alternatives rejected (with why)",
+                                    "Reusable patterns produced",
+                                    "Anti-patterns observed",
+                                    "Links")));
+
     /**
      * Template definitions: filename to mandatory sections mapping. {@link LinkedHashMap} preserves
      * insertion order for deterministic processing.
      */
-    static final Map<String, List<String>> TEMPLATE_SECTIONS = buildTemplateSections();
+    public static final Map<String, List<String>> TEMPLATE_SECTIONS = buildTemplateSections();
+
+    /**
+     * Conditional templates for the {@code governance.ai-memory} capability. Copied only when
+     * {@code ProjectConfig.aiMemory().enabled()} is {@code true}.
+     */
+    public static final Map<String, List<String>> MEMORY_TEMPLATE_SECTIONS =
+            buildMemoryTemplateSections();
 
     private PlanTemplateDefinitions() {
         // utility class
+    }
+
+    private static Map<String, List<String>> buildMemoryTemplateSections() {
+        Map<String, List<String>> map = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> e : AI_MEMORY_TEMPLATES) {
+            map.put(e.getKey(), e.getValue());
+        }
+        return Collections.unmodifiableMap(map);
     }
 
     private static Map<String, List<String>> buildTemplateSections() {
@@ -308,6 +392,7 @@ final class PlanTemplateDefinitions {
                         EPIC_EXECUTION_TEMPLATES,
                         TASK_FIRST_TEMPLATES,
                         EPIC_STORY_TEMPLATES,
+                        QUALITY_TEMPLATES,
                         PR_BODY_TEMPLATES);
         for (List<Map.Entry<String, List<String>>> group : groups) {
             for (Map.Entry<String, List<String>> e : group) {

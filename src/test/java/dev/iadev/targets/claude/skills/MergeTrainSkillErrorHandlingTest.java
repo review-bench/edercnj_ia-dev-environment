@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * TDD tests for the Error Handling table (≥ 11 codes) in x-pr-merge-train/SKILL.md
+ * TDD tests for the Error Handling table (≥ 11 codes) in x-manage-pr-merge-train/SKILL.md
  * (story-0042-0003, TASK-0042-0003-004).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that the Error Handling
@@ -21,7 +21,7 @@ class MergeTrainSkillErrorHandlingTest {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(

@@ -1,0 +1,388 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0070",
+  "epicSlug": "value-driven-templates-v2",
+  "epicBranch": "epic/0070",
+  "targetBranch": "develop",
+  "mode": "sequential",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "6cfcf48cdb8e308d9d1f046a3a342956c018dae19166e1eb69edbbc245234fac",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0070-0001": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "d04daa5ef1ea7e5fe40cf2d4b0088b0686c00f02791dab528088d9b9b89c4ca0",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All 5 mandatory dimensions passed after edits: AC cobre 4 categorias mandatórias (perf/SLA + security/auth adicionados); seção Contracts declara schemas para capability YAML, Rule MD e ADR MD; Metrics tem unidade+target local."
+      }
+    },
+    "story-0070-0002": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "47cab83ee4b802f0e3fc01ea4c77423834426a2b156728900d108d267f70603a",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": "No explicit ## Risks section (advisory-only for template-rewrite scope)"
+          }
+        },
+        "blockers": [],
+        "rationale": "All 5 mandatory dimensions pass. AC adapts 4-category mandate to template-rewrite scope (Error+Degenerate substitute cleanly for perf/security in static markdown). Risks gap is advisory only."
+      }
+    },
+    "story-0070-0003": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
+      }
+    },
+    "story-0070-0004": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
+      }
+    },
+    "story-0070-0005": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
+      }
+    },
+    "story-0070-0006": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "376b2a68d94e735309dd44d99f2d60bdd378579349b758c4a13139d422fd167e",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All 7 dimensions pass. Persona específico (orquestrador). Value falsifiable (sync metric, idempotency hash). Alternative (full regen) explicitly rejected."
+      }
+    },
+    "story-0070-0007": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "031e039c1b0dbe9184e1006bd3bea862703b6a4349a48be25fee4f675b5c8f0a",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All 7 dimensions pass. Concrete operator persona, measurable value (100% preservation), 4 Gherkin categories, typed contracts, alternative auto-merge bash rejected at ~40% bad outcomes."
+      }
+    },
+    "story-0070-0008": {
+      "status": "completed",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "2a109e51b3c2396943988bf29166b005cd79b15d861d2d403162cfbc11d11261",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": [],
+        "rationale": "All mandatory dimensions passed after adding Performance/SLA and Security/auth Gherkin scenarios."
+      }
+    }
+  }
+}

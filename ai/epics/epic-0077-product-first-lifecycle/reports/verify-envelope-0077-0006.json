@@ -1,0 +1,25 @@
+{
+  "storyId": "story-0077-0006",
+  "epicId": "EPIC-0077",
+  "verifiedAt": "2026-05-04T20:41:00Z",
+  "passed": true,
+  "tasksExecuted": [
+    {"taskId": "TASK-0077-0006-001", "status": "DONE", "prNumber": 976, "merged": true},
+    {"taskId": "TASK-0077-0006-002", "status": "DONE", "prNumber": 977, "merged": true},
+    {"taskId": "TASK-0077-0006-003", "status": "DONE", "prNumber": 978, "merged": true},
+    {"taskId": "TASK-0077-0006-004", "status": "DONE", "prNumber": 979, "merged": true}
+  ],
+  "testResults": {
+    "totalTests": 4797,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 14,
+    "build": "SUCCESS"
+  },
+  "reviewArtifacts": {
+    "specialistReview": "ai/epics/epic-0077-product-first-lifecycle/plans/review-story-0077-0006.md",
+    "techLeadReview": "ai/epics/epic-0077-product-first-lifecycle/plans/techlead-review-story-0077-0006.md"
+  },
+  "specialistVerdict": "GO",
+  "techLeadVerdict": "GO"
+}

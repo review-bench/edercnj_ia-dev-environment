@@ -1,0 +1,44 @@
+{
+  "storyId": "story-0077-0003",
+  "epicId": "EPIC-0077",
+  "passed": true,
+  "verifiedAt": "2026-05-04T20:00:00Z",
+  "tasksExecuted": [
+    {
+      "taskId": "TASK-0077-0003-001",
+      "status": "SUCCESS",
+      "prNumber": null,
+      "commitSha": "fcf1e50c0",
+      "description": "Coordination record + Phase 1 planning artifacts (direct epic/0077 commit)"
+    },
+    {
+      "taskId": "TASK-0077-0003-002",
+      "status": "SUCCESS",
+      "prNumber": 967,
+      "commitSha": "581047ce1",
+      "description": "audit-skill-references.sh + skill-rename-smoke.sh bash scripts"
+    },
+    {
+      "taskId": "TASK-0077-0003-003",
+      "status": "SUCCESS",
+      "prNumber": 968,
+      "commitSha": "8a2ea5d02",
+      "description": "DEPRECATIONS.md and docs/migration/x-feature-create-to-create-feature.md"
+    }
+  ],
+  "testsRun": 4777,
+  "testsFailed": 0,
+  "coverageLine": 95.4,
+  "coverageBranch": 91.2,
+  "domainPurity": "N/A",
+  "buildStatus": "SUCCESS",
+  "qualityGates": {
+    "coverage": "PASS",
+    "domainPurity": "N/A",
+    "tdd": "N/A"
+  },
+  "auditScriptResults": {
+    "audit-skill-references": "PASS (0 legacy x-feature-create refs)",
+    "skill-rename-smoke": "PASS (4/4 checks)"
+  }
+}

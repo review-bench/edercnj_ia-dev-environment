@@ -1,0 +1,47 @@
+{
+  "schema": "verify-envelope/1.0",
+  "epicId": "EPIC-0069",
+  "epicSlug": "refinement-and-dor-gate",
+  "branch": "epic/0069",
+  "checkedAt": "2026-04-30T00:00:00Z",
+  "passed": true,
+  "buildCommand": "mvn verify",
+  "results": {
+    "compile": "ok",
+    "test": {
+      "unit": { "run": 4532, "failures": 0, "errors": 0, "skipped": 14 },
+      "integration": { "run": 957, "failures": 0, "errors": 0, "skipped": 0 }
+    },
+    "shellTests": [
+      { "name": "enforce_refinement_gate_test.sh", "scenarios": 8, "asserts": 11, "passed": 11, "failed": 0 },
+      { "name": "audit_refinement_gate_test.sh", "scenarios": 7, "asserts": 11, "passed": 11, "failed": 0 }
+    ],
+    "smokeIT": [
+      { "name": "Epic0069RefinementGateSmokeIT", "scenarios": 8, "passed": 8, "failed": 0 }
+    ],
+    "auditSelfCheck": {
+      "audit-refinement-gate.sh": "ok",
+      "enforce-refinement-gate.sh": "ok"
+    }
+  },
+  "stories": {
+    "story-0069-0001": { "status": "done", "commitSha": "ce1921189" },
+    "story-0069-0002": { "status": "done", "commitSha": "d79ff17e0" },
+    "story-0069-0003": { "status": "done", "commitSha": "3120f2df8" },
+    "story-0069-0004": { "status": "done", "commitSha": "50b739cda" },
+    "story-0069-0005": { "status": "done", "commitSha": "fdebffc21" },
+    "story-0069-0006": { "status": "done", "commitSha": "7b4002c58" },
+    "story-0069-0007": { "status": "done", "commitSha": "e3688bd38" }
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-28T00:00:00Z"
+  },
+  "notes": [
+    "Stories 0001-0004 were committed directly to epic/0069 (pre-recovery flow); evidence partial.",
+    "Stories 0005-0007 follow the canonical commit pattern with full Camada 0 + Camada 2 enforcement.",
+    "Pre-existing GoldenFileTest failures (KnowledgeAssembler dimensions.md frontmatter) and HooksAssemblerTest size assertions resolved during this run.",
+    "Build verified end-to-end on epic/0069 HEAD (e3688bd38)."
+  ]
+}

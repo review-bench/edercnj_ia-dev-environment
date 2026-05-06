@@ -1,8 +1,8 @@
 ## TDD Tags — Canonical Glossary
 
 This glossary is the single source of truth for the Red-Green-Refactor tag set
-used across TDD-oriented skills (`x-test-tdd`, `x-task-implement`,
-`x-story-implement`). When any of those skills documents commit-footer
+used across TDD-oriented skills (`x-drive-tdd`, `x-implement-task`,
+`x-implement-story`). When any of those skills documents commit-footer
 syntax or cycle semantics, link to this file instead of duplicating.
 
 ## Core Tags
@@ -17,10 +17,10 @@ syntax or cycle semantics, link to this file instead of duplicating.
 
 | Variant | Meaning | Consumer Skill |
 | :--- | :--- | :--- |
-| `RED_NOT_OBSERVED` | Tooling could not confirm the test failed before GREEN commit | `x-task-implement` aborts when this is detected (enforces TDD honesty) |
+| `RED_NOT_OBSERVED` | Tooling could not confirm the test failed before GREEN commit | `x-implement-task` aborts when this is detected (enforces TDD honesty) |
 | `GREEN_FLAKY` | Test passed on retry but failed on first invocation | Logged as a warning; story-level review gate inspects |
 | `REFACTOR_DEFERRED` | Cycle completed without a REFACTOR commit because no improvement was needed | Valid; not every cycle requires a refactor |
-| `COALESCED` | Two or more logically atomic tasks committed together under RULE-TF-04 | `x-task-implement` emits `Coalesces-with: TASK-XXXX` footer |
+| `COALESCED` | Two or more logically atomic tasks committed together under RULE-TF-04 | `x-implement-task` emits `Coalesces-with: TASK-XXXX` footer |
 
 ## Conventional-Commits Footer Format
 
@@ -34,7 +34,7 @@ commit body, in the form:
 Example:
 
 ```
-test(x-story-implement): add failing test for empty task list
+test(x-implement-story): add failing test for empty task list
 
 RED: TASK-0047-0001-003
 ```

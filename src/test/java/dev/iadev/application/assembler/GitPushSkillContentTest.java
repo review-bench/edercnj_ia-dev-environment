@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for x-git-push SKILL.md content.
+ * Tests for x-push-branch SKILL.md content.
  *
  * <p>Validates that the generated skill uses {@code develop} as the default base branch for feature
  * workflows and includes a separate hotfix workflow branching from {@code main}.
  */
-@DisplayName("x-git-push — develop base + hotfix")
+@DisplayName("x-push-branch — develop base + hotfix")
 class GitPushSkillContentTest {
 
-    private static final String SKILL_PATH = "skills/x-git-push/SKILL.md";
+    private static final String SKILL_PATH = "skills/x-push-branch/SKILL.md";
 
     private String generateSkillContent(Path tempDir) throws IOException {
         Path outputDir = tempDir.resolve("output");

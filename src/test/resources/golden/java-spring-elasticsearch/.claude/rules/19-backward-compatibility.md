@@ -3,6 +3,7 @@
 > **Related:** Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 08 (Release Process).
 > **Introduced by:** EPIC-0049 (Refatoração do Fluxo de Épico) — RULE-008 (`flowVersion` + `--legacy-flow`).
 > **Extended by:** EPIC-0060 (Folder Reorganization v4) — `flowVersion: "4"` for v4 layout (`ai/epics/`).
+> **Extended by:** EPIC-0077 (Product-First Lifecycle) — `flowVersion: "5"` for Product-First lifecycle with `productFirstLifecycle: true` in state file (stories 0077-0029, 0077-0028).
 
 ## Purpose
 
@@ -26,6 +27,17 @@ Every `execution-state.json` produced by the orchestrators carries a top-level d
 | `"2"` | New flow (EPIC-0049+) — story PRs target `epic/XXXX`, manual gate to `develop`, sequential default. v3 layout (`plans/`). |
 | `"3"` | **Local-First (EPIC-0061+)** — same flow as `"2"` with: non-interactive as default (menus opt-in via `--interactive`), Java audits in generator CI (`mvn verify`), bash audit templates per stack for generated projects. `localFirstLifecycle: true` in state file. |
 | `"4"` | New layout (EPIC-0060+) — same flow as `"2"` but artifacts live under `ai/epics/<epic>-<slug>/` (v4 layout). PathResolver auto-detects via filesystem probe. |
+| `"5"` | **Product-First (EPIC-0077+)** — same flow as `"4"` with: task tracking mandatory, refinement-gate active, epic-branch routing active, and `productFirstLifecycle: true` in state file. Introduces the Product-First Lifecycle hierarchy (Ideation → Product → Capability → Feature → Epic → Story → Task). |
+
+## Normative Status for `flowVersion: "5"`
+
+`flowVersion: "5"` is the **canonical** lifecycle for every epic created from a Product-First hierarchy. The backward-compatibility guarantees in this rule still protect legacy epics, but they do **not** dilute the normative expectation for new Product-First work:
+
+- new Product-First epics MUST persist `flowVersion: "5"` and `productFirstLifecycle: true`;
+- Product-First lineage (`Ideation → Product → Capability → Feature → Epic → Story → Task`) is the reference hierarchy for planning, gating, and audit scripts;
+- C4 mandatory checks, RNF inheritance gates, and Product-First audit scripts are part of the standard v5 contract, not optional extensions.
+
+For EPIC-0077 and successor epics, older flow versions remain relevant only for historical resume / migration scenarios covered by the fallback matrix below.
 
 ## Fallback Matrix
 
@@ -38,7 +50,8 @@ Whenever an orchestrator reads `execution-state.json` (or creates a new one duri
 | Field = `"2"` (explicit) | `"2"` | New flow, v3 layout (`plans/`) | No |
 | Field = `"3"` (explicit) | `"3"` | **EPIC-0061 Local-First** — non-interactive default, Java audits in CI, bash audits per stack in generated projects | No |
 | Field = `"4"` (explicit) | `"4"` | New flow, v4 layout (`ai/epics/`) — paths resolved via `PathResolver` | No |
-| Field = any other value (typo, future-version `"5"`, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
+| Field = `"5"` (explicit) | `"5"` | **EPIC-0077 Product-First** — task tracking mandatory, refinement-gate active, epic-branch routing active, `productFirstLifecycle: true` in state file | No |
+| Field = any other value (typo, unknown future version, etc.) | `"1"` | Legacy flow + warning | **Yes** — visible warning |
 
 **Warning format:**
 
@@ -50,7 +63,7 @@ WARN [flowVersion-fallback] execution-state.json has flowVersion=<value>;
 
 ## `--legacy-flow` Flag
 
-Orchestrators (`x-epic-implement`, `x-story-implement`, `x-epic-orchestrate`) accept `--legacy-flow` as an explicit opt-in to legacy mode:
+Orchestrators (`x-implement-epic`, `x-implement-story`, `x-orchestrate-epic`) accept `--legacy-flow` as an explicit opt-in to legacy mode:
 
 - Forces `flowVersion: "1"` on new state files regardless of defaults.
 - Overrides any explicit `flowVersion: "2"` in an existing state file (emits warning).
@@ -77,7 +90,7 @@ Release counting: each tagged release on `main` that includes EPIC-0049 or a suc
 Stories whose PR has already been merged into `develop` before the epic branch was introduced are treated as legacy:
 
 - Their `storyStatuses[storyId].flowVersion` field is set to `"1"` retroactively.
-- `x-status-reconcile` treats them as complete (not subject to epic-branch routing).
+- `x-reconcile-status` treats them as complete (not subject to epic-branch routing).
 - The epic's aggregate `flowVersion` remains `"2"` even when individual stories are `"1"` — mixed mode is supported during the window.
 
 ## Skill Renaming
@@ -100,12 +113,18 @@ A **hard-cut** (immediate removal with no deprecation window) is permitted when 
 
 | Old name (public) | New name | Condition | Release |
 | :--- | :--- | :--- | :--- |
-| `x-epic-decompose` | `x-feature-create` (public) + `x-internal-epic-create` / `x-internal-epic-map` / `x-internal-story-create` (internal) | Taxonomic merge + visibility change | EPIC-0065 |
-| `x-epic-create` | `x-internal-epic-create` | Visibility change (public → internal) | EPIC-0065 |
-| `x-epic-map` | `x-internal-epic-map` | Visibility change (public → internal) | EPIC-0065 |
-| `x-story-create` | `x-internal-story-create` | Visibility change (public → internal) | EPIC-0065 |
+| `x-epic-decompose` | `x-create-feature` (public) + `x-internal-create-epic` / `x-internal-map-epic` / `x-internal-create-story` (internal) | Taxonomic merge + visibility change | EPIC-0065 |
+| `x-epic-create` | `x-internal-create-epic` | Visibility change (public → internal) | EPIC-0065 |
+| `x-epic-map` | `x-internal-map-epic` | Visibility change (public → internal) | EPIC-0065 |
+| `x-story-create` | `x-internal-create-story` | Visibility change (public → internal) | EPIC-0065 |
 
 Hard-cuts MUST be documented in the CHANGELOG under `## Removed` with a migration note pointing to the new names. CI `audit-skill-visibility.sh` validates that no public alias remains for hard-cut skills.
+
+### EPIC-0077 exception — semantic reintroduction
+
+EPIC-0077 story-0024 reintroduces `x-epic-create` as a **new public skill with narrower semantics**: it only supports **Feature → Epic** generation (`--from-feature`) and does not recreate the removed generic public epic generator. This is allowed under condition 3 (**semantic redefinition**): the legacy public skill and the new Product-First wrapper do not share the same responsibility or argument contract.
+
+EPIC-0077 story-0025 reintroduces `x-story-create` under the same principle: it only supports **Feature → Story** generation linked to an existing epic (`--from-feature --epic-id`) and does not recreate the removed generic public story generator.
 
 ## Field Additions to `execution-state.json`
 
@@ -117,7 +136,7 @@ New fields added to `execution-state.json` (e.g., `parallelismDowngrades` in EPI
 
 ### `taskTracking` Field (EPIC-0055 / EPIC-0059)
 
-Added by EPIC-0055 (Rule 25 — Task Hierarchy & Phase Gate Enforcement). Controls whether orchestrators emit `TaskCreate`/`TaskUpdate` calls and invoke `x-internal-phase-gate`.
+Added by EPIC-0055 (Rule 25 — Task Hierarchy & Phase Gate Enforcement). Controls whether orchestrators emit `TaskCreate`/`TaskUpdate` calls and invoke `x-internal-verify-phase-gates`.
 
 **EPIC-0059 enforcement:** `flowVersion=2` now requires `taskTracking.enabled=true`. Absence of `taskTracking` on a `flowVersion=2` state file is a `TASK_TRACKING_REQUIRED` error — no silent no-op. Run `scripts/migrate-task-tracking-v2.sh` before enabling `audit-flow-version.sh` to migrate all active epics.
 
@@ -167,6 +186,59 @@ WARN [interactiveMode-fallback] execution-state.json has interactiveMode=<value>
 
 **Consumers:** `enforce-continuous-flow.sh` (Stop hook, EPIC-0068). No CI audit script reads this field; it is a runtime-only discriminator.
 
+### `refinementVerdict` Field (EPIC-0069)
+
+Added by EPIC-0069 (Story Refinement & DoR Gate — Rule 29). Carries the output of `/x-refine-story` or `/x-refine-epic` — a multi-persona verdict indicating whether the story/epic has been approved for implementation.
+
+#### Fallback Matrix
+
+| Condition on `refinementVerdict` | `flowVersion` | Resolved value | Behavior | Warning? |
+| :--- | :--- | :--- | :--- | :--- |
+| Field absent (legacy state file pre-EPIC-0069) | `"1"` or absent | `{ status: "tbd" }` | Hook is no-op — preserves legacy behavior | No |
+| Field absent | `"2"` or `"4"` | `{ status: "tbd" }` | Hook active — blocks with `REFINEMENT_REQUIRED` (exit 33) | **Yes** — visible warning `[refinementVerdict-absent]` |
+| Field present, `status = "tbd"` | `"1"` or absent | `"tbd"` | Hook is no-op (legacy) | No |
+| Field present, `status = "tbd"` | `"2"` or `"4"` | `"tbd"` | Hook active — blocks with `REFINEMENT_REQUIRED` | **Yes** — visible warning `[refinementVerdict-tbd]` |
+| Field present, `status = "rejected"` | any | `"rejected"` | Hook active — blocks with `REFINEMENT_REQUIRED` | No (rejection is explicit) |
+| Field present, `status = "approved"` | any | `"approved"` | Hook is no-op — gate passed | No |
+| Field present, `status = any other value` (typo) | any | `"tbd"` | Hook active — blocks | **Yes** — visible warning `[refinementVerdict-invalid]` |
+
+**Exception — `hotfix/*` branches:** `enforce-refinement-gate.sh` exits 0 (no-op) regardless of `refinementVerdict.status` when the current branch matches `hotfix/*` (Rule 27 Exception 2).
+
+**Warning format (absent on flowVersion ≥ 2):**
+
+```
+WARN [refinementVerdict-absent] execution-state.json has no refinementVerdict;
+     defaulting to status=tbd. Run /x-refine-story <STORY-ID> to refine before implementing.
+     Gate: enforce-refinement-gate.sh (exit 33 REFINEMENT_REQUIRED).
+```
+
+**Consumers:** `enforce-refinement-gate.sh` (PreToolUse hook, EPIC-0069, Camada 0); `audit-refinement-gate.sh` (CI script, EPIC-0069, Camada 2). The `verdictHash` sub-field is also consumed by the CI audit to detect manual divergence between the state file and the markdown `## Refinement Verdict` block.
+
+### `productFirstLifecycle` Field (EPIC-0077)
+
+Added by EPIC-0077 (Product-First Lifecycle — story-0077-0029). Signals that the epic was created under the Product-First Lifecycle, enabling Product-First specific behavior in orchestrators (C4 diagram requirements, RNF gates, ideation-to-feature hierarchy tracking).
+
+**Presence rule:** When `flowVersion: "5"`, `productFirstLifecycle: true` MUST be present. Absence emits warning `[productFirstLifecycle-absent]` (non-blocking — backward compatible per Rule 19 §Field Additions).
+
+#### Fallback Matrix
+
+| Condition on `productFirstLifecycle` | `flowVersion` | Resolved value | Behavior | Warning? |
+| :--- | :--- | :--- | :--- | :--- |
+| Field absent | `"1"`–`"4"` or absent | `false` | No-op — field not relevant for non-v5 epics | No |
+| Field absent | `"5"` | `false` | Warn — orchestrators expect v5 epics to declare flag | **Yes** — `[productFirstLifecycle-absent]` |
+| Field = `true` (explicit) | `"5"` | `true` | Product-First mode active — C4 gates, RNF gate, hierarchy tracking enabled | No |
+| Field = `false` (explicit) | `"5"` | `false` | Product-First mode disabled — unusual; orchestrators emit a WARN but proceed | **Yes** — `[productFirstLifecycle-false-on-v5]` |
+| Field = any other value (non-boolean) | any | `false` | Fallback safe; schema validation fails at Camada 0 | **Yes** — schema error surfaced |
+
+**Warning format (absent on flowVersion=5):**
+
+```
+WARN [productFirstLifecycle-absent] execution-state.json has flowVersion=5 but productFirstLifecycle is absent;
+     defaulting to false. Set productFirstLifecycle=true for EPIC-0077+ epics.
+```
+
+**Consumers:** `audit-flow-version.sh` (Camada 2 — emits `[productFirstLifecycle-absent]` when absent on v5 state files). No hard-fail — warning only (Rule 19 §Field Additions §1: absence = legacy default).
+
 ## Forbidden
 
 - Removing `flowVersion` resolution logic from orchestrators during the deprecation window.
@@ -178,7 +250,7 @@ WARN [interactiveMode-fallback] execution-state.json has interactiveMode=<value>
 
 CI script `scripts/audit-flow-version.sh` checks every `execution-state.json` under `ai/epics/epic-*/`:
 
-- Field `flowVersion` present and in `{"1", "2"}`.
+- Field `flowVersion` present and in `{"1", "2", "3", "4", "5"}` (extended by EPIC-0077 story-0077-0029).
 - If the enclosing epic uses Rule 21 (`epic/XXXX` branch exists on the remote), `flowVersion` MUST be `"2"` unless `--legacy-flow` was recorded in the epic's metadata.
 - **EPIC-0059 addition:** If `flowVersion=2`, `taskTracking.enabled` MUST be `true`. Absence or `false` → exit 1 `FLOW_VERSION_VIOLATION` with message `taskTracking required for flowVersion=2`.
 - `--self-check`: validates `jq` on PATH and existence of `plans/` directory.
@@ -190,4 +262,3 @@ Violations fail the CI build with `FLOW_VERSION_VIOLATION`.
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
-

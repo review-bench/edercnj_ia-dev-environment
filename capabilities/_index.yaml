@@ -38,3 +38,48 @@ categories:
     description: Runtime environments
     capabilities:
       - runtime.jvm.openjdk
+
+  - name: governance
+    description: Governance gates, refinement, and lifecycle enforcement
+    capabilities:
+      - governance.refinement-gate
+      - governance.value-driven-templates
+      - governance.doc-as-dod
+      - governance.dependency-policy
+      - governance.dependency-policy.cve
+      - governance.dependency-policy.license
+      - governance.dependency-policy.version
+      - governance.dependency-policy.freshness
+      - governance.dependency-policy.scope
+      - governance.ai-memory
+
+  - name: quality
+    description: Quality gates — performance, mutation, contract, regression, and DAST testing
+    capabilities:
+      - quality.performance.rest
+      - quality.performance.grpc
+      - quality.performance.cli
+      - quality.performance.graphql
+      - quality.performance.socket
+      - quality.mutation.java-pit
+      - quality.mutation.stryker
+      - quality.mutation.mutmut
+      - quality.mutation.go-mutesting
+      - quality.contract.openapi-diff
+      - quality.contract.pact
+      - quality.contract.buf
+      - quality.contract.scc
+      - quality.regression.self
+      - quality.regression.service
+      - quality.dast.zap-passive
+      - quality.dast.zap-active
+      - quality.dast.nuclei
+
+  - name: product-first
+    description: Product-First Lifecycle planning hierarchy capabilities
+    capabilities:
+      - product-first.product-capability-transformation
+      - product-first.c4-model-mandatory
+      - product-first.rnf-validation
+      - product-first.pentest-always-on
+      - product-first.story-planning-v5

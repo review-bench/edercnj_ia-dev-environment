@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0013: x-runtime-eval skill for runtime protection evaluation.
+ * Tests for story-0022-0013: x-evaluate-runtime skill for runtime protection evaluation.
  *
- * <p>Validates that the x-runtime-eval skill template is generated correctly with proper
+ * <p>Validates that the x-evaluate-runtime skill template is generated correctly with proper
  * frontmatter, 7 evaluation dimensions, 3 intensity levels, ASVS mapping, SARIF output, and scoring
  * model.
  */
-@DisplayName("x-runtime-eval Skill")
+@DisplayName("x-evaluate-runtime Skill")
 class RuntimeProtectionSkillTest {
 
     @Nested
@@ -28,18 +28,18 @@ class RuntimeProtectionSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-runtime-eval SKILL.md exists" + " after assembly")
+        @DisplayName("x-evaluate-runtime SKILL.md exists" + " after assembly")
         void assemble_runtimeProtection_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-runtime-eval/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-evaluate-runtime/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-runtime-eval")
+        @DisplayName("frontmatter contains name:" + " x-evaluate-runtime")
         void assemble_runtimeProtection_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-runtime-eval");
+            assertThat(content).contains("name: x-evaluate-runtime");
         }
 
         @Test
@@ -246,7 +246,7 @@ class RuntimeProtectionSkillTest {
         @DisplayName("SARIF contains tool driver name")
         void assemble_runtimeProtection_hasSarifToolName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("\"name\": \"x-runtime-eval\"");
+            assertThat(content).contains("\"name\": \"x-evaluate-runtime\"");
         }
 
         @Test
@@ -391,6 +391,7 @@ class RuntimeProtectionSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-runtime-eval" + "/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-evaluate-runtime" + "/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

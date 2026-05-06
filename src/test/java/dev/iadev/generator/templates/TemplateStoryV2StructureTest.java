@@ -11,10 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates RA9 structural invariants of {@code _TEMPLATE-STORY.md} v2 (story-0056-0003).
+ * Validates value-driven structural invariants of {@code _TEMPLATE-STORY.md} v2 (story-0070-0003).
  *
- * <p>Checks: all 9 section headers present, RA9-specific placeholders, Decision Rationale
- * micro-template, and Gherkin acceptance criteria preserved as subsection of Quality Gates.
+ * <p>Checks: all 9 section headers present, v2-specific AC categories in Gherkin section, Decision
+ * Rationale micro-template, and File Footprint preserved in Dependências section.
  */
 @DisplayName("TemplateStoryV2StructureTest")
 class TemplateStoryV2StructureTest {
@@ -24,15 +24,15 @@ class TemplateStoryV2StructureTest {
 
     private static final List<String> REQUIRED_SECTIONS =
             List.of(
-                    "## 1. Contexto & Escopo",
-                    "## 2. Packages (Hexagonal)",
-                    "## 3. Contratos & Endpoints",
-                    "## 4. Materialização SOLID",
-                    "## 5. Quality Gates",
-                    "## 6. Segurança",
-                    "## 7. Observabilidade",
+                    "## 1. Visão",
+                    "## 2. Persona & Cenário",
+                    "## 3. Entrega de Valor",
+                    "## 4. AC (Gherkin — 4 categorias mandatórias)",
+                    "## 5. Contratos",
+                    "## 6. Tasks",
+                    "## 7. Dependências",
                     "## 8. Decision Rationale",
-                    "## 9. Dependências & File Footprint");
+                    "## 9. Refinement Verdict");
 
     @Test
     @DisplayName("storyTemplate_hasAllNineRa9Sections")
@@ -46,14 +46,15 @@ class TemplateStoryV2StructureTest {
     }
 
     @Test
-    @DisplayName("storyTemplate_hasPackagesPlaceholders")
-    void storyTemplate_hasPackagesPlaceholders() throws IOException {
+    @DisplayName("storyTemplate_hasMandatoryAcCategories")
+    void storyTemplate_hasMandatoryAcCategories() throws IOException {
         String content = readTemplate();
         assertThat(content)
-                .as("Story template must have Packages section" + " with domain layer placeholder")
-                .contains("Domain Layer")
-                .contains("Application Layer")
-                .contains("Adapter Inbound");
+                .as("Story template must have all 4 mandatory AC categories in Gherkin section")
+                .contains("Cenario: Degenerate")
+                .contains("Cenario: Happy")
+                .contains("Cenario: Error")
+                .contains("Cenario: Performance/SLA");
     }
 
     @Test

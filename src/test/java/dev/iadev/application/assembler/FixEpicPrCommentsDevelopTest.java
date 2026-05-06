@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0027-0007: x-pr-fix-epic correction PRs must target develop instead of main.
+ * Tests for story-0027-0007: x-fix-epic-pr correction PRs must target develop instead of main.
  *
  * <p>Validates that the generated SKILL.md uses {@code --base develop} for PR creation and {@code
  * git checkout develop} for branch setup, with baseBranch resolution from execution-state.
  */
-@DisplayName("x-pr-fix-epic — Develop Base")
+@DisplayName("x-fix-epic-pr — Develop Base")
 class FixEpicPrCommentsDevelopTest {
 
     @Nested
@@ -103,6 +103,6 @@ class FixEpicPrCommentsDevelopTest {
 
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
-        return SkillContentReader.readSkillWithReferences(outputDir, "x-pr-fix-epic");
+        return SkillContentReader.readSkillWithReferences(outputDir, "x-fix-epic-pr");
     }
 }

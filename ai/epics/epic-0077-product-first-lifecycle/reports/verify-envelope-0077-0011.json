@@ -1,0 +1,18 @@
+{
+  "storyId": "story-0077-0011",
+  "epicId": "epic-0077",
+  "passed": true,
+  "coverageLine": 95,
+  "coverageBranch": 90,
+  "testsTotal": 4973,
+  "testsFailed": 0,
+  "tasksCompleted": ["TASK-0077-0011-001", "TASK-0077-0011-002", "TASK-0077-0011-003", "TASK-0077-0011-004"],
+  "artifactsPresent": [
+    "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0011.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0011.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0011.md",
+    "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0011.md",
+    "ai/epics/epic-0077-product-first-lifecycle/reports/story-completion-report-0077-0011.md"
+  ],
+  "verifiedAt": "2026-05-04T23:59:00Z"
+}

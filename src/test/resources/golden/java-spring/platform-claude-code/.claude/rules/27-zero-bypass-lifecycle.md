@@ -22,36 +22,37 @@ critical:
 
 | Bypass pattern | Why it is prohibited |
 | :--- | :--- |
-| Implementing a story via direct `git commit` + `gh pr create` without `x-story-implement` | Skips 6 Phase-1 planning artifacts, 4 Phase-3 evidence artifacts, telemetry, and the review gate |
+| Implementing a story via direct `git commit` + `gh pr create` without `x-implement-story` | Skips 6 Phase-1 planning artifacts, 4 Phase-3 evidence artifacts, telemetry, and the review gate |
 | Manually committing implementation files to an epic branch without a task PR | Skips CI-watch, specialist reviews, and coverage validation |
 | Creating a PR with `gh pr create` and body not containing "## Orchestrator Evidence" | Evidence of orchestrator execution is absent — CI audit blocks merge |
 | Implementing a task by hand and marking it DONE in `execution-state.json` | Circumvents the TDD loop, coverage gate, and diff-based reviews |
-| Rerunning only Phase 3 (`x-internal-story-verify`) on a story that had no Phase 1/2 | Evidence chain is incomplete — verify envelope cannot prove planning |
+| Rerunning only Phase 3 (`x-internal-verify-story`) on a story that had no Phase 1/2 | Evidence chain is incomplete — verify envelope cannot prove planning |
 
 ## Non-bypass Contract
 
-Every story implementation MUST be traceable to an invocation of `x-story-implement`.
-Every task implementation MUST be traceable to an invocation of `x-task-implement`.
+Every story implementation MUST be traceable to an invocation of `x-implement-story`.
+Every task implementation MUST be traceable to an invocation of `x-implement-task`.
 No PR targeting `epic/*` or `develop` may be merged without all required evidence
 artifacts present on disk and referenced in the PR body.
 
-The 12 surfaces (orchestration points) where bypass is explicitly catalogued and
+The 13 surfaces (orchestration points) where bypass is explicitly catalogued and
 prohibited are:
 
 | # | Surface | Required orchestrator | Evidence artifact |
 | :--- | :--- | :--- | :--- |
-| 01 | Story implementation | `x-story-implement` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` |
-| 02 | Task implementation | `x-task-implement` | Git log on `feat/task-*` branch (Camada 4) |
-| 03 | Story verification gate | `x-internal-story-verify` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` |
-| 04 | Specialist review | `x-review` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` |
+| 01 | Story implementation | `x-implement-story` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` |
+| 02 | Task implementation | `x-implement-task` | Git log on `feat/task-*` branch (Camada 4) |
+| 03 | Story verification gate | `x-internal-verify-story` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` |
+| 04 | Specialist review | `x-review-codebase` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` |
 | 05 | Tech-lead review | `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` |
-| 06 | PR CI-watch | `x-pr-watch-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` |
-| 07 | Architecture plan | `x-arch-plan` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` |
-| 08 | Dependency audit | `x-dependency-audit` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` |
-| 09 | Phase-1 planning wave | `x-internal-story-build-plan` | 6 artifacts under `ai/epics/epic-XXXX/plans/` |
-| 10 | Epic integrity gate | `x-internal-epic-integrity-gate` | `ai/epics/epic-XXXX/reports/verify-envelope-epic-XXXX.json` |
-| 11 | Story-level PR body | `x-pr-create` (structured body) | `## Orchestrator Evidence` section in PR description |
+| 06 | PR CI-watch | `x-watch-pr-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` |
+| 07 | Architecture plan | `x-plan-architecture` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` |
+| 08 | Dependency audit | `x-audit-dependencies` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` |
+| 09 | Phase-1 planning wave | `x-internal-build-story-plan` | 6 artifacts under `ai/epics/epic-XXXX/plans/` |
+| 10 | Epic integrity gate | `x-internal-verify-epic-integrity` | `ai/epics/epic-XXXX/reports/verify-envelope-epic-XXXX.json` |
+| 11 | Story-level PR body | `x-create-pr` (structured body) | `## Orchestrator Evidence` section in PR description |
 | 12 | Telemetry stream | `telemetry-phase.sh` markers | `ai/epics/epic-XXXX/telemetry/events.ndjson` (phase.start + phase.end pairs) |
+| 13 | Dependency policy gate | `x-validate-dependency-policy` (conditional: `dependencies.policy.enabled=true`) | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` |
 
 ## Enforcement Layers
 
@@ -76,7 +77,7 @@ Orchestrator SKILL.md files phrase every mandatory invocation as
 ### Camada 3 — CI audit
 
 `scripts/audit-execution-integrity.sh` runs on every PR to `develop` or `epic/*`.
-- Verifies all 12 surface evidence artifacts for each merged story.
+- Verifies all 13 surface evidence artifacts for each merged story.
 - Fails with `EIE_EVIDENCE_MISSING` when any mandatory artifact is absent.
 - Extended in EPIC-0059 (story-0059-0003) to include bypass-flag checks:
   `scripts/audit-bypass-flags.sh` scans every merged SKILL.md change for
@@ -85,9 +86,9 @@ Orchestrator SKILL.md files phrase every mandatory invocation as
 ### Camada 4 — Observability
 
 Telemetry NDJSON under `ai/epics/epic-XXXX/telemetry/events.ndjson` provides a
-continuous audit trail. The `/x-telemetry-analyze` skill consumes it to produce
+continuous audit trail. The `/x-analyze-telemetry` skill consumes it to produce
 Gantt timelines and phase aggregates. Absence of `phase.start`/`phase.end` pairs
-for `x-story-implement` phases is a Camada 4 signal that the orchestrator was
+for `x-implement-story` phases is a Camada 4 signal that the orchestrator was
 not invoked — flagged as a WARNING in the telemetry report.
 
 ## Exceptions
@@ -98,7 +99,7 @@ Two and only two legitimate paths exist to bypass orchestrator enforcement:
 
 Epics with `flowVersion: "1"` (or absent) in `execution-state.json` were created
 before the orchestrator model was introduced. For these epics, `--legacy-flow` on
-`x-epic-implement` or `x-story-implement` disables Rule 21 branch routing AND
+`x-implement-epic` or `x-implement-story` disables Rule 21 branch routing AND
 produces a backward-compatibility opt-out. No new epics may use `--legacy-flow`
 after EPIC-0059 merges.
 
@@ -121,8 +122,8 @@ EPIC-0059, story-0059-0005).
 
 ## Forbidden
 
-- Direct `git commit` + `gh pr create` for a story without invoking `x-story-implement`.
-- Direct `git commit` + `gh pr create` for a task without invoking `x-task-implement`.
+- Direct `git commit` + `gh pr create` for a story without invoking `x-implement-story`.
+- Direct `git commit` + `gh pr create` for a task without invoking `x-implement-task`.
 - Marking a story `COMPLETE` in `execution-state.json` without the evidence artifact set.
 - Creating a PR with a body that lacks `## Orchestrator Evidence` (catches manual PRs).
 - Merging a PR that fails `scripts/audit-execution-integrity.sh` (bypassing the CI gate).
@@ -135,7 +136,7 @@ EPIC-0059, story-0059-0005).
 ## Audit
 
 `scripts/audit-execution-integrity.sh` (extended in EPIC-0059 story-0059-0003) is
-the primary CI gate for Rule 27. It verifies all 12 surfaces listed in the
+the primary CI gate for Rule 27. It verifies all 13 surfaces listed in the
 Non-bypass Contract. Exit codes follow the Rule 26 §Standardized Exit Codes matrix:
 
 | Exit | Code | Condition |

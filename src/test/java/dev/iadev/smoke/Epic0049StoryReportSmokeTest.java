@@ -44,7 +44,7 @@ class Epic0049StoryReportSmokeTest extends SmokeTestBase {
     private static final String SKILL_SOURCE_REL =
             "src/main/resources/targets/claude/skills/"
                     + "core/internal/plan/"
-                    + "x-internal-story-report";
+                    + "x-internal-write-story-report";
 
     private static final String TEMPLATE_SOURCE_REL =
             "src/main/resources/shared/templates/" + "_TEMPLATE-STORY-COMPLETION-REPORT.md";
@@ -53,7 +53,7 @@ class Epic0049StoryReportSmokeTest extends SmokeTestBase {
 
     private static final List<String> REQUIRED_FRONTMATTER =
             List.of(
-                    "name: x-internal-story-report",
+                    "name: x-internal-write-story-report",
                     "visibility: internal",
                     "user-invocable: false",
                     "category: internal-plan");

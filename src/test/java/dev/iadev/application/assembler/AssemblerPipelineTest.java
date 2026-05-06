@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/** Tests for AssemblerPipeline — orchestrates 24 assemblers per RULE-005. */
+/** Tests for AssemblerPipeline — orchestrates 26 assemblers per RULE-005. */
 @DisplayName("AssemblerPipeline")
 class AssemblerPipelineTest {
 
@@ -44,6 +44,7 @@ class AssemblerPipelineTest {
                     "SloSliTemplateAssembler",
                     "DocsContributingAssembler",
                     "DataMigrationPlanAssembler",
+                    "SystemArchAssembler",
                     "CicdAssembler",
                     "EpicReportAssembler",
                     "PlanTemplatesAssembler",
@@ -55,11 +56,11 @@ class AssemblerPipelineTest {
     class BuildAssemblers {
 
         @Test
-        @DisplayName("returns exactly 24 assembler descriptors")
-        void assemble_whenCalled_returnsExactly23() {
+        @DisplayName("returns exactly 26 assembler descriptors")
+        void assemble_whenCalled_returnsExactly26() {
             List<AssemblerDescriptor> descriptors = AssemblerPipeline.buildAssemblers();
 
-            assertThat(descriptors).hasSize(25);
+            assertThat(descriptors).hasSize(26);
         }
 
         @Test
@@ -82,7 +83,7 @@ class AssemblerPipelineTest {
             assertThat(descriptors.get(1).target()).isEqualTo(AssemblerTarget.CLAUDE);
             assertThat(descriptors.get(10).target()).isEqualTo(AssemblerTarget.ROOT);
             assertThat(descriptors.get(19).target()).isEqualTo(AssemblerTarget.ROOT);
-            assertThat(descriptors.get(23).target()).isEqualTo(AssemblerTarget.CLAUDE);
+            assertThat(descriptors.get(24).target()).isEqualTo(AssemblerTarget.CLAUDE);
         }
 
         @Test

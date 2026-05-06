@@ -1,0 +1,27 @@
+{
+  "storyId": "story-0070-0002",
+  "epicId": "EPIC-0070",
+  "verifiedAt": "2026-04-30T00:00:00Z",
+  "passed": true,
+  "coverageLine": null,
+  "coverageBranch": null,
+  "acCheckResults": [
+    { "scenario": "Happy — 9 v2 sections present", "passed": true, "note": "All 9 sections verified via grep" },
+    { "scenario": "Degenerate — 0 v1 technical sections", "passed": true, "note": "grep -E returns no matches for Packages/Contratos/SOLID/Segurança/Observabilidade" },
+    { "scenario": "Error — frontmatter v3.0 present", "passed": true, "note": "requires-capabilities: [governance.value-driven-templates] + template-version: '2.0'" },
+    { "scenario": "Boundary — dogfood validation", "passed": true, "note": "EPIC-0070 and EPIC-0064 metadata maps to v2 sections; hypothesis is in Se/então/porque form" }
+  ],
+  "acCheckCount": 4,
+  "artifacts": [
+    "src/main/resources/shared/templates/_TEMPLATE-EPIC.md (REWRITTEN v2)",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/arch-story-0070-0002.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/plan-story-0070-0002.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/tests-story-0070-0002.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/tasks-story-0070-0002.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/security-story-0070-0002.md",
+    "ai/epics/epic-0070-value-driven-templates-v2/plans/compliance-story-0070-0002.md"
+  ],
+  "prNumber": 885,
+  "prMergeStatus": "MERGED",
+  "commitSha": "f69b43bc0"
+}

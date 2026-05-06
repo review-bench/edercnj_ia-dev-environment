@@ -26,7 +26,7 @@ the same phase even when both write to the same hotspot file — historically
 `SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`,
 `pom.xml`, and the golden-file tree under `src/test/resources/golden/**`.
 
-When `x-epic-implement` / `x-story-implement` dispatched those stories as
+When `x-implement-epic` / `x-implement-story` dispatched those stories as
 parallel worktrees, merge conflicts occurred on the hotspot files at
 integration time. The cost surfaced across EPIC-0036..EPIC-0040: at least one
 hotspot collision per epic, sometimes blocking the integration branch for
@@ -62,22 +62,22 @@ across the planning → mapping → execution pipeline. Concretely:
    `.gitignore`, `CHANGELOG.md`, `pom.xml`, `src/test/resources/golden/**`)
    are treated as **exclusive-write**: any pair that touches the same
    hotspot serializes, even across waves.
-4. **New skill `/x-parallel-eval --scope=epic|story|task`.** Standalone
+4. **New skill `/x-evaluate-parallelism --scope=epic|story|task`.** Standalone
    Java-backed skill (under `dev.iadev.parallelism.*`) that parses footprints
    and emits a collision matrix + reagrupment recommendation. Output is
    deterministic (alphabetic ordering, no embedded timestamps) so golden
    tests can pin its behaviour (RULE-008).
-5. **`x-epic-map` Step 8.5.** Invokes `/x-parallel-eval --scope=epic` and
+5. **`x-epic-map` Step 8.5.** Invokes `/x-evaluate-parallelism --scope=epic` and
    annotates the Implementation Map with a new section "8.5 Restrições de
    Paralelismo" listing the pairs that must be serialized and the reason.
-6. **Execution gate in `x-epic-implement` (Phase 0.5.0) and
-   `x-story-implement` (Phase 1.5).** Before any parallel worktree
-   dispatch, the gate re-runs `/x-parallel-eval`. On collision, the
+6. **Execution gate in `x-implement-epic` (Phase 0.5.0) and
+   `x-implement-story` (Phase 1.5).** Before any parallel worktree
+   dispatch, the gate re-runs `/x-evaluate-parallelism`. On collision, the
    executor **degrades the wave to serial and logs a visible warning** with
    the conflicting pairs (RULE-005). It does NOT abort. The downgrade is
    persisted on `ExecutionState.parallelismDowngrades` for audit.
 7. **Backward compatibility (RULE-006).** Plans generated before this epic
-   do not carry a footprint. `/x-parallel-eval` treats a missing footprint
+   do not carry a footprint. `/x-evaluate-parallelism` treats a missing footprint
    as "unknown", emits a warning, and does NOT block execution. Re-planning
    with `--force` is the recommended migration path.
 8. **Retroactive re-evaluation.** `plans/epic-0041/migrations/` contains
@@ -105,7 +105,7 @@ files, `CLAUDE.md`, `pom.xml`) where most real conflicts actually happen,
 (c) the engineering cost dominates the hotspot-centric benefit. RULE-002
 keeps this option open for a later iteration — path granularity is a
 subset of class granularity, so an AST-backed scanner can augment
-`/x-parallel-eval` without breaking the contract.
+`/x-evaluate-parallelism` without breaking the contract.
 
 ### A3 — Granularity by Java class only (skip non-code hotspots)
 
@@ -142,7 +142,7 @@ class-only model would miss the majority of real conflicts.
 
 ### Neutral
 
-- `/x-parallel-eval` is additive — no existing skill changes its user-facing
+- `/x-evaluate-parallelism` is additive — no existing skill changes its user-facing
   contract. Existing `x-epic-map` callers continue to work; Step 8.5 is
   rendered only when footprints are available.
 - The feature is orthogonal to EPIC-0038 (task-first flow) and EPIC-0040
@@ -152,7 +152,7 @@ class-only model would miss the majority of real conflicts.
 ## Related ADRs
 
 - [ADR-0004 — Worktree-First Branch Creation Policy](ADR-0004-worktree-first-branch-creation-policy.md)
-  — the parallelism gate fires before `/x-git-worktree create`, so
+  — the parallelism gate fires before `/x-manage-worktrees create`, so
   downgraded waves never spawn competing worktrees in the first place.
 - [ADR-0005 — Telemetry Architecture](ADR-0005-telemetry-architecture.md)
   — parallelism downgrades are surfaced through the same

@@ -29,26 +29,26 @@ class InteractiveModePersistenceTest {
 
     private static final List<String> ORCHESTRATOR_SKILLS =
             List.of(
-                    "core/dev/x-epic-implement",
-                    "core/dev/x-story-implement",
-                    "core/dev/x-task-implement",
+                    "core/dev/x-implement-epic",
+                    "core/dev/x-implement-story",
+                    "core/dev/x-implement-task",
                     "core/ops/x-release",
-                    "core/plan/x-epic-orchestrate",
-                    "core/review/x-review",
+                    "core/plan/x-orchestrate-epic",
+                    "core/review/x-review-codebase",
                     "core/review/x-review-pr",
-                    "core/pr/x-pr-merge-train");
+                    "core/pr/x-manage-pr-merge-train");
 
     @ParameterizedTest(name = "{0}")
     @ValueSource(
             strings = {
-                "core/dev/x-epic-implement",
-                "core/dev/x-story-implement",
-                "core/dev/x-task-implement",
+                "core/dev/x-implement-epic",
+                "core/dev/x-implement-story",
+                "core/dev/x-implement-task",
                 "core/ops/x-release",
-                "core/plan/x-epic-orchestrate",
-                "core/review/x-review",
+                "core/plan/x-orchestrate-epic",
+                "core/review/x-review-codebase",
                 "core/review/x-review-pr",
-                "core/pr/x-pr-merge-train"
+                "core/pr/x-manage-pr-merge-train"
             })
     @DisplayName("orchestrator SKILL.md writes interactiveMode field in Phase 0")
     void orchestrator_skillMd_writesInteractiveModeField(String skillPath) throws IOException {

@@ -41,6 +41,7 @@ class AssemblerFactoryPlatformTest {
                     "SloSliTemplateAssembler",
                     "DocsContributingAssembler",
                     "DataMigrationPlanAssembler",
+                    "SystemArchAssembler",
                     "CicdAssembler",
                     "EpicReportAssembler",
                     "DocsAdrAssembler",
@@ -51,11 +52,11 @@ class AssemblerFactoryPlatformTest {
     class PlatformCounts {
 
         @Test
-        @DisplayName("total assembler count is 24")
-        void buildAssemblers_totalCount_is25() {
+        @DisplayName("total assembler count is 26")
+        void buildAssemblers_totalCount_is26() {
             List<AssemblerDescriptor> descriptors = AssemblerFactory.buildAssemblers();
 
-            assertThat(descriptors).hasSize(25);
+            assertThat(descriptors).hasSize(26);
         }
 
         @Test
@@ -70,13 +71,13 @@ class AssemblerFactoryPlatformTest {
         }
 
         @Test
-        @DisplayName("14 assemblers have SHARED platform")
-        void buildAssemblers_sharedCount_is14() {
+        @DisplayName("15 assemblers have SHARED platform")
+        void buildAssemblers_sharedCount_is15() {
             List<String> sharedNames = filterByPlatform(Platform.SHARED);
 
             assertThat(sharedNames)
                     .as("SHARED assemblers")
-                    .hasSize(14)
+                    .hasSize(15)
                     .containsExactlyInAnyOrderElementsOf(SHARED_NAMES);
         }
 
@@ -86,7 +87,7 @@ class AssemblerFactoryPlatformTest {
             int claude = filterByPlatform(Platform.CLAUDE_CODE).size();
             int shared = filterByPlatform(Platform.SHARED).size();
 
-            assertThat(claude + shared).as("11 + 14 = 25").isEqualTo(25);
+            assertThat(claude + shared).as("11 + 15 = 26").isEqualTo(26);
         }
     }
 

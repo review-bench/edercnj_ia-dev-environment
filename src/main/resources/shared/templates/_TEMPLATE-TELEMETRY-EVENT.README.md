@@ -29,7 +29,7 @@ that fail validation so that the data remains machine-processable.
 | `storyId` | string \| null | O | `story-NNNN-NNNN` | `"story-0040-0001"` |
 | `taskId` | string \| null | O | `TASK-NNNN-NNNN-NNN` | `"TASK-0040-0001-001"` |
 | `type` | string (enum) | **M** | see §3 | `"tool.call"` |
-| `skill` | string \| null | O | kebab-case, max 64 | `"x-story-implement"` |
+| `skill` | string \| null | O | kebab-case, max 64 | `"x-implement-story"` |
 | `phase` | string \| null | O | max 64 chars | `"Phase-2-Implementation"` |
 | `tool` | string \| null | O | max 64 chars | `"Bash"` |
 | `durationMs` | integer \| null | O | `>= 0` | `12345` |
@@ -106,7 +106,7 @@ Three fixtures ship alongside this contract under
   "storyId": "story-0040-0001",
   "taskId": "TASK-0040-0001-001",
   "type": "skill.end",
-  "skill": "x-story-implement",
+  "skill": "x-implement-story",
   "phase": "Phase-2-Implementation",
   "durationMs": 12345,
   "status": "ok",

@@ -1,0 +1,40 @@
+{
+  "storyId": "story-0077-0004",
+  "epicId": "epic-0077",
+  "verifiedAt": "2026-05-04T00:00:00Z",
+  "passed": true,
+  "phase1Artifacts": {
+    "arch": "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0004.md",
+    "plan": "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0004.md",
+    "tests": "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0004.md",
+    "tasks": "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0004.md",
+    "security": "ai/epics/epic-0077-product-first-lifecycle/plans/security-story-0077-0004.md",
+    "compliance": "ai/epics/epic-0077-product-first-lifecycle/plans/compliance-story-0077-0004.md"
+  },
+  "phase3Artifacts": {
+    "specialistReview": "ai/epics/epic-0077-product-first-lifecycle/plans/review-story-0077-0004.md",
+    "techLeadReview": "ai/epics/epic-0077-product-first-lifecycle/plans/techlead-review-story-0077-0004.md",
+    "completionReport": "ai/epics/epic-0077-product-first-lifecycle/reports/story-completion-report-0077-0004.md",
+    "verifyEnvelope": "ai/epics/epic-0077-product-first-lifecycle/reports/verify-envelope-0077-0004.json"
+  },
+  "tasks": [
+    { "taskId": "TASK-0077-0004-001", "status": "DONE", "prNumber": 969, "commitSha": "merged" },
+    { "taskId": "TASK-0077-0004-002", "status": "DONE", "prNumber": 970, "commitSha": "f42461aaa" },
+    { "taskId": "TASK-0077-0004-003", "status": "DONE", "prNumber": 971, "commitSha": "7d32fdcf4" }
+  ],
+  "testResults": {
+    "total": 4784,
+    "failures": 0,
+    "newTests": 7,
+    "lineCoverage": ">=95%",
+    "branchCoverage": ">=90%"
+  },
+  "smokeTest": {
+    "script": "ci/smoke/ideation-template-smoke.sh",
+    "result": "PASS",
+    "pilotsValidated": 3,
+    "sectionsRequired": 7
+  },
+  "specialistReviewVerdict": "GO",
+  "techLeadReviewVerdict": "GO"
+}

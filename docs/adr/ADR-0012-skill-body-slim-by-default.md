@@ -57,8 +57,8 @@ architecture level:
    cross-checks the two halves.
 
 Bucket A item A5 of the `mellow-mixing-rainbow.md` plan (PR #534) deleted the
-five dead `## Slim Mode` sections from `x-test-tdd`, `x-story-implement`,
-`x-git-commit`, `x-code-format`, and `x-code-lint`. That cleanup removed the
+five dead `## Slim Mode` sections from `x-drive-tdd`, `x-implement-story`,
+`x-commit-changes`, `x-format-code`, and `x-lint-code`. That cleanup removed the
 contradiction but did not solve the underlying problem: the verbose body is
 still re-injected on every invocation.
 
@@ -89,8 +89,8 @@ Concretely:
    `references/full-protocol.md` only when the slim contract is insufficient
    for the task at hand. That conditional read costs one extra `Read` tool
    call — an explicit, observable cost.
-4. The five skills that previously carried `## Slim Mode` — `x-test-tdd`,
-   `x-story-implement`, `x-git-commit`, `x-code-format`, `x-code-lint` —
+4. The five skills that previously carried `## Slim Mode` — `x-drive-tdd`,
+   `x-implement-story`, `x-commit-changes`, `x-format-code`, `x-lint-code` —
    are the **pilot**. Future skills migrate to this pattern as they enter
    maintenance (no force-migration of the corpus).
 5. Decision criterion for "minimum viable": the slim `SKILL.md` MUST be
@@ -172,7 +172,7 @@ authors cannot maintain two halves of the same document in sync.
 
 ### Alternative C — Split each skill into two peer skills
 
-Have `/x-git-commit` (happy path) and `/x-git-commit-full` (complete
+Have `/x-commit-changes` (happy path) and `/x-git-commit-full` (complete
 protocol) as separate invocable skills.
 
 **Rejected.** Explodes the `/` command surface (roughly doubles it),

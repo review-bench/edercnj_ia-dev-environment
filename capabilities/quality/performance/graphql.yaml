@@ -1,0 +1,31 @@
+id: quality.performance.graphql
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  GraphQL performance gate — runs k6 with the graphql plugin against GraphQL endpoints
+  and validates P50/P95/P99 latency and throughput. Invoked by /x-test-performance
+  when interfaces[].type = graphql.
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  tool:
+    type: string
+    enum: [k6]
+    default: k6
+  slo:
+    p50_ms:
+      type: integer
+      default: 100
+    p95_ms:
+      type: integer
+      default: 200
+    p99_ms:
+      type: integer
+      default: 500
+    throughput_rps:
+      type: integer
+      default: 100

@@ -1,306 +1,198 @@
+---
+requires-capabilities: [governance.value-driven-templates]
+template-version: "2.0"
+---
+
 # História: <Título da História>
 
 **ID:** <story-XXXX-YYYY>
 **Chave Jira:** <CHAVE-JIRA>
 **Status:** Pendente
 
-> **Status Transitions (Rule 22 — lifecycle-integrity):**
-> valores permitidos `Pendente | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
-> Transições válidas: `Pendente → Planejada | Em Andamento | Falha | Bloqueada`;
+> **Status Transitions (Rule 29 — refinement-gate):**
+> valores permitidos `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
+> Transições válidas: `Pendente → Refinada` (via `/x-refine-story`);
+> `Refinada → Planejada | Em Andamento | Bloqueada`;
 > `Planejada → Em Andamento | Falha | Bloqueada`;
 > `Em Andamento → Concluída | Falha | Bloqueada`;
-> reabertura `Concluída → Em Andamento` (via `x-status-reconcile --apply`) e
+> reabertura `Concluída → Em Andamento` (via `x-reconcile-status --apply`) e
 > `Falha → Pendente`; `Bloqueada → Pendente | Planejada | Em Andamento | Falha`.
-> Ver [`.claude/rules/22-lifecycle-integrity.md`](../.claude/rules/22-lifecycle-integrity.md).
+> Ver [`.claude/rules/29-refinement-gate.md`](../.claude/rules/29-refinement-gate.md).
 
 ---
 
-## 1. Contexto & Escopo
+## 1. Visão
 
-Como **<Persona>**, eu quero <ação/capacidade>, garantindo que <benefício/resultado esperado>.
+> **O que queremos alcançar — em uma frase de usuário.**
+> Formato: `Como <persona específica>, quero <capacidade>, para que <benefício mensurável>`.
+> A persona deve ser um papel real (ex: "engenheiro de backend configurando um novo serviço"),
+> não um sistema ("o sistema") nem um genérico ("o usuário").
 
-<Contexto adicional (2-3 parágrafos) explicando o porquê desta história, como ela se encaixa no épico, e quaisquer decisões de design relevantes.>
+Como **<persona específica>**, quero <capacidade/ação concreta>, para que <benefício mensurável/observável>.
 
-### 1.1 Regras Transversais Aplicáveis
-
-> Referência às regras definidas no Épico (seção 4). Listar apenas as regras que impactam esta história.
-
-| ID | Título |
-| :--- | :--- |
-| <RULE-NNN> | <Título da regra> |
-
-### 1.2 Entrega de Valor
-
-- **Valor Principal:** <Descrição do valor de negócio mensurável>
-- **Métrica de Sucesso:** <Como medir que o valor foi entregue>
-- **Impacto no Negócio:** <Impacto direto para o usuário/stakeholder>
+<Contexto adicional (1-3 parágrafos): por que esta história existe agora, como ela se encaixa no épico, qual dor ela alivia. Seja específico — evite "melhora a experiência" sem evidência.>
 
 ---
 
-## 2. Packages (Hexagonal)
+## 2. Persona & Cenário
 
-> Packages novos/tocados por esta história em cada camada.
-> Camadas sem impacto: marcadas `—`.
-> Direção: `adapter → application → domain` (inward only — Rule 04).
+> **Quem usa isso — e em que contexto.**
+> Descreva a persona com granularidade suficiente para guiar decisões de design.
+> Inclua o cenário de uso (jornada do usuário até este ponto) e os critérios de sucesso pessoal.
 
-### Domain Layer
-
-- `domain/<package>/` — <Entity|VO|Service|Port>: `<NomeClasse>`
-- <ou `—` se nenhuma classe de domínio é alterada>
-
-### Application Layer
-
-- `application/<package>/` — UseCases: `<NomeUseCase>`
-- Portas outbound: `<NomePort>`
-- <ou `—`>
-
-### Adapter Inbound
-
-- `adapter/inbound/<type>/` — <Controller|CLI|Handler>: `<NomeClasse>`
-- DTOs: `<NomeDTO>`
-- <ou `—`>
-
-### Adapter Outbound
-
-- `adapter/outbound/<type>/` — `<NomeAdapter>`
-- <ou `—`>
-
-### Infrastructure
-
-- `infrastructure/<package>/` — <Config|Observability>
-- <ou `—`>
-
-**Dependency direction:** `adapter.inbound/outbound → application → domain` (inward only).
+**Persona:** <Papel/título específico>
+**Cenário de uso:** <O que a persona está fazendo quando encontra essa feature. Ex: "configurando pipeline de CI pela primeira vez", "revisando uma story em refinement gate">
+**Dor atual:** <O que a persona faz hoje que é lento, incorreto, ou frustrante>
+**Critério de sucesso pessoal:** <O que a persona diria para confirmar que esta story entregou valor? Ex: "não preciso mais preencher manualmente X">
+**Contexto técnico relevante:** <O que a persona sabe/não sabe; ex: "familiarizada com YAML, não com Pebble templates">
 
 ---
 
-## 3. Contratos & Endpoints
+## 3. Entrega de Valor
 
-> Contratos de dados (request/response), endpoints expostos, ou eventos produzidos/consumidos.
+> **Por que isso importa — em termos mensuráveis.**
 
-### 3.1 Request
+- **Valor Principal:** <Descrição do valor de negócio mensurável. Evite "melhora eficiência" — seja específico: "reduz de 3 passos manuais para 1 clique">
+- **Métrica de Sucesso:** <Como medir que o valor foi entregue. Unidade + valor-alvo + quando medir>
+- **Impacto no Negócio:** <Impacto direto para o usuário/stakeholder. Ex: "revisores gastam 30% menos tempo em code review de stories mal-escritas">
+
+---
+
+## 4. AC (Gherkin — 4 categorias mandatórias)
+
+> **Critérios de aceite em Gherkin PT-BR.**
+> As 4 categorias abaixo são mandatórias. Adapte os cenários ao domínio desta story.
+> Ordem TPP: degenerate → happy → error/boundary → performance/SLA → security.
+>
+> **Categorias:**
+> - `Degenerate` — input vazio, zero, nulo, lista vazia
+> - `Happy` — fluxo principal de valor (caminho dourado)
+> - `Error/Boundary` — falha externa controlada, valores nos limites do domínio
+> - `Performance/SLA` — tempo de resposta, throughput, tamanho de payload
+> - `Security` — autenticação, autorização, injeção, dados sensíveis
+
+```gherkin
+Cenario: Degenerate — <input nulo/vazio/zero>
+  DADO que <pré-condição de caso nulo ou entrada mínima>
+  QUANDO <ação é executada com esse input>
+  ENTÃO <comportamento esperado — ex: erro tipado, lista vazia, 0 resultados>
+
+Cenario: Happy — <fluxo principal>
+  DADO que <pré-condição válida>
+  QUANDO <ação principal é executada>
+  ENTÃO <resultado esperado>
+  E <validação adicional, se necessária>
+
+Cenario: Error — <falha externa ou condição de borda>
+  DADO que <pré-condição de falha ou valor no limite do domínio>
+  QUANDO <ação é executada>
+  ENTÃO <comportamento de erro esperado>
+  E <nenhum efeito colateral indesejado>
+
+Cenario: Performance/SLA — <latência ou throughput dentro do SLA>
+  DADO que <conjunto típico de dados de entrada>
+  QUANDO <operação é executada>
+  ENTÃO <tempo de resposta ≤ Xms (p95)> ou <throughput ≥ Y req/s>
+
+Cenario: Security — <autenticação, autorização ou sanitização>
+  DADO que <usuário sem permissão> ou <input malicioso>
+  QUANDO <ação é tentada>
+  ENTÃO <acesso negado> ou <input sanitizado sem efeito indesejado>
+```
+
+---
+
+## 5. Contratos
+
+> **Interfaces tipadas — request, response, eventos.**
+> Use tabelas para campos escalares. Para schemas complexos, use bloco JSON/TypeScript.
+> Esses contratos são input para `x-detect-spec-drift` (EPIC-0071) — seja preciso nos tipos.
+
+### 5.1 Request
 
 | Campo | Tipo | M/O | Validações | Exemplo |
 | :--- | :--- | :--- | :--- | :--- |
-| `<campo>` | `<UUID/BigDecimal/String(255)/Integer/List<String>>` | `<M ou O>` | `<min/max, regex, enum values>` | `<valor concreto>` |
+| `<campo>` | `<String(255)/UUID/BigDecimal/Integer/List<String>>` | `<M ou O>` | `<min/max, regex, enum values>` | `<valor concreto>` |
 
-### 3.2 Response
+### 5.2 Response
 
 | Campo | Tipo | Sempre presente | Descrição |
 | :--- | :--- | :--- | :--- |
 | `<campo>` | `<UUID/String/BigDecimal>` | `<Sim ou Não>` | `<descrição do campo>` |
 
-### 3.3 Error Codes Mapeados
+### 5.3 Error Codes
 
-| HTTP Status | Error Code | Condição | Mensagem (RFC 7807) |
-| :--- | :--- | :--- | :--- |
-| `<status>` | `<code>` | `<condição que dispara>` | `<mensagem padrão RFC 7807>` |
+| HTTP Status | Error Code | Condição |
+| :--- | :--- | :--- |
+| `<status>` | `<code>` | `<condição que dispara>` |
 
-### 3.4 Event Schema (para event-driven)
+### 5.4 Event Schema (para event-driven)
 
-> Incluir apenas quando `eventDriven: true`.
+> Incluir apenas quando a story produz ou consome eventos.
 
 | Campo | Tipo | Obrigatório | Descrição |
 | :--- | :--- | :--- | :--- |
 | `eventType` | `String` | Sim | Tipo do evento |
 | `eventVersion` | `String` | Sim | Versão do schema |
-| `timestamp` | `Instant` | Sim | Momento da emissão (ISO-8601 UTC) |
+| `timestamp` | `Instant` | Sim | ISO-8601 UTC |
 | `correlationId` | `UUID` | Sim | ID de correlação |
 | `payload` | `Object` | Sim | Payload do evento |
 
 ---
 
-## 4. Materialização SOLID
+## 6. Tasks
 
-> Regras de negócio e restrições SOLID aplicáveis a esta história.
-> Referenciar regras do épico por ID (RULE-NNN). Adicionar restrições locais se necessário.
+> **Decomposição em tarefas implementáveis.**
+> Cada task = 1 branch = 1 PR. Mínimo 3, máximo 8. Tamanho ideal: M (50-150 LOC).
 
-### 4.1 Regras Aplicáveis do Épico
-
-| ID | Título | Impacto nesta história |
-| :--- | :--- | :--- |
-| <RULE-NNN> | <Título da regra do épico> | <Como se aplica aqui> |
-
-### 4.2 Princípios SOLID Aplicáveis
-
-- **SRP:** <Uma classe = uma razão para mudar. Ex: `PaymentController` trata apenas HTTP, delega lógica ao use case.>
-- **OCP:** <Novo comportamento = nova classe, nunca modificar handlers existentes.>
-- **LSP:** <Toda implementação deve cumprir o contrato da interface.>
-- **ISP:** <Interfaces pequenas e focadas; sem implementações vazias.>
-- **DIP:** <Depender de abstrações (ports), não de implementações concretas.>
-
-### 4.3 Coding Constraints
-
-- Métodos: ≤ 25 linhas (Rule 03)
-- Classes: ≤ 250 linhas (Rule 03)
-- Parâmetros: ≤ 4 por função (usar parameter object se mais)
-- Linha: ≤ 120 caracteres
-
----
-
-## 5. Quality Gates
-
-### 5.1 Definition of Ready (DoR Local)
-
-- [ ] <Pré-condição específica desta história>
-- [ ] <Decisão técnica que precisa estar tomada>
-- [ ] <Artefato/schema/config que precisa existir>
-
-### 5.2 Acceptance Criteria (Gherkin)
-
-> Gherkin scenarios MUST follow TPP order: degenerate → unconditional → conditions → iterations → edge cases.
-
-```gherkin
-Cenario: <Nome do cenário de caso degenerado>
-  DADO que <pré-condição de caso nulo/vazio>
-  QUANDO <ação>
-  ENTÃO <comportamento esperado>
-
-Cenario: <Nome do cenário de sucesso (happy path)>
-  DADO que <pré-condição>
-  QUANDO <ação>
-  E <condição adicional>
-  ENTÃO <resultado esperado>
-  E <validação adicional>
-
-Cenario: <Nome do cenário de erro>
-  DADO que <pré-condição>
-  QUANDO <ação com dados inválidos>
-  ENTÃO <comportamento de erro esperado>
-  E <validação de integridade>
-
-Cenario: <Nome do cenário de borda>
-  DADO que <condição de borda>
-  QUANDO <ação>
-  ENTÃO <comportamento esperado>
-```
-
-**Mandatory scenario categories:**
-- [ ] Degenerate cases (null, empty, zero)
-- [ ] Happy path (basic success)
-- [ ] Error paths (each error type)
-- [ ] Boundary values (at-min, at-max, past-max)
-
-### 5.3 Definition of Done (DoD Local)
-
-- [ ] <Critério de aceite implementado e validado>
-- [ ] <Componente/handler/endpoint funcional>
-- [ ] <Teste específico passando>
-- [ ] Pelo menos 1 teste automatizado (unitário, integração ou E2E) validando o critério de aceite principal
-- [ ] Smoke test passando (quando testing.smoke_tests == true)
-
-### 5.4 Global DoD (Reference)
-
-> Copiar do Épico. Mantido para referência rápida durante code review.
-
-- **Cobertura:** ≥ 95% Line, ≥ 90% Branch (Rule 05 — absolute gate)
-- **TDD Compliance:** test-first (RED→GREEN→REFACTOR). Tests incremental (TPP).
-- **Double-Loop TDD:** Gherkin scenarios → acceptance tests (outer loop); unit tests via TPP (inner loop).
-
----
-
-## 6. Segurança
-
-> Controles de segurança aplicáveis a esta história (Rule 06).
-
-| Área | Controle | Status |
-| :--- | :--- | :--- |
-| Input validation | <Validação de entrada esperada> | Required |
-| Authentication | <Requerimentos de autenticação/autorização> | Required |
-| Sensitive data | <Campos sensíveis e como protegê-los> | Required |
-| Path operations | <Normalização de caminhos se aplicável> | If applicable |
-
-**Forbidden (Rule 06):** SQL concatenation, hardcoded secrets, `Math.random()` for tokens, blindly following symlinks.
-
----
-
-## 7. Observabilidade
-
-> Logging, tracing, e métricas necessários para esta história (Rule 07).
-
-### 7.1 Structured Logging
-
-| Evento | Level | Campos obrigatórios |
-| :--- | :--- | :--- |
-| <nome do evento> | `INFO/WARN/ERROR` | `trace_id`, `span_id`, `<domain field>` |
-
-### 7.2 Metrics
-
-| Métrica | Tipo | Tags | SLO |
-| :--- | :--- | :--- | :--- |
-| `<nome_da_metrica>` | `counter/gauge/histogram` | `<tags>` | <SLO se aplicável> |
-
-**Correlation ID propagation:** `X-Correlation-ID` header must flow through all downstream calls.
-
----
-
-## 8. Decision Rationale
-
-> Registro de decisões de design desta história.
-> Obrigatório: ≥ 1 item com o micro-template de 4 linhas (Rule 24 / planning-standards-kp).
-> Aceita `N/A — <motivo curto>` apenas quando genuinamente sem trade-off relevante.
-
-**Decisão:** <statement da decisão tomada>
-**Motivo:** <por que esta opção foi escolhida — restrição técnica ou de negócio>
-**Alternativa descartada:** <o que foi rejeitado e por quê>
-**Consequência:** <trade-off ou implicação futura>
-
----
-
-## 9. Dependências & File Footprint
-
-### 9.1 Dependências
-
-| Blocked By | Blocks |
-| :--- | :--- |
-| <story-XXXX-YYYY ou -> | <story-XXXX-YYYY ou -> |
-
-### 9.2 Tasks
-
-> Each task = 1 branch = 1 PR. Minimum 3, maximum 8. Ideal size: M (50-150 LOC).
-
-#### TASK-{{EPIC_ID}}-{{STORY_ID}}-001: <Imperative title (max 80 chars)>
+#### TASK-{{EPIC_ID}}-{{STORY_ID}}-001: <Título imperativo (máx 80 chars)>
 
 - **Layer:** <Domain|Port|Adapter|Application|Config|Test|Doc>
 - **Test Type:** <Unit|Integration|API|Contract|E2E|Smoke|Verification>
 - **Size:** <S|M|L>
-- **Dependencies:** <TASK IDs or —>
+- **Dependencies:** —
 - **Branch:** `feat/task-{{EPIC_ID}}-{{STORY_ID}}-001-short-desc`
-- **Testability:** <Domain + UnitTest|Port + Adapter + IT|UseCase + AT|Endpoint + APITest>
 - **Files:**
   - `path/to/file1.ext`
-  - `path/to/file2.ext`
 - **Acceptance Criteria:**
-  - [ ] <criterion 1>
-  - [ ] <criterion 2>
+  - [ ] <critério 1>
+  - [ ] <critério 2>
 
-#### TASK-{{EPIC_ID}}-{{STORY_ID}}-002: <Imperative title (max 80 chars)>
+#### TASK-{{EPIC_ID}}-{{STORY_ID}}-002: <Título imperativo>
 
-- **Layer:** <Domain|Port|Adapter|Application|Config|Test|Doc>
-- **Test Type:** <Unit|Integration|API|Contract|E2E|Smoke|Verification>
+- **Layer:** <camada>
+- **Test Type:** <tipo>
 - **Size:** <S|M|L>
 - **Dependencies:** TASK-{{EPIC_ID}}-{{STORY_ID}}-001
 - **Branch:** `feat/task-{{EPIC_ID}}-{{STORY_ID}}-002-short-desc`
-- **Testability:** <Valid pattern>
 - **Files:**
   - `path/to/file1.ext`
 - **Acceptance Criteria:**
-  - [ ] <criterion 1>
+  - [ ] <critério 1>
 
-#### TASK-{{EPIC_ID}}-{{STORY_ID}}-003: <Imperative title (max 80 chars)>
+#### TASK-{{EPIC_ID}}-{{STORY_ID}}-003: <Título imperativo>
 
-- **Layer:** <Domain|Port|Adapter|Application|Config|Test|Doc>
-- **Test Type:** <Unit|Integration|API|Contract|E2E|Smoke|Verification>
+- **Layer:** <camada>
+- **Test Type:** <tipo>
 - **Size:** <S|M|L>
 - **Dependencies:** TASK-{{EPIC_ID}}-{{STORY_ID}}-001, TASK-{{EPIC_ID}}-{{STORY_ID}}-002
 - **Branch:** `feat/task-{{EPIC_ID}}-{{STORY_ID}}-003-short-desc`
-- **Testability:** <Valid pattern>
 - **Files:**
   - `path/to/file1.ext`
 - **Acceptance Criteria:**
-  - [ ] <criterion 1>
+  - [ ] <critério 1>
 
-### 9.3 File Footprint (EPIC-0041 parallelism evaluation)
+---
+
+## 7. Dependências
+
+### 7.1 Dependências da Story
+
+| Blocked By | Blocks |
+| :--- | :--- |
+| <story-XXXX-YYYY ou —> | <story-XXXX-YYYY ou —> |
+
+### 7.2 File Footprint (EPIC-0041 parallelism evaluation)
 
 ```
 write:
@@ -310,3 +202,37 @@ read:
 regen:
   - <path/to/golden/file.md>
 ```
+
+---
+
+## 8. Decision Rationale
+
+> **Registro de decisões de design desta story.**
+> Obrigatório: ≥ 1 item com o micro-template de 4 linhas.
+> Aceita `N/A — <motivo curto>` apenas quando genuinamente sem trade-off relevante.
+
+**Decisão:** <statement da decisão tomada>
+**Motivo:** <por que esta opção foi escolhida — restrição técnica ou de negócio>
+**Alternativa descartada:** <o que foi rejeitado e por quê>
+**Consequência:** <trade-off ou implicação futura>
+
+---
+
+## 9. Refinement Verdict
+
+<!-- CONTRACT: Este bloco é populado exclusivamente por `/x-refine-story` (EPIC-0069).
+     Não editar manualmente — `audit-refinement-gate.sh` detecta divergência via
+     verdictHash (Rule 29 §verdictHash). Estrutura canônica:
+
+     **Status:** approved | rejected | tbd
+     **Scope:** story
+     **Refined at:** ISO-8601
+     **Verdict hash:** sha256(## Refinement Verdict block content)
+     ### Dimensions: table with per-dimension status
+     ### Blockers: list (empty if approved)
+     ### Rationale: paragraph
+-->
+
+> _Slot reservado para `/x-refine-story`. Não editar manualmente._
+>
+> **Status:** TBD — execute `/x-refine-story <story-id>` para preencher.

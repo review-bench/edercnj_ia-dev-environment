@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0008: Infrastructure Security Scanner (x-security-infra).
+ * Tests for story-0022-0008: Infrastructure Security Scanner (x-assess-infrastructure-security).
  *
- * <p>Validates that the x-security-infra SKILL.md is generated when infraScan is enabled, follows
- * the security skill template, and contains all required sections.
+ * <p>Validates that the x-assess-infrastructure-security SKILL.md is generated when infraScan is
+ * enabled, follows the security skill template, and contains all required sections.
  */
-@DisplayName("x-security-infra Skill")
+@DisplayName("x-assess-infrastructure-security Skill")
 class InfraScanSkillTest {
 
     @Nested
@@ -28,19 +28,20 @@ class InfraScanSkillTest {
     class ConditionalGeneration {
 
         @Test
-        @DisplayName("infraScan enabled generates" + " x-security-infra SKILL.md")
+        @DisplayName("infraScan enabled generates" + " x-assess-infrastructure-security SKILL.md")
         void assemble_infraScanEnabled_generatesSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = assembleWithInfraScan(tempDir, true);
 
-            assertThat(outputDir.resolve("skills/x-security-infra/SKILL.md")).exists();
+            assertThat(outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md"))
+                    .exists();
         }
 
         @Test
-        @DisplayName("infraScan disabled excludes" + " x-security-infra")
+        @DisplayName("infraScan disabled excludes" + " x-assess-infrastructure-security")
         void assemble_infraScanDisabled_excludesSkill(@TempDir Path tempDir) throws IOException {
             Path outputDir = assembleWithInfraScan(tempDir, false);
 
-            assertThat(outputDir.resolve("skills/x-security-infra")).doesNotExist();
+            assertThat(outputDir.resolve("skills/x-assess-infrastructure-security")).doesNotExist();
         }
 
         @Test
@@ -58,12 +59,12 @@ class InfraScanSkillTest {
     class Frontmatter {
 
         @Test
-        @DisplayName("contains name: x-security-infra")
+        @DisplayName("contains name: x-assess-infrastructure-security")
         void assemble_skillMd_hasName(@TempDir Path tempDir) throws IOException {
             Path outputDir = assembleWithInfraScan(tempDir, true);
             String content = readSkillContent(outputDir);
 
-            assertThat(content).contains("name: x-security-infra");
+            assertThat(content).contains("name: x-assess-infrastructure-security");
         }
 
         @Test
@@ -486,6 +487,7 @@ class InfraScanSkillTest {
 
     private String readSkillContent(Path outputDir) throws IOException {
         return Files.readString(
-                outputDir.resolve("skills/x-security-infra/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-assess-infrastructure-security/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

@@ -1,0 +1,440 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0071",
+  "epicSlug": "documentation-as-dod",
+  "interactiveMode": "non-interactive",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-30T00:00:00Z",
+    "verdictHash": "30bff2943c83778dd485cb6f593333e3c33eaa536dab1497cbb156a1a2f8d25b",
+    "dimensions": {
+      "problem": {
+        "checked": true,
+        "blocker": null
+      },
+      "persona": {
+        "checked": true,
+        "blocker": null
+      },
+      "value": {
+        "checked": true,
+        "blocker": null
+      },
+      "okrs": {
+        "checked": true,
+        "blocker": null
+      },
+      "alternatives": {
+        "checked": true,
+        "blocker": null
+      },
+      "risks": {
+        "checked": true,
+        "blocker": null
+      },
+      "scope": {
+        "checked": true,
+        "blocker": null
+      }
+    },
+    "blockers": []
+  },
+  "storyStatuses": {
+    "story-0071-0001": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "e872dbec9f03474747532b3b53204060519f8ba46427bda6280d1a4a0a2ac191",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      },
+      "prNumber": 891,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/891",
+      "mergedAt": "2026-05-01T02:36:17Z"
+    },
+    "story-0071-0002": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 892,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/892",
+      "mergedAt": "2026-05-01T03:00:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "352c76d3e24174a167aa7c14550dddd760973b143538007f576af093130cfbb0",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0003": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 893,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/893",
+      "mergedAt": "2026-05-01T03:30:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ba6b02d8da2067f502a77dc5eaf46d77c38c41397bbe18bb22521b58cb273444",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0004": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 894,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/894",
+      "mergedAt": "2026-05-01T04:00:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "418d39e3bbde21e7382731184b88ad98bbaf2119ecba449c6b8a1a92a8508a26",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0005": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 895,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/895",
+      "mergedAt": "2026-05-01T05:00:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "c296f288e3c724ca02f1b3cb53d95331d11335c03e5656fa3d980266c4a5b514",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0006": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 896,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/896",
+      "mergedAt": "2026-05-01T06:00:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "ad596b751cc1fcf6092521ae378f438c97dd9a91e63e765236085c81c508b7d1",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0007": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 897,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/897",
+      "mergedAt": "2026-05-01T07:30:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "a374bca1952cef919cd1f5a8c3ae365865e2d024580f68748a29a75351193f78",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    },
+    "story-0071-0008": {
+      "status": "concluida",
+      "flowVersion": "4",
+      "prNumber": 898,
+      "prUrl": "https://github.com/edercnj/ia-dev-environment/pull/898",
+      "mergedAt": "2026-05-01T08:45:00Z",
+      "refinementVerdict": {
+        "status": "approved",
+        "scope": "story",
+        "checkedAt": "2026-04-30T00:00:00Z",
+        "verdictHash": "05c300971c22f8a88c563ac2eecfc626f7cbf4d1af12063553b3bb18791f5a54",
+        "dimensions": {
+          "persona": {
+            "checked": true,
+            "blocker": null
+          },
+          "value": {
+            "checked": true,
+            "blocker": null
+          },
+          "ac": {
+            "checked": true,
+            "blocker": null
+          },
+          "contracts": {
+            "checked": true,
+            "blocker": null
+          },
+          "metrics": {
+            "checked": true,
+            "blocker": null
+          },
+          "alternatives": {
+            "checked": true,
+            "blocker": null
+          },
+          "risks": {
+            "checked": true,
+            "blocker": null
+          }
+        },
+        "blockers": []
+      }
+    }
+  },
+  "phases": [
+    {
+      "id": 0,
+      "name": "Governance + Domain",
+      "stories": [
+        "story-0071-0001"
+      ],
+      "mode": "sequential"
+    },
+    {
+      "id": 1,
+      "name": "Skills + Templates",
+      "stories": [
+        "story-0071-0002",
+        "story-0071-0003",
+        "story-0071-0004"
+      ],
+      "mode": "parallel"
+    },
+    {
+      "id": 2,
+      "name": "Infrastructure + Integration",
+      "stories": [
+        "story-0071-0005",
+        "story-0071-0006",
+        "story-0071-0007"
+      ],
+      "mode": "sequential"
+    },
+    {
+      "id": 3,
+      "name": "Smoke Test + Release",
+      "stories": [
+        "story-0071-0008"
+      ],
+      "mode": "sequential"
+    }
+  ]
+}

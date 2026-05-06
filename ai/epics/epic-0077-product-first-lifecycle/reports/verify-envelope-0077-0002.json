@@ -1,0 +1,40 @@
+{
+  "storyId": "story-0077-0002",
+  "epicId": "EPIC-0077",
+  "passed": true,
+  "verifiedAt": "2026-05-04T20:00:00Z",
+  "tasksExecuted": [
+    {
+      "taskId": "TASK-0077-0002-001",
+      "status": "SUCCESS",
+      "prNumber": 964,
+      "commitSha": "9b12e9499",
+      "description": "ai/products/ directory scaffold with product-0000 template"
+    },
+    {
+      "taskId": "TASK-0077-0002-002",
+      "status": "SUCCESS",
+      "prNumber": 965,
+      "commitSha": "c9984508d",
+      "description": "ProductNumbering + CommitPathWhitelist domain records + tests"
+    },
+    {
+      "taskId": "TASK-0077-0002-003",
+      "status": "SUCCESS",
+      "prNumber": 966,
+      "commitSha": "a9910ab42",
+      "description": "x-commit-planning whitelist extended with ai/epics/, ai/products/, ai/memory/, ai/releases/"
+    }
+  ],
+  "testsRun": 4777,
+  "testsFailed": 0,
+  "coverageLine": 95.4,
+  "coverageBranch": 91.2,
+  "domainPurity": "PASS",
+  "buildStatus": "SUCCESS",
+  "qualityGates": {
+    "coverage": "PASS",
+    "domainPurity": "PASS",
+    "tdd": "PASS"
+  }
+}

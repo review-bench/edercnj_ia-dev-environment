@@ -5,17 +5,17 @@
 
 ## Purpose
 
-Models are an economic resource. Opus tokens cost ~2× Sonnet and ~5× Haiku, and every implicit default ("inherit from parent") cascades premium cost across an entire epic run (`x-epic-implement` → `x-story-implement` → `x-test-tdd` → `x-git-commit`). Model selection MUST be **explicit at the point of invocation** — via frontmatter, `Agent(model:)`, `Skill(model:)`, and agent metadata — so that deep-reasoning work lands in Opus, orchestration and review land in Sonnet, and utilities land in Haiku. Baseline before this rule: 84.4% Opus / 0.2% Sonnet / 5.8% Haiku. Target: ≤50% Opus / ≥35% Sonnet / ≥12% Haiku.
+Models are an economic resource. Opus tokens cost ~2× Sonnet and ~5× Haiku, and every implicit default ("inherit from parent") cascades premium cost across an entire epic run (`x-implement-epic` → `x-implement-story` → `x-drive-tdd` → `x-commit-changes`). Model selection MUST be **explicit at the point of invocation** — via frontmatter, `Agent(model:)`, `Skill(model:)`, and agent metadata — so that deep-reasoning work lands in Opus, orchestration and review land in Sonnet, and utilities land in Haiku. Baseline before this rule: 84.4% Opus / 0.2% Sonnet / 5.8% Haiku. Target: ≤50% Opus / ≥35% Sonnet / ≥12% Haiku.
 
 ## Matrix
 
 | Layer | Default Tier | Examples | Justification | Exception |
 | :--- | :--- | :--- | :--- | :--- |
-| Orchestrator | `sonnet` | `x-epic-implement`, `x-story-implement`, `x-release`, `x-review`, `x-epic-orchestrate`, `x-pr-fix-epic`, `x-task-implement`, `x-epic-decompose` | Dispatches other skills/agents; no deep design reasoning inline. | None — orchestrators always declare `model:` explicitly. |
-| Deep Planner | `opus` | `x-arch-plan`, Architect subagent inside `x-story-plan` | Produces architecture plans, ADR content, trade-off analysis that benefits from strongest reasoning. | None. |
-| Reviewer / Validator | `sonnet` | `x-review-qa`, `x-review-perf`, `x-review-pr`, `x-review-devops`, reviewer subagents | Applies checklists against code/plans; structured reasoning suffices. | Security-critical review MAY opt into `opus` per story. |
-| Executor | `sonnet` | `x-task-implement`, `x-test-tdd`, TDD inner loop | TDD cycle is procedural; Sonnet preserves quality at lower cost. | `opus` only when story explicitly flags "deep-reasoning implementation". |
-| Utility | `haiku` | `x-git-worktree`, `x-git-commit`, `x-code-format`, `x-code-lint` | Git ops, formatting, linting — zero design reasoning. | None. |
+| Orchestrator | `sonnet` | `x-implement-epic`, `x-implement-story`, `x-release`, `x-review-codebase`, `x-orchestrate-epic`, `x-fix-epic-pr`, `x-implement-task`, `x-epic-decompose` | Dispatches other skills/agents; no deep design reasoning inline. | None — orchestrators always declare `model:` explicitly. |
+| Deep Planner | `opus` | `x-plan-architecture`, Architect subagent inside `x-plan-story` | Produces architecture plans, ADR content, trade-off analysis that benefits from strongest reasoning. | None. |
+| Reviewer / Validator | `sonnet` | `x-review-qa`, `x-review-performance`, `x-review-pr`, `x-review-devops`, reviewer subagents | Applies checklists against code/plans; structured reasoning suffices. | Security-critical review MAY opt into `opus` per story. |
+| Executor | `sonnet` | `x-implement-task`, `x-drive-tdd`, TDD inner loop | TDD cycle is procedural; Sonnet preserves quality at lower cost. | `opus` only when story explicitly flags "deep-reasoning implementation". |
+| Utility | `haiku` | `x-manage-worktrees`, `x-commit-changes`, `x-format-code`, `x-lint-code` | Git ops, formatting, linting — zero design reasoning. | None. |
 | Knowledge Pack (KP) | `haiku` | `architecture`, `coding-standards`, `testing`, `layer-templates`, `patterns`, `dockerfile` | Read-only reference consumed as context. No reasoning performed by the KP itself. | None. |
 
 ## Enforcement Points
@@ -26,7 +26,7 @@ Three technical contracts. Each MUST carry `model:` at the invocation site.
 
 ```yaml
 ---
-name: x-epic-implement
+name: x-implement-epic
 description: ...
 model: sonnet
 allowed-tools: [Skill, Agent, Bash]
@@ -52,13 +52,13 @@ Every `Agent(subagent_type: "general-purpose", ...)` invocation inside a skill M
 
 ```text
 Skill(
-  skill: "x-story-implement",
+  skill: "x-implement-story",
   model: "sonnet",
   args: "..."
 )
 ```
 
-Every `Skill(skill: "...", ...)` call inside an orchestrator MUST pass `model:` when the invoked skill's tier differs from the parent. Exception: user entry-points (top-level invocation by a human typing `/x-epic-implement` in chat) inherit — the human's session model is the tier for that outer skill, and only outer-skill callees need explicit `model:`.
+Every `Skill(skill: "...", ...)` call inside an orchestrator MUST pass `model:` when the invoked skill's tier differs from the parent. Exception: user entry-points (top-level invocation by a human typing `/x-implement-epic` in chat) inherit — the human's session model is the tier for that outer skill, and only outer-skill callees need explicit `model:`.
 
 ## Agent Metadata Contract
 
@@ -83,7 +83,7 @@ A skill is eligible for `model: haiku` if it satisfies at least one of:
 - **(a) Utility without design reasoning** — git operations, formatting, linting, status-file mutations, branch manipulation. No code generation, no architectural choices, no test authoring.
 - **(b) Read-only knowledge pack** — consumed as reference context by other skills; performs no execution logic of its own.
 
-Initial eligibility list (10 skills): `x-git-worktree`, `x-git-commit`, `x-code-format`, `x-code-lint`, `architecture`, `coding-standards`, `testing`, `layer-templates`, `patterns`, `dockerfile`. Additions require a one-paragraph rationale in the skill's SKILL.md Integration Notes section.
+Initial eligibility list (10 skills): `x-manage-worktrees`, `x-commit-changes`, `x-format-code`, `x-lint-code`, `architecture`, `coding-standards`, `testing`, `layer-templates`, `patterns`, `dockerfile`. Additions require a one-paragraph rationale in the skill's SKILL.md Integration Notes section.
 
 ## Audit Contract
 
@@ -121,7 +121,7 @@ Model selection is **additive**:
 
 ## Exceptions
 
-- **User-invoked entry-point skills** (skills a human types as `/name` in chat — e.g., `/x-release`, `/x-epic-implement`, `/x-review`) MAY omit `model:` in frontmatter: the user's session tier applies to the outer skill, and only nested callees must declare. Audit script MUST skip these (list maintained in the script header).
+- **User-invoked entry-point skills** (skills a human types as `/name` in chat — e.g., `/x-release`, `/x-implement-epic`, `/x-review-codebase`) MAY omit `model:` in frontmatter: the user's session tier applies to the outer skill, and only nested callees must declare. Audit script MUST skip these (list maintained in the script header).
 - **Legacy skills (pre-EPIC-0050)** not in the enforcement matrix are ignored until they enter a future scope-expansion epic.
 - **Internal skills (`x-internal-*`, Rule 22)** follow the same matrix as their public caller but MAY omit `model:` when their parent orchestrator's frontmatter guarantees the tier — declare `model:` only if the internal skill legitimately needs a different tier.
 - **One-off experimental skills under `.claude/skills/experimental/`** are out of scope for this rule.

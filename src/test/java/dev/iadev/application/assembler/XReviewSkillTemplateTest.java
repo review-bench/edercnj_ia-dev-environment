@@ -94,7 +94,7 @@ class XReviewSkillTemplateTest {
 
         @Test
         @DisplayName(
-                "Phase 2 references x-review-perf"
+                "Phase 2 references x-review-performance"
                         + " skill invocation via Skill tool"
                         + " with STORY_ID args")
         void phase2_referencesPerfSkill() {
@@ -102,7 +102,7 @@ class XReviewSkillTemplateTest {
 
             assertThat(content)
                     .containsPattern(
-                            "Skill\\(skill: \"x-review-perf\","
+                            "Skill\\(skill: \"x-review-performance\","
                                     + "\\s+model: \"sonnet\","
                                     + "\\s+args: \"\\{STORY_ID\\}\"\\)");
         }
@@ -110,14 +110,14 @@ class XReviewSkillTemplateTest {
         @Test
         @DisplayName(
                 "Phase 2 references conditional"
-                        + " x-review-db skill via Skill tool"
+                        + " x-review-database skill via Skill tool"
                         + " with STORY_ID args")
         void phase2_referencesDbSkill() {
             String content = readSkill(CLAUDE_SKILL_PATH);
 
             assertThat(content)
                     .containsPattern(
-                            "Skill\\(skill: \"x-review-db\","
+                            "Skill\\(skill: \"x-review-database\","
                                     + "\\s+model: \"sonnet\","
                                     + "\\s+args: \"\\{STORY_ID\\}\"\\)");
         }
@@ -180,7 +180,7 @@ class XReviewSkillTemplateTest {
 
             assertThat(content)
                     .contains("| QA | `/x-review-qa`" + " | /36 | Always |")
-                    .contains("| Performance |" + " `/x-review-perf`" + " | /26 | Always |");
+                    .contains("| Performance |" + " `/x-review-performance`" + " | /26 | Always |");
         }
     }
 
@@ -415,7 +415,7 @@ class XReviewSkillTemplateTest {
     }
 
     private static Path resolveClaudeSkillPath() {
-        // Hierarchical SoT (story-0036-0002): x-review
+        // Hierarchical SoT (story-0036-0002): x-review-codebase
         // lives under core/review/. Legacy flat path is
         // retained as a fallback.
         Path[] candidates =
@@ -423,19 +423,19 @@ class XReviewSkillTemplateTest {
                     Path.of(
                             "src/main/resources/targets/claude/"
                                     + "skills/core/review/"
-                                    + "x-review/SKILL.md"),
+                                    + "x-review-codebase/SKILL.md"),
                     Path.of(
                             "src/main/resources/targets/"
                                     + "claude/skills/core/review/"
-                                    + "x-review/SKILL.md"),
+                                    + "x-review-codebase/SKILL.md"),
                     Path.of(
                             "src/main/resources/targets/claude/"
-                                    + "skills/core/x-review/"
+                                    + "skills/core/x-review-codebase/"
                                     + "SKILL.md"),
                     Path.of(
                             "src/main/resources/targets/"
                                     + "claude/skills/core/"
-                                    + "x-review/SKILL.md")
+                                    + "x-review-codebase/SKILL.md")
                 };
         for (Path c : candidates) {
             if (Files.exists(c)) {

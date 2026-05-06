@@ -1,0 +1,66 @@
+{
+  "storyId": "story-0077-0005",
+  "epicId": "epic-0077",
+  "verifiedAt": "2026-05-04T00:00:00Z",
+  "passed": true,
+  "tasks": [
+    {
+      "taskId": "TASK-0077-0005-001",
+      "status": "DONE",
+      "prNumber": 972,
+      "branch": "feat/task-0077-0005-001-product-template",
+      "mergedTo": "epic/0077"
+    },
+    {
+      "taskId": "TASK-0077-0005-002",
+      "status": "DONE",
+      "prNumber": 973,
+      "branch": "feat/task-0077-0005-002-rnf-domain-model",
+      "mergedTo": "epic/0077"
+    },
+    {
+      "taskId": "TASK-0077-0005-003",
+      "status": "DONE",
+      "prNumber": 974,
+      "branch": "feat/task-0077-0005-003-rnf-inheritance",
+      "mergedTo": "epic/0077"
+    },
+    {
+      "taskId": "TASK-0077-0005-004",
+      "status": "DONE",
+      "prNumber": 975,
+      "branch": "feat/task-0077-0005-004-product-smoke",
+      "mergedTo": "epic/0077"
+    }
+  ],
+  "testSuite": {
+    "total": 4791,
+    "passed": 4791,
+    "failed": 0,
+    "lineCoverage": "≥95%",
+    "branchCoverage": "≥90%"
+  },
+  "artifacts": {
+    "planningPhase": [
+      "ai/epics/epic-0077-product-first-lifecycle/plans/arch-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/plan-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/tests-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/tasks-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/security-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/compliance-story-0077-0005.md"
+    ],
+    "evidencePhase": [
+      "ai/epics/epic-0077-product-first-lifecycle/plans/review-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/plans/techlead-review-story-0077-0005.md",
+      "ai/epics/epic-0077-product-first-lifecycle/reports/verify-envelope-0077-0005.json",
+      "ai/epics/epic-0077-product-first-lifecycle/reports/story-completion-report-0077-0005.md"
+    ]
+  },
+  "smokeTests": {
+    "productTemplateSmokeScript": "ci/smoke/product-template-smoke.sh",
+    "result": "PASS",
+    "details": "8 sections present, 6 mandatory RNF categories validated"
+  },
+  "reviewVerdict": "GO",
+  "techLeadVerdict": "GO"
+}

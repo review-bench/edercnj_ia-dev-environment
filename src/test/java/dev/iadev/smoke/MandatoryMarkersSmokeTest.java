@@ -34,12 +34,12 @@ class MandatoryMarkersSmokeTest {
 
     static Stream<RetrofitTarget> targets() {
         return Stream.of(
-                new RetrofitTarget("x-story-implement", "Rule 24"),
-                new RetrofitTarget("x-task-implement", "Rule 24"),
+                new RetrofitTarget("x-implement-story", "Rule 24"),
+                new RetrofitTarget("x-implement-task", "Rule 24"),
                 new RetrofitTarget("x-release", "Rule 24"),
-                new RetrofitTarget("x-epic-implement", "Rule 24"),
-                new RetrofitTarget("x-owasp-scan", "Rule 24"),
-                new RetrofitTarget("x-review", "Rule 24"));
+                new RetrofitTarget("x-implement-epic", "Rule 24"),
+                new RetrofitTarget("x-scan-owasp", "Rule 24"),
+                new RetrofitTarget("x-review-codebase", "Rule 24"));
     }
 
     @ParameterizedTest(name = "[{0}]")
@@ -63,7 +63,7 @@ class MandatoryMarkersSmokeTest {
     @Test
     @DisplayName("x-review marker covers the specialist invocation block")
     void xReview_markerPrecedesSpecialistBlock() throws IOException {
-        Path skill = repoRoot().resolve(GOLDEN_BASE).resolve("x-review/SKILL.md");
+        Path skill = repoRoot().resolve(GOLDEN_BASE).resolve("x-review-codebase/SKILL.md");
         String body = Files.readString(skill, StandardCharsets.UTF_8);
 
         int markerIdx = body.indexOf("MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24)");

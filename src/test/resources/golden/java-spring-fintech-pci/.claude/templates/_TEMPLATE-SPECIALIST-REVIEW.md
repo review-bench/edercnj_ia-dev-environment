@@ -1,7 +1,7 @@
 <!-- template-version: 1.0 -->
 ---
 schema-version: "1.0"
-generated-by: x-review@{{COMMIT_SHA}}
+generated-by: x-review-codebase@{{COMMIT_SHA}}
 story-id: {{STORY_ID}}
 epic-id: {{EPIC_ID}}
 date: {{ISO_TIMESTAMP}}

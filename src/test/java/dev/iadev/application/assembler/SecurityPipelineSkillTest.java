@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0020: x-security-pipeline skill for CI/CD pipeline generation with
+ * Tests for story-0022-0020: x-generate-security-pipeline skill for CI/CD pipeline generation with
  * conditional security stages.
  *
- * <p>Validates that the x-security-pipeline skill template is generated correctly with proper
- * frontmatter, stage definitions, platform support, composability, and conditional stage
+ * <p>Validates that the x-generate-security-pipeline skill template is generated correctly with
+ * proper frontmatter, stage definitions, platform support, composability, and conditional stage
  * evaluation.
  */
-@DisplayName("x-security-pipeline Skill")
+@DisplayName("x-generate-security-pipeline Skill")
 class SecurityPipelineSkillTest {
 
     @Nested
@@ -29,18 +29,18 @@ class SecurityPipelineSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-security-pipeline SKILL.md exists" + " after assembly")
+        @DisplayName("x-generate-security-pipeline SKILL.md exists" + " after assembly")
         void assemble_securityPipeline_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-security-pipeline/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-generate-security-pipeline/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-security-pipeline")
+        @DisplayName("frontmatter contains name:" + " x-generate-security-pipeline")
         void assemble_securityPipeline_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-security-pipeline");
+            assertThat(content).contains("name: x-generate-security-pipeline");
         }
 
         @Test
@@ -209,14 +209,14 @@ class SecurityPipelineSkillTest {
         void assemble_securityPipeline_refsAtomicSkills(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
             assertThat(content)
-                    .contains("x-security-secrets")
-                    .contains("x-security-sast")
-                    .contains("x-dependency-audit")
-                    .contains("x-security-sonar")
-                    .contains("x-security-container")
-                    .contains("x-security-dast")
-                    .contains("x-owasp-scan")
-                    .contains("x-hardening-eval");
+                    .contains("x-scan-secrets")
+                    .contains("x-run-sast")
+                    .contains("x-audit-dependencies")
+                    .contains("x-run-sonar-security")
+                    .contains("x-scan-container-security")
+                    .contains("x-run-dast")
+                    .contains("x-scan-owasp")
+                    .contains("x-evaluate-hardening");
         }
 
         @Test
@@ -263,7 +263,7 @@ class SecurityPipelineSkillTest {
         @DisplayName("references ci-cd-generate skill")
         void assemble_securityPipeline_refsDevopsAgent(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("x-ci-generate");
+            assertThat(content).contains("x-generate-ci");
         }
     }
 
@@ -386,6 +386,7 @@ class SecurityPipelineSkillTest {
 
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
-        return SkillContentReader.readSkillWithReferences(outputDir, "x-security-pipeline");
+        return SkillContentReader.readSkillWithReferences(
+                outputDir, "x-generate-security-pipeline");
     }
 }

@@ -1,0 +1,26 @@
+id: quality.dast.zap-passive
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  OWASP ZAP passive scan — read-only spider + passive analysis of HTTP traffic. Does not send
+  attack payloads. Used in the smoke tier (tier-pr) of /x-pentest-dynamic. Generates SARIF 2.1.0
+  output. Runs in 2-3 minutes against a local-container, preview-env, or staging target.
+  Forbidden target: production (ConfigValidationException DAST_TARGET_PRODUCTION_FORBIDDEN).
+requires-capabilities: []
+requires: []
+excludes: []
+universal: false
+parameters:
+  target:
+    type: string
+    enum: [local-container, preview-env, staging]
+    default: local-container
+  timeout-minutes:
+    type: integer
+    default: 10
+  active-scan-policy:
+    type: string
+    enum: [default, custom-pci, custom-lgpd]
+    default: default

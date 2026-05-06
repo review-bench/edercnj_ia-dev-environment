@@ -1,0 +1,24 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0075",
+  "epicBranch": "epic/0075",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-04-29T00:00:00Z"
+  },
+  "storyStatuses": {
+    "story-0075-0001": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0002": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0003": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0004": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0005": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0006": { "status": "pending", "flowVersion": "4" },
+    "story-0075-0007": { "status": "pending", "flowVersion": "4" }
+  }
+}

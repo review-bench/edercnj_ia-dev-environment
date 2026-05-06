@@ -39,7 +39,7 @@ class SkillsAssemblerPruneTest {
     @DisplayName("stale skill dir not in source is removed" + " after assemble")
     void assemble_whenStaleSkillExists_removesIt(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
         Path staleSkill = outputDir.resolve("skills/x-dev-implement");
@@ -49,7 +49,7 @@ class SkillsAssemblerPruneTest {
         runAssemble(tempDir, outputDir);
 
         assertThat(Files.exists(staleSkill)).as("stale skill dir must be pruned").isFalse();
-        assertThat(Files.exists(outputDir.resolve("skills/x-task-implement")))
+        assertThat(Files.exists(outputDir.resolve("skills/x-implement-task")))
                 .as("fresh skill must be written")
                 .isTrue();
     }
@@ -59,7 +59,7 @@ class SkillsAssemblerPruneTest {
             "database-patterns is protected" + " (owned by RulesConditionals, not SkillsAssembler)")
     void assemble_whenDatabasePatternsExists_preserved(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
         Path dbPatterns = outputDir.resolve("skills/database-patterns");
@@ -78,7 +78,7 @@ class SkillsAssemblerPruneTest {
     @DisplayName("knowledge-packs directory is protected" + " from prune")
     void assemble_whenKnowledgePacksDirExists_preserved(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
         Path kpDir = outputDir.resolve("skills/knowledge-packs");
@@ -120,7 +120,7 @@ class SkillsAssemblerPruneTest {
     @DisplayName("stray file at skills root is NOT deleted" + " (only directories are pruned)")
     void assemble_whenStrayFileAtRoot_fileRetained(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
         Path skillsRoot = outputDir.resolve("skills");
@@ -151,7 +151,7 @@ class SkillsAssemblerPruneTest {
     @DisplayName("multiple stale dirs are all removed")
     void assemble_whenMultipleStaleDirs_allRemoved(@TempDir Path tempDir) throws IOException {
         Path core = tempDir.resolve("targets/claude/skills/core");
-        createSkillInSource(core, "x-task-implement");
+        createSkillInSource(core, "x-implement-task");
 
         Path outputDir = tempDir.resolve("output");
         Path skillsRoot = outputDir.resolve("skills");

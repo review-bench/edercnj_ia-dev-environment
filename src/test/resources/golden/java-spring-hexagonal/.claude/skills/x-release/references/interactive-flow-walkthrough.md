@@ -162,7 +162,7 @@ Operator chooses `1`. Skill proceeds to VALIDATE-DEEP.
 
 O que deseja fazer?
   [1] PR mergeado — continuar
-  [2] Rodar /x-pr-fix PR#412
+  [2] Rodar /x-fix-pr PR#412
   [3] Sair e retomar depois
 > 3
 ```
@@ -175,7 +175,7 @@ Operator chooses `3`. Skill exits cleanly; state is preserved:
 ```
 
 The operator reviews the PR on GitHub with teammates, addresses any
-comments via `/x-pr-fix 412`, and eventually merges via the GitHub UI.
+comments via `/x-fix-pr 412`, and eventually merges via the GitHub UI.
 
 ### 1.10 Resume — `/x-release --continue-after-merge`
 
@@ -205,7 +205,7 @@ $ /x-release --continue-after-merge
 
 O que deseja fazer?
   [1] PR mergeado — continuar
-  [2] Rodar /x-pr-fix PR#413
+  [2] Rodar /x-fix-pr PR#413
   [3] Sair e retomar depois
 > 1
 ```
@@ -229,7 +229,7 @@ O que deseja fazer?
 ### 1.14 Phase 12 — CLEANUP
 
 ```
-[12] x-git-worktree remove --id release-3.2.0
+[12] x-manage-worktrees remove --id release-3.2.0
 [12] git push origin --delete release/3.2.0
 [12] git branch -D release/3.2.0
 [12] Cleanup complete.
@@ -362,7 +362,7 @@ Same 10 checks as a normal release. Check 2 (correct branch) expects
 ```
 O que deseja fazer?
   [1] PR mergeado — continuar
-  [2] Rodar /x-pr-fix PR#418
+  [2] Rodar /x-fix-pr PR#418
   [3] Sair e retomar depois
 > 1
 ```
@@ -392,7 +392,7 @@ active release:
 
 O que deseja fazer?
   [1] PR mergeado — continuar
-  [2] Rodar /x-pr-fix PR#419
+  [2] Rodar /x-fix-pr PR#419
   [3] Sair e retomar depois
 > 1
 ```
@@ -410,7 +410,7 @@ Deseja criar o GitHub Release?
 ### 2.14 Phase 12 — CLEANUP
 
 ```
-[12] x-git-worktree remove --id hotfix-3-2-1
+[12] x-manage-worktrees remove --id hotfix-3-2-1
 [12] git push origin --delete hotfix/3.2.1
 ```
 
@@ -442,7 +442,7 @@ Deseja criar o GitHub Release?
 ```
 
 Total operator-visible prompts: **5** (pre-flight, approval gate,
-backmerge gate, GitHub Release; add any `x-pr-fix` handoff if used).
+backmerge gate, GitHub Release; add any `x-fix-pr` handoff if used).
 
 ---
 

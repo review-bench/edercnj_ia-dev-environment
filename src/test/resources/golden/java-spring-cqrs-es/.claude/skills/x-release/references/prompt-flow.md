@@ -15,8 +15,8 @@ specific to the halt point.
 
 | Halt Point | Phase | `waitingFor` | Options |
 |:---|:---|:---|:---|
-| `APPROVAL_GATE` | Phase 8 | `PR_MERGE` | "PR mergeado — continuar", "Rodar /x-pr-fix PR#", "Sair e retomar depois" |
-| `BACKMERGE_MERGE` | Phase 10 | `BACKMERGE_MERGE` | "PR mergeado — continuar", "Rodar /x-pr-fix PR#", "Sair e retomar depois" |
+| `APPROVAL_GATE` | Phase 8 | `PR_MERGE` | "PR mergeado — continuar", "Rodar /x-fix-pr PR#", "Sair e retomar depois" |
+| `BACKMERGE_MERGE` | Phase 10 | `BACKMERGE_MERGE` | "PR mergeado — continuar", "Rodar /x-fix-pr PR#", "Sair e retomar depois" |
 | `RECOVERABLE_FAILURE` | Any | `USER_CONFIRMATION` | "Tentar novamente", "Pular esta etapa", "Abortar" |
 
 ## State Persistence
@@ -34,8 +34,8 @@ state file before prompting:
 
 | `waitingFor` | `nextActions` (labels) |
 |:---|:---|
-| `PR_MERGE` | "PR mergeado — continuar", "Rodar /x-pr-fix PR#", "Sair e retomar depois" |
-| `BACKMERGE_MERGE` | "PR mergeado — continuar", "Rodar /x-pr-fix PR#", "Sair e retomar depois" |
+| `PR_MERGE` | "PR mergeado — continuar", "Rodar /x-fix-pr PR#", "Sair e retomar depois" |
+| `BACKMERGE_MERGE` | "PR mergeado — continuar", "Rodar /x-fix-pr PR#", "Sair e retomar depois" |
 | `USER_CONFIRMATION` | "Tentar novamente", "Pular esta etapa", "Abortar" |
 
 ## Option Dispatch
@@ -45,7 +45,7 @@ state file before prompting:
 | Option | Action | Result |
 |:---|:---|:---|
 | "PR mergeado — continuar" | `CONTINUE` | Proceeds to next phase (RESUME_AND_TAG or cleanup) |
-| "Rodar /x-pr-fix PR#" | `HANDOFF` | Delegates to `/x-pr-fix` (story-0039-0011) |
+| "Rodar /x-fix-pr PR#" | `HANDOFF` | Delegates to `/x-fix-pr` (story-0039-0011) |
 | "Sair e retomar depois" | `EXIT` | Exits with state preserved; resume via `--continue-after-merge` |
 
 ### RECOVERABLE_FAILURE
@@ -89,9 +89,9 @@ sequenceDiagram
         alt "PR mergeado"
             Engine-->>Skill: CONTINUE
             Skill->>Skill: proceed to RESUME_AND_TAG
-        else "Rodar /x-pr-fix PR#"
+        else "Rodar /x-fix-pr PR#"
             Engine-->>Skill: HANDOFF
-            Skill->>Skill: delegate to /x-pr-fix
+            Skill->>Skill: delegate to /x-fix-pr
         else "Sair"
             Engine-->>Skill: EXIT
             Skill-->>Op: exit 0 with resume instruction
@@ -105,21 +105,21 @@ sequenceDiagram
 |:---|:---|:---|
 | 1 | `PROMPT_INVALID_RESPONSE` | Unexpected input (should not occur with AskUserQuestion fixed options) |
 | 2 | `PROMPT_USER_ABORT` | Operator chose "Abortar" at a recoverable failure halt |
-| 0 | `HANDOFF_SKILL_FAILED` | `/x-pr-fix` invocation failed (warn-only; retry offered) |
+| 0 | `HANDOFF_SKILL_FAILED` | `/x-fix-pr` invocation failed (warn-only; retry offered) |
 | 1 | `HANDOFF_PR_NOT_FOUND` | PR deleted during handoff (`gh pr view` 404) |
 
 ## Handoff Contract (story-0039-0011)
 
-When the operator chooses "Rodar /x-pr-fix PR#" at `APPROVAL_GATE` or
+When the operator chooses "Rodar /x-fix-pr PR#" at `APPROVAL_GATE` or
 `BACKMERGE_MERGE`, the `PromptEngine` returns `HANDOFF` and delegates to
 `HandoffOrchestrator` (`dev.iadev.release.handoff.HandoffOrchestrator`),
-which owns the handoff loop to the `/x-pr-fix` sibling skill (renamed by EPIC-0036).
+which owns the handoff loop to the `/x-fix-pr` sibling skill (renamed by EPIC-0036).
 
 ### Input (Skill tool invocation)
 
 ```json
 {
-  "skill": "x-pr-fix",
+  "skill": "x-fix-pr",
   "args": "297"
 }
 ```
@@ -161,10 +161,10 @@ based on the refreshed PR state:
 
 ### Handoff sequence (per story §3.1)
 
-1. Operator chooses "Rodar /x-pr-fix PR#" at the halt point
+1. Operator chooses "Rodar /x-fix-pr PR#" at the halt point
 2. `PromptEngine` returns `PromptAction.HANDOFF`
 3. Caller delegates to `HandoffOrchestrator.handoff(prNumber)`
-4. `HandoffOrchestrator` invokes `Skill(skill: "x-pr-fix", args: "<PR#>")` via `SkillInvokerPort`
+4. `HandoffOrchestrator` invokes `Skill(skill: "x-fix-pr", args: "<PR#>")` via `SkillInvokerPort`
 5. After the skill returns, `HandoffOrchestrator` calls `gh pr view <PR#> --json state,mergedAt,reviewDecision` via `GhCliPort`
 6. `resolveOptions(PrState)` yields the new option list
 7. Caller re-invokes `PromptEngine.resolve(...)` with the refreshed state and option list

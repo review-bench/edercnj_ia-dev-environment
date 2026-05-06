@@ -105,7 +105,7 @@ capabilities:
     - compliance.pci-dss
   disable:                         # opt-out fino
     - testing.e2e.cypress
-    - skill.x-review-perf          # também desabilita artefato específico
+    - skill.x-review-performance          # também desabilita artefato específico
 
 governance:
   adr-required: true
@@ -122,7 +122,7 @@ Toda skill/rule/KP/agent/hook/template DEVE declarar:
 
 ```yaml
 ---
-name: x-review-db
+name: x-review-database
 description: Database specialist review
 visibility: public                    # public | internal | shared
 platform: claude-code                 # claude-code | shared
@@ -273,8 +273,8 @@ profile: java-cli-picocli
 **Capabilities ativas:** `language.java`, `framework.picocli`, `interface.cli`, `testing.smoke`.
 
 **Output esperado:**
-- Inclui: `x-git-commit`, `x-code-format`, `x-test-tdd`, `x-review` (fragmentos `qa.md`, `perf.md` apenas), agentes `architect`, `tech-lead`, `qa-engineer`, KPs `coding-standards`, `testing`, `architecture`.
-- **Exclui:** `data-management/`, `database-patterns/`, `data-modeling/`, `database-engineer.md`, `x-review-db`, `x-review-devops`, `x-review-events`, `messaging-patterns/`, `stack-patterns/quarkus/`, `stack-patterns/spring/` (apenas `picocli/`).
+- Inclui: `x-commit-changes`, `x-format-code`, `x-drive-tdd`, `x-review-codebase` (fragmentos `qa.md`, `perf.md` apenas), agentes `architect`, `tech-lead`, `qa-engineer`, KPs `coding-standards`, `testing`, `architecture`.
+- **Exclui:** `data-management/`, `database-patterns/`, `data-modeling/`, `database-engineer.md`, `x-review-database`, `x-review-devops`, `x-review-events`, `messaging-patterns/`, `stack-patterns/quarkus/`, `stack-patterns/spring/` (apenas `picocli/`).
 
 ### 8.2 Spring Boot REST + Postgres + Kafka
 
@@ -292,7 +292,7 @@ capabilities:
 **Capabilities ativas:** `language.java`, `framework.spring-boot`, `interface.rest`, `data.database.postgres`, `messaging.kafka`, `compliance.pci-dss`, `testing.{smoke,contract,e2e}`, `observability.tracing.otel`.
 
 **Output esperado:**
-- `x-review` composto com 6 especialistas (`qa.md`, `perf.md`, `db.md`, `api.md`, `event.md`, `compliance.md`).
+- `x-review-codebase` composto com 6 especialistas (`qa.md`, `perf.md`, `db.md`, `api.md`, `event.md`, `compliance.md`).
 - KPs `database-patterns/postgres/` (não `mongo/`), `messaging-patterns/kafka/`, `pci-dss-requirements/`.
 - Rule 09 inclui fragmento `data-migration` (Postgres-flavored).
 - Rule 06 inclui fragmento `pci-dss`.
@@ -318,7 +318,7 @@ Todos integram via Rule 26 (catalog em `docs/audit-gates-catalog.md`).
 
 ## 10. Out of Scope (v1)
 
-- AI-based capability inference de código (heurística manual + skill `/x-frontmatter-migrate` é suficiente).
+- AI-based capability inference de código (heurística manual + skill `/x-migrate-frontmatter` é suficiente).
 - Hot-reload de capabilities em runtime.
 - Diferenciação de capabilities por ambiente (dev/staging/prod) — feature de v2.
 - Mini-DSL completa AND/OR/NOT — apenas `requires` (AND implícito) e `requires-any` (OR) na v1.

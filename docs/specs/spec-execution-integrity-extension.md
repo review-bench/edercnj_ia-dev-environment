@@ -2,12 +2,12 @@
 
 ## 1. Problem Statement
 
-No EPIC-0053 foi diagnosticado que a skill `x-pr-watch-ci` foi silenciosamente pulada em 6 task-PRs e no PR final #619, sem que qualquer camada de enforcement da Rule 24 detectasse a omissão. O merge cascata só foi pego por `Epic0047CompressionSmokeTest` em `mvn verify` na CI remota — blind spot local. Análise exaustiva do catálogo identificou 14 gaps análogos em orquestradoras principais.
+No EPIC-0053 foi diagnosticado que a skill `x-watch-pr-ci` foi silenciosamente pulada em 6 task-PRs e no PR final #619, sem que qualquer camada de enforcement da Rule 24 detectasse a omissão. O merge cascata só foi pego por `Epic0047CompressionSmokeTest` em `mvn verify` na CI remota — blind spot local. Análise exaustiva do catálogo identificou 14 gaps análogos em orquestradoras principais.
 
 ## 2. Causa raiz tripla
 
-1. **Tabela "Mandatory Evidence Artifacts" incompleta** — Rule 24 §32–42 lista apenas 5 sub-skills. `x-pr-watch-ci`, `x-pr-create`, `x-test-tdd`/`x-test-run`, `x-git-commit` (ciclo TDD), `x-dependency-audit`, `x-threat-model` produzem evidência mas não são tabulados. Camadas 3 e 4 cegas.
-2. **Invocações em prosa sem marker MANDATORY — NON-NEGOTIABLE** em ao menos 8 pontos: `x-story-implement/SKILL.md:202` (x-pr-watch-ci), `x-task-implement/SKILL.md:496`, `x-release/SKILL.md:1381`, `x-review/SKILL.md:99–155` (9 specialists sem marker), `x-story-implement/SKILL.md:250–254` (MANDATORY em comment, não no bloco Skill), `x-epic-implement/SKILL.md:333` (x-pr-fix-epic), `x-epic-orchestrate/SKILL.md:338` (x-story-plan), `x-owasp-scan/SKILL.md:273` (x-dependency-audit).
+1. **Tabela "Mandatory Evidence Artifacts" incompleta** — Rule 24 §32–42 lista apenas 5 sub-skills. `x-watch-pr-ci`, `x-create-pr`, `x-drive-tdd`/`x-execute-tests`, `x-commit-changes` (ciclo TDD), `x-audit-dependencies`, `x-model-threats` produzem evidência mas não são tabulados. Camadas 3 e 4 cegas.
+2. **Invocações em prosa sem marker MANDATORY — NON-NEGOTIABLE** em ao menos 8 pontos: `x-implement-story/SKILL.md:202` (x-watch-pr-ci), `x-implement-task/SKILL.md:496`, `x-release/SKILL.md:1381`, `x-review-codebase/SKILL.md:99–155` (9 specialists sem marker), `x-implement-story/SKILL.md:250–254` (MANDATORY em comment, não no bloco Skill), `x-implement-epic/SKILL.md:333` (x-fix-epic-pr), `x-orchestrate-epic/SKILL.md:338` (x-plan-story), `x-scan-owasp/SKILL.md:273` (x-audit-dependencies).
 3. **Infraestrutura de enforcement incompleta**: `scripts/audit-execution-integrity.sh` (Camada 3) NÃO existe. Rule 45 (CI-Watch Integrity) NÃO existe. Stop hook (`verify-story-completion.sh`) não verifica `.claude/state/pr-watch-*.json`. Flags `--no-ci-watch`, `--no-auto-remediation`, `--skip-pr-comments`, `--no-github-release`, `--no-jira` em happy-path violando Rule 24 §30.
 
 ## 3. Escopo
@@ -16,8 +16,8 @@ No EPIC-0053 foi diagnosticado que a skill `x-pr-watch-ci` foi silenciosamente p
 
 - Expansão da tabela "Mandatory Evidence Artifacts" (Rule 24) com 6 novas entradas.
 - Implementação de `scripts/audit-execution-integrity.sh` (Camada 3) com `--self-check` e exit codes 0/1/2/3 conforme Rule 24 §66–72.
-- Criação da Rule 45 (CI-Watch Integrity) consolidando `RULE-045-*` hoje referenciadas apenas em `x-pr-watch-ci/SKILL.md`.
-- Retrofit de markers **MANDATORY — NON-NEGOTIABLE** em 6 orquestradoras (x-story-implement, x-task-implement, x-release, x-review, x-epic-implement, x-owasp-scan).
+- Criação da Rule 45 (CI-Watch Integrity) consolidando `RULE-045-*` hoje referenciadas apenas em `x-watch-pr-ci/SKILL.md`.
+- Retrofit de markers **MANDATORY — NON-NEGOTIABLE** em 6 orquestradoras (x-implement-story, x-implement-task, x-release, x-review-codebase, x-implement-epic, x-scan-owasp).
 - Implementação de `scripts/audit-bypass-flags.sh` e remediação de flags em happy-path (mover para `## Recovery` ou remover).
 - Extensão do Stop hook (`verify-story-completion.sh`) para verificar `.claude/state/pr-watch-*.json` e novos artefatos tabulados.
 - Promoção de `Epic0047CompressionSmokeTest` (e smoke tests congêneres) para `mvn test` ou criação de gate local `mvn pre-push`.
@@ -26,7 +26,7 @@ No EPIC-0053 foi diagnosticado que a skill `x-pr-watch-ci` foi silenciosamente p
 ### 3.2 Fora de escopo
 
 - Refatoração profunda de skills (apenas retrofit de markers e tabelas).
-- Alterações em x-epic-implement Phase 5 (manual-gate é design intencional, Rule 21).
+- Alterações em x-implement-epic Phase 5 (manual-gate é design intencional, Rule 21).
 - Adição de classes Java runtime (violaria Rule 14 — Project Scope Guard).
 - Alterações em ADR-0010 ou ADR-0012.
 
@@ -71,7 +71,7 @@ No EPIC-0053 foi diagnosticado que a skill `x-pr-watch-ci` foi silenciosamente p
 
 ## 7. Entrega de valor
 
-Fecha uma vulnerabilidade comprovadamente explorável no protocolo de execução provada pelo EPIC-0053: LLM pode silenciosamente pular sub-skills críticas (CI-watch, reviews, audits) sem que qualquer camada detecte. Pós-épico: Camada 3 CI audit passa a existir; 14 gaps de prosa sem MANDATORY eliminados; flags bypass em happy-path reduzidas a zero; blind spot local (mvn verify só em CI) eliminado. Impacto mensurável: redução para zero de PROTOCOL_VIOLATION silencioso em x-story-implement / x-task-implement / x-release.
+Fecha uma vulnerabilidade comprovadamente explorável no protocolo de execução provada pelo EPIC-0053: LLM pode silenciosamente pular sub-skills críticas (CI-watch, reviews, audits) sem que qualquer camada detecte. Pós-épico: Camada 3 CI audit passa a existir; 14 gaps de prosa sem MANDATORY eliminados; flags bypass em happy-path reduzidas a zero; blind spot local (mvn verify só em CI) eliminado. Impacto mensurável: redução para zero de PROTOCOL_VIOLATION silencioso em x-implement-story / x-implement-task / x-release.
 
 ## 8. Definition of Done (por story)
 
@@ -86,4 +86,4 @@ Fecha uma vulnerabilidade comprovadamente explorável no protocolo de execução
 - NÃO reformula Rule 24 (expansão aditiva).
 - NÃO introduz código Java runtime (Rule 14).
 - NÃO força backfill destrutivo em `audits/execution-integrity-baseline.txt` fora da Story 0057-0008.
-- NÃO altera contrato de `x-pr-watch-ci` ou seus exit codes.
+- NÃO altera contrato de `x-watch-pr-ci` ou seus exit codes.

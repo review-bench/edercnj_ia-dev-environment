@@ -1,0 +1,22 @@
+id: quality.regression.service
+category: quality
+kind: atomic
+version: "1.0"
+status: stable
+description: >
+  Regression-shell service mode — consumes tests/regression/scenarios.yaml declared by the
+  project team, executes each scenario via cURL/grpcurl/wscat according to interfaces[].type,
+  and validates status code + response payload + headers. Output written to
+  tests/regression/results/regression-YYYY-MM-DD.md. Invoked by /x-test-regression-shell
+  when quality.regression.mode = service (client projects).
+requires-capabilities: []
+requires: []
+excludes: [quality.regression.self]
+universal: false
+parameters:
+  scenarios-file:
+    type: string
+    default: tests/regression/scenarios.yaml
+  results-dir:
+    type: string
+    default: tests/regression/results

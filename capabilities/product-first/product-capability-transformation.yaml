@@ -1,0 +1,7 @@
+id: product-first.product-capability-transformation
+name: Product-to-Capability Transformation
+description: Enables the generator to resolve a Product declaration in the project YAML into a set of active capability bundles. A Product entry in the YAML activates or deactivates capability groups during ia-dev-env generate.
+category: product-first
+universal: false
+requires: []
+excludes: []

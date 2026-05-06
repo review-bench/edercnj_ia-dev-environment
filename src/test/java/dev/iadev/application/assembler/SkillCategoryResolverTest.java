@@ -39,11 +39,11 @@ class SkillCategoryResolverTest {
     void listSkills_whenCategorySkill_stripsCategory(@TempDir Path tempDir) throws IOException {
         Path root = tempDir.resolve("core");
         writeSkill(root.resolve("plan/x-epic-create"));
-        writeSkill(root.resolve("dev/x-task-implement"));
+        writeSkill(root.resolve("dev/x-implement-task"));
 
         List<String> skills = SkillCategoryResolver.listSkills(root);
 
-        assertThat(skills).containsExactlyInAnyOrder("x-epic-create", "x-task-implement");
+        assertThat(skills).containsExactlyInAnyOrder("x-epic-create", "x-implement-task");
     }
 
     @Test

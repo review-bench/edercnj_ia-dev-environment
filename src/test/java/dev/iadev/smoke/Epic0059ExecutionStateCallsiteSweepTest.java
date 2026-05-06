@@ -41,7 +41,7 @@ class Epic0059ExecutionStateCallsiteSweepTest {
             "(?i)(Edit|Write)\\s*\\(.*execution-state\\.json";
 
     /** The canonical skill that is allowed to mutate execution-state.json. */
-    private static final String CANONICAL_SKILL = "x-internal-status-update";
+    private static final String CANONICAL_SKILL = "x-internal-update-status";
 
     @Test
     @DisplayName(
@@ -74,7 +74,7 @@ class Epic0059ExecutionStateCallsiteSweepTest {
                         "Found SKILL.md files with direct Edit/Write calls "
                                 + "to execution-state.json outside %s. "
                                 + "Migrate these call-sites to use "
-                                + "x-internal-status-update instead:\n%s",
+                                + "x-internal-update-status instead:\n%s",
                         CANONICAL_SKILL, String.join("\n", violations))
                 .isEmpty();
     }
@@ -95,7 +95,7 @@ class Epic0059ExecutionStateCallsiteSweepTest {
         }
         assertThat(found)
                 .as(
-                        "x-internal-status-update/SKILL.md must exist "
+                        "x-internal-update-status/SKILL.md must exist "
                                 + "under skills source-of-truth")
                 .isTrue();
     }

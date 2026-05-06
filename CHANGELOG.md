@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-05-06
+
+### Highlights — EPIC-0077 (Product-First Lifecycle & Planning C4 Model)
+
+EPIC-0077 introduz a hierarquia de planejamento **Product → Capability → Feature → Epic → Story → Task** como domain model de primeira classe no pipeline do `ia-dev-env`. Uma declaração `Product` no YAML do projeto determina quais capability bundles são ativados; cada `Capability` mapeia para skills, rules e templates que são incluídos ou excluídos do `.claude/` gerado.
+
+**ADR-0030** estende a Rule 14 (Project Scope Guard) para autorizar os pacotes `domain/products/`, `domain/capabilities/`, `domain/features/` e `domain/planning/rnf-validation/` — todos servem o pipeline de geração e não contradizem o scope guard original.
+
+### Added — EPIC-0077 story-0077-0000 (Rule 14 Amendment & ADR-0030)
+
+- **ADR-0030** `docs/adr/ADR-0030-rule14-product-first-domain.md`: amenda a Rule 14 para autorizar os 4 pacotes do domínio Product-First com critério de eligibilidade de 3 condições.
+- **Rule 14 §Product-First Domain Extension**: seção adicionada à Rule 14 documentando os pacotes autorizados, suas entidades e seu papel no pipeline de geração.
+
 ## [5.2.0] - 2026-05-04
 
 ### Highlights — EPIC-0076 (Verb-First Skill Naming Refactor)
@@ -241,7 +254,6 @@ O CI script `audit-doc-freshness.sh` (Camada 2, Rule 26) complementa o gate loca
 ### Highlights — EPIC-0069
 
 > **Histórias e épicos deixam de chegar mal-definidos a `x-story-implement` e `x-epic-implement`.** O gate de refinamento (Rule 29) é bloqueante em quatro camadas — normativa (a própria Rule 29 + bloco "REFINEMENT GATE — INEGOCIÁVEL" em CLAUDE.md), preventiva local (PreToolUse hook `enforce-refinement-gate.sh`, exit `33`), CI (`audit-refinement-gate.sh`, exit `1`), e detecção pós-merge via `verdictHash`. Operadores rodam `/x-story-refine STORY-ID` ou `/x-epic-refine EPIC-ID` antes de implementar; persona-agents paralelos (PO, Tech Lead, Architect, Security, QA, condicionais Perf/SRE) aplicam silenciosamente seus NO-GOs e consolidam um único batch de perguntas para o operador. O resultado: AC com 4 categorias obrigatórias (happy/erro/perf/sec), contratos tipados, métricas mensuráveis, alternativas consideradas e riscos identificados — antes do TDD começar.
-
 
 ## [5.1.0] - 2026-04-30
 

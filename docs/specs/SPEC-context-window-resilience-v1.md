@@ -104,8 +104,8 @@ contexto. Isso leva a estouros imprevisíveis.
 
 1. Adicionar campo `context-budget` ao frontmatter de SKILL.md com valores:
    - `light` (< 200 linhas core, ~3K tokens) — x-format, x-lint, x-commit
-   - `medium` (200-500 linhas core, 3-7K tokens) — x-tdd, x-plan-task, x-pr-create
-   - `heavy` (> 500 linhas core, > 7K tokens) — x-dev-lifecycle, x-dev-epic-implement, x-review
+   - `medium` (200-500 linhas core, 3-7K tokens) — x-tdd, x-plan-task, x-create-pr
+   - `heavy` (> 500 linhas core, > 7K tokens) — x-dev-lifecycle, x-dev-epic-implement, x-review-codebase
 
 2. Adicionar ao template Jinja dos skills core a geração do campo `context-budget`
 
@@ -325,7 +325,7 @@ detalhados de TDD cycles. Esse acúmulo é cumulativo — cada iteração adicio
 2. **Phase reports em subagent**: Gerar phase completion reports em subagent dedicado
    que salva em arquivo. O orquestrador recebe apenas `{ "status": "GENERATED", "path": "..." }`
 
-3. **Review output compaction**: x-review já salva dashboard em arquivo. Garantir que o
+3. **Review output compaction**: x-review-codebase já salva dashboard em arquivo. Garantir que o
    orquestrador lê apenas o score final e lista de bloqueios, não o dashboard inteiro
 
 4. **TDD cycle logs**: x-tdd emite log completo de cada ciclo. Instruir para emitir apenas:
@@ -395,7 +395,7 @@ verificar que todos os prompts de subagent seguem essa regra.
 1. Auditar todos os prompts de subagent em:
    - `x-dev-epic-implement/SKILL.md`: Section 1.4, 1.4a, 1.4c (dispatch prompts)
    - `x-dev-lifecycle/SKILL.md`: Phase 1B, 1D, 1E, 1F (planning subagents)
-   - `x-review/SKILL.md`: specialist subagent prompts
+   - `x-review-codebase/SKILL.md`: specialist subagent prompts
    - `x-epic-plan/SKILL.md`: planning subagents
 
 2. Para cada prompt, verificar:

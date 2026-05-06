@@ -443,12 +443,12 @@ class SkillsKpGoldenEdgeTest {
             String expected =
                     loadResource(
                             "golden/java-quarkus/.claude/"
-                                    + "skills/x-story-implement/"
+                                    + "skills/x-implement-story/"
                                     + "SKILL.md");
             if (expected != null) {
                 String actual =
                         Files.readString(
-                                outputDir.resolve("skills/x-story-implement/" + "SKILL.md"),
+                                outputDir.resolve("skills/x-implement-story/" + "SKILL.md"),
                                 StandardCharsets.UTF_8);
                 assertThat(actual).isEqualTo(expected);
             }

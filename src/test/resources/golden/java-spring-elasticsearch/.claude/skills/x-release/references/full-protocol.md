@@ -145,7 +145,7 @@ sed -i "s/<version>.*-SNAPSHOT/<version>X.Y.Z/" pom.xml
 
 ### Step 5 — Changelog Generation
 
-Generate/update via `x-release-changelog`. Move `[Unreleased]` section to `[X.Y.Z] - YYYY-MM-DD`. Checks `[Unreleased]` is non-empty before proceeding.
+Generate/update via `x-generate-release-changelog`. Move `[Unreleased]` section to `[X.Y.Z] - YYYY-MM-DD`. Checks `[Unreleased]` is non-empty before proceeding.
 
 **Version & Changelog** section written. `## Release v` marker in output.
 
@@ -215,7 +215,7 @@ State transitions from `PR_OPENED` → `APPROVAL_PENDING` on halt. Then on resum
 
 3 options:
 1. **Default** — continue (PROCEED): `gh pr view` verifies state `MERGED` → advance to Step 9. `expected TAGGED` flow. `exit 0` on halt.
-2. **Interactive** — Fix PR (`Fix PR`): invoke `x-pr-fix` → loop (max 3 cycles). `APPROVAL_CANCELLED` on abort. `exit 2` on third failure.
+2. **Interactive** — Fix PR (`Fix PR`): invoke `x-fix-pr` → loop (max 3 cycles). `APPROVAL_CANCELLED` on abort. `exit 2` on third failure.
 3. **Cancel** — `APPROVAL_PR_STILL_OPEN`; exit 0.
 
 `--continue-after-merge` semantics: equivalent to selecting PROCEED — advances directly to Step 9 after `gh pr view` validates `MERGED` state.
@@ -406,8 +406,8 @@ Shows: version, `Mode:`, `Source branch:`, `State file:`, current phase, PR URLs
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| `x-release-changelog` | calls (Step 5) | `[Unreleased]` → `[X.Y.Z]` promotion |
+| `x-generate-release-changelog` | calls (Step 5) | `[Unreleased]` → `[X.Y.Z]` promotion |
 | `x-review-pr` | calls (Step 7, opt-out `--skip-review`) | `--skip-review` flag |
-| `x-pr-watch-ci` | calls (Step 7.5, opt-in `--ci-watch`) | CI polling |
-| `x-pr-fix` | calls (Step 8 gate, FIX slot) | `x-pr-fix` during gate |
+| `x-watch-pr-ci` | calls (Step 7.5, opt-in `--ci-watch`) | CI polling |
+| `x-fix-pr` | calls (Step 8 gate, FIX slot) | `x-fix-pr` during gate |
 | `09-branching-model` | references | `Rule 09` release branch conventions |

@@ -21,7 +21,7 @@ class FrontmatterInjectorTest {
             String content =
                     """
                     ---
-                    name: x-git-push
+                    name: x-push-branch
                     description: "Git operations"
                     user-invocable: true
                     allowed-tools: Bash, Read
@@ -61,7 +61,7 @@ class FrontmatterInjectorTest {
             String content =
                     """
                     ---
-                    name: x-story-implement
+                    name: x-implement-story
                     argument-hint: "[STORY-ID]"
                     ---
                     ## Body

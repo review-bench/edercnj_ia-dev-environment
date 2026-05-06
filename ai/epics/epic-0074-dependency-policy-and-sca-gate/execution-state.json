@@ -1,0 +1,50 @@
+{
+  "flowVersion": "4",
+  "epicId": "EPIC-0074",
+  "epicSlug": "dependency-policy-and-sca-gate",
+  "epicBranch": "epic/0074",
+  "interactiveMode": "non-interactive",
+  "taskTracking": {
+    "enabled": true,
+    "rootTaskId": null,
+    "phaseGateResults": []
+  },
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-05-01T00:00:00Z",
+    "verdictHash": "manual-approved-refinement-d-r1-d-r12",
+    "blockers": []
+  },
+  "resolvedTBDs": {
+    "ruleNumber": 32,
+    "adrNumber": "ADR-0027",
+    "rule27Surface": 13
+  },
+  "storyStatuses": {
+    "story-0074-0001": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    },
+    "story-0074-0002": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    },
+    "story-0074-0003": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    },
+    "story-0074-0004": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    },
+    "story-0074-0005": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    },
+    "story-0074-0006": {
+      "status": "Pendente",
+      "flowVersion": "4"
+    }
+  }
+}

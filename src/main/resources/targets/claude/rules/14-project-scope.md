@@ -55,9 +55,32 @@ Before adding a new package or class, ask:
 
 If the answer to all three is NO, the code does not belong in this project.
 
+## Product-First Domain Extension (EPIC-0077)
+
+> **ADR:** [ADR-0030 — Rule 14 Extension for Product-First Runtime Domain](../../docs/adr/ADR-0030-rule14-product-first-domain.md)
+> **Introduced by:** EPIC-0077 (Product-First Lifecycle & Planning C4 Model), story-0077-0000
+
+The following additional packages are explicitly authorized under this amendment. They serve the `ia-dev-env generate` pipeline by modeling the Product-First planning hierarchy that drives capability resolution and composition:
+
+| Package | Entities | Pipeline role |
+| :--- | :--- | :--- |
+| `domain/products/` | `Product`, `ProductId`, `ProductStatus` | Root of planning hierarchy; determines which capability bundles are resolved during generation |
+| `domain/capabilities/` | `Capability`, `CapabilityId` | Intermediate layer between Product and Feature; drives `CapabilityResolver` during composition |
+| `domain/features/` | `Feature`, `FeatureId` | Maps to epic/epic cluster; used by `x-create-feature` and `x-internal-map-epic` to scope planning artifacts |
+| `domain/planning/rnf-validation/` | `RnfValidationConfig`, `RnfGate` | Non-functional requirements gate configuration inherited by epics/stories; consumed by `x-refine-story` and `x-refine-epic` |
+
+**Eligibility criterion for future packages under this amendment:** Code is eligible when it satisfies ALL three conditions:
+1. Serves the `ia-dev-env generate` or `ia-dev-env validate` pipeline.
+2. Models entities of the Product-First hierarchy required for generation of `.claude/` artifacts.
+3. Is read during composition by `CapabilityResolver`, `CapabilityAwareComposer`, or their immediate collaborators.
+
+Code that does not satisfy all three conditions remains subject to the original Rule 14 scope guard above.
+
+---
+
 ## Worktree Lifecycle (EPIC-0049)
 
-Git worktrees enable parallel task / story / epic execution by creating additional working trees for the same repository. They live under `.claude/worktrees/{identifier}/` and are managed exclusively by the `x-git-worktree` skill.
+Git worktrees enable parallel task / story / epic execution by creating additional working trees for the same repository. They live under `.claude/worktrees/{identifier}/` and are managed exclusively by the `x-manage-worktrees` skill.
 
 ### Directory Pattern
 
@@ -66,13 +89,13 @@ Git worktrees enable parallel task / story / epic execution by creating addition
 | Task (within a story) | `.claude/worktrees/task-XXXX-YYYY-NNN/` | Parent story branch |
 | Story (within an epic) | `.claude/worktrees/story-XXXX-YYYY/` | `epic/XXXX` (not `develop` — see Rule 21) |
 | Epic integration | `.claude/worktrees/epic-XXXX/` | `develop` |
-| Feature creation (EPIC-0065) | `.claude/worktrees/feature-XXXX-<slug>/` | `epic/XXXX` — owned by `x-feature-create`; sub-skills inherit via §3 re-entrancy |
-| Feature ideation (EPIC-0065) | `.claude/worktrees/feature-ideation-<slug>/` | `develop` — owned by `x-feature-ideate`; produces spec PR to `develop` |
+| Feature creation (EPIC-0065) | `.claude/worktrees/feature-XXXX-<slug>/` | `epic/XXXX` — owned by `x-create-feature`; sub-skills inherit via §3 re-entrancy |
+| Feature ideation (EPIC-0065) | `.claude/worktrees/feature-ideation-<slug>/` | `develop` — owned by `x-ideate-feature`; produces spec PR to `develop` |
 
 ### Invariants
 
 - **Creator-owned removal.** The skill that created a worktree is the only one allowed to remove it. Nested invocations reuse the existing worktree without creating a new one (ADR-0004 §D2).
 - **Epic-base for parallel stories.** In `--parallel` mode, story worktrees MUST be created from `epic/XXXX`, never from `develop`. This keeps story PRs targetable at the epic branch (Rule 21, RULE-002 of EPIC-0049).
-- **Failure preservation.** A worktree MUST be preserved on failure for diagnosis. Removal happens only on success, or via explicit `x-git-worktree cleanup` by the user.
+- **Failure preservation.** A worktree MUST be preserved on failure for diagnosis. Removal happens only on success, or via explicit `x-manage-worktrees cleanup` by the user.
 - **One worktree per identifier.** Attempts to create a second worktree with the same identifier are no-ops that return the existing path.
 

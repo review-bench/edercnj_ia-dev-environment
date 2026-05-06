@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0016-0004: x-spec-drift skill for standalone spec drift detection.
+ * Tests for story-0016-0004: x-detect-spec-drift skill for standalone spec drift detection.
  *
- * <p>Validates that the x-spec-drift skill template is generated correctly with proper frontmatter,
- * drift check categories, output format, and exit code semantics.
+ * <p>Validates that the x-detect-spec-drift skill template is generated correctly with proper
+ * frontmatter, drift check categories, output format, and exit code semantics.
  */
-@DisplayName("x-spec-drift Skill")
+@DisplayName("x-detect-spec-drift Skill")
 class SpecDriftCheckSkillTest {
 
     @Nested
@@ -27,18 +27,18 @@ class SpecDriftCheckSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-spec-drift SKILL.md exists" + " after assembly")
+        @DisplayName("x-detect-spec-drift SKILL.md exists" + " after assembly")
         void assemble_specDriftCheck_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-spec-drift/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-detect-spec-drift/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-spec-drift")
+        @DisplayName("frontmatter contains name:" + " x-detect-spec-drift")
         void assemble_specDriftCheck_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-spec-drift");
+            assertThat(content).contains("name: x-detect-spec-drift");
         }
 
         @Test
@@ -223,6 +223,7 @@ class SpecDriftCheckSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-spec-drift" + "/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-detect-spec-drift" + "/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

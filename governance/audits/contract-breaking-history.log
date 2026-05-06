@@ -1,0 +1,4 @@
+# Contract Breaking Change History Log
+# Format: <ISO8601-timestamp>\t<git-sha>\t<author-email>\t<breaking-type>\t<artifact-path>\t"<justification>"
+# Append-only — do NOT remove entries.
+# One entry required per documented breaking change merged to any PR.

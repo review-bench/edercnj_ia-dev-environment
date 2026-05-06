@@ -1,0 +1,27 @@
+{
+  "storyId": "story-0069-0001",
+  "epicId": "EPIC-0069",
+  "passed": true,
+  "verifiedAt": "2026-04-30T09:30:00Z",
+  "coverageLine": null,
+  "coverageBranch": null,
+  "artifactsVerified": [
+    "capabilities/governance/refinement-gate.yaml",
+    "capabilities/_index.yaml",
+    "src/main/resources/targets/claude/rules/29-refinement-gate.md",
+    "docs/adr/ADR-0022-refinement-gate.md",
+    "src/main/resources/targets/claude/knowledge/refinement/dimensions.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/plan-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/arch-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/tests-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/tasks-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/security-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/compliance-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/review-story-0069-0001.md",
+    "ai/epics/epic-0069-refinement-and-dor-gate/plans/techlead-review-story-0069-0001.md"
+  ],
+  "specialistReview": { "verdict": "GO", "path": "ai/epics/epic-0069-refinement-and-dor-gate/plans/review-story-0069-0001.md" },
+  "techLeadReview": { "verdict": "GO", "path": "ai/epics/epic-0069-refinement-and-dor-gate/plans/techlead-review-story-0069-0001.md" },
+  "d_r6_compliance": "ADR-0018 taken — using ADR-0022 as confirmed",
+  "notes": "Content-layer story (no Java code). Coverage N/A. All normative artifacts present."
+}

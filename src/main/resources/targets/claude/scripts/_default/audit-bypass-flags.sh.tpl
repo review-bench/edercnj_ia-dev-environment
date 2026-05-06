@@ -10,8 +10,8 @@ case "${1:-}" in
 esac
 violations=0
 while IFS= read -r -d '' skill; do
-  if grep -q "\-\-no-ci-watch\|\-\-skip-verification" "$skill" 2>/dev/null; then
-    if ! grep -B1 "\-\-no-ci-watch\|\-\-skip-verification" "$skill" 2>/dev/null | grep -q "## Recovery\|audit-exempt"; then
+  if grep -q "\-\-no-ci-watch\|\-\-skip-verification\|\-\-skip-doc" "$skill" 2>/dev/null; then
+    if ! grep -B1 "\-\-no-ci-watch\|\-\-skip-verification\|\-\-skip-doc" "$skill" 2>/dev/null | grep -q "## Recovery\|audit-exempt"; then
       echo "BYPASS_FLAG_VIOLATION: $skill" >&2; violations=$((violations + 1))
     fi
   fi

@@ -90,8 +90,8 @@ public final class SkillsAssembler implements Assembler {
      * <p>Story-0047-0001 introduces {@code _shared/} for cross-cutting Markdown snippets referenced
      * by consumer skills via Markdown relative links (per ADR-0011 — shared-snippets inclusion
      * strategy). For links like {@code ../_shared/error-handling.md} in a generated {@code
-     * skills/x-git-commit/SKILL.md} to resolve at runtime, the target directory must ship in the
-     * same output tree.
+     * skills/x-commit-changes/SKILL.md} to resolve at runtime, the target directory must ship in
+     * the same output tree.
      *
      * <p>When the source {@code _shared/} directory does not exist, this method is a no-op and
      * returns {@link Optional#empty()}.

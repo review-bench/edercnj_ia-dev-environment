@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for story-0022-0012: x-hardening-eval skill for application hardening evaluation against
- * CIS/OWASP benchmarks.
+ * Tests for story-0022-0012: x-evaluate-hardening skill for application hardening evaluation
+ * against CIS/OWASP benchmarks.
  *
- * <p>Validates that the x-hardening-eval skill template is generated correctly with proper
+ * <p>Validates that the x-evaluate-hardening skill template is generated correctly with proper
  * frontmatter, 7 hardening dimensions, weighted scoring, SARIF output, benchmark support, and ASVS
  * level mapping.
  */
-@DisplayName("x-hardening-eval Skill")
+@DisplayName("x-evaluate-hardening Skill")
 class HardeningEvalSkillTest {
 
     @Nested
@@ -29,18 +29,18 @@ class HardeningEvalSkillTest {
     class ClaudeFrontmatter {
 
         @Test
-        @DisplayName("x-hardening-eval SKILL.md exists" + " after assembly")
+        @DisplayName("x-evaluate-hardening SKILL.md exists" + " after assembly")
         void assemble_hardeningEval_skillMdExists(@TempDir Path tempDir) throws IOException {
             Path outputDir = generateOutput(tempDir);
-            Path skillMd = outputDir.resolve("skills/x-hardening-eval/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-evaluate-hardening/SKILL.md");
             assertThat(skillMd).exists();
         }
 
         @Test
-        @DisplayName("frontmatter contains name:" + " x-hardening-eval")
+        @DisplayName("frontmatter contains name:" + " x-evaluate-hardening")
         void assemble_hardeningEval_hasName(@TempDir Path tempDir) throws IOException {
             String content = generateClaudeContent(tempDir);
-            assertThat(content).contains("name: x-hardening-eval");
+            assertThat(content).contains("name: x-evaluate-hardening");
         }
 
         @Test
@@ -383,6 +383,6 @@ class HardeningEvalSkillTest {
     private String generateClaudeContent(Path tempDir) throws IOException {
         Path outputDir = generateOutput(tempDir);
         return Files.readString(
-                outputDir.resolve("skills/x-hardening-eval/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-evaluate-hardening/SKILL.md"), StandardCharsets.UTF_8);
     }
 }

@@ -11,10 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Validates RA9 structural invariants of {@code _TEMPLATE-EPIC.md} v2 (story-0056-0002).
+ * Validates value-driven structural invariants of {@code _TEMPLATE-EPIC.md} v2 (story-0070-0002).
  *
- * <p>Checks: all 9 section headers present and RA9-specific placeholders for Packages + Decision
- * Rationale.
+ * <p>Checks: all 9 section headers present and v2-specific value-driven content for hypothesis,
+ * OKRs, and alternatives.
  */
 @DisplayName("TemplateEpicV2StructureTest")
 class TemplateEpicV2StructureTest {
@@ -24,24 +24,18 @@ class TemplateEpicV2StructureTest {
 
     private static final List<String> REQUIRED_SECTIONS =
             List.of(
-                    "## 1. Contexto & Escopo",
-                    "## 2. Packages (Hexagonal)",
-                    "## 3. Contratos & Endpoints",
-                    "## 4. Materialização SOLID",
-                    "## 5. Quality Gates",
-                    "## 6. Segurança",
-                    "## 7. Observabilidade",
-                    "## 8. Decision Rationale",
-                    "## 9. Dependências & File Footprint");
+                    "## 1. Visão & Problema",
+                    "## 2. Persona & Stakeholders",
+                    "## 3. Hipótese & OKRs",
+                    "## 4. Alternativas Consideradas",
+                    "## 5. Escopo",
+                    "## 6. Riscos",
+                    "## 7. Índice de Histórias",
+                    "## 8. Quality Gates",
+                    "## Refinement Verdict");
 
-    private static final List<String> REQUIRED_PLACEHOLDERS =
-            List.of(
-                    "{{PACKAGES_DOMAIN}}",
-                    "{{PACKAGES_APPLICATION}}",
-                    "{{PACKAGES_ADAPTER_INBOUND}}",
-                    "{{PACKAGES_ADAPTER_OUTBOUND}}",
-                    "{{PACKAGES_INFRASTRUCTURE}}",
-                    "{{DECISION_RATIONALE}}");
+    private static final List<String> REQUIRED_V2_CONTENT =
+            List.of("Hipótese de Valor", "Decisão de rejeição:", "story-XXXX-", "File Footprint");
 
     @Test
     @DisplayName("epicTemplate_hasAllNineRa9Sections")
@@ -55,26 +49,25 @@ class TemplateEpicV2StructureTest {
     }
 
     @Test
-    @DisplayName("epicTemplate_hasRa9SpecificPlaceholders")
-    void epicTemplate_hasRa9SpecificPlaceholders() throws IOException {
+    @DisplayName("epicTemplate_hasV2ValueDrivenContent")
+    void epicTemplate_hasV2ValueDrivenContent() throws IOException {
         String content = readTemplate();
-        for (String placeholder : REQUIRED_PLACEHOLDERS) {
+        for (String marker : REQUIRED_V2_CONTENT) {
             assertThat(content)
-                    .as("_TEMPLATE-EPIC.md must have placeholder: %s", placeholder)
-                    .contains(placeholder);
+                    .as("_TEMPLATE-EPIC.md v2 must have content: %s", marker)
+                    .contains(marker);
         }
     }
 
     @Test
-    @DisplayName("epicTemplate_hasDecisionRationaleMicroTemplate")
-    void epicTemplate_hasDecisionRationaleMicroTemplate() throws IOException {
+    @DisplayName("epicTemplate_hasHypothesisAndOkrsMicroTemplate")
+    void epicTemplate_hasHypothesisAndOkrsMicroTemplate() throws IOException {
         String content = readTemplate();
         assertThat(content)
-                .as("Epic template must include Decision Rationale" + " micro-template fields")
-                .contains("**Decisão:**")
-                .contains("**Motivo:**")
-                .contains("**Alternativa descartada:**")
-                .contains("**Consequência:**");
+                .as("Epic template must include value-driven hypothesis and OKRs fields")
+                .contains("Hipótese de Valor")
+                .contains("Decisão de rejeição:")
+                .contains("OKRs");
     }
 
     @Test
@@ -82,7 +75,7 @@ class TemplateEpicV2StructureTest {
     void epicTemplate_preservesStoryIndexSection() throws IOException {
         String content = readTemplate();
         assertThat(content)
-                .as("Story index must be preserved (in section 9)")
+                .as("Story index must be preserved (in section 7)")
                 .contains("story-XXXX-")
                 .contains("Dependências");
     }

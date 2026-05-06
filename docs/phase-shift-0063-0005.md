@@ -2,12 +2,12 @@
 
 > **Story:** story-0063-0005
 > **Epic:** EPIC-0063 (Local-First Preflight Gates)
-> **Introduced by:** story-0063-0005 — x-story-implement Phase Shift
+> **Introduced by:** story-0063-0005 — x-implement-story Phase Shift
 
 ## Summary
 
-This document formalises a new execution gate — **Phase 2.7** — inside `x-story-implement`.
-The gate ensures that specialist reviews (`x-review`) and tech-lead review (`x-review-pr`)
+This document formalises a new execution gate — **Phase 2.7** — inside `x-implement-story`.
+The gate ensures that specialist reviews (`x-review-codebase`) and tech-lead review (`x-review-pr`)
 are invoked **after all tasks complete but BEFORE the story-level PR is created**.
 
 Before this change, reviews were optionally invoked after the PR was already open.
@@ -22,14 +22,14 @@ weakening the evidence chain required by Rule 24 and Rule 27.
 Phase 2 — Task Execution Loop
 │
 ├── 2.1  Load task list from plan-story-XXXX-YYYY.md
-├── 2.2  For each task → x-task-implement (TDD cycle)
+├── 2.2  For each task → x-implement-task (TDD cycle)
 │        ↑ loop until all tasks DONE
 │
 ├── 2.7  [NEW] Pre-PR Review Gate  ◄──── gate introduced here
-│        ├── Invoke x-review        (specialist reviews)
+│        ├── Invoke x-review-codebase        (specialist reviews)
 │        └── Invoke x-review-pr     (tech-lead 45-point checklist)
 │
-└── 2.8  Create story-level PR via x-pr-create
+└── 2.8  Create story-level PR via x-create-pr
          (PR body now INCLUDES evidence of 2.7 reviews)
 ```
 
@@ -37,12 +37,12 @@ Phase 2 — Task Execution Loop
 
 | Step | Action | Output artifact |
 | :--- | :--- | :--- |
-| 2.7.1 | Invoke `x-review` on the story branch (parallel specialist wave) | `plans/epic-XXXX/plans/review-story-STORY-ID.md` |
+| 2.7.1 | Invoke `x-review-codebase` on the story branch (parallel specialist wave) | `plans/epic-XXXX/plans/review-story-STORY-ID.md` |
 | 2.7.2 | Invoke `x-review-pr` on the story branch (tech-lead 45-point) | `plans/epic-XXXX/plans/techlead-review-story-STORY-ID.md` |
 | 2.7.3 | Assert both artifacts exist on disk | Gate blocks if either is missing |
 | 2.7.4 | If `x-review-pr` verdict is NO-GO → surface to operator (interactive) or fail-fast (non-interactive) | — |
 
-The gate is a synchronous blocker: step 2.8 (`x-pr-create`) MUST NOT be reached unless
+The gate is a synchronous blocker: step 2.8 (`x-create-pr`) MUST NOT be reached unless
 phase 2.7 returns `passed=true`.
 
 ---
@@ -73,8 +73,8 @@ phase 2.7 returns `passed=true`.
 --skip-review
 ```
 
-When `--skip-review` is passed to `x-story-implement`, Phase 2.7 is skipped entirely.
-The flag is inherited by the orchestrator from the caller; `x-epic-implement` propagates
+When `--skip-review` is passed to `x-implement-story`, Phase 2.7 is skipped entirely.
+The flag is inherited by the orchestrator from the caller; `x-implement-epic` propagates
 it unchanged.
 
 **Constraint (Rule 24 / Rule 27):** `--skip-review` is only permitted inside a
@@ -113,6 +113,6 @@ checked by `.claude/hooks/verify-story-completion.sh` (Camada 2, Stop hook).
 - Rule 24 — Execution Integrity (`.claude/rules/24-execution-integrity.md`)
 - Rule 27 — Zero-Bypass Lifecycle (`.claude/rules/27-zero-bypass-lifecycle.md`)
 - Rule 20 — Interactive Gates Convention (`.claude/rules/20-interactive-gates.md`)
-- `x-review` skill (`.claude/skills/x-review/`)
+- `x-review-codebase` skill (`.claude/skills/x-review-codebase/`)
 - `x-review-pr` skill (`.claude/skills/x-review-pr/`)
 - ADR-0016 — Zero-Bypass Lifecycle Convention (`docs/adr/ADR-0016-zero-bypass-lifecycle.md`)

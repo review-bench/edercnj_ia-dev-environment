@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 class Epic0064ReviewCompositionSmokeTest {
 
     private static final Path X_REVIEW_ROOT =
-            Path.of("src/main/resources/targets/claude/skills/core/review/x-review");
+            Path.of("src/main/resources/targets/claude/skills/core/review/x-review-codebase");
     private static final Path FRAGMENTS_ROOT = X_REVIEW_ROOT.resolve("fragments");
     private static final Path PARENT_SKILL = X_REVIEW_ROOT.resolve("SKILL.md");
 

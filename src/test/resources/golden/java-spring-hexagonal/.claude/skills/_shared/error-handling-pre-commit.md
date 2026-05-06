@@ -2,7 +2,7 @@
 
 This table is the single source of truth for error handling across the
 pre-commit chain (`format -> lint -> compile -> commit`). It is referenced
-from `x-git-commit`, `x-code-format`, and `x-code-lint`.
+from `x-commit-changes`, `x-format-code`, and `x-lint-code`.
 
 When any of those three skills documents error behavior, link to this file
 instead of duplicating the rows.
@@ -35,7 +35,7 @@ instead of duplicating the rows.
 - Skipping hooks with `--no-verify` or `--no-gpg-sign` to "unblock" the chain.
   Rule 07 forbids this; fix the underlying failure instead.
 - Catching one of these exit codes and mapping it to a generic `EXIT_1`. The
-  caller (e.g., `x-story-implement`) distinguishes failure modes based on
+  caller (e.g., `x-implement-story`) distinguishes failure modes based on
   these codes; losing the distinction breaks retry/remediation logic.
 - Hand-rolling an equivalent table in a specific skill's `SKILL.md` or
   `references/*.md`. The whole point of this snippet is single-source-of-truth.

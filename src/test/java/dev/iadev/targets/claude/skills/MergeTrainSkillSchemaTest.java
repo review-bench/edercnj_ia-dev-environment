@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * TDD tests for the state.json schema documentation, atomic-write pattern, and --resume entry logic
- * in x-pr-merge-train/SKILL.md (story-0042-0003, TASK-0042-0003-003).
+ * in x-manage-pr-merge-train/SKILL.md (story-0042-0003, TASK-0042-0003-003).
  *
  * <p>Reads the golden SKILL.md from the golden output directory and asserts that the state.json
  * complete schema, atomic-write (.tmp + rename) pattern, and --resume entry logic are documented.
@@ -20,7 +20,7 @@ class MergeTrainSkillSchemaTest {
 
     private static final String GOLDEN_FULL_PROTOCOL_RELATIVE_PATH =
             "src/test/resources/golden/java-spring-hexagonal"
-                    + "/.claude/skills/x-pr-merge-train/references/full-protocol.md";
+                    + "/.claude/skills/x-manage-pr-merge-train/references/full-protocol.md";
 
     @Test
     @DisplayName(

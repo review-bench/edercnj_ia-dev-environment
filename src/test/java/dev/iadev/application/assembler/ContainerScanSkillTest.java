@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Tests for x-security-container skill: conditional inclusion, SKILL.md content, and scanning
+ * Tests for x-scan-container-security skill: conditional inclusion, SKILL.md content, and scanning
  * selection.
  */
-@DisplayName("Container Scan Skill — x-security-container")
+@DisplayName("Container Scan Skill — x-scan-container-security")
 class ContainerScanSkillTest {
 
     @Nested
@@ -27,13 +27,13 @@ class ContainerScanSkillTest {
     class SelectSecurityScanningSkills {
 
         @Test
-        @DisplayName("containerScan true includes" + " x-security-container")
+        @DisplayName("containerScan true includes" + " x-scan-container-security")
         void select_containerScanTrue_includesScan() {
             ProjectConfig config = TestConfigBuilder.builder().containerScan(true).build();
 
             List<String> skills = SkillsSelection.selectSecurityScanningSkills(config);
 
-            assertThat(skills).containsExactly("x-security-container");
+            assertThat(skills).containsExactly("x-scan-container-security");
         }
 
         @Test
@@ -68,7 +68,7 @@ class ContainerScanSkillTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).contains("x-security-container");
+            assertThat(skills).contains("x-scan-container-security");
         }
 
         @Test
@@ -78,7 +78,7 @@ class ContainerScanSkillTest {
 
             List<String> skills = SkillsSelection.selectConditionalSkills(config);
 
-            assertThat(skills).doesNotContain("x-security-container");
+            assertThat(skills).doesNotContain("x-scan-container-security");
         }
     }
 
@@ -96,7 +96,7 @@ class ContainerScanSkillTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path skillMd = outputDir.resolve("skills/x-security-container/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-scan-container-security/SKILL.md");
             assertThat(skillMd).exists();
         }
 
@@ -110,16 +110,16 @@ class ContainerScanSkillTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            Path skillMd = outputDir.resolve("skills/x-security-container/SKILL.md");
+            Path skillMd = outputDir.resolve("skills/x-scan-container-security/SKILL.md");
             assertThat(skillMd).doesNotExist();
         }
 
         @Test
-        @DisplayName("generated SKILL.md contains" + " x-security-container name")
+        @DisplayName("generated SKILL.md contains" + " x-scan-container-security name")
         void assemble_skillMd_containsName(@TempDir Path tempDir) throws IOException {
             String content = generateContainerScanContent(tempDir);
 
-            assertThat(content).contains("name: x-security-container");
+            assertThat(content).contains("name: x-scan-container-security");
         }
 
         @Test
@@ -193,6 +193,7 @@ class ContainerScanSkillTest {
         SkillsAssembler assembler = new SkillsAssembler();
         assembler.assemble(config, new TemplateEngine(), outputDir);
         return Files.readString(
-                outputDir.resolve("skills/x-security-container/SKILL.md"), StandardCharsets.UTF_8);
+                outputDir.resolve("skills/x-scan-container-security/SKILL.md"),
+                StandardCharsets.UTF_8);
     }
 }

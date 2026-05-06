@@ -25,6 +25,17 @@
 | ADR-0019 | [Preflight Gates WARN→FAIL Rollout Strategy](ADR-0019-preflight-warn-to-fail-rollout.md) | Accepted | 2026-04-28 |
 | ADR-0020 | [Hexagonal Architecture Migration (EPIC-0015)](ADR-0020-hexagonal-architecture-migration.md) | Accepted | 2026-04-04 |
 | ADR-0021 | [`CLAUDE.md` Contract (Root File via Dedicated Assembler) (EPIC-0048)](ADR-0021-claude-md-contract.md) | Accepted | 2026-04-22 |
+| ADR-0022 | [Refinement Gate Convention (EPIC-0069)](ADR-0022-refinement-gate.md) | Accepted | 2026-04-30 |
+| ADR-0023 | [Value-Driven Templates v2 (EPIC-0070)](ADR-0023-value-driven-templates.md) | Accepted | 2026-04-30 |
+| ADR-0024 | [Documentation Freshness Gate (EPIC-0071)](ADR-0024-documentation-freshness-gate.md) | Accepted | 2026-04-30 |
+| ADR-0025 | [Comprehensive Test Strategy (EPIC-0072)](ADR-0025-comprehensive-test-strategy.md) | Accepted | 2026-04-30 |
+| ADR-0026 | [Regression Shell + DAST (EPIC-0073)](ADR-0026-regression-shell-and-dast.md) | Accepted | 2026-05-01 |
+| ADR-0027 | [Dependency Policy & SCA Final Gate (EPIC-0074)](ADR-0027-dependency-policy-gate.md) | Accepted | 2026-05-01 |
+| ADR-0028 | [AI Memory Layer (EPIC-0075)](ADR-0028-ai-memory-layer.md) | Accepted | 2026-05-03 |
+| ADR-0029 | [Verb-First Skill Naming Convention (EPIC-0076)](ADR-0029-verb-first-skill-naming.md) | Accepted | 2026-05-03 |
+| ADR-0030 | [Rule 14 Extension for Product-First Runtime Domain (EPIC-0077)](ADR-0030-rule14-product-first-domain.md) | Accepted | 2026-05-04 |
+| ADR-0031 | [Product-First Capability Registration (EPIC-0077)](ADR-0031-product-first-capability-registration.md) | Accepted | 2026-05-04 |
+| ADR-0032 | [Product-First Lifecycle Finalization (EPIC-0077)](ADR-0032-product-first-lifecycle-finalization.md) | Accepted | 2026-05-05 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.

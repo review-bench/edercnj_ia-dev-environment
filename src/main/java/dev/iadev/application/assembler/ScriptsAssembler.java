@@ -1,6 +1,7 @@
 package dev.iadev.application.assembler;
 
 import dev.iadev.domain.model.ProjectConfig;
+import dev.iadev.domain.model.QualityConfig;
 import dev.iadev.template.TemplateEngine;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,17 +47,22 @@ public final class ScriptsAssembler implements Assembler {
 
     /**
      * The canonical list of audit and utility scripts bundled in the flat source-of-truth directory
-     * (legacy). Ordered alphabetically. Golden tests assert all 7 are present in generated output.
+     * (legacy). Ordered alphabetically. Golden tests assert all 13 are present in generated output.
      */
     public static final List<String> AUDIT_SCRIPTS =
             List.of(
+                    "audit-contract-breaking.sh",
                     "audit-epic-branches.sh",
                     "audit-execution-integrity.sh",
                     "audit-flow-version.sh",
                     "audit-model-selection.sh",
+                    "audit-mutation-score.sh",
+                    "audit-perf-baseline.sh",
                     "audit-pr-template.sh",
+                    "audit-refinement-gate.sh",
                     "audit-review-frontmatter.sh",
                     "audit-skill-visibility.sh",
+                    "audit-template-version.sh",
                     "telemetry-consolidate.sh");
 
     private static final Map<String, Map<String, String>> PLACEHOLDER_TABLE =
@@ -285,6 +291,89 @@ public final class ScriptsAssembler implements Assembler {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to create dir: " + dir, e);
         }
+    }
+
+    /**
+     * Writes {@code tests/regression/scenarios.yaml} when {@code
+     * config.quality().regression().enabled()} is true.
+     *
+     * <p>The output is assembled from the shared template {@code
+     * shared/templates/scenarios.yaml.template} by replacing four interface-specific placeholder
+     * blocks: {@code INTERFACE_REST_BLOCK}, {@code INTERFACE_GRPC_BLOCK}, {@code
+     * INTERFACE_WEBSOCKET_BLOCK}, and {@code INTERFACE_CLI_BLOCK}. Each block is sourced from the
+     * matching snippet under {@code shared/templates/regression/blocks/}.
+     *
+     * @param config project configuration
+     * @param outputDir root output directory for the generated project
+     * @return path to the generated file, or {@code null} when regression is disabled
+     */
+    public Path renderRegressionScenarios(ProjectConfig config, Path outputDir) {
+        QualityConfig.RegressionConfig regression = config.quality().regression();
+        if (!regression.enabled()) {
+            return null;
+        }
+
+        String mainTemplate = loadSnippet("shared/templates/scenarios.yaml.template");
+        String rawName = config.project() != null ? config.project().name() : null;
+        String projectName = rawName != null ? rawName : "project";
+
+        String restBlock =
+                hasInterface(config, "rest")
+                        ? loadSnippet("shared/templates/regression/blocks/rest.yaml.snippet")
+                        : "";
+        String grpcBlock =
+                hasInterface(config, "grpc")
+                        ? loadSnippet("shared/templates/regression/blocks/grpc.yaml.snippet")
+                        : "";
+        String wsBlock =
+                hasInterface(config, "websocket")
+                        ? loadSnippet("shared/templates/regression/blocks/socket.yaml.snippet")
+                        : "";
+        String cliBlock =
+                hasInterface(config, "cli")
+                        ? loadSnippet("shared/templates/regression/blocks/cli.yaml.snippet")
+                        : "";
+
+        String rendered =
+                mainTemplate
+                        .replace("{{PROJECT_NAME}}", projectName)
+                        .replace("{{INTERFACE_REST_BLOCK}}", restBlock)
+                        .replace("{{INTERFACE_GRPC_BLOCK}}", grpcBlock)
+                        .replace("{{INTERFACE_WEBSOCKET_BLOCK}}", wsBlock)
+                        .replace("{{INTERFACE_CLI_BLOCK}}", cliBlock);
+
+        // Replace PROJECT_NAME inside CLI block placeholder too
+        rendered = rendered.replace("{{PROJECT_NAME}}", projectName);
+
+        Path regressionDir = outputDir.resolve("tests").resolve("regression");
+        createDir(regressionDir);
+        Path target = regressionDir.resolve("scenarios.yaml");
+        try {
+            Files.writeString(target, rendered);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to write scenarios.yaml", e);
+        }
+        return target;
+    }
+
+    private String loadSnippet(String classpathPath) {
+        URL url = getClass().getClassLoader().getResource(classpathPath);
+        if (url == null) {
+            throw new IllegalStateException(
+                    "ScriptsAssembler: snippet not found on classpath: " + classpathPath);
+        }
+        try (InputStream is = url.openStream()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to load snippet: " + classpathPath, e);
+        }
+    }
+
+    private boolean hasInterface(ProjectConfig config, String type) {
+        if (config.interfaces() == null) {
+            return false;
+        }
+        return config.interfaces().stream().anyMatch(iface -> type.equalsIgnoreCase(iface.type()));
     }
 
     private void setExecutable(Path file) {
