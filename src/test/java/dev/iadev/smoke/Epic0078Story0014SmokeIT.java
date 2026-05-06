@@ -58,12 +58,12 @@ class Epic0078Story0014SmokeIT {
     }
 
     @Test
-    @DisplayName("scenario3_advisoryModeIsDefaultAndEmitsWarning")
+    @DisplayName("scenario3_hardModeIsDefaultAndExcludesNonMatchingArtifacts")
     void scenario3_advisoryModeIsDefaultAndEmitsWarning() throws IOException {
         CapabilityAwareComposer composer = new CapabilityAwareComposer();
         assertThat(composer.mode())
-                .as("default mode must be ADVISORY")
-                .isEqualTo(CapabilityAwareComposer.PruningMode.ADVISORY);
+                .as("default mode must be HARD since story-0078-0016")
+                .isEqualTo(CapabilityAwareComposer.PruningMode.HARD);
 
         Path tempDir = Files.createTempDirectory("story0014-smoke");
         try {
@@ -73,10 +73,10 @@ class Epic0078Story0014SmokeIT {
 
             ResolvedCapabilitySet pythonProfile = capSet(List.of());
             CompositionPlan plan = composer.plan(pythonProfile, tempDir);
-            assertThat(plan.included()).hasSize(1);
-            assertThat(plan.excluded()).isEmpty();
-            assertThat(plan.warnings()).hasSize(1);
-            assertThat(plan.warnings().get(0)).contains("rule-pruning-advisory");
+            // HARD mode: non-matching artifact moves to excluded, not included
+            assertThat(plan.included()).isEmpty();
+            assertThat(plan.excluded()).hasSize(1);
+            assertThat(plan.warnings()).isEmpty();
         } finally {
             Files.deleteIfExists(tempDir.resolve("12-security-anti-patterns.md"));
             Files.deleteIfExists(tempDir);
