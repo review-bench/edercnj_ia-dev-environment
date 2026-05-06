@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 23 — Model Selection Strategy
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility).
@@ -129,4 +132,3 @@ Model selection is **additive**:
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
-

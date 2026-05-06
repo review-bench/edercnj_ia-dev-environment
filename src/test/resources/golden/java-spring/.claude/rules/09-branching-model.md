@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 09 — Branching Model (Git Flow)
 
 > **Related:** See Rule 08 for release process, Conventional Commits, and CHANGELOG requirements.

@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 22 — Skill Visibility
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 21 (Epic Branch Model).

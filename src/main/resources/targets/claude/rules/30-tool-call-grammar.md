@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 30 — Tool-Call Grammar
 
 > **Related:** Rule 13, Rule 24, Rule 25.

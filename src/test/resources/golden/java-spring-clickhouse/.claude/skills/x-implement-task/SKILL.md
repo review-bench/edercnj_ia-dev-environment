@@ -247,6 +247,11 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implem
 | `STATUS_SYNC_FAILED` | Phase 3.5 (v2) failed to update `**Status:**` header or map row |
 | Coverage below threshold | Add missing test scenarios; no bypass |
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
+Read src/main/resources/targets/claude/knowledge/governance/tool-call-grammar.md
+
 ## Full Protocol
 
 > Complete step-by-step instructions for each phase (Step 0 plan-reuse + staleness check, Step 0.5 worktree three-way mode decision, Step 1 subagent KP loading, Step 2 Double-Loop TDD + TPP ordering, Step 3 coverage + AC validation, Step 3.5 status transition, Step 4 atomic commit conventions, Step 4.5 CI-Watch decision table, Step 5 mode-aware cleanup), v2 extensions (Phase 0c schema detection, Phase 0d–0e pre-execution gates, Phase 5 status report), CI-Watch state-file schema, and all knowledge pack references in [`references/full-protocol.md`](references/full-protocol.md). Canonical TDD cycle tracking protocol (Batch A/B dispatch, wave gate, cycle IDs) in [`references/tdd-cycle-protocol.md`](references/tdd-cycle-protocol.md).

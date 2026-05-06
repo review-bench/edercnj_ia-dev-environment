@@ -396,6 +396,10 @@ Full fallback body template, dedup interaction, and RULE-004 contract detail in 
 | `git log --grep` returns empty SHA | Fall back to `git rev-parse HEAD` for `Orchestrator Commit SHA` field |
 | No Phase 1/3 artifacts found on disk | Use `(none found)` as value; PR is still created (audit validates at CI time) |
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/zero-bypass.md
+
 ## Integration Notes
 
 | Skill | Relationship | Context |

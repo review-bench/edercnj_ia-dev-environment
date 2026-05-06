@@ -513,6 +513,8 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-t
 | parallelism-heuristics | `knowledge/parallelism-heuristics.md` | File Footprint semantics (write/read/regen sub-sections) consumed by Phase 4.5 |
 | coding-standards | `knowledge/coding-standards.md` | {{LANGUAGE}} conventions, naming, SOLID principles |
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Planning Status Propagation (Rule 22 / EPIC-0046)
 
 > V2-gated: only runs when `SchemaVersionResolver.resolve(ai/epics/epic-XXXX/execution-state.json) == V2`. v1 epics: skip silently (Rule 19).

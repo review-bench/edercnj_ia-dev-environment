@@ -398,6 +398,12 @@ Resuming after an aborted lifecycle may legitimately skip already-completed step
 ## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
 All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `epicId` auto-derived — identical to EPIC-0048. `--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
+Read src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md
+Read src/main/resources/targets/claude/knowledge/governance/tool-call-grammar.md
+
 ## Integration Notes
 `x-internal-normalize-args` (0.1), `x-internal-load-story-context` (0.2), `x-internal-resume-story` (0.4 cond.), `x-internal-build-story-plan` (1), `x-implement-task` (2 per-task), `x-create-pr` (2 per-task+story), `x-watch-pr-ci` (2), `x-evaluate-parallelism` (1), `x-review-codebase`/`x-review-pr`/`x-fix-pr` (3.2), `x-internal-verify-story` (3.1), `x-internal-write-story-report` (3.3), `x-internal-update-status` (all phases), `x-manage-worktrees` (0.3+3.5), `x-implement-epic` (caller).
 

@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 32 — Dependency Policy Gate
 
 > **Related:** Rule 05 (Quality Gates), Rule 06 (Security Baseline), Rule 19 (Backward Compatibility), Rule 24 (Execution Integrity), Rule 26 (Audit Gate Lifecycle), Rule 27 (Zero-Bypass Lifecycle).

@@ -110,6 +110,10 @@ After AI inference: emit `WARNING: AI inference used for {file} — manual revie
 If a file fails validation after migration, the original is preserved (backed up to `<file>.v2.bak`).
 Re-run with `--force-ai` to use AI inference instead of heuristics.
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/governance/capability-composition.md
+
 ## Integration Notes
 
 Consumed by stories 0203-0214 (batch migration of 182 artifacts).

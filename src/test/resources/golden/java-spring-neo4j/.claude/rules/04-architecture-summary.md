@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 04 — Architecture Summary
 
 > **Full reference:** Read `knowledge/architecture.md` before designing or implementing features.

@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 31 — Documentation Freshness Gate
 
 > **Related:** Rule 04 (Architecture Summary), Rule 22 (Skill Visibility), Rule 24 (Execution Integrity), Rule 26 (Audit Gate Lifecycle), Rule 27 (Zero-Bypass Lifecycle), Rule 30 (Value-Driven Templates).

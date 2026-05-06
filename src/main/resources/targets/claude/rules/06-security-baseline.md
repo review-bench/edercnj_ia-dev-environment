@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 06 — Security Baseline
 
 > **Full reference:** Read `knowledge/security/index.md` for OWASP Top 10, cryptography, and pentest readiness.

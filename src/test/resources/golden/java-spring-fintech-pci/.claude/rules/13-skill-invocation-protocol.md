@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 13 — Skill Invocation Protocol
 
 > **Related:** Rule 07 defines the order of the pre-commit chain. This rule defines the *syntax* for skill-to-skill invocations across **any** chain, not just pre-commit.
@@ -250,4 +253,3 @@ The linter runs as part of the CI build via the per-skill acceptance tests under
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
-

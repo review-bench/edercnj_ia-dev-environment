@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 33 — AI Memory Production
 
 > **Related:** Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility), Rule 24 (Execution Integrity), Rule 26 (Audit Gate Lifecycle), Rule 27 (Zero-Bypass Lifecycle).

@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 21 — Epic Branch Model
 
 > **Related:** Rule 09 (Branching Model — Git Flow), Rule 22 (Skill Visibility), Rule 19 (Backward Compatibility).
@@ -81,4 +84,3 @@ Any violation fails the CI build with `EPIC_BRANCH_VIOLATION`.
 ---
 
 > **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
-

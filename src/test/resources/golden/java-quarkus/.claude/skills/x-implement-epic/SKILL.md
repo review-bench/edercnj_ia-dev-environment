@@ -277,6 +277,12 @@ When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPI
 | 7 | `PLAN_BUILD_FAILED` | Phase 1 non-zero (non-cyclic) |
 | 8 | `CYCLIC_DEPENDENCY` | Phase 1 exit 3 |
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
+Read src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md
+Read src/main/resources/targets/claude/knowledge/governance/tool-call-grammar.md
+
 ## Full Protocol
 
 > Per-phase detail (Phase 0 flow-version detection, Phase 3 retry/backoff/circuit-breaker, Phase 4 integrity-gate recovery algorithm + remediation-agent prompt, Phase 5 TTY-detection + gate menu), legacy-flow phase-by-phase diff (§6), resume workflow for v1/v2 (§7), `SubagentResult` error shape (§8), `--auto-approve-pr` propagation (§9), and `args-schema.json` reference (§1) in [`references/full-protocol.md`](references/full-protocol.md). Idempotency contract and integration notes also in references.
