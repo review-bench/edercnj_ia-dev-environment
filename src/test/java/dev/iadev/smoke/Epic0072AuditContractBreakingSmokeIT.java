@@ -136,9 +136,9 @@ class Epic0072AuditContractBreakingSmokeIT {
         }
 
         @Test
-        @DisplayName("scenario11_auditScripts_has13Scripts")
+        @DisplayName("scenario11_auditScripts_has15Scripts")
         void scenario11_auditScripts_has13Scripts() {
-            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(13);
+            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(15);
         }
     }
 

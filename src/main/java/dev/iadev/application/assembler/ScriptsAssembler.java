@@ -51,6 +51,7 @@ public final class ScriptsAssembler implements Assembler {
      */
     public static final List<String> AUDIT_SCRIPTS =
             List.of(
+                    "audit-context-budget.sh",
                     "audit-contract-breaking.sh",
                     "audit-epic-branches.sh",
                     "audit-execution-integrity.sh",
@@ -63,6 +64,7 @@ public final class ScriptsAssembler implements Assembler {
                     "audit-review-frontmatter.sh",
                     "audit-skill-visibility.sh",
                     "audit-template-version.sh",
+                    "measure-context-budget.sh",
                     "telemetry-consolidate.sh");
 
     private static final Map<String, Map<String, String>> PLACEHOLDER_TABLE =

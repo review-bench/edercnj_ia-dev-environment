@@ -34,7 +34,7 @@ class ScriptsAssemblerTest {
     private final TemplateEngine engine = new TemplateEngine();
 
     @Test
-    @DisplayName("assemble returns paths for all 8 audit and utility scripts")
+    @DisplayName("assemble returns paths for all 15 audit and utility scripts")
     void assemble_returnsPathsForAllAuditScripts() {
         List<String> generated = assembler.assemble(config, engine, tempDir);
 
@@ -86,11 +86,12 @@ class ScriptsAssemblerTest {
     }
 
     @Test
-    @DisplayName("AUDIT_SCRIPTS list contains exactly 13 scripts")
+    @DisplayName("AUDIT_SCRIPTS list contains exactly 15 scripts")
     void auditScripts_constantHasExpectedSize() {
         assertThat(ScriptsAssembler.AUDIT_SCRIPTS)
-                .hasSize(13)
+                .hasSize(15)
                 .contains(
+                        "audit-context-budget.sh",
                         "audit-contract-breaking.sh",
                         "audit-flow-version.sh",
                         "audit-epic-branches.sh",
@@ -103,6 +104,7 @@ class ScriptsAssemblerTest {
                         "audit-refinement-gate.sh",
                         "audit-review-frontmatter.sh",
                         "audit-template-version.sh",
+                        "measure-context-budget.sh",
                         "telemetry-consolidate.sh");
     }
 
