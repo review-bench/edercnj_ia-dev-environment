@@ -1,6 +1,6 @@
 ---
 name: x-migrate-templates
-description: "Assists migration of a v1 epic document to the v2 value-driven template (EPIC-0070). Parses v1 technical blocks (Packages, Contratos, SOLID, Observabilidade), classifies each block with a safe default heuristic, and optionally asks the operator for confirmation per block (--interactive). Side-effects: writes epic.md in v2 format atomically, creates ADRs for 'virar ADR' decisions, updates system.md via x-update-system-architecture. Supports --dry-run and recovery from interrupted sessions."
+description: "Migrates a v1 epic to v2 value-driven template (EPIC-0070), with optional --interactive."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Edit, Write, Skill, AskUserQuestion, Bash

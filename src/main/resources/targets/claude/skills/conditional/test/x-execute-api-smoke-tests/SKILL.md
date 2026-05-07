@@ -1,6 +1,6 @@
 ---
 name: x-execute-api-smoke-tests
-description: "Runs automated smoke tests against the REST API using Newman/Postman. Supports local, container-orchestrated, and staging environments."
+description: "Runs Newman/Postman smoke tests against the REST API across local/container/staging."
 user-invocable: true
 allowed-tools: Read, Bash
 argument-hint: "[--env local|k8s|staging] [--k8s]"

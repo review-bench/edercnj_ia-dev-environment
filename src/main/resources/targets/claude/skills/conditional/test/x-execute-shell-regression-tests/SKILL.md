@@ -1,6 +1,6 @@
 ---
 name: x-execute-shell-regression-tests
-description: "Regression-shell gate: reads QualityConfig.regression, runs curated scenario scripts against the target (self mode: generator output; service mode: client services), compares against baseline, and blocks merge on unexpected diffs."
+description: "Regression-shell gate: runs scenario scripts vs baseline; blocks merge on diffs."
 visibility: public
 user-invocable: true
 model: sonnet

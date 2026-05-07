@@ -1,6 +1,6 @@
 ---
 name: x-reconcile-status
-description: "Reconciles execution-state.json (telemetry) against the **Status:** field of Epic / Story markdown artifacts. Default mode (diagnose) is read-only and prints a divergence table. Opt-in --apply rewrites the markdowns atomically via StatusFieldParser and commits via x-commit-changes. Respects Rule 19 (legacy v1 epics skip silently) and Rule 22 (markdown is SoT; state.json is telemetry). Use for manual recovery of legacy epics whose markdown status drifted from execution checkpoints."
+description: "Reconciles execution-state.json telemetry against Status field of Epic/Story markdowns."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, AskUserQuestion
 argument-hint: "--epic XXXX | --story story-XXXX-YYYY [--apply] [--non-interactive] [--dry-run]"

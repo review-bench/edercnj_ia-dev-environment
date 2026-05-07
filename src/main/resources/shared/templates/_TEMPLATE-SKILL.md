@@ -1,5 +1,6 @@
 ---
 name: {{SKILL_NAME}}
+# description: ≤100 chars. Pattern: <verb> <object>; <trigger or key constraint>.
 description: "{{SKILL_DESCRIPTION}}"
 user-invocable: true
 allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Skill

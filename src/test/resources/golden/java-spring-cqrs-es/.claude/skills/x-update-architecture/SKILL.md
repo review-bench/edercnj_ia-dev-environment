@@ -1,6 +1,6 @@
 ---
 name: x-update-architecture
-description: "Incrementally updates the service architecture document with changes from architecture plans. Adds new components, integrations, flows, and ADR references without rewriting existing content. Use after implementation to keep architecture documentation current."
+description: "Incrementally updates the service architecture document with changes from arch plans."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[STORY-ID or architecture-plan-path]"

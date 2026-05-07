@@ -1,6 +1,6 @@
 ---
 name: quarkus-resource
-description: "Generate a Quarkus RESTEasy Reactive @Path resource with DTOs, @RegisterForReflection, ExceptionMapper, and @QuarkusTest unit tests."
+description: "Generates a Quarkus RESTEasy Reactive @Path resource with DTOs, mapper, and tests."
 visibility: public
 model: sonnet
 requires-capabilities: [web.quarkus.framework]

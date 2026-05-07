@@ -1,6 +1,6 @@
 ---
 name: x-instrument-observability
-description: "Adds or reviews distributed tracing, metrics, and structured logging using OpenTelemetry SDK with OTLP export."
+description: "Adds or reviews tracing, metrics, and structured logging using OpenTelemetry SDK."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[component-name or 'full']"

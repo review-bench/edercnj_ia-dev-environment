@@ -1,6 +1,6 @@
 ---
 name: x-execute-e2e-tests
-description: "Runs integration tests that validate the complete flow from request through all application layers to response, using a real database."
+description: "Runs integration tests covering the full request flow with a real database."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[scenario: happy-path|error|timeout|persistent|all]"

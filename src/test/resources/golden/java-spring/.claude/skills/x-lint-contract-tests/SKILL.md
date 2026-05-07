@@ -1,6 +1,6 @@
 ---
 name: x-lint-contract-tests
-description: "Validates API contracts (OpenAPI 3.1, AsyncAPI 2.6, Protobuf 3) against their specifications. Reports structural errors, missing fields, and spec violations."
+description: "Validates API contracts (OpenAPI, AsyncAPI, Protobuf) against their specifications."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[contract-file-path]"

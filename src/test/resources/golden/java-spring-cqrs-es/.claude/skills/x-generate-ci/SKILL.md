@@ -1,6 +1,6 @@
 ---
 name: x-generate-ci
-description: "Generate or update CI/CD pipelines based on project stack: detect language, analyze existing workflows, generate CI/CD/release/security pipelines, validate with actionlint, support monorepo triggers."
+description: "Generates or updates CI/CD pipelines per project stack with actionlint validation."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 argument-hint: "[ci|cd|release|security|all] [--monorepo] [--force]"

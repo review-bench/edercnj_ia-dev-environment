@@ -1,6 +1,6 @@
 ---
 name: x-audit-code
-description: "Full codebase review against all project standards. Launches parallel subagents per audit dimension (Clean Code, SOLID, Architecture, Tests, Security, Cross-file), consolidates findings into a severity-categorized report with score. Use for periodic quality validation."
+description: "Full codebase review against project standards via parallel specialist subagents."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 argument-hint: "[--scope all|rules|patterns|architecture|cross-file]"

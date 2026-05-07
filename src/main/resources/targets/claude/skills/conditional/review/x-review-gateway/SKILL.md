@@ -1,6 +1,6 @@
 ---
 name: x-review-gateway
-description: "Reviews API gateway configuration for routing rules, authentication, rate limiting, CORS, security headers, TLS, and observability integration."
+description: "Reviews API gateway: routing, auth, rate limits, CORS, headers, TLS, observability."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[gateway config files or PR]"

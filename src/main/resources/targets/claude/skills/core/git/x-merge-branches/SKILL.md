@@ -1,6 +1,6 @@
 ---
 name: x-merge-branches
-description: "Merges a source branch into a target branch locally with configurable strategy (merge/squash/rebase), automatic conflict detection + rollback, and idempotent no-op when target already contains source HEAD. Centralizes the ~120 lines of inline Bash previously in x-implement-epic Phase 1.4e auto-rebase."
+description: "Merges source into target locally with strategy, conflict rollback, and idempotent no-op."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--source <branch> --target <branch> [--strategy merge|squash|rebase] [--message <msg>] [--no-push]"

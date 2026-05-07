@@ -1,6 +1,6 @@
 ---
 name: x-review-devops
-description: "DevOps specialist review: validates Dockerfile, container security, CI/CD pipeline, resource limits, health probes, graceful shutdown, and deployment configuration."
+description: "DevOps specialist review: Dockerfile, CI/CD, resource limits, health probes, deploy."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"

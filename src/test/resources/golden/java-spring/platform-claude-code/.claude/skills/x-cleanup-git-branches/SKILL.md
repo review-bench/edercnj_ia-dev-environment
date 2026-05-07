@@ -1,6 +1,6 @@
 ---
 name: x-cleanup-git-branches
-description: "Cleans local git state in one pass: fetches origin with prune, removes all non-main worktrees (any path), and deletes all local branches except main/master/develop. Destructive by default with an interactive y/N confirmation gate; supports --dry-run (preview) and --yes (non-interactive)."
+description: "Cleans local git: prune, remove non-main worktrees, delete branches except main/develop."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[--dry-run] [--yes]"

@@ -1,6 +1,6 @@
 ---
 name: picocli-command
-description: "Generate a Picocli @Command with subcommands, @Option/@Parameters, type converters, exit code constants, and unit tests."
+description: "Generates a Picocli @Command with subcommands, options, converters, and unit tests."
 visibility: public
 model: sonnet
 requires-capabilities: [cli.picocli.framework]

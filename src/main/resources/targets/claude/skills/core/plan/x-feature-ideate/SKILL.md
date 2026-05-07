@@ -1,6 +1,6 @@
 ---
 name: x-feature-ideate
-description: "Transform free-form prose or a text file into a structured RA9 spec (5 mandatory sections) and open a PR on docs/feature-<slug> targeting develop for human review before invoking x-feature-create."
+description: "Transforms prose into a structured RA9 spec and opens a docs/feature-* PR for review."
 model: opus
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Skill, Agent

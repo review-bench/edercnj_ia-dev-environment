@@ -1,6 +1,6 @@
 ---
 name: x-review-graphql
-description: "Validates GraphQL schema design, resolver implementation, security patterns, and observability for compliance with best practices."
+description: "Validates GraphQL schema design, resolvers, security patterns, and observability."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[schema-file or resolver-name]"

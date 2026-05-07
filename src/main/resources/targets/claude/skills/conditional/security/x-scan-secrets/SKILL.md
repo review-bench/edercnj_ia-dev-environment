@@ -1,6 +1,6 @@
 ---
 name: x-scan-secrets
-description: "Scans code and git history for leaked credentials, API keys, tokens, and secrets. Produces SARIF output with scoring and baseline support."
+description: "Scans code and git history for leaked credentials, API keys, and tokens; SARIF output."
 user-invocable: true
 allowed-tools: Bash, Read, Write, Glob, Grep
 argument-hint: "[--scope current|history|both] [--baseline path] [--since-commit SHA] [--format sarif|markdown|both]"

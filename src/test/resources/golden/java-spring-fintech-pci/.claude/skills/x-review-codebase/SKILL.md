@@ -1,7 +1,7 @@
 ---
 name: x-review-codebase
 model: sonnet
-description: "Parallel code review with specialist engineers (Security, QA, Performance, Database, Observability, DevOps, API, Event). Invokes individual review skills in parallel via Skill tool, then consolidates into a scored report. Use for pre-PR quality validation."
+description: "Parallel code review with specialist engineers (Security, QA, Perf, DB, Obs, DevOps)."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, TaskCreate, TaskUpdate
 argument-hint: "[STORY-ID or --scope reviewer1,reviewer2] [--no-auto-fix-story]"

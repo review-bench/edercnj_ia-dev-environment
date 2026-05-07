@@ -1,6 +1,6 @@
 ---
 name: helidon-scaffold
-description: "Scaffold a Helidon SE or MP service with routing, health checks, config, Dockerfile, and integration tests."
+description: "Scaffolds a Helidon SE/MP service with routing, health, config, Dockerfile, and tests."
 visibility: public
 model: sonnet
 requires-capabilities: [web.helidon.framework]

@@ -1,6 +1,6 @@
 ---
 name: x-internal-write-story-report
-description: "Generates the final consolidated story-completion report by reading ai/epics/epic-XXXX/execution-state.json, collecting per-task status and commitSha, PR metadata (prNumber, prState), coverage delta, and review findings, then rendering the output via x-internal-write-report with _TEMPLATE-STORY-COMPLETION-REPORT.md to the caller-specified --output path. Eighth skill in the x-internal-* convention and the fifth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, x-internal-verify-story, and x-internal-resume-story). Read-only against state; writes only to --output via x-internal-write-report."
+description: "Generates the consolidated story-completion report from execution-state.json."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill

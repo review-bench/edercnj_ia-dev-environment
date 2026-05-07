@@ -1,6 +1,6 @@
 ---
 name: x-internal-load-story-context
-description: "Loads a story file, validates predecessor dependencies against execution-state.json, executes artifact pre-checks (mtime-based staleness detection across the 7 planning artifacts), classifies scope (SIMPLE / STANDARD / COMPLEX) from task-count + Gherkin-scenario heuristics, and detects planning mode (PRE_PLANNED / HYBRID / INLINE). Replaces ~140 lines of inline Phase 0 logic previously duplicated inside x-implement-story. Fourth skill in the x-internal-* convention (after x-internal-update-status pilot, x-internal-write-report, and x-internal-normalize-args): internal visibility, non-user-invocable, read-only, subdir scoping under internal/plan/."
+description: "Loads a story file, validates predecessors, runs pre-checks, classifies scope."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

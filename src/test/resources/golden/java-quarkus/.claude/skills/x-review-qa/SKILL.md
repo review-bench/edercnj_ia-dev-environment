@@ -1,6 +1,6 @@
 ---
 name: x-review-qa
-description: "QA specialist review: validates test coverage, TDD compliance, test naming, fixtures, parametrized tests, and acceptance criteria coverage."
+description: "QA review: coverage, TDD compliance, naming, fixtures, parametrized tests, AC coverage."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"

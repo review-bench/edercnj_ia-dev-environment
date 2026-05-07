@@ -1,6 +1,6 @@
 ---
 name: x-create-jira-epic
-description: "Create a Jira Epic from an existing local epic markdown file. Read the epic file, map fields to Jira, create the issue via MCP, and sync the Jira key back to the local file."
+description: "Creates a Jira Epic from a local epic markdown and syncs the Jira key back to the file."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
 argument-hint: "[EPIC_FILE_PATH]"

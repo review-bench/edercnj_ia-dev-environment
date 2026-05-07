@@ -1,6 +1,6 @@
 ---
 name: x-internal-summarize-epic
-description: Generates ai/memory/epic-XXXX-summary.md from a completed epic's artifacts using structured header parsing
+description: "Generates ai/memory/epic-XXXX-summary.md from a completed epic's artifacts."
 visibility: internal
 user-invocable: false
 model: haiku
