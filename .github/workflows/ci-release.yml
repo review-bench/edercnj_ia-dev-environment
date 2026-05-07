@@ -65,6 +65,16 @@ jobs:
       # audit-bypass-flags.sh, audit-baseline-immutability.sh) were removed
       # in favor of the local-first architecture (Camada 0-4). See ADR-0017
       # and Rule 26 §Camada-0.
+
+      # EPIC-0079 (story-0079-0005): agent-skill-wiring gate — detects inline
+      # persona regressions (You are a Senior/Specialist/Principal in general-purpose
+      # Agent() dispatches). Camada 2 gate (Rule 26).
+      - name: audit-agent-skill-wiring --self-check
+        run: bash scripts/audit-agent-skill-wiring.sh --self-check
+
+      - name: audit-agent-skill-wiring --strict
+        run: bash scripts/audit-agent-skill-wiring.sh --strict
+
       - name: mvn -B verify
         run: mvn -B verify
 
