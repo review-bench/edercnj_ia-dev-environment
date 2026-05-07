@@ -11,22 +11,22 @@
 
 Rows = predecessor; Columns = successor; `X` = direct dependency edge (predecessor must complete before successor starts).
 
-| pred ↓ \ succ →     | 0080-0001 | 0080-0002 | 0080-0003 | 0080-0004 | 0080-0005 | 0080-0006 |
+| pred ↓ \ succ →     | 0080-0001 | 0080-0002 | 0080-0003 | 0080-0004 | 0080-0006 | 0080-0005 |
 | :------------------ | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: |
 | **story-0080-0001** |     —     |     X     |     X     |           |           |           |
-| **story-0080-0002** |           |     —     |     X     |           |     X     |           |
+| **story-0080-0002** |           |     —     |     X     |           |           |     X     |
 | **story-0080-0003** |           |           |     —     |     X     |           |           |
 | **story-0080-0004** |           |           |           |     —     |     X     |           |
-| **story-0080-0005** |           |           |           |           |     —     |     X     |
-| **story-0080-0006** |           |           |           |           |           |     —     |
+| **story-0080-0006** |           |           |           |           |     —     |     X     |
+| **story-0080-0005** |           |           |           |           |           |     —     |
 
 Legend:
 - `0080-0001` blocks `0080-0002` (story decomposition needs the bug.md template) and `0080-0003` (the map needs the folder layout).
-- `0080-0002` blocks `0080-0003` (map aggregates story files) and `0080-0005` (gate scans story files).
+- `0080-0002` blocks `0080-0003` (map aggregates story files) and `0080-0005` (gate scans story files — indirect, via 0080-0006).
 - `0080-0003` blocks `0080-0004` (refinement reads the map).
-- `0080-0004` blocks `0080-0005` (gate enforces verdict).
-- `0080-0005` blocks `0080-0006` (PR review references rule R-080-3 published in 0080-0005).
-- No cycles. DAG verified via Kahn topological sort.
+- `0080-0004` blocks `0080-0006` (PR review gate is next in the lifecycle chain; merge strategy R-080-6 must be active before the Camada 0 enforcement hook runs).
+- `0080-0006` blocks `0080-0005` (Camada 0 hook enforcement requires R-080-6 merge strategy to be deployed first so the audit signal is meaningful from day one).
+- No cycles. DAG verified via Kahn topological sort. Corrected order per Risk-3: `0080-0001 → 0080-0002 → 0080-0003 → 0080-0004 → 0080-0006 → 0080-0005`.
 
 ## 2. Phase Diagram (ASCII)
 
@@ -64,16 +64,16 @@ Legend:
             │
             v
    ┌──────────────────┐
-   │  Phase 4: Gate   │
-   │  story-0080-0005 │
-   │  Camada 0 + 2    │
+   │  Phase 4: PR     │
+   │  story-0080-0006 │
+   │  review + merge  │
    └────────┬─────────┘
             │
             v
    ┌──────────────────┐
-   │  Phase 5: PR     │
-   │  story-0080-0006 │
-   │  review + merge  │
+   │  Phase 5: Gate   │
+   │  story-0080-0005 │
+   │  Camada 0 + 2    │
    └──────────────────┘
 ```
 
@@ -88,7 +88,7 @@ skill folders.
 The critical path is the longest chain of dependencies from start to finish:
 
 ```
-story-0080-0001  →  story-0080-0002  →  story-0080-0003  →  story-0080-0004  →  story-0080-0005  →  story-0080-0006
+story-0080-0001  →  story-0080-0002  →  story-0080-0003  →  story-0080-0004  →  story-0080-0006  →  story-0080-0005
    (Phase 1)        (Phase 2a)          (Phase 2b)          (Phase 3)            (Phase 4)            (Phase 5)
 ```
 
@@ -119,8 +119,8 @@ graph TD
     S2 --> S3
     S2 --> S5
     S3 --> S4
-    S4 --> S5
-    S5 --> S6
+    S4 --> S6
+    S6 --> S5
 
     style S1 fill:#cfe8ff,stroke:#0366d6
     style S6 fill:#d4f4dd,stroke:#28a745
@@ -149,17 +149,17 @@ graph TD
 | :--------------- | :-------- | :---: | :------------------------------------------------------------ |
 | story-0080-0004  | Tech Lead |   8   | `x-refine-bug` skill, 3 agent personas (Developer/Tech-Lead/QA), verdictHash schema. |
 
-### Phase 4 — Enforcement
+### Phase 4 — PR Lifecycle
+
+| Story            | Persona  | Tasks | Key Deliverables                                              |
+| :--------------- | :------- | :---: | :------------------------------------------------------------ |
+| story-0080-0006  | Engineer |  10   | Extended `x-review-pr` checklist (BR-PR-1/2/3), extended `x-merge-pr` default strategy, `audit-bug-regression-coverage.sh`, `audit-bug-pr-merge-strategy.sh`, rules R-080-5 + R-080-6. |
+
+### Phase 5 — Enforcement
 
 | Story            | Persona       | Tasks | Key Deliverables                                              |
 | :--------------- | :------------ | :---: | :------------------------------------------------------------ |
 | story-0080-0005  | Orchestrator  |   9   | `find-refinement-target.sh` dispatcher, extended `enforce-refinement-gate.sh`, `audit-bug-refinement-gate.sh`, rule R-080-3. |
-
-### Phase 5 — PR Lifecycle
-
-| Story            | Persona  | Tasks | Key Deliverables                                              |
-| :--------------- | :------- | :---: | :------------------------------------------------------------ |
-| story-0080-0006  | Engineer |  10   | Extended `x-review-pr` checklist, extended `x-merge-pr` strategy default, `audit-bug-regression-coverage.sh`, `audit-bug-pr-merge-strategy.sh`, rules R-080-5 + R-080-6. |
 
 ### Cumulative Totals
 
