@@ -72,6 +72,16 @@ CI script `scripts/audit-skill-visibility.sh` verifies:
 
 Any violation exits with `SKILL_VISIBILITY_VIOLATION` (exit 22).
 
+## EPIC-0065 Chain Internals
+
+Three internal skills introduced by EPIC-0065 (Feature Creation Chain Refactor):
+
+| Internal skill | Replaced public skill | Source path | Invoked by |
+| :--- | :--- | :--- | :--- |
+| `x-internal-create-epic` | `x-epic-create` (hard-cut) | `core/internal/plan/x-internal-create-epic/SKILL.md` | `x-create-feature`, `x-epic-create` |
+| `x-internal-map-epic` | `x-epic-map` (hard-cut) | `core/internal/plan/x-internal-map-epic/SKILL.md` | `x-create-feature` |
+| `x-internal-create-story` | `x-story-create` (hard-cut) | `core/internal/plan/x-internal-create-story/SKILL.md` | `x-create-feature`, `x-story-create` |
+
 ## Migration Path
 
 1. Pick name: `x-internal-{subject}-{action}`

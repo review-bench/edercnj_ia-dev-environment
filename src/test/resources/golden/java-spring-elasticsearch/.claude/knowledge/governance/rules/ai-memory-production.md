@@ -50,7 +50,7 @@ Phase 5 of `x-implement-epic` MUST conclude with:
 Skill(skill: "x-internal-summarize-epic", model: "haiku", args: "<EPIC-ID>")  [required]
 ```
 
-This is a **MANDATORY TOOL CALL**. Evidence artifact: `ai/memory/epic-XXXX-summary.md`.
+This is a **MANDATORY TOOL CALL** (Rule 24). Evidence artifact: `ai/memory/epic-XXXX-summary.md`.
 
 Conditional: this invocation is conditional on `governance.ai-memory` capability being active.
 
@@ -62,7 +62,7 @@ Conditional: this invocation is conditional on `governance.ai-memory` capability
 | **2 — CI Script** | `audit-memory-coverage.sh` | PR open/sync | `MEMORY_COVERAGE_VIOLATION` |
 | **3 — Java Test** | `Epic0075MemoryLayerSmokeIT` | `mvn verify` | JUnit assertion failure |
 
-## Backward Compatibility
+## Backward Compatibility (Rule 19)
 
 `governance.ai-memory` capability defaults to **disabled** for existing projects. Existing projects are completely unaffected.
 
@@ -72,3 +72,9 @@ Conditional: this invocation is conditional on `governance.ai-memory` capability
 - Summaries exceeding 200 lines
 - Storing secrets, tokens, or PII in any summary file
 - Manually editing `ai/memory/_index.yaml` entries without running `x-internal-summarize-epic`
+
+## Audit
+
+`audit-memory-coverage.sh --self-check` MUST verify: this KP file exists; `x-internal-summarize-epic/SKILL.md` exists.
+
+Failure → `RULE_33_ENFORCEMENT_BROKEN`.

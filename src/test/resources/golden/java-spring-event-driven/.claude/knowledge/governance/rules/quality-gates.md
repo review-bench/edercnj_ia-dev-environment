@@ -57,6 +57,8 @@ Rationale:
 1. **First release** with `quality.mutation.enabled=true` (`release_count=0`): audit emits WARN only; baseline is initialized.
 2. **Second release+** (`release_count≥1`): threshold and regression violations are hard FAIL (exit 1).
 
+Exit codes: `0=OK`, `1=MUTATION_SCORE_VIOLATION`, `1=MUTATION_REGRESSION`, `2=OPERATIONAL_ERROR`, `3=BASELINE_CORRUPT`.
+
 ## Performance Budget
 
 > **Gate:** `audit-perf-baseline.sh` (Camada 2 CI script).

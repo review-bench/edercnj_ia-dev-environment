@@ -5,6 +5,7 @@ requires-capabilities: []
 ---
 # Audit Gate Lifecycle — Full Reference
 
+> **Related:** Rule 13 (Skill Invocation), Rule 14 (Project Scope), Rule 19 (Lifecycle Integrity Contract), Rule 21 (Epic Branch Model), Rule 22 (Skill Visibility), Rule 23 (Model Selection), Rule 24 (Execution Integrity), Rule 25 (Task Hierarchy).
 > **Introduced by:** EPIC-0058. **Extended by:** EPIC-0061 (Camada 0).
 > **ADR:** ADR-0015, ADR-0017.
 > **Full reference (decision tree, Camada 0 details, naming, exit codes, self-check template):**

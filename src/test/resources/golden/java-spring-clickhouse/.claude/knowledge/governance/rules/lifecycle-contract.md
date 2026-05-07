@@ -23,7 +23,7 @@ requires-capabilities: []
 | `"4"` | v4 layout: `ai/epics/<epic-slug>/` via PathResolver |
 | `"5"` | EPIC-0077 Product-First — `productFirstLifecycle: true` |
 
-Field absent → defaults to `"1"` (legacy) with WARNING.
+Field absent → defaults to `"1"` (legacy) with WARNING. See `backward-compatibility.md` for the full fallback matrix including `interactiveMode`, `taskTracking`, `refinementVerdict`, and `productFirstLifecycle`.
 
 ## Invariants (5 — Must Hold Before Any PR Merge)
 
