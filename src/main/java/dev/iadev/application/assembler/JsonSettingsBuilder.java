@@ -55,12 +55,13 @@ public final class JsonSettingsBuilder {
         sb.append(JsonHelpers.indent(2)).append("\"allow\": [\n");
         appendPermissions(sb, permissions);
         sb.append(JsonHelpers.indent(2)).append("]\n");
+        sb.append(JsonHelpers.indent(1)).append("},\n");
         boolean hasAnyHook = hookPresence.hasHooks() || telemetryEnabled;
+        sb.append(JsonHelpers.indent(1))
+                .append("\"skillListingBudgetFraction\": 0.05")
+                .append(hasAnyHook ? ",\n" : "\n");
         if (hasAnyHook) {
-            sb.append(JsonHelpers.indent(1)).append("},\n");
             HookConfigBuilder.appendHooksSection(sb, hookPresence.hasHooks(), telemetryEnabled);
-        } else {
-            sb.append(JsonHelpers.indent(1)).append("}\n");
         }
         sb.append("}\n");
         return sb.toString();

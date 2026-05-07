@@ -37,6 +37,7 @@
       "Bash(npx *)"
     ]
   },
+  "skillListingBudgetFraction": 0.05,
   "hooks": {
     "SessionStart": [
       {
