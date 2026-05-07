@@ -11,7 +11,6 @@
 | ADR-0005 | [Telemetry Architecture for Skill Execution Visibility (EPIC-0040)](ADR-0005-telemetry-architecture.md) | Accepted | 2026-04-17 |
 | ADR-0006 | [File-Conflict-Aware Parallelism Analysis (EPIC-0041)](ADR-0006-file-conflict-aware-parallelism.md) | Accepted | 2026-04-19 |
 | ADR-0007 | [ConsoleProgressReporter stdout/stderr Contract](ADR-0007-console-progress-reporter-stdout-contract.md) | Accepted | 2026-04-20 |
-| ADR-0008 | [Hybrid Hex-Core + Flat-CLI Package Layout](ADR-0008-hybrid-hex-core-and-flat-cli-layout.md) | Accepted | 2026-04-21 |
 | ADR-0009 | [Wide Records Bound to External Schemas (Rule 03 Exception)](ADR-0009-wide-records-bound-to-external-schemas.md) | Accepted | 2026-04-21 |
 | ADR-0010 | [Interactive Gates Convention (Rule 20)](ADR-0010-interactive-gates-convention.md) | Accepted | 2026-04-22 |
 | ADR-0011 | [Shared Snippets — Inclusion Strategy for `_shared/`](ADR-0011-shared-snippets-inclusion-strategy.md) | Accepted | 2026-04-23 |
