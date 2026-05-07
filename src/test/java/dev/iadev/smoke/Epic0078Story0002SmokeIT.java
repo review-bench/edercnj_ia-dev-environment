@@ -40,17 +40,18 @@ class Epic0078Story0002SmokeIT extends SmokeTestBase {
     }
 
     @Test
-    @DisplayName("scenario2_projectIdentity_containsNoDomainRuleReference")
+    @DisplayName("scenario2_essentials_containsNoDomainRuleReference")
     void scenario2_projectIdentity_containsNoDomainRuleReference() throws IOException {
         runPipeline(PROFILE);
         Path outputDir = getOutputDir(PROFILE);
 
-        Path identity = outputDir.resolve(".claude/rules/01-project-identity.md");
-        assertThat(identity).as("01-project-identity.md must exist").exists();
+        // 01-project-identity.md replaced by 00-essentials.md in rules-consolidation-essentials.
+        Path essentials = outputDir.resolve(".claude/rules/00-essentials.md");
+        assertThat(essentials).as("00-essentials.md must exist").exists();
 
-        String content = Files.readString(identity, StandardCharsets.UTF_8);
+        String content = Files.readString(essentials, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("01-project-identity.md must not reference 02-domain.md")
+                .as("00-essentials.md must not reference 02-domain.md")
                 .doesNotContain("02-domain.md");
     }
 
