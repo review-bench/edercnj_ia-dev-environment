@@ -42,6 +42,9 @@ Include this skill when the project uses REST protocol.
 |------|-------|---------|
 | api-design | `skills/api-design/references/api-design-principles.md` | URL structure, status codes, error format, pagination |
 | protocols | `skills/protocols/references/rest-conventions.md` | REST resource naming, HTTP methods, versioning, RFC 7807 |
+| checklists | `knowledge/checklists/graphql-api.md` | GraphQL-specific review checklist |
+| checklists | `knowledge/checklists/grpc-api.md` | gRPC-specific review checklist |
+| checklists | `knowledge/checklists/websocket-api.md` | WebSocket-specific review checklist |
 
 ## Prerequisites
 

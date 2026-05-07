@@ -252,7 +252,6 @@ they are used by skills (via Task tool) to delegate work to agents with specific
 | **api-engineer** | `api-engineer.md` |
 | **architect** | `architect.md` |
 | **devops-engineer** | `devops-engineer.md` |
-| **devsecops-engineer** | `devsecops-engineer.md` |
 | **java-developer** | `java-developer.md` |
 | **pentest-engineer** | `pentest-engineer.md` |
 | **performance-engineer** | `performance-engineer.md` |
@@ -262,7 +261,7 @@ they are used by skills (via Task tool) to delegate work to agents with specific
 | **sre-engineer** | `sre-engineer.md` |
 | **tech-lead** | `tech-lead.md` |
 
-**Total: 12 agents**
+**Total: 11 agents**
 
 ---
 
@@ -362,7 +361,7 @@ See the files directly for current configuration.
 | Rules (.claude) | 29 |
 | Skills (.claude) | 84 |
 | Knowledge Packs (.claude) | 22 |
-| Agents (.claude) | 12 |
+| Agents (.claude) | 11 |
 | Hooks (.claude) | 17 |
 | Settings (.claude) | 2 |
 | Plan Templates (.claude) | 29 |
