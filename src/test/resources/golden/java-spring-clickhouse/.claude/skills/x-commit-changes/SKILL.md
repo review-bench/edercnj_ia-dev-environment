@@ -1,7 +1,7 @@
 ---
 name: x-commit-changes
 model: haiku
-description: "Creates Conventional Commits with Task ID in scope and pre-commit chain (format -> lint -> compile). Central commit point in the task-centric workflow with TDD tag support."
+description: "Creates Conventional Commits with Task ID and pre-commit chain (format/lint/compile)."
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Skill
 argument-hint: "--task TASK-XXXX-YYYY-NNN --type <type> --subject <subject> [--tdd RED|GREEN|REFACTOR] [--body <body>] [--skip-chain] [--amend]"

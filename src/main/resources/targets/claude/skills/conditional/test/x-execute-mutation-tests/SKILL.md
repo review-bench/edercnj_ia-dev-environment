@@ -1,6 +1,6 @@
 ---
 name: x-execute-mutation-tests
-description: "Stack-aware mutation testing skill: detects language/framework, dispatches to PIT (Java/Maven or Gradle), Stryker (JS/TS), mutmut (Python), or go-mutesting (Go), enforces quality.mutation.threshold (default 80%) and runtime-cap-min, and blocks merge on score below threshold."
+description: "Conditional mutation-testing gate (PIT/Stryker) with kill-rate threshold."
 visibility: public
 user-invocable: true
 model: sonnet

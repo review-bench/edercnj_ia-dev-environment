@@ -1,6 +1,6 @@
 ---
 name: x-internal-verify-epic-integrity
-description: "Executes the epic-level verification gate end-to-end (Phase 1.7 / Phase 4 carve-out of x-implement-epic) on the epic/XXXX branch HEAD: checks out the branch, runs mvn clean test + jacoco:report, parses filtered coverage against epic-level thresholds (default line >=95, branch >=90), runs a declarative DoD checklist (presence of tests, tasks DONE, CHANGELOG entry, ADR references), and emits a single-line JSON envelope {passed, failures, coverageDelta, dodChecklist}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, and x-internal-verify-story). Isolates ~180 inline lines of integrity-gate logic from x-implement-epic."
+description: "Epic-level verification gate on epic/XXXX HEAD: tests, coverage, DoD checklist."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

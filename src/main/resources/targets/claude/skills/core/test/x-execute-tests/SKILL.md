@@ -1,6 +1,6 @@
 ---
 name: x-execute-tests
-description: "Runs tests with coverage reporting and threshold validation. Use whenever writing, running, or analyzing tests. Triggers on: test, coverage, TDD, unit test, integration test, test failure, coverage gap, or Definition of Done validation."
+description: "Runs tests with coverage reporting and threshold validation."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[ClassName or package or --coverage]"
 requires-capabilities: []

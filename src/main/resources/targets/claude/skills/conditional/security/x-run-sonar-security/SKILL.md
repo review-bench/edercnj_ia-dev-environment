@@ -1,6 +1,6 @@
 ---
 name: x-run-sonar-security
-description: "Integrates with SonarQube/SonarCloud for security hotspot tracking, quality gate enforcement, and SARIF output from findings."
+description: "Integrates SonarQube/SonarCloud for security hotspots, quality gate, and SARIF."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "--server <url> --token <token> [--quality-gate default|strict] [--project-key <key>] [--branch <branch>] [--timeout <seconds>]"

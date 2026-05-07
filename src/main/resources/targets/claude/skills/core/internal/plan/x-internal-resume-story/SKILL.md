@@ -1,6 +1,6 @@
 ---
 name: x-internal-resume-story
-description: "Detects the resumable state of an in-flight story: reads ai/epics/epic-XXXX/execution-state.json via x-internal-update-status --read-only, identifies the first PENDING or IN_PROGRESS task (the resume point), catalogues DONE tasks with their commitSha, extracts the last committed SHA, and flags staleness when the story file's mtime is newer than any DONE task's completion timestamp. Emits a single-line JSON envelope {resumePoint, tasksCompleted, tasksPending, lastCommitSha, staleWarnings}. Seventh skill in the x-internal-* convention and the fourth under internal/plan/ (after x-internal-load-story-context, x-internal-build-story-plan, x-internal-verify-story). Read-only by construction — never mutates state."
+description: "Detects resumable state of a story from execution-state.json (read-only envelope)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

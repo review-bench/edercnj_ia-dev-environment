@@ -1,6 +1,6 @@
 ---
 name: x-internal-precheck-worktree
-description: "Classifies the git working tree state (CLEAN/DIRTY/DIVERGENT/AMBIGUOUS) and returns a stable exit code. Invoked by orchestrators before starting story/task execution to detect dirty or divergent states early. Exit 0 = CLEAN or DIRTY; exit 15 (WORKTREE_AMBIGUOUS) = DIVERGENT or AMBIGUOUS (unless --allow-dirty)."
+description: "Classifies git tree state (CLEAN/DIRTY/DIVERGENT/AMBIGUOUS) with stable exit code."
 visibility: internal
 user-invocable: false
 model: haiku

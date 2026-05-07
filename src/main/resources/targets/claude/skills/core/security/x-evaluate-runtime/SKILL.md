@@ -1,6 +1,6 @@
 ---
 name: x-evaluate-runtime
-description: "Evaluate runtime protection controls: rate limiting, WAF rules, bot protection, DDoS mitigation, account lockout, brute force protection, CSP enforcement, and permissions policy. Produce SARIF 2.1.0 output with ASVS compliance mapping and scored Markdown report."
+description: "Evaluates runtime protection (rate limits, WAF, CSP) with SARIF + ASVS scoring."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Glob, Grep
 argument-hint: "--target <url> [--scope all|rate-limit|waf|bot-protection|account-lockout|brute-force|csp|permissions] [--intensity passive|moderate|aggressive] [--login-endpoint /path]"

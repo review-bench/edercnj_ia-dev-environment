@@ -1,6 +1,6 @@
 ---
 name: x-review-compliance
-description: "PCI-DSS compliance review with 25-point checklist for code changes involving payment card data. Produces per-point PASS/FAIL report with remediation."
+description: "PCI-DSS compliance review with 25-point checklist for payment-card-data changes."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"

@@ -1,6 +1,6 @@
 ---
 name: x-internal-build-story-plan
-description: "Orchestrates parallel story-planning (Phase 1 carve-out of x-implement-story): invokes x-plan-architecture (Step 1A) and then dispatches 5 sibling Agent subagents in ONE assistant message for implementation plan, test plan, task breakdown, security assessment, and compliance assessment (Steps 1B-1F). Applies the Rule 13 SUBAGENT-GENERAL pattern as the canonical parallel-planning gateway. Scope-aware: SIMPLE skips 1E/1F. Returns a consolidated envelope of artifact paths to the calling orchestrator. Fifth skill in the x-internal-* convention and the second under internal/plan/ (after x-internal-load-story-context)."
+description: "Orchestrates parallel story planning: 5 sibling agents (impl, tests, tasks, sec, comp)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill, Agent

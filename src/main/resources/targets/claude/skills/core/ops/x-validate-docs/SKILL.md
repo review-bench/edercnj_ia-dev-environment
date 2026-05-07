@@ -1,6 +1,6 @@
 ---
 name: x-validate-docs
-description: "Documentation freshness gate: validates 6 dimensions (readme, api-specs, grpc-proto, adr, skill-docs, system-architecture) against code changes in a PR. Stack-aware — only validates targets declared/auto-detected from ProjectConfig.documentation.targets. Returns exit non-zero on staleness; produces structured report."
+description: "Documentation freshness gate: validates 6 dimensions (readme, api, adr, etc.) per PR."
 visibility: public
 user-invocable: true
 model: sonnet

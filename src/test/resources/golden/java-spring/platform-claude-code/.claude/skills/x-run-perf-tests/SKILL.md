@@ -1,6 +1,6 @@
 ---
 name: x-run-perf-tests
-description: "Runs performance tests to validate latency SLAs, throughput targets, and resource stability under load. Supports baseline, normal, peak, and sustained scenarios."
+description: "Runs performance tests for latency SLAs, throughput, and resource stability under load."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[scenario: baseline|normal|peak|sustained|all] [--save-baseline] [--compare-baseline]"

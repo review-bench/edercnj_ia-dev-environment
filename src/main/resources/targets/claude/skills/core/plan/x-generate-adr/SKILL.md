@@ -1,6 +1,6 @@
 ---
 name: x-generate-adr
-description: "Automates ADR generation from architecture plan mini-ADRs: extracts inline decisions, expands to full ADR format, assigns sequential numbering, updates the ADR index, and adds cross-references."
+description: "Generates ADRs from architecture-plan mini-ADRs with sequential numbering and index update."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[architecture-plan-path] [story-id]"

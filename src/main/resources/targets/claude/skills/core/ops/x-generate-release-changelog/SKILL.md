@@ -1,6 +1,6 @@
 ---
 name: x-generate-release-changelog
-description: "Changelog generator v2: hybrid format combining narrative Highlights block (derived from 'Entrega de Valor' of merged v2 epics) with Keep-a-Changelog sections (Added/Changed/Fixed/Breaking/Deprecated). Stack-aware via documentation.changelog.format config. Falls back gracefully when EPIC-0070 epics unavailable (D-R10)."
+description: "Hybrid changelog: narrative Highlights + Keep-a-Changelog sections from v2 epics."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob

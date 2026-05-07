@@ -1,6 +1,6 @@
 ---
 name: x-audit-dependencies
-description: "Checks project dependencies for vulnerabilities, outdated versions, and license issues. Detects build tool automatically, runs language-specific audit commands, and generates a severity-categorized report."
+description: "Audits dependencies for CVEs, outdated versions, and license issues per stack."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--scope all|vulnerabilities|outdated|licenses|sbom|license-report|tree] [--policy]"

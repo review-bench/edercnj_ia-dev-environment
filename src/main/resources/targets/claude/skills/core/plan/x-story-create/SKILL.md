@@ -1,7 +1,7 @@
 ---
 name: x-story-create
 model: sonnet
-description: "Create focused Story artifacts from an existing Feature markdown with epic linkage, sourceFeature metadata, inherited RNFs, and Product-First streamlined sections."
+description: "Creates focused Story artifacts from a Feature markdown with epic linkage and RNFs."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--from-feature <feature-file|feature-id> --epic-id <EPIC-NNNN|NNNN> [--capability-file <path>] [--product-file <path>] [--output-dir <path>] [--dry-run]"

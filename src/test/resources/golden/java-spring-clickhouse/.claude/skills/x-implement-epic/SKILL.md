@@ -1,7 +1,7 @@
 ---
 name: x-implement-epic
 model: sonnet
-description: "Thin orchestrator (~460 lines — story-0049-0018 refactor) that drives an epic end-to-end via 6 delegated phases: Phase 0 (args via x-internal-normalize-args), Phase 1 (load+plan via x-internal-build-epic-plan), Phase 2 (epic branch via x-internal-ensure-epic-branch), Phase 3 (sequential-by-default story loop via x-implement-story), Phase 4 (integrity gate + report via x-internal-verify-epic-integrity + x-internal-write-report), Phase 5 (final PR epic/XXXX → develop via x-merge-branches + x-create-pr). Defaults flipped by EPIC-0049: sequential execution (opt-in parallel via --parallel), auto-merge of story PRs into epic/XXXX (target changed from develop). Legacy EPIC-0042 behavior preserved under --legacy-flow (auto-detected via execution-state.json flowVersion=1). Zero inline git/gh/jq/mvn calls — orchestrator uses only Read/Glob + Skill."
+description: "Drives an epic end-to-end via 6 phases: plan, branch, story loop, integrity gate, final PR."
 user-invocable: true
 allowed-tools: Read, Write, Glob, Skill, Agent, AskUserQuestion, TaskCreate, TaskUpdate
 argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--non-interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"

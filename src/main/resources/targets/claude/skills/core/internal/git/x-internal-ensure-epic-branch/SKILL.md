@@ -1,6 +1,6 @@
 ---
 name: x-internal-ensure-epic-branch
-description: "Single source of truth for the `epic/<ID>` branch convention (RULE-001). Invoked by every epic entry-point (x-epic-create, x-epic-decompose, x-orchestrate-epic, x-implement-epic, x-epic-map) at step 0; ensures the branch exists idempotently both locally and on origin. When the branch is absent, delegates creation to `x-create-git-branch`; when present locally but not on origin, emits a complementary `git push`. Seventh skill in the x-internal-* convention and the first under internal/git/ (after x-internal-update-status / x-internal-write-report / x-internal-normalize-args at internal/ops/ and x-internal-load-story-context / x-internal-build-story-plan / x-internal-verify-story at internal/plan/)."
+description: "Ensures epic/XXXX branch exists idempotently, locally and on origin."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

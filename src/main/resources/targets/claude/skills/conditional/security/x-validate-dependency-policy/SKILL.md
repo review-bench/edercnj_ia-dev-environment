@@ -1,6 +1,6 @@
 ---
 name: x-validate-dependency-policy
-description: "Validates project dependencies against the declared dependency policy (denied CVEs, license whitelist, version constraints, freshness window, scope policy). Produces a structured validation report and exits with BLOCK or WARN based on D-R10/D-R11 enforcement matrix."
+description: "Conditional dep-policy gate: CVEs, licenses, versions, freshness; SARIF + report."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--story-id STORY-XXXX-YYYY] [--report <path>] [--dry-run]"

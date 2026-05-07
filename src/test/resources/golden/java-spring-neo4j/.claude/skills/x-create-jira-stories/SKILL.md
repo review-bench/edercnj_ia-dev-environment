@@ -1,6 +1,6 @@
 ---
 name: x-create-jira-stories
-description: "Create Jira Stories from existing local story markdown files. Read all story files in an epic directory, map fields to Jira, create issues with parent epic link, create dependency links between stories, and sync Jira keys back to local files."
+description: "Creates Jira Stories from local story markdowns; links parent Epic and dependencies."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion
 argument-hint: "[EPIC_DIR_PATH or EPIC_ID]"

@@ -1,6 +1,6 @@
 ---
 name: x-internal-create-epic
-description: "Generate an Epic document from spec analysis or from an existing Feature artifact: cross-cutting rules, story index, DoR/DoD, optional Jira, sourceFeature lineage, and inherited RNFs. Invoked by orchestrators and focused public wrappers. Not user-invocable."
+description: "Generates an Epic document from spec analysis or from an existing Feature artifact."
 visibility: internal
 user-invocable: false
 model: sonnet
