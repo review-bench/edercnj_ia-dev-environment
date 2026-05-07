@@ -467,6 +467,8 @@ When run in CI mode, the skill:
 | 1 | Security | `knowledge/security/index.md` | OWASP ASVS verification items |
 | 2 | Security References | `knowledge/security/application-security.md` | Detailed ASVS chapter mappings |
 
+Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+
 ## Integration Notes
 
 | Skill | Relationship | Context |

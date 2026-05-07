@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Writes core rules (01-09, plus conditional 09-12) and routes core knowledge pack files during
@@ -19,6 +20,8 @@ import java.util.Map;
  * @see RulesAssembler
  */
 public final class CoreRulesWriter {
+
+    private static final Logger LOG = Logger.getLogger(CoreRulesWriter.class.getName());
 
     private final Path resourcesDir;
     private final AntiPatternsRuleWriter antiPatternsWriter;
@@ -79,23 +82,14 @@ public final class CoreRulesWriter {
         return dest.toString();
     }
 
+    // EPIC-0078: 02-domain.md removed from always-loaded layer; saves ~5k tokens per turn.
     String copyDomainTemplate(
             ProjectConfig config,
             Path rulesDir,
             TemplateEngine engine,
             Map<String, Object> context) {
-        Path dest = rulesDir.resolve("02-domain.md");
-        Path template = resourcesDir.resolve("shared/templates/domain-template.md");
-        if (Files.exists(template) && Files.isRegularFile(template)) {
-            return CopyHelpers.copyTemplateFile(template, dest, engine, context);
-        }
-        try {
-            Files.writeString(
-                    dest, RulesIdentity.fallbackDomainContent(config), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Failed to write domain rule", e);
-        }
-        return dest.toString();
+        LOG.info("[RulesAssembler] rule=02-domain.md reason=removed-epic-0078 — skipped");
+        return null;
     }
 
     List<String> copyConditionals(

@@ -42,7 +42,7 @@ class RulesAssemblerTest {
 
             Path rulesDir = outputDir.resolve("rules");
             assertThat(rulesDir.resolve("01-project-identity.md")).exists();
-            assertThat(rulesDir.resolve("02-domain.md")).exists();
+            assertThat(rulesDir.resolve("02-domain.md")).doesNotExist();
             assertThat(rulesDir.resolve("03-coding-standards.md")).exists();
             assertThat(rulesDir.resolve("04-architecture-summary.md")).exists();
             assertThat(rulesDir.resolve("05-quality-gates.md")).exists();
@@ -103,8 +103,8 @@ class RulesAssemblerTest {
         }
 
         @Test
-        @DisplayName("02-domain.md generated from template")
-        void assemble_whenCalled_domainFromTemplate(@TempDir Path tempDir) throws IOException {
+        @DisplayName("02-domain.md not generated — removed by EPIC-0078")
+        void assemble_whenCalled_domainFileAbsent(@TempDir Path tempDir) throws IOException {
             Path resourceDir = createMinimalResources(tempDir);
             Path outputDir = tempDir.resolve("output");
             Files.createDirectories(outputDir);
@@ -114,34 +114,7 @@ class RulesAssemblerTest {
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 
-            String content =
-                    Files.readString(
-                            outputDir.resolve("rules/02-domain.md"), StandardCharsets.UTF_8);
-
-            assertThat(content).contains("{DOMAIN_NAME}");
-        }
-
-        @Test
-        @DisplayName("02-domain.md uses fallback when" + " template missing")
-        void assemble_whenTemplateMissing_domainFallback(@TempDir Path tempDir) throws IOException {
-            Path resourceDir = tempDir.resolve("res");
-            Path coreRules = resourceDir.resolve("targets/claude/rules");
-            Files.createDirectories(coreRules);
-
-            Path outputDir = tempDir.resolve("output");
-            Files.createDirectories(outputDir);
-
-            RulesAssembler assembler = new RulesAssembler(resourceDir);
-            ProjectConfig config =
-                    TestConfigBuilder.builder().projectName("fallback-project").build();
-
-            assembler.assemble(config, new TemplateEngine(), outputDir);
-
-            String content =
-                    Files.readString(
-                            outputDir.resolve("rules/02-domain.md"), StandardCharsets.UTF_8);
-
-            assertThat(content).contains("fallback-project").contains("{DOMAIN_NAME}");
+            assertThat(outputDir.resolve("rules/02-domain.md")).doesNotExist();
         }
 
         @Test
@@ -588,14 +561,6 @@ class RulesAssemblerTest {
             String expected = loadGoldenFile("01-project-identity.md");
 
             assertThat(content).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("02-domain matches golden file")
-        void golden_domain_matchesGoldenFile() throws IOException {
-            String expected = loadGoldenFile("02-domain.md");
-
-            assertThat(expected).contains("{DOMAIN_NAME}").contains("{DOMAIN_OVERVIEW}");
         }
 
         @Test

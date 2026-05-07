@@ -118,7 +118,10 @@ public final class RulesAssembler implements Assembler {
             Map<String, Object> context,
             List<String> generated) {
         generated.add(coreWriter.generateProjectIdentity(config, rulesDir));
-        generated.add(coreWriter.copyDomainTemplate(config, rulesDir, engine, context));
+        String domainPath = coreWriter.copyDomainTemplate(config, rulesDir, engine, context);
+        if (domainPath != null) {
+            generated.add(domainPath);
+        }
         generated.addAll(coreWriter.copyConditionalDataRule(config, rulesDir, engine, context));
         generated.addAll(
                 coreWriter.copyConditionalAntiPatternsRule(config, rulesDir, engine, context));

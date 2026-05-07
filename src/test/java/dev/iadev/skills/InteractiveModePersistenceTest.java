@@ -67,22 +67,29 @@ class InteractiveModePersistenceTest {
     }
 
     @Test
-    @DisplayName("Rule 19 source-of-truth contains interactiveMode fallback matrix entry")
+    @DisplayName("Rule 19 + lifecycle KP document interactiveMode fallback matrix (EPIC-0068)")
     void rule19_containsInteractiveModeFallbackMatrix() throws IOException {
+        // EPIC-0078 story-0078-0011 slimmed Rule 19: the interactiveMode fallback matrix
+        // moved from the rule body to the lifecycle KP backward-compatibility.md.
+        // Rule 19 now references `interactiveMode` in the KP pointer; the full matrix lives in the KP.
         Path rule19 =
                 Path.of("src/main/resources/targets/claude/rules/19-backward-compatibility.md");
+        Path kp =
+                Path.of(
+                        "src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md");
 
         assertThat(rule19).as("Rule 19 source-of-truth must exist").exists();
+        assertThat(kp).as("backward-compatibility KP must exist").exists();
 
-        String content = Files.readString(rule19);
+        String rule19Content = Files.readString(rule19);
+        assertThat(rule19Content)
+                .as("Rule 19 must reference interactiveMode (pointer to KP — EPIC-0078 slim)")
+                .contains("interactiveMode");
 
-        assertThat(content)
-                .as("Rule 19 must document interactiveMode fallback matrix (EPIC-0068)")
-                .contains("`interactiveMode` Field (EPIC-0068)");
-
-        assertThat(content)
-                .as(
-                        "Rule 19 interactiveMode section must cover absent-field fallback to interactive")
+        String kpContent = Files.readString(kp);
+        assertThat(kpContent)
+                .as("Lifecycle KP must contain interactiveMode fallback matrix")
+                .contains("`interactiveMode` Fallback Matrix")
                 .contains("Field absent")
                 .contains("\"interactive\"");
     }

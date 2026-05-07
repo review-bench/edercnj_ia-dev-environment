@@ -613,6 +613,10 @@ x-refine-epic completed for epic-XXXX
 
 ---
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/refinement-gate.md
+
 ## Integration Notes
 
 - **Consumed by:** `x-implement-epic` (Phase 0: checks `refinementVerdict.status == "approved"` AND `scope == "epic"` via `enforce-refinement-gate.sh` hook).

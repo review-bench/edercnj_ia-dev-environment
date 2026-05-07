@@ -204,14 +204,16 @@ class Epic0065SmokeIT extends SmokeTestBase {
                 .isTrue();
 
         String content = Files.readString(rule19, StandardCharsets.UTF_8);
+        // EPIC-0078 story-0078-0011 slimmed Rule 19: "Hard-cut autorizado" section + x-epic-decompose
+        // table moved to lifecycle KP backward-compatibility.md. Compact rule retains the concept.
         assertThat(content)
                 .as(
-                        "profile %s: Rule 19 must contain Hard-cut autorizado clause (story-0065-0001)",
+                        "profile %s: Rule 19 must document Hard-cut (immediate removal — story-0065-0001)",
                         profile)
-                .contains("Hard-cut autorizado");
+                .contains("Hard-cut");
         assertThat(content)
-                .as("profile %s: Rule 19 Hard-cut must document x-epic-decompose case", profile)
-                .contains("x-epic-decompose");
+                .as("profile %s: Rule 19 hard-cut must document visibility changes case", profile)
+                .contains("visibility changes");
     }
 
     @ParameterizedTest(name = "[{0}]")

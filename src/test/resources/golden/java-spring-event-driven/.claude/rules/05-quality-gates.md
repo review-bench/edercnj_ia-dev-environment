@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 05 — Quality Gates
 
 > **Full reference:** Read `knowledge/testing.md` for test patterns and conventions.

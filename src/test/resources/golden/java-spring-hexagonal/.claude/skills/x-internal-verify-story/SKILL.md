@@ -462,6 +462,10 @@ Reference: Rule 13 (Skill Invocation Protocol), Rule 22 (Lifecycle
 Integrity Audit), ADR-0010 (Interactive Gates Convention — exempts
 internal skills from the 3-option menu contract).
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md
+
 ## Integration Notes
 
 | Skill | Relationship | Context |

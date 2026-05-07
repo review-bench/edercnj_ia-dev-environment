@@ -14,16 +14,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Verifies the Rule 24 "Mandatory Evidence Artifacts" table contains all 11 sub-skills required by
- * EPIC-0057 (story-0057-0001).
+ * Verifies the Rule 24 "Mandatory Evidence Artifacts" table is present in the lifecycle KP.
  *
- * <p>The table moved from 5 to 11 entries to close the EPIC-0053 post-mortem blind spot where
- * {@code x-pr-watch-ci} was silently skipped without any enforcement layer detecting the omission.
+ * <p>EPIC-0078 story-0078-0013 slimmed Rule 24 to a compact contract stub; the full evidence table
+ * (previously 11+ entries) moved to the lifecycle KP {@code
+ * .claude/knowledge/lifecycle/execution-integrity.md}. This test guards the KP contract.
  *
- * <p>Acceptance criteria: every regenerated profile golden contains the 11 canonical entries; build
- * fails if the table regresses.
+ * <p>Acceptance criteria: every regenerated profile golden carries the KP with all 11 canonical
+ * sub-skill entries; build fails if the table regresses.
  */
-@DisplayName("Rule24EvidenceTableExpansionTest — Rule 24 §32-42 has 11 entries")
+@DisplayName("Rule24EvidenceTableExpansionTest — lifecycle KP carries 11+ evidence entries")
 @DisabledOnOs(
         value = OS.WINDOWS,
         disabledReason =
@@ -47,40 +47,47 @@ class Rule24EvidenceTableExpansionTest extends SmokeTestBase {
 
     private static final String TABLE_HEADER = "| Sub-skill | Artifact path | Enforced by |";
 
+    // EPIC-0078 story-0078-0013: evidence table moved from Rule 24 to lifecycle KP.
+    private static final String EVIDENCE_KP_PATH =
+            ".claude/knowledge/lifecycle/execution-integrity.md";
+
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("Rule 24 evidence table contains all 11 expected sub-skills")
+    @DisplayName("lifecycle KP evidence table contains all 11 expected sub-skills")
     void rule24_evidenceTable_containsExpectedSubSkills(String profile) throws IOException {
         runPipeline(profile);
         Path rule = getOutputDir(profile).resolve(".claude/rules/24-execution-integrity.md");
+        Path kp = getOutputDir(profile).resolve(EVIDENCE_KP_PATH);
 
         assertThat(rule).as("profile %s: Rule 24 file must exist", profile).exists();
+        assertThat(kp).as("profile %s: execution-integrity KP must exist", profile).exists();
 
-        String body = Files.readString(rule, StandardCharsets.UTF_8);
+        String body = Files.readString(kp, StandardCharsets.UTF_8);
 
         assertThat(body)
-                .as("profile %s: table header must be present", profile)
+                .as("profile %s: KP table header must be present", profile)
                 .contains(TABLE_HEADER);
 
         for (String subskill : EXPECTED_SUBSKILLS) {
             assertThat(body)
-                    .as("profile %s: table must reference '%s'", profile, subskill)
+                    .as("profile %s: KP table must reference '%s'", profile, subskill)
                     .contains("`" + subskill);
         }
     }
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("Rule 24 evidence table has at least 11 data rows")
+    @DisplayName("lifecycle KP evidence table has at least 11 data rows")
     void rule24_evidenceTable_hasAtLeastElevenRows(String profile) throws IOException {
         runPipeline(profile);
-        Path rule = getOutputDir(profile).resolve(".claude/rules/24-execution-integrity.md");
+        Path kp = getOutputDir(profile).resolve(EVIDENCE_KP_PATH);
 
-        String body = Files.readString(rule, StandardCharsets.UTF_8);
+        assertThat(kp).as("profile %s: execution-integrity KP must exist", profile).exists();
+        String body = Files.readString(kp, StandardCharsets.UTF_8);
         long rowCount = countTableRows(body);
 
         assertThat(rowCount)
-                .as("profile %s: table must have ≥11 data rows; found %d", profile, rowCount)
+                .as("profile %s: KP table must have ≥11 data rows; found %d", profile, rowCount)
                 .isGreaterThanOrEqualTo(11);
     }
 

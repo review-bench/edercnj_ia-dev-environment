@@ -771,3 +771,63 @@ The file is append-only; multiple runs add new sections.
 | Epic | flowVersion | Source | Destination | Action |
 | :--- | :--- | :--- | :--- | :--- |
 | 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:35:26Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:35:26Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:38:50Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:38:51Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:42:12Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:42:12Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:46:14Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:46:14Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:49:35Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |
+
+## Run at 2026-05-06T13:49:35Z (dry-run)
+
+| Epic | flowVersion | Source | Destination | Action |
+| :--- | :--- | :--- | :--- | :--- |
+| 0042 | 0 | plans/epic-0042 | ai/epics/epic-0042 | skipped (legacy v0) |

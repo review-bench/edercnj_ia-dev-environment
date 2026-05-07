@@ -306,3 +306,13 @@ entries:
     superseded-by: null
     created: "2026-05-05"
     last-updated: "2026-05-05"
+
+  - epic-id: EPIC-0078
+    slug: context-budget-optimization
+    summary-path: epic-0078-summary.md
+    summary-version: "1.0"
+    indexable: true
+    archived: false
+    superseded-by: null
+    created: "2026-05-06"
+    last-updated: "2026-05-06"

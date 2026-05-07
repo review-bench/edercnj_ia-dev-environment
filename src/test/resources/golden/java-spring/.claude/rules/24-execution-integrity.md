@@ -1,138 +1,18 @@
+---
+requires-capabilities: []
+---
 # Rule 24 — Execution Integrity
 
-> **Related:** Rule 13 (Skill Invocation Protocol), Rule 22 (Skill Visibility), Rule 05 (Quality Gates).
-> **Introduced by:** EPIC-0052 (Execution Integrity Enforcement).
+> **Consolidated by:** EPIC-0078 (Context Budget Optimization). **Authoritative contract:** Rule 19 (Lifecycle Integrity Contract).
+> **Full detail — mandatory evidence artifacts, non-inlining contract, Camadas 0–4, audit exit codes, baseline format:**
+> `Read src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md`
 
-## Purpose
+## Contract (Non-Negotiable)
 
-Every `Skill(skill: "...", args: "...")` declaration inside a SKILL.md body is a **tool call**, never prose, never a conceptual description to be "simulated" by the LLM in its own reasoning window. When the LLM executing a skill inlines what a sub-skill would do instead of actually emitting the tool call, the multi-agent architecture collapses into single-agent best-effort, silently bypassing specialist reviews, verify gates, and evidence production.
-
-Rule 24 codifies the invariant and defines the enforcement layers that detect and block violations: runtime (Stop hook), CI (audit script), and normative (this rule + assertive SKILL.md language).
-
-## Non-inlining Contract
-
-The LLM executing any skill MUST NOT:
-
-1. **Summarize** what a declared sub-skill would do in place of invoking it.
-2. **Simulate** the sub-skill's output in its own context window.
-3. **Skip** a declared sub-skill on the grounds of "trivial case", "obvious result", "already verified manually", or any similar heuristic.
-4. **Claim** that a phase passed without the corresponding sub-skill having been invoked.
-
-The only legitimate way to not invoke a declared sub-skill is via an explicit `--skip-*` flag passed by the caller:
-
-| Flag | Skill it bypasses |
-| :--- | :--- |
-| `--skip-review` | `x-review-codebase` + `x-review-pr` |
-| `--skip-verification` | `x-internal-verify-story` |
-| `--skip-smoke` | smoke test inside verify gate |
-| `--skip-pr-comments` | `x-fix-epic-pr` post-gate |
-
-Every `--skip-*` usage outside a `## Recovery` block in the calling skill is a Rule 22 violation AND a Rule 24 violation — both caught by the audit.
-
-## Mandatory Evidence Artifacts
-
-Certain sub-skills MUST produce a persistent artifact as proof of execution. The Camada 3 CI audit (`scripts/audit-execution-integrity.sh`) checks existence of these files for every merged story PR:
-
-| Sub-skill | Artifact path | Enforced by |
-| :--- | :--- | :--- |
-| `x-internal-verify-story` | `ai/epics/epic-XXXX/reports/verify-envelope-STORY-ID.json` | Camada 3 |
-| `x-review-codebase` | `ai/epics/epic-XXXX/plans/review-story-STORY-ID.md` | Camada 3 |
-| `x-review-pr` | `ai/epics/epic-XXXX/plans/techlead-review-story-STORY-ID.md` | Camada 3 |
-| `x-internal-write-story-report` | `ai/epics/epic-XXXX/reports/story-completion-report-STORY-ID.md` | Camada 3 |
-| `x-plan-architecture` | `ai/epics/epic-XXXX/plans/arch-story-STORY-ID.md` | Camada 3 (soft) |
-| `x-watch-pr-ci` | `.claude/state/pr-watch-{PR_NUMBER}.json` | Camada 2 (Stop hook) |
-| `x-create-pr` | telemetry NDJSON (evento `gh pr create` em `ai/epics/epic-XXXX/telemetry/events.ndjson`) | Camada 4 (observabilidade) |
-| `x-drive-tdd` / `x-execute-tests` | `ai/epics/epic-XXXX/reports/test-run-STORY-ID.txt` | Camada 3 (soft) |
-| `x-commit-changes` (ciclo TDD) | evidência via `git log --oneline` da branch no PR | Camada 4 (observabilidade) |
-| `x-audit-dependencies` | `ai/epics/epic-XXXX/reports/dependency-audit-STORY-ID.md` | Camada 3 |
-| `x-model-threats` | `ai/epics/epic-XXXX/plans/threat-model-story-STORY-ID.md` | Camada 3 (soft) |
-| `x-validate-docs` | `ai/epics/epic-XXXX/reports/doc-validate-report-STORY-ID.md` | Camada 3 (EPIC-0071) |
-| `x-execute-performance-tests` | `ai/epics/epic-XXXX/reports/perf-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.performance.enabled=true`, EPIC-0072) |
-| `x-execute-mutation-tests` | `ai/epics/epic-XXXX/reports/mutation-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.mutation.enabled=true`, EPIC-0072) |
-| `x-execute-contract-tests` | `ai/epics/epic-XXXX/reports/contract-report-STORY-ID.md` | Camada 3 (soft — conditional: `quality.contract.enabled=true`, EPIC-0072) |
-| `x-validate-dependency-policy` | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` | Camada 3 (soft — conditional: `dependencies.policy.enabled=true`, EPIC-0074) |
-
-Absence of any mandatory artifact on a merged story fails the CI audit with `EIE_EVIDENCE_MISSING`.
-
-## Enforcement Layers
-
-Five defense-in-depth layers (extended by EPIC-0063 with Camada 0). A violation caught by any layer fails the lifecycle.
-
-### Camada 0 — Local Pre-Flight (NEW — EPIC-0063)
-
-Gates that execute on the operator's machine BEFORE any remote operation (`git push`, `gh pr create`, `Skill x-create-pr`). This camada is the only one that can **prevent** a bad action from happening; Camadas 1-4 are detective (catch after the fact).
-
-| Aspect | Detail |
-| :--- | :--- |
-| Trigger | PreToolUse hook (`enforce-preflight-gates.sh`) on `Bash`, `Skill x-create-pr`, etc. |
-| Vinculatividade | PreToolUse hook is physically blocking — `git push` is intercepted before reaching origin |
-| Único bypass | `CLAUDE_RECOVERY_MODE=1` env var (with visible WARNING). No silent escape. |
-| Scripts | `scripts/preflight.sh` orchestrates: `audit-review-content.sh`, `audit-verify-envelope.sh`, `audit-coverage-local.sh`, `audit-execution-integrity.sh --scope=telemetry` |
-| Cross-ref | Rule 27 RULE-059-07 (CLAUDE_RECOVERY_MODE is the only accepted bypass variable) |
-
-**Failure semantics:** when preflight fails, the PreToolUse hook exits with code 2 (blocking) and Claude Code surfaces the error to the LLM with the failed gate's exit code/message. The operator must fix the underlying issue before retrying — there is no `--no-verify` style escape.
-
-**Stories implementing Camada 0:**
-- story-0063-0001 (preflight.sh runner), story-0063-0002 (content audits), story-0063-0003 (telemetry audit), story-0063-0004 (PreToolUse hook), story-0063-0007 (coverage gate), story-0063-0021 (PR-fix gate)
-
-### Camada 1 — Normative (this rule + assertive SKILL.md + CLAUDE.md)
-
-- This rule is loaded into every conversation (rules are always active).
-- Root `CLAUDE.md` carries a top-level "EXECUTION INTEGRITY — NÃO NEGOCIÁVEL" block.
-- Orchestrator SKILL.md files (`x-implement-story`, `x-implement-epic`, `x-implement-task`) phrase every sub-skill invocation as **MANDATORY TOOL CALL** and reference this rule by exit code.
-
-### Camada 2 — Runtime Stop hook
-
-- `.claude/hooks/verify-story-completion.sh` fires on every `Stop` event (end of LLM turn).
-- Detects recent PR-creation / story-completion activity for the active story (via telemetry NDJSON `gh pr create` events AND the current branch / latest commit message).
-- Checks that the required evidence artifacts for mandatory sub-skills exist on disk (under `ai/epics/epic-XXXX/plans/` and `ai/epics/epic-XXXX/reports/`) for that story, rather than relying on telemetry entries.
-- On missing evidence, emits a visible WARNING on stderr and exits with code 2, which Claude Code surfaces to the LLM as a blocking notification.
-
-### Camada 3 — CI audit
-
-- `scripts/audit-execution-integrity.sh` runs on every PR to `develop` (via the CI workflow) and on every PR to `epic/*` branches.
-- For each story-branch merge detected via `git log`, verifies the mandatory artifact set exists.
-- Fails the CI build with `EIE_EVIDENCE_MISSING` if evidence is absent.
-- Escape hatch: baseline file `governance/baselines/execution-integrity-baseline.txt` grandfathers stories merged before this rule was introduced. Newly-merged stories cannot be added to the baseline.
-- Per-story escape: `<!-- audit-exempt: <reason> -->` line in the story markdown (rare, reviewed exceptions).
-
-### Camada 4 — Observability (mandatory artifacts)
-
-Sub-skills that "count" for Rule 24 are required by contract to emit their evidence file. The artifact IS the proof. If a sub-skill is genuinely invoked, the file exists. If the file does not exist, the sub-skill was not invoked — no room for ambiguity.
-
-## Audit Script Contract
-
-`scripts/audit-execution-integrity.sh` exit codes:
-
-| Exit | Code | Meaning |
-| :--- | :--- | :--- |
-| 0 | `OK` | All merged stories have required evidence (or are grandfathered). |
-| 1 | `EIE_EVIDENCE_MISSING` | At least one merged story lacks mandatory artifacts. |
-| 2 | `EIE_BASELINE_CORRUPT` | `governance/baselines/execution-integrity-baseline.txt` malformed. |
-| 3 | `EIE_INVALID_EXEMPTION` | `audit-exempt` marker missing a reason. |
-
-## Baseline (Grandfather List)
-
-`governance/baselines/execution-integrity-baseline.txt` lists stories merged before Rule 24 was introduced. Format: one `STORY-ID` per line, with trailing `# reason` comment. No new entries may be added after Rule 24 merges — CI refuses additions via a separate immutability check.
-
-Example (initial baseline):
-
-```
-story-0051-0001  # pre-Rule-24, merged 2026-04-23 (PR #602), inline execution was legal at time
-```
+Every `Skill(skill: "...", args: "...")` in a SKILL.md body MUST be executed as a real tool call — never simulated, summarized, or skipped without an explicit `--skip-*` flag inside a `## Recovery` block. Absence of a mandatory evidence artifact on a merged story PR fails CI (`EIE_EVIDENCE_MISSING`).
 
 ## Forbidden
 
-- Removing or weakening any of the four layers.
-- Adding stories to the baseline after the rule was introduced.
-- Writing a SKILL.md that declares a sub-skill call in prose form without making it a MANDATORY TOOL CALL block.
-- Bypassing the audit with `--no-verify` or `git commit -n`.
-
-## Audit
-
-The audit is self-auditing: `scripts/audit-execution-integrity.sh --self-check` verifies that this rule file exists, the Stop hook is registered in `settings.json`, and the baseline file is present. Any missing piece fails the CI build with `EIE_ENFORCEMENT_BROKEN`.
-
----
-
-> **Catalogado em:** [`docs/audit-gates-catalog.md`](../../docs/audit-gates-catalog.md)
-
+- Inlining what a sub-skill would do instead of emitting the Skill tool call.
+- Using `--skip-*` flags outside `## Recovery` blocks.
+- Bypassing `scripts/audit-execution-integrity.sh` via `--no-verify`.

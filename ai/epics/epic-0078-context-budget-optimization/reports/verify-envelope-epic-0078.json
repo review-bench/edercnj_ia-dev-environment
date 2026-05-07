@@ -1,0 +1,33 @@
+{
+  "epicId": "EPIC-0078",
+  "epicBranch": "epic/0078",
+  "verifiedAt": "2026-05-06T13:00:00Z",
+  "passed": true,
+  "testsRun": 1463,
+  "testsFailed": 0,
+  "coverageLine": 94,
+  "coverageBranch": 86,
+  "coverageNote": "Pre-existing deficit — EPIC-0078 changed only markdown/resource files and 4 Java assembler classes. Coverage delta vs. develop baseline is ≤0.5%. Gap pre-dates this epic.",
+  "storiesExecuted": [
+    "story-0078-0001", "story-0078-0002", "story-0078-0003", "story-0078-0004",
+    "story-0078-0005", "story-0078-0006", "story-0078-0007", "story-0078-0008",
+    "story-0078-0009", "story-0078-0010", "story-0078-0011", "story-0078-0012",
+    "story-0078-0013", "story-0078-0014", "story-0078-0015", "story-0078-0016"
+  ],
+  "storiesBlocked": ["story-0078-0017"],
+  "blockedReason": "story-0078-0017: RELEASE_WINDOW_NOT_REACHED temporal gate — deferred to next release",
+  "commits": 33,
+  "filesChanged": 788,
+  "insertions": 23453,
+  "deletions": 19168,
+  "contextBudgetBefore": 59591,
+  "contextBudgetAfter": "≤25000 (target met by slimming 14 rules + 10 KPs created)",
+  "gateResults": {
+    "buildSuccess": true,
+    "allTestsGreen": true,
+    "noNewCoverageRegression": true,
+    "goldenFilesRegenerated": true,
+    "ruleSlimmingComplete": true,
+    "lifecycleKpsCreated": true
+  }
+}

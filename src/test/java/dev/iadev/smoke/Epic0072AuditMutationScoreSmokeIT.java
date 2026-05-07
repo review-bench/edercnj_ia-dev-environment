@@ -131,9 +131,9 @@ class Epic0072AuditMutationScoreSmokeIT {
         }
 
         @Test
-        @DisplayName("scenario10_auditScripts_has12Scripts")
+        @DisplayName("scenario10_auditScripts_has15Scripts")
         void scenario10_auditScripts_has12Scripts() {
-            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(13);
+            assertThat(ScriptsAssembler.AUDIT_SCRIPTS).hasSize(15);
         }
     }
 

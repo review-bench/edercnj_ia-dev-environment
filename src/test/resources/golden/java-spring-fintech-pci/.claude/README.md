@@ -68,7 +68,6 @@ They define mandatory standards that Claude MUST follow when generating code.
 | # | File | Scope |
 |---|------|-------|
 | 01 | `01-project-identity.md` | project identity |
-| 02 | `02-domain.md` | domain |
 | 03 | `03-coding-standards.md` | coding standards |
 | 04 | `04-architecture-summary.md` | architecture summary |
 | 05 | `05-quality-gates.md` | quality gates |
@@ -90,15 +89,15 @@ They define mandatory standards that Claude MUST follow when generating code.
 | 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle |
 | 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
 | 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
-| 28 | `28-tool-call-grammar.md` | tool call grammar |
 | 29 | `29-refinement-gate.md` | refinement gate |
+| 30 | `30-tool-call-grammar.md` | tool call grammar |
 | 30 | `30-value-driven-templates.md` | value driven templates |
 | 31 | `31-documentation-freshness-gate.md` | documentation freshness gate |
 | 32 | `32-dependency-policy-gate.md` | dependency policy gate |
 | 33 | `33-ai-memory-production.md` | ai memory production |
 | 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 30 rules**
+**Total: 29 rules**
 
 ### Numbering
 
@@ -369,7 +368,7 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 30 |
+| Rules (.claude) | 29 |
 | Skills (.claude) | 90 |
 | Knowledge Packs (.claude) | 22 |
 | Agents (.claude) | 15 |

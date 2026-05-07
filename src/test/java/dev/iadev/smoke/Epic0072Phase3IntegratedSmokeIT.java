@@ -36,6 +36,18 @@ class Epic0072Phase3IntegratedSmokeIT {
                     "rules",
                     "24-execution-integrity.md");
 
+    // EPIC-0078 story-0078-0013 slimmed Rule 24; evidence table moved to lifecycle KP.
+    private static final Path EXECUTION_INTEGRITY_KP =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "lifecycle",
+                    "execution-integrity.md");
+
     private static final Path AUDIT_EI =
             Path.of(
                     "src",
@@ -212,29 +224,31 @@ class Epic0072Phase3IntegratedSmokeIT {
         @Test
         @DisplayName("scenario7_rule24_containsThreeConditionalQualityArtifacts")
         void scenario7_rule24_containsThreeConditionalQualityArtifacts() throws Exception {
-            String content = Files.readString(RULE_24.toAbsolutePath());
-            assertThat(content)
-                    .as("Rule 24 must list perf-report-STORY-ID.md as conditional artifact")
+            // EPIC-0078 story-0078-0013 slimmed Rule 24: evidence table moved to lifecycle KP.
+            String kpContent = Files.readString(EXECUTION_INTEGRITY_KP.toAbsolutePath());
+            assertThat(kpContent)
+                    .as("execution-integrity KP must list perf-report-STORY-ID.md as conditional artifact")
                     .contains("perf-report-STORY-ID.md");
-            assertThat(content)
-                    .as("Rule 24 must list mutation-report-STORY-ID.md as conditional artifact")
+            assertThat(kpContent)
+                    .as("execution-integrity KP must list mutation-report-STORY-ID.md as conditional artifact")
                     .contains("mutation-report-STORY-ID.md");
-            assertThat(content)
-                    .as("Rule 24 must list contract-report-STORY-ID.md as conditional artifact")
+            assertThat(kpContent)
+                    .as("execution-integrity KP must list contract-report-STORY-ID.md as conditional artifact")
                     .contains("contract-report-STORY-ID.md");
         }
 
         @Test
         @DisplayName("scenario8_rule24_qualityArtifactsMarkedAsConditional")
         void scenario8_rule24_qualityArtifactsMarkedAsConditional() throws Exception {
-            String content = Files.readString(RULE_24.toAbsolutePath());
-            assertThat(content)
+            // EPIC-0078 story-0078-0013 slimmed Rule 24: evidence table moved to lifecycle KP.
+            String kpContent = Files.readString(EXECUTION_INTEGRITY_KP.toAbsolutePath());
+            assertThat(kpContent)
                     .as("perf artifact must be conditional on quality.performance.enabled")
                     .contains("quality.performance.enabled=true");
-            assertThat(content)
+            assertThat(kpContent)
                     .as("mutation artifact must be conditional on quality.mutation.enabled")
                     .contains("quality.mutation.enabled=true");
-            assertThat(content)
+            assertThat(kpContent)
                     .as("contract artifact must be conditional on quality.contract.enabled")
                     .contains("quality.contract.enabled=true");
         }

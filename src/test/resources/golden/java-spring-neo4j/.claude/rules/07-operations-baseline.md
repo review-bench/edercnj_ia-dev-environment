@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 07 — Operations Baseline
 
 > **Full reference:** Read `knowledge/observability/index.md` for detailed SRE practices and monitoring patterns.

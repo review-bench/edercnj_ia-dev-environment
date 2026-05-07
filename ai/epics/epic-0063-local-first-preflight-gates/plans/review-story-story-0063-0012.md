@@ -8,8 +8,8 @@
 ## Architecture Review
 
 The implementation follows hexagonal architecture patterns consistently:
-- Rule 28 normative document at `.claude/rules/28-tool-call-grammar.md` (Camada 1)
-- Source-of-truth copy at `java/src/main/resources/targets/claude/rules/28-tool-call-grammar.md`
+- Rule 28 normative document at `.claude/rules/30-tool-call-grammar.md` (Camada 1)
+- Source-of-truth copy at `java/src/main/resources/targets/claude/rules/30-tool-call-grammar.md`
 - CI audit script at `scripts/audit-tool-call-grammar.sh` (Camada 2, Rule 26 §audit-* prefix)
 - Baseline file at `audits/tool-call-grammar-baseline.txt` (grandfather list)
 - Shell tests at `src/test/shell/audit_tool_call_grammar_test.sh` (TDD RED→GREEN)
@@ -18,7 +18,7 @@ The implementation follows hexagonal architecture patterns consistently:
 
 - `scripts/audit-tool-call-grammar.sh`: bash strict mode (`set -uo pipefail`), exit codes Rule 26 compliant (0=OK, 1=violation, 2=operational, 3=baseline), `--self-check` implemented, `--skill-file` and `--skills-root` modes operational
 - `src/test/shell/audit_tool_call_grammar_test.sh`: 7 test cases covering T1–T7, all passing (verified via bash execution)
-- `.claude/rules/28-tool-call-grammar.md`: BNF marker grammar defined, Anexo B scope listed, exit codes declared, integration with Rules 13/24/25 documented
+- `.claude/rules/30-tool-call-grammar.md`: BNF marker grammar defined, Anexo B scope listed, exit codes declared, integration with Rules 13/24/25 documented
 
 ## Code Quality Assessment
 

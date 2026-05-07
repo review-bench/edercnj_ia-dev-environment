@@ -50,8 +50,11 @@ class FatJarContentTest {
     }
 
     @Test
-    void templates_whenCalled_domainTemplateExists() {
-        assertResourceExists("shared/templates/domain-template.md");
+    void templates_whenCalled_ruleTemplateExists() {
+        // domain-template.md was intentionally deleted by EPIC-0078 story-0078-0002
+        // (Rule 02 — Domain removed as part of context budget optimization).
+        // _TEMPLATE-RULE.md was added by EPIC-0078 story-0078-0016 as its replacement contract.
+        assertResourceExists("shared/templates/_TEMPLATE-RULE.md");
     }
 
     @Test

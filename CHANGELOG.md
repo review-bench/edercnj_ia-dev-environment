@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — EPIC-0078 story-0078-0016 (Hard-Fail Context Budget + ADR + Rule Template)
+
+- **`ADR-0033`** (`docs/adr/ADR-0033-rules-as-short-contracts.md`): codifies the "rules as short contracts" architectural decision — ≤ 120 lines per rule, ≤ 25,000 token always-loaded budget, 4-block mandatory structure (Purpose / Invariants / Enforcement / Reference).
+- **`_TEMPLATE-RULE.md`** (`src/main/resources/shared/templates/`): authoritative template for new rules with 4 canonical blocks and placeholder tokens.
+- **`Epic0078E2eSmokeTest`** (`dev.iadev.smoke`): epic-level acceptance test (5 scenarios) verifying ADR existence, rule template, 25 K limit in baseline, hard-fail default, and HARD-prune exclusion.
+
+### Changed — EPIC-0078 story-0078-0016 (Hard-Fail Context Budget + ADR + Rule Template)
+
+- **`audit-context-budget.sh`**: default mode flipped from advisory (`ADVISORY=true`) to hard-fail (`ADVISORY=false`). CI now exits 1 on `CONTEXT_BUDGET_VIOLATION` without explicit `--advisory` flag. `--advisory` flag still available for exempted invocations.
+- **`governance/baselines/context-budget.json`**: updated `alwaysLoaded` to 54 613 (post-EPIC-0078 stories 0001–0015 measurement), set `limit: 25000` as the enforced ceiling.
+- **`CapabilityAwareComposer`**: default constructor now uses `PruningMode.HARD` (was `ADVISORY`). Non-matching artifacts are excluded from the composition plan, not warned-and-included.
+- **`ContextBudgetAuditorTest`**: extended with 2 new scenarios — hard-fail exits 1 on exceeded limit, and no-flag defaults to hard-fail.
+- **`Epic0078Story0014SmokeIT`**: updated scenario3 to assert `HARD` is the default mode and that non-Java rules move to `excluded` (not `included + warning`) in HARD mode.
+
+### Added — EPIC-0078 story-0078-0015 (KP Orphan Detector)
+
+- **`audit-kp-references.sh`** (`src/main/resources/targets/claude/scripts/`): CI audit script that detects Knowledge Pack orphans — KPs not referenced by any skill. Exit codes: `0=OK`, `1=KP_ORPHAN`, `2=OPERATIONAL_ERROR`, `3=BASELINE_CORRUPT`, `4=SECURITY_KP_MISSING`. Supports `--self-check`, `--security-strict`, `--mode`, `--format`.
+- **`KpReferencesAuditorTest`** (`dev.iadev.audit`): Maven CI-blocking Java harness (7 scenarios) for the audit script.
+- **`governance/baselines/kp-references-baseline.txt`**: Baseline of 99 pre-existing orphan KPs grandfathered at EPIC-0078 merge. Immutable post-EPIC-0078.
+- **`docs/audit-gates-catalog.md`**: Added `audit-kp-references.sh` entry (Layer 2, 5 exit codes).
+
 ## [5.3.0] - 2026-05-06
 
 ### Highlights — EPIC-0077 (Product-First Lifecycle & Planning C4 Model)

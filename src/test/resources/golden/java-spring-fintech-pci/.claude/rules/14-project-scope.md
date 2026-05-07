@@ -1,3 +1,6 @@
+---
+requires-capabilities: []
+---
 # Rule 14 — Project Scope Guard
 
 ## Rule
@@ -98,4 +101,3 @@ Git worktrees enable parallel task / story / epic execution by creating addition
 - **Epic-base for parallel stories.** In `--parallel` mode, story worktrees MUST be created from `epic/XXXX`, never from `develop`. This keeps story PRs targetable at the epic branch (Rule 21, RULE-002 of EPIC-0049).
 - **Failure preservation.** A worktree MUST be preserved on failure for diagnosis. Removal happens only on success, or via explicit `x-manage-worktrees cleanup` by the user.
 - **One worktree per identifier.** Attempts to create a second worktree with the same identifier are no-ops that return the existing path.
-

@@ -215,6 +215,11 @@ See `references/full-protocol.md §Phase 7` for full implementation.
     Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode final --skill x-manage-pr-merge-train --phase Phase-7-Report --expected-artifacts plans/merge-train/{trainId}/report.md,plans/merge-train/{trainId}/state.json")
     TaskUpdate(id: phase7TaskId, status: "completed")
 
+## Knowledge Pack References
+
+Read src/main/resources/targets/claude/knowledge/lifecycle/zero-bypass.md
+Read src/main/resources/targets/claude/knowledge/lifecycle/ci-watch-integrity.md
+
 ## Full Protocol
 
 > Full 8-phase workflow (Phase 0 Preparation → Phase 7 Report + Cleanup), `state.json` complete

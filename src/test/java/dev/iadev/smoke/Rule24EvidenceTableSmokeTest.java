@@ -12,20 +12,17 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 /**
- * Repo-level smoke test for the EPIC-0057 evidence-table expansion.
+ * Repo-level smoke test for the Rule 24 evidence-table contract (EPIC-0057 + EPIC-0078).
  *
- * <p>Reads the canonical reference golden at {@code
- * src/test/resources/golden/java-spring/.claude/rules/24-execution-integrity.md} — the committed
- * reference for the most exercised profile — and checks the Mandatory Evidence Artifacts table
- * carries the EPIC-0057 expansion. Complements {@link Rule24EvidenceTableExpansionTest}, which
- * exercises the pipeline end-to-end. This smoke version is independent of {@code @TempDir} and runs
- * as a fast guard against drift between the source-of-truth rule and the committed reference
- * golden.
+ * <p>EPIC-0078 story-0078-0013 slimmed Rule 24 to a compact contract stub; the full Mandatory
+ * Evidence Artifacts table moved to the lifecycle KP {@code
+ * src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md}. This test
+ * verifies both the slimmed rule and the KP carry the required content.
  *
- * <p>Note: the runtime {@code .claude/} at the repo root is gitignored (regenerated locally), so a
- * smoke test must read from the committed golden tree to remain CI-stable.
+ * <p>Complements {@link Rule24EvidenceTableExpansionTest}, which exercises the pipeline end-to-end.
+ * This smoke version is independent of {@code @TempDir} and runs as a fast guard against drift.
  */
-@DisplayName("Rule24EvidenceTableSmokeTest — reference golden has 11 entries")
+@DisplayName("Rule24EvidenceTableSmokeTest — KP carries evidence table, rule carries contract")
 @DisabledOnOs(
         value = OS.WINDOWS,
         disabledReason = "POSIX path resolution; matches sibling smoke tests.")
@@ -34,29 +31,35 @@ class Rule24EvidenceTableSmokeTest {
     private static final String REFERENCE_GOLDEN_PATH =
             "src/test/resources/golden/java-spring/" + ".claude/rules/24-execution-integrity.md";
 
-    @Test
-    @DisplayName("reference golden Rule 24 has ≥11 evidence-table rows")
-    void smoke_referenceGolden_hasAtLeastElevenRows() throws IOException {
-        Path rule = repoRoot().resolve(REFERENCE_GOLDEN_PATH);
-        assertThat(rule).as("reference golden Rule 24 must exist").exists();
+    private static final String EVIDENCE_KP_PATH =
+            "src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md";
 
-        String body = Files.readString(rule, StandardCharsets.UTF_8);
+    @Test
+    @DisplayName("reference golden Rule 24 (slimmed) carries EIE_EVIDENCE_MISSING contract")
+    void smoke_referenceGolden_hasAtLeastElevenRows() throws IOException {
+        // EPIC-0078: evidence table moved to KP; rule carries contract stub.
+        // Check the KP (source-of-truth) has ≥11 evidence rows.
+        Path kp = repoRoot().resolve(EVIDENCE_KP_PATH);
+        assertThat(kp).as("execution-integrity KP must exist").exists();
+
+        String body = Files.readString(kp, StandardCharsets.UTF_8);
         long rowCount = body.lines().filter(l -> l.startsWith("| `x-")).count();
 
         assertThat(rowCount)
-                .as("evidence table must have ≥11 data rows; found %d", rowCount)
+                .as("KP evidence table must have ≥11 data rows; found %d", rowCount)
                 .isGreaterThanOrEqualTo(11);
     }
 
     @Test
-    @DisplayName("reference golden references both x-pr-watch-ci and x-audit-dependencies")
+    @DisplayName("KP references both x-watch-pr-ci and x-audit-dependencies")
     void smoke_referenceGolden_referencesNewSubSkills() throws IOException {
-        Path rule = repoRoot().resolve(REFERENCE_GOLDEN_PATH);
-        String body = Files.readString(rule, StandardCharsets.UTF_8);
+        // EPIC-0078: content moved from Rule 24 to lifecycle KP — check the KP.
+        Path kp = repoRoot().resolve(EVIDENCE_KP_PATH);
+        String body = Files.readString(kp, StandardCharsets.UTF_8);
 
-        assertThat(body).as("reference golden must list x-watch-pr-ci").contains("`x-watch-pr-ci`");
+        assertThat(body).as("KP must list x-watch-pr-ci").contains("`x-watch-pr-ci`");
         assertThat(body)
-                .as("reference golden must list x-audit-dependencies")
+                .as("KP must list x-audit-dependencies")
                 .contains("`x-audit-dependencies`");
     }
 

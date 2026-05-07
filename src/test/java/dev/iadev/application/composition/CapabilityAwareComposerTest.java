@@ -18,6 +18,8 @@ import org.junit.jupiter.api.io.TempDir;
 class CapabilityAwareComposerTest {
 
     private final CapabilityAwareComposer composer = new CapabilityAwareComposer();
+    private final CapabilityAwareComposer hardComposer =
+            new CapabilityAwareComposer(CapabilityAwareComposer.PruningMode.HARD);
 
     private static ResolvedCapabilitySet activeSet(List<String> capIds) {
         List<CapabilityId> ids = capIds.stream().map(CapabilityId::of).toList();
@@ -127,13 +129,27 @@ class CapabilityAwareComposerTest {
         }
 
         @Test
-        @DisplayName("artifact with non-matching capability is excluded")
-        void nonMatchingCapabilityExcluded(@TempDir Path root) throws IOException {
+        @DisplayName("artifact with non-matching capability is excluded in HARD mode")
+        void nonMatchingCapabilityExcludedHard(@TempDir Path root) throws IOException {
             writeArtifact(root, "postgres-skill.md", "data.database.postgres");
             ResolvedCapabilitySet active = activeSet(List.of("framework.spring-boot.mvc"));
-            CompositionPlan plan = composer.plan(active, root);
+            CompositionPlan plan = hardComposer.plan(active, root);
             assertThat(plan.excluded()).hasSize(1);
             assertThat(plan.excluded().get(0).excludeReason()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("artifact with non-matching capability emits warning in ADVISORY mode")
+        void nonMatchingCapabilityAdvisoryWarning(@TempDir Path root) throws IOException {
+            CapabilityAwareComposer advisory =
+                    new CapabilityAwareComposer(CapabilityAwareComposer.PruningMode.ADVISORY);
+            writeArtifact(root, "java-rule.md", "lang.java.*");
+            ResolvedCapabilitySet active = activeSet(List.of());
+            CompositionPlan plan = advisory.plan(active, root);
+            assertThat(plan.included()).hasSize(1);
+            assertThat(plan.excluded()).isEmpty();
+            assertThat(plan.warnings()).hasSize(1);
+            assertThat(plan.warnings().get(0)).contains("rule-pruning-advisory");
         }
 
         @Test
