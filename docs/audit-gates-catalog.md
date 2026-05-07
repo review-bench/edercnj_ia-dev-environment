@@ -420,6 +420,18 @@
 
 ---
 
+### audit-agent-frontmatter.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0079 (Native Agent–Skill Wiring) |
+| **Layer** | 2 — CI Script |
+| **Validates** | All agent files under `agents/core/`, `agents/conditional/`, `agents/developers/` carry canonical frontmatter: `name`, `description`, `tools`, `model`, `requires-capabilities`. Validates against `governance/schemas/agent-frontmatter-1.0.json`. Detects `MODEL_ADAPTIVE_FORBIDDEN` and `MISSING_FIELD` violations. |
+| **Introduced** | story-0079-0001 (EPIC-0079) |
+| **Exit Codes** | `0` = OK · `1` = `FRONTMATTER_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `SCHEMA_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

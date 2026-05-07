@@ -1,5 +1,8 @@
 ---
 name: database-engineer
+description: Use when reviewing database schema design, query optimization, migration strategies, ORM mapping correctness, or caching patterns
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: [data.database.*]
 ---
 # Global Behavior & Language Policy
