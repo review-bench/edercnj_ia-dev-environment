@@ -62,6 +62,36 @@ Agent(
 
 **Parallelism:** Emit all `Agent(...)` calls as SIBLING tool calls in the SAME assistant message.
 
+### Pattern 2b — SUBAGENT-NAMED (named agent dispatch)
+
+Use when a registered agent file exists for the role (`.claude/agents/core/<name>.md`). The Claude Code runtime loads the agent's `.md` body as system prompt automatically — the `prompt:` field must contain **task instructions only**, never persona text.
+
+**Required form:**
+
+```markdown
+Agent(
+  subagent_type: "<agent-name>",
+  description: "<short 3-7 word summary>",
+  prompt: "<task instructions — NO 'You are a ...' persona text>"
+)
+```
+
+**When to use Pattern 2b vs Pattern 2a:**
+
+| Situation | Pattern |
+| :--- | :--- |
+| Registered agent file exists (`.claude/agents/core/<name>.md`) | **2b — named** |
+| No agent file; role is ad-hoc or one-off | **2a — general-purpose** with inline persona |
+| Parallel wave mixing registered + ad-hoc roles | Mix both |
+
+**Telemetry:** `metadata.role` in `subagent-start`/`subagent-end` events receives the agent name (e.g., `"sre-engineer"`) — not a free-form string. Enables per-role latency analysis.
+
+**Forbidden in `prompt:` when using named dispatch:** inline persona text (`"You are a ..."`) — duplicating the persona creates drift when the agent file is updated.
+
+**ADR:** [ADR-0049 — Named Subagent Dispatch](../../../docs/adr/ADR-0049-named-subagent-dispatch.md) (EPIC-0079).
+
+**Requirement:** the parent's `allowed-tools` MUST include `Agent`.
+
 ### Pattern 3 — SUBAGENT-RESEARCH (no Skill call, pure exploration)
 
 Use when the orchestrator needs investigation that does NOT require invoking another skill.
@@ -128,7 +158,7 @@ Fail-open contract: invalid arguments → log to stderr and exit 0 (skills never
 
 ### Subagent Markers
 
-Planning skills that dispatch parallel subagents MUST emit `subagent.start` / `subagent.end` markers:
+Planning skills that dispatch parallel subagents MUST emit `subagent.start` / `subagent.end` markers. When Pattern 2b (named dispatch) is used, the role argument (`$3`) MUST be the registered agent name (e.g., `"sre-engineer"`) — not a free-form string. This enables per-role latency aggregation in `/x-analyze-telemetry` (EPIC-0079, ADR-0049).
 
 ```markdown
 <!-- TELEMETRY: subagent.start -->
