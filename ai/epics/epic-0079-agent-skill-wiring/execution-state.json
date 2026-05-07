@@ -1,0 +1,157 @@
+{
+  "epicId": "0079",
+  "slug": "agent-skill-wiring",
+  "flowVersion": "4",
+  "status": "refinement-approved",
+  "refinementVerdict": {
+    "status": "approved",
+    "verdictHash": "c41e5e390ae3c5d72d1bc6ac1da80757ea2b402776180ccf85f8bd9d80027ed5",
+    "refinedAt": "2026-05-07T17:15:51Z",
+    "blockers": []
+  },
+  "taskTracking": {
+    "enabled": true
+  },
+  "interactiveMode": "non-interactive",
+  "status": "in-progress",
+  "productFirstLifecycle": false,
+  "refinementNotes": {
+    "dispatchMechanism": "Verified: Agent(subagent_type: '<agent-name>') loads .claude/agents/<name>.md as system prompt. Dispatch key = filename stem (e.g. 'architect' for architect.md). No PoC required — native Claude Code behavior confirmed by operator.",
+    "javaCompatibility": "No Java changes required. Adding tools/model fields to agent .md frontmatter does not require PlanAgentsAssembler updates — generator passes frontmatter through verbatim.",
+    "adrNumber": "To be assigned in story-0079-0007 (next available ADR number — do not pre-pin).",
+    "orphanSecurityDecision": "Deleting appsec-engineer or devsecops-engineer is safe: x-review-security provides compensating coverage for security review domain in the planning pipeline.",
+    "smokeStrategy": "Manual verification: post-migration spot-check that SKILL.md files reference subagent_type with named agent (not general-purpose). Executed during story implementation review."
+  },
+  "stories": {
+    "story-0079-0001": {
+      "status": "complete",
+      "prNumber": 1075,
+      "prMergeStatus": "MERGED",
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "9b91841da8e8de34ed1cf3253aa7bfc2a123f79e0924a66ff28428c032575753",
+        "refinedAt": "2026-05-07T17:19:54Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "passed",
+          "risks": "gap"
+        }
+      }
+    },
+    "story-0079-0002": {
+      "status": "complete",
+      "prNumber": 1076,
+      "prMergeStatus": "MERGED",
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "59692ab1d33ea1fd28a0588e66f6ff85803fa59a4c3c2a83db6b2fdcdbda4b9a",
+        "refinedAt": "2026-05-07T17:21:11Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "gap",
+          "risks": "gap"
+        }
+      }
+    },
+    "story-0079-0003": {
+      "status": "complete",
+      "prNumber": 1077,
+      "prMergeStatus": "MERGED",
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "d104700b0d78e1977a7530f9db5478bc88c83ae0e0e074847e29e96d7a467c59",
+        "refinedAt": "2026-05-07T17:21:30Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "gap",
+          "risks": "gap"
+        }
+      }
+    },
+    "story-0079-0004": {
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "09a6bed49065ff73cada89af32169c99810b6e1ed483b2a5c92535208bec383c",
+        "refinedAt": "2026-05-07T17:20:54Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "gap",
+          "risks": "passed"
+        }
+      }
+    },
+    "story-0079-0005": {
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "ebc42f545920b00e1d11002eef259acd466b8dae9e7d4a0aa033b9ea052aa286",
+        "refinedAt": "2026-05-07T17:21:10Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "passed",
+          "risks": "passed"
+        }
+      }
+    },
+    "story-0079-0006": {
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "38f1a0eb435edaa1d28e5d597f42f8b43de949f06c5b792b22d84df6c0ee14c1",
+        "refinedAt": "2026-05-07T17:22:34Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "passed",
+          "risks": "passed"
+        }
+      }
+    },
+    "story-0079-0007": {
+      "refinementVerdict": {
+        "status": "approved",
+        "verdictHash": "c150cc4c456e5e2fa021c5895bb0d5763a964f27a58fbd3eb751c8ff94d5f4a8",
+        "refinedAt": "2026-05-07T17:22:23Z",
+        "blockers": [],
+        "dimensions": {
+          "value": "passed",
+          "persona": "passed",
+          "ac": "passed",
+          "contracts": "passed",
+          "metrics": "passed",
+          "alternatives": "passed",
+          "risks": "passed"
+        }
+      }
+    }
+  },
+  "createdAt": "2026-05-07T00:00:00Z",
+  "updatedAt": "2026-05-07T18:12:00Z"
+}
