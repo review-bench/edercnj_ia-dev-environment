@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ia-dev-env.example/schemas/agent-frontmatter-1.0.json",
+  "title": "Agent Frontmatter Schema v1.0 (EPIC-0079)",
+  "description": "Schema de frontmatter canônico para agentes Claude Code. Valida os 5 campos obrigatórios para named subagent dispatch (Rule 23, EPIC-0079).",
+  "type": "object",
+  "required": ["name", "description", "tools", "model", "requires-capabilities"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Identificador kebab-case único no agent registry. Usado como dispatch key em Agent(subagent_type: '<name>')."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 255,
+      "description": "Descrição imperativa do agente. Deve conter contexto proativo de quando usar o agente."
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Whitelist de tools Claude Code permitidas para o agente."
+    },
+    "model": {
+      "type": "string",
+      "enum": ["Opus", "Sonnet", "Haiku"],
+      "description": "Tier do modelo por Rule 23. Adaptive é proibido (MODEL_ADAPTIVE_FORBIDDEN)."
+    },
+    "requires-capabilities": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs de capabilities requeridas (EPIC-0064 / Rule 28). [] = sempre ativo."
+        },
+        {
+          "type": "string",
+          "description": "Capability única requerida (shorthand)."
+        }
+      ]
+    },
+    "requires-any": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "OR predicate: pelo menos uma das capabilities listadas deve estar ativa."
+    }
+  }
+}

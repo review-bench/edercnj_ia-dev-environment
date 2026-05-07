@@ -1,5 +1,8 @@
 ---
 name: observability-engineer
+description: Use when reviewing distributed tracing, metrics design, structured logging, health check patterns, or SLO definitions
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy
