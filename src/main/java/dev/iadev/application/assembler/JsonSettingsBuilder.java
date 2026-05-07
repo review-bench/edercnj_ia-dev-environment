@@ -17,10 +17,10 @@ public final class JsonSettingsBuilder {
     /**
      * Default Claude Code skill-listing budget fraction (5% of context).
      *
-     * <p>The Claude Code default is 1%, which truncates the skill catalog when a project ships
-     * more than ~30 skills. ia-dev-env-generated projects routinely ship ≥ 100 skills, so we pin
-     * to 5% (~10k tokens) to keep the full catalog visible to the LLM. Adjust here if the catalog
-     * grows beyond what 5% can fit.
+     * <p>The Claude Code default is 1%, which truncates the skill catalog when a project ships more
+     * than ~30 skills. ia-dev-env-generated projects routinely ship ≥ 100 skills, so we pin to 5%
+     * (~10k tokens) to keep the full catalog visible to the LLM. Adjust here if the catalog grows
+     * beyond what 5% can fit.
      */
     private static final double SKILL_LISTING_BUDGET_FRACTION = 0.05;
 

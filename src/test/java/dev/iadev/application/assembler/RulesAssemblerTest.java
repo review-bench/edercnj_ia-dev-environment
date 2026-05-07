@@ -88,8 +88,7 @@ class RulesAssemblerTest {
 
             String content =
                     Files.readString(
-                            outputDir.resolve("rules/00-essentials.md"),
-                            StandardCharsets.UTF_8);
+                            outputDir.resolve("rules/00-essentials.md"), StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("my-api")
@@ -112,8 +111,7 @@ class RulesAssemblerTest {
 
             String content =
                     Files.readString(
-                            outputDir.resolve("rules/00-essentials.md"),
-                            StandardCharsets.UTF_8);
+                            outputDir.resolve("rules/00-essentials.md"), StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("§2. Hard Limits")
@@ -137,8 +135,7 @@ class RulesAssemblerTest {
 
             String content =
                     Files.readString(
-                            outputDir.resolve("rules/00-essentials.md"),
-                            StandardCharsets.UTF_8);
+                            outputDir.resolve("rules/00-essentials.md"), StandardCharsets.UTF_8);
 
             assertThat(content)
                     .contains("§5. Lifecycle Integrity Contract")
@@ -160,12 +157,9 @@ class RulesAssemblerTest {
 
             String content =
                     Files.readString(
-                            outputDir.resolve("rules/00-essentials.md"),
-                            StandardCharsets.UTF_8);
+                            outputDir.resolve("rules/00-essentials.md"), StandardCharsets.UTF_8);
 
-            assertThat(content)
-                    .contains("§7. Knowledge Pack Index")
-                    .contains("governance/rules/");
+            assertThat(content).contains("§7. Knowledge Pack Index").contains("governance/rules/");
         }
     }
 
@@ -181,8 +175,7 @@ class RulesAssemblerTest {
             Files.createDirectories(outputDir);
 
             RulesAssembler assembler = new RulesAssembler(resourceDir);
-            ProjectConfig config =
-                    TestConfigBuilder.builder().database("postgresql", "17").build();
+            ProjectConfig config = TestConfigBuilder.builder().database("postgresql", "17").build();
 
             assembler.assemble(config, new TemplateEngine(), outputDir);
 

@@ -65,8 +65,10 @@ class Epic0063LocalFirstSmokeTest {
 
     // ── Rule files ────────────────────────────────────────────────────────────
 
+    // EPIC-0078: Rule 30 (tool-call-grammar) consolidated into governance KP.
     private static final Path RULE_28_TOOL_CALL_GRAMMAR =
-            Path.of("src/main/resources/targets/claude/rules/30-tool-call-grammar.md");
+            Path.of(
+                    "src/main/resources/targets/claude/knowledge/governance/rules/tool-call-grammar.md");
 
     // ── Documentation paths ───────────────────────────────────────────────────
 

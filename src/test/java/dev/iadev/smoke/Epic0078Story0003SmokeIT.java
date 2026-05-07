@@ -11,14 +11,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Smoke test — validates structural invariants for EPIC-0078 story-0078-0003
- * (Renumber 28-tool-call-grammar.md → 30-tool-call-grammar.md) and the subsequent
- * Rules Consolidation (chore/rules-consolidation-essentials) that migrated all
- * numbered rules into a single 00-essentials.md.
+ * Smoke test — validates structural invariants for EPIC-0078 story-0078-0003 (Renumber
+ * 28-tool-call-grammar.md → 30-tool-call-grammar.md) and the subsequent Rules Consolidation
+ * (chore/rules-consolidation-essentials) that migrated all numbered rules into a single
+ * 00-essentials.md.
  *
- * <p>The 30-tool-call-grammar.md is now a KP under knowledge/governance/rules/ rather
- * than a numbered rule in rules/. The key invariant: no orphan "28-tool-call-grammar"
- * references exist in source.
+ * <p>The 30-tool-call-grammar.md is now a KP under knowledge/governance/rules/ rather than a
+ * numbered rule in rules/. The key invariant: no orphan "28-tool-call-grammar" references exist in
+ * source.
  */
 @DisplayName("Epic0078Story0003SmokeIT — tool-call-grammar consolidation")
 class Epic0078Story0003SmokeIT extends SmokeTestBase {
@@ -33,8 +33,9 @@ class Epic0078Story0003SmokeIT extends SmokeTestBase {
     void scenario1_oldRuleFiles_absent_from_source() {
         // All numbered rule files migrated to KPs in rules-consolidation-essentials.
         assertThat(RULES_SOURCE.resolve("30-tool-call-grammar.md"))
-                .as("30-tool-call-grammar.md must NOT exist in source-of-truth rules dir"
-                        + " (migrated to KP)")
+                .as(
+                        "30-tool-call-grammar.md must NOT exist in source-of-truth rules dir"
+                                + " (migrated to KP)")
                 .doesNotExist();
         assertThat(RULES_SOURCE.resolve("28-tool-call-grammar.md"))
                 .as("28-tool-call-grammar.md must NOT exist (renamed to 30, then migrated to KP)")
@@ -108,8 +109,10 @@ class Epic0078Story0003SmokeIT extends SmokeTestBase {
                     .as("00-essentials.md must exist for profile: " + profile)
                     .exists();
             assertThat(rulesDir.resolve("30-tool-call-grammar.md"))
-                    .as("30-tool-call-grammar.md must NOT exist for profile: " + profile
-                            + " (now a KP)")
+                    .as(
+                            "30-tool-call-grammar.md must NOT exist for profile: "
+                                    + profile
+                                    + " (now a KP)")
                     .doesNotExist();
             assertThat(rulesDir.resolve("28-tool-call-grammar.md"))
                     .as("28-tool-call-grammar.md must NOT exist for profile: " + profile)

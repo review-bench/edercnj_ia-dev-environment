@@ -12,13 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Smoke test — validates structural invariants for EPIC-0078 story-0078-0004
- * (Extract concluded epics history from CLAUDE.md).
+ * Smoke test — validates structural invariants for EPIC-0078 story-0078-0004 (Extract concluded
+ * epics history from CLAUDE.md).
  *
- * <p>Verifies that: (a) CLAUDE.md ≤200 lines; (b) docs/epics-history.md exists
- * with ≥10 "Concluded" blocks; (c) CLAUDE.md contains a link to epics-history.md;
- * (d) CLAUDE.md contains no "Concluded — " blockquote lines; (e) extracted content
- * represents a reduction of ≥3000 token-equivalents (bytes/4 heuristic).
+ * <p>Verifies that: (a) CLAUDE.md ≤200 lines; (b) docs/epics-history.md exists with ≥10 "Concluded"
+ * blocks; (c) CLAUDE.md contains a link to epics-history.md; (d) CLAUDE.md contains no "Concluded —
+ * " blockquote lines; (e) extracted content represents a reduction of ≥3000 token-equivalents
+ * (bytes/4 heuristic).
  */
 @DisplayName("Epic0078Story0004SmokeIT — Extract concluded epics to docs/epics-history.md")
 class Epic0078Story0004SmokeIT {
@@ -45,13 +45,10 @@ class Epic0078Story0004SmokeIT {
     @Test
     @DisplayName("scenario2_epicsHistory_existsWithMinConcludedBlocks")
     void scenario2_epicsHistory_existsWithMinConcludedBlocks() throws IOException {
-        assertThat(EPICS_HISTORY)
-                .as("docs/epics-history.md must exist")
-                .exists();
+        assertThat(EPICS_HISTORY).as("docs/epics-history.md must exist").exists();
 
         List<String> lines = Files.readAllLines(EPICS_HISTORY, StandardCharsets.UTF_8);
-        long blockCount =
-                lines.stream().filter(l -> CONCLUDED_HEADER.matcher(l).find()).count();
+        long blockCount = lines.stream().filter(l -> CONCLUDED_HEADER.matcher(l).find()).count();
 
         assertThat(blockCount)
                 .as(

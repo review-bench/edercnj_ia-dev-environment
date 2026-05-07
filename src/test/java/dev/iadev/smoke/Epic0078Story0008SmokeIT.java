@@ -15,13 +15,30 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Epic0078Story0008SmokeIT — Slim Rule 28 capability-composition KP")
 class Epic0078Story0008SmokeIT {
 
-    private static final Path KP_FILE = Path.of(
-            "src", "main", "resources", "targets", "claude",
-            "knowledge", "governance", "capability-composition.md");
+    private static final Path KP_FILE =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "capability-composition.md");
 
-    private static final Path RULE_28 = Path.of(
-            "src", "main", "resources", "targets", "claude",
-            "rules", "28-capability-frontmatter-contract.md");
+    // EPIC-0078 rules-consolidation-essentials: Rule 28 merged into 00-essentials.md +
+    // knowledge/governance/rules/capability-frontmatter.md KP.
+    private static final Path RULE_28 =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "rules",
+                    "capability-frontmatter.md");
 
     @Test
     @DisplayName("scenario1_kpFileExists")
@@ -33,19 +50,24 @@ class Epic0078Story0008SmokeIT {
     @DisplayName("scenario2_kpContainsRequiredSections")
     void scenario2_kpContainsRequiredSections() throws IOException {
         String content = Files.readString(KP_FILE, StandardCharsets.UTF_8);
-        assertThat(content).as("KP must contain Capability ID Format section")
+        assertThat(content)
+                .as("KP must contain Capability ID Format section")
                 .contains("## Capability ID Format");
-        assertThat(content).as("KP must contain Glob Rules section")
-                .contains("## Glob Rules");
-        assertThat(content).as("KP must contain YAML Example (a) section")
+        assertThat(content).as("KP must contain Glob Rules section").contains("## Glob Rules");
+        assertThat(content)
+                .as("KP must contain YAML Example (a) section")
                 .contains("## YAML Example (a)");
-        assertThat(content).as("KP must contain YAML Example (b) section")
+        assertThat(content)
+                .as("KP must contain YAML Example (b) section")
                 .contains("## YAML Example (b)");
-        assertThat(content).as("KP must contain YAML Example (c) section")
+        assertThat(content)
+                .as("KP must contain YAML Example (c) section")
                 .contains("## YAML Example (c)");
-        assertThat(content).as("KP must contain YAML Example (d) section")
+        assertThat(content)
+                .as("KP must contain YAML Example (d) section")
                 .contains("## YAML Example (d)");
-        assertThat(content).as("KP must contain Migration Notes section")
+        assertThat(content)
+                .as("KP must contain Migration Notes section")
                 .contains("## Migration Notes");
     }
 
@@ -63,10 +85,11 @@ class Epic0078Story0008SmokeIT {
     @DisplayName("scenario4_rule28ContainsInvariantsAndAuditTable")
     void scenario4_rule28ContainsInvariantsAndAuditTable() throws IOException {
         String content = Files.readString(RULE_28, StandardCharsets.UTF_8);
-        assertThat(content).as("Rule 28 must contain Invariants section").contains("## Invariante");
+        assertThat(content).as("Rule 28 must contain Invariants section").contains("## Invariants");
         assertThat(content).as("Rule 28 must contain Audit section").contains("## Audit");
         assertThat(content).as("Rule 28 must contain Forbidden section").contains("## Forbidden");
-        assertThat(content).as("Rule 28 must reference 6 audit scripts")
+        assertThat(content)
+                .as("Rule 28 must reference 6 audit scripts")
                 .contains("audit-capability-coverage.sh")
                 .contains("audit-frontmatter-schema.sh")
                 .contains("audit-capability-graph.sh")
@@ -80,6 +103,8 @@ class Epic0078Story0008SmokeIT {
     void scenario5_kpHasFrontmatterWithRequiresCapabilities() throws IOException {
         String content = Files.readString(KP_FILE, StandardCharsets.UTF_8);
         assertThat(content).as("KP must start with frontmatter delimiter").startsWith("---");
-        assertThat(content).as("KP must have requires-capabilities").contains("requires-capabilities");
+        assertThat(content)
+                .as("KP must have requires-capabilities")
+                .contains("requires-capabilities");
     }
 }

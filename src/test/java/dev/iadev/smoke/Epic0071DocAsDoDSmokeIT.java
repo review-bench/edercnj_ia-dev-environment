@@ -147,7 +147,22 @@ class Epic0071DocAsDoDSmokeIT {
     @Test
     @DisplayName("scenario7_rule31Governance_filesPresent")
     void scenario7_rule31Governance_filesPresent() throws IOException {
-        String rule31 = read(RULES_ROOT, "31-documentation-freshness-gate.md");
+        // EPIC-0078: Rule 31 content migrated to governance KP doc-freshness-gate.md.
+        Path docFreshnessKp =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "knowledge",
+                        "governance",
+                        "rules",
+                        "doc-freshness-gate.md");
+        assertThat(docFreshnessKp.toAbsolutePath())
+                .as("31-documentation-freshness-gate.md must exist at KP destination")
+                .exists();
+        String rule31 = Files.readString(docFreshnessKp.toAbsolutePath(), java.nio.charset.StandardCharsets.UTF_8);
         assertThat(rule31)
                 .as("Rule 31 MUST reference audit-doc-freshness.sh")
                 .contains("audit-doc-freshness.sh");

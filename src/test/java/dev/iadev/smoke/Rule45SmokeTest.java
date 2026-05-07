@@ -27,8 +27,10 @@ import org.junit.jupiter.api.condition.OS;
         disabledReason = "POSIX path resolution; mirrors sibling smoke tests.")
 class Rule45SmokeTest {
 
+    // EPIC-0078 rules-consolidation: Rule 45 migrated from .claude/rules/ to lifecycle KP.
     private static final String REFERENCE_GOLDEN_PATH =
-            "src/test/resources/golden/java-spring/" + ".claude/rules/45-ci-watch-integrity.md";
+            "src/test/resources/golden/java-spring/"
+                    + ".claude/knowledge/lifecycle/ci-watch-integrity.md";
 
     @Test
     @DisplayName("reference golden Rule 45 references SUCCESS and CI_FAILED")

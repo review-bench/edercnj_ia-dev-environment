@@ -22,10 +22,10 @@ import java.util.Objects;
  * <p>Pruning modes:
  *
  * <ul>
- *   <li>{@link PruningMode#ADVISORY} — artifacts with unmatched capabilities are kept in
- *       {@code included} but a {@code WARN [rule-pruning-advisory]} warning is emitted.
- *   <li>{@link PruningMode#HARD} — artifacts with unmatched capabilities are moved to
- *       {@code excluded} (default pre-advisory-mode behavior).
+ *   <li>{@link PruningMode#ADVISORY} — artifacts with unmatched capabilities are kept in {@code
+ *       included} but a {@code WARN [rule-pruning-advisory]} warning is emitted.
+ *   <li>{@link PruningMode#HARD} — artifacts with unmatched capabilities are moved to {@code
+ *       excluded} (default pre-advisory-mode behavior).
  * </ul>
  */
 public final class CapabilityAwareComposer {

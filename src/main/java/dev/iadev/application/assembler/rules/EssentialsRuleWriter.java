@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Writes the consolidated {@code 00-essentials.md} rule file from the
- * {@code _TEMPLATE-ESSENTIALS-RULE.md} template.
+ * Writes the consolidated {@code 00-essentials.md} rule file from the {@code
+ * _TEMPLATE-ESSENTIALS-RULE.md} template.
  *
  * <p>The essentials file is the single always-loaded rule file produced by {@code ia-dev-env
  * generate}. It consolidates the minimal normative contract (project identity, hard limits,
@@ -33,8 +33,7 @@ import java.util.stream.Collectors;
  */
 public final class EssentialsRuleWriter {
 
-    private static final String TEMPLATE_PATH =
-            "shared/templates/_TEMPLATE-ESSENTIALS-RULE.md";
+    private static final String TEMPLATE_PATH = "shared/templates/_TEMPLATE-ESSENTIALS-RULE.md";
     private static final String IDENTITY_MARKER = "{PROJECT_IDENTITY_SECTION}";
     private static final String OUTPUT_FILENAME = "00-essentials.md";
 
@@ -88,8 +87,7 @@ public final class EssentialsRuleWriter {
     private String readTemplate() {
         Path templatePath = resourcesDir.resolve(TEMPLATE_PATH);
         if (!Files.exists(templatePath)) {
-            throw new IllegalStateException(
-                    "Essentials rule template not found: " + templatePath);
+            throw new IllegalStateException("Essentials rule template not found: " + templatePath);
         }
         try {
             return Files.readString(templatePath, StandardCharsets.UTF_8);
@@ -100,9 +98,7 @@ public final class EssentialsRuleWriter {
 
     private static String buildIdentitySection(ProjectConfig config) {
         String ifaces =
-                config.interfaces().stream()
-                        .map(i -> i.type())
-                        .collect(Collectors.joining(", "));
+                config.interfaces().stream().map(i -> i.type()).collect(Collectors.joining(", "));
         if (ifaces.isEmpty()) {
             ifaces = "none";
         }
@@ -119,10 +115,7 @@ public final class EssentialsRuleWriter {
                 .append(" ")
                 .append(config.language().version())
                 .append("\n");
-        sb.append("- **Framework:** ")
-                .append(config.framework().name())
-                .append(fwVer)
-                .append("\n");
+        sb.append("- **Framework:** ").append(config.framework().name()).append(fwVer).append("\n");
         sb.append("- **Interfaces:** ").append(ifaces).append("\n");
         sb.append("\n");
         sb.append("### Technology Stack\n\n");
@@ -134,17 +127,12 @@ public final class EssentialsRuleWriter {
                 .append(" ")
                 .append(config.language().version())
                 .append(" |\n");
-        sb.append("| Framework | ")
-                .append(config.framework().name())
-                .append(fwVer)
-                .append(" |\n");
+        sb.append("| Framework | ").append(config.framework().name()).append(fwVer).append(" |\n");
         sb.append("| Build Tool | ").append(config.framework().buildTool()).append(" |\n");
         sb.append("| Database | ").append(config.databaseName()).append(" |\n");
         sb.append("| Migration | ").append(config.migrationName()).append(" |\n");
         sb.append("| Cache | ").append(config.cacheName()).append(" |\n");
-        sb.append("| Container | ")
-                .append(config.infrastructure().container())
-                .append(" |\n");
+        sb.append("| Container | ").append(config.infrastructure().container()).append(" |\n");
         sb.append("| Orchestrator | ")
                 .append(config.infrastructure().orchestrator())
                 .append(" |\n");
@@ -153,8 +141,9 @@ public final class EssentialsRuleWriter {
         sb.append("### Constraints\n\n");
         sb.append("- Cloud-Agnostic: ZERO dependencies on cloud-specific services\n");
         sb.append("- Horizontal scalability: Application must be stateless\n");
-        sb.append("- Externalized configuration: All configuration via environment variables"
-                + " or ConfigMaps\n");
+        sb.append(
+                "- Externalized configuration: All configuration via environment variables"
+                        + " or ConfigMaps\n");
 
         return sb.toString();
     }

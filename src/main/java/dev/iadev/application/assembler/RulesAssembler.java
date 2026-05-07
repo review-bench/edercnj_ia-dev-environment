@@ -14,10 +14,9 @@ import java.util.Map;
  * Assembles {@code .claude/rules/} and {@code .claude/skills/} from source knowledge packs and
  * templates.
  *
- * <p>This is the first assembler in the pipeline. As of EPIC-0078 Rules Consolidation, it
- * delegates to {@link EssentialsRuleWriter} to write the single {@code 00-essentials.md}
- * rule file, and to {@link CoreRulesWriter} for KP routing, conditional rules, and language/
- * framework KPs.
+ * <p>This is the first assembler in the pipeline. As of EPIC-0078 Rules Consolidation, it delegates
+ * to {@link EssentialsRuleWriter} to write the single {@code 00-essentials.md} rule file, and to
+ * {@link CoreRulesWriter} for KP routing, conditional rules, and language/ framework KPs.
  *
  * <p>Assembly layers:
  *

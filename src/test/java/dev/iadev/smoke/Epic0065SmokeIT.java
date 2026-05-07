@@ -172,20 +172,22 @@ class Epic0065SmokeIT extends SmokeTestBase {
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
-    @DisplayName("smoke_rule09DocsType — Rule 09 contains docs/ branch type (story-0065-0001)")
+    @DisplayName("smoke_rule09DocsType — branching KP contains docs/ branch type (story-0065-0001)")
     void smoke_rule09DocsType(String profile) throws IOException {
         runPipeline(profile);
-        Path rulesDir = getOutputDir(profile).resolve(".claude/rules");
-        Path rule09 = rulesDir.resolve("09-branching-model.md");
+        // EPIC-0078 rules-consolidation-essentials: Rule 09 merged into 00-essentials.md +
+        // knowledge/governance/rules/branching.md KP. Check the KP in generated output.
+        Path kpDir = getOutputDir(profile).resolve(".claude/knowledge/governance/rules");
+        Path branchingKp = kpDir.resolve("branching.md");
 
-        assertThat(Files.isRegularFile(rule09))
-                .as("profile %s: 09-branching-model.md must exist", profile)
+        assertThat(Files.isRegularFile(branchingKp))
+                .as("profile %s: knowledge/governance/rules/branching.md must exist", profile)
                 .isTrue();
 
-        String content = Files.readString(rule09, StandardCharsets.UTF_8);
+        String content = Files.readString(branchingKp, StandardCharsets.UTF_8);
         assertThat(content)
                 .as(
-                        "profile %s: Rule 09 must document docs/ branch type (story-0065-0001)",
+                        "profile %s: branching KP must document docs/ branch type (story-0065-0001)",
                         profile)
                 .contains("`docs/*`");
     }
@@ -193,51 +195,63 @@ class Epic0065SmokeIT extends SmokeTestBase {
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
-            "smoke_rule19HardCut — Rule 19 contains Hard-cut autorizado clause (story-0065-0001)")
+            "smoke_rule19HardCut — lifecycle-contract KP contains Hard-cut clause (story-0065-0001)")
     void smoke_rule19HardCut(String profile) throws IOException {
         runPipeline(profile);
-        Path rulesDir = getOutputDir(profile).resolve(".claude/rules");
-        Path rule19 = rulesDir.resolve("19-backward-compatibility.md");
+        // EPIC-0078 rules-consolidation-essentials: Rule 19 rewritten as lifecycle-contract KP.
+        // Check the KP in generated output.
+        Path kpDir = getOutputDir(profile).resolve(".claude/knowledge/governance/rules");
+        Path lifecycleKp = kpDir.resolve("lifecycle-contract.md");
 
-        assertThat(Files.isRegularFile(rule19))
-                .as("profile %s: 19-backward-compatibility.md must exist", profile)
+        assertThat(Files.isRegularFile(lifecycleKp))
+                .as(
+                        "profile %s: knowledge/governance/rules/lifecycle-contract.md must exist",
+                        profile)
                 .isTrue();
 
-        String content = Files.readString(rule19, StandardCharsets.UTF_8);
-        // EPIC-0078 story-0078-0011 slimmed Rule 19: "Hard-cut autorizado" section + x-epic-decompose
-        // table moved to lifecycle KP backward-compatibility.md. Compact rule retains the concept.
+        String content = Files.readString(lifecycleKp, StandardCharsets.UTF_8);
+        // EPIC-0078 story-0078-0011: "Hard-cut autorizado" section + x-epic-decompose
+        // table consolidated into lifecycle KP.
         assertThat(content)
                 .as(
-                        "profile %s: Rule 19 must document Hard-cut (immediate removal — story-0065-0001)",
+                        "profile %s: lifecycle KP must document Hard-cut (immediate removal — story-0065-0001)",
                         profile)
                 .contains("Hard-cut");
         assertThat(content)
-                .as("profile %s: Rule 19 hard-cut must document visibility changes case", profile)
+                .as(
+                        "profile %s: lifecycle KP hard-cut must document visibility changes case",
+                        profile)
                 .contains("visibility changes");
     }
 
     @ParameterizedTest(name = "[{0}]")
     @MethodSource("dev.iadev.smoke.SmokeProfiles#profiles")
     @DisplayName(
-            "smoke_rule22InternalSkills — Rule 22 documents 3 EPIC-0065 internals (story-0065-0001)")
+            "smoke_rule22InternalSkills — skill-visibility KP documents 3 EPIC-0065 internals (story-0065-0001)")
     void smoke_rule22InternalSkills(String profile) throws IOException {
         runPipeline(profile);
-        Path rulesDir = getOutputDir(profile).resolve(".claude/rules");
-        Path rule22 = rulesDir.resolve("22-skill-visibility.md");
+        // EPIC-0078 rules-consolidation-essentials: Rule 22 merged into 00-essentials.md +
+        // knowledge/governance/rules/skill-visibility.md KP. Check the KP in generated output.
+        Path kpDir = getOutputDir(profile).resolve(".claude/knowledge/governance/rules");
+        Path skillVisibilityKp = kpDir.resolve("skill-visibility.md");
 
-        assertThat(Files.isRegularFile(rule22))
-                .as("profile %s: 22-skill-visibility.md must exist", profile)
+        assertThat(Files.isRegularFile(skillVisibilityKp))
+                .as(
+                        "profile %s: knowledge/governance/rules/skill-visibility.md must exist",
+                        profile)
                 .isTrue();
 
-        String content = Files.readString(rule22, StandardCharsets.UTF_8);
+        String content = Files.readString(skillVisibilityKp, StandardCharsets.UTF_8);
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-create-epic", profile)
+                .as("profile %s: skill-visibility KP must document x-internal-create-epic", profile)
                 .contains("x-internal-create-epic");
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-map-epic", profile)
+                .as("profile %s: skill-visibility KP must document x-internal-map-epic", profile)
                 .contains("x-internal-map-epic");
         assertThat(content)
-                .as("profile %s: Rule 22 must document x-internal-create-story", profile)
+                .as(
+                        "profile %s: skill-visibility KP must document x-internal-create-story",
+                        profile)
                 .contains("x-internal-create-story");
     }
 
