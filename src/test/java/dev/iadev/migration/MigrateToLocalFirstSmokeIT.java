@@ -83,9 +83,10 @@ class MigrateToLocalFirstSmokeIT {
     @Test
     @DisplayName("Rule 19 fallback matrix contains flowVersion 3 entry")
     void rule19_containsFlowVersion3() throws IOException {
+        // EPIC-0078: Rule 19 consolidated into lifecycle-contract.md KP.
         Path rule19 =
                 REPO_ROOT.resolve(
-                        "src/main/resources/targets/claude/rules/19-backward-compatibility.md");
+                        "src/main/resources/targets/claude/knowledge/governance/rules/lifecycle-contract.md");
 
         String content = Files.readString(rule19);
 

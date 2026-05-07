@@ -20,8 +20,10 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Epic0058Rule26SmokeTest — Rule 26 Audit Gate Lifecycle")
 class Epic0058Rule26SmokeTest {
 
+    // EPIC-0078 rules-consolidation-essentials: Rule 26 moved from .claude/rules/ to
+    // governance KP at knowledge/governance/rules/audit-gate-lifecycle.md.
     private static final String RULE_26_CLASSPATH =
-            "targets/claude/rules/26-audit-gate-lifecycle.md";
+            "targets/claude/knowledge/governance/rules/audit-gate-lifecycle.md";
 
     // EPIC-0078 story-0078-0011 slimmed Rule 26: Purpose/Audit/Related sections moved to
     // governance KP; Naming & Exit Codes split into separate headings; --self-check Flag
@@ -108,8 +110,9 @@ class Epic0058Rule26SmokeTest {
     @DisplayName("Rule 26 H1 title matches canonical form")
     void rule26_h1TitleMatchesCanonicalForm() throws IOException {
         String body = loadRule26();
+        // EPIC-0078: Rule 26 content migrated to KP; H1 is the KP title.
         assertThat(body)
-                .as("Rule 26 must start with canonical H1 title")
-                .contains("# Rule 26 — Audit Gate Lifecycle");
+                .as("Rule 26 KP must contain canonical title")
+                .contains("Audit Gate Lifecycle");
     }
 }

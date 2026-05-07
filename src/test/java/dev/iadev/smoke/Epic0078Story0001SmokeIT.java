@@ -12,8 +12,8 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 /**
- * Smoke test — validates structural invariants for EPIC-0078 story-0078-0001
- * (Context Budget Baseline Tooling).
+ * Smoke test — validates structural invariants for EPIC-0078 story-0078-0001 (Context Budget
+ * Baseline Tooling).
  *
  * <p>Verifies that: scripts are present, baseline JSON schema is valid, and
  * ScriptsAssembler.AUDIT_SCRIPTS includes both new scripts.
@@ -65,11 +65,14 @@ class Epic0078Story0001SmokeIT {
         Path script = SCRIPTS_ROOT.resolve("audit-context-budget.sh");
         String content = Files.readString(script, StandardCharsets.UTF_8);
         assertThat(content).as("must document exit code 0=OK").contains("0=OK");
-        assertThat(content).as("must document exit code 1=CONTEXT_BUDGET_VIOLATION")
+        assertThat(content)
+                .as("must document exit code 1=CONTEXT_BUDGET_VIOLATION")
                 .contains("CONTEXT_BUDGET_VIOLATION");
-        assertThat(content).as("must document exit code 2=OPERATIONAL_ERROR")
+        assertThat(content)
+                .as("must document exit code 2=OPERATIONAL_ERROR")
                 .contains("OPERATIONAL_ERROR");
-        assertThat(content).as("must document exit code 3=BASELINE_CORRUPT")
+        assertThat(content)
+                .as("must document exit code 3=BASELINE_CORRUPT")
                 .contains("BASELINE_CORRUPT");
     }
 

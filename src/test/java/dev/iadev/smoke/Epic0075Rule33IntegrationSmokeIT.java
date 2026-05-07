@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Epic0075Rule33IntegrationSmokeIT — Rule 33 + x-implement-epic Phase 5 integration")
 class Epic0075Rule33IntegrationSmokeIT {
 
+    // EPIC-0078: Rule 33 content migrated to governance KP ai-memory-production.md.
     private static final Path RULE_FILE =
             Path.of(
                     "src",
@@ -19,8 +20,10 @@ class Epic0075Rule33IntegrationSmokeIT {
                     "resources",
                     "targets",
                     "claude",
+                    "knowledge",
+                    "governance",
                     "rules",
-                    "33-ai-memory-production.md");
+                    "ai-memory-production.md");
 
     private static final Path X_EPIC_IMPLEMENT_SKILL =
             Path.of(

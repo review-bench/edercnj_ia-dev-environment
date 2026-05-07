@@ -16,19 +16,17 @@ import org.junit.jupiter.api.Test;
  * Enforces the ≤100-character ceiling on the {@code description:} field of every SKILL.md
  * frontmatter under the source-of-truth tree {@code src/main/resources/targets/claude/skills/}.
  *
- * <p>The skill description appears in the runtime catalog (system-reminder block injected on
- * every conversation turn), in {@code /help}, and in the generated README. Long descriptions
- * inflate every turn permanently. The cap keeps the catalog cheap to load.
+ * <p>The skill description appears in the runtime catalog (system-reminder block injected on every
+ * conversation turn), in {@code /help}, and in the generated README. Long descriptions inflate
+ * every turn permanently. The cap keeps the catalog cheap to load.
  */
 class SkillDescriptionLengthTest {
 
-    private static final Path SKILLS_ROOT =
-            Path.of("src/main/resources/targets/claude/skills");
+    private static final Path SKILLS_ROOT = Path.of("src/main/resources/targets/claude/skills");
 
     private static final int MAX_DESCRIPTION_LENGTH = 100;
 
-    private static final Pattern DESCRIPTION_LINE =
-            Pattern.compile("^description:\\s*(.*)$");
+    private static final Pattern DESCRIPTION_LINE = Pattern.compile("^description:\\s*(.*)$");
 
     @Test
     void allSkillDescriptions_areAtMost100Characters() throws IOException {
@@ -47,9 +45,7 @@ class SkillDescriptionLengthTest {
         assertThat(violations)
                 .as(
                         "SKILL.md description field must be ≤%d characters; %d violations:%n%s",
-                        MAX_DESCRIPTION_LENGTH,
-                        violations.size(),
-                        String.join("\n", violations))
+                        MAX_DESCRIPTION_LENGTH, violations.size(), String.join("\n", violations))
                 .isEmpty();
     }
 
@@ -77,8 +73,8 @@ class SkillDescriptionLengthTest {
     }
 
     /**
-     * Returns the unquoted value of the first {@code description:} line in the YAML frontmatter,
-     * or {@code null} if the field is absent.
+     * Returns the unquoted value of the first {@code description:} line in the YAML frontmatter, or
+     * {@code null} if the field is absent.
      */
     private static String extractDescription(Path skillFile) throws IOException {
         List<String> lines = Files.readAllLines(skillFile);

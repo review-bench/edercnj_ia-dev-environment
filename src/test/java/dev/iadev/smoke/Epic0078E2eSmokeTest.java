@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Epic-level acceptance test — EPIC-0078 (Context Budget Optimization).
  *
- * <p>Verifies the end-to-end contract across story-0078-0016 deliverables:
- * ADR existence, rule template existence, hard-fail default, and HARD-prune exclusion.
+ * <p>Verifies the end-to-end contract across story-0078-0016 deliverables: ADR existence, rule
+ * template existence, hard-fail default, and HARD-prune exclusion.
  */
 @DisplayName("Epic0078E2eSmokeTest — context budget optimization end-to-end")
 class Epic0078E2eSmokeTest {
@@ -28,13 +28,7 @@ class Epic0078E2eSmokeTest {
             Path.of("docs", "adr", "ADR-0033-rules-as-short-contracts.md");
 
     private static final Path RULE_TEMPLATE_PATH =
-            Path.of(
-                    "src",
-                    "main",
-                    "resources",
-                    "shared",
-                    "templates",
-                    "_TEMPLATE-RULE.md");
+            Path.of("src", "main", "resources", "shared", "templates", "_TEMPLATE-RULE.md");
 
     private static final Path CONTEXT_BUDGET_BASELINE =
             Path.of("governance", "baselines", "context-budget.json");
@@ -80,7 +74,9 @@ class Epic0078E2eSmokeTest {
         }
         assertThat(content).as("template must contain Purpose block").contains("## Purpose");
         assertThat(content).as("template must contain Invariants block").contains("## Invariants");
-        assertThat(content).as("template must contain Enforcement block").contains("## Enforcement");
+        assertThat(content)
+                .as("template must contain Enforcement block")
+                .contains("## Enforcement");
         assertThat(content).as("template must contain Reference block").contains("## Reference");
     }
 

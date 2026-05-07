@@ -67,37 +67,11 @@ They define mandatory standards that Claude MUST follow when generating code.
 
 | # | File | Scope |
 |---|------|-------|
-| 01 | `01-project-identity.md` | project identity |
-| 03 | `03-coding-standards.md` | coding standards |
-| 04 | `04-architecture-summary.md` | architecture summary |
-| 05 | `05-quality-gates.md` | quality gates |
-| 06 | `06-security-baseline.md` | security baseline |
-| 07 | `07-operations-baseline.md` | operations baseline |
-| 08 | `08-release-process.md` | release process |
-| 09 | `09-branching-model.md` | branching model |
+| 00 | `00-essentials.md` | essentials |
 | 10 | `10-anti-patterns.md` | anti patterns |
 | 12 | `12-security-anti-patterns.md` | security anti patterns |
-| 13 | `13-skill-invocation-protocol.md` | skill invocation protocol |
-| 14 | `14-project-scope.md` | project scope |
-| 19 | `19-backward-compatibility.md` | backward compatibility |
-| 20 | `20-interactive-gates.md` | interactive gates |
-| 21 | `21-epic-branch-model.md` | epic branch model |
-| 22 | `22-skill-visibility.md` | skill visibility |
-| 23 | `23-model-selection.md` | model selection |
-| 24 | `24-execution-integrity.md` | execution integrity |
-| 25 | `25-task-hierarchy.md` | task hierarchy |
-| 26 | `26-audit-gate-lifecycle.md` | audit gate lifecycle |
-| 27 | `27-zero-bypass-lifecycle.md` | zero bypass lifecycle |
-| 28 | `28-capability-frontmatter-contract.md` | capability frontmatter contract |
-| 29 | `29-refinement-gate.md` | refinement gate |
-| 30 | `30-tool-call-grammar.md` | tool call grammar |
-| 30 | `30-value-driven-templates.md` | value driven templates |
-| 31 | `31-documentation-freshness-gate.md` | documentation freshness gate |
-| 32 | `32-dependency-policy-gate.md` | dependency policy gate |
-| 33 | `33-ai-memory-production.md` | ai memory production |
-| 45 | `45-ci-watch-integrity.md` | ci watch integrity |
 
-**Total: 29 rules**
+**Total: 3 rules**
 
 ### Numbering
 
@@ -368,7 +342,7 @@ See the files directly for current configuration.
 
 | Component | Count |
 |-----------|-------|
-| Rules (.claude) | 29 |
+| Rules (.claude) | 3 |
 | Skills (.claude) | 90 |
 | Knowledge Packs (.claude) | 22 |
 | Agents (.claude) | 15 |

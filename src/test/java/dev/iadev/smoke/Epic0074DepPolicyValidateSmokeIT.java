@@ -43,6 +43,8 @@ class Epic0074DepPolicyValidateSmokeIT {
     private static final Path TEMPLATES_ROOT =
             Path.of("src", "main", "resources", "shared", "templates");
 
+    // EPIC-0078 rules-consolidation-essentials: Rule 32 merged into 00-essentials.md +
+    // knowledge/governance/rules/dependency-policy.md KP.
     private static final Path RULE_32 =
             Path.of(
                     "src",
@@ -50,8 +52,10 @@ class Epic0074DepPolicyValidateSmokeIT {
                     "resources",
                     "targets",
                     "claude",
+                    "knowledge",
+                    "governance",
                     "rules",
-                    "32-dependency-policy-gate.md");
+                    "dependency-policy.md");
 
     @Nested
     @DisplayName("SKILL.md — file structure")
@@ -228,6 +232,8 @@ class Epic0074DepPolicyValidateSmokeIT {
                         "x-implement-story",
                         "SKILL.md");
 
+        // EPIC-0078 rules-consolidation-essentials: Rules 24/27 merged into 00-essentials.md +
+        // lifecycle KPs. Access content via KP paths.
         private static final Path RULE_24 =
                 Path.of(
                         "src",
@@ -235,8 +241,10 @@ class Epic0074DepPolicyValidateSmokeIT {
                         "resources",
                         "targets",
                         "claude",
+                        "knowledge",
+                        "governance",
                         "rules",
-                        "24-execution-integrity.md");
+                        "lifecycle-contract.md");
 
         private static final Path RULE_27 =
                 Path.of(
@@ -245,8 +253,9 @@ class Epic0074DepPolicyValidateSmokeIT {
                         "resources",
                         "targets",
                         "claude",
-                        "rules",
-                        "27-zero-bypass-lifecycle.md");
+                        "knowledge",
+                        "lifecycle",
+                        "zero-bypass.md");
 
         // EPIC-0078 story-0078-0013 slimmed Rules 24/27; full evidence table + 13 surfaces
         // moved to lifecycle KPs execution-integrity.md and zero-bypass.md.
@@ -312,7 +321,8 @@ class Epic0074DepPolicyValidateSmokeIT {
                             "execution-integrity KP must register x-validate-dependency-policy as mandatory evidence artifact")
                     .contains("x-validate-dependency-policy");
             assertThat(kpContent)
-                    .as("execution-integrity KP must reference dep-policy-validation-report artifact path")
+                    .as(
+                            "execution-integrity KP must reference dep-policy-validation-report artifact path")
                     .contains("dep-policy-validation-report-STORY-ID.md");
         }
 
@@ -408,24 +418,25 @@ class Epic0074DepPolicyValidateSmokeIT {
         }
 
         @Test
-        @DisplayName("scenario27_goldenProfiles_includeRule32")
+        @DisplayName("scenario27_goldenProfiles_includeDependencyPolicyKp")
         void scenario27_goldenProfiles_includeRule32() throws Exception {
+            // EPIC-0078 rules-consolidation-essentials: Rule 32 moved from .claude/rules/ to
+            // .claude/knowledge/governance/rules/dependency-policy.md KP.
             Path goldenRoot = Path.of("src", "test", "resources", "golden");
-            long profilesWithRule32 =
+            long profilesWithDepPolicy =
                     Files.walk(goldenRoot, 3)
                             .filter(
                                     p ->
                                             p.getFileName().toString().equals("README.md")
                                                     && p.toString().contains(".claude"))
-                            .map(p -> p.getParent().resolve("rules"))
+                            .map(p -> p.getParent().resolve("knowledge/governance/rules"))
                             .filter(
-                                    rulesDir ->
-                                            rulesDir.resolve("32-dependency-policy-gate.md")
-                                                    .toFile()
-                                                    .exists())
+                                    kpDir ->
+                                            kpDir.resolve("dependency-policy.md").toFile().exists())
                             .count();
-            assertThat(profilesWithRule32)
-                    .as("all golden profiles must include Rule 32 in .claude/rules/")
+            assertThat(profilesWithDepPolicy)
+                    .as(
+                            "all golden profiles must include dependency-policy.md in .claude/knowledge/governance/rules/")
                     .isGreaterThanOrEqualTo(9L);
         }
     }

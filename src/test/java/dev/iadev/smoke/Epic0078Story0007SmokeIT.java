@@ -15,13 +15,30 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Epic0078Story0007SmokeIT — Slim Rule 26 audit-gate-lifecycle KP")
 class Epic0078Story0007SmokeIT {
 
-    private static final Path KP_FILE = Path.of(
-            "src", "main", "resources", "targets", "claude",
-            "knowledge", "governance", "audit-gate-lifecycle.md");
+    private static final Path KP_FILE =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "audit-gate-lifecycle.md");
 
-    private static final Path RULE_26 = Path.of(
-            "src", "main", "resources", "targets", "claude",
-            "rules", "26-audit-gate-lifecycle.md");
+    // EPIC-0078 rules-consolidation-essentials: Rule 26 merged into 00-essentials.md +
+    // knowledge/governance/rules/audit-gate-lifecycle.md KP.
+    private static final Path RULE_26 =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "rules",
+                    "audit-gate-lifecycle.md");
 
     @Test
     @DisplayName("scenario1_kpFileExists")
@@ -33,15 +50,16 @@ class Epic0078Story0007SmokeIT {
     @DisplayName("scenario2_kpContainsRequiredSections")
     void scenario2_kpContainsRequiredSections() throws IOException {
         String content = Files.readString(KP_FILE, StandardCharsets.UTF_8);
-        assertThat(content).as("KP must contain Decision Tree section")
+        assertThat(content)
+                .as("KP must contain Decision Tree section")
                 .contains("## Decision Tree");
-        assertThat(content).as("KP must contain Camada 0 section")
-                .contains("## Camada 0");
-        assertThat(content).as("KP must contain Naming Conventions section")
+        assertThat(content).as("KP must contain Camada 0 section").contains("## Camada 0");
+        assertThat(content)
+                .as("KP must contain Naming Conventions section")
                 .contains("## Naming Conventions");
-        assertThat(content).as("KP must contain Exit Codes section")
-                .contains("## Exit Codes");
-        assertThat(content).as("KP must contain self-check template section")
+        assertThat(content).as("KP must contain Exit Codes section").contains("## Exit Codes");
+        assertThat(content)
+                .as("KP must contain self-check template section")
                 .contains("## `--self-check` Template");
     }
 
@@ -71,6 +89,8 @@ class Epic0078Story0007SmokeIT {
     void scenario5_kpHasFrontmatterWithRequiresCapabilities() throws IOException {
         String content = Files.readString(KP_FILE, StandardCharsets.UTF_8);
         assertThat(content).as("KP must start with frontmatter delimiter").startsWith("---");
-        assertThat(content).as("KP must have requires-capabilities").contains("requires-capabilities");
+        assertThat(content)
+                .as("KP must have requires-capabilities")
+                .contains("requires-capabilities");
     }
 }

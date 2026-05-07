@@ -1,3 +1,6 @@
+---
+requires-capabilities: ["lang.java.*"]
+---
 # Rule 12 — Security Anti-Patterns (Java)
 
 > Language-specific security anti-patterns with vulnerable and fixed code examples.
