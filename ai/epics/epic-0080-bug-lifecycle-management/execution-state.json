@@ -1,0 +1,16 @@
+{
+  "epicId": "epic-0080",
+  "slug": "bug-lifecycle-management",
+  "flowVersion": "4",
+  "status": "PLANNING",
+  "taskTracking": {
+    "enabled": true
+  },
+  "interactiveMode": false,
+  "refinementVerdict": {
+    "status": "pending",
+    "scope": "epic"
+  },
+  "createdAt": "2026-05-07T22:00:00Z",
+  "updatedAt": "2026-05-07T22:00:00Z"
+}
