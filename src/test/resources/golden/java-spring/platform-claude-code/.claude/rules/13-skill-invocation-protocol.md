@@ -67,6 +67,46 @@ Agent(
 
 **Parallelism:** To launch multiple `general-purpose` subagents in parallel, emit all `Agent(...)` calls as SIBLING tool calls in the SAME assistant message. See `x-implement-story` Phases 1B-1F "Parallelism + tracking batching" section for the canonical parallel dispatch pattern (Batch A = all TaskCreate + Agent launches as siblings; Batch B = all TaskUpdate as siblings after results return).
 
+### Pattern 2b — SUBAGENT-NAMED (named agent dispatch)
+
+Use when a registered agent file exists for the role (`.claude/agents/core/<name>.md`). The Claude Code runtime loads the agent's `.md` body as the system prompt automatically — the `prompt:` field must contain **task instructions only**, never persona text.
+
+**Required form:**
+
+```markdown
+Agent(
+  subagent_type: "<agent-name>",
+  description: "<short 3-7 word summary of the subagent's job>",
+  prompt: "<task instructions — NO 'You are a ...' persona text>"
+)
+```
+
+**Example:**
+
+```markdown
+Agent(
+  subagent_type: "sre-engineer",
+  description: "Validate incident response plan for {SEV}",
+  prompt: "Review the mitigation steps for severity {SEV}. Validate root cause hypothesis. Return: {rcaHypothesis, mitigationPlan, checklistGaps}."
+)
+```
+
+**When to use Pattern 2b vs Pattern 2a:**
+
+| Situation | Pattern |
+| :--- | :--- |
+| Registered agent file exists (`.claude/agents/core/<name>.md`) | **2b — named** |
+| No agent file; role is ad-hoc or one-off | **2a — general-purpose** with inline persona |
+| Parallel wave mixing registered + ad-hoc roles | Mix: named for registered, general-purpose for ad-hoc |
+
+**Telemetry:** When `subagent_type` is a registered agent name, the `metadata.role` field in `subagent-start`/`subagent-end` telemetry events receives the agent name (e.g., `"sre-engineer"`) — not a free-form string. This enables per-role latency analysis in `/x-analyze-telemetry`.
+
+**Rule 28 grammar markers** apply identically to named dispatch — every named `Agent(...)` call in an Anexo B orchestrator MUST carry `[required]`, `[optional]`, or `[conditional: <expr>]`.
+
+**Requirement:** the parent's `allowed-tools` MUST include `Agent`.
+
+**ADR:** [ADR-0049 — Named Subagent Dispatch](../../docs/adr/ADR-0049-named-subagent-dispatch.md) (EPIC-0079).
+
 ### Pattern 3 — SUBAGENT-RESEARCH (no Skill call, pure exploration)
 
 Use when the orchestrator needs investigation or research that does NOT require invoking another skill. The subagent reads, greps, and reports back in natural language.
@@ -164,6 +204,7 @@ Do NOT add any of the following to a skill body:
 - Prose like "then run `/x-foo` to do X" — rewrite as "then invoke `x-foo` via the Skill tool: `Skill(skill: \"x-foo\", args: \"...\")`"
 - Subagent prompts that tell the subagent to "run /x-foo" — rewrite as "invoke the `x-foo` skill via the Skill tool"
 - Bullet lists of slash commands intended as parallel delegation — rewrite as a single block of parallel `Skill(...)` calls (Pattern 1, multiple calls in one message)
+- Inline persona text in `prompt:` when `subagent_type` is a registered agent name — the runtime loads the persona from the agent's `.md`; duplicating it creates persona drift when the agent file is updated (Pattern 2b — EPIC-0079)
 
 ## Telemetry Markers (story-0040-0006)
 
@@ -226,7 +267,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-end
 ```
 
 The role argument (position 3) is persisted under `metadata.role` of the
-telemetry event. Degenerate planning skills (no parallel dispatch, e.g.,
+telemetry event. When Pattern 2b (named dispatch) is used, the role argument MUST be
+the registered agent name (e.g., `"sre-engineer"`) — not a free-form string. This
+enables per-role latency aggregation in `/x-analyze-telemetry` (EPIC-0079, ADR-0049).
+Degenerate planning skills (no parallel dispatch, e.g.,
 `x-plan-architecture`, `x-plan-tests`, `x-epic-map`) MUST emit ZERO subagent markers —
 this is validated by the `PlanningSmokeIT` acceptance test.
 
