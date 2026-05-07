@@ -2,7 +2,7 @@
 name: x-review-security
 description: "Reviews code changes for compliance with selected security frameworks. Verifies sensitive data handling, audit trails, and access control patterns."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: security, fragment-order: 10 }
@@ -49,29 +49,20 @@ Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
 
 ## Workflow
 
-### Step 1 — Identify Active Frameworks
+### Step 1 -- Gather Context
 
-Read `skills/compliance/references/` to identify active frameworks (PCI-DSS, LGPD, GDPR, HIPAA, SOX).
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 — Verify Framework-Specific Requirements
+### Step 2 -- Dispatch to Security Engineer Agent
 
-For each active framework, verify the change against framework-specific requirements.
-
-### Step 3 — Check Sensitive Data Handling
-
-Check data classification, masking, and encryption per `skills/security/references/cryptography.md`.
-
-### Step 4 — Verify Audit Trail Requirements
-
-Ensure audit trail requirements are met for the active frameworks.
-
-### Step 5 — Check Access Control Patterns
-
-Verify access control patterns comply with framework requirements.
-
-### Step 6 — Produce Compliance Report
-
-Generate the compliance review report with per-framework results.
+    Agent(
+      subagent_type: "security-engineer",
+      description: "Security specialist review for {target}",
+      prompt: "Review the code changes for security compliance. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/security/references/security-principles.md`, `skills/security/references/application-security.md`, and `skills/security/references/cryptography.md`. Read `skills/compliance/SKILL.md` to identify active compliance frameworks (PCI-DSS, LGPD, GDPR, HIPAA, SOX). Apply your full security checklist including sensitive data handling, input validation, auth/authz, defensive coding, and all active compliance framework checks. Produce output in this exact format:\n\nENGINEER: Security\nSTORY: {target}\nSCORE: XX/30\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [SEC-XX] Description (2/2)\nFAILED:\n- [SEC-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [SEC-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 

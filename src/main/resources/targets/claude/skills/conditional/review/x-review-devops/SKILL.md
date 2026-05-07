@@ -2,7 +2,7 @@
 name: x-review-devops
 description: "DevOps specialist review: validates Dockerfile, container security, CI/CD pipeline, resource limits, health probes, graceful shutdown, and deployment configuration."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: devops, fragment-order: 70 }
@@ -82,28 +82,18 @@ Each item scores 0 (missing), 1 (partial), or 2 (fully compliant).
 
 ### Step 1 -- Gather Context
 
-Read the infrastructure knowledge pack:
-- `skills/infrastructure/SKILL.md`
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 -- Identify Changed Files
+### Step 2 -- Dispatch to DevOps Engineer Agent
 
-Determine scope: Dockerfile, docker-compose, Kubernetes manifests, CI/CD config.
-
-### Step 3 -- Dockerfile Review
-
-Check multi-stage build, non-root user, minimal base image, .dockerignore.
-
-### Step 4 -- Security Review
-
-Verify no secrets in layers, image version pinning.
-
-### Step 5 -- Deployment Review
-
-Check resource limits, health probes, graceful shutdown, config externalization.
-
-### Step 6 -- Generate Report
-
-Produce the scored report.
+    Agent(
+      subagent_type: "devops-engineer",
+      description: "DevOps specialist review for {target}",
+      prompt: "Review the code changes for DevOps best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/infrastructure/SKILL.md` for infrastructure patterns. Apply your full DevOps checklist (Dockerfile, container security, deployment manifests, CI/CD, resource limits, health probes). Produce output in this exact format:\n\nENGINEER: DevOps\nSTORY: {target}\nSCORE: XX/20\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [DEVOPS-XX] Description (2/2)\nFAILED:\n- [DEVOPS-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [DEVOPS-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 
