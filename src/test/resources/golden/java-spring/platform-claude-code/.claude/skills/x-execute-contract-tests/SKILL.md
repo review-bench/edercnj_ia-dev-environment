@@ -1,6 +1,6 @@
 ---
 name: x-execute-contract-tests
-description: "Stack-aware contract breaking-change detection: openapi-diff (REST), buf breaking (gRPC/proto3), Spring Cloud Contract (Java/Spring), schema registry compat (events). Pact opt-in via quality.contract.pact=true."
+description: "Stack-aware contract breaking-change detection (openapi-diff, buf, schema registry)."
 visibility: public
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob

@@ -1,6 +1,6 @@
 ---
 name: x-scan-container-security
-description: "Scans Docker images for CVEs and Dockerfile best practices violations. Uses Trivy, Grype, or Snyk Container. Produces SARIF output with scoring."
+description: "Scans Docker images for CVEs and Dockerfile best-practices; SARIF output."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--image name:tag] [--dockerfile path] [--severity-threshold CRITICAL|HIGH|MEDIUM|LOW] [--ignore-unfixed]"

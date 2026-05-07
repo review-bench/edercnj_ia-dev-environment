@@ -1,6 +1,6 @@
 ---
 name: x-create-pr
-description: "Task-level PR creation with formatted title, automatic labels, structured body, and target branch logic. Creates standardized PRs for individual tasks with Task ID traceability."
+description: "Task-level PR creation with formatted title, labels, structured body, and target branch."
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Skill
 argument-hint: "TASK-XXXX-YYYY-NNN [--auto-approve-pr] [--draft] [--description \"short desc\"] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>]"

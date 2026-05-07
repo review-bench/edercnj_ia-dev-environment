@@ -1,6 +1,6 @@
 ---
 name: x-analyze-telemetry-trends
-description: "Detect cross-epic P95 regressions (>= threshold %) and rank top-10 slowest skills from the global telemetry index. Single-responsibility partner of /x-analyze-telemetry focused on trend detection, not point-in-time reporting. Use to answer 'is skill X getting slower over the last N epics?' with evidence."
+description: "Detects cross-epic P95 regressions and ranks top-10 slowest skills from global index."
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--last N] [--threshold-pct P] [--baseline mean|median] [--format md|json] [--out path]"
 context-budget: light

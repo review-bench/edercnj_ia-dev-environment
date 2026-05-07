@@ -1,6 +1,6 @@
 ---
 name: x-internal-verify-phase-gates
-description: "Validates phase transitions for orchestrators under Rule 25. Four modes: --mode pre (assert predecessor phases completed before entering phase N), --mode post (assert all child tasks of phase N are completed AND all expected artifacts exist on disk), --mode wave (post-Batch-B verification of parallel wave completeness: N child TaskUpdate completed + N artifacts exist), --mode final (terminal gate composing with x-internal-verify-epic-integrity). Reads execution-state.json.taskTracking.phaseGateResults and TaskList task state; writes back the gate result. Emits a single-line JSON envelope {passed, mode, skill, phase, expectedTasks, completedTasks, missingTasks, expectedArtifacts, missingArtifacts, wallclockMs, timestamp}. Exit 0 on passed, 12 on failure, 13 on malformed args, 14 on task-resolution timeout. First skill in the x-internal-* convention authored by EPIC-0055; eighth overall (after status-update, report-write, args-normalize, story-load-context, story-build-plan, story-verify, story-resume, epic-build-plan, epic-integrity-gate, epic-branch-ensure, story-report) and the eighth under internal/plan/."
+description: "Validates phase transitions for orchestrators (Rule 25): pre/post/wave/final modes."
 model: haiku
 visibility: internal
 user-invocable: false

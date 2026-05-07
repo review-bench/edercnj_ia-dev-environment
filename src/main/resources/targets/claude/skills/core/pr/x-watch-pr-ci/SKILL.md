@@ -1,6 +1,6 @@
 ---
 name: x-watch-pr-ci
-description: "Polls a PR's CI checks and Copilot review status, blocking until checks complete or timeout. Returns one of 8 stable exit codes (SUCCESS=0, CI_PENDING_PROCEED=10, CI_FAILED=20, TIMEOUT=30, PR_ALREADY_MERGED=40, NO_CI_CONFIGURED=50, PR_CLOSED=60, PR_NOT_FOUND=70). Writes a versioned state-file for session resume."
+description: "Polls a PR's CI checks and Copilot review until completion or timeout (8 exit codes)."
 user-invocable: true
 allowed-tools: Bash
 argument-hint: "--pr-number <N> [--timeout-seconds 1800] [--poll-interval-seconds 60] [--require-copilot-review true] [--require-checks-passing true] [--copilot-review-timeout 900] [--state-file <path>] [--no-state-file]"

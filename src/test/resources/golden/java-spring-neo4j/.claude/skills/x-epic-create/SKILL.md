@@ -1,7 +1,7 @@
 ---
 name: x-epic-create
 model: sonnet
-description: "Create a focused Epic artifact from an existing Feature markdown, preserving sourceFeature lineage and inherited RNFs without generating stories or implementation map."
+description: "Creates a focused Epic artifact from a Feature markdown, preserving lineage and RNFs."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--from-feature <feature-file|feature-id> [--capability-file <path>] [--product-file <path>] [--epic-id <NNNN>] [--output-dir <path>] [--dry-run]"

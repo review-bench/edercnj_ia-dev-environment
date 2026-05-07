@@ -1,6 +1,6 @@
 ---
 name: x-audit-supply-chain
-description: "Enhanced supply chain security audit beyond x-audit-dependencies. Analyzes maintainer risk, typosquatting detection, phantom dependencies, dependency age, EPSS scoring, and SLSA assessment. Produces SARIF 2.1.0 output with weighted risk scoring."
+description: "Supply-chain audit: maintainer risk, typosquatting, EPSS, SLSA; SARIF + report."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--depth shallow|deep] [--include-dev-deps] [--risk-threshold 0-100] [--focus all|maintainer|typosquatting|phantom|age|epss|slsa]"

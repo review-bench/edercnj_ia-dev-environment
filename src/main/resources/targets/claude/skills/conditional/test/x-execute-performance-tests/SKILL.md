@@ -1,6 +1,6 @@
 ---
 name: x-execute-performance-tests
-description: "Stack-aware performance skill: reads QualityConfig.performance SLOs, dispatches to Newman (REST), ghz (gRPC), hyperfine (CLI), Artillery (GraphQL), or custom harness (Socket), compares against governance/baselines/performance-baseline.json, and blocks merge on regression > tolerance."
+description: "Conditional performance-tests gate: SLA budget validation per quality.performance."
 visibility: public
 user-invocable: true
 model: sonnet

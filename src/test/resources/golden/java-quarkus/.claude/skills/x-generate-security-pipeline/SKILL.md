@@ -1,6 +1,6 @@
 ---
 name: x-generate-security-pipeline
-description: "Generate CI/CD pipeline configurations with conditional security stages based on SecurityConfig flags. Support GitHub Actions, GitLab CI, and Azure DevOps with minimal and full stage modes, configurable severity thresholds, and SARIF artifact upload."
+description: "Generates CI/CD pipelines with conditional security stages from SecurityConfig flags."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 argument-hint: "[--ci github|gitlab|azure] [--stages all|minimal] [--trigger push|pr|schedule] [--fail-on-findings true|false] [--severity-threshold CRITICAL|HIGH|MEDIUM]"

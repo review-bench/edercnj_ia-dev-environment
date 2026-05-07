@@ -1,6 +1,6 @@
 ---
 name: x-review-data-modeling
-description: "Data modeling specialist review: validates entity design, aggregate boundaries, value objects, repository patterns, domain event persistence, and DDD tactical patterns."
+description: "Data-modeling specialist review: entities, aggregates, value objects, repositories, DDD."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"

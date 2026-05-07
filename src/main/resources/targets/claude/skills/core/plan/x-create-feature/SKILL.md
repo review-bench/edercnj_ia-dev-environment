@@ -1,7 +1,7 @@
 ---
 name: x-create-feature
 model: sonnet
-description: "Create a complete feature (Epic + N Stories + Implementation Map) from a spec file, with a worktree-isolated docs/ branch, consolidated commit, and auto-merged PR into epic/XXXX."
+description: "Creates a complete feature (Epic + Stories + Map) from a spec file in an isolated worktree."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "[SPEC-FILE-PATH] --epic-id <NNNN> [--no-jira] [--dry-run]"

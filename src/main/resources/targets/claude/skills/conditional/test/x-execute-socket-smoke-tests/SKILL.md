@@ -1,6 +1,6 @@
 ---
 name: x-execute-socket-smoke-tests
-description: "Runs automated smoke tests against the TCP socket server using a standalone Java client with message framing and protocol validation."
+description: "Runs smoke tests against the TCP socket server using a standalone Java client."
 user-invocable: true
 allowed-tools: Read, Bash
 argument-hint: "[--scenario echo|all] [--k8s] [--host <host>] [--port <port>]"

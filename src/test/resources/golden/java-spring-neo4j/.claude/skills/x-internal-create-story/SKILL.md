@@ -1,6 +1,6 @@
 ---
 name: x-internal-create-story
-description: "Generate Story files from Epic or from an existing Feature artifact: data contracts, inherited RNFs, dependency declarations, sub-tasks, quality validation, optional Jira integration. Invoked by orchestrators and focused public wrappers."
+description: "Generates Story files from Epic or from an existing Feature artifact."
 visibility: internal
 user-invocable: false
 model: sonnet

@@ -1,6 +1,6 @@
 ---
 name: x-review-grpc
-description: "Validates gRPC service definitions, proto3 conventions, implementation patterns, and operational readiness."
+description: "Validates gRPC service definitions, proto3 conventions, and operational readiness."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[service-name or proto-file]"

@@ -1,6 +1,6 @@
 ---
 name: x-run-sast
-description: "Static Application Security Testing -- scans source code for security vulnerabilities without executing the application. Produces SARIF output with OWASP mapping."
+description: "Static Application Security Testing: scans source for vulnerabilities; SARIF output."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[--scope all|owasp|custom-rules] [--severity-threshold CRITICAL|HIGH|MEDIUM|LOW|INFO]"

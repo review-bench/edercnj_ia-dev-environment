@@ -1,6 +1,6 @@
 ---
 name: x-internal-verify-story
-description: "Executes the story-level verification gate (Phase 3 carve-out of x-implement-story): identifies files touched by the story via the task breakdown, runs the test suite scoped to those files, parses filtered coverage against the story-specific thresholds (default line >=95, branch >=90), performs cross-file consistency checks (constructor patterns, return-type uniformity per role), optionally runs the smoke suite, and validates every Section 7 Gherkin scenario has a matching acceptance test. Emits a single-line JSON envelope {passed, coverageDelta, failures, acCheckResults}. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-load-story-context and x-internal-build-story-plan)."
+description: "Story-level verification gate: filtered tests, coverage, AC check, optional smoke."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

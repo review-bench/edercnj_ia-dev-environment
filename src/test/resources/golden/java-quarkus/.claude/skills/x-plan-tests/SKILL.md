@@ -1,6 +1,6 @@
 ---
 name: x-plan-tests
-description: "Generates a Double-Loop TDD test plan with TPP-ordered scenarios before implementation. Delegates KP reading to a context-gathering subagent, then produces structured Acceptance Tests (outer loop) and Unit Tests in Transformation Priority Premise order (inner loop)."
+description: "Generates a Double-Loop TDD test plan with TPP-ordered acceptance and unit scenarios."
 user-invocable: true
 allowed-tools: Read, Grep, Glob
 argument-hint: "[STORY-ID]"

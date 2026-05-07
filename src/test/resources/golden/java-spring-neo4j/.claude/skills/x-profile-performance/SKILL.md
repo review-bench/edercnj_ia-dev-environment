@@ -1,6 +1,6 @@
 ---
 name: x-profile-performance
-description: "Automated profiling: detect language/runtime, select appropriate profiler, execute session, generate flamegraph, identify hotspots, and suggest optimizations referencing the performance-engineering knowledge pack."
+description: "Automated profiling: detects runtime, runs profiler, generates flamegraph and hotspots."
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Agent
 argument-hint: "[cpu|memory|io|all] [--duration 30s] [--output flamegraph|report|raw]"

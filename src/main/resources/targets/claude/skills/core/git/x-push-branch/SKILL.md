@@ -1,6 +1,6 @@
 ---
 name: x-push-branch
-description: "Git operations: branch creation, atomic commits (Conventional Commits), push, and PR creation. Use for any git workflow task including branching, committing, pushing, creating PRs, or managing version control."
+description: "Git workflow: branch, atomic Conventional Commits, push, and PR creation."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "[branch-name or commit-message]"

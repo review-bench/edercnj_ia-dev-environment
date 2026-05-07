@@ -1,6 +1,6 @@
 ---
 name: x-evaluate-parallelism
-description: "Detects and classifies file-collision risks between work units (tasks, stories, or epic phases) before parallel execution. Reads ## File Footprint blocks produced by x-plan-task / x-plan-story, applies the parallelism-heuristics knowledge pack (hard / regen / soft categories + hotspot overrides), and emits a collision matrix + serialization recommendation in Markdown (default) or JSON."
+description: "Detects file-collision risks between parallel work units; emits collision matrix."
 user-invocable: true
 argument-hint: "--scope=epic|story|task [--epic PATH] [--a ID --b ID] [--out PATH] [--format markdown|json]"
 context-budget: light

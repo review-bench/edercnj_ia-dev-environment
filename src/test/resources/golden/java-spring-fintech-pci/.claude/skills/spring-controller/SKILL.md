@@ -1,6 +1,6 @@
 ---
 name: spring-controller
-description: "Generate a Spring Boot @RestController with matching DTOs, mappers, @ControllerAdvice handler, and unit tests following hexagonal architecture."
+description: "Generates a Spring Boot @RestController with DTOs, mappers, advice, and unit tests."
 visibility: public
 model: sonnet
 requires-capabilities: [web.spring.boot]

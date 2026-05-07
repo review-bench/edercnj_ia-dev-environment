@@ -1,6 +1,6 @@
 ---
 name: x-internal-map-epic
-description: "Generate Implementation Map from Epic and Stories: dependency matrix, phase computation, critical path, ASCII diagrams, Mermaid graphs, strategic observations. Invoked only by x-create-feature (Phase 4)."
+description: "Generates Implementation Map from Epic and Stories: deps, phases, critical path."
 visibility: internal
 user-invocable: false
 model: sonnet

@@ -1,6 +1,6 @@
 ---
 name: x-review-events
-description: "Validates event schemas, producer/consumer patterns, error handling, dead letter topics, and operational readiness for event-driven architectures."
+description: "Reviews event schemas, producer/consumer patterns, error handling, and DLQ readiness."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[event-name or consumer/producer class]"

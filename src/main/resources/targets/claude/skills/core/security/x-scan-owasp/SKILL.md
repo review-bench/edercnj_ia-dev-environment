@@ -1,6 +1,6 @@
 ---
 name: x-scan-owasp
-description: "Automated OWASP Top 10 (2021) verification mapped to ASVS levels (L1/L2/L3). Checks all 10 categories (A01-A10) with per-category pass/fail, ASVS coverage percentage, score grading, SARIF 2.1.0 output, and CI integration. Delegates A06 to x-audit-dependencies."
+description: "Automated OWASP Top 10 (2021) verification mapped to ASVS L1/L2/L3 with SARIF output."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent
 argument-hint: "[--level L1|L2|L3] [--category A01-A10|all] [--report-format markdown|sarif|both]"

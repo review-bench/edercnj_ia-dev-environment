@@ -1,6 +1,6 @@
 ---
 name: x-troubleshoot-operations
-description: "Diagnoses errors, stacktraces, build failures, and unexpected behavior. Systematic approach: reproduce, locate, understand, fix, verify. Use whenever something fails: compilation errors, test failures, runtime exceptions, coverage gaps, or performance issues."
+description: "Diagnoses errors and failures: reproduce, locate, understand, fix, verify."
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
 argument-hint: "[error-description or test-name]"

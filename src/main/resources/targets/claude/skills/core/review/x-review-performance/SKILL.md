@@ -1,6 +1,6 @@
 ---
 name: x-review-performance
-description: "Performance specialist review: validates N+1 queries, connection pools, async patterns, pagination, caching, timeouts, circuit breakers, and resource cleanup."
+description: "Performance review: N+1, pools, async, pagination, cache, timeouts, circuit breakers."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 argument-hint: "[PR number or file paths]"

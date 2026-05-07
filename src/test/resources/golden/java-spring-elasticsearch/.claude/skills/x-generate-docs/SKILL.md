@@ -1,6 +1,6 @@
 ---
 name: x-generate-docs
-description: "Documentation automation v2: stack-aware generation consuming documentation.targets from ProjectConfig. Detects documentation type needed (API, README, ADR, changelog, system-architecture) from code changes and stack config, delegates to specialized skills or generates inline. Invokes x-update-system-architecture on architectural change detection."
+description: "Documentation automation v2: stack-aware generation from documentation.targets."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill

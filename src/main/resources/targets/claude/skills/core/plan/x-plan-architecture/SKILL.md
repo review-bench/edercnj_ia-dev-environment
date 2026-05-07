@@ -1,6 +1,6 @@
 ---
 name: x-plan-architecture
-description: "Generates a comprehensive architecture plan with component diagrams, sequence diagrams, deployment topology, mini-ADRs, NFRs, and resilience/observability strategies. Use before implementation to document design decisions."
+description: "Generates an architecture plan with C4 diagrams, mini-ADRs, NFRs, and resilience strategy."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 argument-hint: "[STORY-ID or feature-name]"

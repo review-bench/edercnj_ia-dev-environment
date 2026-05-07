@@ -1,6 +1,6 @@
 ---
 name: x-internal-update-status
-description: "Atomic read-modify-write of execution-state.json with flock-based concurrency, schema validation, and idempotency detection. Substitutes inline Edit-based mutations in orchestrator skills (x-implement-epic, x-implement-story, x-fix-epic-pr) that previously suffered race conditions in --parallel mode. PILOT skill for the x-internal-* convention: internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+description: "Atomic read-modify-write of execution-state.json with flock and schema validation."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

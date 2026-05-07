@@ -1,6 +1,6 @@
 ---
 name: x-internal-render-pr-body
-description: "Renders PR body Markdown from existing disk artifacts using one of two templates. --kind=implementation: reads review/verify/telemetry artifacts for a story and emits a structured implementation PR body. --kind=backlog: reads epic/map artifacts and emits a scaffolding PR body. Fail-open: absent artifacts produce human-readable placeholders, never audit-sentinel strings. Internal — invoked only by x-create-pr and x-create-feature."
+description: "Renders PR body Markdown from disk artifacts (--kind=implementation|backlog)."
 visibility: internal
 user-invocable: false
 model: haiku

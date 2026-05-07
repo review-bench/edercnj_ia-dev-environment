@@ -1,6 +1,6 @@
 ---
 name: x-internal-normalize-args
-description: "Parses an argv string against a declarative JSON schema with typed flags (boolean, string, integer, enum), defaults, mutually-exclusive groups, and deprecation warnings, then emits a normalized `{parsed, warnings, errors}` envelope on stdout. Replaces ~150 lines of inline argv parsing inlined inside `x-implement-epic`, `x-implement-story`, and `x-orchestrate-epic`, giving every orchestrator identical flag-validation syntax and error messages. Third skill in the x-internal-* convention (after x-internal-update-status pilot and x-internal-write-report): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+description: "Parses argv against a JSON schema and emits {parsed, warnings, errors} envelope."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash
