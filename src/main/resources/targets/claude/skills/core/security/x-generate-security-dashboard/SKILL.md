@@ -1,6 +1,6 @@
 ---
 name: x-generate-security-dashboard
-description: "Aggregates results from all security scanning skills into a unified posture view with score 0-100, trend tracking, OWASP risk heatmap, per-dimension breakdown, and remediation priority queue. Never executes scans — reads existing results only (RULE-011)."
+description: "Aggregates results of all security scanning skills into a unified posture dashboard."
 user-invocable: true
 allowed-tools: Read, Write, Bash, Grep, Glob
 argument-hint: "[--period last-7d|last-30d|last-90d|all] [--format markdown|json] [--compare-previous]"

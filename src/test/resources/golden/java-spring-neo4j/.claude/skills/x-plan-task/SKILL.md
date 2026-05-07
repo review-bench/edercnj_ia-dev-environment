@@ -1,6 +1,6 @@
 ---
 name: x-plan-task
-description: "Generates a detailed per-task implementation plan (plan-task-TASK-XXXX-YYYY-NNN.md) with TDD cycles in TPP order, file impact analysis by architecture layer, security checklist by task type, and exit criteria. Two invocation modes: task-file-first (--task-file) consumes a standalone task-TASK-XXXX-YYYY-NNN.md contract (EPIC-0038); story-scoped (STORY-ID --task TASK-ID) reads the task from story Section 8 (legacy). Invocable standalone OR via x-plan-story (future)."
+description: "Generates plan-task-*.md with TDD cycles in TPP order, file-impact, and exit criteria."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "--task-file <path> [--output-dir <dir>] [--no-commit] [--dry-run]  |  [STORY-ID] --task [TASK-ID] [--force] [--no-commit] [--dry-run]"

@@ -1,7 +1,7 @@
 ---
 name: x-format-code
 model: haiku
-description: "Formats source code using the appropriate formatter for {{LANGUAGE}}. First step of the pre-commit chain (format -> lint -> compile -> commit). Supports --check (dry-run) and --changed-only modes."
+description: "Formats source code; first step of the pre-commit chain (format -> lint -> compile)."
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 argument-hint: "[--check | --changed-only]"

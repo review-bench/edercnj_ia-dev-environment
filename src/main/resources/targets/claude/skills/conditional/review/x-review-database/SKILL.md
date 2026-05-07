@@ -1,6 +1,6 @@
 ---
 name: x-review-database
-description: "Database specialist review: validates schema design, migration safety, query optimization, connection management, transaction boundaries, and data integrity patterns."
+description: "Database specialist review: schema, migrations, queries, pools, transactions, integrity."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"

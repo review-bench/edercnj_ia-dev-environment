@@ -1,6 +1,6 @@
 ---
 name: planning-standards-kp
-description: "Fonte da verdade do modelo RA9 (Rule-Aligned 9-Section) para templates de planejamento Epic/Story/Task. Define as 9 seções fixas, granularidade por nível, micro-template Decision Rationale, e mapeamento rule ↔ seção."
+description: "Knowledge pack RA9 (Rule-Aligned 9-Section) for Epic/Story/Task planning templates."
 user-invocable: false
 requires-capabilities: []
 context-budget: medium

@@ -14,11 +14,11 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Maven CI-blocking audit harness for measure-context-budget.sh and
- * audit-context-budget.sh (EPIC-0078 story-0078-0001).
+ * Maven CI-blocking audit harness for measure-context-budget.sh and audit-context-budget.sh
+ * (EPIC-0078 story-0078-0001).
  *
- * <p>Validates exit codes 0/1/2/3 per Rule 26 §Standardized Exit Codes + story-0078-0016
- * hard-fail contract.
+ * <p>Validates exit codes 0/1/2/3 per Rule 26 §Standardized Exit Codes + story-0078-0016 hard-fail
+ * contract.
  */
 @DisplayName("ContextBudgetAuditorTest (Maven CI-blocking)")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
@@ -35,9 +35,7 @@ class ContextBudgetAuditorTest {
                     "src/main/resources/targets/claude/scripts/audit-context-budget.sh");
 
     private static final Path BASELINE_PATH =
-            Path.of(
-                    System.getProperty("user.dir"),
-                    "governance/baselines/context-budget.json");
+            Path.of(System.getProperty("user.dir"), "governance/baselines/context-budget.json");
 
     private static final String REPO_DIR = System.getProperty("user.dir");
 
@@ -77,7 +75,8 @@ class ContextBudgetAuditorTest {
 
         int exit = proc.exitValue();
         if (exit != 0) {
-            String stderr = new String(proc.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            String stderr =
+                    new String(proc.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
             assertThat(exit).as("non-zero must be 2 (OPERATIONAL_ERROR): " + stderr).isEqualTo(2);
             assertThat(stderr).contains("OPERATIONAL_ERROR");
         }
@@ -98,7 +97,8 @@ class ContextBudgetAuditorTest {
 
         int exit = proc.exitValue();
         if (exit != 0) {
-            String stderr = new String(proc.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            String stderr =
+                    new String(proc.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
             assertThat(exit).as("non-zero must be 2 (OPERATIONAL_ERROR): " + stderr).isEqualTo(2);
         }
     }
@@ -132,7 +132,8 @@ class ContextBudgetAuditorTest {
             assertThat(stdout).as("output must contain perSkill").contains("perSkill");
             assertThat(stdout).as("output must contain measuredAt").contains("measuredAt");
         } else {
-            assertThat(exit).as("non-zero exit must be 2 (OPERATIONAL_ERROR): " + stderr)
+            assertThat(exit)
+                    .as("non-zero exit must be 2 (OPERATIONAL_ERROR): " + stderr)
                     .isEqualTo(2);
             assertThat(stderr).as("stderr must name missing dep").contains("OPERATIONAL_ERROR");
         }
@@ -141,8 +142,7 @@ class ContextBudgetAuditorTest {
     @Test
     @DisplayName("audit-context-budget.sh --advisory exits 0 on valid baseline")
     void audit_advisoryExitsZeroOnValidBaseline() throws IOException, InterruptedException {
-        ProcessBuilder pb =
-                new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--advisory");
+        ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--advisory");
         pb.directory(new java.io.File(REPO_DIR));
         pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
         pb.environment().put("BASELINE_PATH", BASELINE_PATH.toString());
@@ -180,7 +180,8 @@ class ContextBudgetAuditorTest {
             throws IOException, InterruptedException {
         // Baseline with limit so low that any .claude directory will exceed it
         Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
-        Files.writeString(tinyBaseline,
+        Files.writeString(
+                tinyBaseline,
                 """
                 {
                   "alwaysLoaded": 1,
@@ -203,15 +204,17 @@ class ContextBudgetAuditorTest {
         assertThat(proc.exitValue())
                 .as("--hard with exceeded limit must exit 1: " + output)
                 .isEqualTo(1);
-        assertThat(output).as("must contain CONTEXT_BUDGET_VIOLATION").contains("CONTEXT_BUDGET_VIOLATION");
+        assertThat(output)
+                .as("must contain CONTEXT_BUDGET_VIOLATION")
+                .contains("CONTEXT_BUDGET_VIOLATION");
     }
 
     @Test
     @DisplayName("default mode is hard-fail (no flag → exit 1 when limit exceeded)")
-    void audit_defaultIsHardFail(@TempDir Path tempDir)
-            throws IOException, InterruptedException {
+    void audit_defaultIsHardFail(@TempDir Path tempDir) throws IOException, InterruptedException {
         Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
-        Files.writeString(tinyBaseline,
+        Files.writeString(
+                tinyBaseline,
                 """
                 {
                   "alwaysLoaded": 1,

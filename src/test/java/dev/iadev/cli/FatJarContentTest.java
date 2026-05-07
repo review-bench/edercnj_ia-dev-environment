@@ -73,8 +73,11 @@ class FatJarContentTest {
     }
 
     @Test
-    void coreRules_whenCalled_exist() {
-        assertResourceExists("targets/claude/rules/" + "01-project-identity.md");
+    void coreRules_essentialsTemplate_exists() {
+        // Old numbered rule files removed in Rules Consolidation
+        // (chore/rules-consolidation-essentials).
+        // The single 00-essentials.md is generated from this template at assembly time.
+        assertResourceExists("shared/templates/_TEMPLATE-ESSENTIALS-RULE.md");
     }
 
     @Test

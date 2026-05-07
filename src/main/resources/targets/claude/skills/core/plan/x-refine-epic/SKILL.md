@@ -1,6 +1,6 @@
 ---
 name: x-refine-epic
-description: "Multi-persona 4-phase strategic epic refinement dispatcher. Phase A: 5-6 parallel specialist agents analyse the epic for strategic gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-6 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict with scope=epic and dual-writes to execution-state.json + epic markdown."
+description: "Multi-persona 4-phase strategic epic refinement: parallel specialists + verdict."
 visibility: public
 user-invocable: true
 model: sonnet

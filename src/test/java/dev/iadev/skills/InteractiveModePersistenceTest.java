@@ -69,24 +69,24 @@ class InteractiveModePersistenceTest {
     @Test
     @DisplayName("Rule 19 + lifecycle KP document interactiveMode fallback matrix (EPIC-0068)")
     void rule19_containsInteractiveModeFallbackMatrix() throws IOException {
-        // EPIC-0078 story-0078-0011 slimmed Rule 19: the interactiveMode fallback matrix
-        // moved from the rule body to the lifecycle KP backward-compatibility.md.
-        // Rule 19 now references `interactiveMode` in the KP pointer; the full matrix lives in the KP.
-        Path rule19 =
-                Path.of("src/main/resources/targets/claude/rules/19-backward-compatibility.md");
-        Path kp =
+        // Rules Consolidation (chore/rules-consolidation-essentials): Rule 19 source file
+        // migrated to governance/rules/lifecycle-contract.md KP. Validate via the KP path.
+        Path lifecycleContractKp =
+                Path.of(
+                        "src/main/resources/targets/claude/knowledge/governance/rules/lifecycle-contract.md");
+        Path backwardCompatKp =
                 Path.of(
                         "src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md");
 
-        assertThat(rule19).as("Rule 19 source-of-truth must exist").exists();
-        assertThat(kp).as("backward-compatibility KP must exist").exists();
+        assertThat(lifecycleContractKp).as("Lifecycle contract KP must exist").exists();
+        assertThat(backwardCompatKp).as("backward-compatibility KP must exist").exists();
 
-        String rule19Content = Files.readString(rule19);
-        assertThat(rule19Content)
-                .as("Rule 19 must reference interactiveMode (pointer to KP — EPIC-0078 slim)")
+        String lifecycleContent = Files.readString(lifecycleContractKp);
+        assertThat(lifecycleContent)
+                .as("lifecycle-contract KP must reference interactiveMode")
                 .contains("interactiveMode");
 
-        String kpContent = Files.readString(kp);
+        String kpContent = Files.readString(backwardCompatKp);
         assertThat(kpContent)
                 .as("Lifecycle KP must contain interactiveMode fallback matrix")
                 .contains("`interactiveMode` Fallback Matrix")

@@ -1,6 +1,6 @@
 ---
 name: x-run-dast
-description: "Dynamic Application Security Testing -- tests the running application for XSS, injection, misconfiguration, and information disclosure using OWASP ZAP or Nuclei."
+description: "DAST: tests running app for XSS, injection, misconfig via OWASP ZAP or Nuclei."
 user-invocable: true
 allowed-tools: Read, Bash
 argument-hint: "--target <URL> [--env local|dev|homolog|prod] [--mode passive|active|full] [--confirm-prod] [--openapi <path>] [--auth-token <token>]"

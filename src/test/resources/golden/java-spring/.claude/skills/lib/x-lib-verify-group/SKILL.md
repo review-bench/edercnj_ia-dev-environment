@@ -1,6 +1,6 @@
 ---
 name: x-lib-verify-group
-description: "Build gate verification between parallelism groups. Compiles code, classifies errors, decides retry vs escalate, extracts outputs for next group. Used between each implementation group in Phase 2."
+description: "Build gate verification between parallelism groups: compile, classify, retry/escalate."
 user-invocable: false
 allowed-tools: Bash, Read, Grep, Glob
 requires-capabilities: []

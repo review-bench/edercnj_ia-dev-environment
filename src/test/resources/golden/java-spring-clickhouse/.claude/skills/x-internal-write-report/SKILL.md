@@ -1,6 +1,6 @@
 ---
 name: x-internal-write-report
-description: "Renders _TEMPLATE-*.md templates by substituting {{KEY}} placeholders (simple and nested, dot-path) and resolving {{#each}} loops against a structured JSON data payload, then writes the result atomically to an output path. Supports an --append mode with per-section deduplication keyed by `## ID: <value>` markers. Centralises phase reports, epic execution reports and planning reports so orchestrators (x-implement-epic, x-orchestrate-epic, x-implement-story) stop duplicating `Read template + inline Edit/Write` logic. Second skill in the x-internal-* convention (after x-internal-update-status pilot): internal visibility, non-user-invocable, subdir scoping under internal/ops/."
+description: "Renders _TEMPLATE-*.md from a JSON payload and writes the result atomically."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash

@@ -1,6 +1,6 @@
 ---
 name: micronaut-scaffold
-description: "Scaffold a Micronaut service with @Controller, @Singleton DI, health indicators, compile-time DI, Dockerfile, and integration tests."
+description: "Scaffolds a Micronaut service with @Controller, DI, health, Dockerfile, and tests."
 visibility: public
 model: sonnet
 requires-capabilities: [web.micronaut.framework]

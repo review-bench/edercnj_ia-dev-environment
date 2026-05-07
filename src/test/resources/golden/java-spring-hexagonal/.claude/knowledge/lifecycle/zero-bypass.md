@@ -40,7 +40,7 @@ Rule 27 loaded every conversation. CLAUDE.md carries "ZERO-BYPASS LIFECYCLE — 
 ### Camada 3 — CI Audit
 
 `scripts/audit-execution-integrity.sh` runs on every PR to `develop` or `epic/*`:
-- Verifies all 13 surface evidence artifacts for each merged story.
+- Verifies all 13 surfaces evidence artifacts for each merged story.
 - Fails with `EIE_EVIDENCE_MISSING` when any mandatory artifact is absent.
 - `scripts/audit-bypass-flags.sh` scans for `--no-ci-watch` or `--skip-*` outside `## Recovery` blocks.
 

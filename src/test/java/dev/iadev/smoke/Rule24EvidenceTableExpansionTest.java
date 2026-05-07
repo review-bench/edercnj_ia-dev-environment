@@ -56,10 +56,10 @@ class Rule24EvidenceTableExpansionTest extends SmokeTestBase {
     @DisplayName("lifecycle KP evidence table contains all 11 expected sub-skills")
     void rule24_evidenceTable_containsExpectedSubSkills(String profile) throws IOException {
         runPipeline(profile);
-        Path rule = getOutputDir(profile).resolve(".claude/rules/24-execution-integrity.md");
+        // rules-consolidation-essentials: Rule 24 stub removed from .claude/rules/;
+        // content fully lives in the lifecycle execution-integrity KP.
         Path kp = getOutputDir(profile).resolve(EVIDENCE_KP_PATH);
 
-        assertThat(rule).as("profile %s: Rule 24 file must exist", profile).exists();
         assertThat(kp).as("profile %s: execution-integrity KP must exist", profile).exists();
 
         String body = Files.readString(kp, StandardCharsets.UTF_8);

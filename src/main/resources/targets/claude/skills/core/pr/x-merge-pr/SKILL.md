@@ -1,6 +1,6 @@
 ---
 name: x-merge-pr
-description: "Merges a single PR via gh CLI with configurable strategy (merge/squash/rebase), idempotency for already-merged PRs, pre-checks for CI and approvals in synchronous mode, GitHub native auto-merge in --auto mode, and structured error codes. Extracted from x-implement-epic Phase 1.3b to provide a testable, reusable merge primitive callable from x-create-pr --auto-merge and x-implement-epic."
+description: "Merges a single PR via gh CLI with configurable strategy and idempotent behavior."
 user-invocable: true
 allowed-tools: Bash, Read, Write
 argument-hint: "--pr N [--strategy merge|squash|rebase] [--delete-branch true|false] [--auto] [--wait-timeout-min N]"

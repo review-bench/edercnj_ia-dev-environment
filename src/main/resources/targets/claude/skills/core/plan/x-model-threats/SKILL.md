@@ -1,6 +1,6 @@
 ---
 name: x-model-threats
-description: "Generate threat models using STRIDE analysis: identify components, map data flows, analyze threats per category, classify severity, suggest mitigations, and produce threat model document."
+description: "Generates STRIDE threat models: components, data flows, threats, severity, mitigations."
 user-invocable: true
 allowed-tools: Read, Write, Glob, Grep, Agent
 argument-hint: "[architecture-plan-path] [--format stride|pasta|linddun] [--output results/security/]"

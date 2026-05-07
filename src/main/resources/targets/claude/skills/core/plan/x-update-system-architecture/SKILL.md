@@ -1,6 +1,6 @@
 ---
 name: x-update-system-architecture
-description: "Incrementally updates docs/architecture/system.md after an epic completes. Appends new entries to the Decision Log (§11) using x-internal-write-report --append (dedup by ## ID: marker) and surgically inserts component/integration changes into sections 1-10 via Edit. Idempotent: re-running with the same epic produces a byte-identical system.md."
+description: "Incrementally updates docs/architecture/system.md after an epic completes."
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Edit, Skill, Glob, Bash

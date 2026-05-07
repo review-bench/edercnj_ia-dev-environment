@@ -1,6 +1,6 @@
 ---
 name: x-review-api
-description: "Validates REST API endpoints for RFC 7807 error responses, pagination, URL versioning, OpenAPI documentation, status codes, and DTO patterns."
+description: "Validates REST endpoints: RFC 7807, pagination, versioning, OpenAPI, status codes, DTOs."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[endpoint-path or feature-name]"

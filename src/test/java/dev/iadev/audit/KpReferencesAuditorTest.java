@@ -17,7 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Maven CI-blocking audit harness for audit-kp-references.sh (EPIC-0078 story-0078-0015).
  *
- * <p>Validates exit codes 0/1/2/3/4 per Rule 26 §Standardized Exit Codes + story-0078-0015 contract.
+ * <p>Validates exit codes 0/1/2/3/4 per Rule 26 §Standardized Exit Codes + story-0078-0015
+ * contract.
  */
 @DisplayName("KpReferencesAuditorTest (Maven CI-blocking)")
 @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Bash script tests require POSIX environment")
@@ -29,14 +30,10 @@ class KpReferencesAuditorTest {
                     "src/main/resources/targets/claude/scripts/audit-kp-references.sh");
 
     private static final Path KNOWLEDGE_ROOT =
-            Path.of(
-                    System.getProperty("user.dir"),
-                    "src/main/resources/targets/claude/knowledge");
+            Path.of(System.getProperty("user.dir"), "src/main/resources/targets/claude/knowledge");
 
     private static final Path SKILLS_ROOT =
-            Path.of(
-                    System.getProperty("user.dir"),
-                    "src/main/resources/targets/claude/skills");
+            Path.of(System.getProperty("user.dir"), "src/main/resources/targets/claude/skills");
 
     private static final String REPO_DIR = System.getProperty("user.dir");
 
@@ -81,8 +78,8 @@ class KpReferencesAuditorTest {
     @Test
     @DisplayName("--self-check passes when knowledge and skills roots exist")
     void selfCheck_passesWithValidRoots() throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder(
-                "/bin/bash", AUDIT_SCRIPT.toString(), "--self-check");
+        ProcessBuilder pb =
+                new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--self-check");
         pb.directory(new File(REPO_DIR));
         pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
         pb.environment().put("KNOWLEDGE_ROOT", KNOWLEDGE_ROOT.toString());
@@ -107,16 +104,18 @@ class KpReferencesAuditorTest {
 
     @Test
     @DisplayName("happy path: KP referenced by skill exits 0")
-    void happyPath_kpReferenced_exits0(@TempDir Path tempRoot) throws IOException, InterruptedException {
+    void happyPath_kpReferenced_exits0(@TempDir Path tempRoot)
+            throws IOException, InterruptedException {
         Path knowledgeDir = tempRoot.resolve("knowledge/security/anti-patterns");
         Files.createDirectories(knowledgeDir);
         Files.writeString(knowledgeDir.resolve("j1-sql.md"), "# J1 SQL Injection\n");
 
         Path skillsDir = tempRoot.resolve("skills/x-review-qa");
         Files.createDirectories(skillsDir);
-        Files.writeString(skillsDir.resolve("SKILL.md"),
+        Files.writeString(
+                skillsDir.resolve("SKILL.md"),
                 "---\nname: x-review-qa\n---\n"
-                + "Read knowledge/security/anti-patterns/j1-sql.md\n");
+                        + "Read knowledge/security/anti-patterns/j1-sql.md\n");
 
         java.util.Map<String, String> env = new java.util.HashMap<>();
         env.put("KNOWLEDGE_ROOT", tempRoot.resolve("knowledge").toString());
@@ -130,11 +129,13 @@ class KpReferencesAuditorTest {
     void orphanKp_exits1(@TempDir Path tempRoot) throws IOException, InterruptedException {
         Path knowledgeDir = tempRoot.resolve("knowledge/governance");
         Files.createDirectories(knowledgeDir);
-        Files.writeString(knowledgeDir.resolve("capability-composition.md"), "# Capability Composition\n");
+        Files.writeString(
+                knowledgeDir.resolve("capability-composition.md"), "# Capability Composition\n");
 
         Path skillsDir = tempRoot.resolve("skills/x-some-skill");
         Files.createDirectories(skillsDir);
-        Files.writeString(skillsDir.resolve("SKILL.md"), "---\nname: x-some-skill\n---\n# No KP refs here\n");
+        Files.writeString(
+                skillsDir.resolve("SKILL.md"), "---\nname: x-some-skill\n---\n# No KP refs here\n");
 
         ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString());
         pb.directory(new File(REPO_DIR));
@@ -151,8 +152,8 @@ class KpReferencesAuditorTest {
     @Test
     @DisplayName("path traversal in --knowledge-root exits 2")
     void pathTraversal_exits2() throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder(
-                "/bin/bash", AUDIT_SCRIPT.toString(), "--knowledge-root", "..");
+        ProcessBuilder pb =
+                new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--knowledge-root", "..");
         pb.directory(new File(REPO_DIR));
         pb.redirectErrorStream(true);
         Process proc = pb.start();
@@ -169,7 +170,8 @@ class KpReferencesAuditorTest {
             return; // skip if roots missing
         }
         Path baselinePath = Path.of(REPO_DIR, "governance/baselines/kp-references-baseline.txt");
-        ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--mode=kp-orphan");
+        ProcessBuilder pb =
+                new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--mode=kp-orphan");
         pb.directory(new File(REPO_DIR));
         pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
         pb.environment().put("KNOWLEDGE_ROOT", KNOWLEDGE_ROOT.toString());

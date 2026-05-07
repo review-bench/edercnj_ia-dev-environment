@@ -141,45 +141,57 @@ class Epic0072AuditMutationScoreSmokeIT {
     @DisplayName("Rule 05 extension")
     class Rule05Extension {
 
-        private static final Path RULES_ROOT =
-                Path.of("src", "main", "resources", "targets", "claude", "rules");
+        // EPIC-0078 rules-consolidation-essentials: Rule 05 merged into 00-essentials.md +
+        // knowledge/governance/rules/quality-gates.md KP.
+        private static final Path KP_ROOT =
+                Path.of(
+                        "src",
+                        "main",
+                        "resources",
+                        "targets",
+                        "claude",
+                        "knowledge",
+                        "governance",
+                        "rules");
 
         @Test
         @DisplayName("scenario11_rule05_containsMutationScoreSection")
         void scenario11_rule05_containsMutationScoreSection() throws Exception {
-            Path rule05 = RULES_ROOT.resolve("05-quality-gates.md").toAbsolutePath();
-            assertThat(rule05).exists();
-            String content = Files.readString(rule05);
+            Path qualityKp = KP_ROOT.resolve("quality-gates.md").toAbsolutePath();
+            assertThat(qualityKp).exists();
+            String content = Files.readString(qualityKp);
             assertThat(content)
-                    .as("Rule 05 must contain §Mutation Score Threshold")
+                    .as("quality-gates KP must contain §Mutation Score Threshold")
                     .contains("Mutation Score Threshold");
             assertThat(content)
-                    .as("Rule 05 must reference MUTATION_SCORE_VIOLATION")
+                    .as("quality-gates KP must reference MUTATION_SCORE_VIOLATION")
                     .contains("MUTATION_SCORE_VIOLATION");
         }
 
         @Test
         @DisplayName("scenario12_rule05_containsPerformanceBudgetSection")
         void scenario12_rule05_containsPerformanceBudgetSection() throws Exception {
-            Path rule05 = RULES_ROOT.resolve("05-quality-gates.md").toAbsolutePath();
-            String content = Files.readString(rule05);
+            Path qualityKp = KP_ROOT.resolve("quality-gates.md").toAbsolutePath();
+            String content = Files.readString(qualityKp);
             assertThat(content)
-                    .as("Rule 05 must contain §Performance Budget")
+                    .as("quality-gates KP must contain §Performance Budget")
                     .contains("Performance Budget");
             assertThat(content)
-                    .as("Rule 05 must reference perf-baseline-updates.log")
+                    .as("quality-gates KP must reference perf-baseline-updates.log")
                     .contains("perf-baseline-updates.log");
         }
 
         @Test
         @DisplayName("scenario13_rule05_containsStagePolicyDoc")
         void scenario13_rule05_containsStagePolicyDoc() throws Exception {
-            Path rule05 = RULES_ROOT.resolve("05-quality-gates.md").toAbsolutePath();
-            String content = Files.readString(rule05);
+            Path qualityKp = KP_ROOT.resolve("quality-gates.md").toAbsolutePath();
+            String content = Files.readString(qualityKp);
             assertThat(content)
-                    .as("Rule 05 must document stage policy WARN→FAIL")
+                    .as("quality-gates KP must document stage policy WARN→FAIL")
                     .contains("Stage Policy");
-            assertThat(content).as("Rule 05 must mention release_count").contains("release_count");
+            assertThat(content)
+                    .as("quality-gates KP must mention release_count")
+                    .contains("release_count");
         }
     }
 

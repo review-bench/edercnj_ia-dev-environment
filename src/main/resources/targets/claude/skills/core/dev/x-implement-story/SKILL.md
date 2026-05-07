@@ -1,7 +1,7 @@
 ---
 name: x-implement-story
 model: sonnet
-description: "Thin orchestrator (~320 lines — story-0049-0019 refactor) that drives a story end-to-end via 4 delegated phases: Phase 0 (args via x-internal-normalize-args + context via x-internal-load-story-context + resume via x-internal-resume-story), Phase 1 (parallel planning via x-internal-build-story-plan), Phase 2 (task execution loop via x-implement-task per task, then final story PR via x-create-pr), Phase 3 (verify via x-internal-verify-story + report via x-internal-write-story-report + optional worktree cleanup via x-manage-worktrees). New EPIC-0049 flags --target-branch / --auto-merge / --epic-id propagate OO-style to x-implement-task and x-create-pr. Backward compatible: absent flags preserve legacy EPIC-0048 behavior (target=develop, auto-merge=none)."
+description: "Drives a story end-to-end via 4 phases: plan, task loop, verify, report."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, TaskUpdate, AskUserQuestion
 argument-hint: "[STORY-ID] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>] [--auto-approve-pr] [--task TASK-ID] [--resume] [--skip-verification] [--skip-smoke] [--skip-review] [--full-lifecycle] [--worktree] [--non-interactive] [--no-auto-remediation] [--no-ci-watch]"

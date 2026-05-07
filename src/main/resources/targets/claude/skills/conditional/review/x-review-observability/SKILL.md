@@ -1,6 +1,6 @@
 ---
 name: x-review-observability
-description: "Observability specialist review: validates distributed tracing, metrics naming, structured logging, health checks, correlation IDs, and alerting configuration."
+description: "Observability review: tracing, metrics naming, structured logging, health, correlation."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"

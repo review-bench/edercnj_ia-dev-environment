@@ -1,6 +1,6 @@
 ---
 name: x-refine-story
-description: "Multi-persona 4-phase story refinement dispatcher. Phase A: 5-7 parallel specialist agents analyse the story for gaps. Phase B: single consolidated question batch to the operator. Phase C: 5-7 parallel specialists refine with answers. Phase D: Architect (opus) consolidates a Refinement Verdict and dual-writes to execution-state.json + story markdown."
+description: "Multi-persona 4-phase story refinement: parallel specialists + verdict."
 visibility: public
 user-invocable: true
 model: sonnet

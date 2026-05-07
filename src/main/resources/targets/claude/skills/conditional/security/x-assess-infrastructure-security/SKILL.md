@@ -1,6 +1,6 @@
 ---
 name: x-assess-infrastructure-security
-description: "Scans Kubernetes manifests, Terraform modules, Helm charts, and Docker Compose files for misconfigurations against CIS benchmarks."
+description: "Scans Kubernetes/Terraform/Helm/Compose files for misconfigurations vs CIS benchmarks."
 user-invocable: true
 allowed-tools: Bash, Read, Write, Glob, Grep
 argument-hint: "[--scope k8s|terraform|helm|compose|all] [--benchmark cis-1.8|cis-1.7|custom]"

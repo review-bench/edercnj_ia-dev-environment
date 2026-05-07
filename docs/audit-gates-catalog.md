@@ -1,7 +1,7 @@
 # Audit Gates Catalog
 
 > **Maintained by:** Rule 26 §Catalog-before-Add (RULE-004).
-> **Last updated:** story-0068-0004 (EPIC-0068 — Continuous-Flow Heartbeat Hook).
+> **Last updated:** chore/rules-consolidation-essentials (ADR-0034 — Rules Consolidation).
 > **Purpose:** Single source of truth for every governance gate across all 5 layers (Camada 0–4).
 >
 > No gate of any layer may be introduced in any Rule, ADR, SKILL.md, or code comment
@@ -444,6 +444,17 @@
 
 ---
 
+### audit-essentials-rule.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | ADR-0034 — Rules Consolidation (chore/rules-consolidation-essentials) |
+| **Layer** | 2 — CI Script |
+| **Validates** | `00-essentials.md` exists; ≤ 400 lines; §1–§7 sections present (`Project Identity`, `Hard Limits`, `Architecture Golden Rule`, `Forbidden`, `Lifecycle Integrity Contract`, `Skill Invocation Protocol`, `Knowledge Pack Index`); no old numbered rule files (`[0-9][0-9]-*.md`) in `.claude/rules/`; required governance KPs exist under `knowledge/governance/rules/`. |
+| **Introduced** | chore/rules-consolidation-essentials (ADR-0034) |
+| **Exit Codes** | `0` = OK · `1` = `ESSENTIALS_RULE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
+
+---
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.

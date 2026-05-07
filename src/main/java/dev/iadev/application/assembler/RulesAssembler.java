@@ -1,5 +1,6 @@
 package dev.iadev.application.assembler;
 
+import dev.iadev.application.assembler.rules.EssentialsRuleWriter;
 import dev.iadev.config.ContextBuilder;
 import dev.iadev.domain.model.ProjectConfig;
 import dev.iadev.domain.stack.VersionResolver;
@@ -13,20 +14,18 @@ import java.util.Map;
  * Assembles {@code .claude/rules/} and {@code .claude/skills/} from source knowledge packs and
  * templates.
  *
- * <p>This is the first assembler in the pipeline (position 1 of 23 per RULE-005). It delegates to
- * specialized writers: {@link CoreRulesWriter} for 9 core rules (plus conditional rules 09-12),
- * {@link LanguageKpWriter} for language knowledge packs, and {@link FrameworkKpWriter} for
- * framework knowledge packs.
+ * <p>This is the first assembler in the pipeline. As of EPIC-0078 Rules Consolidation, it delegates
+ * to {@link EssentialsRuleWriter} to write the single {@code 00-essentials.md} rule file, and to
+ * {@link CoreRulesWriter} for KP routing, conditional rules, and language/ framework KPs.
  *
  * <p>Assembly layers:
  *
  * <ol>
- *   <li>Core rules — copy targets/claude/rules/*.md with replacement
+ *   <li>Essentials rule — write {@code 00-essentials.md} from template (replaces ~29 per-rule
+ *       files)
  *   <li>Core KP routing — route core docs to knowledge packs
  *   <li>Language KPs — language-specific coding standards and testing conventions
  *   <li>Framework KPs — framework-specific patterns
- *   <li>Project identity — generate 01-project-identity.md (overwrites template copy)
- *   <li>Domain template — generate/copy 02-domain.md
  *   <li>Conditionals — database, cache, security, cloud, infrastructure
  * </ol>
  *
@@ -39,14 +38,14 @@ import java.util.Map;
  * }</pre>
  *
  * @see Assembler
- * @see RulesIdentity
- * @see RulesConditionals
+ * @see EssentialsRuleWriter
  * @see CoreRulesWriter
  * @see LanguageKpWriter
  * @see FrameworkKpWriter
  */
 public final class RulesAssembler implements Assembler {
 
+    private final EssentialsRuleWriter essentialsWriter;
     private final CoreRulesWriter coreWriter;
     private final LanguageKpWriter languageWriter;
     private final FrameworkKpWriter frameworkWriter;
@@ -72,6 +71,7 @@ public final class RulesAssembler implements Assembler {
      * @param versionResolver the version resolver
      */
     RulesAssembler(Path resourcesDir, VersionResolver versionResolver) {
+        this.essentialsWriter = new EssentialsRuleWriter(resourcesDir);
         this.coreWriter = new CoreRulesWriter(resourcesDir);
         this.languageWriter = new LanguageKpWriter(resourcesDir, versionResolver);
         this.frameworkWriter = new FrameworkKpWriter(resourcesDir, versionResolver);
@@ -104,7 +104,7 @@ public final class RulesAssembler implements Assembler {
             Path skillsDir,
             Map<String, Object> context,
             List<String> generated) {
-        generated.addAll(coreWriter.copyCoreRules(rulesDir, engine, context));
+        generated.add(essentialsWriter.write(config, engine, rulesDir, context));
         generated.addAll(coreWriter.routeCoreToKps(config, skillsDir));
         generated.addAll(languageWriter.copyLanguageKps(config, skillsDir));
         generated.addAll(frameworkWriter.copyFrameworkKps(config, skillsDir));
@@ -117,11 +117,6 @@ public final class RulesAssembler implements Assembler {
             Path skillsDir,
             Map<String, Object> context,
             List<String> generated) {
-        generated.add(coreWriter.generateProjectIdentity(config, rulesDir));
-        String domainPath = coreWriter.copyDomainTemplate(config, rulesDir, engine, context);
-        if (domainPath != null) {
-            generated.add(domainPath);
-        }
         generated.addAll(coreWriter.copyConditionalDataRule(config, rulesDir, engine, context));
         generated.addAll(
                 coreWriter.copyConditionalAntiPatternsRule(config, rulesDir, engine, context));
@@ -129,8 +124,6 @@ public final class RulesAssembler implements Assembler {
         generated.addAll(
                 coreWriter.copyConditionalSecurityAntiPatternsRule(
                         config, rulesDir, engine, context));
-        generated.addAll(
-                SecurityBaselineWriter.appendVerificationSection(config.security(), rulesDir));
         generated.addAll(coreWriter.copyConditionals(config, skillsDir, engine, context));
     }
 

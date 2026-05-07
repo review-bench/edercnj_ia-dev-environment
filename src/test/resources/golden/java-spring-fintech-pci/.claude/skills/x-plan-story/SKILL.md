@@ -1,6 +1,6 @@
 ---
 name: x-plan-story
-description: "Multi-agent story planning: launches 7 specialized agents (Architect, QA, Security, PentestEngineer, TechLead, ProductOwner, PerformanceEngineer) in parallel to produce a consolidated task breakdown, individual task plans, planning report, and DoR validation. Schema-aware: v1 (legacy) runs the original 6-phase flow; v2 (task-first, EPIC-0038) adds Phases 4a-4c that emit task-TASK-NNN.md + plan-task-TASK-NNN.md per task and a task-implementation-map-STORY-*.md, wiring every task through x-plan-task in parallel."
+description: "Multi-agent story planning: 7 specialized agents produce task breakdown and plans."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
 argument-hint: "[STORY-ID] [--force] [--skip-dor] [--dry-run] [--no-commit]"

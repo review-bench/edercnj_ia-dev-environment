@@ -221,11 +221,13 @@ class FrontmatterSmokeTest extends SmokeTestBase {
 
             for (Path ruleFile : ruleFiles) {
                 String raw = Files.readString(ruleFile, StandardCharsets.UTF_8).trim();
-                // EPIC-0078 story-0078-0014: rules now have YAML frontmatter (requires-capabilities).
+                // EPIC-0078 story-0078-0014: rules now have YAML frontmatter
+                // (requires-capabilities).
                 // Strip the frontmatter block (---...---) before checking the heading.
-                String content = raw.startsWith("---")
-                        ? raw.replaceFirst("(?s)^---.*?---\\s*", "").trim()
-                        : raw;
+                String content =
+                        raw.startsWith("---")
+                                ? raw.replaceFirst("(?s)^---.*?---\\s*", "").trim()
+                                : raw;
                 if (!content.startsWith("# Rule") && !content.startsWith("# Global")) {
                     violations.add(
                             "%s starts with: %s"

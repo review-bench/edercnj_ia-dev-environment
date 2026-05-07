@@ -1,6 +1,6 @@
 ---
 name: x-create-git-branch
-description: "Creates a bare git branch (no worktree) from a configurable base with naming validation and idempotency. Single source of truth for branch creation logic consumed by orchestrators (x-internal-ensure-epic-branch, x-implement-story) and users."
+description: "Creates a bare git branch from a configurable base with naming validation and idempotency."
 user-invocable: true
 allowed-tools: Bash, Read
 argument-hint: "--name <branch> [--base <branch>] [--push] [--dry-run]"

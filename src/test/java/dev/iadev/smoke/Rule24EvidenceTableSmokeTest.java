@@ -16,8 +16,8 @@ import org.junit.jupiter.api.condition.OS;
  *
  * <p>EPIC-0078 story-0078-0013 slimmed Rule 24 to a compact contract stub; the full Mandatory
  * Evidence Artifacts table moved to the lifecycle KP {@code
- * src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md}. This test
- * verifies both the slimmed rule and the KP carry the required content.
+ * src/main/resources/targets/claude/knowledge/lifecycle/execution-integrity.md}. This test verifies
+ * both the slimmed rule and the KP carry the required content.
  *
  * <p>Complements {@link Rule24EvidenceTableExpansionTest}, which exercises the pipeline end-to-end.
  * This smoke version is independent of {@code @TempDir} and runs as a fast guard against drift.
@@ -58,9 +58,7 @@ class Rule24EvidenceTableSmokeTest {
         String body = Files.readString(kp, StandardCharsets.UTF_8);
 
         assertThat(body).as("KP must list x-watch-pr-ci").contains("`x-watch-pr-ci`");
-        assertThat(body)
-                .as("KP must list x-audit-dependencies")
-                .contains("`x-audit-dependencies`");
+        assertThat(body).as("KP must list x-audit-dependencies").contains("`x-audit-dependencies`");
     }
 
     private Path repoRoot() {

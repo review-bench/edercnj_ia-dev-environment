@@ -22,9 +22,30 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Epic0078Story0014SmokeIT — rule frontmatter annotations + advisory pruning")
 class Epic0078Story0014SmokeIT {
 
-    private static final Path RULES_DIR = Path.of(
-            "src", "main", "resources", "targets", "claude", "rules");
-    private static final Path RULE_12 = RULES_DIR.resolve("12-security-anti-patterns.md");
+    // EPIC-0078: numbered rules replaced by KPs in knowledge/governance/rules/ (23 files,
+    // all with requires-capabilities frontmatter v3.0).
+    private static final Path RULES_DIR =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "knowledge",
+                    "governance",
+                    "rules");
+    // Rule 12 lives as a conditional Java-specific file; frontmatter added in EPIC-0078.
+    private static final Path RULE_12 =
+            Path.of(
+                    "src",
+                    "main",
+                    "resources",
+                    "targets",
+                    "claude",
+                    "rules",
+                    "conditional",
+                    "security-anti-patterns",
+                    "12-security-anti-patterns.java.md");
 
     private static ResolvedCapabilitySet capSet(List<String> ids) {
         return new ResolvedCapabilitySet(
@@ -41,7 +62,9 @@ class Epic0078Story0014SmokeIT {
             for (Path rule : mdFiles) {
                 String content = Files.readString(rule, StandardCharsets.UTF_8);
                 assertThat(content)
-                        .as("Rule %s must have requires-capabilities frontmatter", rule.getFileName())
+                        .as(
+                                "Rule %s must have requires-capabilities frontmatter",
+                                rule.getFileName())
                         .startsWith("---")
                         .contains("requires-capabilities");
             }
@@ -68,8 +91,7 @@ class Epic0078Story0014SmokeIT {
         Path tempDir = Files.createTempDirectory("story0014-smoke");
         try {
             Path rule = tempDir.resolve("12-security-anti-patterns.md");
-            Files.writeString(rule,
-                    "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
+            Files.writeString(rule, "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
 
             ResolvedCapabilitySet pythonProfile = capSet(List.of());
             CompositionPlan plan = composer.plan(pythonProfile, tempDir);
@@ -90,8 +112,7 @@ class Epic0078Story0014SmokeIT {
         Path tempDir = Files.createTempDirectory("story0014-java");
         try {
             Path rule = tempDir.resolve("12-security-anti-patterns.md");
-            Files.writeString(rule,
-                    "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
+            Files.writeString(rule, "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
 
             ResolvedCapabilitySet javaProfile = capSet(List.of("lang.java.21"));
             CompositionPlan plan = composer.plan(javaProfile, tempDir);
@@ -111,8 +132,7 @@ class Epic0078Story0014SmokeIT {
         Path tempDir = Files.createTempDirectory("story0014-hard");
         try {
             Path rule = tempDir.resolve("12-security-anti-patterns.md");
-            Files.writeString(rule,
-                    "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
+            Files.writeString(rule, "---\nrequires-capabilities: [lang.java.*]\n---\n# Rule 12\n");
 
             ResolvedCapabilitySet pythonProfile = capSet(List.of());
             CompositionPlan plan = hardComposer.plan(pythonProfile, tempDir);

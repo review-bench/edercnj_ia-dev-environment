@@ -1,6 +1,6 @@
 ---
 name: x-review-security
-description: "Reviews code changes for compliance with selected security frameworks. Verifies sensitive data handling, audit trails, and access control patterns."
+description: "Reviews code changes for compliance with selected security frameworks and patterns."
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"

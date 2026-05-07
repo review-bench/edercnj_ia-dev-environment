@@ -1,6 +1,6 @@
 ---
 name: x-migrate-frontmatter
-description: Migrates artifact frontmatter from v2 to v3.0 (requires-capabilities) using path heuristics, keyword scan, and AI fallback
+description: "Migrates artifact frontmatter from v2 to v3.0 (requires-capabilities) using heuristics."
 visibility: public
 user-invocable: true
 model: sonnet

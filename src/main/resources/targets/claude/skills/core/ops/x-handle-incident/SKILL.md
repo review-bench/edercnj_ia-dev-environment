@@ -1,6 +1,6 @@
 ---
 name: x-handle-incident
-description: "Guides incident response with severity-based checklists, communication templates, and postmortem triggers. Interactive guide for SEV1-SEV4 incidents covering classification, response coordination, and action item tracking."
+description: "Guides SEV1-SEV4 incident response with checklists, comms templates, and postmortems."
 user-invocable: true
 argument-hint: "[severity SEV1|SEV2|SEV3|SEV4] [--postmortem] [--notify]"
 allowed-tools: Read, Write, Bash, Grep, Glob, Agent

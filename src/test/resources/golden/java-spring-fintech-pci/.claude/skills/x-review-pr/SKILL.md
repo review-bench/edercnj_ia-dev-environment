@@ -1,6 +1,6 @@
 ---
 name: x-review-pr
-description: "Tech Lead holistic review with 64-point checklist covering Clean Code, SOLID, architecture, framework conventions, tests, TDD process, security, and cross-file consistency. Produces GO/NO-GO decision. Use for final review before merge."
+description: "Tech Lead holistic review with 45-point checklist; produces GO/NO-GO verdict."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
 argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"

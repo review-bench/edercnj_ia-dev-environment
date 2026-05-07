@@ -21,6 +21,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`ContextBudgetAuditorTest`**: extended with 2 new scenarios — hard-fail exits 1 on exceeded limit, and no-flag defaults to hard-fail.
 - **`Epic0078Story0014SmokeIT`**: updated scenario3 to assert `HARD` is the default mode and that non-Java rules move to `excluded` (not `included + warning`) in HARD mode.
 
+### Added — chore/rules-consolidation-essentials (Rules Consolidation — ADR-0034)
+
+- **`00-essentials.md`** (generated output): single always-loaded rule file (≤ 400 lines) replacing 28 numbered rule files. Sections §1–§7: Project Identity, Hard Limits, Architecture Golden Rule, Forbidden, Lifecycle Integrity Contract, Skill Invocation Protocol, Knowledge Pack Index. Generated from `_TEMPLATE-ESSENTIALS-RULE.md` by `EssentialsRuleWriter`.
+- **`_TEMPLATE-ESSENTIALS-RULE.md`** (`src/main/resources/shared/templates/`): source template for the single essentials rule. Validates via `FatJarContentTest.coreRules_essentialsTemplate_exists()`.
+- **23 Knowledge Pack files** under `src/main/resources/targets/claude/knowledge/governance/rules/`: `ai-memory-production.md`, `architecture-summary.md`, `audit-gate-lifecycle.md`, `branching.md`, `capability-frontmatter.md`, `coding-standards-rule.md`, `dependency-policy.md`, `doc-freshness-gate.md`, `domain-template.md`, `epic-branch-model.md`, `interactive-gates.md`, `lifecycle-contract.md`, `model-selection.md`, `operations-baseline.md`, `project-scope.md`, `quality-gates.md`, `release-process.md`, `security-baseline.md`, `skill-invocation.md`, `skill-visibility.md`, `task-hierarchy.md`, `tool-call-grammar.md`, `value-driven-templates.md`. All are lazy-loaded via `00-essentials.md` §7 Read links.
+- **`knowledge/security/anti-patterns-java.md`**: consolidated Java security anti-patterns KP (migrated from `12-security-anti-patterns.md` always-loaded rule).
+- **`EssentialsRuleWriter.java`** (`dev.iadev.application.assembler.rules`): new assembler that reads the template, runs placeholder substitution, injects `{PROJECT_IDENTITY_SECTION}`, and writes `00-essentials.md`.
+- **`audit-essentials-rule.sh`** (`src/main/resources/targets/claude/scripts/`): CI audit script verifying essentials invariants. Exit codes: `0=OK`, `1=ESSENTIALS_RULE_VIOLATION`, `2=OPERATIONAL_ERROR`.
+- **`ADR-0034`** (`docs/adr/ADR-0034-rules-consolidation.md`): architectural decision record documenting the context, decision, alternatives considered, and consequences of the rules consolidation.
+- **`docs/audit-gates-catalog.md`**: added `audit-essentials-rule.sh` entry (Layer 2, 2 exit codes).
+
+### Removed — chore/rules-consolidation-essentials (Rules Consolidation — ADR-0034)
+
+The following 28 always-loaded numbered rule source files were deleted from `src/main/resources/targets/claude/rules/`. Their full content was migrated to the corresponding KP under `knowledge/governance/rules/`:
+
+`01-project-identity.md`, `02-domain.md`, `03-coding-standards.md`, `04-architecture-summary.md`, `05-quality-gates.md`, `06-security-baseline.md`, `07-operations-baseline.md`, `08-release-process.md`, `09-branching-model.md`, `13-skill-invocation-protocol.md`, `14-project-scope.md`, `19-backward-compatibility.md`, `20-interactive-gates.md`, `21-epic-branch-model.md`, `22-skill-visibility.md`, `23-model-selection.md`, `24-execution-integrity.md`, `25-task-hierarchy.md`, `26-audit-gate-lifecycle.md`, `27-zero-bypass-lifecycle.md`, `28-capability-frontmatter-contract.md`, `28-tool-call-grammar.md`, `29-refinement-gate.md`, `30-tool-call-grammar.md`, `30-value-driven-templates.md`, `31-documentation-freshness-gate.md`, `32-dependency-policy-gate.md`, `33-ai-memory-production.md`, `45-ci-watch-integrity.md`.
+
+### Changed — chore/rules-consolidation-essentials (Rules Consolidation — ADR-0034)
+
+- **`RulesAssembler.java`**: `assembleCoreRulesAndKps()` now calls `essentialsWriter.write()` (generating `00-essentials.md`) instead of copying 28 individual rule files. `assembleIdentityAndConditionals()` retains conditional rule logic (data-management, anti-patterns, PCI, security-anti-patterns).
+- **`RulesAssemblerTest.java`**: rewritten — tests now validate `00-essentials.md` generation, absence of old numbered rule files, project identity injection, and §1-§7 sections. Old tests for numbered files removed.
+- **`governance/baselines/kp-references-baseline.txt`**: extended with 24 new entries for governance/rules KPs + `security/anti-patterns-java.md` (all baseline-exempt since they're referenced via `00-essentials.md` §7 Read links, not via skill YAML frontmatter).
+- **Golden files regenerated** for all 9 profiles (`java-spring`, `java-spring-hexagonal`, `java-spring-clickhouse`, `java-spring-cqrs-es`, `java-spring-event-driven`, `java-spring-fintech-pci`, `java-spring-neo4j`, `java-quarkus`): `.claude/rules/` now contains only `00-essentials.md` + applicable conditional rules.
+
 ### Added — EPIC-0078 story-0078-0015 (KP Orphan Detector)
 
 - **`audit-kp-references.sh`** (`src/main/resources/targets/claude/scripts/`): CI audit script that detects Knowledge Pack orphans — KPs not referenced by any skill. Exit codes: `0=OK`, `1=KP_ORPHAN`, `2=OPERATIONAL_ERROR`, `3=BASELINE_CORRUPT`, `4=SECURITY_KP_MISSING`. Supports `--self-check`, `--security-strict`, `--mode`, `--format`.

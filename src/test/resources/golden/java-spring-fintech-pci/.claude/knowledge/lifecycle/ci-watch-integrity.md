@@ -61,6 +61,12 @@ Every `--no-ci-watch` occurrence outside these contexts is caught by `scripts/au
 
 `.claude/state/pr-watch-{PR_NUMBER}.json` is produced by every `x-watch-pr-ci` invocation. This file IS the evidence the watch ran. If it does not exist, the skill was not invoked.
 
+## Forbidden
+
+- Inlining `gh pr checks` instead of invoking `x-watch-pr-ci` (bypasses state-file contract).
+- Using `--no-ci-watch` outside `## Recovery` blocks.
+- Hard-coding numeric exit codes — use canonical names.
+
 ## Audit Contract
 
 | Layer | Mechanism | Trigger |

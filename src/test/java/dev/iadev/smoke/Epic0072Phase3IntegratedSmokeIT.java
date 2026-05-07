@@ -227,13 +227,16 @@ class Epic0072Phase3IntegratedSmokeIT {
             // EPIC-0078 story-0078-0013 slimmed Rule 24: evidence table moved to lifecycle KP.
             String kpContent = Files.readString(EXECUTION_INTEGRITY_KP.toAbsolutePath());
             assertThat(kpContent)
-                    .as("execution-integrity KP must list perf-report-STORY-ID.md as conditional artifact")
+                    .as(
+                            "execution-integrity KP must list perf-report-STORY-ID.md as conditional artifact")
                     .contains("perf-report-STORY-ID.md");
             assertThat(kpContent)
-                    .as("execution-integrity KP must list mutation-report-STORY-ID.md as conditional artifact")
+                    .as(
+                            "execution-integrity KP must list mutation-report-STORY-ID.md as conditional artifact")
                     .contains("mutation-report-STORY-ID.md");
             assertThat(kpContent)
-                    .as("execution-integrity KP must list contract-report-STORY-ID.md as conditional artifact")
+                    .as(
+                            "execution-integrity KP must list contract-report-STORY-ID.md as conditional artifact")
                     .contains("contract-report-STORY-ID.md");
         }
 

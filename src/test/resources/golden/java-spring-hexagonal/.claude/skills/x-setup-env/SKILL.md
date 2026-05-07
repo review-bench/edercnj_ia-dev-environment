@@ -1,6 +1,6 @@
 ---
 name: x-setup-env
-description: "Validate and configure local development environment: detect stack, check prerequisites, verify versions, validate IDE config, test database connectivity, run initial build, and report status with fix suggestions."
+description: "Validates and configures local dev environment: stack detection, deps, IDE, build."
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Write
 argument-hint: "[--check-only] [--fix]"

@@ -1,6 +1,6 @@
 ---
 name: x-internal-build-epic-plan
-description: "Builds the canonical ExecutionPlan for an epic (Phase 0/0.5 carve-out of x-implement-epic): loads epic-XXXX.md, IMPLEMENTATION-MAP.md, and every story-*.md; constructs the inter-story dependency DAG; runs Kahn's algorithm with cycle detection; optionally computes a file-overlap matrix (mode=parallel) and the critical path; then renders ai/epics/epic-XXXX/epic-execution-plan.md via x-internal-write-report using the _TEMPLATE-EPIC-EXECUTION-PLAN.md template. Emits a stable JSON envelope on stdout for orchestrator consumption. Sixth skill in the x-internal-* convention and the third under internal/plan/ (after x-internal-load-story-context and x-internal-build-story-plan)."
+description: "Builds the canonical ExecutionPlan for an epic (DAG, Kahn topo, optional parallelism)."
 visibility: internal
 user-invocable: false
 allowed-tools: Bash, Skill
