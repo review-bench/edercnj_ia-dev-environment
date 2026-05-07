@@ -1,0 +1,7 @@
+# agent-skill-wiring-baseline.txt
+# Baseline for audit-agent-skill-wiring.sh — append-only after EPIC-0079 merge.
+# Format: <skill-name>  # <reason>
+# Skills listed here are grandfathered from INLINE_PERSONA_VIOLATION detection.
+#
+# EPIC-0079 baseline: zero entries — all review and planning skills migrated to
+# named subagent dispatch. No legitimate inline personas remain in SKILL.md files.

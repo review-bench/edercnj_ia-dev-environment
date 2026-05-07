@@ -432,6 +432,18 @@
 
 ---
 
+### audit-agent-skill-wiring.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0079 (Native Agent–Skill Wiring) |
+| **Layer** | 2 — CI Script |
+| **Validates** | SKILL.md files under `skills/` that use `Agent(subagent_type: "general-purpose")` with an inline persona (`"You are a (Senior|Specialist|Principal)"` within 10 lines). Detects `INLINE_PERSONA_VIOLATION` for skills not grandfathered in `audits/agent-skill-wiring-baseline.txt`. |
+| **Introduced** | story-0079-0005 (EPIC-0079) |
+| **Exit Codes** | `0` = OK · `1` = `INLINE_PERSONA_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.
