@@ -1,0 +1,26 @@
+{
+  "epicId": "0079",
+  "slug": "agent-skill-wiring",
+  "flowVersion": "4",
+  "status": "refinement-approved",
+  "refinementVerdict": {
+    "status": "approved",
+    "verdictHash": "c41e5e390ae3c5d72d1bc6ac1da80757ea2b402776180ccf85f8bd9d80027ed5",
+    "refinedAt": "2026-05-07T17:15:51Z",
+    "blockers": []
+  },
+  "taskTracking": {
+    "enabled": true
+  },
+  "interactiveMode": false,
+  "productFirstLifecycle": false,
+  "refinementNotes": {
+    "dispatchMechanism": "Verified: Agent(subagent_type: '<agent-name>') loads .claude/agents/<name>.md as system prompt. Dispatch key = filename stem (e.g. 'architect' for architect.md). No PoC required — native Claude Code behavior confirmed by operator.",
+    "javaCompatibility": "No Java changes required. Adding tools/model fields to agent .md frontmatter does not require PlanAgentsAssembler updates — generator passes frontmatter through verbatim.",
+    "adrNumber": "To be assigned in story-0079-0007 (next available ADR number — do not pre-pin).",
+    "orphanSecurityDecision": "Deleting appsec-engineer or devsecops-engineer is safe: x-review-security provides compensating coverage for security review domain in the planning pipeline.",
+    "smokeStrategy": "Manual verification: post-migration spot-check that SKILL.md files reference subagent_type with named agent (not general-purpose). Executed during story implementation review."
+  },
+  "createdAt": "2026-05-07T00:00:00Z",
+  "updatedAt": "2026-05-07T17:15:51Z"
+}
