@@ -14,6 +14,16 @@ import java.util.List;
  */
 public final class JsonSettingsBuilder {
 
+    /**
+     * Default Claude Code skill-listing budget fraction (5% of context).
+     *
+     * <p>The Claude Code default is 1%, which truncates the skill catalog when a project ships
+     * more than ~30 skills. ia-dev-env-generated projects routinely ship ≥ 100 skills, so we pin
+     * to 5% (~10k tokens) to keep the full catalog visible to the LLM. Adjust here if the catalog
+     * grows beyond what 5% can fit.
+     */
+    private static final double SKILL_LISTING_BUDGET_FRACTION = 0.05;
+
     JsonSettingsBuilder() {
         // package-private constructor
     }
@@ -58,7 +68,8 @@ public final class JsonSettingsBuilder {
         sb.append(JsonHelpers.indent(1)).append("},\n");
         boolean hasAnyHook = hookPresence.hasHooks() || telemetryEnabled;
         sb.append(JsonHelpers.indent(1))
-                .append("\"skillListingBudgetFraction\": 0.05")
+                .append("\"skillListingBudgetFraction\": ")
+                .append(SKILL_LISTING_BUDGET_FRACTION)
                 .append(hasAnyHook ? ",\n" : "\n");
         if (hasAnyHook) {
             HookConfigBuilder.appendHooksSection(sb, hookPresence.hasHooks(), telemetryEnabled);
