@@ -3,6 +3,7 @@
 # Detects SKILL.md files that use Agent(subagent_type: "general-purpose") with
 # an inline persona heuristic: "You are a (Senior|Specialist|Principal)" within
 # 10 lines of the general-purpose dispatch.
+# --check-orphans: detects agent files with zero subagent_type callsites in skills.
 # Exit codes: 0=OK, 1=INLINE_PERSONA_VIOLATION, 2=OPERATIONAL_ERROR, 3=BASELINE_CORRUPT
 
 set -euo pipefail
@@ -10,21 +11,27 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DEFAULT_SKILLS_ROOT="${PROJECT_ROOT}/src/main/resources/targets/claude/skills"
+DEFAULT_AGENTS_ROOT="${PROJECT_ROOT}/src/main/resources/targets/claude/agents"
 DEFAULT_BASELINE="${PROJECT_ROOT}/audits/agent-skill-wiring-baseline.txt"
 
 SKILLS_ROOT="$DEFAULT_SKILLS_ROOT"
+AGENTS_ROOT="$DEFAULT_AGENTS_ROOT"
 BASELINE_FILE="$DEFAULT_BASELINE"
 STRICT=false
 WARN=false
 SELF_CHECK=false
+CHECK_ORPHANS=false
 
 for arg in "$@"; do
   case "$arg" in
     --self-check) SELF_CHECK=true ;;
     --strict) STRICT=true ;;
     --warn) WARN=true ;;
+    --check-orphans) CHECK_ORPHANS=true ;;
     --skills-root=*) SKILLS_ROOT="${arg#--skills-root=}" ;;
     --skills-root) SKILLS_ROOT="${2:-}"; shift ;;
+    --agents-root=*) AGENTS_ROOT="${arg#--agents-root=}" ;;
+    --agents-root) AGENTS_ROOT="${2:-}"; shift ;;
     --baseline=*) BASELINE_FILE="${arg#--baseline=}" ;;
     --baseline) BASELINE_FILE="${2:-}"; shift ;;
   esac
@@ -67,6 +74,35 @@ while IFS= read -r line; do
     BASELINE_ENTRIES["$skill_name"]=1
   fi
 done < "$BASELINE_FILE"
+
+# ── check-orphans mode ───────────────────────────────────────────────────────
+if [[ "$CHECK_ORPHANS" == "true" ]]; then
+  orphans=0
+  agents_scanned=0
+
+  while IFS= read -r agent_file; do
+    agents_scanned=$((agents_scanned+1))
+    agent_name=$(basename "$agent_file" .md)
+
+    # Search for subagent_type: "<agent-name>" in any SKILL.md
+    callsites=$(grep -rl "subagent_type: \"${agent_name}\"" "$SKILLS_ROOT" --include="SKILL.md" 2>/dev/null | wc -l)
+    if [[ "$callsites" -eq 0 ]]; then
+      echo "ORPHAN_AGENT: $agent_name ($agent_file)" >&2
+      orphans=$((orphans+1))
+    fi
+  done < <(find "$AGENTS_ROOT" -name "*.md" | sort)
+
+  echo "audit-agent-skill-wiring --check-orphans: scanned=$agents_scanned orphans=$orphans"
+
+  if [[ $orphans -gt 0 ]]; then
+    if [[ "$WARN" == "true" ]]; then
+      echo "WARN: $orphans ORPHAN_AGENT(s) detected (warn mode — not blocking)"
+      exit 0
+    fi
+    exit 1
+  fi
+  exit 0
+fi
 
 # ── scan skill files ─────────────────────────────────────────────────────────
 VIOLATIONS=0

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,11 @@ class CiPipelineLeanSmokeIT {
 
     private static final Path REPO_ROOT = Path.of(System.getProperty("user.dir"));
 
+    // Agent governance audit scripts exempted from RULE-007 (EPIC-0079): these scripts
+    // validate agent frontmatter and skill-wiring contracts and are not stack-specific templates.
+    private static final Set<String> RULE_007_ALLOWED_AUDIT_SCRIPTS =
+            Set.of("audit-agent-frontmatter.sh", "audit-agent-skill-wiring.sh");
+
     @Test
     @DisplayName("scripts/ root has no audit-*.sh files (RULE-007)")
     void scriptsRoot_hasNoAuditShFiles() throws Exception {
@@ -38,7 +44,9 @@ class CiPipelineLeanSmokeIT {
                         .filter(
                                 p -> {
                                     String name = p.getFileName().toString();
-                                    return name.startsWith("audit-") && name.endsWith(".sh");
+                                    return name.startsWith("audit-")
+                                            && name.endsWith(".sh")
+                                            && !RULE_007_ALLOWED_AUDIT_SCRIPTS.contains(name);
                                 })
                         .toList();
 

@@ -46,6 +46,10 @@ Include this skill when the project has compliance frameworks configured (PCI-DS
 | compliance | `skills/compliance/SKILL.md` and `skills/compliance/references/` | Active framework requirements |
 
 Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+Read src/main/resources/targets/claude/knowledge/checklists/hipaa-security.md
+Read src/main/resources/targets/claude/knowledge/checklists/pci-dss-security.md
+Read src/main/resources/targets/claude/knowledge/checklists/privacy-security.md
+Read src/main/resources/targets/claude/knowledge/checklists/sox-security.md
 
 ## Workflow
 

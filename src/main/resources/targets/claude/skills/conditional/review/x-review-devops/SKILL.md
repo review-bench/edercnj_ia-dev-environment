@@ -48,6 +48,10 @@ Include this skill when `container != "none"` in the project configuration.
 | Pack | Files | Purpose |
 |------|-------|---------|
 | infrastructure | `skills/infrastructure/SKILL.md` | Docker, Kubernetes, 12-Factor, graceful shutdown, resource management |
+| checklists | `knowledge/checklists/helm-devops.md` | Helm chart review checklist |
+| checklists | `knowledge/checklists/iac-devops.md` | Infrastructure-as-code review checklist |
+| checklists | `knowledge/checklists/mesh-devops.md` | Service mesh review checklist |
+| checklists | `knowledge/checklists/registry-devops.md` | Container registry review checklist |
 
 ## Checklist (10 Items, Max Score: /20)
 

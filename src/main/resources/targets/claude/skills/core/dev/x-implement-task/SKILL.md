@@ -93,7 +93,15 @@ Open phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed"
 
     TaskCreate(subject: "{TASK_ID} › Step 1 - Prepare", activeForm: "Loading knowledge packs and building TDD plan")
 
-Dispatch a preparation subagent (Rule 13 Pattern 2 — SUBAGENT-GENERAL) that reads KPs and produces the TDD implementation plan. See `references/full-protocol.md` §Step 1.
+Dispatch a preparation subagent (Rule 13 Pattern 2 — SUBAGENT-GENERAL) that reads KPs and produces the TDD implementation plan. For Java projects, dispatch the `java-developer` named subagent:
+
+    Agent(
+      subagent_type: "java-developer",
+      description: "Load KPs and build TDD implementation plan for {TASK_ID}",
+      prompt: "FIRST ACTION: TaskCreate(subject: \"{TASK_ID} › Step 1 - Prepare\", activeForm: \"Loading KPs\"). Read KPs: architecture-principles.md, coding-conventions.md, version-features.md, testing.md, layer-templates.md. Read all plan artifacts from ai/epics/. Produce a TDD implementation plan covering: layer order, AT-N acceptance tests, UT-N unit tests in TPP order. LAST ACTION: TaskUpdate(status: \"completed\")."
+    )
+
+See `references/full-protocol.md` §Step 1 for full subagent prompt and KP loading details.
 
 Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-task --phase Phase-1-Prepare")
 
