@@ -1,5 +1,8 @@
 ---
 name: qa-engineer
+description: Use when reviewing test coverage, validating acceptance criteria, identifying missing edge cases, or assessing TDD compliance
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

@@ -1,5 +1,8 @@
 ---
 name: sre-engineer
+description: Use when assessing production readiness, health checks, graceful shutdown, SLO definitions, or incident response patterns
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

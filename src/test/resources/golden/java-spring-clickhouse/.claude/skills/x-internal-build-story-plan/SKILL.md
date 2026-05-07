@@ -41,7 +41,7 @@ the orchestrator shrinks to a read-the-envelope consumer.
 Responsibilities (single):
 
 1. Invoke `x-plan-architecture` for the story (Step 1A).
-2. Dispatch 5 sibling `Agent(general-purpose, …)` subagents in ONE
+2. Dispatch 5 sibling `Agent(subagent_type: "<agent-name>", …)` subagents in ONE
    assistant message for Steps 1B (implementation plan), 1C (test
    plan), 1D (task breakdown), 1E (security assessment), and 1F
    (compliance assessment).
@@ -195,17 +195,17 @@ the arch plan.
 
 ### Steps 1B-1F — Parallel subagent dispatch (one assistant message)
 
-Dispatch exactly 5 sibling `Agent(general-purpose, …)` tool calls
+Dispatch exactly 5 sibling `Agent(subagent_type: "<agent-name>", …)` tool calls
 in ONE assistant message — the canonical Rule 13 Pattern 2
 (SUBAGENT-GENERAL) parallel-launch shape. When `--scope=SIMPLE`,
 dispatch only Steps 1B / 1C / 1D (3 siblings) and record `1E` and
 `1F` in `skipped`.
 
-Each subagent prompt follows the structure:
+Each subagent prompt follows the structure (persona injected by runtime from agent.md):
 
 ```markdown
 FIRST ACTION: <no-op — TaskCreate/TaskUpdate unavailable in this harness>.
-You are a <role>. Read context files:
+Read context files:
 - ai/epics/epic-${epic_id}/${story_id}.md (story)
 - ai/epics/epic-${epic_id}/plans/arch-story-${story_id}.md (arch plan)
 - <role-specific templates under .claude/templates/>.
@@ -213,15 +213,15 @@ Produce <artifact> at ${plans_dir}/<basename>.
 LAST ACTION: return the absolute path of the artifact you produced.
 ```
 
-Per-step role and artifact mapping:
+Per-step named agent and artifact mapping:
 
-| Step | Role | Skill delegate (if any) | Artifact basename |
+| Step | Agent (`subagent_type`) | Skill delegate (if any) | Artifact basename |
 | :--- | :--- | :--- | :--- |
-| 1B | Senior Architect | — (inline prompt) | `plan-story-${story_id}.md` |
-| 1C | QA Engineer | `x-plan-tests` via `Skill(…)` inside subagent | `tests-story-${story_id}.md` |
-| 1D | Task Decomposer | `x-lib-decompose-task` via `Skill(…)` inside subagent | `tasks-story-${story_id}.md` + `task-implementation-map-story-${story_id}.md` |
-| 1E | Security Engineer | `x-model-threats` via `Skill(…)` inside subagent | `security-story-${story_id}.md` |
-| 1F | Compliance Engineer | — (inline prompt) | `compliance-story-${story_id}.md` |
+| 1B | `architect` | — (task-only prompt) | `plan-story-${story_id}.md` |
+| 1C | `qa-engineer` | `x-plan-tests` via `Skill(…)` inside subagent | `tests-story-${story_id}.md` |
+| 1D | `tech-lead` | `x-lib-decompose-task` via `Skill(…)` inside subagent | `tasks-story-${story_id}.md` + `task-implementation-map-story-${story_id}.md` |
+| 1E | `security-engineer` | `x-model-threats` via `Skill(…)` inside subagent | `security-story-${story_id}.md` |
+| 1F | `product-owner` | — (task-only prompt) | `compliance-story-${story_id}.md` |
 
 #### Origin Marker Emission (EPIC-0059 — mandatory for all 1B-1F artifacts)
 

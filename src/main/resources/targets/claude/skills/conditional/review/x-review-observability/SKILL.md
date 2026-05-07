@@ -2,7 +2,7 @@
 name: x-review-observability
 description: "Observability review: tracing, metrics naming, structured logging, health, correlation."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: obs, fragment-order: 40 }
@@ -81,32 +81,18 @@ Each item scores 0 (missing), 1 (partial), or 2 (fully compliant).
 
 ### Step 1 -- Gather Context
 
-Read the observability knowledge pack:
-- `skills/observability/SKILL.md`
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 -- Identify Changed Files
+### Step 2 -- Dispatch to Observability Engineer Agent
 
-Determine scope: configuration, middleware, service classes, health check endpoints.
-
-### Step 3 -- Tracing Review
-
-Check span creation, attributes, and context propagation.
-
-### Step 4 -- Logging Review
-
-Verify structured logging, mandatory fields, and sensitive data exclusion.
-
-### Step 5 -- Health Check Review
-
-Verify liveness, readiness, and startup probe implementations.
-
-### Step 6 -- Metrics Review
-
-Check custom metrics naming conventions and correlation ID propagation.
-
-### Step 7 -- Generate Report
-
-Produce the scored report.
+    Agent(
+      subagent_type: "observability-engineer",
+      description: "Observability specialist review for {target}",
+      prompt: "Review the code changes for observability best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/observability/SKILL.md` for project observability patterns. Apply your full observability checklist (tracing, structured logging, health probes, metrics, correlation IDs). Produce output in this exact format:\n\nENGINEER: Observability\nSTORY: {target}\nSCORE: XX/18\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [OBS-XX] Description (2/2)\nFAILED:\n- [OBS-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [OBS-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 

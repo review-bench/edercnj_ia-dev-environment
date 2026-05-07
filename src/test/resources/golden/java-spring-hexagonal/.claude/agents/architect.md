@@ -1,5 +1,8 @@
 ---
 name: architect
+description: Use when deep architectural decisions, system design, trade-off analysis, or ADR authoring is needed
+tools: [Read, Write, Edit, Bash, Grep, WebSearch, WebFetch, Agent]
+model: Opus
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

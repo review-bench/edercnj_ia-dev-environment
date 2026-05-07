@@ -2,7 +2,7 @@
 name: x-review-database
 description: "Database specialist review: schema, migrations, queries, pools, transactions, integrity."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: db, fragment-order: 30 }
@@ -102,32 +102,18 @@ Each item scores 0 (missing), 1 (partial), or 2 (fully compliant).
 
 ### Step 1 -- Gather Context
 
-Read the database patterns knowledge pack:
-- `skills/database-patterns/SKILL.md`
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 -- Identify Changed Files
+### Step 2 -- Dispatch to Database Engineer Agent
 
-Determine scope: migration files, entity classes, repository classes, configuration.
-
-### Step 3 -- Schema Review
-
-Check table design, constraints, naming conventions.
-
-### Step 4 -- Migration Safety Review
-
-Verify reversibility, zero-downtime compatibility, data preservation.
-
-### Step 5 -- Query Performance Review
-
-Check for N+1, missing indexes, unbounded queries.
-
-### Step 6 -- Transaction Review
-
-Verify transaction boundaries, read-only flags, connection management.
-
-### Step 7 -- Generate Report
-
-Produce the scored report.
+    Agent(
+      subagent_type: "database-engineer",
+      description: "Database specialist review for {target}",
+      prompt: "Review the code changes for database best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/database-patterns/SKILL.md` for project database patterns. Apply your full database checklist (schema design, migration safety, query optimization, connection management, transaction boundaries, data integrity). Produce output in this exact format:\n\nENGINEER: Database\nSTORY: {target}\nSCORE: XX/40\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [DB-XX] Description (2/2)\nFAILED:\n- [DB-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [DB-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 

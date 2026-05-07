@@ -1,5 +1,8 @@
 ---
 name: product-owner
+description: Use when validating requirements, decomposing features into stories, assessing business value alignment, or reviewing acceptance criteria completeness
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

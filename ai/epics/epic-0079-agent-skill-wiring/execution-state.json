@@ -12,7 +12,8 @@
   "taskTracking": {
     "enabled": true
   },
-  "interactiveMode": false,
+  "interactiveMode": "non-interactive",
+  "status": "integrity-gate-passed",
   "productFirstLifecycle": false,
   "refinementNotes": {
     "dispatchMechanism": "Verified: Agent(subagent_type: '<agent-name>') loads .claude/agents/<name>.md as system prompt. Dispatch key = filename stem (e.g. 'architect' for architect.md). No PoC required — native Claude Code behavior confirmed by operator.",
@@ -23,6 +24,9 @@
   },
   "stories": {
     "story-0079-0001": {
+      "status": "complete",
+      "prNumber": 1075,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "9b91841da8e8de34ed1cf3253aa7bfc2a123f79e0924a66ff28428c032575753",
@@ -40,6 +44,9 @@
       }
     },
     "story-0079-0002": {
+      "status": "complete",
+      "prNumber": 1076,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "59692ab1d33ea1fd28a0588e66f6ff85803fa59a4c3c2a83db6b2fdcdbda4b9a",
@@ -57,6 +64,9 @@
       }
     },
     "story-0079-0003": {
+      "status": "complete",
+      "prNumber": 1077,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "d104700b0d78e1977a7530f9db5478bc88c83ae0e0e074847e29e96d7a467c59",
@@ -74,6 +84,9 @@
       }
     },
     "story-0079-0004": {
+      "status": "complete",
+      "prNumber": 1078,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "09a6bed49065ff73cada89af32169c99810b6e1ed483b2a5c92535208bec383c",
@@ -91,6 +104,9 @@
       }
     },
     "story-0079-0005": {
+      "status": "complete",
+      "prNumber": 1079,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "ebc42f545920b00e1d11002eef259acd466b8dae9e7d4a0aa033b9ea052aa286",
@@ -108,6 +124,9 @@
       }
     },
     "story-0079-0006": {
+      "status": "complete",
+      "prNumber": 1080,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "38f1a0eb435edaa1d28e5d597f42f8b43de949f06c5b792b22d84df6c0ee14c1",
@@ -125,6 +144,9 @@
       }
     },
     "story-0079-0007": {
+      "status": "complete",
+      "prNumber": 1081,
+      "prMergeStatus": "MERGED",
       "refinementVerdict": {
         "status": "approved",
         "verdictHash": "c150cc4c456e5e2fa021c5895bb0d5763a964f27a58fbd3eb751c8ff94d5f4a8",
@@ -143,5 +165,5 @@
     }
   },
   "createdAt": "2026-05-07T00:00:00Z",
-  "updatedAt": "2026-05-07T17:22:34Z"
+  "updatedAt": "2026-05-07T20:30:00Z"
 }

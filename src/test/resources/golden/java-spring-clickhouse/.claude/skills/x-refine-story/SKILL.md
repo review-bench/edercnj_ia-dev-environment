@@ -95,10 +95,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "product-owner",
   model: "sonnet",
   description: "PO gap analysis for {STORY_ID}",
-  prompt: "You are a Product Owner specialist performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY these dimensions for the PO persona: value, persona, alternatives.
 Return a JSON gap-report with this shape:
@@ -116,10 +116,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "tech-lead",
   model: "sonnet",
   description: "Tech Lead gap analysis for {STORY_ID}",
-  prompt: "You are a Tech Lead performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY these dimensions for Tech Lead: contracts (interfaces, events, APIs), metrics (observability), risks.
 Return a JSON gap-report: {\"persona\": \"TechLead\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -130,10 +130,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "sonnet",
   description: "Architect gap analysis for {STORY_ID}",
-  prompt: "You are an Architect performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY these dimensions: contracts (architectural), alternatives (design trade-offs), risks (technical).
 Return a JSON gap-report: {\"persona\": \"Architect\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -144,10 +144,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "security-engineer",
   model: "sonnet",
   description: "Security gap analysis for {STORY_ID}",
-  prompt: "You are a Security specialist performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY: ac (security/auth acceptance criteria), risks (security).
 Return a JSON gap-report: {\"persona\": \"Security\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -158,10 +158,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "qa-engineer",
   model: "sonnet",
   description: "QA gap analysis for {STORY_ID}",
-  prompt: "You are a QA specialist performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY: ac (all 4 mandatory categories: happy-path, error/boundary, performance/SLA, security/auth). Flag any missing category as noGo.
 Return a JSON gap-report: {\"persona\": \"QA\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -174,10 +174,10 @@ Conditional personas (activate when story signals the domain):
 
 ```
 Agent(  [conditional: flag.has_sla_declared]
-  subagent_type: "general-purpose",
+  subagent_type: "performance-engineer",
   model: "sonnet",
   description: "Performance gap analysis for {STORY_ID}",
-  prompt: "You are a Performance engineer performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY: metrics (SLA thresholds, p95/p99 latency targets, throughput), ac (performance/SLA category).
 Return a JSON gap-report: {\"persona\": \"Performance\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -188,10 +188,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(  [conditional: flag.has_infra_changes]
-  subagent_type: "general-purpose",
+  subagent_type: "devops-engineer",
   model: "sonnet",
   description: "DevOps gap analysis for {STORY_ID}",
-  prompt: "You are a DevOps engineer performing DoR gap analysis.
+  prompt: "Perform DoR gap analysis for this story.
 Read the story at {storyPath}. Read .claude/knowledge/refinement/dimensions.md §Story Dimensions.
 Analyse ONLY: contracts (deployment/infrastructure), metrics (operational), risks (operational).
 Return a JSON gap-report: {\"persona\": \"DevOps\", \"gaps\": [{\"dimension\": ..., \"issue\": ..., \"question\": ..., \"severity\": \"question|noGo\"}]}.
@@ -323,11 +323,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "product-owner",
   model: "sonnet",
   description: "PO refinement for {STORY_ID}",
-  prompt: "You are a Product Owner specialist.
-Read the story at {storyPath}.
+  prompt: "Read the story at {storyPath}.
 The operator answered your questions as follows: {answersForPO}.
 Based on these answers, produce the proposed story sections for your dimensions (value, persona, alternatives).
 Return a JSON object: {\"persona\": \"PO\", \"proposedSections\": {\"value\": \"<refined text>\", \"persona\": \"<refined text>\", \"alternatives\": \"<refined text>\"}}.
@@ -339,11 +338,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "tech-lead",
   model: "sonnet",
   description: "Tech Lead refinement for {STORY_ID}",
-  prompt: "You are a Tech Lead specialist.
-Read the story at {storyPath}.
+  prompt: "Read the story at {storyPath}.
 The operator answered your questions as follows: {answersForTechLead}.
 Based on these answers, produce the proposed story sections for your dimensions (contracts, metrics, risks).
 Return a JSON object: {\"persona\": \"TechLead\", \"proposedSections\": {\"contracts\": \"<refined text>\", \"metrics\": \"<refined text>\", \"risks\": \"<refined text>\"}}.
@@ -355,11 +353,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "sonnet",
   description: "Architect refinement for {STORY_ID}",
-  prompt: "You are an Architect specialist.
-Read the story at {storyPath}.
+  prompt: "Read the story at {storyPath}.
 The operator answered your questions as follows: {answersForArchitect}.
 Based on these answers, produce the proposed story sections for your dimensions (contracts, alternatives, risks).
 Return a JSON object: {\"persona\": \"Architect\", \"proposedSections\": {\"contracts\": \"<refined text>\", \"alternatives\": \"<refined text>\", \"risks\": \"<refined text>\"}}.
@@ -371,11 +368,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "security-engineer",
   model: "sonnet",
   description: "Security refinement for {STORY_ID}",
-  prompt: "You are a Security specialist.
-Read the story at {storyPath}.
+  prompt: "Read the story at {storyPath}.
 The operator answered your questions as follows: {answersForSecurity}.
 Based on these answers, produce the proposed story sections for your dimensions (ac security/auth, risks security).
 Return a JSON object: {\"persona\": \"Security\", \"proposedSections\": {\"ac\": \"<refined text>\", \"risks\": \"<refined text>\"}}.
@@ -387,11 +383,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "qa-engineer",
   model: "sonnet",
   description: "QA refinement for {STORY_ID}",
-  prompt: "You are a QA specialist.
-Read the story at {storyPath}.
+  prompt: "Read the story at {storyPath}.
 The operator answered your questions as follows: {answersForQA}.
 Based on these answers, produce the proposed story sections for your dimensions (ac: all 4 mandatory categories).
 Return a JSON object: {\"persona\": \"QA\", \"proposedSections\": {\"ac\": \"<refined text>\"}}.
@@ -452,10 +447,10 @@ Open phase tracker:
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "opus",
   description: "Architect consolidation for {STORY_ID}",
-  prompt: "You are the Lead Architect and final consolidator for a story refinement session.
+  prompt: "You are the final consolidator for a story refinement session.
 
 Story: {storyPath}
 Proposed section refinements: {proposedSections}

@@ -101,7 +101,13 @@ Load the severity-specific checklist from the SRE Practices knowledge pack (`kno
 
 ### Step 3 — Guide Response
 
-Conduct the team through the incident response flow. Use the `sre-engineer` agent via Agent tool for reliability expertise and validation.
+Conduct the team through the incident response flow. Dispatch the `sre-engineer` agent for reliability expertise and checklist validation:
+
+    Agent(
+      subagent_type: "sre-engineer",
+      description: "Validate incident response plan and guide reliability decisions",
+      prompt: "You are guiding an incident response for severity {SEV}. Review the mitigation steps, validate the root cause hypothesis, and ensure all SRE checklist items are covered. Load knowledge/sre-practices/ for relevant runbooks. Return: {rcaHypothesis, mitigationPlan, checklistGaps}."
+    )
 
 #### Detection
 

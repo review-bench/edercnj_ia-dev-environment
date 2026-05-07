@@ -420,6 +420,30 @@
 
 ---
 
+### audit-agent-frontmatter.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0079 (Native Agent–Skill Wiring) |
+| **Layer** | 2 — CI Script |
+| **Validates** | All agent files under `agents/core/`, `agents/conditional/`, `agents/developers/` carry canonical frontmatter: `name`, `description`, `tools`, `model`, `requires-capabilities`. Validates against `governance/schemas/agent-frontmatter-1.0.json`. Detects `MODEL_ADAPTIVE_FORBIDDEN` and `MISSING_FIELD` violations. |
+| **Introduced** | story-0079-0001 (EPIC-0079) |
+| **Exit Codes** | `0` = OK · `1` = `FRONTMATTER_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `SCHEMA_CORRUPT` |
+
+---
+
+### audit-agent-skill-wiring.sh
+
+| Field | Value |
+| :--- | :--- |
+| **Rule Anchor** | EPIC-0079 (Native Agent–Skill Wiring) |
+| **Layer** | 2 — CI Script |
+| **Validates** | SKILL.md files under `skills/` that use `Agent(subagent_type: "general-purpose")` with an inline persona (`"You are a (Senior|Specialist|Principal)"` within 10 lines). Detects `INLINE_PERSONA_VIOLATION` for skills not grandfathered in `audits/agent-skill-wiring-baseline.txt`. |
+| **Introduced** | story-0079-0005 (EPIC-0079) |
+| **Exit Codes** | `0` = OK · `1` = `INLINE_PERSONA_VIOLATION` · `2` = `OPERATIONAL_ERROR` · `3` = `BASELINE_CORRUPT` |
+
+---
+
 ### audit-essentials-rule.sh
 
 | Field | Value |
@@ -431,7 +455,6 @@
 | **Exit Codes** | `0` = OK · `1` = `ESSENTIALS_RULE_VIOLATION` · `2` = `OPERATIONAL_ERROR` |
 
 ---
-
 ## Notes
 
 - Scripts listed above are source-of-truth copies shipped to consumer projects via `ScriptsAssembler`.
