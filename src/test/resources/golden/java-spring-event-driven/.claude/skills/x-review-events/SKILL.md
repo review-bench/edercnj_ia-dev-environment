@@ -2,9 +2,9 @@
 name: x-review-events
 description: "Validates event schemas, producer/consumer patterns, error handling, dead letter topics, and operational readiness for event-driven architectures."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[event-name or consumer/producer class]"
-context-budget: medium
+context-budget: light
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: events, fragment-order: 60 }
 ---
@@ -51,60 +51,20 @@ Include this skill when the project uses event-driven interfaces (`interfaces` c
 
 ## Workflow
 
-### Step 1 — Discover Event Definitions
+### Step 1 -- Gather Context
 
-Scan for event classes, schemas, Avro/Protobuf definitions:
-- List all event types with their schemas
-- Identify event envelope structure
+Collect the review target: event name or producer/consumer class from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 — Discover Producers
+### Step 2 -- Dispatch to Event Engineer Agent
 
-Scan for classes publishing events:
-- Map producers to topics and event types
-- Identify publishing patterns (outbox, direct)
-
-### Step 3 — Discover Consumers
-
-Scan for classes consuming events:
-- Map consumers to topics and consumer groups
-- Identify idempotency mechanisms
-
-### Step 4 — Validate Event Design
-
-Check naming, envelope, versioning:
-- Past tense event names
-- CloudEvents spec compliance
-- Schema registry integration
-- Data minimization
-
-### Step 5 — Validate Producer Patterns
-
-Check reliability:
-- Outbox or at-least-once delivery
-- Acknowledgment levels
-- Error handling and retry
-
-### Step 6 — Validate Consumer Patterns
-
-Check processing:
-- Idempotency implementation
-- Offset commit strategy
-- Dead letter topic configuration
-- Graceful shutdown
-
-### Step 7 — Validate Operational Readiness
-
-Check monitoring:
-- Consumer lag monitoring
-- Dead letter topic alerts
-- Schema registry health
-
-### Step 8 — Generate Report
-
-Summarize findings as checklist:
-- List compliant items
-- List violations with file paths and line numbers
-- Suggest fixes for each violation
+    Agent(
+      subagent_type: "event-engineer",
+      description: "Event-driven specialist review for {target}",
+      prompt: "Review the event-driven patterns for best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/protocols/references/event-driven-conventions.md` for event design patterns. Apply your full event checklist (event schema design, CloudEvents envelope, producer/consumer patterns, error handling, dead letter topics, idempotency, operational readiness). Produce output in this exact format:\n\nENGINEER: Events\nSTORY: {target}\nSCORE: XX/28\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [EVT-XX] Description (2/2)\nFAILED:\n- [EVT-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [EVT-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Event Design Checklist (10 points)
 

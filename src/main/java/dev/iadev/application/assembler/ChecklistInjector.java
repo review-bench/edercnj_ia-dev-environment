@@ -18,7 +18,7 @@ import java.nio.file.Path;
  */
 final class ChecklistInjector {
 
-    private static final String AGENTS_TEMPLATES_DIR = "targets/claude/agents";
+    private static final String KNOWLEDGE_TEMPLATES_DIR = "targets/claude/knowledge";
     private static final String CHECKLISTS_DIR = "checklists";
     private static final String AGENTS_OUTPUT = "agents";
 
@@ -56,7 +56,7 @@ final class ChecklistInjector {
 
     private static Path resolveChecklistSrc(Path resourcesDir, String checklistFile) {
         return resourcesDir.resolve(
-                AGENTS_TEMPLATES_DIR + "/" + CHECKLISTS_DIR + "/" + checklistFile);
+                KNOWLEDGE_TEMPLATES_DIR + "/" + CHECKLISTS_DIR + "/" + checklistFile);
     }
 
     private static void performInjection(Path agentPath, Path checklistSrc, String checklistFile) {

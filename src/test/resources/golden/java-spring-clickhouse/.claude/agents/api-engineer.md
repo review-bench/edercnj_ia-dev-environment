@@ -1,5 +1,8 @@
 ---
 name: api-engineer
+description: Use when reviewing REST API design, OpenAPI spec compliance, HTTP semantics, error response format, or API contract consistency
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-any: [web.spring.boot, web.quarkus.framework, web.micronaut.framework, web.helidon.framework]
 requires-capabilities: []
 ---

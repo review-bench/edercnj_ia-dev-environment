@@ -1,5 +1,8 @@
 ---
 name: compliance-auditor
+description: Use when assessing GDPR, LGPD, HIPAA, PCI-DSS, or SOX compliance gaps, collecting audit evidence, or evaluating data protection posture
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: [compliance.*]
 ---
 # Global Behavior & Language Policy

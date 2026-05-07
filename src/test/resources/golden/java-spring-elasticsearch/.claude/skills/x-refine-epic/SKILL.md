@@ -98,10 +98,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "product-owner",
   model: "sonnet",
   description: "PO strategic analysis for epic-XXXX",
-  prompt: "You are a Product Owner specialist performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY these dimensions for the PO persona: problem, persona (epic-level), hypothesis (value), okrs.
 Apply these NO-GOs silently (do NOT ask about them — reject immediately):
@@ -124,10 +124,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "tech-lead",
   model: "sonnet",
   description: "Tech Lead strategic analysis for epic-XXXX",
-  prompt: "You are a Tech Lead performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY these dimensions for Tech Lead: feasibility (technical viability), epic-dependencies (inter-epic blockers, circular dependencies).
 Apply these NO-GOs silently:
@@ -142,10 +142,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "sonnet",
   description: "Architect strategic analysis for epic-XXXX",
-  prompt: "You are an Architect performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY these dimensions: strategic-alternatives (§5 Alternativas), architectural-impact, out-of-scope (§1.4 Fora do escopo — REQUIRED: ≥3 explicit items).
 Apply these NO-GOs silently:
@@ -161,10 +161,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "security-engineer",
   model: "sonnet",
   description: "Security strategic analysis for epic-XXXX",
-  prompt: "You are a Security Engineer performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY: security-posture (does the epic address security concerns?), compliance-triggers (PCI/LGPD/HIPAA/SOC2 if domain is sensitive).
 Apply these NO-GOs silently:
@@ -179,10 +179,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "qa-engineer",
   model: "sonnet",
   description: "QA strategic analysis for epic-XXXX",
-  prompt: "You are a QA Engineer performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY: quality-strategy (how do we know the epic shipped successfully?), smoke-scope (is a smoke test strategy declared?).
 Apply these NO-GOs silently:
@@ -199,10 +199,10 @@ Conditional persona (activate when `infra.observability.*` OR `infra.deploy.*` c
 
 ```
 Agent(  [conditional: flag.has_infra_capability]
-  subagent_type: "general-purpose",
+  subagent_type: "sre-engineer",
   model: "sonnet",
   description: "SRE/DevOps strategic analysis for epic-XXXX",
-  prompt: "You are an SRE/DevOps Engineer performing strategic DoR gap analysis for an EPIC.
+  prompt: "Perform strategic DoR gap analysis for an EPIC.
 Read the epic markdown at {epicPath}. Read .claude/knowledge/refinement/dimensions.md §Epic Dimensions.
 Analyse ONLY: operational-impact (how does this epic affect production operations?), rollback-strategy (is there a rollback plan?).
 Apply these NO-GOs silently:
@@ -346,11 +346,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "product-owner",
   model: "sonnet",
   description: "PO strategic refinement for epic-XXXX",
-  prompt: "You are a Product Owner specialist.
-Read the epic markdown at {epicPath}.
+  prompt: "Read the epic markdown at {epicPath}.
 The operator answered your strategic questions as follows: {answersForPO}.
 Based on these answers, produce the proposed epic sections for your dimensions (problem, persona, hypothesis, okrs).
 Return a JSON object: {\"persona\": \"PO\", \"proposedSections\": {\"problem\": \"<refined text>\", \"persona\": \"<refined text>\", \"hypothesis\": \"<refined text>\", \"okrs\": \"<refined text>\"}}.
@@ -362,11 +361,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "tech-lead",
   model: "sonnet",
   description: "Tech Lead strategic refinement for epic-XXXX",
-  prompt: "You are a Tech Lead specialist.
-Read the epic markdown at {epicPath}.
+  prompt: "Read the epic markdown at {epicPath}.
 The operator answered your strategic questions as follows: {answersForTechLead}.
 Based on these answers, produce the proposed epic sections for your dimensions (feasibility, epic-dependencies).
 Return a JSON object: {\"persona\": \"TechLead\", \"proposedSections\": {\"feasibility\": \"<refined text>\", \"epic-dependencies\": \"<refined text>\"}}.
@@ -378,11 +376,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "sonnet",
   description: "Architect strategic refinement for epic-XXXX",
-  prompt: "You are an Architect specialist.
-Read the epic markdown at {epicPath}.
+  prompt: "Read the epic markdown at {epicPath}.
 The operator answered your strategic questions as follows: {answersForArchitect}.
 Based on these answers, produce the proposed epic sections for your dimensions (strategic-alternatives, out-of-scope, architectural-impact).
 Return a JSON object: {\"persona\": \"Architect\", \"proposedSections\": {\"alternatives\": \"<refined text>\", \"out-of-scope\": \"<refined text>\", \"architectural-impact\": \"<refined text>\"}}.
@@ -394,11 +391,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "security-engineer",
   model: "sonnet",
   description: "Security strategic refinement for epic-XXXX",
-  prompt: "You are a Security specialist.
-Read the epic markdown at {epicPath}.
+  prompt: "Read the epic markdown at {epicPath}.
 The operator answered your strategic questions as follows: {answersForSecurity}.
 Based on these answers, produce the proposed epic sections for your dimensions (security-posture, compliance-triggers).
 Return a JSON object: {\"persona\": \"Security\", \"proposedSections\": {\"security-posture\": \"<refined text>\", \"compliance-triggers\": \"<refined text>\"}}.
@@ -410,11 +406,10 @@ LAST ACTION: TaskUpdate(status: \"completed\")."
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "qa-engineer",
   model: "sonnet",
   description: "QA strategic refinement for epic-XXXX",
-  prompt: "You are a QA specialist.
-Read the epic markdown at {epicPath}.
+  prompt: "Read the epic markdown at {epicPath}.
 The operator answered your strategic questions as follows: {answersForQA}.
 Based on these answers, produce the proposed epic sections for your dimensions (quality-strategy, smoke-scope).
 Return a JSON object: {\"persona\": \"QA\", \"proposedSections\": {\"quality-strategy\": \"<refined text>\", \"smoke-scope\": \"<refined text>\"}}.
@@ -478,10 +473,10 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 ```
 Agent(
-  subagent_type: "general-purpose",
+  subagent_type: "architect",
   model: "opus",
   description: "Architect consolidation for epic-XXXX",
-  prompt: "You are the Lead Architect and final consolidator for an epic strategic refinement session.
+  prompt: "You are the final consolidator for an epic strategic refinement session.
 
 Epic: {epicPath}
 Proposed section refinements from all personas: {proposedSections}

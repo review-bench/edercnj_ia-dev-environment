@@ -1,5 +1,8 @@
 ---
 name: event-engineer
+description: Use when reviewing event-driven architecture, message schema design, saga orchestration, producer/consumer patterns, or event sourcing
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-any: [messaging.kafka.standard, messaging.rabbitmq.standard]
 requires-capabilities: []
 ---

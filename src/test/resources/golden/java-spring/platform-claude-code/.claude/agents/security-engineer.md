@@ -1,5 +1,8 @@
 ---
 name: security-engineer
+description: Use when identifying security vulnerabilities, reviewing OWASP compliance, validating input handling, or assessing authentication and authorization patterns
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy
