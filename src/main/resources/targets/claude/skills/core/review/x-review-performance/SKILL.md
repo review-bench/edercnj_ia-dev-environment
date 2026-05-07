@@ -2,7 +2,7 @@
 name: x-review-performance
 description: "Performance specialist review: validates N+1 queries, connection pools, async patterns, pagination, caching, timeouts, circuit breakers, and resource cleanup."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 requires-capabilities: []
 fragment-slot: { slot: review-specialist, fragment-id: perf, fragment-order: 110 }
@@ -91,32 +91,18 @@ Each item scores 0 (missing), 1 (partial), or 2 (fully compliant).
 
 ### Step 1 -- Gather Context
 
-Read the resilience knowledge pack:
-- `knowledge/resilience/index.md`
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 -- Identify Changed Files
+### Step 2 -- Dispatch to Performance Engineer Agent
 
-Determine scope: PR diff or specified paths. Focus on repository, service, and adapter layers.
-
-### Step 3 -- Query Analysis
-
-Scan for N+1 patterns, missing indexes, unbounded queries.
-
-### Step 4 -- Resilience Check
-
-Verify timeout, circuit breaker, and retry configurations on external calls.
-
-### Step 5 -- Resource Management Check
-
-Verify proper resource cleanup, connection pool configuration, and batch operations.
-
-### Step 6 -- Concurrency Check
-
-Check for thread safety issues, shared mutable state, and proper synchronization.
-
-### Step 7 -- Generate Report
-
-Produce the scored report.
+    Agent(
+      subagent_type: "performance-engineer",
+      description: "Performance specialist review for {target}",
+      prompt: "Review the code changes for performance compliance. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `knowledge/resilience/index.md` for resilience patterns. Apply your full performance checklist (N+1 queries, connection pools, async patterns, pagination, caching, timeouts, circuit breakers, thread safety, resource cleanup). Produce output in this exact format:\n\nENGINEER: Performance\nSTORY: {target}\nSCORE: XX/26\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [PERF-XX] Description (2/2)\nFAILED:\n- [PERF-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [PERF-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 
