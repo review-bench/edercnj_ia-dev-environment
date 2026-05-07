@@ -8,9 +8,15 @@
   },
   "interactiveMode": false,
   "refinementVerdict": {
-    "status": "pending",
-    "scope": "epic"
+    "status": "rejected",
+    "scope": "epic",
+    "checkedAt": "2026-05-07T22:30:00Z",
+    "verdictHash": "2514fd0982422f28b9f7c24c9afb2d7b000f6a8070f2b829f9eb3941a15a1e1c",
+    "blockers": [
+      "quality-strategy: No epic-level DoD with measured KPI thresholds (KPI-1 ≤8min, KPI-2 ≥95%) over a defined minimum sample size of merged bug PRs",
+      "smoke-scope: No smoke testing strategy for end-to-end /x-create-bug → /x-refine-bug → PR merge lifecycle declared"
+    ]
   },
   "createdAt": "2026-05-07T22:00:00Z",
-  "updatedAt": "2026-05-07T22:00:00Z"
+  "updatedAt": "2026-05-07T22:30:00Z"
 }
