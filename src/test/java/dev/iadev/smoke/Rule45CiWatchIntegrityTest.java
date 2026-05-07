@@ -31,7 +31,10 @@ class Rule45CiWatchIntegrityTest extends SmokeTestBase {
     // rules-consolidation-essentials: Rule 45 migrated to lifecycle KP.
     // Canonical sections: Exit Codes Matrix, Mandatory Invocation Sites, Forbidden, Audit Contract.
     private static final List<String> CANONICAL_SECTIONS =
-            List.of("## Exit Codes Matrix", "## Mandatory Invocation Sites", "## Forbidden",
+            List.of(
+                    "## Exit Codes Matrix",
+                    "## Mandatory Invocation Sites",
+                    "## Forbidden",
                     "## Audit Contract");
 
     // Exit codes in the KP table format.

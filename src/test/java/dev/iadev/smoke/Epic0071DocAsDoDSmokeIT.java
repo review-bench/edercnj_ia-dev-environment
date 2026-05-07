@@ -162,7 +162,9 @@ class Epic0071DocAsDoDSmokeIT {
         assertThat(docFreshnessKp.toAbsolutePath())
                 .as("31-documentation-freshness-gate.md must exist at KP destination")
                 .exists();
-        String rule31 = Files.readString(docFreshnessKp.toAbsolutePath(), java.nio.charset.StandardCharsets.UTF_8);
+        String rule31 =
+                Files.readString(
+                        docFreshnessKp.toAbsolutePath(), java.nio.charset.StandardCharsets.UTF_8);
         assertThat(rule31)
                 .as("Rule 31 MUST reference audit-doc-freshness.sh")
                 .contains("audit-doc-freshness.sh");
