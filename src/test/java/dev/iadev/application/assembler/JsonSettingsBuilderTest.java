@@ -80,6 +80,31 @@ class JsonSettingsBuilderTest {
             assertThat(json.trim()).startsWith("{");
             assertThat(json.trim()).endsWith("}");
         }
+
+        @Test
+        @DisplayName("emits skillListingBudgetFraction without hooks")
+        void build_withoutHooks_emitsSkillListingBudget() {
+            String json = builder.build(List.of("Bash(git *)"), HookPresence.WITHOUT_HOOKS, false);
+
+            assertThat(json).contains("\"skillListingBudgetFraction\": 0.05");
+            assertThat(json).doesNotContain("\"skillListingBudgetFraction\": 0.05,");
+        }
+
+        @Test
+        @DisplayName("emits skillListingBudgetFraction with hooks (trailing comma)")
+        void build_withHooks_emitsSkillListingBudgetWithComma() {
+            String json = builder.build(List.of("Bash(git *)"), HookPresence.WITH_HOOKS, false);
+
+            assertThat(json).contains("\"skillListingBudgetFraction\": 0.05,");
+        }
+
+        @Test
+        @DisplayName("emits skillListingBudgetFraction with telemetry only")
+        void build_withTelemetryOnly_emitsSkillListingBudgetWithComma() {
+            String json = builder.build(List.of("Bash(git *)"), HookPresence.WITHOUT_HOOKS, true);
+
+            assertThat(json).contains("\"skillListingBudgetFraction\": 0.05,");
+        }
     }
 
     @Nested
