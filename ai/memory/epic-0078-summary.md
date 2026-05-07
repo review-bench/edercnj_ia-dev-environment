@@ -2,77 +2,96 @@
 epic-id: EPIC-0078
 slug: context-budget-optimization
 summary-version: "1.0"
+created: "2026-05-06"
+last-updated: "2026-05-07"
+indexable: true
+archived: false
+superseded-by: null
 tags:
   - context-budget
   - rules-slimming
   - knowledge-packs
   - capability-composition
   - governance
+  - token-optimization
 capabilities-affected:
   - governance.capability-frontmatter
   - governance.audit-gate-lifecycle
   - governance.ai-memory
 rules-affected:
-  - Rule 03 (Coding Standards)
-  - Rule 04 (Architecture Summary)
-  - Rule 05 (Quality Gates)
-  - Rule 06 (Security Baseline)
-  - Rule 07 (Operations Baseline)
-  - Rule 08 (Release Process)
-  - Rule 09 (Branching Model)
-  - Rule 12 (Security Anti-Patterns)
-  - Rule 19 (Backward Compatibility)
-  - Rule 24 (Execution Integrity)
-  - Rule 25 (Task Hierarchy)
-  - Rule 26 (Audit Gate Lifecycle)
-  - Rule 27 (Zero-Bypass Lifecycle)
-  - Rule 28 (Capability Frontmatter)
-  - Rule 29 (Refinement Gate)
-  - Rule 30 (Value-Driven Templates)
-  - Rule 45 (CI-Watch Integrity)
+  - Rule-03
+  - Rule-04
+  - Rule-05
+  - Rule-06
+  - Rule-07
+  - Rule-08
+  - Rule-09
+  - Rule-12
+  - Rule-19
+  - Rule-24
+  - Rule-25
+  - Rule-26
+  - Rule-27
+  - Rule-28
+  - Rule-29
+  - Rule-30
+  - Rule-45
+adrs-referenced:
+  - ADR-0033
+patterns-introduced:
+  - stub-pointer-rule
+  - lifecycle-kp-split
+  - requires-capabilities-frontmatter
+antipatterns-rejected:
+  - rules-as-reference-documents
+  - verbatim-rule-content-in-tests
+dependencies-of:
+  - EPIC-0064
+  - EPIC-0077
+dependencies-for: []
 ---
 
 # EPIC-0078 — Context Budget Optimization
 
-## Problem
+## Why this epic existed
 
-The always-loaded rule set consumed **59,591 tokens** per LLM conversation — 2.4× the 25,000-token target. Rules had grown from concise contracts into fully-detailed reference documents. Every conversation injected entire fallback matrices, complete code examples, and extended rationale sections that are rarely needed inline.
+O conjunto de regras always-loaded consumia **59,591 tokens** por conversa LLM — 2.4× o target de 25,000. As regras cresceram de contratos concisos para documentos de referência completos ao longo de múltiplos épicos. Cada épico adicionava "mais uma linha" a tabelas e matrizes sem auditar o tamanho total. O resultado: toda conversa injetava matrizes de fallback inteiras, exemplos de código completos e seções de rationale extensas que raramente são necessárias inline.
 
-## Hypothesis
+## Hypothesis tested
 
-If we split rules into compact stub contracts (≤50 lines, ≤2K tokens each) pointing to lifecycle KPs for full detail, and add `requires-capabilities` frontmatter to enable capability-aware pruning, then always-loaded context drops below 25,000 tokens without losing any governance enforcement.
+Se dividirmos regras em contratos stub compactos (≤50 linhas) apontando para KPs de lifecycle para detalhes completos, e adicionarmos frontmatter `requires-capabilities` para habilitar pruning por capability, então o contexto always-loaded cai abaixo de 25,000 tokens sem perder nenhum enforcement de governança.
 
-## Decisions (With Rationale)
+## Decisions taken (with why)
 
-1. **KP split over inline compression.** Compressing rule prose would lose precision. Extracting to KPs preserves fidelity while removing content from the always-loaded layer. KPs are loaded on-demand by skills that need the detail.
+- **D-001 KP split sobre inline compression**: Comprimir o texto das regras perderia precisão. Extrair para KPs preserva fidelidade enquanto remove conteúdo da camada always-loaded. KPs são carregados sob demanda por skills que precisam do detalhe.
+- **D-002 5 lifecycle KPs + 5 governance KPs**: Conteúdo agrupado por fase do lifecycle (task-hierarchy, backward-compat, exec-integrity, zero-bypass, refinement-gate, ci-watch) e tipo de governança (audit-gate-lifecycle, capability-composition, tool-call-grammar) para retrieval direcionado.
+- **D-003 `requires-capabilities` frontmatter em modo advisory primeiro**: Hard-fail no pruning de capability arriscaria remover conteúdo em projetos que não declararam capabilities. Modo advisory (WARN_ONLY) vai primeiro; hard-fail segue em release posterior após adoção validar.
+- **D-004 Rule 02 (Domain Template) removida completamente**: O domain template é um esqueleto que times customizam imediatamente — navegar como regra always-loaded não adicionava valor. Deletada do output do generator por inteiro.
+- **D-005 `audit-context-budget.sh` como gate CI hard-fail**: Previne regressão futura de budget. Baseline commitada no token count pós-EPIC-0078; qualquer PR que aumente o count falha no CI.
 
-2. **5 lifecycle KPs + 5 governance KPs.** Content grouped by lifecycle phase (task-hierarchy, backward-compat, exec-integrity, zero-bypass, refinement-gate, ci-watch) and governance type (audit-gate-lifecycle, capability-composition, tool-call-grammar) for targeted retrieval.
+## Alternatives rejected (with why)
 
-3. **`requires-capabilities` frontmatter — advisory mode first.** Hard-fail capability pruning risks removing content on projects that haven't declared capabilities. Advisory mode (WARN_ONLY) ships first; hard-fail follows in a later release after adoption validates.
+- **Per-profile rule trimming**: Exigiria arquivos de regra separados por perfil de capability. A abordagem de KP pointer funciona para todos os perfis com um único arquivo de regra.
+- **Context window increase**: Tratamento de sintoma, não causa raiz. Não ajuda custo de tokens nem melhora qualidade de resposta em problemas mais curtos.
+- **Compressão inline de prosa**: Perderia precisão dos contratos; o conteúdo detalhado ficaria inacessível sem re-expandir nas regras.
 
-4. **Rule 02 (Domain Template) fully removed.** The domain template is a skeleton that teams immediately customize — shipping it as an always-loaded rule added no value. Deleted from generator output entirely.
+## Reusable patterns produced
 
-5. **`audit-context-budget.sh` as hard-fail CI gate.** Prevents future budget regression. Baseline committed at post-EPIC-0078 token count; any PR that increases the count fails CI.
+- **Stub-pointer pattern**: `## Full Detail → [lifecycle KP](../knowledge/lifecycle/X.md)` em uma regra permite que regras compactas permaneçam normativamente completas. Qualquer regra futura que crescer demais pode usar o mesmo padrão.
+- **YAML frontmatter em regras**: `requires-capabilities: []` marca regras universalmente carregadas; não-vazio habilita pruning. Padrão agora standard para todos os arquivos de regra.
+- **KP naming convention**: `knowledge/lifecycle/` para KPs de fluxo de execução; `knowledge/governance/` para KPs de meta-governança.
+- **Test adaptation guide para rule-slimming**: Testes checando tabelas de evidência/seções detalhadas → redirecionar para o KP correspondente. Testes checando presença de seção → adaptar para a nova lista (mais curta) de seções na regra slim.
 
-## Alternatives Rejected
+## Anti-patterns observed
 
-- **Per-profile rule trimming:** Would require separate rule files per capability profile. The KP pointer approach works for all profiles with a single rule file.
-- **Context window increase:** Symptom treatment, not root cause. Doesn't help token cost or improve response quality on shorter problems.
+- **Rules-as-reference-documents**: Regras crescem de contratos concisos para documentos de referência completos ao longo de múltiplos épicos, cada um adicionando "mais uma linha" sem auditar tamanho total. `audit-context-budget.sh` previne a reincidência.
+- **Verbatim rule content in tests**: Testes que verificam conteúdo de regras verbatim quebram quando regras são slimadas. Quando rules.slim, 14 test classes falharam localmente antes do fix. Padrão correto: testar KP para detalhe, stub para ponteiro/cabeçalhos de seção.
+- **Memory summary format mismatch**: Primeiro draft da memory summary usou formato livre em vez do schema canônico com seções `## Why this epic existed`, `## Hypothesis tested`, etc. — detectado por `RetroSeedSmokeIT` no CI.
 
-## Reusable Patterns
+## Links
 
-- **Stub-pointer pattern:** `## Full Detail → [lifecycle KP](../knowledge/lifecycle/X.md)` in a rule allows compact rules to stay normatively complete.
-- **YAML frontmatter on rules:** `requires-capabilities: []` marks universally-loaded rules; non-empty enables pruning. Pattern now standard for all rule files.
-- **KP naming:** `knowledge/lifecycle/` for execution-flow KPs; `knowledge/governance/` for meta-governance KPs.
-
-## Anti-Patterns Observed
-
-- Rules that grew into full reference documents over multiple epics — each epic added "one more row" to tables without auditing total size.
-- Tests that checked rule content verbatim — when rules slim, tests break. Pattern: tests should check either the KP (for detail) or the stub (for pointer/section headers).
-
-## Test Adaptation Key
-
-When a rule is slimmed:
-1. Tests checking **evidence tables / detailed sections** → redirect to the corresponding lifecycle KP.
-2. Tests checking **section presence** → adapt to new (shorter) section list in slim rule.
-3. Tests checking **line count** → may need limit adjustment (actual vs. theoretical target).
+- [Epic document](../epics/epic-0078-context-budget-optimization/epic-0078.md)
+- [ADR-0033 Context Budget Optimization](../docs/adr/ADR-0033-context-budget-optimization.md)
+- [Integrity gate report](../epics/epic-0078-context-budget-optimization/reports/epic-completion-report-0078.md)
+- [EPIC-0064 Capability-Driven Composition](epic-0064-summary.md)
+- [EPIC-0077 Product-First Lifecycle](epic-0077-summary.md)
