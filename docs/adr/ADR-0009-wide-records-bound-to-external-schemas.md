@@ -158,10 +158,10 @@ false positive that this ADR closes.
 - [`ADR-0001-intentional-architectural-deviations-for-cli-tool.md`](ADR-0001-intentional-architectural-deviations-for-cli-tool.md)
   — precedent for narrowly-scoped, audit-closing ADR exemptions with a clear
   rationale and enumerated scope.
-- [`ADR-0008-hybrid-hex-core-and-flat-cli-layout.md`](ADR-0008-hybrid-hex-core-and-flat-cli-layout.md)
-  — companion audit-closing ADR (2026-04-17); demonstrates the pattern of
-  exempting an enumerated set from a general rule rather than relaxing the
-  rule itself.
+- [`../specs/SPEC-architecture-decision-engine-v1.md`](../specs/SPEC-architecture-decision-engine-v1.md)
+  — canonical architecture-decision-engine specification; preserves the
+  reusable rationale for hybrid compositions and selective architectural
+  promotion without depending on a separate ADR artifact.
 
 ### Related Rules
 
