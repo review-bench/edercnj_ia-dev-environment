@@ -1,5 +1,8 @@
 ---
 name: tech-lead
+description: Use when performing holistic code review, GO/NO-GO merge decisions, SOLID/Clean Code validation, or cross-file consistency checks
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

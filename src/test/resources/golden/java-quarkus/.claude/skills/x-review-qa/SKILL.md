@@ -2,7 +2,7 @@
 name: x-review-qa
 description: "QA specialist review: validates test coverage, TDD compliance, test naming, fixtures, parametrized tests, and acceptance criteria coverage."
 user-invocable: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Agent
 argument-hint: "[PR number or file paths]"
 context-budget: light
 requires-capabilities: []
@@ -111,60 +111,18 @@ score line (see Output Template below).
 
 ### Step 1 -- Gather Context
 
-Read the testing knowledge pack for project test conventions:
-- `knowledge/testing.md`
+Collect the review target: PR number or file paths from args. Run:
+```bash
+git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
+```
 
-### Step 2 -- Identify Changed Files
+### Step 2 -- Dispatch to QA Engineer Agent
 
-Determine scope: PR diff or specified paths. Separate production code from test code.
-
-### Step 3 -- Coverage Analysis
-
-Check coverage reports or run coverage tool. Verify line >= 95% and branch >= 90%.
-
-**Absolute gate (Rule 05 RULE-005-01):** the gate fires when the repository's
-measured coverage falls below either threshold, regardless of whether the
-deficit was caused by the PR or was pre-existing on the base branch. The
-specialist MUST record the finding and fail QA-02/QA-03 in both cases; it
-is not the specialist's place to grant a pre-existing exemption.
-
-### Step 4 -- Test Naming Audit
-
-Scan test files for naming convention compliance: `[methodUnderTest]_[scenario]_[expectedBehavior]`.
-
-### Step 5 -- TDD Commit Audit
-
-Analyze git log for test-first pattern: test commits should precede or accompany implementation commits.
-
-### Step 6 -- Test Quality Review
-
-For each test file:
-- Check AAA pattern
-- Check parametrized tests for multi-scenario validations
-- Check exception path coverage
-- Check fixture centralization
-- Check unique test data
-
-### Step 6.5 -- Smoke Test Verification (EPIC-0042)
-
-Execute smoke test verification when `testing.smoke_tests == true`:
-
-1. Check if smoke test infrastructure exists:
-   - If `testing.smoke_tests == false`: mark QA-19 and QA-20 as **N/A** (not scored, excluded from max score)
-   - If `testing.smoke_tests == true`: proceed with smoke verification
-2. **QA-19 — Smoke test existence:** Verify smoke tests exist and cover at least the critical path (health check + primary flow)
-3. **QA-20 — Smoke test execution:** Run `{{SMOKE_COMMAND}}` and verify ALL smoke tests pass:
-   ```bash
-   {{SMOKE_COMMAND}}
-   ```
-   - If ALL smoke tests **PASS**: QA-20 scores 2/2
-   - If ANY smoke test **FAILS**: QA-20 scores 0/2 AND STATUS becomes **Rejected**
-   - Log each failing smoke test name and failure reason
-4. **Hard rule:** ALL unit + integration + smoke tests MUST pass for STATUS: Approved
-
-### Step 7 -- Generate Report
-
-Produce the scored report.
+    Agent(
+      subagent_type: "qa-engineer",
+      description: "QA specialist review for {target}",
+      prompt: "Review the code changes for QA compliance. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `knowledge/testing.md` for project test conventions. Apply your full QA checklist. Produce output in this exact format:\n\nENGINEER: QA\nSTORY: {target}\nSCORE: XX/36\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [QA-XX] Description (2/2)\nFAILED:\n- [QA-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [QA-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+    )
 
 ## Output Format
 

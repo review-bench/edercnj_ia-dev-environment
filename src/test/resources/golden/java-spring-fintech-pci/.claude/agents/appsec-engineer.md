@@ -1,5 +1,8 @@
 ---
 name: appsec-engineer
+description: Use when integrating security requirements into SDLC, validating threat models, reviewing secure design patterns, or assessing security test plans
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

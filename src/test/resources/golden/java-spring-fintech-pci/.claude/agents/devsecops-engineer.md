@@ -1,5 +1,8 @@
 ---
 name: devsecops-engineer
+description: Use when reviewing CI/CD pipeline security, software supply chain integrity, artifact signing, SLSA compliance, or SAST/DAST integration
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

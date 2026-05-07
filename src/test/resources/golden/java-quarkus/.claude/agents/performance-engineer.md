@@ -1,5 +1,8 @@
 ---
 name: performance-engineer
+description: Use when latency optimization, throughput analysis, N+1 detection, concurrency patterns, or performance SLA validation is needed
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-capabilities: []
 ---
 # Global Behavior & Language Policy

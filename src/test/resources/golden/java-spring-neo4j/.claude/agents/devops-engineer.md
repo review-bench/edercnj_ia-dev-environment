@@ -1,5 +1,8 @@
 ---
 name: devops-engineer
+description: Use when reviewing Dockerfile, CI/CD pipeline, container security, resource limits, health probes, or deployment configuration
+tools: [Read, Bash, Grep]
+model: Sonnet
 requires-any: [infra.docker.standard, infra.cicd.github-actions]
 requires-capabilities: []
 ---
