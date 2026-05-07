@@ -19,79 +19,48 @@
   },
   "storyRefinements": {
     "story-0080-0001": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "526a2ab904e012cf726a09df630b8f222e93481026244783c8106f10b5bbed5e",
-      "blockers": [
-        "risks: Sequential file-based Bug ID counter has no atomicity/locking guarantee — concurrent /x-create-bug invocations can produce duplicate IDs"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "19dfebb733f280f8b7f4c59dffcf300532883ec67269474d3d6e9ffe3fa6270d",
+      "blockers": []
     },
     "story-0080-0002": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "3c32e4a4d716a2b113078f66a91492e8aa170c641bc35c250a74fce1cf3ab130",
-      "blockers": [
-        "contracts: §5.3 output described as plain text with no typed field schema — field names, types, nullable constraints, and error envelopes absent",
-        "ac: 'high+' severity threshold in decomposition rules table §5.2 is ambiguous — undefined whether 'high+' includes 'high' or only 'critical'"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "0ab49b7557097e09d3b696ce4832e67570477c9d49239b3ca9be77a679042b71",
+      "blockers": []
     },
     "story-0080-0003": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "6cc982a730b0253d146000b9ddefdd86451e1499a80cc2486fea432b68079130",
-      "blockers": [
-        "alternatives: Only 1 alternative documented; ≥2 required per RA9 v2 Rule 30",
-        "value: §3 Entrega de Valor metric is a technical compliance metric, not a measurable business-value outcome with unit and target",
-        "contracts: §5.3 output schema omits field types, nullability, and exit-code-to-error-body mapping for exit 1 MAP_INCONSISTENT_DEPS",
-        "ac: AC-4 security/auth does not specify the defensive mechanism preventing shell expansion of story file content at generation time"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "df3a5b66f31830621cbcffa28e4477672ae975b5f9acd165e38537ad113b17f8",
+      "blockers": []
     },
     "story-0080-0004": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "72fac04cd64cd82c5aba12e57f75ad4ce113fbac7e2242c4f303c14329ff6d71",
-      "blockers": [
-        "alternatives: Only 1 alternative documented; ≥2 required per RA9 v2 Rule 30",
-        "contracts: §5.2 verdict block schema 'notes' field has no max-length or format constraint",
-        "ac: No AC covers the 'rejected' verdict scenario — condition distinguishing 'needs-changes' from 'rejected' is unspecified",
-        "ac: --auto-approve-trivial flag bypasses 3-persona review without any immutable audit-trail requirement"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "1debbab80f2470e08f2695e496022e0d15dbc96ef455823a6d1a8bfd5648a767",
+      "blockers": []
     },
     "story-0080-0005": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "7dde8c6dd9f56a6a066e349c1d9c0d0b181f4517d005fdbe087c6b8aca6bc7c4",
-      "blockers": [
-        "persona: §2 persona is 'Orchestrator infrastructure' — a system actor, not a human role; RA9 v2 requires a specific human persona",
-        "contracts: §5.2 dispatcher output field 'parentPath' is ambiguous — rename to 'targetPath' or document precisely",
-        "ac: AC-2 fail-open path creates a false-negative risk where a bug story bypasses the gate if the dispatcher errors",
-        "ac: AC-1 labeled 'happy-path' tests the BLOCK scenario; true happy-path (approved verdict → exit 0) has no dedicated AC",
-        "ac: No security/auth AC for path traversal in the dispatcher's $1 argument",
-        "ac: CLAUDE_RECOVERY_MODE=1 bypass behavior on bug stories is undocumented — no AC specifies audit trail"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "20c10262c73ad864feb82c8e3e8e7f2312b5a4ade283b2dc0861d901597ac057",
+      "blockers": []
     },
     "story-0080-0006": {
-      "status": "rejected",
+      "status": "approved",
       "scope": "story",
-      "checkedAt": "2026-05-07T23:00:00Z",
-      "verdictHash": "5ee564185a4c4884155fafb1520ffe0e06eea0dfed69bd4f46bc19df853acb06",
-      "blockers": [
-        "persona: §2 persona 'Engineer reviewing or merging a bug PR' is too generic — no distinguishing attributes or knowledge level specified",
-        "alternatives: Only 1 alternative documented; ≥2 required per RA9 v2 Rule 30",
-        "contracts: BR-PR-3 skip condition is not formally specified — valid skip reason, provider, and recording location are undefined",
-        "contracts: §5.3 PR body section lacks typed field constraints — verdictHash format, branch pattern, PASS/FAIL/WARN enumeration unspecified",
-        "ac: No AC covers BR-PR-1 FAIL (no test file in diff)",
-        "ac: No AC covers BR-PR-2 FAIL (fix commit before test commit)",
-        "ac: --rebase merge strategy interaction with R-080-5 audit is undocumented",
-        "ac: AC-4 --pr-number input used in gh commands has no explicit sanitization contract in §5 (command injection surface)"
-      ]
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "e29e6d6e74c3cf1de966f35b65af2026bd1c27592c2e1026382236fea5ece1de",
+      "blockers": []
     }
   },
   "createdAt": "2026-05-07T22:00:00Z",
-  "updatedAt": "2026-05-07T23:00:00Z"
+  "updatedAt": "2026-05-07T23:30:00Z"
 }
