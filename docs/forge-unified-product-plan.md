@@ -1,6 +1,6 @@
 # Forge — Plano Unificado para Ideação de Produto, Capabilities e Features
 
-> **Status:** Plano consolidado e organizado para servir como entrada direta de `forge ideate --kind product|capability|feature` (e equivalentes atuais `x-feature-ideate` / `x-feature-create`).
+> **Status:** Plano consolidado e organizado para servir como entrada direta de `forge ideate --kind product|capability|feature` (e equivalentes atuais `x-ideate-feature` / `x-create-feature`).
 > **Origem:** Síntese de [`forge-strategic-plan-v3.md`](forge-strategic-plan-v3.md) (estratégia) + [`forge-implementation-roadmap.md`](forge-implementation-roadmap.md) (ordem de execução), reconciliados com o estado atual do `ia-dev-environment` **até EPIC-0076 entregue + EPIC-0077 (Product-First Lifecycle) em andamento**.
 > **Propósito:** Forge é um **projeto novo** que usa o `ia-dev-environment` como base. Tudo que já está implementado nele é **dado de entrada**, não escopo de novo épico.
 > **Hierarquia oficial deste plano:** `Project → Product → Capability → Feature` (decomposição em Epic/Story/Task fica para refinement).
@@ -133,7 +133,7 @@ Hooks shell e audit scripts deixam de ser mecanismo primário; viram serviços/p
 | :--- | :--- |
 | Padrão alvo `x-<verbo>-<objeto>` | públicas: `x-<verbo>-<objeto>`; internas: `x-internal-<verbo>-<objeto>`; libs: `x-lib-<verbo>-<objeto>`. |
 | Estado atual no repo | A maioria das skills canônicas **já está em verb-first**: `x-implement-story`, `x-implement-epic`, `x-implement-task`, `x-refine-story`, `x-refine-epic`, `x-plan-story`, `x-plan-task`, `x-plan-architecture`, `x-create-pr`, `x-fix-pr`, `x-merge-pr`, `x-watch-pr-ci`, `x-create-feature`, `x-ideate-feature`, `x-search-memory`, `x-drive-tdd`, `x-analyze-telemetry`, `x-analyze-telemetry-trends`, `x-update-architecture`, `x-update-system-architecture`, `x-generate-adr`, `x-generate-docs`, `x-validate-docs`, `x-orchestrate-epic`, `x-recommend-mcp`, `x-internal-update-status`, `x-internal-write-report`, `x-internal-normalize-args`, `x-internal-summarize-epic`, `x-commit-changes`, `x-push-branch`, `x-create-git-branch`, `x-manage-worktrees`, `x-merge-branches`, `x-cleanup-git-branches`, `x-commit-planning`, `x-fix-epic-pr`, `x-manage-pr-merge-train`, `x-model-threats`, `x-execute-tests`, `x-plan-tests`, `x-execute-e2e-tests`. |
-| Renames pendentes em EPIC-0076 | Skills hoje em forma noun-first (`x-epic-implement`, `x-arch-plan`, `x-pr-fix`, `x-feature-create`, `x-feature-ideate`, ...) coexistem com a forma verb-first; EPIC-0076 ainda em **Backlog** consolidará para verb-first com hard-cut (Rule 19 §Hard-cut autorizado). |
+| Renames pendentes em EPIC-0076 | Skills hoje em forma noun-first (`x-epic-implement`, `x-arch-plan`, `x-pr-fix`, ...) coexistem com a forma verb-first; EPIC-0076 ainda em **Backlog** consolidará para verb-first com hard-cut (Rule 19 §Hard-cut autorizado). |
 | Exceções permanentes | Skills com escopo declarado preservam ordem `x-<contexto>-<verbo>-<objeto>` (ex.: `x-arch-plan-product`, `x-arch-plan-capability` introduzidas em EPIC-0077). |
 
 > **Implicação para Forge:** este documento adota como **canônicas as formas verb-first já presentes no repo hoje**. Os nomes podem ser usados como entrada direta para os comandos atuais e mapeiam diretamente para os comandos `forge` futuros (§7-§8).
@@ -328,7 +328,7 @@ Runtime determinístico
 | ID | Nome | Escopo | Herdado de `ia-dev-env`? | Wave |
 | :--- | :--- | :--- | :--- | :-: |
 | P1.C1 | **Project & Product Lifecycle** | `forge project create/approve` (NOVO no Forge); `forge product create/approve`; `forge product propose-capabilities` (worker que sugere candidatas). | Parcial (templates `_TEMPLATE-PRODUCT.md` em EPIC-0077). | W10 |
-| P1.C2 | **Capability & Feature Lifecycle** | `forge capability create/approve`; `forge feature create/approve`; predecessor remote gate; `forge ideate --kind product/capability/feature` (multi-round, personas, comparação de alternativas). | Parcial (`x-feature-create`, `x-feature-ideate` já existem; falta capability/product). | W10 |
+| P1.C2 | **Capability & Feature Lifecycle** | `forge capability create/approve`; `forge feature create/approve`; predecessor remote gate; `forge ideate --kind product/capability/feature` (multi-round, personas, comparação de alternativas). | Parcial (`x-create-feature`, `x-ideate-feature` já existem; falta capability/product). | W10 |
 | P1.C3 | **Architecture Planning (3 níveis)** | `forge arch plan product/capability/feature`; coleta de NFRs mínimos (usuários, simultaneidade, latência, disponibilidade, volume, segurança); architecture decision log; **Feature → Epic gate** (`architecture-feature` aprovado + remote-clean); `forge arch system update` incremental. | **Sim — `x-arch-plan-product` + `x-arch-plan-capability` em EPIC-0077; `x-plan-architecture` (feature), `x-update-architecture`, `x-update-system-architecture` já existem; C4 obrigatório.** | W10 |
 | P1.C4 | **Feature → Epic Generation** | `forge epic create <FEATURE>` gera epic + stories + IMPLEMENTATION-MAP a partir da feature e do `architecture-feature` aprovado; bidirectional linking; backlog versioning (commit/PR); replanejamento incremental quando arquitetura/feature mudam; **bug/change → change-epic correction-story** (Post-Delivery); effort scoring misto humano/IA. | Parcial (`x-internal-create-epic`/`x-internal-create-story`/`x-internal-map-epic` já existem). | W10 |
 | P1.C5 | **Post-Delivery Lifecycle** | Taxonomia tipada de entradas pós-entrega: `Bug`, `FeatureChange`, `FeatureDeprecation`, `FeatureRemoval`, `SecurityFinding`, `SpecDrift`, `Maintenance`, `DependencyUpgrade`, `Rollback`, `Experiment`, `SupportRequest`. State machines, lineage, impact assessment, comandos `forge bug/feature change/feature deprecate/feature remove/security finding/spec drift/maintenance/dependency upgrade/rollback/experiment/support`. | Não. (V3 §9 inteira é nova.) | W10/W11 |
@@ -553,9 +553,9 @@ Runtime determinístico
 #### P1.C2 — Capability & Feature Lifecycle
 
 - **F1 `[V0]`** — `forge capability create/approve` (com `_TEMPLATE-CAPABILITY.md` 7 seções, RNF no-relax). **Herdado:** template em EPIC-0077.
-- **F2 `[V0]`** — `forge feature create/approve`. **Herdado:** `x-feature-create`.
+- **F2 `[V0]`** — `forge feature create/approve`. **Herdado:** `x-create-feature`.
 - **F3 `[V0]`** — Predecessor remote gate (Capability aprovada + commitada + sincronizada).
-- **F4 `[V0]`** — `forge ideate --kind product/capability/feature` (multi-round, personas avançadas, comparação de alternativas). **Herdado:** `x-feature-ideate` parcial.
+- **F4 `[V0]`** — `forge ideate --kind product/capability/feature` (multi-round, personas avançadas, comparação de alternativas). **Herdado:** `x-ideate-feature` parcial.
 - **F5 `[V0]`** — RNF inheritance gate (no-relax). **Herdado:** `x-internal-rnf-validate` em EPIC-0077.
 
 #### P1.C3 — Architecture Planning (3 níveis)
@@ -1084,7 +1084,7 @@ W5: x-implement-task, x-implement-story (hub central — bloqueia 44 outras)
    - Stub `forge story refine` que use os três + chame Anthropic via `LlmProvider`.
    - Comparar com `x-refine-story` markdown atual: tempo, taxa de bypass, qualidade, debuggability.
 4. **Spike de target adapter Cursor** em paralelo (P2.C3).
-5. **Decompor W0 + W1** em épicos concretos do Forge usando este documento como entrada de `forge epic create` (atualmente via `x-feature-create` → `x-internal-create-epic`).
+5. **Decompor W0 + W1** em épicos concretos do Forge usando este documento como entrada de `forge epic create` (atualmente via `x-create-feature` → `x-internal-create-epic`).
 6. **Criar Project `Forge`** com este documento como artefato fundador. Cadeia: `forge project create FORGE` → `forge product create FORGE-FOUNDATIONS` → `forge capability create FORGE-FOUNDATIONS-PROJECT-BOOTSTRAP` → `forge feature create FORGE-FOUNDATIONS-PROJECT-BOOTSTRAP-CLI-BINARY` → `forge arch plan feature ...` → `forge epic create ...`.
 7. **Atualizar `CLAUDE.md` raiz** com link para este plano como referência operacional adicional ao v3 e roadmap.
 8. **Validar com 5-10 usuários atuais do `ia-dev-env`** a hipótese de inversão de controle e a cadeia Product-First (alguns já estão envolvidos via EPIC-0077).
