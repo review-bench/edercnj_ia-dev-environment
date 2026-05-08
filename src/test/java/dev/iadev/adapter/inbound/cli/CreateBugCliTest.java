@@ -242,6 +242,11 @@ class CreateBugCliTest {
 
     // Helper methods
 
+    private void testSlugGeneration(String description, String expectedSlug) {
+        String actual = generateSlug(description);
+        assertEquals(expectedSlug, actual, "Slug for: " + description);
+    }
+
     private String generateSlug(String description) {
         // Simple slug generation: lowercase, replace spaces with hyphens, remove special chars
         return description
