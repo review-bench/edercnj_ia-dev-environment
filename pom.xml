@@ -4,18 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.iadev</groupId>
-    <artifactId>ia-dev-env</artifactId>
-    <version>5.3.0</version>
+    <groupId>dev.iadevkit</groupId>
+    <artifactId>ia-dev-kit</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>ia-dev-env</name>
-    <description>CLI tool that generates Claude Code configuration (.claude/) and shared DevEx artifacts (.github/workflows/, Dockerfile, ADRs, docs) for AI-assisted development environments</description>
+    <name>ia-dev-kit</name>
+    <description>CLI tool that copies Claude Code resources (.claude/) to any project</description>
 
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Packages — edercnj/ia-dev-environment</name>
+            <name>GitHub Packages — edercnj/ia-dev-kit</name>
             <url>https://maven.pkg.github.com/edercnj/ia-dev-environment</url>
         </repository>
     </distributionManagement>
@@ -31,16 +31,11 @@
         <spotless.version>2.44.5</spotless.version>
         <google-java-format.version>1.25.2</google-java-format.version>
         <checkstyle.version>10.23.1</checkstyle.version>
-        <pebble.version>3.2.2</pebble.version>
-        <snakeyaml.version>2.6</snakeyaml.version>
-        <jackson.version>2.21.2</jackson.version>
-        <jline.version>3.28.0</jline.version>
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.15</logback.version>
         <junit.version>5.11.4</junit.version>
         <assertj.version>3.27.7</assertj.version>
         <mockito.version>5.14.2</mockito.version>
-        <archunit.version>1.4.2</archunit.version>
         <jacoco.version>0.8.14</jacoco.version>
         <cyclonedx.version>2.9.1</cyclonedx.version>
     </properties>
@@ -53,40 +48,7 @@
             <version>${picocli.version}</version>
         </dependency>
 
-        <!-- Template engine -->
-        <dependency>
-            <groupId>io.pebbletemplates</groupId>
-            <artifactId>pebble</artifactId>
-            <version>${pebble.version}</version>
-        </dependency>
-
-        <!-- YAML parsing -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
-        </dependency>
-
-        <!-- JSON processing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- Interactive terminal -->
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>${jline.version}</version>
-        </dependency>
-
-        <!-- Logging (required by Pebble template engine at runtime) -->
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -124,22 +86,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Property-based testing (EPIC-0064 story-0064-0110) -->
-        <dependency>
-            <groupId>net.jqwik</groupId>
-            <artifactId>jqwik</artifactId>
-            <version>1.9.2</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Architecture testing -->
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5</artifactId>
-            <version>${archunit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -160,31 +106,6 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>clean-stale-generated-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>${project.build.outputDirectory}/targets</directory>
-                                </fileset>
-                                <fileset>
-                                    <directory>${project.build.outputDirectory}/shared</directory>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -259,7 +180,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>dev.iadev.cli.IaDevEnvApplication</mainClass>
+                                    <mainClass>dev.iadevkit.IaDevKitApplication</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
@@ -348,7 +269,7 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <excludes>
-                        <exclude>dev/iadev/cli/IaDevEnvApplication.class</exclude>
+                        <exclude>dev/iadevkit/IaDevKitApplication.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -447,7 +368,7 @@
                         </executions>
                         <configuration>
                             <imageName>ia-dev-env</imageName>
-                            <mainClass>dev.iadev.cli.IaDevEnvApplication</mainClass>
+                            <mainClass>dev.iadevkit.IaDevKitApplication</mainClass>
                             <buildArgs>
                                 <buildArg>--no-fallback</buildArg>
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>

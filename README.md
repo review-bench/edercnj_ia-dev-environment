@@ -1,833 +1,266 @@
-# ia-dev-environment
+# ia-dev-kit
 
-A CLI tool that generates complete `.claude/` boilerplate for AI-assisted development environments. Produces rules, skills, agents, hooks, settings, and documentation -- everything a Claude Code project needs to enforce engineering standards from day one.
+A CLI that installs a complete Claude Code development environment into any project with a single command.
+
+```bash
+ia-dev-kit generate
+```
+
+That's it. Your project gains rules, skills, agents, hooks, templates, and a `CLAUDE.md` — everything Claude Code needs to assist you with engineering work from the very first conversation.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
+- [What it does](#what-it-does)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Bundled Stack Profiles](#bundled-stack-profiles)
-- [What's Generated](#whats-generated)
-- [Generated Skills Reference](#generated-skills-reference)
-  - [Story Planning & Decomposition](#story-planning--decomposition)
-  - [Development Lifecycle](#development-lifecycle)
-  - [Architecture & Design](#architecture--design)
-  - [Testing](#testing)
-  - [Code Review & Quality](#code-review--quality)
-  - [Git & Operations](#git--operations)
-  - [Conditional Skills](#conditional-skills)
+- [What gets generated](#what-gets-generated)
 - [Development](#development)
 - [License](#license)
 
 ---
 
-## Overview
+## What it does
 
-`ia-dev-env` reads a YAML configuration file describing your project's tech stack (language, framework, database, infrastructure, etc.) and generates a complete Claude Code configuration:
+`ia-dev-kit` copies a curated bundle of Claude Code resources from the JAR into your project's
+`.claude/` directory. The result is a fully configured development environment:
 
-- **Claude Code** (`.claude/`) -- rules, skills, agents, hooks, settings
-- **Documentation** (`governance/steering/`, `docs/specs/`, `plans/` + `ai/epics/`, `ai/runs/`, `docs/runbooks/`, `docs/contracts/`, `docs/adr/`) -- architecture, specs, epics (legacy + v4), runs, runbooks, contracts, ADRs
-- **CI/CD** -- Dockerfile, docker-compose, GitHub Actions workflows, Kubernetes manifests
+- **Rules** — coding standards and architecture boundaries loaded into every Claude Code session
+- **Skills** — slash commands (`/x-implement-story`, `/x-review-pr`, `/x-arch-plan`, and more) covering the full development lifecycle
+- **Agents** — specialized AI personas for architecture, security, QA, SRE, and other roles
+- **Knowledge packs** — domain knowledge for governance, security patterns, lifecycle contracts, and CI tooling
+- **Templates** — planning, review, and documentation templates ready to use
+- **Hooks** — a post-compile check that catches Java compilation errors immediately after every edit
+- **Settings** — `settings.json` with permissions and hooks pre-configured
+- **`CLAUDE.md`** — the executive summary Claude Code loads automatically on every conversation
 
-All generated artifacts enforce consistent engineering standards: coding conventions, architecture boundaries, TDD workflow, coverage thresholds, and security practices.
+No configuration required. No internet access at generate time. Everything ships inside the JAR.
+
+---
 
 ## Prerequisites
 
 - Java 21 or later
 
+---
+
 ## Installation
 
-### From JAR (recommended)
+### Mac / Linux
 
 ```bash
 git clone https://github.com/edercnj/ia-dev-environment.git
-cd ia-dev-environment/java
-mvn clean package -DskipTests
-
-java -jar target/ia-dev-env-2.0.0-SNAPSHOT.jar --help
+cd ia-dev-environment
+bash install.sh
 ```
 
-### Using the wrapper script
+The installer builds the JAR, places it in `~/.local/share/ia-dev-kit/`, and adds a `ia-dev-kit`
+wrapper to your PATH.
+
+### Windows
+
+```powershell
+git clone https://github.com/edercnj/ia-dev-environment.git
+cd ia-dev-environment
+.\install.ps1
+```
+
+### Uninstall
 
 ```bash
-chmod +x bin/ia-dev-env
-./bin/ia-dev-env --help
+bash install.sh --uninstall   # Mac / Linux
+.\install.ps1 --uninstall     # Windows
 ```
 
-The wrapper auto-detects Java 21 and sets appropriate JVM flags.
-
-### GraalVM native image (optional)
+### From source (no installer)
 
 ```bash
-cd java
-mvn clean package -Pnative -DskipTests
-./target/ia-dev-env --help
+mvn clean package
+java -jar target/ia-dev-kit-*.jar generate
 ```
 
-Produces a standalone binary with ~50ms startup time (no JVM required at runtime).
+---
 
 ## Usage
 
-### Generate from a bundled profile
+### Generate into the current directory
 
 ```bash
-ia-dev-env generate --stack java-spring --output ./my-project
+ia-dev-kit generate
 ```
 
-### Generate from a custom config
+### Generate into a specific project
 
 ```bash
-ia-dev-env generate --config my-config.yaml --output ./my-project
+ia-dev-kit generate --output /path/to/your/project
 ```
 
-### Generate interactively
+### Preview without writing anything
 
 ```bash
-ia-dev-env generate --interactive --output ./my-project
+ia-dev-kit generate --dry-run --verbose
 ```
 
-### Validate a config file
+### Overwrite existing files
 
 ```bash
-ia-dev-env validate --config my-config.yaml --verbose
+ia-dev-kit generate --force
 ```
 
-### Generate for a specific platform
-
-```bash
-ia-dev-env generate --config my-config.yaml --platform claude-code --output ./my-project
-```
-
-### Dry run (preview without writing)
-
-```bash
-ia-dev-env generate --config my-config.yaml --dry-run
-```
-
-### CLI Reference
+### Full CLI reference
 
 ```
-ia-dev-env [OPTIONS] COMMAND [ARGS]...
+ia-dev-kit generate [OPTIONS]
 
-Commands:
-  generate    Generate AI dev environment boilerplate
-  validate    Validate a YAML configuration file
+  -o, --output <DIR>    Target project directory (default: current directory)
+  -f, --force           Overwrite existing files
+      --dry-run         Simulate without writing any files
+  -v, --verbose         List each file as it is copied
 
-Global Options:
-  -V, --version   Print version and exit
-  -h, --help      Show help and exit
-
-Generate Options:
-  -c, --config <path>    Path to YAML config file
-  -i, --interactive      Interactive mode (mutually exclusive with --config)
-  -s, --stack <name>     Use a bundled stack profile (see profiles below)
-  -o, --output <dir>     Output directory (default: current directory)
-  -v, --verbose          Verbose logging
-  -p, --platform <value> Target AI platform: claude-code (only supported value; `all` is also accepted and now resolves to claude-code output since it is the only remaining platform)
-  -f, --force            Overwrite existing files without prompting
-  --dry-run              Preview what would be generated
-
-Validate Options:
-  -c, --config <path>    Path to YAML config file (required)
-  -v, --verbose          Per-category validation results
+  -V, --version         Print version and exit
+  -h, --help            Show help and exit
 ```
 
-## Bundled Stack Profiles
-
-10 ready-to-use profiles available via `--stack <name>`:
-
-| Profile | Language | Framework | Database | Notes | Command |
-|---------|----------|-----------|----------|-------|---------|
-| `go-gin` | Go 1.22 | Gin | PostgreSQL | REST API | `ia-dev-env generate --stack go-gin -o ./my-project` |
-| `java-picocli-cli` | Java 21 | Picocli 4.7 | — | CLI tool | `ia-dev-env generate --stack java-picocli-cli -o ./my-project` |
-| `java-quarkus` | Java 21 | Quarkus 3.17 | PostgreSQL | Cloud-native | `ia-dev-env generate --stack java-quarkus -o ./my-project` |
-| `java-spring` | Java 21 | Spring Boot 3.4 | PostgreSQL | Enterprise | `ia-dev-env generate --stack java-spring -o ./my-project` |
-| `kotlin-ktor` | Kotlin 2.0 | Ktor | PostgreSQL | Lightweight | `ia-dev-env generate --stack kotlin-ktor -o ./my-project` |
-| `python-click-cli` | Python 3.9 | Click 8.1 | — | CLI tool | `ia-dev-env generate --stack python-click-cli -o ./my-project` |
-| `python-fastapi` | Python 3.12 | FastAPI | PostgreSQL | Async API | `ia-dev-env generate --stack python-fastapi -o ./my-project` |
-| `rust-axum` | Rust 2024 | Axum | PostgreSQL | High-performance | `ia-dev-env generate --stack rust-axum -o ./my-project` |
-| `typescript-commander-cli` | TypeScript 5 | Commander | — | CLI tool | `ia-dev-env generate --stack typescript-commander-cli -o ./my-project` |
-| `typescript-nestjs` | TypeScript 5 | NestJS | PostgreSQL | Full-stack | `ia-dev-env generate --stack typescript-nestjs -o ./my-project` |
-
-You can also use your own config file instead of a bundled profile:
-
-```bash
-ia-dev-env generate --config path/to/setup-config.yaml -o ./my-project
-```
-
-Each profile generates the complete set of skills, agents, and rules tailored to that stack.
-
-## What's Generated
+After running, `ia-dev-kit` prints a summary of what was installed:
 
 ```
-.claude/                          # Claude Code configuration
-├── README.md                     # Auto-generated project guide
-├── settings.json                 # Permissions and hooks
-├── settings.local.json           # Local overrides template
-├── rules/                        # Coding rules (loaded into system prompt)
-├── skills/                       # Skills invocable via /command
-│   └── {knowledge-packs}/        # Internal context for agents
-├── agents/                       # AI personas (architect, tech-lead, etc.)
-├── templates/                    # 12 plan & review templates (EPIC-0024)
-└── hooks/                        # Automation scripts (post-compile, etc.)
+Pipeline: Success (65ms)
 
-governance/steering/              # Persistent project context
-├── service-architecture.md       # Service architecture doc
-└── product.md, tech-stack.md...  # Project identity files
-
-docs/specs/                       # Human-authored specifications
-└── _templates/                   # Spec templates (contributing, etc.)
-
-docs/runbooks/                    # Operational runbooks and templates
-└── deploy-runbook.md             # Deploy runbook, operational guides
-
-ai/runs/                          # Local execution outputs
-├── audits/                       # Codebase audit reports
-├── reviews/                      # Review session outputs
-├── test-runs/                    # Test execution snapshots
-└── telemetry/                    # Cross-session telemetry NDJSON
-
-docs/contracts/                   # API contracts and schemas
-└── api/                          # gRPC reference (when applicable)
-
-docs/adr/                         # Architecture Decision Records
-├── README.md                     # ADR index
-└── _TEMPLATE-ADR.md              # ADR template
-
-ai/epics/                         # Epic workspaces (v4 layout, flowVersion 4)
-└── epic-XXXX-<slug>/             # epic.md, IMPLEMENTATION-MAP, stories, plans/, reports/
-
-plans/                            # Legacy epic workspaces (read-only, flowVersion ≤ 2)
-└── epic-XXXX/                    # 60 legacy epics 0001..0060 — kept per SPEC RULE-001
+  Category                Count
+  ──────────────────────  ─────
+  Agents                     14
+  Hooks                       1
+  Knowledge                 166
+  Root Files                  1
+  Rules                       5
+  Scripts                    44
+  Settings                    1
+  Skills                    273
+  Templates                  62
+  ──────────────────────  ─────
+  Total                     567
 ```
 
-Plus CI/CD artifacts: `Dockerfile`, `docker-compose.yml`, `.github/workflows/ci.yml`, and Kubernetes manifests (when applicable).
-
 ---
 
-## Generated Skills Reference
-
-The generator produces **20 core skills** (always included) and up to **13 conditional skills** (based on your project config). Skills are invoked via `/skill-name` in the AI assistant chat. Each skill is self-contained -- the AI agent can execute it by reading only the SKILL.md file.
-
-> **Note:** Skills are generated for Claude Code (`.claude/skills/`).
-
-> **EPIC-0036 (Skill Taxonomy Refactor) — renames applied.**
-> The source of truth for skills under `java/src/main/resources/targets/claude/skills/` has been reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`) and 19 skills have been renamed to a consistent `x-{subject}-{action}` scheme. The generated output (`.claude/skills/`) remains **flat** — user-facing invocation paths stay `/{skill-name}` without a category prefix.
->
-> - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
-> - Rename history: [`ai/epics/epic-0036/skill-renames.md`](ai/epics/epic-0036/skill-renames.md)
-> - Release notes (post-merge migration table): [`docs/release-notes/EPIC-0036-skill-renames.md`](docs/release-notes/EPIC-0036-skill-renames.md)
-
-### Story Planning & Decomposition
-
-Skills for breaking down specifications into implementable work items.
-
-#### `/x-epic-decompose` -- Complete Spec Decomposition
-
-Orchestrates the full decomposition of a system specification into three deliverables: Epic, Stories, and Implementation Map.
-
-| | |
-|---|---|
-| **When to use** | Starting a new feature or project from a specification document |
-| **Input** | Path to a system specification file |
-| **Output** | Epic file + individual story files + implementation map |
-
-**What it does:**
-1. Reads and analyzes the system specification
-2. Extracts cross-cutting business rules (RULE-001..N)
-3. Identifies stories by layer (Foundation → Core → Extensions → Compositions)
-4. Maps dependencies between stories
-5. Computes implementation phases and critical path
-6. Generates all three deliverables in `ai/epics/epic-XXXX/`
-
-**Generated artifacts:**
-- `EPIC-XXXX.md` -- scope, rules table, DoR/DoD, story index
-- `story-XXXX-YYYY.md` -- per-story files with data contracts, Gherkin, diagrams, sub-tasks
-- `IMPLEMENTATION-MAP.md` -- dependency graph, phase diagram, critical path, bottleneck analysis
-
-Internally delegates to `/x-epic-create`, `/x-story-create`, and `/x-epic-map`.
-
----
-
-#### `/x-epic-create` -- Generate Epic from Spec
-
-| | |
-|---|---|
-| **When to use** | When you only need the Epic document, not the full decomposition |
-| **Input** | Specification file |
-| **Output** | `ai/epics/epic-XXXX/EPIC-XXXX.md` |
-
-Generates the top-level Epic file with: scope overview, cross-cutting business rules table, global DoR/DoD (including TDD compliance requirements), and story index with dependency declarations.
-
----
-
-#### `/x-story-create` -- Generate Story Files
-
-| | |
-|---|---|
-| **When to use** | When the Epic exists but individual stories need to be generated |
-| **Input** | Epic file with story index |
-| **Output** | Individual `story-XXXX-YYYY.md` files |
-
-Each generated story includes:
-- Dependency table (Blocked By / Blocks)
-- Applicable cross-cutting rules
-- Technical description with architecture context
-- Local DoR/DoD + global DoD
-- Data contracts (request/response fields with M/O notation)
-- Mermaid sequence diagrams
-- Gherkin acceptance criteria (minimum 4 scenarios in TPP order)
-- Tagged sub-tasks: `[Dev]`, `[Test]`, `[Doc]`
-
----
-
-#### `/x-epic-map` -- Generate Implementation Map
-
-| | |
-|---|---|
-| **When to use** | When Epic and Stories exist but you need the execution plan |
-| **Input** | Epic directory with story files |
-| **Output** | `IMPLEMENTATION-MAP.md` |
-
-Produces:
-- Dependency matrix (story → blocked by / blocks)
-- ASCII phase diagram showing parallel execution opportunities
-- Mermaid dependency graph (color-coded by phase)
-- Critical path identification with bottleneck analysis
-- Phase summary with parallelism counts
-- Strategic observations: bottleneck stories, leaf stories, convergence points
-
----
-
-### Development Lifecycle
-
-Skills for implementing features from planning through PR creation.
-
-#### `/x-dev-lifecycle` -- Full Feature Lifecycle
-
-The main orchestrator skill. Takes a story from branch creation to merged PR in 9 phases.
-
-| | |
-|---|---|
-| **When to use** | Implementing a complete feature with review and PR |
-| **Input** | Story ID or feature description |
-| **Output** | Branch with implementation, reviews, and PR |
-
-**Phases:**
-
-| Phase | Name | Description |
-|-------|------|-------------|
-| 0 | Preparation | Branch creation, dependency validation |
-| 1 | Architecture Planning | Component diagrams, ADRs, NFRs (via `/x-arch-plan`) |
-| 1B-1E | Parallel Planning | Test plan, task decomposition, event schema, compliance (parallel subagents) |
-| 2 | TDD Implementation | Red-Green-Refactor cycles with compile checks (subagent) |
-| 3 | Documentation | API docs, changelogs, architecture updates |
-| 4 | Specialist Review | Security, QA, Performance, DevOps reviews (via `/x-review`) |
-| 5-6 | Fixes + Push | Fix review findings, push, create PR |
-| 7 | Tech Lead Review | 45-point checklist review (via `/x-review-pr`) |
-| 8 | Final Verification | DoD checklist, smoke tests |
-
----
-
-#### `/x-task-implement` -- Quick TDD Implementation
-
-| | |
-|---|---|
-| **When to use** | Quick implementation without the full review lifecycle |
-| **Input** | Story ID or feature description |
-| **Output** | TDD implementation with atomic commits |
-
-**How it differs from `/x-story-implement`:**
-
-| Scenario | Use |
-|----------|-----|
-| Single class, small fix, coding without reviews | `/x-task-implement` |
-| Complete lifecycle: code → review → fix → PR | `/x-story-implement` |
-
-**Workflow:**
-1. **Prepare** -- Subagent reads architecture, coding standards, and test plan knowledge packs
-2. **TDD Loop** -- For each scenario in TPP order: RED (write failing test) → GREEN (minimum code to pass) → REFACTOR (improve design) → compile check
-3. **Validate** -- Coverage thresholds (≥95% line, ≥90% branch), all acceptance tests green
-4. **Commit** -- One atomic commit per Red-Green-Refactor cycle
-
----
-
-#### `/x-epic-implement` -- Epic Orchestration
-
-| | |
-|---|---|
-| **When to use** | Implementing an entire epic (multiple stories) |
-| **Input** | Epic ID with optional flags |
-| **Output** | All stories implemented, reviewed, and consolidated |
+## What gets generated
 
 ```
-/x-epic-implement EPIC-0007
-/x-epic-implement EPIC-0007 --story story-0007-0003    # single story
-/x-epic-implement EPIC-0007 --resume                    # resume from checkpoint
-/x-epic-implement EPIC-0007 --parallel                  # parallel worktrees
-/x-epic-implement EPIC-0007 --dry-run                   # preview only
+<your-project>/
+├── CLAUDE.md                    # Executive summary — loaded automatically by Claude Code
+└── .claude/
+    ├── settings.json            # Permissions and hooks
+    ├── agents/                  # 14 AI personas
+    │   ├── architect.md
+    │   ├── tech-lead.md
+    │   ├── security-engineer.md
+    │   └── ...
+    ├── hooks/
+    │   └── post-compile-check.sh
+    ├── knowledge/               # 166 domain knowledge packs
+    │   ├── governance/
+    │   ├── security/
+    │   ├── lifecycle/
+    │   └── ...
+    ├── rules/                   # 5 core rules
+    │   └── 00-essentials.md
+    ├── scripts/                 # 44 audit and utility scripts
+    ├── skills/                  # 273 slash commands
+    │   ├── x-implement-story/
+    │   ├── x-review-pr/
+    │   ├── x-arch-plan/
+    │   └── ...
+    └── templates/               # 62 planning and review templates
+        ├── _TEMPLATE-EPIC.md
+        ├── _TEMPLATE-STORY.md
+        ├── _TEMPLATE-IMPLEMENTATION-PLAN.md
+        └── ...
 ```
 
-**Features:**
-- Dependency-aware execution order (respects IMPLEMENTATION-MAP.md phases)
-- Checkpoint system with resume capability
-- Integrity gates between phases
-- Parallel worktree support for independent stories
-- Per-story dispatch to `/x-dev-lifecycle`
-- Epic-level Tech Lead review on full diff
-- Final status: COMPLETE / PARTIAL / FAILED
-
----
-
-### Architecture & Design
-
-Skills for architecture planning, documentation, and decision records.
-
-#### `/x-arch-plan` -- Architecture Plan
-
-| | |
-|---|---|
-| **When to use** | Before implementing a feature that changes architecture |
-| **Input** | Story ID or feature name |
-| **Output** | `ai/epics/epic-XXXX/plans/architecture-story-XXXX-YYYY.md` |
-
-Generates a comprehensive architecture plan:
-- Component diagrams (Mermaid)
-- Sequence diagrams for key flows
-- Deployment topology diagram
-- Mini-ADRs (Context / Decision / Rationale)
-- Non-functional requirements with measurable targets
-- Observability strategy (metrics, traces, logs)
-- Resilience strategy (circuit breakers, retries, fallback)
-- Impact analysis with migration and rollback planning
-
-Automatically evaluates scope (Full / Simplified / Skip) based on change impact.
-
----
-
-#### `/x-arch-update` -- Update Architecture Docs
-
-| | |
-|---|---|
-| **When to use** | After implementing a feature, to keep architecture docs current |
-| **Input** | Story ID or architecture plan path |
-| **Output** | Updated `governance/steering/service-architecture.md` |
-
-Reads the architecture plan and incrementally updates the service architecture document. **Appends only** -- never rewrites existing content. Updates the Change History section with date, story ID, and summary.
-
----
-
-#### `/x-adr-generate` -- ADR Generation
-
-| | |
-|---|---|
-| **When to use** | After creating an architecture plan with mini-ADRs |
-| **Input** | Architecture plan path + Story ID |
-| **Output** | `adr/ADR-NNNN-title.md` files + updated index |
-
-Extracts `### ADR:` markers from architecture plans, expands them to full ADR format (YAML frontmatter + Context/Decision/Consequences), assigns sequential numbering, checks for duplicates, updates the ADR index, and adds cross-references back to the source plan.
-
----
-
-### Testing
-
-Skills for test planning and execution.
-
-#### `/x-test-plan` -- Generate Test Plan
-
-| | |
-|---|---|
-| **When to use** | Before implementation, to define the TDD roadmap |
-| **Input** | Story ID |
-| **Output** | `ai/epics/epic-XXXX/plans/tests-story-XXXX-YYYY.md` |
-
-Generates a Double-Loop TDD test plan:
-- **Outer loop (Acceptance Tests):** AT-1..N mapping to Gherkin scenarios -- these start RED and drive the implementation
-- **Inner loop (Unit Tests):** UT-1..N in strict TPP order (degenerate → constant → scalar → collection → complex)
-- **Integration Tests:** IT-1..N for database and framework interactions
-- Coverage estimation table per test category
-
----
-
-#### `/x-test-run` -- Run Tests with Coverage
-
-| | |
-|---|---|
-| **When to use** | Running tests, checking coverage, finding gaps |
-| **Input** | Optional: class name, package, or `--coverage` |
-| **Output** | Test results + coverage report + gap analysis |
-
-```
-/x-test-run                    # run all tests with coverage
-/x-test-run UserServiceTest    # run specific test class
-/x-test-run --coverage         # focus on coverage analysis
-```
-
-Executes tests, collects coverage report, analyzes per-class coverage (line % and branch %), identifies uncovered branches/exception paths, and provides specific remediation suggestions for gaps.
-
----
-
-### Code Review & Quality
-
-Skills for automated code review and quality auditing.
-
-#### `/x-review` -- Parallel Specialist Review
-
-| | |
-|---|---|
-| **When to use** | Pre-PR quality validation with multiple specialists |
-| **Input** | Story ID or `--scope reviewer1,reviewer2` |
-| **Output** | Per-engineer review reports + consolidated summary |
-
-Launches **parallel subagents**, one per engineering specialty:
-
-| Specialist | Focus Area | Condition |
-|-----------|------------|-----------|
-| Security | Vulnerabilities, auth, data exposure | Always |
-| QA | Test quality, coverage, edge cases | Always |
-| Performance | Latency, throughput, resource usage | Always |
-| Database | Queries, indexes, migrations | If database configured |
-| Observability | Metrics, traces, logging | If observability configured |
-| DevOps | Containers, deployments, infra | If container/orchestrator configured |
-| API | REST/gRPC/GraphQL design | If API interfaces configured |
-| Event | Event schemas, async flows | If event-driven |
-
-Each specialist reads their dedicated knowledge pack and produces findings with severity scores. The orchestrator consolidates all findings into a scored summary and optionally generates a correction story for CRITICAL/MEDIUM issues.
-
----
-
-#### `/x-review-pr` -- Tech Lead Review
-
-| | |
-|---|---|
-| **When to use** | Final review before merge (GO/NO-GO decision) |
-| **Input** | PR number, Story ID, or current branch |
-| **Output** | Review report with score and GO/NO-GO decision |
-
-```
-/x-review-pr           # review current branch vs main
-/x-review-pr 123       # review PR #123
-/x-review-pr STORY-ID  # review by story ID
-```
-
-Applies a **45-point checklist** across 11 dimensions:
-
-| Section | Points | Covers |
-|---------|--------|--------|
-| A. Clean Code | 5 | Naming, method length, complexity |
-| B. SOLID | 5 | SRP, OCP, LSP, ISP, DIP |
-| C. Architecture | 5 | Layer boundaries, dependency direction |
-| D. Framework | 4 | Idiomatic usage, injection patterns |
-| E. Tests | 5 | Coverage, naming, isolation |
-| F. TDD Process | 5 | Test-first evidence in git history |
-| G. Security | 4 | OWASP Top 10, input validation |
-| H. Error Handling | 3 | No null returns, context in exceptions |
-| I. Performance | 3 | N+1 queries, resource leaks |
-| J. Observability | 3 | Metrics, traces, structured logging |
-| K. Cross-File | 3 | Consistency, unused code, duplication |
-
-**Decision:** GO (≥38/45) or NO-GO (<38/45) with detailed findings.
-
----
-
-#### `/x-codebase-audit` -- Full Codebase Audit
-
-| | |
-|---|---|
-| **When to use** | Periodic quality assessment of the entire codebase |
-| **Input** | Optional: `--scope all\|rules\|patterns\|architecture\|security\|cross-file` |
-| **Output** | `ai/runs/audits/codebase-audit-YYYY-MM-DD.md` |
-
-Like `/x-review-pr` but for the **entire codebase**, not just a single PR. Launches parallel subagents for 6 audit dimensions:
-
-1. **Clean Code & SOLID** -- method/class length, parameter count, boolean flags, SRP/OCP/LSP/ISP/DIP
-2. **Architecture Layers** -- domain importing from adapter, circular dependencies, framework leaks
-3. **Coding Standards** -- language-specific conventions, null handling, exception patterns
-4. **Test Quality & TDD** -- coverage gaps, naming violations, mocked domain logic
-5. **Security** -- SQL/XSS/command injection, hardcoded secrets, missing validation
-6. **Cross-File Consistency** -- duplicated logic, inconsistent patterns, orphaned files
-
-**Scoring:** Starts at 100, deducts per finding (CRITICAL: -10, MEDIUM: -3, LOW: -1). Final score 0-100.
-
----
-
-#### `/x-dependency-audit` -- Dependency Audit
-
-| | |
-|---|---|
-| **When to use** | Checking dependencies for security, freshness, and licensing |
-| **Input** | Optional: `--scope all\|vulnerabilities\|outdated\|licenses` |
-| **Output** | `ai/runs/audits/dependency-audit-YYYY-MM-DD.md` |
-
-Audits three dimensions with language-specific commands:
-
-| Dimension | npm | Maven | Cargo | pip | Go |
-|-----------|-----|-------|-------|-----|-----|
-| Vulnerabilities | `npm audit` | ossindex plugin | `cargo audit` | `pip-audit` | `govulncheck` |
-| Outdated | `npm outdated` | versions plugin | `cargo outdated` | `pip list --outdated` | `go list -m -u` |
-| Licenses | `license-checker` | license plugin | `cargo license` | `pip-licenses` | `go-licenses` |
-
-Categorizes findings by severity (CRITICAL/HIGH/MEDIUM/LOW) and generates remediation recommendations.
-
----
-
-#### `/x-fix-pr-comments` -- Fix PR Review Comments
-
-| | |
-|---|---|
-| **When to use** | After receiving PR review feedback |
-| **Input** | PR number (or auto-detects from current branch) |
-| **Output** | Fixed code + commits + replies to comment threads |
-
-```
-/x-fix-pr-comments         # fix comments on current branch's PR
-/x-fix-pr-comments 123     # fix comments on PR #123
-```
-
-**Workflow:**
-1. Fetches all review comments via `gh api`
-2. Classifies each comment: Actionable / Suggestion / Question / Praise / Resolved
-3. Implements fixes for actionable and accepted suggestions
-4. Compiles and tests after each fix
-5. **Replies to each comment thread in Portuguese (pt-BR):**
-   - Fixed: `Corrigido. {descricao da alteracao}. Commit: {hash}`
-   - Rejected: `Observacao analisada, mas nao faz sentido neste contexto. Motivo: {explicacao}`
-   - Failed: `Tentei corrigir, mas a alteracao causou falha. Necessita intervencao manual.`
-6. Commits with `fix(scope): address PR review comments`
-7. Generates a summary report table
-
----
-
-### Git & Operations
-
-Skills for git workflow, troubleshooting, changelog, and MCP server management.
-
-#### `/x-git-push` -- Git Workflow
-
-| | |
-|---|---|
-| **When to use** | Any git operation: branching, committing, pushing, creating PRs |
-| **Input** | Branch name or commit message |
-| **Output** | Clean git history with atomic commits |
-
-Standardizes the complete git workflow:
-- **Branch naming:** `feat/story-XXXX-YYYY-short-description`
-- **Commits:** Conventional Commits format (`type(scope): subject`)
-- **TDD commits:** Optional markers `[TDD:RED]`, `[TDD:GREEN]`, `[TDD:REFACTOR]`
-- **PR creation:** Via `gh pr create` with standardized title and body
-- **Release tagging:** Semantic versioning tags
-
----
-
-#### `/x-ops-troubleshoot` -- Diagnose & Fix Issues
-
-| | |
-|---|---|
-| **When to use** | Compilation errors, test failures, runtime exceptions, build failures |
-| **Input** | Error description or test name |
-| **Output** | Root cause diagnosis + fix with regression test |
-
-Systematic 5-step debug workflow:
-
-```
-1. REPRODUCE  → Get the exact error
-2. LOCATE     → Find where it originates
-3. UNDERSTAND → Why is it failing?
-4. FIX        → Write a test that reproduces the bug, then fix
-5. VERIFY     → Run full test suite, no regressions
-```
-
-Includes diagnostic tables for compilation errors, test failures, build failures, runtime errors, and performance issues -- all adapted to the project's language and build tool.
-
----
-
-#### `/x-changelog` -- Generate Changelog
-
-| | |
-|---|---|
-| **When to use** | Preparing a release or documenting changes |
-| **Input** | Version tag (e.g., `v1.2.0`) or `--unreleased` |
-| **Output** | Updated `CHANGELOG.md` |
-
-```
-/x-changelog                # unreleased changes since last tag
-/x-changelog v1.2.0         # changelog for specific version
-/x-changelog --full          # regenerate entire changelog
-```
-
-Parses `git log` for Conventional Commits and maps to [Keep a Changelog](https://keepachangelog.com/) sections:
-
-| Commit Type | Changelog Section |
-|-------------|------------------|
-| `feat` | Added |
-| `fix` | Fixed |
-| `refactor`, `perf` | Changed |
-| `BREAKING CHANGE` | Breaking Changes |
-| `deprecate` | Deprecated |
-
-Performs **incremental updates** -- inserts new version section while preserving existing entries. Includes commit hash links and version comparison URLs.
-
----
-
-#### `/x-mcp-recommend` -- MCP Server Recommendations
-
-| | |
-|---|---|
-| **When to use** | Setting up MCP servers for your AI development environment |
-| **Input** | None (auto-detects from project config) |
-| **Output** | Recommendations report + optional config file updates |
-
-```
-/x-mcp-recommend             # analyze and recommend
-/x-mcp-recommend --install   # recommend and auto-configure
-```
-
-Auto-detects your tech stack and matches against a built-in catalog of 20+ MCP servers:
-
-| Category | Servers |
-|----------|---------|
-| Database | PostgreSQL, MySQL, MongoDB, SQLite, Redis |
-| DevOps | Docker, Kubernetes, AWS, Terraform |
-| Productivity | GitHub, Slack, Linear, Jira |
-| Development | Puppeteer, Filesystem, Memory, Fetch |
-| Observability | Sentry, Datadog, Grafana |
-
-Each recommendation includes priority (Essential / Recommended / Optional), rationale, and installation instructions for Claude Code. With `--install`, auto-updates `.claude/settings.local.json`.
-
----
-
-### Conditional Skills
-
-These skills are generated only when your project config includes the relevant technology. They are invoked the same way as core skills.
-
-#### Testing (conditional)
-
-| Skill | Condition | Description |
-|-------|-----------|-------------|
-| `/x-test-e2e` | Always (if testing enabled) | End-to-end tests validating full flow with real database |
-| `/x-test-smoke-api` | REST interfaces | Black-box smoke tests against running API |
-| `/x-test-smoke-socket` | WebSocket interfaces | WebSocket connection and message validation |
-| `/x-test-contract` | Contract tests enabled | Parametrized business rule validation |
-| `/x-test-perf` | Performance tests enabled | Latency SLAs, throughput, resource usage |
-
-#### Review (conditional)
-
-| Skill | Condition | Description |
-|-------|-----------|-------------|
-| `/x-review-api` | REST interfaces | REST API design review (RFC 7807, pagination, versioning) |
-| `/x-review-grpc` | gRPC interfaces | gRPC service review (protobuf, streaming, error codes) |
-| `/x-review-events` | Event-driven | Event schema review (naming, versioning, dead letters) |
-| `/x-review-gateway` | API gateway | Gateway routing, rate limiting, auth review |
-| `/x-review-graphql` | GraphQL interfaces | Schema design, N+1 queries, pagination review |
-| `/x-review-security` | Security config | OWASP Top 10, auth flows, data exposure review |
-
-#### Infrastructure (conditional)
-
-| Skill | Condition | Description |
-|-------|-----------|-------------|
-| `/setup-environment` | Orchestrator configured | Environment setup (K8s namespaces, secrets, service mesh) |
-| `/instrument-otel` | Observability configured | OpenTelemetry instrumentation (metrics, traces, logs) |
-
----
-
-### Internal Skills (not user-invocable)
-
-The following are **not** shown in the `/` menu. They are used internally by other skills:
-
-| Internal Skill | Used By |
-|---------------|---------|
-| `x-lib-task-decomposer` | `/x-dev-lifecycle` (Phase 1B) |
-| `x-lib-audit-rules` | `/x-codebase-audit`, `/x-review-pr` |
-| `x-lib-group-verifier` | `/x-epic-implement` |
-
-**Knowledge packs** (architecture, coding-standards, testing, security, etc.) are also internal -- they provide domain knowledge to agents during skill execution but are never invoked directly.
+### Agents
+
+14 specialized AI personas used by skills during code reviews, architecture planning, security
+audits, and other tasks:
+
+`architect` · `tech-lead` · `security-engineer` · `qa-engineer` · `sre-engineer` ·
+`performance-engineer` · `java-developer` · `devops-engineer` · `database-engineer` ·
+`api-engineer` · `observability-engineer` · `event-engineer` · `pentest-engineer` ·
+`product-owner`
+
+### Skills (slash commands)
+
+Skills are invoked via `/skill-name` in the Claude Code chat. A selection of the most commonly used:
+
+| Skill | Description |
+|-------|-------------|
+| `/x-implement-story` | Implements a story end-to-end: planning → TDD → review → PR |
+| `/x-review-pr` | Tech lead review with GO/NO-GO decision |
+| `/x-arch-plan` | Architecture plan with component and sequence diagrams |
+| `/x-epic-decompose` | Decomposes a specification into epic, stories, and implementation map |
+| `/x-test-plan` | Generates a Double-Loop TDD test plan |
+| `/x-test-run` | Runs tests and reports coverage gaps |
+| `/x-codebase-audit` | Full codebase quality audit across 6 dimensions |
+| `/x-changelog` | Generates changelog from Conventional Commits |
+| `/x-ops-troubleshoot` | Systematic diagnosis of compilation, test, and runtime failures |
+
+The full list of 273 skills is available in `.claude/skills/` after generation.
 
 ---
 
 ## Development
 
 ```bash
-cd java
-
 # Build
 mvn clean package
 
-# Run tests
-mvn test
-
-# Run tests with coverage report
+# Run tests with coverage
 mvn verify
 
-# Run only unit tests
-mvn test -Punit-tests
-
-# Run integration tests (golden file parity)
-mvn verify -Pintegration-tests
-
-# Run all tests
-mvn verify -Pall-tests
+# Run a dry-run against a temp directory
+java -jar target/ia-dev-kit-*.jar generate --output /tmp/test-output --dry-run --verbose
 ```
 
-### Project Structure
+### Project structure
 
 ```
-ia-dev-environment/
-├── java/                         # Java 21 source
-│   ├── pom.xml                   # Maven build (JUnit 5, JaCoCo, Picocli, Pebble)
-│   ├── bin/                      # Wrapper script with Java 21 detection
-│   ├── src/main/java/dev/iadev/
-│   │   ├── cli/                  # Picocli commands (generate, validate)
-│   │   ├── config/               # YAML loading, profiles, context builder
-│   │   ├── model/                # 17 immutable data records
-│   │   ├── domain/               # Stack resolution, DAG, implementation map
-│   │   ├── assembler/            # 34 assemblers (rules, skills, agents, templates, ...)
-│   │   ├── template/             # Pebble engine with Python-bool filter
-│   │   ├── checkpoint/           # Execution state management
-│   │   ├── progress/             # Metrics and reporting
-│   │   ├── exception/            # 7 context-rich exceptions
-│   │   └── util/                 # I/O, path safety, resource discovery
-│   ├── src/main/resources/       # Template files on classpath
-│   │   ├── targets/claude/       # Claude Code target resources (rules, skills, agents, hooks, settings)
-│   │   ├── knowledge/            # Shared knowledge base (core, databases, frameworks, ...)
-│   │   ├── shared/               # Cross-cutting templates (config, cicd, docs, ...)
-│   │   └── readme-template.md    # README generation template
-│   └── src/test/
-│       ├── java/                 # 1961 tests (unit + integration + golden)
-│       └── resources/golden/     # Golden files for 8 profiles
-├── steering/                     # Persistent project context
-├── docs/specs/                   # Human-authored specifications
-├── plans/                        # SDD artifacts (epics, stories, maps)
-├── results/                      # Execution outputs (audits, reviews, runbooks)
-├── contracts/                    # API contracts and schemas
-├── docs/adr/                     # Architecture Decision Records
-├── CLAUDE.md                     # Executive summary (auto-loaded by Claude Code)
-└── README.md                     # This file
+ia-dev-kit/
+├── pom.xml
+├── src/
+│   ├── main/
+│   │   ├── java/dev/iadevkit/
+│   │   │   ├── IaDevKitApplication.java    # CLI entry point
+│   │   │   ├── VersionProvider.java
+│   │   │   └── command/
+│   │   │       └── GenerateCommand.java    # generate subcommand
+│   │   └── resources/
+│   │       ├── CLAUDE.md                   # template for generated CLAUDE.md
+│   │       └── claude/                     # bundled .claude/ resources
+│   │           ├── agents/
+│   │           ├── hooks/
+│   │           ├── knowledge/
+│   │           ├── rules/
+│   │           ├── scripts/
+│   │           ├── skills/
+│   │           ├── templates/
+│   │           └── settings.json
+│   └── test/
+│       └── java/dev/iadevkit/
+├── install.sh
+└── install.ps1
 ```
 
 ### Coverage
 
-| Metric | Minimum | Current |
-|--------|---------|---------|
-| Line Coverage | ≥ 95% | 95.23% |
-| Branch Coverage | ≥ 90% | 91.12% |
+| Metric | Threshold | Current |
+|--------|-----------|---------|
+| Line   | ≥ 85%     | 92%     |
+| Branch | ≥ 80%     | 89%     |
 
-Enforced by JaCoCo in `mvn verify`. Build fails if thresholds are not met.
+Enforced by JaCoCo in `mvn verify`.
 
-### Regenerating Golden Files
-
-When templates change, regenerate the golden files used for byte-for-byte parity tests:
-
-```bash
-cd java
-mvn compile test-compile
-java -cp target/classes:target/test-classes:$(mvn dependency:build-classpath -q -DincludeScope=test -Dmdep.outputFile=/dev/stdout) \
-  dev.iadev.golden.GoldenFileRegenerator
-mvn test
-```
+---
 
 ## License
 

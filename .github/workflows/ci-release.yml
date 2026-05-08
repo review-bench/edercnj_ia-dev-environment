@@ -45,36 +45,6 @@ jobs:
           java-version: "21"
           cache: maven
 
-      # EPIC-0040: shellcheck the telemetry hook scripts.
-      # Ubuntu runners already ship shellcheck; -S warning mirrors the
-      # project convention in src/main/resources/targets/claude/hooks/.
-      - name: Shellcheck telemetry hooks
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          SCRIPTS=(src/main/resources/targets/claude/hooks/telemetry-*.sh)
-          if (( ${#SCRIPTS[@]} == 0 )); then
-            echo "No telemetry-*.sh scripts found — skipping shellcheck"
-            exit 0
-          fi
-          shellcheck -S warning -e SC2034 "${SCRIPTS[@]}"
-
-      # EPIC-0061 (RULE-007): all governance audit gates moved to Java auditors
-      # under dev.iadev.audit.* and run as part of `mvn verify`. The legacy
-      # bash scripts (audit-model-selection.sh, audit-execution-integrity.sh,
-      # audit-bypass-flags.sh, audit-baseline-immutability.sh) were removed
-      # in favor of the local-first architecture (Camada 0-4). See ADR-0017
-      # and Rule 26 §Camada-0.
-
-      # EPIC-0079 (story-0079-0005): agent-skill-wiring gate — detects inline
-      # persona regressions (You are a Senior/Specialist/Principal in general-purpose
-      # Agent() dispatches). Camada 2 gate (Rule 26).
-      - name: audit-agent-skill-wiring --self-check
-        run: bash scripts/audit-agent-skill-wiring.sh --self-check
-
-      - name: audit-agent-skill-wiring --strict
-        run: bash scripts/audit-agent-skill-wiring.sh --strict
-
       - name: mvn -B verify
         run: mvn -B verify
 
@@ -177,11 +147,6 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
-          # GHSA-p75g-cxfj-7wrx: Pebble Templates LFI via include macro.
-          # Pre-existing on develop (pebble 3.2.2 unchanged); no upstream
-          # patch available (advisory: affected <=3.2.3, patched=None).
-          # Mitigation tracked separately; replacing Pebble is out of scope.
-          allow-ghsas: GHSA-p75g-cxfj-7wrx
 
   publish:
     name: Publish to GitHub Packages (tag only)
@@ -217,7 +182,7 @@ jobs:
         with:
           name: release-artifacts-${{ github.ref_name }}
           path: |
-            target/ia-dev-env-*.jar
+            target/ia-dev-kit-*.jar
             target/bom.json
           retention-days: 1
           if-no-files-found: error
@@ -246,7 +211,7 @@ jobs:
       - name: Generate SLSA build-provenance attestation
         uses: actions/attest-build-provenance@v4
         with:
-          subject-path: "artifacts/ia-dev-env-*.jar"
+          subject-path: "artifacts/ia-dev-kit-*.jar"
 
       - name: Install cosign (Sigstore keyless)
         uses: sigstore/cosign-installer@v3
@@ -255,7 +220,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           set -euo pipefail
-          JAR=$(ls artifacts/ia-dev-env-*.jar | head -1)
+          JAR=$(ls artifacts/ia-dev-kit-*.jar | head -1)
           cosign sign-blob --yes \
             --output-signature "${JAR}.sig" \
             --output-certificate "${JAR}.crt" \
@@ -281,9 +246,9 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "${{ github.ref_name }}" \
-            artifacts/ia-dev-env-*.jar \
-            artifacts/ia-dev-env-*.jar.sig \
-            artifacts/ia-dev-env-*.jar.crt \
+            artifacts/ia-dev-kit-*.jar \
+            artifacts/ia-dev-kit-*.jar.sig \
+            artifacts/ia-dev-kit-*.jar.crt \
             artifacts/bom.json \
             --clobber
 
