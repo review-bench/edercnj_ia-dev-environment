@@ -22,7 +22,7 @@ Validation rules:
 
 ### 1.2 Story-scoped mode — legacy (epics 0025-0037)
 
-Reads the task from `## 8. Tasks` of a story file. Preserved for backward compatibility. The task ID is located by exact string match (`### TASK-XXXX-YYYY-NNN:`).
+Reads the task from `## 8. Tasks` of a story file. The task ID is located by exact string match (`### TASK-XXXX-YYYY-NNN:`).
 
 ## 2. P1-P5 Lifecycle (EPIC-0049)
 
@@ -51,8 +51,6 @@ The P4 step is an **alias** over the pre-existing Phase 5.4 (Planning Status Pro
 | Re-invocation semantics | Idempotent (staleness check) | Idempotent; flipping the flag between runs alternates commit behavior |
 
 **Caller contract (e.g., `x-plan-story`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-commit-planning` call covering every plan + status update — producing a single commit per story instead of N commits.
-
-**Backward compat:** absence of `--no-commit` (or explicit `--no-commit=false`) preserves pre-EPIC-0049 behavior byte-for-byte.
 
 ## 4. Failure Matrix
 

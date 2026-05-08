@@ -89,7 +89,7 @@ Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop 
 
     Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type epic --id <EPIC-ID> --field interactiveMode --value <interactive|non-interactive>")
 
-Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+Value: `"interactive"` when `--interactive` flag was passed; otherwise `"non-interactive"` (Rule 20 default).
 
 Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-epic --phase Phase-0-Args")
 
@@ -160,7 +160,7 @@ Open phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed"
     currentStoryId = TaskCreate(subject: "EPIC-XXXX › Phase 3 › story-XXXX-YYYY", activeForm: "Implementing story-XXXX-YYYY")
     [if previous story exists]: TaskUpdate(id: previousStoryId, addBlockedBy: [currentStoryId])
 
-    Skill(skill: "x-implement-story", model: "sonnet", args: "<STORY-ID> --target-branch <epicBranch> --auto-merge <strategy> [--skip-review] [--non-interactive] [--auto-approve-pr]")
+    Skill(skill: "x-implement-story", model: "sonnet", args: "<STORY-ID> --target-branch <epicBranch> --auto-merge <strategy> [--skip-review] [--auto-approve-pr]")
 
     TaskUpdate(id: currentStoryId, status: "completed")
 

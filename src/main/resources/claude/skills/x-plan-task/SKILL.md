@@ -643,7 +643,6 @@ After writing `plan-task-TASK-XXXX-YYYY-NNN.md`, propagate the lifecycle status 
 
 **Caller contract (e.g., `x-plan-story`):** when invoking N tasks with `--no-commit=true`, the caller MUST aggregate all written paths and issue ONE consolidated `x-commit-planning` call covering every plan + status update — producing a single commit per story instead of N commits.
 
-**Backward compat:** absence of `--no-commit` (or explicit `--no-commit=false`) preserves pre-EPIC-0049 behavior byte-for-byte.
 
 ### Step P4 — Planning Status Commit (alias of Phase 5.4)
 

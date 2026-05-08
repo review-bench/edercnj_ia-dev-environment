@@ -73,7 +73,7 @@ Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop 
 
     Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type task --id <TASK-ID> --field interactiveMode --value <interactive|non-interactive>")
 
-Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+Value: `"interactive"` when `--interactive` passed; otherwise `"non-interactive"` (Rule 20 default).
 
 Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --skill x-implement-task --phase Phase-0-Setup")
 

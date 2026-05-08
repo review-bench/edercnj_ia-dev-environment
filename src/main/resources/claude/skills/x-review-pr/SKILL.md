@@ -3,7 +3,7 @@ name: x-review-pr
 description: "Tech Lead holistic review with 45-point checklist; produces GO/NO-GO verdict."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, AskUserQuestion, Skill
-argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--non-interactive] [--resume-review <pr>]"
+argument-hint: "[PR-number or STORY-ID] [--no-auto-remediation] [--interactive] [--resume-review <pr>]"
 requires-capabilities: []
 ---
 
@@ -115,7 +115,7 @@ Persist interactiveMode to execution-state.json (EPIC-0068 — consumed by Stop 
 
     Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
 
-Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+Value: `"interactive"` when `--interactive` passed; otherwise `"non-interactive"` (Rule 20 default).
 
     TaskUpdate(id: phase0TaskId, status: "completed")
 
@@ -342,13 +342,13 @@ When the review results in NO-GO, automatically dispatch remediation instead of 
 
 Reached when auto-remediation cycles are exhausted (2 retries without convergence) or when `--no-auto-remediation` is set and the review returns NO-GO.
 
-**Non-interactive path (default — `--interactive` absent or `--non-interactive` deprecated flag):**
+**Non-interactive path (default — `--interactive` absent):**
 Skip `AskUserQuestion`. Print HALT text and return NO-GO:
 ```
 REVIEW NO-GO: Auto-remediation exhausted without convergence. Remaining issues recorded in report.
 Run with --resume-review <pr> --interactive to re-enter the gate interactively.
 ```
-Exit with NO-GO. No state file written. (`--non-interactive` DEPRECATED — same as default; WARN emitted per Rule 20 EPIC-0061.)
+Exit with NO-GO. No state file written.
 
 **Interactive path (`--interactive` present):**
 
@@ -407,7 +407,7 @@ When `gateAttempts >= 3` without converging to GO, terminate the gate automatica
 ```
 REVIEW_FIX_LOOP_EXCEEDED: Loop de fix excedeu 3 tentativas no review do PR ${PR};
 gate encerrado com ABORT automático.
-Retomar via --resume-review ${PR} com --non-interactive ou intervenção manual.
+Retomar via --resume-review ${PR} ou intervenção manual.
 ```
 No 4th option is offered. The gate terminates immediately. The menu was presented exactly 3 times (RULE-002 invariant: total option count remains 3 at all previous presentations).
 
@@ -469,7 +469,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review
 | Code | Condition | Message |
 |------|-----------|---------|
 | `REVIEW_REMEDIATION_EXHAUSTED` | Operator selected ABORT in Step 8.4 gate | `"Review NO-GO final: operador abortou após ${N} tentativas de remediation no PR ${PR}"` |
-| `REVIEW_FIX_LOOP_EXCEEDED` | 3 consecutive PROCEED or FIX-PR attempts without converging to GO | `"Loop de fix excedeu 3 tentativas no review do PR ${PR}; gate encerrado com ABORT automático. Retomar via --resume-review ${PR} com --non-interactive ou intervenção manual."` |
+| `REVIEW_FIX_LOOP_EXCEEDED` | 3 consecutive PROCEED or FIX-PR attempts without converging to GO | `"Loop de fix excedeu 3 tentativas no review do PR ${PR}; gate encerrado com ABORT automático. Retomar via --resume-review ${PR} ou intervenção manual."` |
 | `GATE_SCHEMA_INVALID` | State file at `plans/review/<pr>/state.json` fails Rule 20 schema validation | `"State file inválido para gate em {path}: {campo} ausente ou mal-formado"` |
 
 ## Output Artifacts
@@ -492,7 +492,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review
 | Smoke test failure | Automatic NO-GO; record failing smoke tests as CRITICAL finding |
 | NO-GO after 2 retry cycles | Route to Step 8.4 Exhausted-Retry Gate |
 | NO-GO with `--no-auto-remediation` | Route directly to Step 8.4 Exhausted-Retry Gate |
-| `--non-interactive` after retry exhausted | Skip gate; emit legacy HALT text; return NO-GO |
+
 | State file missing on `--resume-review` | Start gate fresh; emit warning |
 | State file schema invalid | Emit `GATE_SCHEMA_INVALID`; start gate fresh |
 

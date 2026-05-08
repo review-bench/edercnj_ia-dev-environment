@@ -4,7 +4,7 @@ model: sonnet
 description: "Drives a story end-to-end via 4 phases: plan, task loop, verify, report."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, Agent, TaskCreate, TaskUpdate, AskUserQuestion
-argument-hint: "[STORY-ID] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>] [--auto-approve-pr] [--task TASK-ID] [--resume] [--skip-verification] [--skip-smoke] [--skip-review] [--full-lifecycle] [--worktree] [--non-interactive] [--no-auto-remediation] [--no-ci-watch]"
+argument-hint: "[STORY-ID] [--target-branch <branch>] [--auto-merge <merge|squash|rebase|none>] [--epic-id <XXXX>] [--auto-approve-pr] [--task TASK-ID] [--resume] [--skip-verification] [--skip-smoke] [--skip-review] [--full-lifecycle] [--worktree] [--no-auto-remediation] [--no-ci-watch]"
 requires-capabilities: []
 ---
 
@@ -45,10 +45,7 @@ Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load
 | `--skip-smoke`, `--skip-review` | Boolean | `false` | Bypass smoke gate / specialist + TL reviews (the only supported per-review bypass path). |
 | `--full-lifecycle`, `--worktree` | Boolean | `false` | Full execution / standalone worktree mode. |
 | `--interactive` | Boolean | `false` | Opt-in to 3-option gate menus (PROCEED/FIX-PR/ABORT). Default: non-interactive (Rule 20, EPIC-0061). |
-| `--non-interactive` | Boolean | **DEPRECATED** | Was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--no-auto-remediation`, `--no-ci-watch` | Boolean | `false` | Skip Step 3.5 remediation / Rule 21 CI-watch. |
-
-**Deprecated (no-op, warn-once):** `--manual-contract-approval`, `--manual-task-approval` (both since EPIC-0043).
 
 ## Output Contract
 
@@ -110,7 +107,7 @@ Write the resolved interactive mode to `execution-state.json` so the Stop hook `
 
     Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
 
-Value is `"interactive"` when `--interactive` flag was passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+Value is `"interactive"` when `--interactive` flag was passed; otherwise `"non-interactive"` (Rule 20 default).
 
 ### 0.2 Load story context
 
@@ -224,7 +221,7 @@ Read tasks from `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` (Section 8 f
 
 ### 2.1 Per-task dispatch
 1. Check deps against `execution-state.json`; unresolved → `BLOCKED` via `x-internal-update-status`, skip.
-2. **Dispatch TDD:** `Skill(skill: "x-implement-task", model: "sonnet", args: "<TASK-ID> --orchestrated --target-branch <targetBranch> [--auto-merge <strategy>] [--epic-id <EPIC-ID>] [--auto-approve-pr] [--non-interactive]")` → RED/GREEN/REFACTOR + atomic commit + push `feat/task-XXXX-YYYY-NNN-desc`. Returns `{status, taskId, commitSha, branchName, coverageLine, coverageBranch}`.
+2. **Dispatch TDD:** `Skill(skill: "x-implement-task", model: "sonnet", args: "<TASK-ID> --orchestrated --target-branch <targetBranch> [--auto-merge <strategy>] [--epic-id <EPIC-ID>] [--auto-approve-pr]")` → RED/GREEN/REFACTOR + atomic commit + push `feat/task-XXXX-YYYY-NNN-desc`. Returns `{status, taskId, commitSha, branchName, coverageLine, coverageBranch}`.
 3. **CI-watch (Rule 21 + Rule 45):** unless `--no-ci-watch`. **MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** `Skill(skill: "x-watch-pr-ci", args: "--branch <branchName>")` — 8 exit codes. Persists `.claude/state/pr-watch-{PR}.json`; absence on a merged PR fails Camada 3 audit.
 4. **PR creation (RULE-009 OO propagation):** `Skill(skill: "x-create-pr", model: "haiku", args: "<TASK-ID> --target-branch <targetBranch> --auto-merge <strategy> --epic-id <EPIC-ID> [--auto-approve-pr]")`. With `--auto-approve-pr`, task-PR target becomes parent story branch. Consume `{prUrl, prNumber, prMergeStatus}`.
 5. **Status:** `Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type task --id <TASK-ID> --field status --value <STATUS>")`.

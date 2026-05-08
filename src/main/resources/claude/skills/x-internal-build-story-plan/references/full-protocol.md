@@ -161,17 +161,7 @@ and NOT by omitting the keys. The `jq -nc` snippet in SKILL.md §
 Workflow Step 2 uses an if-empty-then-null ternary to achieve this
 deterministically.
 
-### 4.2 `task-implementation-map` basename drift
-
-Legacy stories (pre-EPIC-0038) used `map-story-XXXX-YYYY.md`
-instead of the canonical `task-implementation-map-story-XXXX-YYYY.md`.
-Step 1D's subagent writes the canonical name; if the called
-`x-lib-decompose-task` produces the legacy form, this skill
-renames it before emitting the envelope. The rename is a safety
-net, not a silent migration path — it logs a single WARNING line to
-stderr: `legacy map name detected: renamed <old> → <new>`.
-
-### 4.3 Concurrent re-invocation
+### 4.2 Concurrent re-invocation
 
 Two callers invoking this skill for the same story at the same time
 would step on each other's planning artifacts (both `jq -nc` would
@@ -181,7 +171,7 @@ the `feat/story-<id>-<slug>` branch check (one PR per story at any
 time). This skill does NOT acquire its own lock — concurrent
 invocation is a misuse and is out of scope.
 
-### 4.4 Missing `--scope` argument
+### 4.3 Missing `--scope` argument
 
 When `--scope` is not supplied, the default is `STANDARD`. The
 envelope MUST still include `scope:"STANDARD"` and `skipped:[]`

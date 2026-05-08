@@ -1,8 +1,7 @@
 # Approval Gate Workflow
 
 > Reference document for the **x-release** skill, Step 8 (APPROVAL-GATE).
-> Describes default interactive behavior (since EPIC-0043), the `--non-interactive`
-> opt-out for CI, state transitions, error codes, the FIX-PR loop-back mechanism,
+> Describes default interactive behavior, state transitions, error codes, the FIX-PR loop-back mechanism,
 > and the resume path via `--continue-after-merge`.
 >
 > **Related:** Rule 20 (`20-interactive-gates.md`) — canonical option menu contract.
@@ -15,9 +14,7 @@ The Approval Gate is the safety checkpoint between opening the release PR
 back-merge). It ensures the human operator explicitly reviews and merges
 the release PR before the skill creates the git tag.
 
-As of EPIC-0043 (story-0043-0002), the gate **always** presents the canonical
-3-option menu via `AskUserQuestion` by default. The only opt-out is
-`--non-interactive`, which prints the legacy HALT text for CI/automation.
+The gate **always** presents the canonical 3-option menu via `AskUserQuestion`. Use `--interactive` to opt-in; the default behavior is non-interactive (no menu pauses).
 
 ## Default Interactive Workflow (since EPIC-0043)
 
@@ -92,44 +89,13 @@ sequenceDiagram
 | 2 -- FIX-PR | `"Fix PR"` | `"Run x-fix-pr and retry"` | Invokes `Skill(skill: "x-fix-pr", args: "<PR_NUMBER>")` via Rule 13 Pattern 1 INLINE-SKILL. Records `FixAttempt` in state file. Reapresents menu on return. Capped at 3 attempts (see guard-rail). |
 | 3 -- ABORT | `"Abort"` | `"Cancel the operation"` | Double confirmation. On confirm: deletes state file, prints manual cleanup script, exits 2. On back: re-presents gate menu. |
 
-## `--non-interactive` Path (CI/Automation)
-
-When `--non-interactive` is present, the gate skips `AskUserQuestion` entirely:
-
-```
-Step 8.1: Persist APPROVAL_PENDING + initialize gate fields (same as default)
-          |
-          v
-Step 8.2: NON_INTERACTIVE=true -- print legacy HALT text
-          - PR URL and number
-          - Manual steps (review, CI, approve, merge)
-          - Resume command: /x-release <VERSION> --continue-after-merge
-          |
-          v
-Step 8.3: exit 0 (skill halts)
-          |
-     [operator reviews PR on GitHub]
-     [operator merges PR when ready]
-          |
-          v
-Re-invocation: /x-release <VERSION> --continue-after-merge
-          |
-          v
-Step 0 detects APPROVAL_PENDING -> MODE = RESUME -> Phase 9
-```
-
-This is the path for CI pipelines and automation scripts that expect the
-pre-EPIC-0043 textual output.
-
-## Flag Separation (`--interactive` vs `--non-interactive`)
+## Flag Separation (`--interactive`)
 
 > **This distinction is critical. The two flags serve entirely different purposes.**
 
 | Flag | Purpose | Effect at Phase 8 |
 |:---|:---|:---|
-| `--interactive` (without `--dry-run`) | **[DEPRECATED EPIC-0043]** Was the gate opt-in. Now emits deprecation warning and is a no-op. Gate opens normally. | Default 3-option menu |
 | `--interactive --dry-run` | **PRESERVED** -- interactive dry-run simulation mode (story-0039-0013). Pauses before each of 13 phases for simulation. | Dry-run gate (distinct sub-modality) |
-| `--non-interactive` | **NEW (EPIC-0043)** -- CI/automation opt-out from default menu. Prints HALT text. | No `AskUserQuestion` |
 | (no flag) | Default since EPIC-0043 | Default 3-option menu |
 
 ## FIX-PR Loop-Back and Guard-Rail
@@ -161,7 +127,7 @@ If `fixAttempts.size()` is already 3 when slot 2 is selected:
 RELEASE_FIX_LOOP_EXCEEDED: 3 consecutive fix attempts did not resolve the gate.
 Gate terminated automatically. To recover:
   1. Inspect PR #<N> manually and apply a direct fix.
-  2. Resume the skill with --non-interactive to skip this gate.
+  2. Resume the skill without `--interactive` to skip this gate.
   3. Or edit the state file: reset fixAttempts to [] and set lastGateDecision to null.
 ```
 
@@ -214,14 +180,13 @@ MODE = RESUME -> jump to Phase 9 (RESUME-AND-TAG)
           (gate menu is NOT presented; PROCEED is implicit)
 ```
 
-This preserves backward compatibility for automation scripts and human
-operators who prefer the explicit two-step flow.
+This allows automation scripts and operators who prefer the explicit two-step flow.
 
 ## Idempotency (RULE-003)
 
 The Approval Gate is inherently idempotent:
 
-1. On first execution, it writes `APPROVAL_PENDING` and presents the menu (or halts if `--non-interactive`).
+1. On first execution, it writes `APPROVAL_PENDING` and presents the menu (when `--interactive`) or exits with HALT text (non-interactive default).
 2. On re-invocation **without** `--continue-after-merge`, Step 0 detects `phase: APPROVAL_PENDING`
    (which is not `COMPLETED`) and either resumes via smart-resume prompt or aborts with `STATE_CONFLICT`.
 3. On re-invocation **with** `--continue-after-merge`, Step 0 validates the phase
@@ -255,53 +220,3 @@ When the operator confirms the Abort (slot 3):
 | Step 0 (RESUME-DETECT) | Detects `APPROVAL_PENDING` + `--continue-after-merge` to enter RESUME mode |
 | Step 9+ (RESUME-AND-TAG) | Consumes the MERGED PR state to create the git tag |
 
----
-
-## Historical Behavior (pre-EPIC-0043)
-
-> This section is preserved for reference. The behavior below applied to
-> `x-release` versions <=3.6.0 (before EPIC-0043 / story-0043-0002).
-
-### Default Workflow (Non-Interactive, pre-EPIC-0043)
-
-The default behavior was a HALT text exit -- no interactive menu.
-
-```
-Step 7 completes (PR_OPENED)
-          |
-          v
-Step 8.1: Persist APPROVAL_PENDING in state file
-          |
-          v
-Step 8.2: Print human-readable instructions
-          - PR URL and number
-          - Manual steps (review, CI, approve, merge)
-          - Resume command: /x-release <VERSION> --continue-after-merge
-          |
-          v
-Step 8.3: exit 0 (skill halts -- no menu)
-          |
-     [operator reviews PR on GitHub]
-     [operator merges PR when ready]
-          |
-          v
-Re-invocation: /x-release <VERSION> --continue-after-merge
-```
-
-### Interactive Workflow (`--interactive`, pre-EPIC-0043)
-
-When `--interactive` was set, the skill used `AskUserQuestion` instead of exiting.
-Without `--interactive` there was no menu -- the operator had to remember the
-`--continue-after-merge` flag. Passing `--interactive` without `--dry-run` aborted
-with `INTERACTIVE_REQUIRES_DRYRUN`.
-
-The pre-EPIC-0043 menu options:
-
-| # | Label | Behavior |
-|:---|:---|:---|
-| 1 | "PR merged, continue to tag (Recommended)" | Verifies PR state via `gh pr view $PR_NUMBER --json state`. If MERGED, proceeds. If OPEN, aborts with `APPROVAL_PR_STILL_OPEN`. |
-| 2 | "Halt -- resume later with --continue-after-merge" | Identical to default non-interactive behavior. Exits 0. |
-| 3 | "Cancel release entirely" | Double confirmation. Deletes state file. Exits 2. |
-
-These options were replaced by the Rule 20 canonical menu in EPIC-0043.
-No FIX-PR loop-back existed in the pre-EPIC-0043 gate.
