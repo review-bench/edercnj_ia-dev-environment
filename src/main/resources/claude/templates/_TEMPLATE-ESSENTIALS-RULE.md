@@ -84,31 +84,17 @@ Implementation order: domain → ports → adapters → application → inbound 
 
 Every story MUST be implemented via `x-implement-story`. Every task via `x-implement-task`. No PR to `epic/*` or `develop` may be merged without all 13 surface evidence artifacts.
 
-### `flowVersion` Table
+### 4 Non-Negotiable Invariants
 
-| Value | Semantics |
-| :--- | :--- |
-| `"1"` | Legacy — story PRs → develop; no epic branch |
-| `"2"` | Story PRs → epic/XXXX; task tracking required |
-| `"3"` | Local-First — non-interactive default |
-| `"4"` | v4 layout: `ai/epics/<epic-slug>/` via PathResolver |
-| `"5"` | Product-First — `productFirstLifecycle: true` |
+1. All mandatory evidence artifacts present before PR merge
+2. `refinementVerdict.status = "approved"` before any implement call (Camada 0: exit 33 `REFINEMENT_REQUIRED`)
+3. CI-watch state file exists for every merged PR
+4. Every story/task traceable to orchestrator skill
 
-Field absent → defaults to `"1"` (legacy) with WARNING.
+### 2 Bypass Exceptions Only
 
-### 5 Non-Negotiable Invariants
-
-1. `flowVersion` resolved in `execution-state.json`
-2. All mandatory evidence artifacts present before PR merge
-3. `refinementVerdict.status = "approved"` before any implement call (Camada 0: exit 33 `REFINEMENT_REQUIRED`)
-4. CI-watch state file exists for every merged PR
-5. Every story/task traceable to orchestrator skill
-
-### 3 Bypass Exceptions Only
-
-1. `--legacy-flow` for `flowVersion=1` epics
-2. `hotfix/*` branches with `## Hotfix Bypass Justification` in PR body
-3. `CLAUDE_RECOVERY_MODE=1` — `--skip-review` and `--no-ci-watch` only; NEVER bypasses refinement gate
+1. `hotfix/*` branches with `## Hotfix Bypass Justification` in PR body
+2. `CLAUDE_RECOVERY_MODE=1` — `--skip-review` and `--no-ci-watch` only; NEVER bypasses refinement gate
 
 > Full reference: `Read .claude/knowledge/governance/rules/lifecycle-contract.md`
 

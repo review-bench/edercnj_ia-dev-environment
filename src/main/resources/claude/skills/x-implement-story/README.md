@@ -14,7 +14,7 @@
 
 Runs the full story implementation lifecycle as 4 delegated phases. Every substantive responsibility — argv parsing, story loading, planning, TDD, verification, reporting — is delegated to a sub-skill. The orchestrator's inline work is limited to `Read`/`Glob` for local file discovery and `Skill`/`Agent` for delegation.
 
-EPIC-0049 introduced three OO-style flags (`--target-branch`, `--auto-merge`, `--epic-id`) that propagate downward to `x-implement-task` and `x-create-pr`. When the flags are absent, the orchestrator preserves EPIC-0048 behavior exactly (target=develop, auto-merge=none).
+Three OO-style flags propagate downward: `--target-branch` → `x-implement-task` + `x-create-pr`; `--auto-merge` → `x-create-pr`; `--epic-id` → `x-create-pr` (adds `epic-XXXX` label).
 
 ## Execution Flow
 
@@ -68,7 +68,7 @@ flowchart TD
 | `--auto-merge <strategy>` | `none` | → `x-create-pr --auto-merge` (requires `--target-branch` when not `none`) |
 | `--epic-id <XXXX>` | auto-derived | → `x-create-pr --epic-id` (adds `epic-XXXX` label) |
 
-With all three flags absent, behavior is identical to EPIC-0048 (backward compat — RULE-008).
+With flags absent: `target=develop`, `auto-merge=none`, `epic-id` auto-derived.
 
 ## Prerequisites
 

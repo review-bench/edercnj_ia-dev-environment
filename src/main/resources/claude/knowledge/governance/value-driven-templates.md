@@ -55,10 +55,6 @@ Templates for Epics, Stories, and Architecture artifacts MUST separate **busines
 8. **Decision Rationale** — ≥ 1 micro-template (4-line format)
 9. **Refinement Verdict** — filled by `/x-refine-story`
 
-## Adoption Policy (2-release window)
-
-Skills `x-epic-create` and `x-story-create` emit v2 templates by default. Authors may pass `--legacy-template-v1` for up to 2 releases.
-
 ## `docs/architecture/system.md` Lifecycle
 
 | Event | Action |
@@ -71,7 +67,7 @@ Sections 1-5 are auto-filled from project YAML — MUST NOT be edited manually.
 
 ## Forbidden
 
-- Creating new Epic or Story documents using v1 template structure without `--legacy-template-v1`
+- Creating new Epic or Story documents using v1 template structure
 - Placing hexagonal package declarations inside an Epic or Story document under v2 rules
 - Editing the auto-fill sections (1-5) of `docs/architecture/system.md` directly
 - Omitting the 4-category Gherkin mandate in Story AC

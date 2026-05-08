@@ -6,7 +6,6 @@ Supplementary reference for the SKILL.md contract. Covers state-file schema, pol
 
 ```json
 {
-  "flowVersion": "2",
   "epicId": "EPIC-0060",
   "taskTracking": {
     "enabled": true,
@@ -167,15 +166,10 @@ Stderr is ALWAYS one line. Stdout ALWAYS carries the JSON envelope (even on `pas
 
 ## 9. Interaction with Rule 19 (Backward Compatibility)
 
-| Epic flowVersion | `taskTracking.enabled` | Gate behavior |
-| :--- | :--- | :--- |
-| `"1"` (legacy) | absent | Full gate enforcement (default `true` per Rule 19); set `enabled=false` explicitly to opt out |
-| `"2"` + pre-EPIC-0055 | absent | Full gate enforcement (default `true`) |
-| `"2"` + post-EPIC-0055 | `true` (explicit) | Full gate enforcement |
-| Any | `false` (explicit) | Short-circuit: `passed=true`, exit 0, envelope annotated with `note: "taskTracking disabled (legacy mode)"` |
-| `"2"` + `--legacy-flow` forced | `false` | Short-circuit |
-
-To preserve pre-EPIC-0055 silence on a specific epic, set `{"taskTracking": {"enabled": false}}` in its state file. See Rule 19 fallback matrix.
+| `taskTracking.enabled` | Gate behavior |
+| :--- | :--- |
+| `true` (required) | Full gate enforcement |
+| `false` (explicit override) | Short-circuit: `passed=true`, exit 0, envelope annotated with `note: "taskTracking disabled"` |
 
 ## 10. Performance envelope
 

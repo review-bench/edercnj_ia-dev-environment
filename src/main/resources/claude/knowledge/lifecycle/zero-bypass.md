@@ -48,13 +48,9 @@ Rule 27 loaded every conversation. CLAUDE.md carries "ZERO-BYPASS LIFECYCLE — 
 
 Telemetry NDJSON provides continuous audit trail. `/x-analyze-telemetry` produces Gantt timelines and phase aggregates. Absence of `phase.start`/`phase.end` pairs for `x-implement-story` phases is a Camada 4 signal.
 
-## Legitimate Exception Paths (2 Only)
+## Legitimate Exception Paths (1 Only)
 
-### Exception 1: `--legacy-flow` for pre-EPIC-0049 epics (Rule 19)
-
-Epics with `flowVersion: "1"` (or absent). `--legacy-flow` disables Rule 21 branch routing. No new epics may use `--legacy-flow` after EPIC-0059 merges.
-
-### Exception 2: Documented hotfixes on `hotfix/*` branches (Rule 09)
+### Exception: Documented hotfixes on `hotfix/*` branches (Rule 09)
 
 A single-file, single-commit critical fix MAY bypass the full orchestrator when:
 1. The fix is single-file, single-commit with no architectural changes.

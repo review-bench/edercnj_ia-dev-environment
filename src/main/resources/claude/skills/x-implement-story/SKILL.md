@@ -16,7 +16,7 @@ English ONLY; technical, direct, concise (no conversational fillers). Record onl
 
 Orchestrate story end-to-end via delegation. Inline: argv parse (delegate), load context (delegate), drive task loop (`x-implement-task`), close story-level PR. Zero direct git/gh/mvn calls.
 
-**EPIC-0049 flag propagation (OO-style — RULE-009):** `--target-branch <branch>` (default `develop`) → `x-implement-task` + `x-create-pr`; `--auto-merge <strategy>` (default `none`) → `x-create-pr`; `--epic-id <ID>` (auto-derived from storyId) → `x-create-pr` (adds `epic-XXXX` label). All flags absent = EPIC-0048 behavior (backward compat — RULE-008).
+**Flag propagation (OO-style):** `--target-branch <branch>` (default `develop`) → `x-implement-task` + `x-create-pr`; `--auto-merge <strategy>` (default `none`) → `x-create-pr`; `--epic-id <ID>` (auto-derived from storyId) → `x-create-pr` (adds `epic-XXXX` label).
 
 ## Triggers
 
@@ -394,13 +394,13 @@ Resuming after an aborted lifecycle may legitimately skip already-completed step
 | `--skip-smoke` | Smoke gate inside verify |
 | `--no-ci-watch` | CI-watch step in Phase 2 |
 
-## Backward Compatibility (RULE-008) + Idempotency (RULE-002)
-All new EPIC-0049 flags absent → `targetBranch=develop`, `autoMerge=none`, `epicId` auto-derived — identical to EPIC-0048. `--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
+## Idempotency (RULE-002)
+
+`--auto-merge` without `--target-branch` → `ARGS_INVALID` (mutex). Idempotent: story load read-only, artifacts regen only on staleness, task dispatch short-circuits merged PRs, status mutations flock-protected, story PR re-run returns existing `{prUrl, prNumber}`. Full tables in `references/full-protocol.md` §7-8.
 
 ## Knowledge Pack References
 
 Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
-Read src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md
 Read src/main/resources/targets/claude/knowledge/governance/tool-call-grammar.md
 
 ## Integration Notes

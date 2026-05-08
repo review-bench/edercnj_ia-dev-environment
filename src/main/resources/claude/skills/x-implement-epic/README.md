@@ -6,43 +6,31 @@
 > delegation topology; prose specifics live in `SKILL.md` and
 > `references/full-protocol.md`.
 
-## 1. High-Level Orchestration Flow (new default)
+## 1. High-Level Orchestration Flow
 
 ```mermaid
 flowchart TD
     START(["/x-implement-epic EPIC-ID"]) --> P0
 
-    P0["Phase 0 — Args<br/>x-internal-normalize-args"] --> FLOW{flowVersion?}
-    FLOW -->|"1 (legacy)"| P1L["Phase 1 (legacy) — Load & Plan<br/>x-internal-build-epic-plan --mode sequential"]
-    FLOW -->|"2 (default)"| P1N["Phase 1 — Load & Plan<br/>x-internal-build-epic-plan"]
+    P0["Phase 0 — Args<br/>x-internal-normalize-args"] --> P1N["Phase 1 — Load & Plan<br/>x-internal-build-epic-plan"]
 
-    P1L --> P3L
     P1N --> P2["Phase 2 — Branch Setup<br/>x-internal-ensure-epic-branch<br/>(creates epic/XXXX)"]
     P2 --> P3N
 
-    subgraph P3N["Phase 3 — Execution Loop (v2)"]
+    subgraph P3N["Phase 3 — Execution Loop"]
         P3N_SEQ{"Parallel?"}
         P3N_SEQ -->|"No (default)"| SEQ["Sequential: one story at a time<br/>x-implement-story --target-branch epic/XXXX --auto-merge=merge"]
         P3N_SEQ -->|"--parallel"| PAR["Parallel within phase batch<br/>(siblings in ONE assistant message)"]
     end
 
-    subgraph P3L["Phase 3 — Execution Loop (legacy)"]
-        P3L_SEQ["Sequential<br/>x-implement-story --target-branch develop"]
-    end
-
     P3N --> P4["Phase 4 — Integrity Gate + Report<br/>x-internal-verify-epic-integrity +<br/>x-internal-write-report"]
-    P3L --> P4
 
     P4 --> P4B{"--skip-pr-comments?"}
     P4B -->|"No"| P4C["Phase 4b — PR-comment remediation<br/>x-fix-epic-pr"]
-    P4B -->|"Yes"| FLOW2{"flowVersion?"}
-    P4C --> FLOW2
-
-    FLOW2 -->|"2"| P5N["Phase 5 — Final PR<br/>x-merge-branches develop→epic/XXXX +<br/>x-create-pr (no auto-merge)"]
-    FLOW2 -->|"1"| SKIPFINAL["Skip Phase 5<br/>(legacy: stories already in develop)"]
+    P4B -->|"Yes"| P5N
+    P4C --> P5N["Phase 5 — Final PR<br/>x-merge-branches develop→epic/XXXX +<br/>x-create-pr (no auto-merge)"]
 
     P5N --> DONE(["Return envelope"])
-    SKIPFINAL --> DONE
 
     style P0 fill:#16213e,color:#fff
     style P1N fill:#16213e,color:#fff
@@ -50,8 +38,6 @@ flowchart TD
     style P3N fill:#16213e,color:#fff
     style P4 fill:#16213e,color:#fff
     style P5N fill:#2d6a4f,color:#fff
-    style P1L fill:#533483,color:#fff
-    style P3L fill:#533483,color:#fff
     style SKIPFINAL fill:#533483,color:#fff
     style DONE fill:#2d6a4f,color:#fff
 ```
@@ -85,40 +71,14 @@ graph TD
     class MERGE,PR,GITBRANCH,PAREV,PRFIX,TDD primitive
 ```
 
-## 3. Flow Version Decision
+## 3. Architecture summary
 
-```mermaid
-flowchart TD
-    START(["--resume OR first run"]) --> STATE{"execution-state.json<br/>exists?"}
-    STATE -->|"No"| FLAGCHK{"--legacy-flow<br/>on argv?"}
-    STATE -->|"Yes"| READVER["Read flowVersion field"]
-
-    READVER --> VERCHK{"flowVersion == 1<br/>or absent?"}
-    VERCHK -->|"Yes"| FORCELEG["Force --legacy-flow<br/>warn operator"]
-    VERCHK -->|"No (== 2)"| NEWFLOW["flowVersion=2"]
-
-    FLAGCHK -->|"Yes"| LEGACY["flowVersion=1"]
-    FLAGCHK -->|"No"| NEWFLOW
-
-    FORCELEG --> LEGACY
-    LEGACY --> RUNLEGACY(["Run legacy flow<br/>(no epic branch, no final PR)"])
-    NEWFLOW --> RUNNEW(["Run new flow<br/>(epic/XXXX + final PR)"])
-
-    style RUNLEGACY fill:#533483,color:#fff
-    style RUNNEW fill:#2d6a4f,color:#fff
-```
-
-## 4. Default-change summary
-
-| Aspect | EPIC-0042 | EPIC-0049 (this refactor) |
-|--------|-----------|---------------------------|
-| SKILL.md size | ~2000 lines | ~460 lines (77% drop) |
-| References size | ~1300 lines | ~280 lines |
-| Parallelism | default on (`--sequential` opts out) | default off (`--parallel` opts in) |
-| Auto-merge target | `develop` | `epic/<EPIC-ID>` |
-| Final PR | N/A (every story merges to develop) | `epic/<EPIC-ID> → develop` (manual gate) |
-| Inline `git`/`gh`/`jq`/`mvn` | present | **0** (only `Read`/`Glob` + `Skill`) |
-| Backward compat | — | `--legacy-flow` + `flowVersion` auto-detect |
+| Aspect | Value |
+|--------|-------|
+| Parallelism | default off (`--parallel` opts in) |
+| Auto-merge target | `epic/<EPIC-ID>` |
+| Final PR | `epic/<EPIC-ID> → develop` (manual gate) |
+| Inline `git`/`gh`/`jq`/`mvn` | **0** (only `Read`/`Glob` + `Skill`) |
 
 ## 5. Error Code Catalogue
 

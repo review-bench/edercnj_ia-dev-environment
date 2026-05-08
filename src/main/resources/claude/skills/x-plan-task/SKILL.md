@@ -29,11 +29,10 @@ Produces a detailed narrative implementation plan for a single task. The plan is
 - `/x-plan-task STORY-ID --task TASK-ID --force` -- regenerate even if plan exists.
 - `/x-plan-task STORY-ID --task TASK-ID --no-commit` -- **batch mode (story-scoped)**: write plan but skip commit.
 
-> **Invocation modes.** Task-file-first is the canonical path post-EPIC-0038: an
-> orchestrator (human or `x-plan-story` in the future) generates `task-TASK-NNN.md`
-> files and pipes each one through this skill. Story-scoped mode is retained for
-> backward compatibility with epics 0025-0037 that still declare tasks as sub-sections
-> of the story file.
+> **Invocation modes.** Task-file-first is the canonical path: an orchestrator
+> (human or `x-plan-story`) generates `task-TASK-NNN.md` files and pipes each one
+> through this skill. Story-scoped mode also accepted when tasks are declared as
+> sub-sections of the story file.
 
 ## Parameters
 

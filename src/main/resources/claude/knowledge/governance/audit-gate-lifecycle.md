@@ -73,7 +73,7 @@ Every `verify-*.sh` and `enforce-*.sh` in `.claude/hooks/` MUST include:
 
 | Layer | Pattern | Examples |
 | :--- | :--- | :--- |
-| CI script | `audit-{subject}.sh` (prefix mandatory) | `audit-flow-version.sh`, `audit-skill-visibility.sh` |
+| CI script | `audit-{subject}.sh` (prefix mandatory) | `audit-skill-visibility.sh`, `audit-execution-integrity.sh` |
 | Java test | `{Subject}AuditTest.java` or `{Subject}Lint.java` | `LifecycleIntegrityAuditTest.java` |
 | CI workflow | `{action}.yml` (kebab-case) | `ci.yml`, `release.yml` |
 

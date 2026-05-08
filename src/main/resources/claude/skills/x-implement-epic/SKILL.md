@@ -4,7 +4,7 @@ model: sonnet
 description: "Drives an epic end-to-end via 6 phases: plan, branch, story loop, integrity gate, final PR."
 user-invocable: true
 allowed-tools: Read, Write, Glob, Skill, Agent, AskUserQuestion, TaskCreate, TaskUpdate
-argument-hint: "[EPIC-ID] [--parallel] [--legacy-flow] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--non-interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"
+argument-hint: "[EPIC-ID] [--parallel] [--phase N] [--story story-XXXX-YYYY] [--resume] [--dry-run] [--skip-review] [--auto-merge-strategy merge|squash|rebase] [--strict-overlap] [--interactive] [--skip-pr-comments] [--revert-on-failure] [--skip-smoke]"
 context-budget: medium
 requires-capabilities: []
 ---
@@ -20,7 +20,6 @@ requires-capabilities: []
 ```
 /x-implement-epic 0049                  — full run (sequential + auto-merge into epic/0049)
 /x-implement-epic 0049 --parallel       — parallel story execution via worktrees
-/x-implement-epic 0049 --legacy-flow    — EPIC-0042 behavior (stories → develop, no final PR)
 /x-implement-epic 0049 --resume         — continue from execution-state.json
 /x-implement-epic 0049 --story story-0049-0007  — single story in isolation
 /x-implement-epic 0049 --dry-run        — generate execution plan only, no dispatch
@@ -31,32 +30,27 @@ requires-capabilities: []
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
 | `EPIC-ID` | String (4-digit) | — | Positional, required. |
-| `--parallel` | Boolean | `false` | Opt-in parallel via worktrees. Mutually exclusive with `--legacy-flow`. |
-| `--legacy-flow` | Boolean | `false` | Force EPIC-0042: stories → develop; Phase 2 and Phase 5 become no-ops. Auto-set when `flowVersion=1`. |
+| `--parallel` | Boolean | `false` | Opt-in parallel via worktrees. |
 | `--phase N` | Integer | — | Execute only phase N stories. Mutually exclusive with `--story`. |
 | `--story ID` | String | — | Execute a single story. Mutually exclusive with `--phase`. |
-| `--resume` | Boolean | `false` | Continue from checkpoint. Auto-detects `flowVersion`. |
+| `--resume` | Boolean | `false` | Continue from checkpoint. |
 | `--dry-run` | Boolean | `false` | Generate execution plan; exit after Phase 1. |
 | `--skip-review` | Boolean | `false` | Propagated to `x-implement-story` — skips specialist/TL reviews. |
 | `--auto-merge-strategy` | Enum | `merge` | Story-PR auto-merge strategy: `merge\|squash\|rebase`. |
-| `--interactive` | Boolean | `false` | Opt-in to 3-option menus (PROCEED/FIX-PR/ABORT) at each gate. Default: non-interactive (Rule 20 EPIC-0061). |
-| `--non-interactive` | Boolean | **DEPRECATED** | Was opt-in; now equals default. Emits deprecation WARN. Removed in 2 releases. |
+| `--interactive` | Boolean | `false` | Opt-in to 3-option menus (PROCEED/FIX-PR/ABORT) at each gate. Default: non-interactive. |
 | `--skip-pr-comments` | Boolean | `false` | Skip Phase 4b post-gate PR-comment remediation pass. |
 | `--revert-on-failure` | Boolean | `false` | On integrity-gate failure, revert last story merge instead of remediation agent. |
 | `--skip-smoke` | Boolean | `false` | Bypass epic smoke gate (advisory; emergency only). |
-
-Deprecated (still parsed, warn-once): `--sequential`, `--auto-merge`, `--interactive-merge`, `--manual-batch-approval`, `--single-pr`, `--task-tracking`, `--dry-run-only-comments`, `--auto-approve-pr` (propagated as-is).
 
 ## Output Contract
 
 | Field | Description |
 |-------|-------------|
 | `epicId` | 4-digit zero-padded epic identifier |
-| `epicBranch` | `epic/XXXX` (v2) or `develop` (legacy) |
-| `flowVersion` | `"2"` (default) or `"1"` (legacy) |
+| `epicBranch` | `epic/XXXX` |
 | `phasesExecuted` | List of `{name, durationSec, status}` per phase |
 | `storiesExecuted` | List of `{id, status, prNumber, prUrl}` per dispatched story |
-| `finalPrUrl/Number` | Final PR `epic/XXXX → develop`; null when legacy |
+| `finalPrUrl/Number` | Final PR `epic/XXXX → develop` |
 | `integrityGatePassed` | Phase 4 gate `passed` value |
 | `coverageLine/Branch` | Filtered coverage from integrity gate envelope |
 | `reportsDir` | `ai/epics/epic-XXXX/reports/` |
@@ -74,7 +68,7 @@ Deprecated (still parsed, warn-once): `--sequential`, `--auto-merge`, `--interac
 | Status mutations | `x-internal-update-status` | all |
 | Post-gate remediation | `x-fix-epic-pr` | 4b (optional) |
 
-**Workflow:** Phase 0 (Args) → Phase 1 (Load & Plan) → Phase 2 (Branch Setup, skipped for legacy) → Phase 3 (Story Loop) → Phase 4 (Integrity Gate) → Phase 5 (Final PR, skipped for legacy).
+**Workflow:** Phase 0 (Args) → Phase 1 (Load & Plan) → Phase 2 (Branch Setup) → Phase 3 (Story Loop) → Phase 4 (Integrity Gate) → Phase 5 (Final PR).
 
 ## Phase 0 — Args
 
@@ -85,9 +79,9 @@ Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre 
 
 Open phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "completed")` after args normalization):
 
-    TaskCreate(subject: "EPIC-XXXX › Phase 0 - Args", activeForm: "Normalizing args and detecting flow version")
+    TaskCreate(subject: "EPIC-XXXX › Phase 0 - Args", activeForm: "Normalizing args")
 
-Invoke args normalizer and resolve epicId, flowVersion, flags:
+Invoke args normalizer and resolve epicId, flags:
 
     Skill(skill: "x-internal-normalize-args", args: "--schema @references/args-schema.json --argv \"{raw argv}\"")
 
@@ -128,8 +122,7 @@ TaskUpdate(id: phase1TaskId, status: "completed")
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-1-Plan ok`
 
-<!-- phase-no-gate: Phase 2 is skipped for legacy flow; gate lives inside the conditional block -->
-## Phase 2 — Branch Setup (skipped for legacy)
+## Phase 2 — Branch Setup
 
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-2-Branch`
@@ -210,8 +203,7 @@ TaskUpdate(id: phase4TaskId, status: "completed")
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-implement-epic Phase-4-Gate ok`
 
-<!-- phase-no-gate: Phase 5 is skipped for legacy flow; gate lives inside the conditional block -->
-## Phase 5 — Final PR (skipped for legacy)
+## Phase 5 — Final PR
 
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-implement-epic Phase-5-Final-PR`
@@ -280,9 +272,8 @@ When this variable is set, the PreToolUse hook `enforce-no-bypass-flags.sh` (EPI
 ## Knowledge Pack References
 
 Read src/main/resources/targets/claude/knowledge/lifecycle/task-hierarchy.md
-Read src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md
 Read src/main/resources/targets/claude/knowledge/governance/tool-call-grammar.md
 
 ## Full Protocol
 
-> Per-phase detail (Phase 0 flow-version detection, Phase 3 retry/backoff/circuit-breaker, Phase 4 integrity-gate recovery algorithm + remediation-agent prompt, Phase 5 TTY-detection + gate menu), legacy-flow phase-by-phase diff (§6), resume workflow for v1/v2 (§7), `SubagentResult` error shape (§8), `--auto-approve-pr` propagation (§9), and `args-schema.json` reference (§1) in [`references/full-protocol.md`](references/full-protocol.md). Idempotency contract and integration notes also in references.
+> Per-phase detail (Phase 3 retry/backoff/circuit-breaker §2, Phase 4 integrity-gate recovery §3, Phase 5 TTY-detection + gate menu §4), resume workflow (§5), `SubagentResult` error shape (§6), `--auto-approve-pr` propagation (§7), and `args-schema.json` reference (§1) in [`references/full-protocol.md`](references/full-protocol.md). Idempotency contract and integration notes also in references.

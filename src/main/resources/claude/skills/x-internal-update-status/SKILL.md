@@ -215,7 +215,6 @@ Exit: 0.
 Skill(skill: "x-internal-update-status",
       args: "--file ai/epics/epic-XXXX/execution-state.json \
              --type epic --id 0049 \
-             --field flowVersion --value 2 \
              --initialize")
 ```
 
@@ -396,7 +395,6 @@ internal skills from the 3-option menu contract).
 
 ## Knowledge Pack References
 
-Read src/main/resources/targets/claude/knowledge/lifecycle/backward-compatibility.md
 Read src/main/resources/targets/claude/knowledge/lifecycle/refinement-gate.md
 
 ## Integration Notes

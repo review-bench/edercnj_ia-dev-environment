@@ -1,37 +1,22 @@
 ---
 name: lifecycle-contract
-description: Consolidated lifecycle integrity contract — flowVersion, 5 invariants, enforcement layers, bypass exceptions, refinement gate, CI-watch
+description: Consolidated lifecycle integrity contract — 4 invariants, enforcement layers, bypass exceptions, refinement gate, CI-watch
 requires-capabilities: []
 ---
 # Lifecycle Integrity Contract — Full Reference
 
-> **Introduced by:** EPIC-0049. **Extended by:** EPIC-0055, EPIC-0059, EPIC-0061, EPIC-0068, EPIC-0069, EPIC-0077.
-> **Full fallback matrices, 12 surfaces, personas, 8 CI-Watch exit codes:**
-> `Read .claude/knowledge/lifecycle/backward-compatibility.md`
+> **Full reference — 12 surfaces, personas, 8 CI-Watch exit codes:**
 > `Read .claude/knowledge/lifecycle/execution-integrity.md`
 > `Read .claude/knowledge/lifecycle/zero-bypass.md`
 > `Read .claude/knowledge/lifecycle/refinement-gate.md`
 > `Read .claude/knowledge/lifecycle/ci-watch-integrity.md`
 
-## `flowVersion` Quick Reference
+## Invariants (4 — Must Hold Before Any PR Merge)
 
-| Value | Semantics |
-| :--- | :--- |
-| `"1"` | Legacy flow — story PRs → develop; no epic branch |
-| `"2"` | Story PRs → epic/XXXX; task tracking required |
-| `"3"` | EPIC-0061 Local-First — non-interactive default |
-| `"4"` | v4 layout: `ai/epics/<epic-slug>/` via PathResolver |
-| `"5"` | EPIC-0077 Product-First — `productFirstLifecycle: true` |
-
-Field absent → defaults to `"1"` (legacy) with WARNING. See `backward-compatibility.md` for the full fallback matrix including `interactiveMode`, `taskTracking`, `refinementVerdict`, and `productFirstLifecycle`.
-
-## Invariants (5 — Must Hold Before Any PR Merge)
-
-1. **`flowVersion` resolved.** Valid `flowVersion ∈ {"1","2","3","4","5"}`. `flowVersion="2"` requires `taskTracking.enabled=true` (hard fail: `TASK_TRACKING_REQUIRED`).
-2. **Evidence present.** All mandatory artifacts exist for merged stories. Absent → `EIE_EVIDENCE_MISSING` (Camada 3 CI audit).
-3. **`refinementVerdict.status = "approved"` before implement.** `enforce-refinement-gate.sh` (Camada 0) blocks with exit 33 `REFINEMENT_REQUIRED` when not approved. Exception: `flowVersion=1` and `hotfix/*` branches.
-4. **CI-watch ran per PR.** `.claude/state/pr-watch-{PR}.json` state file must exist for every merged PR. Absent → WARNING (Camada 2).
-5. **Orchestrator invoked.** Every story/task must be traceable to `x-implement-story`/`x-implement-task`. No manual `git commit + gh pr create` bypass.
+1. **Evidence present.** All mandatory artifacts exist for merged stories. Absent → `EIE_EVIDENCE_MISSING` (Camada 3 CI audit).
+2. **`refinementVerdict.status = "approved"` before implement.** `enforce-refinement-gate.sh` (Camada 0) blocks with exit 33 `REFINEMENT_REQUIRED` when not approved. Exception: `hotfix/*` branches only.
+3. **CI-watch ran per PR.** `.claude/state/pr-watch-{PR}.json` state file must exist for every merged PR. Absent → WARNING (Camada 2).
+4. **Orchestrator invoked.** Every story/task must be traceable to `x-implement-story`/`x-implement-task`. No manual `git commit + gh pr create` bypass.
 
 ## Enforcement Layers (5 Total)
 
@@ -40,14 +25,13 @@ Field absent → defaults to `"1"` (legacy) with WARNING. See `backward-compatib
 | 0 | PreToolUse hooks (`enforce-preflight-gates.sh`, `enforce-refinement-gate.sh`) | **Preventive** |
 | 1 | Rules + CLAUDE.md + SKILL.md MANDATORY markers | Normative |
 | 2 | Stop hook `verify-story-completion.sh` | Detectivo (runtime) |
-| 3 | CI audit (`audit-execution-integrity.sh`, `audit-refinement-gate.sh`, `audit-flow-version.sh`) | Detectivo (CI) |
+| 3 | CI audit (`audit-execution-integrity.sh`, `audit-refinement-gate.sh`) | Detectivo (CI) |
 | 4 | Telemetry NDJSON (`events.ndjson`) | Observability |
 
-## Bypass Exceptions (3 Only)
+## Bypass Exceptions (2 Only)
 
-1. **`--legacy-flow`** for `flowVersion=1` epics created before EPIC-0049 merges.
-2. **`hotfix/*` branches** — single-file critical fix with `## Hotfix Bypass Justification` in PR body.
-3. **`CLAUDE_RECOVERY_MODE=1`** — allows `--skip-review` and `--no-ci-watch` only; NEVER bypasses refinement gate.
+1. **`hotfix/*` branches** — single-file critical fix with `## Hotfix Bypass Justification` in PR body.
+2. **`CLAUDE_RECOVERY_MODE=1`** — allows `--skip-review` and `--no-ci-watch` only; NEVER bypasses refinement gate.
 
 No other bypass path exists. Undocumented env vars (`CLAUDE_SKIP_AUDIT=1`, etc.) are blocked by `enforce-no-bypass-flags.sh`.
 

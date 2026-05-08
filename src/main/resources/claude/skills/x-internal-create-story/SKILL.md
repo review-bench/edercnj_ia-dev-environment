@@ -45,22 +45,13 @@ Generate individual story files from an Epic and system specification **or from 
 | `--no-jira` | Boolean | No | false | Skip Jira integration entirely, no prompting (EPIC-0042). |
 | `--dry-run` | Boolean | No | false | When true, story files are written to disk but Steps P4 / P5 (planning-commit / push) become no-ops with a `"dry-run, skipping commit"` warning (EPIC-0049 / RULE-007). |
 | `--no-commit` | Boolean | No | false | When true, skip Steps P4 and P5. Used by orchestrators (e.g., `x-epic-decompose`, `x-plan-story`) that batch-commit at the parent level (EPIC-0049 / RULE-007). |
-| `--legacy-template-v1` | Boolean | No | false | **DEPRECATED** (Rule 19 §Skill Renaming — removed in 2 releases). Use v1 template structure. Emits deprecation warning on stderr on every invocation. |
 
 ## Prerequisites
 
 Read the following files before starting:
 
 **Template (output structure):**
-- `.claude/templates/_TEMPLATE-STORY.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict — default since EPIC-0070). When `--legacy-template-v1` is set, use v1 structure and emit deprecation warning (see below).
-
-> **`--legacy-template-v1` deprecation warning:** When the flag is present, emit to stderr before writing each story file:
-> ```
-> WARN [legacy-template] --legacy-template-v1 is DEPRECATED.
->       Templates v1 will be removed in 2 releases.
->       Migrate to v2: /x-migrate-templates <story-id>
-> ```
-> Also emit telemetry event `metadata: {flag: "legacy-template-v1", skill: "x-story-create"}` for adoption tracking.
+- `.claude/templates/_TEMPLATE-STORY.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict).
 
 **Decomposition philosophy (sizing and boundary heuristics):**
 - `.claude/skills/x-epic-decompose/references/decomposition-guide.md`
@@ -150,8 +141,6 @@ Every generated story MUST include at the top:
 **Status:** Pendente
 **Refinement Verdict:** TBD
 ```
-
-When `--legacy-template-v1` is set, use v1 structure instead and emit the deprecation warning (see Prerequisites).
 
 #### 2.1 — Dependencias
 
@@ -820,10 +809,6 @@ Skill(skill: "x-internal-create-story", args: "specs/my-spec.md ai/epics/epic-00
 
 # With quality threshold override
 Skill(skill: "x-internal-create-story", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --quality-threshold 80")
-
-# Legacy v1 template during deprecation window (Rule 19)
-Skill(skill: "x-internal-create-story", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --legacy-template-v1")
-# → Emits: WARN [legacy-template] --legacy-template-v1 is DEPRECATED...
 
 # Orchestrator mode — parent handles branch + commit
 Skill(skill: "x-internal-create-story", args: "specs/my-spec.md ai/epics/epic-0072/epic-0072.md --no-commit")

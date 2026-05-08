@@ -466,8 +466,7 @@ Both columns are populated by reading the story files in situ via the CLI. `x-ep
 
 **Steps (end of map generation, BEFORE the final commit):**
 
-1. Detect v2 via `execution-state.json`. If v1: leave legacy columns untouched (skip this block).
-2. For each story row being rendered into the map:
+1. For each story row being rendered into the map:
    ```bash
    STATUS=$(java -cp $CLAUDE_PROJECT_DIR/java/target/classes \
        dev.iadev.adapter.inbound.cli.StatusFieldParserCli \
