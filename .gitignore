@@ -81,3 +81,4 @@ ai/runs/telemetry/events.ndjson
 # plans/ is a legacy v3 layout directory migrated to ai/epics/ in EPIC-0060/0062 (PR #832).
 # The physical directory may persist locally with symlinks; it is not versioned.
 /plans/
+newOutput/
