@@ -235,6 +235,18 @@ resolve_script_dir() {
     cd -P "$(dirname "$source")" && pwd
 }
 
+resolve_project_root() {
+    local script_dir
+    script_dir=$(resolve_script_dir)
+    if [ -f "$script_dir/pom.xml" ]; then
+        echo "$script_dir"
+    elif [ -f "$script_dir/../pom.xml" ]; then
+        cd -P "$script_dir/.." && pwd
+    else
+        echo "$script_dir"
+    fi
+}
+
 resolve_version() {
     if [ -n "$JAR_PATH" ]; then
         local jar_basename
@@ -254,11 +266,11 @@ resolve_version() {
         return 0
     fi
 
-    local script_dir
-    script_dir=$(resolve_script_dir)
-    local pom_file="$script_dir/pom.xml"
+    local project_root
+    project_root=$(resolve_project_root)
+    local pom_file="$project_root/pom.xml"
     if [ ! -f "$pom_file" ]; then
-        die "pom.xml not found in $script_dir. Cannot determine version."
+        die "pom.xml not found in $project_root. Cannot determine version."
     fi
     VERSION=$(sed -n '/<version>/{s/.*<version>\(.*\)<\/version>.*/\1/p;q;}' "$pom_file")
     if [ -z "$VERSION" ]; then
@@ -269,20 +281,20 @@ resolve_version() {
 }
 
 dev_regenerate() {
-    local script_dir
-    script_dir=$(resolve_script_dir)
+    local project_root
+    project_root=$(resolve_project_root)
 
-    if [ ! -f "$script_dir/pom.xml" ]; then
-        die "pom.xml not found in $script_dir. --dev requires the source tree."
+    if [ ! -f "$project_root/pom.xml" ]; then
+        die "pom.xml not found in $project_root. --dev requires the source tree."
     fi
 
     log_info "Compiling project..."
-    if ! (cd "$script_dir" && mvn compile test-compile -q); then
+    if ! (cd "$project_root" && mvn compile test-compile -q); then
         die "Compilation failed."
     fi
 
     log_info "Regenerating expected-artifacts.json..."
-    if ! (cd "$script_dir" && mvn exec:java \
+    if ! (cd "$project_root" && mvn exec:java \
         -Dexec.mainClass="dev.iadev.smoke.ExpectedArtifactsGenerator" \
         -Dexec.args="src/test/resources/smoke/expected-artifacts.json" \
         -q); then
@@ -290,7 +302,7 @@ dev_regenerate() {
     fi
 
     log_info "Regenerating golden files..."
-    if ! (cd "$script_dir" && mvn exec:java \
+    if ! (cd "$project_root" && mvn exec:java \
         -Dexec.mainClass="dev.iadev.golden.GoldenFileRegenerator" \
         -Dexec.classpathScope="test" \
         -q); then
@@ -298,7 +310,7 @@ dev_regenerate() {
     fi
 
     log_info "Running all tests..."
-    if ! (cd "$script_dir" && mvn verify -P all-tests -q); then
+    if ! (cd "$project_root" && mvn verify -P all-tests -q); then
         die "Tests failed."
     fi
 
@@ -314,9 +326,9 @@ build_jar() {
         return 0
     fi
 
-    local script_dir
-    script_dir=$(resolve_script_dir)
-    local target_jar="$script_dir/target/$JAR_NAME"
+    local project_root
+    project_root=$(resolve_project_root)
+    local target_jar="$project_root/target/$JAR_NAME"
 
     if [ "$SKIP_BUILD" = true ]; then
         if [ ! -f "$target_jar" ]; then
@@ -327,12 +339,12 @@ build_jar() {
         return 0
     fi
 
-    if [ ! -f "$script_dir/pom.xml" ]; then
-        die "pom.xml not found in $script_dir. Run this script from the project root or use --jar=PATH."
+    if [ ! -f "$project_root/pom.xml" ]; then
+        die "pom.xml not found in $project_root. Run this script from the project root or use --jar=PATH."
     fi
 
     log_info "Building fat JAR (this may take a minute)..."
-    if ! (cd "$script_dir" && mvn clean package -DskipTests -q); then
+    if ! (cd "$project_root" && mvn clean package -DskipTests -q); then
         die "Maven build failed."
     fi
 
