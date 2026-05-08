@@ -38,7 +38,7 @@ Supplementary details carved out of SKILL.md to satisfy the orchestrator size co
 **Lifecycle:**
 - Written atomically (write to `<path>.tmp`, rename) when slot 2 (FIX-PR) is selected
 - Not written for PROCEED or ABORT selections
-- Not written on `--non-interactive` path
+- Not written on non-interactive path (default)
 
 **`--resume-review <pr>` flag:**
 

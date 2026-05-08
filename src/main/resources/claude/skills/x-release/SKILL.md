@@ -4,7 +4,7 @@ model: sonnet
 description: "Orchestrates Git Flow release: version bump, validation, PR, tag, back-merge."
 user-invocable: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Skill, AskUserQuestion, TaskCreate, TaskUpdate
-argument-hint: "[major|minor|patch|version] [--version X.Y.Z] [--last-tag <tag>] [--dry-run] [--skip-tests] [--no-publish] [--no-github-release] [--hotfix] [--continue-after-merge] [--interactive] [--non-interactive] [--no-prompt] [--signed-tag] [--skip-review] [--ci-watch] [--state-file <path>] [--skip-integrity] [--integrity-report <path>] [--max-parallel <N>] [--status] [--abort] [--yes] [--force]"
+argument-hint: "[major|minor|patch|version] [--version X.Y.Z] [--last-tag <tag>] [--dry-run] [--skip-tests] [--no-publish] [--no-github-release] [--hotfix] [--continue-after-merge] [--interactive] [--no-prompt] [--signed-tag] [--skip-review] [--ci-watch] [--state-file <path>] [--skip-integrity] [--integrity-report <path>] [--max-parallel <N>] [--status] [--abort] [--yes] [--force]"
 requires-capabilities: []
 ---
 
@@ -38,7 +38,6 @@ requires-capabilities: []
 | `--hotfix` | Create hotfix release from `main` instead of `develop` |
 | `--continue-after-merge` | Resume from `APPROVAL_PENDING` state after PR merged. Requires existing state file. |
 | `--interactive` | Opt-in to gate menus (PROCEED/FIX-PR/ABORT) at Phase 8. With `--dry-run`: pauses before each phase. Default: non-interactive (Rule 20, EPIC-0061). |
-| `--non-interactive` | **DEPRECATED** — was CI opt-in; now equals default. Emits WARN. Removed in 2 releases. |
 | `--skip-review` | Skip `x-review-pr` fire-and-forget in OPEN-RELEASE-PR |
 | `--ci-watch` | Opt-in: poll CI on release PR via `x-watch-pr-ci`; abort on CI failure |
 | `--signed-tag` | Create GPG-signed tag (`git tag -s`) instead of annotated |
@@ -90,7 +89,7 @@ Persist interactiveMode to release state (EPIC-0068 — consumed by Stop hook `e
 
     Skill(skill: "x-internal-update-status", args: "--file ai/releases/release-state-{version}.json --type release --id <VERSION> --field interactiveMode --value <interactive|non-interactive>")
 
-Value: `"interactive"` when `--interactive` passed or `CLAUDE_LEGACY_INTERACTIVE=1`; otherwise `"non-interactive"` (Rule 20 default, EPIC-0061).
+Value: `"interactive"` when `--interactive` passed; otherwise `"non-interactive"` (Rule 20 default).
 
     TaskUpdate(id: phase0TaskId, status: "completed")
 
@@ -196,7 +195,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-rele
     Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-release --phase Phase-8-ApprovalGate")
     TaskCreate(subject: "RELEASE › Phase 8 - Approval Gate", activeForm: "Awaiting release approval")
 
-Persist state with `phase: APPROVAL_PENDING`. Present EPIC-0043 gate menu (PROCEED / FIX-PR / ABORT) unless `--non-interactive`. On PROCEED: advance to Phase 9 (TAG). On FIX-PR: `Skill(skill: "x-fix-pr", args: "<prNumber>")` then loop (max 3 cycles). See `references/approval-gate-workflow.md`.
+Persist state with `phase: APPROVAL_PENDING`. Present EPIC-0043 gate menu (PROCEED / FIX-PR / ABORT) when `--interactive`. On PROCEED: advance to Phase 9 (TAG). On FIX-PR: `Skill(skill: "x-fix-pr", args: "<prNumber>")` then loop (max 3 cycles). See `references/approval-gate-workflow.md`.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-release Phase-Approval-Gate ok`

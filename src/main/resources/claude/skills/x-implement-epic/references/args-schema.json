@@ -1,6 +1,6 @@
 {
   "name": "x-implement-epic",
-  "version": "2.0",
+  "version": "3.0",
   "positional": [
     {
       "name": "epicId",
@@ -17,12 +17,6 @@
       "type": "boolean",
       "default": false,
       "description": "Opt-in parallel story execution via worktrees"
-    },
-    {
-      "name": "--legacy-flow",
-      "type": "boolean",
-      "default": false,
-      "description": "Force EPIC-0042 behavior (stories merge directly into develop; no final PR)"
     },
     {
       "name": "--phase",
@@ -62,16 +56,16 @@
       "description": "Strategy for story-PR auto-merge into epic/<EPIC-ID>"
     },
     {
+      "name": "--interactive",
+      "type": "boolean",
+      "default": false,
+      "description": "Opt-in to 3-option gate menus (PROCEED/FIX-PR/ABORT) at each gate"
+    },
+    {
       "name": "--strict-overlap",
       "type": "boolean",
       "default": false,
       "description": "Demote hard-overlap stories to sequential in --parallel mode"
-    },
-    {
-      "name": "--non-interactive",
-      "type": "boolean",
-      "default": false,
-      "description": "Skip all AskUserQuestion gates (CI / orchestrated invocations)"
     },
     {
       "name": "--skip-pr-comments",
@@ -114,50 +108,62 @@
     {
       "name": "--no-merge",
       "since": "EPIC-0049",
-      "replacement": "--legacy-flow",
-      "warning": "[DEPRECATED] --no-merge is rejected in EPIC-0049 defaults. Use --legacy-flow to preserve EPIC-0042 no-direct-merge semantics.",
+      "replacement": "Omit (epic-branch model is mandatory)",
+      "warning": "[DEPRECATED] --no-merge is rejected. The epic-branch model is mandatory.",
       "reject": true
     },
     {
       "name": "--interactive-merge",
       "since": "EPIC-0049",
-      "replacement": "Default interactive mode when --non-interactive is absent",
-      "warning": "[DEPRECATED] --interactive-merge is a no-op. Interactive behavior is default when --non-interactive is not set."
+      "replacement": "--interactive",
+      "warning": "[DEPRECATED] --interactive-merge is a no-op. Use --interactive to opt-in to gate menus."
     },
     {
       "name": "--manual-batch-approval",
       "since": "EPIC-0043",
-      "replacement": "--non-interactive",
-      "warning": "[DEPRECATED] --manual-batch-approval is a no-op since EPIC-0043. Use --non-interactive for CI."
+      "replacement": "Omit (non-interactive is the default)",
+      "warning": "[DEPRECATED] --manual-batch-approval is a no-op since EPIC-0043."
     },
     {
       "name": "--batch-approval",
       "since": "EPIC-0043",
-      "replacement": "--non-interactive",
-      "warning": "[DEPRECATED] --batch-approval is a no-op since EPIC-0043. Use --non-interactive for CI."
+      "replacement": "Omit (non-interactive is the default)",
+      "warning": "[DEPRECATED] --batch-approval is a no-op since EPIC-0043."
     },
     {
       "name": "--single-pr",
       "since": "EPIC-0049",
-      "replacement": "--legacy-flow",
-      "warning": "[DEPRECATED] --single-pr is an alias for --legacy-flow. Use --legacy-flow explicitly.",
-      "alias": "--legacy-flow"
+      "replacement": "Omit (epic-branch model is mandatory)",
+      "warning": "[DEPRECATED] --single-pr is rejected. The epic-branch model is mandatory.",
+      "reject": true
     },
     {
       "name": "--task-tracking",
       "since": "EPIC-0038",
-      "replacement": "Always-on in v2",
-      "warning": "[DEPRECATED] --task-tracking is always-on in v2. Remove the flag."
+      "replacement": "Always-on",
+      "warning": "[DEPRECATED] --task-tracking is always-on. Remove the flag."
     },
     {
       "name": "--dry-run-only-comments",
       "since": "EPIC-0049",
       "replacement": "--skip-pr-comments",
       "warning": "[DEPRECATED] --dry-run-only-comments is a no-op. Use --skip-pr-comments to suppress Phase 4b entirely."
+    },
+    {
+      "name": "--non-interactive",
+      "since": "EPIC-0061",
+      "replacement": "Omit (non-interactive is the default)",
+      "warning": "[DEPRECATED] --non-interactive is a no-op. Non-interactive is the default. Use --interactive to opt-in to gate menus."
+    },
+    {
+      "name": "--legacy-flow",
+      "since": "EPIC-0059",
+      "replacement": "Omit (epic-branch model is mandatory)",
+      "warning": "[DEPRECATED] --legacy-flow is rejected. The epic-branch model is mandatory for all epics.",
+      "reject": true
     }
   ],
   "mutuallyExclusive": [
-    ["--phase", "--story"],
-    ["--parallel", "--legacy-flow"]
+    ["--phase", "--story"]
   ]
 }

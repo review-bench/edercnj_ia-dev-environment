@@ -13,7 +13,6 @@
 | Epic ID | {{epicId}} |
 | Task IDs | {{taskIds}} |
 | Story Markdown | `{{storyMarkdownPath}}` |
-| flowVersion | {{flowVersion}} |
 
 ## Acceptance Criteria
 

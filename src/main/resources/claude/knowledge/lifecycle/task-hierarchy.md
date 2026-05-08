@@ -84,7 +84,6 @@ Gerund of `subject` without the root prefix, < 40 characters:
 
 ```json
 {
-  "flowVersion": "2",
   "epicId": "EPIC-0060",
   "taskTracking": {
     "enabled": true,

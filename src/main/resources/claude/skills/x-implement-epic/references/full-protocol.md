@@ -1,10 +1,9 @@
 # x-implement-epic — Full Protocol
 
-> Companion reference to `SKILL.md` (thin orchestrator, ~460 lines).
+> Companion reference to `SKILL.md` (thin orchestrator).
 > This file collects everything that would bloat the main skill body:
 > retry/backoff schedules, circuit-breaker rules, recovery algorithms,
-> legacy-flow phase-by-phase behavior, resume workflow for both flow
-> versions, and the `SubagentResult` error shape emitted by delegates.
+> resume workflow, and the `SubagentResult` error shape emitted by delegates.
 > Ordered by section reference used from `SKILL.md`.
 
 ## §1 — `args-schema.json`
@@ -12,36 +11,14 @@
 The schema consumed by `x-internal-normalize-args` in Phase 0. Stored as a
 sibling file at [`references/args-schema.json`](args-schema.json) so the
 normalizer can load it via `@` syntax. The schema declares every flag
-listed in `SKILL.md` §Parameters — including the deprecated flags that
-emit one-time warnings but are still parsed successfully for scripts
-pinned to EPIC-0042 wording. Mutual-exclusion groups are declared there
-(e.g., `--phase` vs `--story`; `--parallel` vs `--legacy-flow`).
+listed in `SKILL.md` §Parameters. Mutual-exclusion groups are declared there
+(e.g., `--phase` vs `--story`).
 
 Do NOT duplicate the schema in this file — read `args-schema.json`
 directly. This reference is concerned with the runtime semantics the
 orchestrator layers on top of the normalizer output.
 
-## §2 — Flow detection and propagation
-
-The orchestrator computes `flowVersion` once in Phase 0 and propagates
-it to every subsequent phase. The three input sources, in priority order:
-
-| Priority | Source | Effect |
-| :--- | :--- | :--- |
-| 1 | `--legacy-flow=true` on argv | `flowVersion="1"` (explicit) |
-| 2 | `ai/epics/epic-XXXX/execution-state.json` top-level `flowVersion` | Whatever the file says (`"1"` or `"2"`); absence is treated as `"1"` |
-| 3 | Absence of prior checkpoint | `flowVersion="2"` (new default) |
-
-When priority 2 forces `flowVersion="1"` despite the operator omitting
-`--legacy-flow`, emit exactly one warning line:
-
-```
-[flow-detect] execution-state.json flowVersion=1 — forcing --legacy-flow. Run without --resume to start fresh with flowVersion=2.
-```
-
-`x-internal-build-epic-plan` receives `flowVersion` as an explicit `--flow-version` argument and writes it into the state file during its first write so subsequent `--resume` calls stay deterministic.
-
-## §3 — Phase 3: retry / backoff / circuit-breaker
+## §2 — Phase 3: retry / backoff / circuit-breaker
 
 ### 3.1 Per-story retry
 
@@ -92,18 +69,18 @@ Trip conditions (evaluated after every story result):
 | 3 consecutive `FAILED` in the same phase | OPEN state: pause execution |
 | 5 total `FAILED` in the same phase (sliding window) | OPEN state: abort phase |
 
-In OPEN state with `--non-interactive=false`, the orchestrator emits the
-EPIC-0043 standard 3-option menu via `AskUserQuestion`:
+In OPEN state with `--interactive`, the orchestrator emits the
+standard 3-option menu via `AskUserQuestion`:
 
 - PROCEED — mark remaining stories `BLOCKED`, exit with `STORY_FAILED`
 - FIX-AND-RESUME — exit with instructions to fix locally and resume
 - ABORT — exit immediately without propagation
 
-With `--non-interactive=true`, circuit-breaker trip = automatic
+Without `--interactive` (default non-interactive), circuit-breaker trip = automatic
 `STORY_FAILED` exit. The breaker state is NOT persisted to
 `execution-state.json` (it resets on resume).
 
-## §4 — Phase 4: integrity-gate failure recovery
+## §3 — Phase 4: integrity-gate failure recovery
 
 When `x-internal-verify-epic-integrity` returns `passed=false`:
 
@@ -141,7 +118,7 @@ When `x-internal-verify-epic-integrity` returns `passed=false`:
 Only one recovery attempt per gate invocation. Repeated failures require
 operator intervention.
 
-## §5 — Phase 5: TTY detection and final-PR gate
+## §4 — Phase 5: TTY detection and final-PR gate
 
 ### 5.1 TTY detection
 
@@ -166,41 +143,7 @@ Do NOT offer a MERGE option. The final PR is the last human review point
 (RULE-004). Auto-merging it would defeat the entire EPIC-0049 design
 principle.
 
-## §6 — Legacy flow (`flowVersion=1`) detailed behavior
-
-Activated when `--legacy-flow=true` OR when `execution-state.json`
-declares `flowVersion=1` (or omits the field on a checkpoint written by
-EPIC-0042 or older).
-
-### 6.1 Per-phase diff vs. new flow
-
-| Phase | New flow (v2) | Legacy flow (v1) |
-| :--- | :--- | :--- |
-| 0 | Args parsed; `flowVersion="2"` | Args parsed; `flowVersion="1"` |
-| 1 | Build plan; persist `flowVersion="2"` in state file | Build plan; persist `flowVersion="1"` in state file |
-| 2 | `epic/<EPIC-ID>` ensured | **NO-OP** — log `[phase-2] skipped — legacy flow` |
-| 3 | Stories target `epic/<EPIC-ID>` with `--auto-merge-strategy` | Stories target `develop`; behavior identical to EPIC-0042 |
-| 4 | Gate runs on `epic/<EPIC-ID>` HEAD | Gate runs on `develop` HEAD after last story merge |
-| 5 | Final `epic/<EPIC-ID> → develop` PR, no auto-merge | **NO-OP** — log `[phase-5] skipped — legacy flow` |
-
-### 6.2 Output contract under legacy flow
-
-The envelope shape is unchanged, but:
-
-- `flowVersion="1"`
-- `epicBranch="develop"`
-- `finalPrUrl=null`
-- `finalPrNumber=null`
-- `phasesExecuted` includes Phase 2 and Phase 5 with `status="skipped"` and `durationSec=0`
-
-### 6.3 Forbidden combinations
-
-- `--parallel` + `--legacy-flow` → orchestrator prints WARNING and ignores `--parallel` (legacy flow is always sequential; parallel worktrees against `develop` would re-introduce the exact merge-conflict problems EPIC-0049 set out to fix).
-- Downgrading a v2 checkpoint to v1 via `--legacy-flow` on `--resume` → exit `ARGS_INVALID` with message `"Cannot downgrade flowVersion from 2 to 1 via --resume. Start a fresh run without --resume."`
-
-## §7 — Resume workflow
-
-### 7.1 v2 resume
+## §5 — Resume workflow
 
 1. Read `execution-state.json` via `x-internal-update-status --read-only`.
 2. For each story whose `status` is IN_PROGRESS / PR_CREATED /
@@ -215,12 +158,7 @@ The envelope shape is unchanged, but:
 5. Phase 4 (integrity gate) runs regardless of resume — the gate is
    idempotent.
 
-### 7.2 v1 resume
-
-Behavior identical to EPIC-0042 resume semantics. Phases 2 and 5 remain
-no-ops; Phase 3 iterates only stories not already MERGED into `develop`.
-
-## §8 — `SubagentResult` error shape
+## §6 — `SubagentResult` error shape
 
 Every delegate skill that can produce an error envelope adheres to the
 following shape:
@@ -247,31 +185,24 @@ map but only persists `status`, `prNumber`, `prUrl`, and `commitSha` via
 context and are surfaced only when needed for the retry/circuit-breaker
 logic.
 
-## §9 — `--auto-approve-pr` propagation
+## §7 — `--auto-approve-pr` propagation
 
-The flag is **orthogonal** to `flowVersion`. It controls only the
-task-PR-into-parent-branch flow inside each story (RULE-004 task-level
-parent-branch mode). Propagation:
+Controls only the task-PR-into-parent-branch flow inside each story
+(RULE-004 task-level parent-branch mode). Propagation:
 
-- Phase 3 dispatches `x-implement-story <STORY-ID> --auto-approve-pr
-  [...]` unchanged.
+- Phase 3 dispatches `x-implement-story <STORY-ID> --auto-approve-pr [...]` unchanged.
 - Each story creates its own `feat/story-XXXX-YYYY-<desc>` parent branch
-  **off the epic branch** (not off `develop` as in EPIC-0042 when
-  `flowVersion="2"`). Task PRs inside the story target that parent
-  branch.
-- When the story finishes, the parent branch is merged into
-  `epic/<EPIC-ID>` (when `flowVersion="2"`) or into `develop` (when
-  `flowVersion="1"`) via `x-implement-story`'s own Phase 3.7 (story-level
-  PR). The orchestrator sees this as a single story PR per usual.
+  **off the epic branch**. Task PRs inside the story target that parent branch.
+- When the story finishes, the parent branch is merged into `epic/<EPIC-ID>`
+  via `x-implement-story`'s own Phase 3.7 (story-level PR). The orchestrator
+  sees this as a single story PR per usual.
 
-## §10 — Known limitations
+## §8 — Known limitations
 
 - The orchestrator does not snapshot `mainShaBeforePhase` inline — the
   integrity-gate sub-skill computes its coverage delta from the commit
   range declared by the build-plan's `storiesExecuted` array, which is
   deterministic after Phase 3.
-- `--story` mode skips Phase 4 entirely (single-story runs), preserving
-  EPIC-0042 behavior.
-- `--dry-run` exits after Phase 1; `flowVersion` is still computed and
-  written to the execution plan but `execution-state.json` is NOT
-  created (dry-run is read-only on state).
+- `--story` mode skips Phase 4 entirely (single-story runs).
+- `--dry-run` exits after Phase 1; `execution-state.json` is NOT created (dry-run is
+  read-only on state).

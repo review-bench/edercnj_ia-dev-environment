@@ -18,7 +18,7 @@ requires-capabilities: [governance.refinement-gate]
 | `Falha` | Orchestrator terminated with error |
 | `Bloqueada` | Dependency unresolved |
 
-**Invariant:** `Pendente → Em Andamento` transition is **forbidden** after EPIC-0069. `enforce-refinement-gate.sh` blocks it at Camada 0. Exception: `flowVersion=1` legacy epics and `hotfix/*` branches.
+**Invariant:** `Pendente → Em Andamento` transition is **forbidden**. `enforce-refinement-gate.sh` blocks it at Camada 0. Exception: `hotfix/*` branches.
 
 ## `refinementVerdict` JSON Shape
 

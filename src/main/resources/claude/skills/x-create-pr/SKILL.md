@@ -86,8 +86,8 @@ fi
 6. Parse extension flags (`--target-branch`, `--auto-merge`, `--epic-id`) and run the validation matrix:
 
 ```bash
-# Defaults (backward compatible: absent flags produce legacy behavior)
-TARGET_BRANCH_OVERRIDE=""     # empty -> legacy target (parent or develop)
+# Defaults
+TARGET_BRANCH_OVERRIDE=""     # empty -> parent or develop
 AUTO_MERGE_STRATEGY="none"    # none | merge | squash | rebase
 EPIC_ID_OVERRIDE=""            # empty -> no epic-XXXX label injection
 

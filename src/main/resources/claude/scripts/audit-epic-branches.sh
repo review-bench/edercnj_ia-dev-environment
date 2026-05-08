@@ -3,15 +3,12 @@
 # audit-epic-branches.sh — Rule 21 (Epic Branch Model) CI audit.
 #
 # Verifies that:
-#   (a) Every open PR targeting develop whose head is epic/* has flowVersion="2"
-#       in its execution-state.json. ABSENT flowVersion is treated as a
-#       violation when the state file exists (Rule 21 requires explicit "2").
-#   (b) No epic/* remote branch contains a "force-push marker" (HEAD diverged
+#   (a) No epic/* remote branch contains a "force-push marker" (HEAD diverged
 #       from upstream by a non-fast-forward — best-effort check via reflog
 #       comparison; full check requires reflog access to origin).
-#   (c) Cleanup configuration excludes epic/* (any tooling that prunes branches
+#   (b) Cleanup configuration excludes epic/* (any tooling that prunes branches
 #       must whitelist epic/* — checked via grep over scripts/setup-hooks.sh).
-#   (d) docs/<epic-id>-<slug> branches (EPIC-0065): validate that the corresponding
+#   (c) docs/<epic-id>-<slug> branches (EPIC-0065): validate that the corresponding
 #       epic/XXXX branch exists. docs/feature-<slug> branches are ideation-only and
 #       are NOT checked for epic/ correlation. docs/* branches are NOT violations
 #       for any check that expects epic/* format.
@@ -24,45 +21,37 @@
 #
 # Flags:
 #   --self-check  Validate script integrity (deps, files). Exit 0 OK / 2 broken.
-#   --skip-pr-check  Skip Check A when gh CLI is unavailable (e.g., local dev).
-#                    By default, missing gh exits 2.
 #   -h|--help     Print usage and exit 0.
 #
 # Introduced by story-0058-0004 (EPIC-0058). See Rule 21 at
 # .claude/rules/21-epic-branch-model.md for the contract.
-# Extended by story-0065-0001 (EPIC-0065): adds Check D for docs/ branch type.
+# Extended by story-0065-0001 (EPIC-0065): adds Check C for docs/ branch type.
 #
 # Catalogado em: docs/audit-gates-catalog.md
 
 set -euo pipefail
 
-SCRIPT_VERSION="1.2.0"
+SCRIPT_VERSION="1.3.0"
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-# v4 layout: execution-state.json lives under ai/epics/<epic-XXXX-slug>/
-# v3 layout (legacy): lives under plans/epic-XXXX/
-# PathResolver-style: try v4 first, fall back to v3
-EPICS_DIR="${REPO_ROOT}/ai/epics"
-PLANS_DIR="${REPO_ROOT}/plans"
 SETUP_HOOKS_FILE="${REPO_ROOT}/scripts/setup-hooks.sh"
 
 usage() {
   cat <<-EOF
-Usage: ${SCRIPT_NAME} [--self-check] [--skip-pr-check] [-h|--help]
+Usage: ${SCRIPT_NAME} [--self-check] [-h|--help]
 
   Audit epic/* branch governance compliance (Rule 21).
 
   Checks:
-    A  Every open epic/* → develop PR has flowVersion="2".
-       (When state file is missing flowVersion: violation.)
-    B  No epic/* remote branch has divergent reflog vs upstream
+    A  No epic/* remote branch has divergent reflog vs upstream
        (best-effort force-push detection).
-    C  Cleanup tooling (scripts/setup-hooks.sh) excludes epic/*.
+    B  Cleanup tooling (scripts/setup-hooks.sh) excludes epic/*.
+    C  docs/<epic-id>-<slug> branches have a corresponding epic/XXXX branch.
 
   Exit codes:
     0  All checks PASS.
     1  EPIC_BRANCH_VIOLATION detected.
-    2  OPERATIONAL_ERROR (gh CLI absent without --skip-pr-check, git error).
+    2  OPERATIONAL_ERROR (git error).
     3  BASELINE_CORRUPT.
 EOF
 }
@@ -83,12 +72,10 @@ self_check() {
 # ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
-SKIP_PR_CHECK=0
 for arg in "$@"; do
   case "$arg" in
-    --self-check)    self_check ;;
-    --skip-pr-check) SKIP_PR_CHECK=1 ;;
-    -h|--help)       usage; exit 0 ;;
+    --self-check) self_check ;;
+    -h|--help)    usage; exit 0 ;;
     *) echo "${SCRIPT_NAME}: INVALID_ARGS: unknown flag: $arg" >&2; exit 2 ;;
   esac
 done
@@ -96,54 +83,7 @@ done
 violations=0
 
 # ---------------------------------------------------------------------------
-# Check A — flowVersion="2" on open epic/* PRs targeting develop
-# ---------------------------------------------------------------------------
-if command -v gh &>/dev/null; then
-  pr_list_output=$(gh pr list --base develop --json number,headRefName \
-                   --jq '.[] | select(.headRefName | startswith("epic/")) | .number' 2>&1) || {
-    echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: gh pr list failed: ${pr_list_output}" >&2
-    exit 2
-  }
-
-  while IFS= read -r pr_number; do
-    [[ -z "$pr_number" ]] && continue
-    epic_id=$(gh pr view "$pr_number" --json headRefName \
-              --jq '.headRefName | match("epic/([0-9]+)").captures[0].string' 2>&1) || {
-      echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: gh pr view #${pr_number} failed: ${epic_id}" >&2
-      exit 2
-    }
-    [[ -z "$epic_id" ]] && continue
-
-    # PathResolver: try v4 layout first (ai/epics/epic-XXXX-*/), then v3 (plans/epic-XXXX/)
-    state_file=""
-    if [[ -d "${EPICS_DIR}" ]]; then
-      state_file=$(find "${EPICS_DIR}" -maxdepth 2 -name "execution-state.json" \
-                   -path "*/epic-${epic_id}-*/*" 2>/dev/null | head -1 || true)
-    fi
-    if [[ -z "$state_file" ]] && [[ -f "${PLANS_DIR}/epic-${epic_id}/execution-state.json" ]]; then
-      state_file="${PLANS_DIR}/epic-${epic_id}/execution-state.json"
-    fi
-    if [[ -n "$state_file" ]] && [[ -f "$state_file" ]]; then
-      flow=$(jq -r '.flowVersion // "ABSENT"' "$state_file" 2>&1) || {
-        echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: failed to parse ${state_file}: ${flow}" >&2
-        exit 2
-      }
-      # flowVersion "2", "3", "4" are all valid new-flow variants (Rule 19)
-      if [[ "$flow" != "2" && "$flow" != "3" && "$flow" != "4" ]]; then
-        echo "${SCRIPT_NAME}: EPIC_BRANCH_VIOLATION: PR #${pr_number} (epic/${epic_id}) has flowVersion=\"${flow}\" (Rule 21 requires 2/3/4)" >&2
-        violations=$((violations + 1))
-      fi
-    fi
-  done <<< "${pr_list_output}"
-elif [[ $SKIP_PR_CHECK -eq 1 ]]; then
-  echo "${SCRIPT_NAME}: INFO: gh CLI absent and --skip-pr-check set; Check A skipped"
-else
-  echo "${SCRIPT_NAME}: OPERATIONAL_ERROR: gh CLI not available (use --skip-pr-check to bypass)" >&2
-  exit 2
-fi
-
-# ---------------------------------------------------------------------------
-# Check B — local epic/* branches: best-effort force-push detection
+# Check A — local epic/* branches: best-effort force-push detection
 # ---------------------------------------------------------------------------
 # Force-pushes rewrite history. A robust check requires origin reflog access,
 # unavailable to clients. Best-effort: check that local epic/* branch HEAD
@@ -169,7 +109,7 @@ while IFS= read -r ref; do
 done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ 2>/dev/null | grep "^origin/epic/" || true)
 
 # ---------------------------------------------------------------------------
-# Check C — cleanup tooling excludes epic/*
+# Check B — cleanup tooling excludes epic/*
 # ---------------------------------------------------------------------------
 if [[ -f "$SETUP_HOOKS_FILE" ]]; then
   # If setup-hooks.sh deletes branches by pattern, it MUST whitelist epic/*.
@@ -183,7 +123,7 @@ if [[ -f "$SETUP_HOOKS_FILE" ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Check D — docs/<epic-id>-<slug> branches: validate epic/XXXX exists (EPIC-0065)
+# Check C — docs/<epic-id>-<slug> branches: validate epic/XXXX exists (EPIC-0065)
 # ---------------------------------------------------------------------------
 while IFS= read -r ref; do
   [[ -z "$ref" ]] && continue
@@ -199,5 +139,5 @@ while IFS= read -r ref; do
   fi
 done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ 2>/dev/null | grep "^origin/docs/" || true)
 
-echo "${SCRIPT_NAME}: checked PRs + local epic/* branches + cleanup config + docs/ branches; violations: ${violations}"
+echo "${SCRIPT_NAME}: checked local epic/* branches + cleanup config + docs/ branches; violations: ${violations}"
 [[ $violations -eq 0 ]] && exit 0 || exit 1

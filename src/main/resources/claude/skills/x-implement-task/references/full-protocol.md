@@ -34,13 +34,13 @@
 
 Returns `{inWorktree, worktreePath, mainRepoPath}`.
 
-**Three-way mode decision:**
+**Two-way mode decision:**
 
 | `inWorktree` | `--worktree` flag | Mode | Action |
 |---|---|---|---|
 | `true` | any | Mode 1 — REUSE | Reuse parent worktree; `TASK_OWNS_WORKTREE=false` |
-| `false` | absent | Mode 3 — LEGACY | Normal `git checkout -b` in main checkout |
 | `false` | present | Mode 2 — CREATE | Create dedicated worktree; `TASK_OWNS_WORKTREE=true` |
+| `false` | absent | **ERROR** | Abort with `ARGS_INVALID`: standalone execution requires `--worktree`. |
 
 **Mode 2 creation:**
 
@@ -124,7 +124,6 @@ Pre-commit chain (RULE-007): format → lint → compile → commit.
 | `inWorktree` (Step 0.5) | `--worktree` | `--no-ci-watch` | Schema | CI-Watch fires? |
 |---|---|---|---|---|
 | `true` (Mode 1) | any | any | any | No — `"CI-Watch delegated to parent orchestrator"` |
-| `false` | absent (Mode 3) | any | any | No — `"CI-Watch skipped: no --worktree"` |
 | `false` | present (Mode 2) | present | any | No — `"CI-Watch skipped: --no-ci-watch"` |
 | `false` | present (Mode 2) | absent | v1 | No — `"CI-Watch skipped: schema v1"` |
 | `false` | present (Mode 2) | absent | v2 | **Yes** |
@@ -146,7 +145,6 @@ Write protocol: write to `{path}.tmp` → rename atomically.
 | Mode 1 (REUSE) | any | Do NOT remove (parent orchestrator owns). Do NOT `git checkout develop` (Rule 14 §2). |
 | Mode 2 (CREATE) | success | `Skill(skill: "x-manage-worktrees", model: "haiku", args: "remove --id task-XXXX-YYYY-NNN")` → then `git checkout develop && git pull origin develop` in mainRepoPath. |
 | Mode 2 (CREATE) | failed | Preserve worktree for diagnosis (Rule 14 §4). Log path for operator triage. |
-| Mode 3 (LEGACY) | any | `git checkout develop && git pull origin develop`. |
 
 ---
 

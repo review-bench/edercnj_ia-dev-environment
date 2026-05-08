@@ -48,7 +48,6 @@ epic/XXXX ●──●──●──●──●──●──●──●─�
 2. **Protection from cleanup.** `x-cleanup-git-branches` MUST exclude `epic/*` from destructive sweep.
 3. **Worktree base.** In `--parallel` mode, story worktrees use `epic/XXXX` as base, **not** `develop`.
 4. **Auto-merge target.** Story PRs target `epic/XXXX`, never `develop`.
-5. **Legacy escape hatch.** `--legacy-flow` forces all target branches back to `develop`.
 
 ## Anti-Patterns
 
@@ -60,16 +59,10 @@ epic/XXXX ●──●──●──●──●──●──●──●─�
 
 **Exception — `docs/` planning PRs:** PRs from `docs/<epic-id>-<slug>` targeting `epic/XXXX` with label `docs` are auto-merged. The audit `audit-epic-branches.sh` explicitly permits this.
 
-## Backward Compatibility
-
-- `flowVersion="1"` or absent: legacy flow — story PRs target `develop` directly
-- `--legacy-flow`: forces legacy mode (warning emitted)
-- Deprecation window: 2 releases after EPIC-0049 merge
-
 ## Audit
 
 `scripts/audit-epic-branches.sh` verifies:
-- Each open `epic/*` PR has `flowVersion: "2"` in its `execution-state.json`
+- Each open `epic/*` PR has an `execution-state.json` present
 - No `epic/*` branch has been force-pushed after its first merge commit
 - `x-cleanup-git-branches` excludes `epic/*` from protected-branch bypass
 

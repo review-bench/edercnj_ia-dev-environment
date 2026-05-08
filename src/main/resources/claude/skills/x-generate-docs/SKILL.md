@@ -4,7 +4,7 @@ description: "Documentation automation v2: stack-aware generation from documenta
 user-invocable: true
 model: sonnet
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill
-argument-hint: "[--type api|readme|adr|changelog|all] [--scope path] [--force] [--dry-run] [--legacy-v1]"
+argument-hint: "[--type api|readme|adr|changelog|all] [--scope path] [--force] [--dry-run]"
 requires-capabilities: [governance.doc-as-dod]
 ---
 
@@ -21,7 +21,6 @@ requires-capabilities: [governance.doc-as-dod]
 Single entry point for generating and updating all project documentation for {{PROJECT_NAME}}. Operates in two modes:
 
 - **`--target-stack-aware` (default, v2):** Reads `documentation.targets` from ProjectConfig (story-0071-0001) and generates only targets relevant to the project stack. Invokes `x-update-system-architecture` (EPIC-0070) when architectural changes are detected.
-- **`--legacy-v1` (deprecated, removed in 2 releases):** Original behavior — uniform auto-detection from `git diff` without stack awareness. Emits visible deprecation warning.
 
 ## Triggers
 
@@ -33,7 +32,6 @@ Single entry point for generating and updating all project documentation for {{P
 - `/x-generate-docs --type all` — process all applicable documentation targets
 - `/x-generate-docs --type all --force` — regenerate all regardless of change status
 - `/x-generate-docs --dry-run` — list what would be updated, without writing
-- `/x-generate-docs --legacy-v1` — **DEPRECATED** v1 behavior (uniform auto-detect, no stack awareness)
 
 ## Parameters
 
@@ -44,14 +42,11 @@ Single entry point for generating and updating all project documentation for {{P
 | `--force` | Flag | No | Regenerate even if no changes detected. |
 | `--dry-run` | Flag | No | List what would be updated without writing any file. |
 | `--target-stack-aware` | Flag | No | **(default)** Reads `documentation.targets` from ProjectConfig and generates only targets relevant to the project stack. Invokes `x-update-system-architecture` when architectural changes detected. |
-| `--legacy-v1` | Flag | No | **DEPRECATED** — emits WARNING: "v1 behavior deprecated; will be removed in 2 releases". Mutually exclusive with `--target-stack-aware`. |
-
-**Flag conflict:** passing both `--legacy-v1` and `--target-stack-aware` in the same invocation exits with `FLAG_CONFLICT` and lists both flags as mutually exclusive.
 
 ## Workflow
 
 ```
-1. PARSE      -> Parse arguments; detect mode (v2 default vs --legacy-v1)
+1. PARSE      -> Parse arguments
 2. LOAD       -> Load documentation.targets from ProjectConfig YAML
 3. DETECT     -> Analyze git diff filtered by active targets
 4. ARCH       -> Detect architectural changes; invoke x-update-system-architecture if needed
@@ -64,14 +59,7 @@ Single entry point for generating and updating all project documentation for {{P
 
 Detect mode:
 
-1. If `--legacy-v1` AND `--target-stack-aware` both present → exit `FLAG_CONFLICT` immediately.
-2. If `--legacy-v1` → emit to stderr:
-   ```
-   WARN [x-generate-docs] --legacy-v1 behavior deprecated (EPIC-0071, Rule 19 §Skill Renaming).
-        Will be removed in 2 releases. Remove --legacy-v1 to use stack-aware v2 default.
-   ```
-   Then proceed with v1 workflow (§v1 Fallback below).
-3. Default (no flag or `--target-stack-aware`) → proceed with v2 stack-aware workflow.
+1. Default (no flag or `--target-stack-aware`) → proceed with v2 stack-aware workflow.
 
 ### Step 2 — Load documentation.targets (v2 mode)
 
@@ -203,7 +191,7 @@ After each generation:
 
 ```
 Documentation generation complete:
-  Mode:          stack-aware (v2) | legacy-v1 DEPRECATED
+  Mode:          stack-aware (v2)
   Targets:       {active targets list}
   Files updated:
     - {relative/path/file.md} ({type})
@@ -216,32 +204,11 @@ Documentation generation complete:
   Duration:      {time}s
 ```
 
-## v1 Fallback (`--legacy-v1` mode)
-
-When `--legacy-v1` is active, the skill uses the original v1 detection logic:
-
-1. Run `git diff --name-only` for all files (no stack filtering).
-2. Apply original auto-detection rules:
-
-| File Pattern | Inferred Type |
-|-------------|---------------|
-| `*Controller*`, `*Resource*`, `*Handler*`, `*Endpoint*`, `*Route*` | `api` |
-| `*ADR*`, `*Decision*`, `architecture*`, `*adr*` | `adr` |
-| Any commits since last tag (Conventional Commits) | `changelog` |
-| `SKILL.md`, `README*`, `config*`, `setup*`, `*.yaml` (config) | `readme` |
-| No matches | No action |
-
-3. Process all detected types (no stack filter, no `x-update-system-architecture`).
-4. No Highlights block in changelog (v1 format only).
-
-The `--legacy-v1` flag and v1 code path will be **removed in 2 releases** per Rule 19 §Skill Renaming. Operators on automated pipelines should migrate to the v2 default before the removal release.
-
 ## Error Handling
 
 | Scenario | Action |
 |----------|--------|
 | No git repository | Exit `OPERATIONAL_ERROR: not a git repository` |
-| `--legacy-v1` and `--target-stack-aware` both present | Exit `FLAG_CONFLICT` listing both flags |
 | Project YAML not found | Use auto-detect mode with WARN |
 | Delegated skill not available | Log warning, skip that type, continue |
 | Path traversal in `documentation.targets` | Exit `PATH_TRAVERSAL_REJECTED` |

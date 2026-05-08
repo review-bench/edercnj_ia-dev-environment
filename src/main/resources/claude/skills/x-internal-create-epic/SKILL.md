@@ -42,14 +42,13 @@ Read a system specification document **or an existing Feature artifact** and gen
 | `--jira` | String | No | — | Jira project key (e.g., PROJ). When provided, skip AskUserQuestion and create in Jira directly (EPIC-0042). |
 | `--no-jira` | Boolean | No | false | Skip Jira integration entirely, no prompting (EPIC-0042). |
 | `--dry-run` | Boolean | No | false | When true, artifacts are written to disk but Steps P4 / P5 (planning-commit / push) become no-ops with a `"dry-run, skipping commit"` warning (EPIC-0049 / RULE-007). |
-| `--legacy-template-v1` | Boolean | No | false | **DEPRECATED** (Rule 19 §Skill Renaming — removed in 2 releases). Use v1 template structure. Emits deprecation warning on stderr on every invocation. |
 
 ## Prerequisites
 
 Read the following files before starting:
 
 **Template (output structure):**
-- `.claude/templates/_TEMPLATE-EPIC.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict). Default. When `--legacy-template-v1` is set, use v1 structure instead and emit the deprecation warning below.
+- `.claude/templates/_TEMPLATE-EPIC.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict).
 
 **Decomposition philosophy (how to identify stories and rules):**
 - `.claude/skills/x-epic-decompose/references/decomposition-guide.md`
@@ -61,13 +60,6 @@ and must be read fresh from disk every time (never hardcode the structure).
 > - **Section 3 (Hipótese & OKRs):** State the value hypothesis in `Se…então…porque` form + at least 1 OKR/KPI with unit and measurement method.
 > - **Section 4 (Alternativas Consideradas):** At least 2 alternatives with rejection rationale (`Decisão de rejeição:` marker).
 > - **Section 5 (Escopo):** In-scope list AND out-of-scope list; out-of-scope ≥ 3 items.
-
-> **`--legacy-template-v1` deprecation warning:** When the flag is present, emit to stderr before writing the file:
-> ```
-> WARN [legacy-template] --legacy-template-v1 is DEPRECATED.
->       Templates v1 will be removed in 2 releases.
->       Migrate to v2: /x-migrate-templates <epic-id>
-> ```
 
 ## Workflow
 
@@ -211,9 +203,6 @@ Write the Epic following the `_TEMPLATE-EPIC.md` structure exactly.
 8. **Section 7 — Índice de Histórias**: Story index from Step 3, with links, dependencies, and measurable value per story
 9. **Section 8 — Quality Gates**: DoR/DoD from Step 4
 10. **Refinement Verdict block**: `Status: TBD`, all dimensions unchecked
-
-**When `--legacy-template-v1` is used:**
-Emit the deprecation warning (see Prerequisites), then use v1 structure: Visao Geral, Anexos e Referencias, Definicoes de Qualidade Globais, Regras de Negocio Transversais, Indice de Historias. Emit telemetry event `metadata: {flag: "legacy-template-v1", skill: "x-epic-create"}` for adoption tracking.
 
 **Directory and file naming** (mandatory — see SD-09 in decomposition guide):
 1. Determine the epic number: scan `plans/` for existing `epic-XXXX` folders and use the next available number (default `0001` if none exist). Ask the user if unsure.
@@ -431,10 +420,6 @@ Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md")
 
 # Explicit v2 (same as default, for documentation clarity)
 Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --epic-id 0072")
-
-# Legacy v1 template during deprecation window (Rule 19)
-Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --legacy-template-v1")
-# → Emits: WARN [legacy-template] --legacy-template-v1 is DEPRECATED...
 
 # Dry-run: write file but skip commit + push
 Skill(skill: "x-internal-create-epic", args: "specs/my-spec.md --dry-run")

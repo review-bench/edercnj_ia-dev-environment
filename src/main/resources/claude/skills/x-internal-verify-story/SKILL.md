@@ -189,9 +189,8 @@ either `--story-id` or `--epic-id` fails regex validation.
 
 Prefer the task breakdown (`tasks-story-XXXX-YYYY.md`), whose `Files:`
 bullet under each task is the authoritative source of truth. When the
-breakdown is absent (legacy v1 stories), fall back to Section 8 of the
-story file and extract `**Files:**` lines. De-duplicate and normalise
-each path to repo-relative form.
+breakdown is absent, fall back to Section 8 of the story file and extract
+`**Files:**` lines. De-duplicate and normalise each path to repo-relative form.
 
 If the resulting list is empty, exit `1` (`STORY_FILES_NOT_FOUND`)
 with message `Could not identify story files`.

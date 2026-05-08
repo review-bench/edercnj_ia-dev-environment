@@ -33,7 +33,6 @@ Assists the migration of a v1 epic document (`ai/epics/<epic-id>/epic-<epic-id>.
 | `EPIC-ID` | String | Yes | — | 4-digit zero-padded epic identifier (e.g., `0050`). Also accepts full form `epic-0050`. |
 | `--interactive` | Boolean | No | false | Show per-block confirmation prompts (`AskUserQuestion`). Default is non-interactive (Rule 20 — EPIC-0061). |
 | `--dry-run` | Boolean | No | false | Show diff + simulated answers (default: "manter") without writing any files. |
-| `--non-interactive` | Boolean | No | **DEPRECATED** | Emits WARN; equals default behavior. Removed in 2 releases. |
 | `--resume` | Boolean | No | false | Resume from a previous interrupted session state-file at `.claude/state/template-migrate-<epic-id>.json`. |
 
 ## Workflow
@@ -179,7 +178,6 @@ Re-invocation with `--resume` loads this state, verifies `originalHash`, and con
 
 - Invokes `x-update-system-architecture` (story-0070-0006) for `move-to-system-md` side-effects — Rule 13 INLINE-SKILL.
 - State-file mirrors `pr-watch-*.json` pattern (Rule 45) for session persistence.
-- Rule 20 (EPIC-0061): `--non-interactive` is deprecated; non-interactive is the default.
 - Rule 45 (CI-Watch): **not applicable** — this skill does not create PRs.
 - Rule 22 (Skill Visibility): **public** — user-invocable, appears in `/help`.
 - After migration, run `/x-refine-epic epic-<ID>` to obtain `refinementVerdict.status = approved` for the migrated epic.

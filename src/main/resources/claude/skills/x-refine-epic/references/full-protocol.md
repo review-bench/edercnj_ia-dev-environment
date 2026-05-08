@@ -143,7 +143,7 @@ verdict_hash=$(echo -n "$verdict_block" | sha256sum | awk '{print $1}')
 | Code | Condition | Recovery |
 | :--- | :--- | :--- |
 | `EPIC_NOT_FOUND` | `ai/epics/epic-XXXX*/epic-XXXX.md` absent on disk | Run `x-create-feature` or create epic manually |
-| `EPIC_STATE_MISSING` | `execution-state.json` absent for the epic | Create with `flowVersion: "4"` and retry |
+| `EPIC_STATE_MISSING` | `execution-state.json` absent for the epic | Create via `x-internal-update-status --initialize` and retry |
 | `PHASE_A_EMPTY` | All persona agents returned `gaps: []` with no questions and no NO-GOs but status remains tbd | Diagnostic: verify persona prompts include the `dimensions.md` KP |
 | `VERDICT_WRITE_FAILED` | `x-internal-update-status` returned non-zero | Check `execution-state.json` permissions; verify `--file` path is correct |
 
