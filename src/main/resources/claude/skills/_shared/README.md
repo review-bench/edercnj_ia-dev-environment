@@ -39,7 +39,7 @@ Content that is:
 
 Skills reference `_shared/` snippets via **Markdown relative links** (not
 placeholder substitution). See
-[`adr/ADR-0011-shared-snippets-inclusion-strategy.md`](../../../../../../../adr/ADR-0011-shared-snippets-inclusion-strategy.md)
+[`docs/adr/ADR-0011-shared-snippets-inclusion-strategy.md`](../../../../../../docs/adr/ADR-0011-shared-snippets-inclusion-strategy.md)
 for the decision, alternatives considered, and rationale.
 
 Note: the story planning artifact refers to this ADR as "ADR-0006"; the actual
@@ -48,24 +48,28 @@ parallelism). The inclusion-strategy ADR was assigned the next free slot,
 `ADR-0011`, at implementation time. The story contract (3 snippet files + one
 ADR explaining the strategy) is satisfied.
 
-Example reference from a `SKILL.md`:
+Example reference from a `SKILL.md` (e.g. from `skills/x-format-code/SKILL.md`,
+which is one directory level under `skills/`):
 
 ```markdown
 > **Pre-commit error matrix.** See
-> [`_shared/error-handling-pre-commit.md`](../../../_shared/error-handling-pre-commit.md)
+> [`_shared/error-handling-pre-commit.md`](../_shared/error-handling-pre-commit.md)
 > for the canonical row set shared by `x-commit-changes`, `x-format-code`, and
 > `x-lint-code`.
 ```
 
 The LLM follows the link on demand; the skill body stays compact.
 
-## Initial Inventory
+## Inventory
 
 | File | Scope | Consumer Skills |
 | :--- | :--- | :--- |
 | [`error-handling-pre-commit.md`](./error-handling-pre-commit.md) | Error rows for the `format -> lint -> compile -> commit` chain | `x-commit-changes`, `x-format-code`, `x-lint-code` |
 | [`tdd-tags-glossary.md`](./tdd-tags-glossary.md) | Canonical RED / GREEN / REFACTOR tag set and commit-footer format | `x-drive-tdd`, `x-implement-task`, `x-implement-story` |
 | [`exit-codes-common.md`](./exit-codes-common.md) | Recurring `DEP_*` / `STATE_*` / `RULE_*` exit-code families | `x-release`, `x-implement-epic`, `x-implement-story` |
+| [`error-handling-orchestrator.md`](./error-handling-orchestrator.md) | Canonical abort codes, fail-open/fail-closed conventions, `--dry-run` semantics | `x-orchestrate-epic`, `x-implement-epic`, `x-implement-story`, `x-create-feature`, `x-release`, internal orchestrators |
+| [`error-handling-review.md`](./error-handling-review.md) | Empty-input handling, template fallback, specialist failure, idempotency contract | `x-review-pr`, `x-review-codebase`, `x-review-*`, `x-audit-*` |
+| [`orchestrator-prelude.md`](./orchestrator-prelude.md) | Canonical Step P1 (worktree-detect) + Step P2 (epic-branch-ensure) sequence with telemetry hooks | every multi-phase orchestrator (P1/P2 entry pattern) |
 
 ## Adding a New Snippet
 
@@ -73,7 +77,7 @@ The LLM follows the link on demand; the skill body stays compact.
    is used by only one skill, keep it in that skill's `references/` folder.
 2. Add the Markdown file under `_shared/` with a Level-2 heading as the first
    non-front-matter line (so the file is identifiable as a standalone snippet).
-3. Add a row to the "Initial Inventory" table above listing the consumer skills.
+3. Add a row to the "Inventory" table above listing the consumer skills.
 4. Update every consumer `SKILL.md` (or `references/*.md`) to reference the new
    file via a relative Markdown link.
 5. Run `mvn process-resources` and verify goldens are unchanged (link-based
@@ -82,11 +86,11 @@ The LLM follows the link on demand; the skill body stays compact.
 
 ## Related
 
-- `adr/ADR-0011-shared-snippets-inclusion-strategy.md` — decision record for
-  the link-based inclusion strategy (Option (b) chosen over placeholder
+- `docs/adr/ADR-0011-shared-snippets-inclusion-strategy.md` — decision record
+  for the link-based inclusion strategy (Option (b) chosen over placeholder
   substitution (a) and symlinks (c)).
 - `CLAUDE.md` — project-wide global output policy (for content that applies to
   the entire session, not just cross-skill sharing).
-- `_TEMPLATE-SKILL.md` (under `src/main/resources/shared/templates/`) —
-  authoring template for new skills; includes guidance on when to extract
-  content to `_shared/` vs. keep it inline.
+- `src/main/resources/claude/templates/_TEMPLATE-SKILL.md` — authoring template
+  for new skills; includes guidance on when to extract content to `_shared/`
+  vs. keep it inline.
