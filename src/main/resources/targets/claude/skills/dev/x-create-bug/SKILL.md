@@ -2,6 +2,7 @@
 visibility: public
 user-invocable: true
 requires-capabilities: [governance.bug-lifecycle]
+description: "Create a structured bug report from the RA9 template"
 ---
 
 # Skill: Create Bug Report
@@ -281,6 +282,10 @@ When invoked, emits:
 
 - `tool.call` event with tool=`x-create-bug`, args=`{description, severity, scope}`, duration_ms
 - Session timestamps (start/end) for bug creation workflow
+
+## Knowledge Pack References
+
+Read knowledge/governance/bug-lifecycle.md
 
 ## References
 

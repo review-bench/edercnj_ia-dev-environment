@@ -3,6 +3,7 @@ requires-capabilities: [governance.bug-lifecycle]
 skill-version: "1.0"
 user-invocable: true
 visibility: public
+description: "Refine a bug report and set Refinement Verdict approved/rejected"
 ---
 
 # Skill: x-refine-bug

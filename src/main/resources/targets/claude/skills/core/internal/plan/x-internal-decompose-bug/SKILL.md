@@ -2,6 +2,7 @@
 visibility: internal
 user-invocable: false
 requires-capabilities: [governance.bug-lifecycle]
+description: "Decompose a bug into 2-4 implementation stories by severity+scope rules"
 ---
 
 > 🔒 **INTERNAL SKILL**

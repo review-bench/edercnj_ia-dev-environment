@@ -2,6 +2,7 @@
 visibility: internal
 user-invocable: false
 requires-capabilities: [governance.bug-lifecycle]
+description: "Generate bug implementation map with Kahn sort and Mermaid graph"
 ---
 
 > 🔒 **INTERNAL SKILL**

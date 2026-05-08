@@ -124,14 +124,15 @@ class CreateBugCliTest {
 
     @Test
     void testBugIdIncrement() throws IOException {
-        // Create two bugs and verify IDs increment
+        // Create first bug file, then verify next ID increments
         String id1 = generateBugId(tempOutputDir, null);
+        Files.writeString(tempOutputDir.resolve(id1 + "-test.md"), "content");
         String id2 = generateBugId(tempOutputDir, null);
 
         int num1 = Integer.parseInt(id1.replace("bug-", ""));
         int num2 = Integer.parseInt(id2.replace("bug-", ""));
 
-        assertEquals(num2, num1 + 1, "Bug IDs should increment sequentially");
+        assertEquals(num1 + 1, num2, "Bug IDs should increment sequentially");
     }
 
     @Test
@@ -248,14 +249,14 @@ class CreateBugCliTest {
     }
 
     private String generateSlug(String description) {
-        // Simple slug generation: lowercase, replace spaces with hyphens, remove special chars
-        return description
-                .toLowerCase()
-                .replaceAll("[^a-z0-9 -]", "")
-                .replaceAll(" +", "-")
-                .replaceAll("-+", "-")
-                .replaceAll("^-|-$", "")
-                .substring(0, Math.min(40, description.length()));
+        String slug =
+                description
+                        .toLowerCase()
+                        .replaceAll("[^a-z0-9 ]", " ")
+                        .replaceAll(" +", "-")
+                        .replaceAll("-+", "-")
+                        .replaceAll("^-|-$", "");
+        return slug.substring(0, Math.min(40, slug.length()));
     }
 
     private boolean isValidSeverity(String severity) {
