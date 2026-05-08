@@ -2,7 +2,7 @@
   "epicId": "epic-0080",
   "slug": "bug-lifecycle-management",
   "flowVersion": "4",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "taskTracking": {
     "enabled": true
   },
@@ -59,7 +59,8 @@
     }
   },
   "createdAt": "2026-05-07T22:00:00Z",
-  "updatedAt": "2026-05-07T23:59:00Z",
+  "updatedAt": "2026-05-08T00:30:00Z",
+  "completedAt": "2026-05-08T00:30:00Z",
   "stories": {
     "story-0080-0001": {
       "status": "DONE",
@@ -67,8 +68,29 @@
       "completedAt": "2026-05-07T23:58:00Z"
     },
     "story-0080-0002": {
-      "status": "IN_PROGRESS",
-      "interactiveMode": "non-interactive"
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-08T00:00:00Z"
+    },
+    "story-0080-0003": {
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-08T00:10:00Z"
+    },
+    "story-0080-0004": {
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-08T00:15:00Z"
+    },
+    "story-0080-0006": {
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-08T00:20:00Z"
+    },
+    "story-0080-0005": {
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-08T00:25:00Z"
     }
   }
 }
