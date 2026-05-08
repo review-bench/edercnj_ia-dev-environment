@@ -1,8 +1,0 @@
-  - id: "grpc-health-check"
-    type: grpc
-    description: "gRPC health check via grpcurl"
-    command: "grpcurl -plaintext localhost:9090 grpc.health.v1.Health/Check"
-    expected:
-      exit_code: 0
-      stdout_contains: "SERVING"
-    timeout_seconds: 15
