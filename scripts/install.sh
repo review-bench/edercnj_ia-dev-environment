@@ -235,6 +235,18 @@ resolve_script_dir() {
     cd -P "$(dirname "$source")" && pwd
 }
 
+resolve_project_root() {
+    local script_dir
+    script_dir=$(resolve_script_dir)
+    if [ -f "$script_dir/pom.xml" ]; then
+        echo "$script_dir"
+    elif [ -f "$script_dir/../pom.xml" ]; then
+        cd -P "$script_dir/.." && pwd
+    else
+        echo "$script_dir"
+    fi
+}
+
 resolve_version() {
     if [ -n "$JAR_PATH" ]; then
         local jar_basename
@@ -255,7 +267,7 @@ resolve_version() {
     fi
 
     local script_dir
-    script_dir=$(resolve_script_dir)
+    script_dir=$(resolve_project_root)
     local pom_file="$script_dir/pom.xml"
     if [ ! -f "$pom_file" ]; then
         die "pom.xml not found in $script_dir. Cannot determine version."
@@ -270,7 +282,7 @@ resolve_version() {
 
 dev_regenerate() {
     local script_dir
-    script_dir=$(resolve_script_dir)
+    script_dir=$(resolve_project_root)
 
     if [ ! -f "$script_dir/pom.xml" ]; then
         die "pom.xml not found in $script_dir. --dev requires the source tree."
@@ -315,7 +327,7 @@ build_jar() {
     fi
 
     local script_dir
-    script_dir=$(resolve_script_dir)
+    script_dir=$(resolve_project_root)
     local target_jar="$script_dir/target/$JAR_NAME"
 
     if [ "$SKIP_BUILD" = true ]; then

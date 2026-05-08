@@ -42,11 +42,34 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Version = "2.0.0-SNAPSHOT"
-$JarName = "ia-dev-kit-$Version.jar"
 $InstalledJarName = "ia-dev-kit.jar"
 $RequiredJavaVersion = 21
 $ProgramName = "ia-dev-kit"
+
+# Resolve project root (script lives in scripts\ subdirectory)
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+$ProjectRoot = if (Test-Path (Join-Path $ScriptDir "pom.xml")) {
+    $ScriptDir
+} elseif (Test-Path (Join-Path $ScriptDir "..\pom.xml")) {
+    (Resolve-Path (Join-Path $ScriptDir "..")).Path
+} else {
+    $ScriptDir
+}
+
+# Read version from pom.xml
+$PomFile = Join-Path $ProjectRoot "pom.xml"
+if (Test-Path $PomFile) {
+    $pomContent = Get-Content $PomFile -Raw
+    if ($pomContent -match '<version>([^<]+)</version>') {
+        $Version = $Matches[1]
+    } else {
+        Write-Warn "Could not parse version from pom.xml; using 'unknown'"
+        $Version = "unknown"
+    }
+} else {
+    $Version = "unknown"
+}
+$JarName = "ia-dev-kit-$Version.jar"
 
 # --- Functions ---
 
@@ -150,11 +173,6 @@ function Test-Maven {
 }
 
 function Build-Jar {
-    $scriptDir = Split-Path -Parent $MyInvocation.ScriptName
-    if (-not $scriptDir) {
-        $scriptDir = $PSScriptRoot
-    }
-
     if ($JarPath) {
         if (-not (Test-Path $JarPath)) {
             Write-Err "JAR not found at: $JarPath"
@@ -164,7 +182,7 @@ function Build-Jar {
         return $JarPath
     }
 
-    $targetJar = Join-Path $scriptDir "target\$JarName"
+    $targetJar = Join-Path $ProjectRoot "target\$JarName"
 
     if ($SkipBuild) {
         if (-not (Test-Path $targetJar)) {
@@ -175,14 +193,14 @@ function Build-Jar {
         return $targetJar
     }
 
-    $pomFile = Join-Path $scriptDir "pom.xml"
+    $pomFile = Join-Path $ProjectRoot "pom.xml"
     if (-not (Test-Path $pomFile)) {
-        Write-Err "pom.xml not found in $scriptDir. Run this script from the java\ directory or use -JarPath."
+        Write-Err "pom.xml not found in $ProjectRoot. Use -JarPath to provide a pre-built JAR."
         exit 1
     }
 
     Write-Info "Building fat JAR (this may take a minute)..."
-    Push-Location $scriptDir
+    Push-Location $ProjectRoot
     try {
         & mvn clean package -DskipTests -q
         if ($LASTEXITCODE -ne 0) {
