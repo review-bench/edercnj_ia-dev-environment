@@ -1,0 +1,145 @@
+---
+requires-capabilities: []
+capability-version: "1.0"
+capability-type: governance
+capability-name: bug-lifecycle
+---
+
+# Bug Lifecycle Management Capability
+
+## Overview
+
+Defines the Bug Lifecycle Management capability that enables structured bug tracking, classification, reproduction, investigation, and resolution within the IA Dev Environment.
+
+## Capability Metadata
+
+| Field | Value |
+| :--- | :--- |
+| Capability ID | `governance.bug-lifecycle` |
+| Version | `1.0` |
+| Type | Governance |
+| Status | Active |
+| Introduced | EPIC-0080 |
+
+## Scope
+
+This capability provides:
+
+1. **Bug Lifecycle Template** (`_TEMPLATE-BUG.md`):
+   - Structured markdown template with 9 RA9 sections
+   - Bug-specific subsections for reproduction, root-cause analysis, and regression testing
+   - YAML frontmatter with capability declaration
+
+2. **Skill Integration** (`x-create-bug`):
+   - CLI command to instantiate new bug reports from template
+   - Automated slug generation from bug description
+   - Status lifecycle management (Pendente → Refinada → Em Investigação → Em Correção → Concluída)
+
+3. **Classification & Telemetry**:
+   - Fault type classification (Logic, Data, Integration, Concurrency, Performance, Security)
+   - KPI tracking for P75 resolution time ≤ 8 minutes
+   - Structured telemetry events (phase.start/end, tool.call, session.start/end)
+
+## Feature Matrix
+
+| Feature | Enabled | Dependencies |
+| :--- | :--- | :--- |
+| Bug Template | ✓ | — |
+| Capability Declaration | ✓ | — |
+| Slug Generation | ✓ | governance |
+| Status Lifecycle | ✓ | governance |
+| Telemetry | ✓ | observability |
+| Classification | ✓ | governance |
+
+## Dependencies
+
+- **Runtime:** None
+- **Build:** Maven, Java 21
+- **Governance:** Requires `governance` capability for status management
+- **Observability:** Telemetry events require observability infrastructure (optional)
+
+## Constraints
+
+1. **Bug Description:** 8 ≤ length ≤ 200 characters
+2. **Slug:** lowercase alphanumeric + hyphens, max 40 characters
+3. **Status Transitions:** Linear progression with optional lateral moves to Bloqueada / Descartada
+4. **Reproduction Steps:** Minimum 1, maximum 10 distinct steps
+5. **Test Coverage:** Regression test must pass before marking bug as Concluída
+
+## Usage
+
+### Creating a Bug Report
+
+```bash
+# Manual template instantiation
+cp src/main/resources/targets/claude/templates/_TEMPLATE-BUG.md \
+   docs/bugs/bug-{{BUG_ID}}-{{SLUG}}.md
+
+# Fill in all 9 sections and run refinement
+/x-refine-bug docs/bugs/bug-{{BUG_ID}}-{{SLUG}}.md
+```
+
+### Workflow
+
+```
+Pendente (draft)
+  ↓ [refinement approved]
+Refinada (ready for investigation)
+  ↓ [investigation starts]
+Em Investigação (root-cause analysis in progress)
+  ↓ [fix assigned]
+Em Correção (fix implementation in progress)
+  ↓ [tests pass]
+Concluída (resolved and deployed)
+```
+
+Optional transitions:
+- `→ Bloqueada` (blocked by external dependency or prerequisite)
+- `→ Descartada` (duplicate, wontfix, or superseded)
+- `→ Falha` (fix validation failed, reverting to Em Correção)
+
+## Telemetry
+
+When enabled, the capability emits the following events:
+
+| Event Type | Trigger | Fields |
+| :--- | :--- | :--- |
+| `phase.start` | Bug refinement begins | phase, story_id, timestamp |
+| `phase.end` | Bug refinement completes | phase, story_id, status, timestamp |
+| `tool.call` | Skill invocation (x-create-bug) | tool, args, result, duration_ms |
+| `session.start` | Bug lifecycle session opens | session_id, user, timestamp |
+| `session.end` | Bug lifecycle session closes | session_id, status, duration_ms |
+
+KPI: P75 resolution time must not exceed 8 minutes (from Pendente to Concluída).
+
+## Configuration
+
+No runtime configuration required. All behavior is determined by the template structure and the governing capability declarations in `requires-capabilities` frontmatter.
+
+## Artifact Inventory
+
+| Artifact | Path | Type | Status |
+| :--- | :--- | :--- | :--- |
+| Bug Template | `src/main/resources/targets/claude/templates/_TEMPLATE-BUG.md` | Template | Active (EPIC-0080-task-0080-0001-001) |
+| Capability Declaration | `config/capabilities/bug-lifecycle.yaml` | YAML | Active (EPIC-0080-task-0080-0001-002) |
+| Create Bug Skill | `.claude/skills/x-create-bug/SKILL.md` | Skill | Planned (EPIC-0080-task-0080-0001-003) |
+| Audit Classification | `scripts/audit-bug-classification.sh` | Script | Planned (EPIC-0080-task-0080-0001-003) |
+| Smoke Test | `src/test/java/.../BugCreationSmokeIT.java` | JUnit | Planned (EPIC-0080-task-0080-0001-007) |
+
+## References
+
+- EPIC-0080: Bug Lifecycle Management
+  - story-0080-0001: Foundation & Templates
+  - story-0080-0002: Decomposition
+  - story-0080-0003: Map
+  - story-0080-0004: Refinement
+  - story-0080-0005: Enforcement Gate
+  - story-0080-0006: PR Lifecycle
+- Template Source: `src/main/resources/targets/claude/templates/_TEMPLATE-BUG.md`
+- Governance Rules: `.claude/rules/` (capability-driven composition per Rule 28)
+
+## Revision History
+
+| Date | Version | Change |
+| :--- | :--- | :--- |
+| 2026-05-07 | 1.0 | Initial capability declaration (task-0080-0001-002) |
