@@ -14,7 +14,7 @@ The Approval Gate is the safety checkpoint between opening the release PR
 back-merge). It ensures the human operator explicitly reviews and merges
 the release PR before the skill creates the git tag.
 
-The gate **always** presents the canonical 3-option menu via `AskUserQuestion`. Use `--interactive` to opt-in; the default behavior is non-interactive (no menu pauses).
+By default the gate is non-interactive: it exits with HALT text for CI/automation. Pass `--interactive` to enable the canonical 3-option menu via `AskUserQuestion`.
 
 ## Default Interactive Workflow (since EPIC-0043)
 
@@ -89,14 +89,13 @@ sequenceDiagram
 | 2 -- FIX-PR | `"Fix PR"` | `"Run x-fix-pr and retry"` | Invokes `Skill(skill: "x-fix-pr", args: "<PR_NUMBER>")` via Rule 13 Pattern 1 INLINE-SKILL. Records `FixAttempt` in state file. Reapresents menu on return. Capped at 3 attempts (see guard-rail). |
 | 3 -- ABORT | `"Abort"` | `"Cancel the operation"` | Double confirmation. On confirm: deletes state file, prints manual cleanup script, exits 2. On back: re-presents gate menu. |
 
-## Flag Separation (`--interactive`)
+## Flag Separation
 
-> **This distinction is critical. The two flags serve entirely different purposes.**
-
-| Flag | Purpose | Effect at Phase 8 |
-|:---|:---|:---|
-| `--interactive --dry-run` | **PRESERVED** -- interactive dry-run simulation mode (story-0039-0013). Pauses before each of 13 phases for simulation. | Dry-run gate (distinct sub-modality) |
-| (no flag) | Default since EPIC-0043 | Default 3-option menu |
+| Flag | Effect at Phase 8 |
+|:---|:---|
+| `--interactive` | Presents the 3-option gate menu (`AskUserQuestion`). |
+| `--interactive --dry-run` | Dry-run simulation: pauses before each phase (story-0039-0013). |
+| (no flag) | Non-interactive default: exits with HALT text; skips `AskUserQuestion`. |
 
 ## FIX-PR Loop-Back and Guard-Rail
 

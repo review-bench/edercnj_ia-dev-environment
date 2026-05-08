@@ -492,7 +492,6 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review
 | Smoke test failure | Automatic NO-GO; record failing smoke tests as CRITICAL finding |
 | NO-GO after 2 retry cycles | Route to Step 8.4 Exhausted-Retry Gate |
 | NO-GO with `--no-auto-remediation` | Route directly to Step 8.4 Exhausted-Retry Gate |
-
 | State file missing on `--resume-review` | Start gate fresh; emit warning |
 | State file schema invalid | Emit `GATE_SCHEMA_INVALID`; start gate fresh |
 

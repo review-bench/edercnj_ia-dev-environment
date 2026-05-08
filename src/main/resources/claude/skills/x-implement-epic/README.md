@@ -38,7 +38,6 @@ flowchart TD
     style P3N fill:#16213e,color:#fff
     style P4 fill:#16213e,color:#fff
     style P5N fill:#2d6a4f,color:#fff
-    style SKIPFINAL fill:#533483,color:#fff
     style DONE fill:#2d6a4f,color:#fff
 ```
 

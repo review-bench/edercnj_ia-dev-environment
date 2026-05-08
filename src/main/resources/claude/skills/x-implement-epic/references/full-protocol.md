@@ -69,14 +69,14 @@ Trip conditions (evaluated after every story result):
 | 3 consecutive `FAILED` in the same phase | OPEN state: pause execution |
 | 5 total `FAILED` in the same phase (sliding window) | OPEN state: abort phase |
 
-In OPEN state with `--non-interactive=false`, the orchestrator emits the
-EPIC-0043 standard 3-option menu via `AskUserQuestion`:
+In OPEN state with `--interactive`, the orchestrator emits the
+standard 3-option menu via `AskUserQuestion`:
 
 - PROCEED — mark remaining stories `BLOCKED`, exit with `STORY_FAILED`
 - FIX-AND-RESUME — exit with instructions to fix locally and resume
 - ABORT — exit immediately without propagation
 
-With `--non-interactive=true`, circuit-breaker trip = automatic
+Without `--interactive` (default non-interactive), circuit-breaker trip = automatic
 `STORY_FAILED` exit. The breaker state is NOT persisted to
 `execution-state.json` (it resets on resume).
 

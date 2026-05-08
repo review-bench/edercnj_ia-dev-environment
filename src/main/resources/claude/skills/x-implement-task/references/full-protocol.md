@@ -34,12 +34,13 @@
 
 Returns `{inWorktree, worktreePath, mainRepoPath}`.
 
-**Three-way mode decision:**
+**Two-way mode decision:**
 
 | `inWorktree` | `--worktree` flag | Mode | Action |
 |---|---|---|---|
 | `true` | any | Mode 1 — REUSE | Reuse parent worktree; `TASK_OWNS_WORKTREE=false` |
 | `false` | present | Mode 2 — CREATE | Create dedicated worktree; `TASK_OWNS_WORKTREE=true` |
+| `false` | absent | **ERROR** | Abort with `ARGS_INVALID`: standalone execution requires `--worktree`. |
 
 **Mode 2 creation:**
 

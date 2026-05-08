@@ -26,11 +26,11 @@
     },
     "localFirstLifecycle": {
       "type": "boolean",
-      "description": "Derived from Product-First lifecycle — serialized for jq discoverability"
+      "description": "Local-First lifecycle flag (EPIC-0055): non-interactive default, local-branch-first task execution."
     },
     "productFirstLifecycle": {
       "type": "boolean",
-      "description": "Required. Signals Product-First Lifecycle (EPIC-0077): C4 gates, RNF gate, ideation-to-feature hierarchy tracking active."
+      "description": "Product-First lifecycle flag (EPIC-0077): C4 gates, RNF gate, ideation-to-feature hierarchy tracking active. Must be true for all epics."
     },
     "taskTracking": {
       "type": "object",
@@ -61,7 +61,7 @@
           "status": {
             "type": "string",
             "enum": ["pending", "in_progress", "done", "failed", "blocked", "refinada"]
-          },
+          }
         }
       }
     },
@@ -122,5 +122,5 @@
       "required": ["status"]
     }
   },
-  "required": ["epicId"]
+  "required": ["epicId", "productFirstLifecycle"]
 }

@@ -61,6 +61,7 @@ Record `inWorktree`, `worktreePath`, and `mainRepoPath` for use in subsequent st
 | :--- | :--- | :--- | :--- |
 | 1 | `inWorktree == true` | **REUSE (orchestrated)** | Reuse the current worktree. Do NOT invoke `/x-manage-worktrees create`. Do NOT create a nested worktree (Rule 14 §3). Branch creation inside the reused worktree follows the `--auto-approve-pr` legacy behavior via `git checkout -b`. The creator of the outer worktree owns its removal (Rule 14 §5). |
 | 2 | `inWorktree == false` AND `--worktree` present | **CREATE (standalone opt-in)** | Provision a dedicated worktree via `Skill(skill: "x-manage-worktrees", args: "create --branch feat/story-XXXX-YYYY-desc --base develop --id story-XXXX-YYYY")`. `x-implement-story` is the creator and owns removal (Rule 14 §5 — end of Phase 3 on success; preserved on failure per Rule 14 §4). |
+| 3 | `inWorktree == false` AND `--worktree` absent | **ERROR** | Abort with `ARGS_INVALID`: standalone execution requires `--worktree` flag. When dispatched by an orchestrator, the parent MUST create a worktree first so this branch is never reached. |
 
 > **Orchestrator auto-path.** When this skill is dispatched by `x-implement-epic`, the parent creates the worktree **before** dispatching, and this invocation detects `inWorktree == true` and selects Mode 1 (REUSE) automatically. No flag is required from the caller.
 
