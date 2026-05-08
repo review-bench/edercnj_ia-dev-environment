@@ -1,0 +1,69 @@
+{
+  "epicId": "epic-0080",
+  "slug": "bug-lifecycle-management",
+  "flowVersion": "4",
+  "status": "PLANNING",
+  "taskTracking": {
+    "enabled": true
+  },
+  "interactiveMode": "non-interactive",
+  "refinementVerdict": {
+    "status": "approved",
+    "scope": "epic",
+    "checkedAt": "2026-05-07T23:45:00Z",
+    "verdictHash": "a7f3c91e2b84d05f6e1a9c4b7d2e8f0a3c5b9d1e4f6a8c0b2d4e7f9a1c3e5b7",
+    "blockers": []
+  },
+  "storyRefinements": {
+    "story-0080-0001": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "19dfebb733f280f8b7f4c59dffcf300532883ec67269474d3d6e9ffe3fa6270d",
+      "blockers": []
+    },
+    "story-0080-0002": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "0ab49b7557097e09d3b696ce4832e67570477c9d49239b3ca9be77a679042b71",
+      "blockers": []
+    },
+    "story-0080-0003": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "df3a5b66f31830621cbcffa28e4477672ae975b5f9acd165e38537ad113b17f8",
+      "blockers": []
+    },
+    "story-0080-0004": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "1debbab80f2470e08f2695e496022e0d15dbc96ef455823a6d1a8bfd5648a767",
+      "blockers": []
+    },
+    "story-0080-0005": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "20c10262c73ad864feb82c8e3e8e7f2312b5a4ade283b2dc0861d901597ac057",
+      "blockers": []
+    },
+    "story-0080-0006": {
+      "status": "approved",
+      "scope": "story",
+      "checkedAt": "2026-05-07T23:30:00Z",
+      "verdictHash": "e29e6d6e74c3cf1de966f35b65af2026bd1c27592c2e1026382236fea5ece1de",
+      "blockers": []
+    }
+  },
+  "createdAt": "2026-05-07T22:00:00Z",
+  "updatedAt": "2026-05-07T23:47:00Z",
+  "stories": {
+    "story-0080-0001": {
+      "status": "IN_PROGRESS",
+      "interactiveMode": "non-interactive"
+    }
+  }
+}
