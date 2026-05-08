@@ -2,7 +2,7 @@
   "epicId": "epic-0080",
   "slug": "bug-lifecycle-management",
   "flowVersion": "4",
-  "status": "PLANNING",
+  "status": "IN_PROGRESS",
   "taskTracking": {
     "enabled": true
   },
@@ -59,9 +59,14 @@
     }
   },
   "createdAt": "2026-05-07T22:00:00Z",
-  "updatedAt": "2026-05-07T23:47:00Z",
+  "updatedAt": "2026-05-07T23:59:00Z",
   "stories": {
     "story-0080-0001": {
+      "status": "DONE",
+      "interactiveMode": "non-interactive",
+      "completedAt": "2026-05-07T23:58:00Z"
+    },
+    "story-0080-0002": {
       "status": "IN_PROGRESS",
       "interactiveMode": "non-interactive"
     }
