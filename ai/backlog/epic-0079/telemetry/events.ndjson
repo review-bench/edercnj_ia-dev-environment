@@ -1,1 +1,0 @@
-{"schemaVersion":"1.0.0","eventId":"0a281a1a-e518-4817-b1fe-8e2efa17f79f","timestamp":"2026-05-07T16:53:43Z","sessionId":"5defe934-a813-4801-9828-5fb3f276ff8f","type":"tool.call","epicId":"EPIC-0079","tool":"Bash","status":"ok","durationMs":2210}
