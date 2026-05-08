@@ -176,7 +176,7 @@ Skills are invoked by the user via `/name` in chat. They are lazy-loaded (only l
 | **x-validate-docs** | `/x-validate-docs` | Documentation freshness gate: validates 6 dimensions (readme, api, adr, etc.) per PR. |
 | **x-watch-pr-ci** | `/x-watch-pr-ci` | Polls a PR's CI checks and Copilot review until completion or timeout (8 exit codes). |
 
-**Total: 112 skills**
+**Total: 114 skills**
 
 ### Usage Examples
 
@@ -202,8 +202,10 @@ to inject domain knowledge. Configured with `user-invocable: false`.
 | `x-internal-build-story-plan` | Referenced internally by agents |
 | `x-internal-create-epic` | Referenced internally by agents |
 | `x-internal-create-story` | Referenced internally by agents |
+| `x-internal-decompose-bug` | Referenced internally by agents |
 | `x-internal-ensure-epic-branch` | Referenced internally by agents |
 | `x-internal-load-story-context` | Referenced internally by agents |
+| `x-internal-map-bug` | Referenced internally by agents |
 | `x-internal-map-epic` | Referenced internally by agents |
 | `x-internal-normalize-args` | Referenced internally by agents |
 | `x-internal-pr-body-render` | Referenced internally by agents |
@@ -341,7 +343,7 @@ See the files directly for current configuration.
 |-----------|-------|
 | Rules (.claude) | 3 |
 | Skills (.claude) | 90 |
-| Knowledge Packs (.claude) | 22 |
+| Knowledge Packs (.claude) | 24 |
 | Agents (.claude) | 12 |
 | Hooks (.claude) | 17 |
 | Settings (.claude) | 2 |
