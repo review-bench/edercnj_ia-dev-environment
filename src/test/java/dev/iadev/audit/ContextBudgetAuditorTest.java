@@ -178,7 +178,10 @@ class ContextBudgetAuditorTest {
     @DisplayName("--hard exits 1 when alwaysLoaded exceeds limit (story-0078-0016)")
     void audit_hardExitsOneWhenLimitExceeded(@TempDir Path tempDir)
             throws IOException, InterruptedException {
-        // Baseline with limit so low that any .claude directory will exceed it
+        Files.createDirectories(tempDir.resolve(".claude"));
+        // CLAUDE.md is what measure-context-budget.sh counts for alwaysLoaded
+        Files.writeString(tempDir.resolve("CLAUDE.md"), "x".repeat(500), StandardCharsets.UTF_8);
+
         Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
         Files.writeString(
                 tinyBaseline,
@@ -195,7 +198,7 @@ class ContextBudgetAuditorTest {
 
         ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString(), "--hard");
         pb.directory(new java.io.File(REPO_DIR));
-        pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
+        pb.environment().put("CLAUDE_PROJECT_DIR", tempDir.toString());
         pb.environment().put("BASELINE_PATH", tinyBaseline.toString());
         pb.redirectErrorStream(true);
         Process proc = pb.start();
@@ -212,6 +215,10 @@ class ContextBudgetAuditorTest {
     @Test
     @DisplayName("default mode is hard-fail (no flag → exit 1 when limit exceeded)")
     void audit_defaultIsHardFail(@TempDir Path tempDir) throws IOException, InterruptedException {
+        Files.createDirectories(tempDir.resolve(".claude"));
+        // CLAUDE.md is what measure-context-budget.sh counts for alwaysLoaded
+        Files.writeString(tempDir.resolve("CLAUDE.md"), "x".repeat(500), StandardCharsets.UTF_8);
+
         Path tinyBaseline = tempDir.resolve("tiny-context-budget.json");
         Files.writeString(
                 tinyBaseline,
@@ -229,7 +236,7 @@ class ContextBudgetAuditorTest {
         // No --advisory flag — default must now be hard-fail
         ProcessBuilder pb = new ProcessBuilder("/bin/bash", AUDIT_SCRIPT.toString());
         pb.directory(new java.io.File(REPO_DIR));
-        pb.environment().put("CLAUDE_PROJECT_DIR", REPO_DIR);
+        pb.environment().put("CLAUDE_PROJECT_DIR", tempDir.toString());
         pb.environment().put("BASELINE_PATH", tinyBaseline.toString());
         pb.redirectErrorStream(true);
         Process proc = pb.start();

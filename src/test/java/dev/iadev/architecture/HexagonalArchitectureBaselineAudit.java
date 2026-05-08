@@ -76,7 +76,6 @@ final class HexagonalArchitectureBaselineAudit {
                         "dev.iadev.template..",
                         "dev.iadev.checkpoint..",
                         "dev.iadev.progress..",
-                        "dev.iadev.smoke..",
                         "dev.iadev.util..",
                         "dev.iadev.model..",
                         "dev.iadev.exception..");

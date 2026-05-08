@@ -8,6 +8,13 @@ set -euo pipefail
 
 SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+# Normalize REPO_ROOT to its real path so the traversal check works on systems
+# where directories resolve through symlinks (e.g., /var → /private/var on macOS).
+if command -v realpath >/dev/null 2>&1; then
+  REPO_ROOT="$(realpath "${REPO_ROOT}" 2>/dev/null || echo "${REPO_ROOT}")"
+else
+  REPO_ROOT="$(cd "${REPO_ROOT}" 2>/dev/null && pwd || echo "${REPO_ROOT}")"
+fi
 
 log_info()  { echo "[measure-context-budget] INFO  $*" >&2; }
 log_error() { echo "[measure-context-budget] ERROR $*" >&2; }

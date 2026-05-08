@@ -86,6 +86,11 @@ if [[ ! -f "${MEASURE_SCRIPT}" ]]; then
   exit 2
 fi
 
+if [[ ! -d "${REPO_ROOT}/.claude" ]]; then
+  log_info ".claude/ not found at ${REPO_ROOT} — skipping audit (not yet generated, exit 0)"
+  exit 0
+fi
+
 MEASUREMENT="$(bash "${MEASURE_SCRIPT}" --root "${REPO_ROOT}/.claude" --format json 2>/dev/null)"
 if [[ -z "${MEASUREMENT}" ]]; then
   log_error "OPERATIONAL_ERROR: measure-context-budget.sh produced no output"
