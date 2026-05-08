@@ -23,6 +23,7 @@ Glob: `ai/epics/epic-XXXX` or `ai/epics/epic-XXXX-*`. If both exist, prefer exac
 | Epic file | `<EPIC_DIR>/epic-XXXX.md` |
 | Implementation map | `<EPIC_DIR>/IMPLEMENTATION-MAP.md` |
 | Output dir | `<EPIC_DIR>/plans/` |
+| **Story Plan (PRIMARY)** | **`<EPIC_DIR>/plans/plan-story-XXXX-YYYY.md`** |
 | Tasks file | `<EPIC_DIR>/plans/tasks-story-XXXX-YYYY.md` |
 | Planning report | `<EPIC_DIR>/plans/planning-report-story-XXXX-YYYY.md` |
 | DoR checklist | `<EPIC_DIR>/plans/dor-story-XXXX-YYYY.md` |
@@ -114,6 +115,26 @@ Agent(subagent_type: "general-purpose", model: "sonnet", description: "x-plan-ta
 ```
 
 **Phase 4c — Task map:** Generate `task-implementation-map-STORY-XXXX-YYYY.md` with topological sort + parallelism analysis via `x-evaluate-parallelism`.
+
+**Phase 4d — Story Plan (PRIMARY artifact):** Generate `plan-story-XXXX-YYYY.md` using `_TEMPLATE-STORY-PLAN.md` and the Architect/QA output blocks from Phase 2.
+
+Idempotency: if `mtime(story) <= mtime(plan-story)` and `--force` absent → log `"Reusing existing story plan"` and skip. Regenerate if stale or `--force`.
+
+| Section | Source | Required |
+|---------|--------|---------|
+| 1. Visão Geral | Architect `NARRATIVE_OVERVIEW` (3-6 paragraphs, plain language) | Yes |
+| 2.2-2.4 Artefatos | Architect `ARTIFACT_IMPACT` (path, action, current state, change description, reason per file) | Yes |
+| 2.5 Diagrama | Architect `COMPONENT_DIAGRAM` (Mermaid NEW/MOD/DEL markers) | Yes |
+| 3.1 Gherkin | QA `GHERKIN_SCENARIOS` (≥4 categories: Degenerate, Happy, Error, Security) | Yes |
+| 3.2 Testes Impactados | QA `EXISTING_TESTS_IMPACT` (modify/delete/new-regression tables; explicit "none" if no impact) | Yes |
+| 3.3 TDD Cycles | QA `TDD_CYCLES` (TPP order, plain-language RED/GREEN/REFACTOR per cycle) | Yes |
+| 4. Tasks | Consolidated CODE_TASKS + mandatory review tasks (TL/SEC/QA) + doc task | Yes |
+| 5. Critérios de Conclusão | Template verbatim — how to mark tasks and story as Concluída | Yes |
+| 6. Riscos | Consolidated risk matrix from all agents | Yes |
+
+Mandatory review/doc tasks (Seção 4.2-4.3) MUST always be present — never omit even if story seems low-risk.
+
+Stage `plan-story-XXXX-YYYY.md` for the Step P4 batch commit.
 
 ---
 

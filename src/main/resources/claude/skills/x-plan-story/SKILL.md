@@ -48,12 +48,13 @@ requires-capabilities: []
 
 | Artifact | Path |
 |----------|------|
-| Task breakdown | `ai/epics/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` |
-| Planning report | `ai/epics/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` |
-| DoR checklist | `ai/epics/epic-XXXX/plans/dor-story-XXXX-YYYY.md` |
-| Task files (v2) | `ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` per task |
-| Task plans (v2) | `ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` per task |
-| Task map (v2) | `ai/epics/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
+| **Story Plan (PRIMARY — v2)** | **`ai/backlog/epic-XXXX/plans/plan-story-XXXX-YYYY.md`** |
+| Task breakdown | `ai/backlog/epic-XXXX/plans/tasks-story-XXXX-YYYY.md` |
+| Planning report | `ai/backlog/epic-XXXX/plans/planning-report-story-XXXX-YYYY.md` |
+| DoR checklist | `ai/backlog/epic-XXXX/plans/dor-story-XXXX-YYYY.md` |
+| Task files (v2) | `ai/backlog/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md` per task |
+| Task plans (v2) | `ai/backlog/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` per task |
+| Task map (v2) | `ai/backlog/epic-XXXX/plans/task-implementation-map-STORY-XXXX-YYYY.md` |
 
 **Phase execution with telemetry:**
 
@@ -107,8 +108,8 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh subagent-sta
 
 Dispatch all 7 in ONE assistant message:
 
-    Agent(subagent_type: "architect", model: "opus", description: "Architect planning for story {STORY_ID}", prompt: "Read context files. Analyze story {STORY_ID}. Produce TASK_PROPOSAL entries (architecture, layers, dependencies). Follow TASK_PROPOSAL format in references/full-protocol.md.")
-    Agent(subagent_type: "qa-engineer", model: "sonnet", description: "QA planning for story {STORY_ID}", prompt: "Read context files. Produce TASK_PROPOSAL entries (tests, coverage, acceptance criteria). Follow TASK_PROPOSAL format in references/full-protocol.md.")
+    Agent(subagent_type: "architect", model: "opus", description: "Architect planning for story {STORY_ID}", prompt: "Read context files. Analyze story {STORY_ID}. Produce TASK_PROPOSAL entries (architecture, layers, dependencies). Follow TASK_PROPOSAL format in references/full-protocol.md. Additionally produce two extra blocks used by Phase 4d: (1) NARRATIVE_OVERVIEW: 3-6 paragraphs in plain language describing WHAT will be built, WHY, and HOW, referencing concrete file paths; (2) ARTIFACT_IMPACT: for each file in the story scope list the path, action (CREATE/MODIFY/DELETE), current state (if modifying), description of the change, and reason; (3) COMPONENT_DIAGRAM: a Mermaid classDiagram or flowchart marking each component as NEW, MOD, or DEL with their relationships.")
+    Agent(subagent_type: "qa-engineer", model: "sonnet", description: "QA planning for story {STORY_ID}", prompt: "Read context files. Produce TASK_PROPOSAL entries (tests, coverage, acceptance criteria). Follow TASK_PROPOSAL format in references/full-protocol.md. Additionally produce: (1) GHERKIN_SCENARIOS: full Gherkin scenarios covering at minimum Degenerate, Happy Path, Error/Boundary, and Security categories; (2) TDD_CYCLES: for each cycle in TPP order (nil → constant → scalar → conditional → collection → complex) describe in plain language the test to write (RED), why it fails, the minimum implementation (GREEN), and what to refactor; (3) EXISTING_TESTS_IMPACT: scan the existing test files and list ALL tests that cover components being modified or deleted — for each: file path, method name, reason for change, and what assertion changes.")
     Agent(subagent_type: "security-engineer", model: "sonnet", description: "Security planning for story {STORY_ID}", prompt: "Read knowledge/security/application-security.md, knowledge/security/security-principles.md, and context files. Produce TASK_PROPOSAL entries (security, OWASP, threat model). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "pentest-engineer", model: "sonnet", description: "Pentest planning for story {STORY_ID}", prompt: "Read capabilities/quality/pentest/pentest-always-on.yaml and context files. Produce TASK_PROPOSAL entries (pentest scenarios, CVSS-rated vulnerabilities, exploitation paths). Follow TASK_PROPOSAL format in references/full-protocol.md.")
     Agent(subagent_type: "tech-lead", model: "sonnet", description: "Tech Lead planning for story {STORY_ID}", prompt: "Read context files. Produce TASK_PROPOSAL entries (code quality, SOLID, complexity). Follow TASK_PROPOSAL format in references/full-protocol.md.")
@@ -149,15 +150,38 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan
 **Phase 4b (v2 only — batch task-plan dispatch):** For each TASK-XXXX-YYYY-NNN, invoke `x-plan-task` in parallel (batch ≤ 4) with `--no-commit` so the caller aggregates into a single Step P4 commit:
 
     Skill(skill: "x-plan-task",
-          args: "--task-file ai/epics/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md --no-commit")
+          args: "--task-file ai/backlog/epic-XXXX/plans/task-TASK-XXXX-YYYY-NNN.md --no-commit")
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-story Phase-4-Artifact-Generation ok`
 
 <!-- TELEMETRY: phase.start -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-story Phase-4d-Story-Plan`
+
+**Phase 4d (v2 only — Story Plan — PRIMARY artifact):** Using Architect and QA subagent outputs from Phase 2 (NARRATIVE_OVERVIEW, ARTIFACT_IMPACT, COMPONENT_DIAGRAM, GHERKIN_SCENARIOS, TDD_CYCLES, EXISTING_TESTS_IMPACT) plus the consolidated task list from Phase 3, generate `plan-story-XXXX-YYYY.md` using `_TEMPLATE-STORY-PLAN.md`.
+
+Idempotency: reuse if `mtime(story) <= mtime(plan-story)` and `--force` is absent. Log: `"Reusing existing story plan"`. Regenerate if stale or `--force`.
+
+The plan MUST include:
+- **Section 1 (Visão Geral):** Architect NARRATIVE_OVERVIEW verbatim — plain-language description readable by humans without other documents.
+- **Section 2 (Escopo da Mudança):** Architect ARTIFACT_IMPACT per file (verbal description of current state, change, reason) + COMPONENT_DIAGRAM (Mermaid classDiagram or flowchart with NEW/MOD/DEL markers).
+- **Section 3.1 (Gherkin):** QA GHERKIN_SCENARIOS — minimum 4 categories (Degenerate, Happy, Error, Security).
+- **Section 3.2 (Testes Impactados):** QA EXISTING_TESTS_IMPACT — tables for tests to modify, delete, and new regression tests needed. If none: write explicitly "Nenhum teste existente é impactado".
+- **Section 3.3 (TDD Cycles):** QA TDD_CYCLES in TPP order with plain-language RED/GREEN/REFACTOR descriptions.
+- **Section 4 (Tasks):** CODE_TASKS from Phase 3 + mandatory review tasks (TL: x-review-pr, Security: x-review-security, QA: x-review-qa) + mandatory documentation task. Review/doc tasks ALWAYS present — never omit.
+- **Section 5 (Critérios de Conclusão):** verbatim from template — how executor marks tasks and story as Concluída.
+- **Section 6 (Riscos):** consolidated risk matrix from all agents.
+
+Stage `plan-story-XXXX-YYYY.md` for inclusion in the Step P4 batch commit.
+
+<!-- TELEMETRY: phase.end -->
+Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-story Phase-4d-Story-Plan ok`
+
+<!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan-story Phase-5-DoR-Validation`
 
-**Phase 5 (DoR Validation):** Run 12 checks; v2 adds per-task READY checks. Skipped with `--skip-dor`.
+**Phase 5 (DoR Validation):** Run 13 checks; v2 adds per-task READY checks. Skipped with `--skip-dor`.
+Check 13 (v2 only): `plan-story-XXXX-YYYY.md` exists and all 7 sections are populated (no empty placeholders in Sections 1-6).
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-story Phase-5-DoR-Validation ok`
@@ -203,7 +227,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-s
 | `EPIC_BRANCH_ENSURE_FAILED` | Step P2 `x-internal-ensure-epic-branch` non-zero |
 | `CONSOLIDATION_FAILED` | No TASK_PROPOSAL entries returned by any subagent |
 | `WRITE_FAILED` | Unable to write output artifact to `ai/epics/epic-XXXX/plans/` |
-| `DOR_NOT_MET` | DoR validation returns < 12/12 checks passed |
+| `DOR_NOT_MET` | DoR validation returns < 13/13 checks passed (v2) or < 12/12 (v1) |
 
 ## Full Protocol
 

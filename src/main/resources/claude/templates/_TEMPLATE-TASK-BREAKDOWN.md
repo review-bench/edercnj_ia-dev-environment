@@ -43,3 +43,15 @@ graph TD
 | Task ID | Reason | Recommended Action |
 |---------|--------|--------------------|
 | {{TASK_ID}} | {{REASON}} | {{ACTION}} |
+
+## Mandatory Review and Documentation Tasks
+
+> These tasks are automatically included in every story. They MUST NOT be removed or marked N/A.
+> They depend on all code tasks being completed. IDs follow the pattern: epic-story-REV-{ROLE}.
+
+| Task ID | Type | Skill | Depends On |
+|---------|------|-------|-----------|
+| TASK-{{EPIC_ID}}-{{STORY_ID}}-REV-TL | Tech Lead Review | x-review-pr | All code tasks |
+| TASK-{{EPIC_ID}}-{{STORY_ID}}-REV-SEC | Security Review | x-review-security | All code tasks |
+| TASK-{{EPIC_ID}}-{{STORY_ID}}-REV-QA | QA Review | x-review-qa | All code tasks |
+| TASK-{{EPIC_ID}}-{{STORY_ID}}-DOC | Documentation Update | (stack-specific) | All review tasks |

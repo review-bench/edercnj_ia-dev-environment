@@ -18,7 +18,7 @@ requires-capabilities: []
 
 ## Purpose
 
-Produces a detailed implementation plan for a single task extracted from a story's Section 8. The plan contains: objective, implementation guide with class/method/pattern, TDD cycles mapped in TPP order (degenerate -> constants -> conditionals -> iterations -> complex), affected files organized by architecture layer, security checklist adapted to the task type, dependencies, and definition of done. Each task plan is a self-contained execution guide that eliminates ad-hoc decisions during coding.
+Produces a detailed narrative implementation plan for a single task. The plan is a self-contained execution guide readable by a human auditor without consulting other documents. It contains: back-reference to the parent `plan-story-XXXX-YYYY.md` section, objective in plain language, class/component diagram scoped to this task, mapping of all existing tests impacted by this task, verbal description of what to write/change in each file, TDD cycles in TPP order described in natural language (RED/GREEN/REFACTOR), security checklist, file footprint, and explicit completion criteria (including how to mark the task as Concluída and update `execution-state.json`).
 
 ## Triggers
 
@@ -224,31 +224,28 @@ Generate TDD cycles based on the task's layer, test type, and acceptance criteri
 
 #### Per-Cycle Structure
 
-Each TDD cycle MUST contain:
+Each TDD cycle MUST be described in **natural language** (not just field names). A developer or AI must be able to read the cycle and understand exactly what to write, why it fails, and what to implement — without needing to infer intent.
 
 ```markdown
-#### Cycle N: [Description]
+### Ciclo N — [TPP Level] (`[tpp_transform]`)
 
-- **TPP Level**: [degenerate|constant|scalar|conditional|collection|complex]
-- **Transform**: [TPP transformation applied]
+**RED — Teste a escrever:**
+Nome: `[methodUnderTest_scenario_expectedBehavior]`
+O que testar: [plain-language description of what the test covers — 1-2 sentences]
+Por que vai falhar: [explain why no implementation exists yet — which class/method is missing]
+Comando: `{{TEST_COMMAND}}`
 
-**RED** (Write Failing Test):
-- Test name: `[methodUnderTest]_[scenario]_[expectedBehavior]`
-- Assertion: [primary assertion description]
-- Run: `{{TEST_COMMAND}}`
-- Expected: FAIL (test fails with specific error)
+**GREEN — Implementação mínima:**
+[Plain-language description of the minimum code change to make the test pass.
+Reference the specific class/method to create or modify. Example: "Create class Foo with
+method bar() returning a hardcoded empty list."]
+Comando: `{{COMPILE_COMMAND}}` → `{{TEST_COMMAND}}`
 
-**GREEN** (Minimum Implementation):
-- Implementation: [minimum code to make test pass]
-- Run: `{{COMPILE_COMMAND}}` then `{{TEST_COMMAND}}`
-- Expected: PASS (all tests green)
+**REFACTOR:**
+[Plain-language description of what to improve without changing behavior. Example:
+"Extract the null-check into a private method isValid(). No behavior change."]
 
-**REFACTOR** (Improve Design):
-- Opportunities: [extract method, rename, eliminate duplication, or "None at this cycle"]
-- Run: `{{TEST_COMMAND}}`
-- Expected: PASS (no behavior change)
-
-**Commit**: `feat(TASK-XXXX-YYYY-NNN): [description] [TDD:RED|GREEN|REFACTOR]`
+**Commit:** `feat(TASK-XXXX-YYYY-NNN): [description] [TDD:RED|GREEN|REFACTOR]`
 ```
 
 #### Minimum Cycles
@@ -357,7 +354,7 @@ mkdir -p <EPIC_DIR>/plans/
 
 #### 5.2 Assemble Plan Document
 
-Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` with the following structure.
+Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` using `_TEMPLATE-TASK-PLAN.md` as the canonical structure.
 
 **MANDATORY — Origin Marker (EPIC-0059):** Prepend the YAML frontmatter block before any Markdown content:
 
@@ -365,6 +362,7 @@ Write the plan to `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` with the fo
 ---
 generated-by: x-plan-task@$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 generated-at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+task-id: TASK-XXXX-YYYY-NNN
 story-id: story-XXXX-YYYY
 ---
 ```
@@ -372,75 +370,158 @@ story-id: story-XXXX-YYYY
 This frontmatter is required by `audit-execution-integrity.sh` Phase-1 validation (EPIC-0059, Rule 24).
 Artifacts without this block fail the CI audit with `EIE_EVIDENCE_MISSING`.
 
+The document MUST follow the sections below in order. Each section marked OBRIGATÓRIO must be filled; omitting or leaving placeholders is a plan quality violation.
+
 ```markdown
-# Task Plan: TASK-XXXX-YYYY-NNN
+# Plano de Task — TASK-XXXX-YYYY-NNN
 
-## Header
+## Cabeçalho
 
-| Field | Value |
+| Campo | Valor |
 |-------|-------|
 | Task ID | TASK-XXXX-YYYY-NNN |
 | Story ID | story-XXXX-YYYY |
-| Epic ID | epic-XXXX |
-| Layer | [extracted from Section 8] |
-| Type | [extracted from Section 8: test type] |
-| TDD Cycles | [count of cycles] |
-| Estimated Effort | [S/M/L mapped to time] |
-| Generated | [ISO-8601 date] |
+| Épico | epic-XXXX |
+| Layer | [extracted from task source] |
+| Tipo de Teste | [UT / AT / IT] |
+| Tamanho | [S / M / L] |
+| Status | Planejada |
+| Gerado por | x-plan-task@[sha] |
+| Gerado em | [ISO-8601 date] |
 
-## Objective
+---
 
-[Description of what this task accomplishes, extracted from Section 8 title and acceptance criteria]
+## 1. Contexto na Story
 
-## Implementation Guide
+[OBRIGATÓRIO — Back-reference explícita: qual parte da story esta task implementa?
+If plan-story-XXXX-YYYY.md exists, cite the specific section (e.g., "Seção 2.2 — criação de Foo").
+If plan-story does not exist yet (standalone execution), derive from the story file description.
+A reader must understand WHAT this task delivers without reading other files.]
 
-### Target Class/Method
+Esta task implementa: **[what part of the story this task covers]**
+Referência no plano da story: `plan-story-story-XXXX-YYYY.md > [section reference or "N/A — plan-story not yet generated"]`
 
-[Specific class, method, and design pattern to implement, with examples in {{LANGUAGE}}]
+---
 
-### Design Pattern
+## 2. Objetivo da Task
 
-[Pattern being applied: Strategy, Factory, Repository, etc.]
+[OBRIGATÓRIO — 1-2 paragraphs in plain language.
+Reference the specific files to be created/modified and what they will do.
+Example: "This task creates the FooValidator class in the domain layer. It will validate
+incoming Foo payloads by checking that field X is non-null and field Y is within range.
+The validator is consumed by FooService.create() which will be modified in a subsequent task."]
 
-### Implementation Steps (Layer Order)
+---
 
-1. [Step 1 - innermost layer first]
-2. [Step 2]
-3. [Step N]
+## 3. Guia de Implementação
 
-## TDD Cycles
+### 3.1 Alvo Principal
 
-[Generated cycles from Phase 2, in TPP order]
+| Campo | Valor |
+|-------|-------|
+| Arquivo principal | `[main file path]` |
+| Ação | CREATE / MODIFY |
+| Classe / Função / Componente | `[ClassName or functionName]` |
+| Padrão de Design | [Strategy / Factory / Repository / Value Object / etc.] |
 
-## Affected Files
+### 3.2 Diagrama de Classes / Componentes desta Task
 
-| # | Path | Action | Layer | Purpose |
-|---|------|--------|-------|---------|
-| 1 | [path] | [CREATE/MODIFY] | [layer] | [purpose] |
+[OBRIGATÓRIO when this task creates or modifies structural components (classes, interfaces, skills).
+Show ONLY the components touched by THIS task — a subset of the plan-story component diagram.
+For Skills/Templates stories: use a flowchart instead of classDiagram.
+If the task does not touch structural components (e.g., pure config or doc task), write "N/A — task sem impacto estrutural".]
 
-## Security Checklist
+```mermaid
+[classDiagram or flowchart scoped to this task's components]
+```
 
-[Generated checklist from Phase 4, adapted to task type]
+### 3.3 Testes Existentes Impactados por esta Task
 
-## Dependencies
+[OBRIGATÓRIO — list every existing test that will be affected when THIS task is implemented.
+If a business rule changes, any test covering that rule must appear here.
+If no existing test is impacted, write: "Nenhum teste existente é impactado por esta task."]
 
-| Depends On | Reason |
-|------------|--------|
-| [TASK ID or cross-story reference] | [Why this dependency exists] |
+| Arquivo de Teste | Método | Tipo de Impacto | O que muda na asserção |
+|-----------------|--------|----------------|----------------------|
+| [test file path] | [test method name] | MODIFY / DELETE | [what assertion changes and why] |
 
-## File Footprint
+### 3.4 O que fazer em cada arquivo
 
-[Generated block from Phase 4.5 — sub-sections `write:`, `read:`, `regen:` with alphabetically-sorted paths. Empty sub-sections omitted.]
+[OBRIGATÓRIO — for each file impacted by this task: describe IN NATURAL LANGUAGE what to write or change.
+Do NOT write the final code — describe the intent and expected result.
+Follow the layer order: Domain → Port → Adapter → Application → Config → Test.]
 
-## Definition of Done
+**`[file path 1]`** ([CREATE/MODIFY] — [Layer])
+> [Plain-language description of what to write/change in this file and why]
 
-- [ ] All TDD cycles completed (RED -> GREEN -> REFACTOR)
-- [ ] All tests passing: `{{TEST_COMMAND}}`
-- [ ] Code compiles cleanly: `{{COMPILE_COMMAND}}`
-- [ ] Security checklist items addressed
-- [ ] No TODO/FIXME/HACK comments in task scope
-- [ ] Acceptance criteria from Section 8 satisfied
-- [extracted DoD criteria from task definition]
+**`[file path 2]`** ([CREATE/MODIFY] — [Layer])
+> [Plain-language description]
+
+### 3.5 Ordem de Implementação
+
+[In what sequence to create/modify the files? Rule: inner layers first.]
+
+| Passo | Arquivo | Motivo da Ordem |
+|-------|---------|----------------|
+| 1 | `[file]` | [why this file comes first] |
+| 2 | `[file]` | [why this file comes second] |
+
+---
+
+## 4. Ciclos TDD (Ordem TPP)
+
+[Generated narrative cycles from Phase 2, in TPP order.
+Each cycle must have full natural-language descriptions as specified in Phase 2 — not just field names.
+Minimum 3 cycles. Cycle 1 MUST be degenerate.]
+
+[Insert cycles here]
+
+---
+
+## 5. Checklist de Segurança
+
+[Generated checklist from Phase 4, adapted to task type.
+Mark as [ ] = pending, [x] = verified/not-applicable with justification.]
+
+- [ ] [security item] ([CRITICAL/HIGH/MEDIUM])
+
+---
+
+## 6. File Footprint
+
+[Generated block from Phase 4.5 — sub-sections write:, read:, regen: with alphabetically-sorted paths. Empty sub-sections omitted.]
+
+### write:
+[paths]
+
+### read:
+[paths]
+
+### regen:
+[paths]
+
+---
+
+## 7. Dependências
+
+| Depende de | Motivo |
+|-----------|--------|
+| [TASK-ID or cross-story ref] | [why this dependency exists] |
+
+---
+
+## 8. Critérios de Conclusão desta Task
+
+Ao terminar esta task, o executor DEVE:
+- [ ] Todos os [N] ciclos TDD completados (RED → GREEN → REFACTOR)
+- [ ] Todos os testes passando: `{{TEST_COMMAND}}`
+- [ ] Artefato válido/compilando: `{{COMPILE_COMMAND}}`
+- [ ] Checklist de segurança (Seção 5) verificada
+- [ ] Testes existentes impactados (Seção 3.3) modificados/excluídos conforme mapeado
+- [ ] Nenhum TODO/FIXME/HACK no escopo desta task
+- [ ] Critérios de aceite da story aplicáveis a esta task satisfeitos
+- [ ] Escrever `**Status:** Concluída` no arquivo `task-TASK-XXXX-YYYY-NNN.md`
+- [ ] Atualizar `execution-state.json`: `tasks.TASK-XXXX-YYYY-NNN.status = COMPLETE`
 ```
 
 #### 5.3 Report
