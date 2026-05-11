@@ -13,7 +13,7 @@ requires-capabilities: [governance.dependency-policy]
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Dependency Policy Validator
+# Skill: Dependency Policy Validator (slim — ADR-0012)
 
 ## Purpose
 
@@ -41,185 +41,41 @@ Produces evidence artifact at `ai/epics/epic-XXXX/reports/dep-policy-validation-
 
 ## Activation Condition
 
-Activated when `dependencies.policy.enabled: true` in project YAML. When disabled (or field absent), skill emits `PERF_DISABLED`-style log and exits 0 immediately — no validation performed, no artifact produced.
+Activated when `dependencies.policy.enabled: true` in project YAML. When disabled (or field absent), skill emits `DEP_POLICY_DISABLED` log line and exits 0 immediately — no validation performed, no artifact produced.
 
-## YAML Schema (Reference)
+## Output Contract
 
-```yaml
-dependencies:
-  policy:
-    enabled: true
-    min-versions:
-      - groupId: com.fasterxml.jackson.core
-        artifactId: jackson-databind
-        version: "2.15.0"
-    max-versions: []
-    allowed-licenses: [Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause]
-    denied-cves: [CVE-2021-44228, CVE-2023-1234567]
-    freshness-window-days: 365
-    block-on:
-      severity-cve: BLOCK
-      license: BLOCK
-      min-version: BLOCK
-      max-version: WARN_ONLY
-      freshness: WARN_ONLY
-    scope-policy:
-      compile: BLOCK
-      runtime: BLOCK
-      test: WARN_ONLY
-      dev: WARN_ONLY
-      provided: WARN_ONLY
-      build: WARN_ONLY
+| Artifact | Path |
+|----------|------|
+| Validation report | `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` (auto-resolved or via `--report`) |
+| Sections | Header / Summary / Blocking Violations / Warning Violations / Suppressed / Policy Snapshot |
+| Exit codes | 0 (disabled/clean) / 1 `DEP_POLICY_BLOCK` / 2 `DEP_POLICY_WARN` |
+
+## Workflow Overview
+
+```text
+1. LOAD     -> Read DependencyPolicyConfig (denied-cves, allowed-licenses, min/max-versions, freshness-window-days, block-on, scope-policy)
+2. DETECT   -> Resolve manifests (pom.xml / package.json / go.mod / etc.) + per-stack dependency-list commands
+3. RESOLVE  -> Parse to Dependency{coordinate, version, scope, age_days}; map devDependencies→dev, dependencies→compile
+4. VALIDATE -> 5 dimensions per dep: denied-cve (RULE-074-01 hard-block) / license / min-version / max-version / freshness
+5. CLASSIFY -> Apply D-R10 block-on + D-R11 scope-policy demotion; denied-CVE bypasses all overrides
+6. REPORT   -> _TEMPLATE-DEP-POLICY-REPORT.md; exit by highest severity
 ```
 
-## Workflow
+Detailed YAML schema, per-dimension validation logic, classification matrix (D-R10 × D-R11), and report template in [`references/full-protocol.md`](references/full-protocol.md):
 
-```
-1. LOAD     -> Read DependencyPolicyConfig from project YAML
-2. DETECT   -> Resolve manifest files (pom.xml, package.json, go.mod)
-3. RESOLVE  -> Parse dependency list with versions and scopes
-4. VALIDATE -> Apply 5 validation dimensions per dependency
-5. CLASSIFY -> Apply D-R10 block-on + D-R11 scope-policy per finding
-6. REPORT   -> Write structured report; exit with highest severity
-```
-
-### Step 1 — Load Policy
-
-Read project YAML (`project.yaml`, `.ia-dev-env.yaml`, or the root config file). Parse the `dependencies.policy` block. If `enabled: false` or block absent → log `DEP_POLICY_DISABLED` and exit 0.
-
-Key fields to extract:
-- `denied-cves` list (RULE-074-01: always BLOCK regardless of scope/severity-threshold)
-- `allowed-licenses` list (empty = no restriction)
-- `min-versions` / `max-versions` list of VersionConstraints (JVM: groupId+artifactId; NPM: name; Go: module)
-- `freshness-window-days` (default 365)
-- `block-on` map → BlockOnPolicy (D-R10 defaults)
-- `scope-policy` map → ScopePolicy (D-R11 defaults)
-
-### Step 2 — Detect Manifests
-
-| Build Tool | Manifest | Dependency Command |
-|------------|----------|--------------------|
-| Maven | `pom.xml` | `mvn dependency:list -DincludeScope=compile,runtime,test,provided` |
-| Gradle | `build.gradle` / `build.gradle.kts` | `./gradlew dependencies --configuration runtimeClasspath,testRuntimeClasspath` |
-| npm | `package.json` + `package-lock.json` | `npm list --json --all --depth 0` |
-| yarn | `yarn.lock` | `yarn list --json --depth 0` |
-| pnpm | `pnpm-lock.yaml` | `pnpm list --json --depth 0` |
-| Go modules | `go.mod` | `go list -m -json all` |
-
-Multiple manifests detected → validate each independently; merge findings; deduplicate by coordinate.
-
-### Step 3 — Resolve Dependencies
-
-Parse each manifest to extract a flat list of:
-
-```
-Dependency {
-  coordinate: String   // "groupId:artifactId" | "name@version" | "module@version"
-  version: String
-  scope: String        // compile | runtime | test | dev | provided | build
-  age_days: Integer    // resolved via mvn versions:display-dependency-updates or npm outdated
-}
-```
-
-For JVM: use `mvn dependency:list` output (format `[INFO]    {groupId}:{artifactId}:{type}:{version}:{scope}`).
-For NPM/yarn/pnpm: parse JSON list output; map `devDependencies` to scope `dev`, `dependencies` to scope `compile`.
-For Go: `go list -m -json all` → `Module.Path`, `Module.Version`; scope always `compile`.
-
-### Step 4 — Validate (5 Dimensions per Dependency)
-
-For each resolved dependency, run the following checks in order:
-
-#### 4.1 Denied CVE Check (RULE-074-01 — Always BLOCK)
-
-```
-if any CVE in denied-cves matches this dependency's known CVEs:
-  VIOLATION(type=denied-cve, severity=BLOCK, cve=CVE-XXXX-XXXXXX)
-  # Hard-block: scope-policy does NOT apply; block-on.severity-cve does NOT apply
-  # The denied-cves list bypasses all override mechanisms
-```
-
-CVE lookup strategy: use output from `mvn dependency:resolve -Dsecurity=true` (OWASP plugin if available), `npm audit --json`, or `trivy image` JSON output. If no CVE scanner is available, skip 4.1 and log `CVE_SCAN_UNAVAILABLE`.
-
-#### 4.2 License Check
-
-```
-if allowed-licenses is not empty:
-  if dependency.license NOT IN allowed-licenses:
-    VIOLATION(type=license, severity=block-on.license, license=<actual>)
-```
-
-License resolution: Maven → read `pom.xml` `<licenses>` section or use `mvn license:aggregate-download-licenses --json`; NPM → `package.json` `license` field; Go → `go-licenses` tool.
-If license cannot be resolved → log `LICENSE_UNRESOLVABLE` as WARN.
-
-#### 4.3 Min-Version Check
-
-```
-for each constraint in min-versions:
-  if constraint matches dependency:
-    if dependency.version < constraint.version:
-      VIOLATION(type=min-version, severity=block-on.min-version, required=constraint.version)
-```
-
-JvmConstraint: match on `groupId` exact + `artifactId` exact or `"*"` wildcard (matches all artifacts in group).
-NpmConstraint: match on `name` exact.
-GoConstraint: match on `module` prefix (e.g., `golang.org/x/net` matches `golang.org/x/net/http2`).
-
-#### 4.4 Max-Version Check
-
-```
-for each constraint in max-versions:
-  if constraint matches dependency:
-    if dependency.version > constraint.version:
-      VIOLATION(type=max-version, severity=block-on.max-version, ceiling=constraint.version)
-```
-
-Same matching rules as 4.3.
-
-#### 4.5 Freshness Check
-
-```
-if freshness-window-days > 0:
-  if dependency.age_days > freshness-window-days:
-    VIOLATION(type=freshness, severity=block-on.freshness, age_days=dependency.age_days)
-```
-
-Age resolution: run `mvn versions:display-dependency-updates -DprocessDependencies=true` → parse `[INFO] ... -> X.Y.Z available` lines; compute age as `today - release_date(latest_version)`. If update unavailable, skip freshness check.
-
-### Step 5 — Classify Violations
-
-For each `VIOLATION(type, severity_raw, ...)` from Step 4:
-
-1. **Denied-CVE**: final_action = BLOCK regardless of anything (RULE-074-01).
-2. **All other types**: `raw_action = severity_raw` (BlockOnPolicy field for the type).
-3. **Scope escalation (D-R11)**: `scope_action = ScopePolicy.actionFor(dependency.scope)`. If `scope_action.ordinal() < raw_action.ordinal()` → demote to `scope_action`. If scope_action = IGNORE → suppress entirely.
-4. **Final action**: `min(raw_action, scope_action)` by severity (BLOCK > WARN_ONLY > IGNORE).
-
-Classification matrix example (D-R10 defaults + D-R11 test scope):
-
-| Type | Raw action | Scope (test) | Final action |
-|------|-----------|--------------|--------------|
-| denied-cve | BLOCK | — | **BLOCK** (RULE-074-01 override) |
-| license | BLOCK | WARN_ONLY | **WARN_ONLY** (scope demotes) |
-| min-version | BLOCK | WARN_ONLY | **WARN_ONLY** |
-| max-version | WARN_ONLY | WARN_ONLY | **WARN_ONLY** |
-| freshness | WARN_ONLY | WARN_ONLY | **WARN_ONLY** |
-
-### Step 6 — Report and Exit
-
-Write report to `--report` path (or auto-resolve as `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md`). Use template `_TEMPLATE-DEP-POLICY-REPORT.md`.
-
-Report sections:
-- **Header**: timestamp, story-id, policy enabled, dimensions checked
-- **Summary**: total dependencies scanned, violations by type and final-action
-- **Blocking Violations**: table of all BLOCK final-action findings
-- **Warning Violations**: table of all WARN_ONLY final-action findings
-- **Suppressed**: count of IGNORE-classified findings (no detail)
-- **Policy Snapshot**: rendered `DependencyPolicyConfig` as YAML for audit trail
-
-Exit codes:
-- `0` — disabled, or zero violations, or all violations are IGNORE
-- `1` (`DEP_POLICY_BLOCK`) — ≥1 BLOCK final-action violation
-- `2` (`DEP_POLICY_WARN`) — zero BLOCK violations; ≥1 WARN_ONLY violation
+- **YAML Schema** (§YAML Schema): full `dependencies.policy` block with all 7 sub-keys and example values.
+- **Step 1** (§Step 1): policy load + key extraction; disabled-mode exit-0 short-circuit.
+- **Step 2** (§Step 2): 6-row manifest detection table (Maven/Gradle/npm/yarn/pnpm/Go) with dependency-list commands.
+- **Step 3** (§Step 3): per-build-tool parse rules (Maven `dependency:list` format, npm `--json` scope mapping, Go `go list -m -json` Module.Path/Version).
+- **Step 4.1** (§Step 4.1 Denied CVE): RULE-074-01 unconditional BLOCK; CVE scanner sources (OWASP plugin, `npm audit`, `trivy`).
+- **Step 4.2** (§Step 4.2 License): allowed-licenses membership; license resolution per stack; `LICENSE_UNRESOLVABLE` WARN fallback.
+- **Step 4.3** (§Step 4.3 Min-Version): per-stack constraint matching (JvmConstraint with `*` wildcard support; NpmConstraint exact; GoConstraint prefix).
+- **Step 4.4** (§Step 4.4 Max-Version): same matching rules as min-version.
+- **Step 4.5** (§Step 4.5 Freshness): age via `mvn versions:display-dependency-updates`; `FRESHNESS_UNAVAILABLE` skip fallback.
+- **Step 5** (§Step 5): 4-step classification algorithm (denied-CVE override → raw block-on → scope demotion → final = `min(raw, scope)` by severity); classification matrix example for `test` scope.
+- **Step 6** (§Step 6): report path resolution; 6-section template (Header/Summary/Blocking/Warning/Suppressed/Policy Snapshot); exit-code semantics.
+- **RULE-074-01** (§RULE-074-01): full hard-block contract (scope/severity-threshold/block-on/patch-availability all bypassed).
 
 ## Error Handling
 
@@ -239,12 +95,6 @@ Exit codes:
 - Evidence artifact path follows PathResolver v4: `ai/epics/epic-XXXX-<slug>/reports/dep-policy-validation-report-STORY-ID.md`.
 - `audit-dep-policy.sh` (Camada 2 CI script, Rule 32) checks existence of this artifact for merged PRs when `DEPENDENCY_POLICY_ENABLED=true` in CI env.
 
-## RULE-074-01 (Denied CVEs — Hard-Block)
+## Full Protocol
 
-Denied CVEs from `denied-cves` list are **unconditional BLOCK** regardless of:
-- Scope (even `test`, `dev`, `build`)
-- Severity threshold (even INFO)
-- `block-on.severity-cve` setting
-- Patch availability
-
-This is the only violation type that bypasses D-R11 scope-policy demotion.
+Minimum viable contract above. Detailed YAML schema reference, 6-step procedure (load → detect manifests → resolve dependencies → validate 5 dimensions → classify with D-R10 + D-R11 → report and exit), per-stack constraint matching rules, classification algorithm with denied-CVE hard-block override, and RULE-074-01 contract live in [`references/full-protocol.md`](references/full-protocol.md) per ADR-0012 (skill body slim-by-default).
