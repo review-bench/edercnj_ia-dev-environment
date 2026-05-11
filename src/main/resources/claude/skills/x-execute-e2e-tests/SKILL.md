@@ -40,8 +40,8 @@ Include this skill for all projects with integration test infrastructure.
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| testing | `skills/testing/references/testing-philosophy.md` | Real vs in-memory DB decisions, fixture patterns, data uniqueness |
-| testing | `skills/testing/references/testing-conventions.md` | {{LANGUAGE}}-specific test framework, assertion library, directory structure |
+| testing | `.claude/knowledge/testing/testing-philosophy.md` | Real vs in-memory DB decisions, fixture patterns, data uniqueness |
+| testing | `.claude/knowledge/testing/testing-conventions.md` | {{LANGUAGE}}-specific test framework, assertion library, directory structure |
 
 ## Prerequisites
 

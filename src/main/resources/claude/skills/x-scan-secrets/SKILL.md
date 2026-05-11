@@ -49,9 +49,9 @@ Include this skill when secret scanning is required for the project security pos
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| security | `skills/security/references/sarif-template.md` | SARIF 2.1.0 schema and required fields |
-| security | `skills/security/references/security-scoring.md` | Scoring model and grade thresholds |
-| security | `skills/security/references/security-skill-template.md` | Canonical structure for security skills |
+| security | `.claude/knowledge/security/sarif-template.md` | SARIF 2.1.0 schema and required fields |
+| security | `.claude/knowledge/security/security-scoring.md` | Scoring model and grade thresholds |
+| security | `.claude/knowledge/security/security-skill-template.md` | Canonical structure for security skills |
 
 ## Workflow
 

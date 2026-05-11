@@ -118,7 +118,7 @@ Per-dimension score uses the security scoring model:
 dimension_score = max(0, 100 - sum(severity_weight * count_per_severity))
 ```
 
-Severity weights (from `references/security-scoring.md`):
+Severity weights (from `.claude/knowledge/security/security-scoring.md`):
 
 | Severity | Weight |
 |----------|--------|
@@ -365,8 +365,8 @@ This skill is an **aggregator**, not a scanner. It MUST:
 - NEVER invoke x-run-sast, x-run-dast, or any other scanning skill
 - NEVER duplicate scanning logic from any atomic skill
 - Read ONLY from `results/security/` (the shared output directory)
-- Respect the SARIF 2.1.0 schema defined in `references/sarif-template.md`
-- Use the scoring model defined in `references/security-scoring.md`
+- Respect the SARIF 2.1.0 schema defined in `.claude/knowledge/security/sarif-template.md`
+- Use the scoring model defined in `.claude/knowledge/security/security-scoring.md`
 
 If a user needs fresh scan data, run the individual scanning skills first, then invoke this dashboard.
 
@@ -374,8 +374,8 @@ If a user needs fresh scan data, run the individual scanning skills first, then 
 
 | # | Knowledge Pack | Path | Purpose |
 |---|----------------|------|---------|
-| 1 | Security Scoring | `knowledge/security/security-scoring.md` | Scoring model and grade thresholds |
-| 2 | Security Skill Template | `knowledge/security/security-skill-template.md` | Output conventions for scan results |
+| 1 | Security Scoring | `.claude/knowledge/security/security-scoring.md` | Scoring model and grade thresholds |
+| 2 | Security Skill Template | `.claude/knowledge/security/security-skill-template.md` | Output conventions for scan results |
 
 ## Integration Notes
 

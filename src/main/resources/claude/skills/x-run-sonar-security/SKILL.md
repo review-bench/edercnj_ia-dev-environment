@@ -44,8 +44,8 @@ Include this skill when `security.qualityGate.provider` is not "none" in the pro
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| security | `skills/security/references/security-principles.md` | Data classification, input validation, fail-secure patterns |
-| security | `skills/security/references/application-security.md` | OWASP Top 10, security headers, secrets management |
+| security | `.claude/knowledge/security/security-principles.md` | Data classification, input validation, fail-secure patterns |
+| security | `.claude/knowledge/security/application-security.md` | OWASP Top 10, security headers, secrets management |
 
 ## Prerequisites
 

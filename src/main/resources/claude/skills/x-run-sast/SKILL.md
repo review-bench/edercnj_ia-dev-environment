@@ -45,10 +45,10 @@ Include this skill when `security.scanning.sast = true` in the project configura
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| security | `skills/security/references/security-skill-template.md` | Canonical structure for security scanning skills |
-| security | `skills/security/references/sarif-template.md` | SARIF 2.1.0 output schema and required fields |
-| security | `skills/security/references/security-scoring.md` | Scoring model and grade thresholds |
-| security | `skills/security/references/security-principles.md` | Data classification, input validation, fail-secure patterns |
+| security | `.claude/knowledge/security/security-skill-template.md` | Canonical structure for security scanning skills |
+| security | `.claude/knowledge/security/sarif-template.md` | SARIF 2.1.0 output schema and required fields |
+| security | `.claude/knowledge/security/security-scoring.md` | Scoring model and grade thresholds |
+| security | `.claude/knowledge/security/security-principles.md` | Data classification, input validation, fail-secure patterns |
 
 ## Workflow
 

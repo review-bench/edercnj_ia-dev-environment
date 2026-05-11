@@ -51,7 +51,7 @@ Read the following files before starting:
 - `.claude/templates/_TEMPLATE-EPIC.md` — The exact structure to follow (v2 value-driven: 9 sections + Refinement Verdict).
 
 **Decomposition philosophy (how to identify stories and rules):**
-- `.claude/skills/x-epic-decompose/references/decomposition-guide.md`
+- `.claude/knowledge/refinement/decomposition-guide.md`
 
 If any template file is missing, stop and tell the user. The templates define the output structure
 and must be read fresh from disk every time (never hardcode the structure).
@@ -147,7 +147,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-epic-c
 <!-- TELEMETRY: phase.start -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic-create Phase-3-Story-Index`
 
-Read the decomposition guide (`x-epic-decompose/references/decomposition-guide.md`) for
+Read the decomposition guide (`.claude/knowledge/refinement/decomposition-guide.md`) for
 the layer-by-layer approach. In summary:
 
 1. **Foundation (Layer 0):** Infrastructure stories — servers, schemas, base APIs, protocol adapters

@@ -40,7 +40,7 @@ Include this skill when the project uses event-driven interfaces (`interfaces` c
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| protocols | `skills/protocols/references/event-driven-conventions.md` | CloudEvents envelope, event naming, schema registry, ordering guarantees, broker patterns |
+| protocols | `.claude/knowledge/protocols/event-driven-conventions.md` | CloudEvents envelope, event naming, schema registry, ordering guarantees, broker patterns |
 
 ## Prerequisites
 
@@ -62,7 +62,7 @@ git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
     Agent(
       subagent_type: "event-engineer",
       description: "Event-driven specialist review for {target}",
-      prompt: "Review the event-driven patterns for best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/protocols/references/event-driven-conventions.md` for event design patterns. Apply your full event checklist (event schema design, CloudEvents envelope, producer/consumer patterns, error handling, dead letter topics, idempotency, operational readiness). Produce output in this exact format:\n\nENGINEER: Events\nSTORY: {target}\nSCORE: XX/28\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [EVT-XX] Description (2/2)\nFAILED:\n- [EVT-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [EVT-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+      prompt: "Review the event-driven patterns for best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `.claude/knowledge/protocols/event-driven-conventions.md` for event design patterns. Apply your full event checklist (event schema design, CloudEvents envelope, producer/consumer patterns, error handling, dead letter topics, idempotency, operational readiness). Produce output in this exact format:\n\nENGINEER: Events\nSTORY: {target}\nSCORE: XX/28\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [EVT-XX] Description (2/2)\nFAILED:\n- [EVT-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [EVT-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
     )
 
 ## Event Design Checklist (10 points)
