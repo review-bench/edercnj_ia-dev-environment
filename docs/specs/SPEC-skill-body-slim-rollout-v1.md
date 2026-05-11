@@ -52,7 +52,7 @@ A [SPEC-context-budget-optimization-v1](./SPEC-context-budget-optimization-v1.md
 
 - Aplicar contrato slim de ADR-0012 em **todas as skills com `SKILL.md` ≥ 500 linhas** (corte herdado de EPIC-0047 e do `SkillSizeLinter`).
 - Onde houver oportunidade clara de delegação cross-skill, consumir snippets de `_shared/` conforme ADR-0011 (sem forçar — só quando o conteúdo é genuinamente cross-cutting).
-- Cinco Waves sequenciais:
+- Seis waves sequenciais (0–5):
   - **Wave 0** — limpar duplicatas que poluem o cálculo de baseline.
   - **Wave 1** — construir infra `_shared/` antes de qualquer slim.
   - **Wave 2** — refactor pesado em skills ≥500 linhas (sub-waves 2.1 a 2.5+).
@@ -181,13 +181,15 @@ Wave 5  ⏸  (precisa mini-ADR primeiro)
 
 ## 6. Métricas e Targets
 
-| Métrica | Baseline (pré-Wave 0) | Pós-Wave 0+1 (atual) | Target pós-Wave 2 | Target final (pós-Wave 5) |
-|---------|----------------------|----------------------|-------------------|---------------------------|
+| Métrica | Baseline v3.9.0 (pré-EPIC-0047) | Atual (pós Wave 2.1 / #1115) | Target pós-Wave 2 | Target final (pós-Wave 5) |
+|---------|---------------------------------|------------------------------|-------------------|---------------------------|
 | Total `SKILL.md` linhas (corpo always-injectável) | ~50,191 | 34,044 | ~28,000 | ≤25,000 |
 | Skills ≥500 linhas | 14 | 10 | 0 | 0 |
 | Skills ≥250 linhas | ~40 | ~38 | ~20 | ≤10 |
 | Skills com `references/` | ~12 | ~14 | ≥24 | ≥40 |
 | Snippets em `_shared/` | 0 | 7 | 7 | 8–10 |
+
+> **Atribuição do drop atual (50,191 → 34,044):** a maior fatia vem de EPIC-0047 (PR #539, piloto ADR-0012 em 5 skills). Wave 0 (#1113) contribuiu com −1,054 linhas removendo duplicatas noun-first. Wave 1 (#1114) e Wave 2.1 (#1115) somaram a redução final de ~5,000 linhas. A coluna "Atual" reflete o estado em 2026-05-11 após merge de #1115.
 
 Medição: `wc -l` recursivo sobre `src/main/resources/claude/skills/**/SKILL.md` (a SoT). O output gerado em `.claude/skills/` é byte-equivalente.
 
@@ -200,7 +202,7 @@ Medição: `wc -l` recursivo sobre `src/main/resources/claude/skills/**/SKILL.md
 - [ ] Inventário da wave congelado em commit (ou item desta spec atualizado).
 - [ ] PR template padronizado contendo: skill alvo, baseline linhas, target linhas, snippets `_shared/` consumidos.
 - [ ] Wave anterior **merged e em verde** no `develop` (Waves não pisam umas nas outras).
-- [ ] Nenhuma epic ativa renomeando os mesmos skill-paths (verificar `ai/epics/` em andamento).
+- [ ] Nenhuma epic ativa renomeando os mesmos skill-paths (verificar `ai/backlog/` em andamento).
 
 ### 7.2 Definition of Done (por sub-wave / PR)
 
@@ -209,7 +211,7 @@ Medição: `wc -l` recursivo sobre `src/main/resources/claude/skills/**/SKILL.md
 - [ ] Snippets `_shared/` referenciados via link relativo resolvem na árvore source-of-truth E na árvore gerada `.claude/skills/`.
 - [ ] `mvn -B test` exit 0 (golden tests podem regenerar; revisor confirma diff intencional).
 - [ ] `mvn -B package -DskipTests` exit 0.
-- [ ] `audits/skill-size-baseline.txt` **remove** a entrada da skill migrada (não adiciona). Se a entrada não existia (skill já estava abaixo do gate), audit segue verde sem mudança.
+- [ ] `governance/baselines/skill-size-baseline.txt` **remove** a entrada da skill migrada (não adiciona). Se a entrada não existia (skill já estava abaixo do gate), audit segue verde sem mudança.
 - [ ] PR body lista: skill, antes/depois (linhas), `_shared/` consumidos, e nota explícita de "nenhuma mudança de contrato externo".
 - [ ] Revisor humano confirma via diff que (a) Triggers/Parameters/Output Contract/Error Envelope intactos, (b) detalhe migrado preserva fases e contratos.
 
@@ -256,4 +258,4 @@ Medição: `wc -l` recursivo sobre `src/main/resources/claude/skills/**/SKILL.md
 - PR #1114 — Wave 1 (infra `_shared/`)
 - PR #1115 — Wave 2.1 (slim `x-orchestrate-epic`)
 - PR #539 — EPIC-0047 piloto ADR-0012 (5 skills)
-- `audits/skill-size-baseline.txt` — baseline do `SkillSizeLinter`
+- `governance/baselines/skill-size-baseline.txt` — baseline do `SkillSizeLinter`
