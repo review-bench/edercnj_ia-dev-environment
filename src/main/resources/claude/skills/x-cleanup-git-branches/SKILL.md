@@ -14,11 +14,11 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Local Git Cleanup (branches + worktrees + fetch)
+# Skill: Local Git Cleanup (slim — ADR-0012)
 
 ## Purpose
 
-Centralizes the "reset local git state" workflow for {{PROJECT_NAME}}: after a batch of merged PRs, stale worktrees and orphan local branches accumulate. This skill does the combined pass in one invocation — fetch with prune, remove every non-main worktree, delete every local branch outside the protected set (`main`, `master`, `develop`).
+Centralizes the "reset local git state" workflow for {{PROJECT_NAME}}: after a batch of merged PRs, stale worktrees and orphan local branches accumulate. This skill does the combined pass in one invocation — fetch with prune, remove every non-main worktree, delete every local branch outside the protected set (`main`, `master`, `develop`, plus `epic/*` and `docs/*` with open PR).
 
 Destructive by design (the user explicitly asked for a sweep). Safety comes from the confirmation gate (`y/N`) before any deletion and from `--dry-run` preview mode.
 
@@ -35,6 +35,13 @@ Destructive by design (the user explicitly asked for a sweep). Safety comes from
 - `/x-cleanup-git-branches --dry-run` — preview candidates, no changes
 - `/x-cleanup-git-branches --yes` — execute, skip confirmation (CI / scripted use)
 
+## Parameters
+
+| Flag | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `--dry-run` | Boolean | No | `false` | Preview candidate worktrees and branches without deleting. Mutually exclusive with `--yes`. |
+| `--yes` / `-y` | Boolean | No | `false` | Skip the `y/N` confirmation gate. For CI / scripted use. Mutually exclusive with `--dry-run`. |
+
 ## Protected Set (Hard-Coded)
 
 | Name | Why protected |
@@ -42,307 +49,52 @@ Destructive by design (the user explicitly asked for a sweep). Safety comes from
 | `main` | Production branch (Rule 09) |
 | `master` | Legacy production alias |
 | `develop` | Integration branch (Rule 09) |
+| `epic/*` | Always protected until the manual epic-to-develop PR gate merges (Rule 21) |
+| `docs/*` with open PR | Preserved until the PR is merged or closed (EPIC-0065 D-R6); fail-safe when `gh` is absent |
 
 The currently checked-out branch (HEAD) is **NOT** in the protected set. If HEAD points at a candidate branch, the skill checks out `develop` (fallback: `main`) before deletion.
 
-## Workflow
+## Output Contract
 
-```
-1.  PARSE FLAGS       -> validate --dry-run / --yes mutual exclusion
-2.  DETECT CONTEXT    -> abort if running inside .claude/worktrees/*
-3.  RESOLVE HEAD      -> capture current branch (empty if detached)
-4.  FETCH             -> git fetch --prune origin (skip if no origin)
-5.  ENUMERATE WTS     -> list non-main worktrees via git worktree list --porcelain
-6.  ENUMERATE BRS     -> list local branches minus protected set
-7.  PRINT PLAN        -> human-readable candidate table
-8.  CONFIRM GATE      -> y/N prompt unless --yes / --dry-run
-9.  SWITCH IF NEEDED  -> checkout develop/main if HEAD is a candidate
-10. REMOVE WORKTREES  -> git worktree remove --force + git worktree prune
-11. DELETE BRANCHES   -> git branch -D per candidate
-12. REPORT SUMMARY    -> counts + exit 0
-```
+Exit codes:
 
-### Step 1 — Parse Flags
+| Exit | Condition |
+|------|-----------|
+| 0 | Success (cleanup completed, dry-run complete, nothing to clean, or user declined confirmation) |
+| 1 | Operational failure (`NOT_A_REPO`, `IN_WORKTREE_UNSAFE`, `NO_SAFE_FALLBACK_BRANCH`) |
+| 2 | Usage error (unknown flag, `--dry-run` and `--yes` both set) |
 
-```bash
-DRY_RUN=false
-ASSUME_YES=false
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=true ;;
-    --yes|-y)  ASSUME_YES=true ;;
-    -h|--help) echo "Usage: x-cleanup-git-branches [--dry-run] [--yes]"; exit 0 ;;
-    *) echo "ERROR: unknown flag: $arg" >&2; exit 2 ;;
-  esac
-done
+Stdout: human-readable cleanup plan + summary line "Worktrees removed: N / Branches deleted: M". Stderr: WARNING lines for individual failures (which do NOT abort the run).
 
-if [ "$DRY_RUN" = "true" ] && [ "$ASSUME_YES" = "true" ]; then
-  echo "ERROR: --dry-run and --yes are mutually exclusive" >&2
-  exit 2
-fi
+## Workflow Overview
+
+```text
+ 1. PARSE_FLAGS       -> validate --dry-run / --yes mutual exclusion
+ 2. DETECT_CONTEXT    -> abort with IN_WORKTREE_UNSAFE if running inside any linked worktree
+ 3. RESOLVE_HEAD      -> capture current branch (empty if detached)
+ 4. FETCH             -> git fetch --prune origin (skip if no origin)
+ 5. ENUM_WORKTREES    -> list non-main worktrees via git worktree list --porcelain
+ 6. ENUM_BRANCHES     -> local branches minus protected (main/master/develop/epic/*/docs-with-PR)
+ 7. PRINT_PLAN        -> human-readable candidate table; exit 0 if --dry-run or empty
+ 8. CONFIRM_GATE      -> y/N prompt unless --yes / --dry-run
+ 9. SWITCH_IF_NEEDED  -> checkout develop/main if HEAD is a candidate
+10. REMOVE_WORKTREES  -> git worktree remove --force + git worktree prune
+11. DELETE_BRANCHES   -> git branch -D per candidate
+12. REPORT_SUMMARY    -> counts to stdout; exit 0
 ```
 
-### Step 2 — Detect Worktree Context (abort if inside one)
+Full bash blocks for all 12 steps, the 3-classifier `detect_worktree_context()` function (Rule 14 non-nesting invariant + git-dir suffix check + toplevel-vs-main comparison), heredoc-based candidate iteration (handles paths with spaces), epic/* and docs/* filtering with `gh pr list` fallback, and `--force` worktree-removal semantics live in [`references/full-protocol.md`](references/full-protocol.md):
 
-This skill MUST run from the main repository. Running from inside a worktree would attempt to remove the host worktree while executing — unsafe.
-
-This skill extends the canonical `detect_worktree_context()` check from `x-manage-worktrees` (Rule 14, non-nesting invariant). The canonical snippet only recognises worktrees under `.claude/worktrees/*`; because this skill enumerates and removes **all** non-main worktrees via `git worktree list --porcelain` (any path), the guard also compares `git rev-parse --show-toplevel` to the main worktree path and inspects `git rev-parse --git-dir` for a `worktrees/` suffix, so a linked worktree in any location triggers the abort.
-
-```bash
-detect_worktree_context() {
-  local toplevel git_dir main_repo wt_path in_wt="false"
-  toplevel=$(git rev-parse --show-toplevel 2>/dev/null) || {
-    echo '{"error":"NOT_A_REPO"}' >&2
-    return 1
-  }
-  git_dir=$(git rev-parse --git-dir 2>/dev/null) || {
-    echo '{"error":"NOT_A_REPO"}' >&2
-    return 1
-  }
-  json_escape() {
-    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
-  }
-
-  # Resolve main repo path (first `worktree` entry, stripping the
-  # `worktree ` prefix so paths containing spaces are preserved).
-  if ! main_repo=$(git worktree list --porcelain 2>/dev/null \
-              | sed -n 's/^worktree //p' | head -n 1) \
-       || [ -z "$main_repo" ]; then
-    main_repo="$toplevel"
-  fi
-
-  # Classifier 1 — Rule 14 non-nesting invariant (substring check).
-  if printf '%s' "$toplevel" | grep -q "/\.claude/worktrees/"; then
-    in_wt="true"
-  fi
-  # Classifier 2 — git-dir of a linked worktree lives under
-  # `<main>/.git/worktrees/<id>/`.
-  case "$git_dir" in
-    */worktrees/*|.git/worktrees/*) in_wt="true" ;;
-  esac
-  # Classifier 3 — toplevel differs from the main repo path.
-  if [ "$toplevel" != "$main_repo" ]; then
-    in_wt="true"
-  fi
-
-  if [ "$in_wt" = "true" ]; then
-    wt_path=$(json_escape "$toplevel")
-    main_repo=$(json_escape "$main_repo")
-    printf '{"inWorktree":%s,"worktreePath":"%s","mainRepoPath":"%s"}\n' \
-      "$in_wt" "$wt_path" "$main_repo"
-  else
-    main_repo=$(json_escape "$main_repo")
-    printf '{"inWorktree":%s,"worktreePath":null,"mainRepoPath":"%s"}\n' \
-      "$in_wt" "$main_repo"
-  fi
-}
-
-CONTEXT_JSON=$(detect_worktree_context) || exit 1
-IN_WT=$(printf '%s' "$CONTEXT_JSON" | grep -o '"inWorktree":[^,]*' | cut -d: -f2)
-
-if [ "$IN_WT" = "true" ]; then
-  echo "ERROR: IN_WORKTREE_UNSAFE — must run from main repo, not a worktree" >&2
-  exit 1
-fi
-```
-
-### Step 3 — Resolve Current Branch
-
-```bash
-CURRENT_BRANCH=$(git symbolic-ref --short -q HEAD || true)
-# Empty string => detached HEAD (safe; no switch needed later)
-```
-
-### Step 4 — Fetch With Prune
-
-```bash
-if git remote | grep -q '^origin$'; then
-  echo "→ git fetch --prune origin"
-  git fetch --prune origin || echo "WARNING: fetch failed, continuing"
-else
-  echo "WARNING: no 'origin' remote configured, skipping fetch"
-fi
-```
-
-### Step 5 — Enumerate Non-Main Worktrees
-
-The first `worktree <path>` entry in `git worktree list --porcelain` is always the main repository. All subsequent entries are removal candidates. Paths in that output can legally contain spaces, so extract them by stripping the literal `worktree ` prefix (nine characters) rather than by whitespace-splitting — `sed` preserves the full path.
-
-```bash
-WORKTREE_CANDIDATES=$(git worktree list --porcelain \
-  | sed -n 's/^worktree //p' \
-  | tail -n +2)
-```
-
-### Step 6 — Enumerate Candidate Branches
-
-```bash
-PROTECTED_REGEX='^(main|master|develop)$'
-# Also preserve epic/* branches (Rule 21) and docs/* branches with open PRs (EPIC-0065 D-R6)
-RAW_CANDIDATES=$(git for-each-ref --format='%(refname:short)' refs/heads/ \
-  | grep -Ev "$PROTECTED_REGEX" || true)
-
-# Filter out epic/* (always protected per Rule 21 §Anti-Patterns)
-# Filter out docs/* branches that have an open PR (preserve until PR is merged/closed)
-BRANCH_CANDIDATES=""
-while IFS= read -r br; do
-  [ -n "$br" ] || continue
-  # epic/* branches: always skip (Rule 21)
-  if [[ "$br" == epic/* ]]; then continue; fi
-  # docs/* branches: skip if an open PR exists (gh CLI check)
-  # When gh is unavailable, treat docs/* as protected by default (fail-safe — avoids deleting a branch with an open PR)
-  if [[ "$br" == docs/* ]]; then
-    if ! command -v gh &>/dev/null; then continue; fi
-    open_prs=$(gh pr list --head "$br" --state open --json number --jq '. | length' 2>/dev/null || echo 0)
-    [ "$open_prs" -gt 0 ] && continue
-  fi
-  BRANCH_CANDIDATES="${BRANCH_CANDIDATES}${br}"$'\n'
-done <<< "$RAW_CANDIDATES"
-```
-
-`grep -Ev … || true` prevents a non-match (exit 1) from aborting the script under `set -e` style shells.
-
-**Epic branch protection (Rule 21):** `epic/*` branches are NEVER deleted by this skill — they are protected until the manual epic-to-develop PR gate is merged.
-
-**Docs branch protection (EPIC-0065):** `docs/*` branches with open PRs are preserved until the PR is merged or closed. Once merged, they become cleanup candidates on the next run.
-
-### Step 7 — Print Plan
-
-```bash
-echo ""
-echo "=== Cleanup Plan ==="
-echo ""
-echo "Worktrees to remove (main worktree preserved):"
-if [ -z "$WORKTREE_CANDIDATES" ]; then
-  echo "  (none)"
-else
-  while IFS= read -r wt; do
-    [ -n "$wt" ] || continue
-    printf '  - %s\n' "$wt"
-  done <<EOF
-$WORKTREE_CANDIDATES
-EOF
-fi
-
-echo ""
-echo "Local branches to delete (protected: main, master, develop):"
-if [ -z "$BRANCH_CANDIDATES" ]; then
-  echo "  (none)"
-else
-  while IFS= read -r br; do
-    [ -n "$br" ] || continue
-    printf '  - %s\n' "$br"
-  done <<EOF
-$BRANCH_CANDIDATES
-EOF
-fi
-
-if [ -z "$WORKTREE_CANDIDATES" ] && [ -z "$BRANCH_CANDIDATES" ]; then
-  echo ""
-  echo "Nothing to clean. Exiting."
-  exit 0
-fi
-
-if [ "$DRY_RUN" = "true" ]; then
-  echo ""
-  echo "Dry-run complete — no changes applied."
-  exit 0
-fi
-```
-
-### Step 8 — Confirmation Gate
-
-```bash
-if [ "$ASSUME_YES" != "true" ]; then
-  echo ""
-  read -r -p "Proceed with deletion? [y/N] " ANS
-  case "$ANS" in
-    y|Y|yes|YES) ;;
-    *) echo "Aborted by user."; exit 0 ;;
-  esac
-fi
-```
-
-### Step 9 — Switch Away From a Candidate HEAD
-
-If the current branch is about to be deleted, git refuses `branch -D`. Switch to `develop` (fallback `main`) first.
-
-```bash
-needs_switch=false
-if [ -n "$CURRENT_BRANCH" ]; then
-  while IFS= read -r b; do
-    [ -n "$b" ] || continue
-    if [ "$b" = "$CURRENT_BRANCH" ]; then
-      needs_switch=true
-      break
-    fi
-  done <<EOF
-$BRANCH_CANDIDATES
-EOF
-fi
-
-if [ "$needs_switch" = "true" ]; then
-  if git show-ref --verify --quiet refs/heads/develop; then
-    echo "→ git checkout develop (HEAD was on a candidate branch)"
-    git checkout develop
-  elif git show-ref --verify --quiet refs/heads/main; then
-    echo "→ git checkout main (develop missing; falling back)"
-    git checkout main
-  else
-    echo "ERROR: NO_SAFE_FALLBACK_BRANCH — neither develop nor main exists; cannot switch away from $CURRENT_BRANCH" >&2
-    exit 1
-  fi
-fi
-```
-
-### Step 10 — Remove Worktrees
-
-Iterate the candidate list with `while IFS= read -r` over a heredoc, so that worktree paths containing spaces (or glob metacharacters) are preserved as a single token. A plain `for` loop would word-split them.
-
-```bash
-WT_REMOVED=0
-while IFS= read -r wt; do
-  [ -n "$wt" ] || continue
-  echo "→ git worktree remove --force $wt"
-  if git worktree remove --force "$wt"; then
-    WT_REMOVED=$((WT_REMOVED + 1))
-  else
-    echo "WARNING: failed to remove worktree: $wt" >&2
-  fi
-done <<EOF
-$WORKTREE_CANDIDATES
-EOF
-git worktree prune
-```
-
-`--force` ensures worktrees with uncommitted changes are removed. This is intentional — the Print Plan step already showed them to the user.
-
-### Step 11 — Delete Local Branches
-
-```bash
-BR_DELETED=0
-while IFS= read -r br; do
-  [ -n "$br" ] || continue
-  echo "→ git branch -D $br"
-  if git branch -D "$br"; then
-    BR_DELETED=$((BR_DELETED + 1))
-  else
-    echo "WARNING: failed to delete branch: $br" >&2
-  fi
-done <<EOF
-$BRANCH_CANDIDATES
-EOF
-```
-
-### Step 12 — Report Summary
-
-```bash
-echo ""
-echo "=== Summary ==="
-echo "Worktrees removed: $WT_REMOVED"
-echo "Branches deleted:  $BR_DELETED"
-exit 0
-```
+- **Step 1** (§Step 1): `case` loop parsing; mutual-exclusion check; usage banner.
+- **Step 2** (§Step 2): 3-classifier `detect_worktree_context()` function with JSON output; abort on `inWorktree=true`.
+- **Steps 3–4** (§Step 3/4): current-branch capture (empty on detached HEAD); `origin`-presence check; fail-open fetch.
+- **Step 5** (§Step 5): porcelain output parsing with `sed -n 's/^worktree //p'` to preserve paths-with-spaces; `tail -n +2` to skip the main worktree.
+- **Step 6** (§Step 6): `for-each-ref` enumeration; `epic/*` unconditional skip; `docs/*` with-PR check via `gh pr list --head ... --state open` (fail-safe when `gh` is absent).
+- **Steps 7–8** (§Step 7/8): plan rendering; `--dry-run` early exit; interactive `y/N` gate.
+- **Step 9** (§Step 9): candidate-HEAD detection; checkout `develop` then `main` fallback; `NO_SAFE_FALLBACK_BRANCH` abort.
+- **Steps 10–11** (§Step 10/11): `while IFS= read -r` over heredoc; per-failure WARNING without aborting; `git worktree prune` after the loop.
+- **Step 12** (§Step 12): summary printf.
+- **Security & Safety Notes** (§Security & Safety Notes): blast radius is local-only; uncommitted work in worktrees is discarded by design after confirmation; protected-set regex is literal.
 
 ## Error Handling
 
@@ -350,20 +102,13 @@ exit 0
 |----------|--------|
 | `--dry-run` and `--yes` both set | Abort with exit 2 (usage error) |
 | Unknown flag passed | Abort with exit 2 (usage error) |
-| Running inside any linked worktree (path anywhere, not just `.claude/worktrees/*`) | Abort with `IN_WORKTREE_UNSAFE`, exit 1 |
-| Not a git repo | Abort with `NOT_A_REPO` (from detect-context), exit 1 |
+| Running inside any linked worktree | Abort with `IN_WORKTREE_UNSAFE`, exit 1 |
+| Not a git repo | Abort with `NOT_A_REPO`, exit 1 |
 | `origin` remote missing | Warn, skip fetch, continue |
 | HEAD is a candidate and neither `develop` nor `main` exists | Abort with `NO_SAFE_FALLBACK_BRANCH`, exit 1 |
 | Individual worktree remove fails | Warn, continue, count excludes it |
 | Individual branch delete fails | Warn, continue, count excludes it |
-| No candidates (worktrees empty and branches empty) | Print "Nothing to clean", exit 0 |
-
-## Security & Safety Notes
-
-- **Blast radius is local-only:** `git fetch` reads from origin; no `push`, no `--force-push`, no tag/remote-branch mutation. Remote state is untouched.
-- **Uncommitted work:** `git worktree remove --force` discards uncommitted changes inside secondary worktrees. This is surfaced in the Print Plan step and the user can decline at the confirmation gate.
-- **Protected set is literal:** filters use exact regex `^(main|master|develop)$` — no substring matches, no accidental protection of `my-develop-fix`.
-- **HEAD in main worktree is preserved implicitly:** `git worktree list` reports the main worktree first and the enumeration skips it.
+| No candidates (worktrees + branches empty) | Print "Nothing to clean", exit 0 |
 
 ## Related Skills
 
@@ -376,5 +121,9 @@ exit 0
 ## References
 
 - [Rule 09 — Branching Model](../../../rules/09-branching-model.md): protected branches policy
-- [Rule 14 — Worktree Lifecycle](../../../rules/14-worktree-lifecycle.md): non-nesting invariant driving step 2
+- [Rule 14 — Worktree Lifecycle](../../../rules/14-worktree-lifecycle.md): non-nesting invariant driving Step 2
 - [x-manage-worktrees/SKILL.md](../x-manage-worktrees/SKILL.md): source of the canonical `detect_worktree_context()` snippet
+
+## Full Protocol
+
+Minimum viable contract above. Detailed bash for all 12 steps (3-classifier worktree detection, heredoc-based candidate iteration handling paths with spaces, epic/docs filtering, `--force` worktree removal semantics, HEAD-switch logic), error tables, and security notes live in [`references/full-protocol.md`](references/full-protocol.md) per ADR-0012 (skill body slim-by-default).

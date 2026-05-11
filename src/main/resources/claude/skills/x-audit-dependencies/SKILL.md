@@ -13,7 +13,7 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Dependency Audit
+# Skill: Dependency Audit (slim — ADR-0012)
 
 ## Purpose
 
@@ -37,334 +37,41 @@ Audits all dependencies of {{PROJECT_NAME}} for security vulnerabilities, outdat
 | `--scope` | Enum | `all` | Audit scope: all, vulnerabilities, outdated, licenses, sbom, license-report, tree |
 | `--policy` | Boolean | `false` | After standard audit, invoke `x-validate-dependency-policy` to enforce `DependencyPolicyConfig` (EPIC-0074, Rule 32) |
 
-## Workflow
+## Output Contract
 
-```
-1. DETECT     -> Identify build tool and package manager
-2. AUDIT      -> Run language-specific audit commands
-3. PARSE      -> Parse results into structured findings
-4. CATEGORIZE -> Assign severity to each finding
-5. REPORT     -> Generate audit report
-```
+| Scope | Artifact |
+|-------|----------|
+| `vulnerabilities` / `outdated` / `licenses` / `all` | `results/audits/dependency-audit-YYYY-MM-DD.md` |
+| `sbom` | `results/audits/sbom-YYYY-MM-DD.json` (CycloneDX 1.6) + summary `.md` |
+| `license-report` | `results/audits/license-attribution-YYYY-MM-DD.md` |
+| `tree` | `results/audits/dependency-tree-YYYY-MM-DD.md` |
+| `--policy` (any scope) | Plus `x-validate-dependency-policy` report; exit non-zero on `DEP_POLICY_BLOCK` |
 
-### Step 1 — Detect Build Tool
+Exit code: 0 on success; non-zero when audit tool fails OR `--policy` validation blocks.
 
-The project uses **{{BUILD_TOOL}}** as its build tool. Detect the package manager and lock files:
+## Workflow Overview
 
-| Build Tool | Lock File | Language |
-|-----------|-----------|----------|
-| npm | package-lock.json | JavaScript/TypeScript |
-| yarn | yarn.lock | JavaScript/TypeScript |
-| pnpm | pnpm-lock.yaml | JavaScript/TypeScript |
-| maven | pom.xml | Java/Kotlin |
-| gradle | build.gradle / build.gradle.kts | Java/Kotlin |
-| cargo | Cargo.lock | Rust |
-| pip | requirements.txt / Pipfile.lock | Python |
-| poetry | poetry.lock | Python |
-| go mod | go.sum | Go |
-
-### Step 2 — Run Audit Commands
-
-#### Vulnerabilities
-
-| Build Tool | Command |
-|-----------|---------|
-| npm | `npm audit --json` |
-| yarn | `yarn audit --json` |
-| pnpm | `pnpm audit --json` |
-| maven | `mvn org.sonatype.ossindex.maven:ossindex-maven-plugin:audit` |
-| gradle | `gradle dependencyCheckAnalyze` (OWASP plugin) |
-| cargo | `cargo audit --json` |
-| pip | `pip-audit --format json` |
-| poetry | `poetry audit` |
-| go mod | `govulncheck -json ./...` |
-
-#### Outdated Packages
-
-| Build Tool | Command |
-|-----------|---------|
-| npm | `npm outdated --json` |
-| yarn | `yarn outdated --json` |
-| pnpm | `pnpm outdated --format json` |
-| maven | `mvn versions:display-dependency-updates` |
-| gradle | `gradle dependencyUpdates` (versions plugin) |
-| cargo | `cargo outdated --format json` |
-| pip | `pip list --outdated --format json` |
-| poetry | `poetry show --outdated` |
-| go mod | `go list -m -u all` |
-
-#### License Check
-
-| Build Tool | Command |
-|-----------|---------|
-| npm | `npx license-checker --json` |
-| yarn | `npx license-checker --json` |
-| maven | `mvn license:third-party-report` |
-| gradle | `gradle generateLicenseReport` (license plugin) |
-| cargo | `cargo license --json` |
-| pip | `pip-licenses --format json` |
-| go mod | `go-licenses report ./...` |
-
-### Step 3 — Parse Results
-
-For each audit dimension, extract:
-
-**Vulnerabilities:**
-```
-- Package name and version
-- CVE identifier (if available)
-- Severity (CRITICAL/HIGH/MEDIUM/LOW)
-- Description
-- Fixed version (if available)
-- Path (dependency chain)
+```text
+1. DETECT     -> Identify build tool ({{BUILD_TOOL}}) and lock file
+2. AUDIT      -> Run per-stack commands for vulnerabilities / outdated / licenses
+3. PARSE      -> Extract package + version + CVE + severity + fix recommendation
+4. CATEGORIZE -> Assign CRITICAL / HIGH / MEDIUM / LOW per CVSS + license type
+5. REPORT     -> Markdown to results/audits/dependency-audit-YYYY-MM-DD.md
+[6. SBOM]     -> CycloneDX JSON when --scope=sbom (or --scope=all in extended mode)
+[7. POLICY]   -> Skill x-validate-dependency-policy when --policy is set
 ```
 
-**Outdated:**
-```
-- Package name
-- Current version
-- Latest version
-- Update type (major/minor/patch)
-- Breaking changes risk
-```
+Per-stack command tables (npm/yarn/pnpm/maven/gradle/cargo/pip/poetry/go), parse contracts, SBOM/license-report/tree sub-workflows, risk scoring, and full report templates live in [`references/full-protocol.md`](references/full-protocol.md):
 
-**Licenses:**
-```
-- Package name
-- License type (MIT, Apache-2.0, GPL-3.0, etc.)
-- Compatibility with project license
-- Copyleft risk
-```
-
-### Step 4 — Categorize Findings
-
-| Severity | Criteria |
-|----------|----------|
-| **CRITICAL** | Known exploited CVE, RCE vulnerability, data exposure |
-| **HIGH** | CVE with CVSS >= 7.0, GPL license in proprietary project |
-| **MEDIUM** | CVE with CVSS 4.0-6.9, major version behind, LGPL license |
-| **LOW** | CVE with CVSS < 4.0, minor/patch version behind, permissive license issue |
-
-### Step 5 — Generate Report
-
-Write report to `results/audits/dependency-audit-YYYY-MM-DD.md`:
-
-```markdown
-# Dependency Audit Report — {{PROJECT_NAME}}
-
-**Date:** YYYY-MM-DD
-**Build Tool:** {{BUILD_TOOL}}
-**Total Dependencies:** {count}
-
-## Summary
-
-| Dimension | CRITICAL | HIGH | MEDIUM | LOW | Total |
-|-----------|----------|------|--------|-----|-------|
-| Vulnerabilities | N | N | N | N | N |
-| Outdated | — | N | N | N | N |
-| Licenses | — | N | N | N | N |
-
-## Vulnerabilities
-
-### [V-001] {Package} — {CVE ID}
-- **Severity:** CRITICAL
-- **Current:** {version}
-- **Fixed:** {fixed_version}
-- **Description:** {description}
-- **Action:** `{command to update}`
-
-## Outdated Dependencies
-
-| Package | Current | Latest | Type | Risk |
-|---------|---------|--------|------|------|
-| {name} | {current} | {latest} | major | Breaking changes possible |
-| {name} | {current} | {latest} | minor | Low risk |
-
-## License Issues
-
-| Package | License | Issue |
-|---------|---------|-------|
-| {name} | GPL-3.0 | Copyleft — incompatible with project license |
-
-## Recommendations
-
-1. **Immediate:** Fix CRITICAL vulnerabilities
-2. **Short-term:** Update HIGH-risk outdated packages
-3. **Long-term:** Review license compliance strategy
-```
-
-## SBOM Generation
-
-Generate a CycloneDX JSON Software Bill of Materials listing all direct and transitive dependencies.
-
-### SBOM Workflow
-
-```
-1. DETECT     -> Identify build tool (reuse Step 1)
-2. GENERATE   -> Run CycloneDX generation command
-3. VALIDATE   -> Verify SBOM contains required fields
-4. OUTPUT     -> Write CycloneDX JSON to results/audits/sbom-YYYY-MM-DD.json
-```
-
-### Generation Commands
-
-| Build Tool | Command |
-|-----------|---------|
-| npm | `npx @cyclonedx/cdxgen -o sbom.json` |
-| maven | `mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom -DoutputFormat=json` |
-| gradle | `gradle cyclonedxBom` (cyclonedx-gradle-plugin) |
-| cargo | `cargo cyclonedx --format json` |
-| pip | `cyclonedx-py environment -o sbom.json --output-format json` |
-| poetry | `cyclonedx-py environment -o sbom.json --output-format json` |
-| go mod | `cyclonedx-gomod mod -json -output sbom.json` |
-
-### Required SBOM Fields
-
-Each component in the generated SBOM must include:
-
-```
-- name: Package name
-- version: Exact version
-- purl: Package URL (pkg:maven/group/artifact@version)
-- licenses[]: SPDX license identifier(s)
-- hashes[]: SHA-256 digest for integrity verification
-- scope: required | optional | excluded
-```
-
-### SBOM Output
-
-Write CycloneDX JSON to `results/audits/sbom-YYYY-MM-DD.json` and generate a human-readable summary:
-
-```markdown
-# SBOM Summary — {{PROJECT_NAME}}
-
-**Date:** YYYY-MM-DD
-**Format:** CycloneDX 1.6
-**Total Components:** {count}
-
-| Type | Count |
-|------|-------|
-| Direct dependencies | N |
-| Transitive dependencies | N |
-| Dev dependencies | N |
-
-## License Distribution
-
-| License | Count | Copyleft |
-|---------|-------|----------|
-| MIT | N | No |
-| Apache-2.0 | N | No |
-| GPL-3.0 | N | Yes |
-```
-
-## License Attribution Report
-
-Generate a comprehensive license attribution report for all dependencies, highlighting copyleft licenses that may impose obligations.
-
-### License Report Workflow
-
-```
-1. DETECT     -> Identify build tool (reuse Step 1)
-2. COLLECT    -> Gather license data for all dependencies
-3. CLASSIFY   -> Categorize by license type and copyleft risk
-4. REPORT     -> Generate attribution report
-```
-
-### License Report Output
-
-Write report to `results/audits/license-attribution-YYYY-MM-DD.md`:
-
-```markdown
-# License Attribution Report — {{PROJECT_NAME}}
-
-**Date:** YYYY-MM-DD
-**Total Dependencies:** {count}
-
-## Summary
-
-| Category | Count | Percentage |
-|----------|-------|------------|
-| Permissive (MIT, Apache-2.0, BSD) | N | N% |
-| Weak copyleft (LGPL, MPL, EPL) | N | N% |
-| Strong copyleft (GPL, AGPL) | N | N% |
-| Unknown / Custom | N | N% |
-
-## Copyleft Dependencies (Requires Review)
-
-| Package | Version | License | Risk | Action |
-|---------|---------|---------|------|--------|
-| {name} | {version} | GPL-3.0 | HIGH | Legal review required |
-| {name} | {version} | LGPL-2.1 | MEDIUM | Check linking compatibility |
-
-## Full Attribution
-
-| Package | Version | License | URL |
-|---------|---------|---------|-----|
-| {name} | {version} | MIT | {repo_url} |
-```
-
-## Dependency Tree Visualization
-
-Generate a visual dependency tree showing transitive relationships and risk scores.
-
-### Tree Workflow
-
-```
-1. DETECT     -> Identify build tool (reuse Step 1)
-2. RESOLVE    -> Build full dependency graph
-3. SCORE      -> Assign risk score to each node
-4. RENDER     -> Generate tree visualization
-```
-
-### Tree Commands
-
-| Build Tool | Command |
-|-----------|---------|
-| npm | `npm ls --all --json` |
-| maven | `mvn dependency:tree -DoutputType=text` |
-| gradle | `gradle dependencies` |
-| cargo | `cargo tree` |
-| pip | `pipdeptree --json` |
-| go mod | `go mod graph` |
-
-### Risk Scoring
-
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| Known CVE | 40% | Active vulnerabilities in the dependency |
-| Depth | 20% | Distance from direct dependency (deeper = harder to update) |
-| Maintainer activity | 15% | Last update, number of maintainers |
-| License risk | 15% | Copyleft or unknown license |
-| Popularity | 10% | Download count, dependents (low = higher risk) |
-
-### Tree Output
-
-Write tree to `results/audits/dependency-tree-YYYY-MM-DD.md`:
-
-```markdown
-# Dependency Tree — {{PROJECT_NAME}}
-
-**Date:** YYYY-MM-DD
-**Total Nodes:** {count}
-**Max Depth:** {depth}
-
-## Risk Summary
-
-| Risk Level | Count |
-|------------|-------|
-| HIGH (score >= 7) | N |
-| MEDIUM (score 4-6) | N |
-| LOW (score < 4) | N |
-
-## Tree
-
-{package}@{version} [risk: LOW]
-├── {dep-a}@{version} [risk: LOW]
-│   ├── {transitive-1}@{version} [risk: MEDIUM]
-│   └── {transitive-2}@{version} [risk: LOW]
-└── {dep-b}@{version} [risk: HIGH]
-    └── {transitive-3}@{version} [risk: HIGH]
-```
+- **Step 1** (§Step 1 Detect Build Tool): build-tool→lock-file mapping table (9 stacks).
+- **Step 2** (§Step 2 Run Audit Commands): per-stack command tables for vulnerabilities (`npm audit`/`mvn ossindex`/`govulncheck`/etc.), outdated (`npm outdated`/`mvn versions:display`/`go list -m -u`/etc.), and license-check (`license-checker`/`mvn license:third-party-report`/`go-licenses report`/etc.).
+- **Step 3** (§Step 3 Parse Results): extracted fields per dimension (package, CVE, severity, fixed version, dep chain for vulns; version delta + breaking-change risk for outdated; SPDX + copyleft risk for licenses).
+- **Step 4** (§Step 4 Categorize Findings): CVSS-anchored severity table (CRITICAL=exploited RCE, HIGH=CVSS≥7.0 OR GPL in proprietary, MEDIUM=CVSS 4.0-6.9 OR LGPL OR major-behind, LOW=CVSS<4.0 OR minor/patch).
+- **Step 5** (§Step 5 Generate Report): full Markdown template with Summary + Vulnerabilities + Outdated + License Issues + Recommendations sections.
+- **SBOM Generation** (§SBOM Generation): per-stack CycloneDX commands; required component fields (name/version/purl/licenses/hashes/scope); summary template.
+- **License Attribution Report** (§License Attribution Report): permissive/weak-copyleft/strong-copyleft classification; copyleft review table.
+- **Dependency Tree Visualization** (§Dependency Tree Visualization): per-stack tree commands; 5-factor risk scoring (CVE 40% / depth 20% / maintainer 15% / license 15% / popularity 10%); ASCII tree output with per-node risk.
+- **`--policy` Flag** (§`--policy` Flag): standard audit → `Skill(x-validate-dependency-policy)` → exit-code propagation; no-op when policy capability not declared.
 
 ## Error Handling
 
@@ -383,18 +90,8 @@ Write tree to `results/audits/dependency-tree-YYYY-MM-DD.md`:
 | `x-audit-supply-chain` | complementary | Handles deeper supply chain risks (maintainer, typosquatting, SLSA) |
 | `x-generate-ci` | called-by | Dependency audit pipeline references audit commands from this skill |
 | `x-generate-security-dashboard` | reads | Dashboard aggregates results from this skill |
-| `x-validate-dependency-policy` | delegates-to | When `--policy` flag is set, delegates policy enforcement to this skill after standard audit completes |
+| `x-validate-dependency-policy` | delegates-to | When `--policy` flag is set, delegates policy enforcement after standard audit completes |
 
-## `--policy` Flag — Policy Validation Integration
+## Full Protocol
 
-When `--policy` is passed:
-
-1. Execute the standard audit workflow (Steps 1-5) normally.
-2. After generating the standard audit report, invoke the policy validator:
-   ```
-   Skill(skill: "x-validate-dependency-policy", args: "--story-id <STORY-ID> --report <artifact-path>")
-   ```
-3. Propagate exit code: if `x-validate-dependency-policy` exits 1 (`DEP_POLICY_BLOCK`), this skill also exits non-zero.
-4. The standard audit report and the policy validation report are independent artifacts.
-
-This flag is a no-op when `dependencies.policy.enabled: false` or the `governance.dependency-policy` capability is not declared in the project profile.
+Minimum viable contract above. Detailed per-stack command tables (9 build tools × 3 audit dimensions + SBOM + tree), parse contracts, full Markdown report templates, risk scoring formula, and `--policy` integration semantics live in [`references/full-protocol.md`](references/full-protocol.md) per ADR-0012 (skill body slim-by-default).
