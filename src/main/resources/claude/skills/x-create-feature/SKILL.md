@@ -36,7 +36,7 @@ Read before starting:
 - `.claude/templates/_TEMPLATE-STORY.md` (RA9 v2: 9 sections)
 - `.claude/templates/_TEMPLATE-IMPLEMENTATION-MAP.md`
 - `.claude/skills/planning-standards-kp/SKILL.md` — **Mandatory** RA9 9-section model (source of truth), granularity per level (Epic/Story/Task), Packages Hexagonal catalog format, Decision Rationale micro-template
-- `references/decomposition-guide.md` (bundled with this skill)
+- `.claude/knowledge/refinement/decomposition-guide.md` (shared knowledge pack)
 
 If any template is missing, stop and tell the user.
 
@@ -115,7 +115,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-create
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-create-feature Phase-1-Analysis`
 
 1. Read the spec file (path from argument or the spec PR produced by `x-ideate-feature`)
-2. Read `references/decomposition-guide.md`
+2. Read `.claude/knowledge/refinement/decomposition-guide.md`
 3. Analyze the spec:
    - Identify cross-cutting rules (spanning multiple journeys)
    - Identify stories by layer (foundation → core → extensions → compositions → cross-cutting)

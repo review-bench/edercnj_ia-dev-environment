@@ -38,15 +38,15 @@ Include this skill when the project handles payment card data and compliance fra
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| security | `skills/security/references/security-principles.md` | Data classification, input validation, fail-secure patterns |
-| security | `skills/security/references/cryptography.md` | TLS, hashing, key management |
-| compliance | `skills/compliance/SKILL.md` and `skills/compliance/references/` | PCI-DSS requirements |
+| security | `.claude/knowledge/security/security-principles.md` | Data classification, input validation, fail-secure patterns |
+| security | `.claude/knowledge/security/cryptography.md` | TLS, hashing, key management |
+| compliance | `.claude/knowledge/compliance.md` and `.claude/knowledge/checklists/` | PCI-DSS requirements |
 
 ## Workflow
 
 ### Step 1 — Read Compliance Requirements
 
-Read `skills/compliance/references/pci-dss.md` for full PCI-DSS requirement mapping.
+Read `.claude/knowledge/pci-dss-requirements.md` for full PCI-DSS requirement mapping.
 
 ### Step 2 — Identify Cardholder Data Files
 

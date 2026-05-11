@@ -48,10 +48,10 @@ Include this skill when `security.scanning.infraScan: true` in the project confi
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| security | `skills/security/references/security-principles.md` | Data classification, input validation, fail-secure patterns |
-| security | `skills/security/references/security-skill-template.md` | Canonical structure, error handling, CI integration |
-| security | `skills/security/references/sarif-template.md` | SARIF 2.1.0 output format |
-| security | `skills/security/references/security-scoring.md` | Scoring model, grade thresholds |
+| security | `.claude/knowledge/security/security-principles.md` | Data classification, input validation, fail-secure patterns |
+| security | `.claude/knowledge/security/security-skill-template.md` | Canonical structure, error handling, CI integration |
+| security | `.claude/knowledge/security/sarif-template.md` | SARIF 2.1.0 output format |
+| security | `.claude/knowledge/security/security-scoring.md` | Scoring model, grade thresholds |
 
 ## Workflow
 

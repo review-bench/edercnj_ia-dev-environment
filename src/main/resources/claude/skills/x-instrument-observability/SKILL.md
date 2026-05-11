@@ -39,7 +39,7 @@ Include this skill when observability is not "none" in the project configuration
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| observability | `skills/observability/references/observability-principles.md` | 3 pillars (traces, metrics, logs), span tree pattern, mandatory attributes, health checks |
+| observability | `.claude/knowledge/observability/observability-principles.md` | 3 pillars (traces, metrics, logs), span tree pattern, mandatory attributes, health checks |
 
 ## Prerequisites
 

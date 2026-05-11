@@ -40,8 +40,8 @@ Include this skill when the project uses REST protocol.
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| api-design | `skills/api-design/references/api-design-principles.md` | URL structure, status codes, error format, pagination |
-| protocols | `skills/protocols/references/rest-conventions.md` | REST resource naming, HTTP methods, versioning, RFC 7807 |
+| api-design | `.claude/knowledge/api-design/api-design-principles.md` | URL structure, status codes, error format, pagination |
+| api-design | `.claude/knowledge/api-design/rest-conventions.md` | REST resource naming, HTTP methods, versioning, RFC 7807 |
 | checklists | `knowledge/checklists/graphql-api.md` | GraphQL-specific review checklist |
 | checklists | `knowledge/checklists/grpc-api.md` | gRPC-specific review checklist |
 | checklists | `knowledge/checklists/websocket-api.md` | WebSocket-specific review checklist |
@@ -66,7 +66,7 @@ git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --name-only --cached
     Agent(
       subagent_type: "api-engineer",
       description: "REST API specialist review for {target}",
-      prompt: "Review the REST API design for best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `skills/api-design/references/api-design-principles.md` and `skills/protocols/references/rest-conventions.md`. Apply your full API checklist (URL structure, status codes, RFC 7807 error responses, pagination, DTOs, OpenAPI documentation). Produce output in this exact format:\n\nENGINEER: API\nSTORY: {target}\nSCORE: XX/16\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [API-XX] Description (2/2)\nFAILED:\n- [API-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [API-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
+      prompt: "Review the REST API design for best practices. Target: {target}. Run `git diff HEAD~1..HEAD` to get the diff. Read `.claude/knowledge/api-design/api-design-principles.md` and `.claude/knowledge/api-design/rest-conventions.md`. Apply your full API checklist (URL structure, status codes, RFC 7807 error responses, pagination, DTOs, OpenAPI documentation). Produce output in this exact format:\n\nENGINEER: API\nSTORY: {target}\nSCORE: XX/16\nSTATUS: Approved | Rejected | Partial\n---\nPASSED:\n- [API-XX] Description (2/2)\nFAILED:\n- [API-XX] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]\nPARTIAL:\n- [API-XX] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]"
     )
 
 ## Error Handling

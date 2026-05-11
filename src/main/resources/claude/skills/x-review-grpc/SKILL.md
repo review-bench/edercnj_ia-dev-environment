@@ -39,7 +39,7 @@ Include this skill when the project uses gRPC protocol (`interfaces` contains `t
 
 | Pack | Files | Purpose |
 |------|-------|---------|
-| protocols | `skills/protocols/references/grpc-conventions.md` | Proto3 style guide, naming, streaming patterns, error codes, health checks |
+| protocols | `.claude/knowledge/protocols/grpc-conventions.md` | Proto3 style guide, naming, streaming patterns, error codes, health checks |
 
 ## Prerequisites
 
