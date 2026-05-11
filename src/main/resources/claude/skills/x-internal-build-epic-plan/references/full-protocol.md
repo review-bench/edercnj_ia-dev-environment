@@ -275,3 +275,178 @@ larger epics (up to 30 stories).
 These cases are covered by the acceptance scenarios in the SKILL.md
 Testing section and by the future regression goldens under
 `src/test/resources/golden/internal/plan/x-internal-build-epic-plan/`.
+
+---
+
+## Workflow Step Detail (migrated from slim SKILL.md per ADR-0012)
+
+### Step 1 — Argument parsing and path resolution
+
+Parse arguments with the Rule-14 single-file `while (($#))` loop; reject unknown flags / missing required flags / empty values with exit `64`. Normalise `--epic-id` to 4 digits (zero-padded); normalise `--mode` to lowercase and verify it matches `^(sequential|parallel)$`. Verify `--output`'s parent directory exists and is writable; reject with exit `64` if not.
+
+Derive:
+
+```bash
+epic_dir="ai/epics/epic-${epic_id}"
+epic_file="${epic_dir}/epic-${epic_id}.md"
+map_file="${epic_dir}/IMPLEMENTATION-MAP.md"
+```
+
+Validate in order:
+
+1. `[[ -d "${epic_dir}" ]]` — else exit `1` with `EPIC_NOT_FOUND`.
+2. `[[ -f "${map_file}" ]]` — else exit `2` with `MAP_NOT_FOUND`.
+3. `[[ -f "${epic_file}" ]]` — else exit `1` with `EPIC_NOT_FOUND` (folded into code `1` for a flatter contract).
+
+### Step 2 — Load and parse artifacts
+
+Parse the epic file's story table (Markdown `| storyId | …` rows) into a `Set<storyId>` of DECLARED stories. Parse `IMPLEMENTATION-MAP.md` dependency section into a `Map<storyId, List<storyId>>` of EDGES (each key's list is its `blockedBy` set). Enumerate `ai/epics/epic-${epic_id}/story-*.md` to a `Set<storyId>` of ON_DISK stories.
+
+Cross-validation:
+
+- For every `storyId` in EDGES.keys ∪ EDGES.values: if `storyId ∉ ON_DISK`, exit `4` with `STORY_FILE_MISSING`.
+- Stories in ON_DISK but absent from EDGES are treated as zero-dep roots (no error — the map is the authority for edges, but its absence implies "no declared dependency").
+
+### Step 3 — Kahn's algorithm + cycle detection
+
+Classic Kahn: compute `inDegree` per story; seed queue with all `inDegree == 0` roots (sorted lexicographically for determinism); emit them as `phase[0].stories`; decrement neighbour in-degrees; stories reaching zero enter `phase[k+1]`.
+
+If after the loop `|emitted| < |stories|`, there is a cycle. Walk from any unvisited node with `inDegree > 0`, following outgoing edges until a node is revisited — that traversal is the minimal cycle chain. Emit:
+
+```text
+Cycle detected: <story1> -> <story2> -> … -> <story1>
+```
+
+and exit `3`.
+
+### Step 4 — Overlap matrix (parallel mode only)
+
+For `--mode parallel`, compute for every pair `(storyA, storyB)` in the SAME Kahn phase:
+
+```text
+filesA = union of write+regen footprint declared in story-A's plans
+filesB = same for story-B
+overlap = filesA ∩ filesB
+```
+
+The footprint source is the `## File Footprint` block introduced by EPIC-0041 in each plan file (task / story level). When the block is absent (legacy stories predating EPIC-0041), mark the story as `footprint-unknown` and include it in the matrix with an empty peer list + an advisory in the envelope's `warnings` field. Never abort — RULE-006 (EPIC-0041) dictates "warn, do not block" for footprint-unknown stories.
+
+Classify each non-empty overlap by the RULE-004 hotspot table:
+
+- `hard` — overlap contains any hotspot file (`SettingsAssembler.java`, `HooksAssembler.java`, `CLAUDE.md`, `CHANGELOG.md`, `pom.xml`, `.gitignore`, `src/test/resources/golden/**`)
+- `regen` — overlap contains only generator-touched files
+- `soft` — overlap contains only hand-edited files outside hotspots
+- `none` — overlap is empty
+
+`overlapSeverity` at the envelope level is the MAX across all pairs (`hard > regen > soft > none`). `--strict-overlap` does NOT change the severity function — it is already maximal; the flag is echoed so the caller can decide its own threshold.
+
+### Step 5 — Critical path
+
+Longest-path in the DAG by topological order. For every story, `longest[story] = max(longest[dep]) + 1` iterating in Kahn order. The critical path is the chain ending at the story with maximum `longest[story]`, unwound via back-pointers. Ties broken by lexicographic storyId.
+
+### Step 6 — Render markdown via x-internal-write-report
+
+Invoke the downstream via the Rule 13 INLINE-SKILL pattern:
+
+```text
+Skill(skill: "x-internal-write-report",
+      args: "--template _TEMPLATE-EPIC-EXECUTION-PLAN.md --output ${output} --data-stdin")
+```
+
+Pipe the JSON envelope (augmented with a `renderedAt` ISO-8601 timestamp) to the child's stdin. The child is responsible for placeholder substitution; this skill passes the data as-is.
+
+On non-zero exit or absent `${output}`, emit: `Report write failed: <child stderr line>` and exit `5`.
+
+### Step 7 — Emit the envelope
+
+Assemble via `jq -nc`:
+
+```bash
+jq -nc \
+  --arg epicId   "${epic_id}" \
+  --arg mode     "${mode}" \
+  --arg planPath "${output}" \
+  --argjson phases        "${phases_json}" \
+  --argjson overlapMatrix "${overlap_json_or_null}" \
+  --arg     overlapSeverity "${severity_or_null}" \
+  --argjson criticalPath  "${critical_json}" \
+  --argjson storyCount    "${story_count}" \
+  --argjson strictOverlap "${strict_bool}" \
+  '{ epicId:$epicId, mode:$mode, phases:$phases,
+     overlapMatrix: (if $overlapMatrix == null then null
+                     else $overlapMatrix end),
+     overlapSeverity: (if $overlapSeverity == "" then null
+                       else $overlapSeverity end),
+     criticalPath:$criticalPath, planPath:$planPath,
+     storyCount:$storyCount, strictOverlap:$strictOverlap }'
+```
+
+Emit on stdout as a single line terminated by `\n`. Exit `0`.
+
+---
+
+## Examples
+
+### Example 1 — Happy path: sequential mode
+
+```text
+Skill(skill: "x-internal-build-epic-plan",
+      args: "--epic-id XXXX --mode sequential --output ai/epics/epic-XXXX/epic-execution-plan.md")
+```
+
+Output:
+
+```json
+{"epicId":"XXXX","mode":"sequential","phases":[{"index":0,"stories":["story-XXXX-0001","story-XXXX-0002"]},{"index":1,"stories":["story-XXXX-0005"]}],"overlapMatrix":null,"overlapSeverity":null,"criticalPath":["story-XXXX-0001","story-XXXX-0005"],"planPath":"ai/epics/epic-XXXX/epic-execution-plan.md","storyCount":22,"strictOverlap":false}
+```
+
+Exit: 0.
+
+### Example 2 — Parallel mode with overlap
+
+```text
+Skill(skill: "x-internal-build-epic-plan",
+      args: "--epic-id XXXX --mode parallel --output ai/epics/epic-XXXX/epic-execution-plan.md")
+```
+
+`overlapMatrix` populated; `overlapSeverity` matches RULE-004 classification (`"regen"` typical).
+
+### Example 3 — Cyclic dependency
+
+Synthetic epic where `story-A` blockedBy `story-B` and `story-B` blockedBy `story-A`.
+
+Stderr:
+
+```text
+Cycle detected: story-0099-0001 -> story-0099-0002 -> story-0099-0001
+```
+
+Exit: 3.
+
+### Example 4 — Epic directory missing
+
+Stderr: `Epic dir not found: ai/epics/epic-9999`. Exit: 1.
+
+### Example 5 — Story file missing
+
+The IMPLEMENTATION-MAP references `story-0049-0099` but no `story-0049-0099.md` exists on disk. Stderr: `Story file missing: story-0049-0099.md`. Exit: 4.
+
+### Example 6 — Boundary: epic with 1 story, zero deps
+
+Output: `{"epicId":"YYYY","mode":"sequential","phases":[{"index":0,"stories":["story-YYYY-0001"]}],...,"storyCount":1,"strictOverlap":false}`. Exit: 0.
+
+---
+
+## Testing
+
+Acceptance scenarios (mirroring Section 7 of story-0049-0009):
+
+1. **Happy path — sequential.** Epic with N stories; K phases emitted; critical path length ≥ 4; markdown produced at `--output`.
+2. **Boundary — single story.** Epic with only `story-XXXX-0001`; 1 phase with 1 story; critical path length 1.
+3. **Error — cyclic dependency.** Synthetic epic A→B, B→A; exit 3; stderr contains `CYCLIC_DEPENDENCY`.
+4. **Error — epic dir missing.** `--epic-id 9999`; exit 1.
+5. **Error — map missing.** Epic dir exists without `IMPLEMENTATION-MAP.md`; exit 2.
+6. **Error — story file missing.** Map references `story-XXXX-0099.md` but file absent; exit 4.
+7. **Parallel — overlap computed.** Two stories in the same phase touching the same file; `overlapMatrix` populated; `overlapSeverity` matches RULE-004 classification.
+
+Coverage requirement: ≥ 95% line / ≥ 90% branch across the parser, DAG, overlap matrix, and envelope-assembly logic.
