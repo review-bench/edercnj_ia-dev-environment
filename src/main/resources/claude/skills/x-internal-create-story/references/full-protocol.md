@@ -15,7 +15,7 @@ The canonical orchestrator prelude for these two steps lives in
 
 Apply it with:
 
-- `<HOST-SKILL>` = `x-story-create`
+- `<HOST-SKILL>` = `x-internal-create-story`
 - `<EPIC-ID>` = the id parsed from the `**ID:**` header of `<EPIC_FILE>` (e.g., `EPIC-0049` → `0049`). This is the authoritative source — do NOT scan `plans/` folders.
 
 Notes specific to this skill:
@@ -28,10 +28,10 @@ Telemetry markers around each step:
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-P1-Worktree-Detect
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-P1-Worktree-Detect
 ... (P1 body) ...
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-P1-Worktree-Detect ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-P1-Worktree-Detect ok
 ```
 
 (repeat for `Phase-P2-Epic-Branch-Ensure`)
@@ -42,7 +42,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Ph
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-1-Context-Gathering
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-1-Context-Gathering
 ```
 
 Read the source inputs completely.
@@ -58,7 +58,7 @@ From the upstream source, understand the technical context: journeys, data contr
 
 ```text
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-1-Context-Gathering ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-1-Context-Gathering ok
 ```
 
 ---
@@ -67,7 +67,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Ph
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-2-Generation-Loop
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-2-Generation-Loop
 ```
 
 For each story in the Epic's index, create a file following `_TEMPLATE-STORY.md`. Process stories in dependency order (foundations first, then core, then extensions).
@@ -434,7 +434,7 @@ After generating each story's markdown content but before saving, optionally cre
 
 ### 3.1 — Cascaded from Orchestrator
 
-If a `jiraContext` was provided by the orchestrator (`x-epic-decompose`) with `jiraContext.enabled == true` and `jiraContext.cascadeToStories == true`:
+If a `jiraContext` was provided by the orchestrator (`x-create-feature`) with `jiraContext.enabled == true` and `jiraContext.cascadeToStories == true`:
 
 For each story (no additional user prompting needed):
 
@@ -522,7 +522,7 @@ This step is best-effort. Report: "N dependency links criados no Jira"
 
 ```text
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-2-Generation-Loop ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-2-Generation-Loop ok
 ```
 
 ---
@@ -531,7 +531,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Ph
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-3-Validation
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-3-Validation
 ```
 
 Before writing any story file to disk, run a quality gate evaluation on the generated markdown content. This step ensures that low-quality stories do not reach the backlog without refinement.
@@ -638,7 +638,7 @@ If Jira integration was active, also report:
 
 ```text
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-3-Validation ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-3-Validation ok
 ```
 
 ---
@@ -647,7 +647,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Ph
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-P4-Planning-Commit
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-P4-Planning-Commit
 ```
 
 If `--dry-run` or `--no-commit` is set, log `"dry-run, skipping commit"` (dry-run) or `"orchestrated mode, skipping commit"` (no-commit) and skip this step entirely.
@@ -667,7 +667,7 @@ On `COMMIT_FAILED` (exit 4 from `x-commit-planning`), abort the workflow with th
 
 ```text
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-P4-Planning-Commit ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-P4-Planning-Commit ok
 ```
 
 ---
@@ -676,7 +676,7 @@ Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Ph
 
 ```text
 <!-- TELEMETRY: phase.start -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-story-create Phase-P5-Push
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-internal-create-story Phase-P5-Push
 ```
 
 If `--dry-run` or `--no-commit` is set, log `"dry-run, skipping push"` / `"orchestrated mode, skipping push"` and skip.
@@ -691,7 +691,7 @@ On push failure (remote rejection, no connectivity), log a WARNING and continue 
 
 ```text
 <!-- TELEMETRY: phase.end -->
-Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-story-create Phase-P5-Push ok
+Bash: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-internal-create-story Phase-P5-Push ok
 ```
 
 ---
