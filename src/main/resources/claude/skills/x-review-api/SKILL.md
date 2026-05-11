@@ -42,9 +42,9 @@ Include this skill when the project uses REST protocol.
 |------|-------|---------|
 | api-design | `.claude/knowledge/api-design/api-design-principles.md` | URL structure, status codes, error format, pagination |
 | api-design | `.claude/knowledge/api-design/rest-conventions.md` | REST resource naming, HTTP methods, versioning, RFC 7807 |
-| checklists | `knowledge/checklists/graphql-api.md` | GraphQL-specific review checklist |
-| checklists | `knowledge/checklists/grpc-api.md` | gRPC-specific review checklist |
-| checklists | `knowledge/checklists/websocket-api.md` | WebSocket-specific review checklist |
+| checklists | `.claude/knowledge/checklists/graphql-api.md` | GraphQL-specific review checklist |
+| checklists | `.claude/knowledge/checklists/grpc-api.md` | gRPC-specific review checklist |
+| checklists | `.claude/knowledge/checklists/websocket-api.md` | WebSocket-specific review checklist |
 
 ## Prerequisites
 

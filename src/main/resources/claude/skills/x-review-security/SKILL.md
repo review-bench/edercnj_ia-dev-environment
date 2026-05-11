@@ -45,11 +45,11 @@ Include this skill when the project has compliance frameworks configured (PCI-DS
 | security | `.claude/knowledge/security/cryptography.md` | TLS, hashing, key management |
 | compliance | `.claude/knowledge/compliance.md` and `.claude/knowledge/checklists/` | Active framework requirements |
 
-Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
-Read src/main/resources/targets/claude/knowledge/checklists/hipaa-security.md
-Read src/main/resources/targets/claude/knowledge/checklists/pci-dss-security.md
-Read src/main/resources/targets/claude/knowledge/checklists/privacy-security.md
-Read src/main/resources/targets/claude/knowledge/checklists/sox-security.md
+Read .claude/knowledge/security/anti-patterns-java.md
+Read .claude/knowledge/checklists/hipaa-security.md
+Read .claude/knowledge/checklists/pci-dss-security.md
+Read .claude/knowledge/checklists/privacy-security.md
+Read .claude/knowledge/checklists/sox-security.md
 
 ## Workflow
 

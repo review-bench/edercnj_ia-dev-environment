@@ -406,7 +406,7 @@ Launch a **single** `general-purpose` subagent with explicit `model: "opus"` (Ru
 **Minimum KPs for Full Plan:** 7 (all except Compliance, which is conditional).
 **Minimum KPs for Simplified Plan:** 1 (Architecture only; add others as relevant).
 
-Read src/main/resources/targets/claude/knowledge/security/anti-patterns/index.md
+Read .claude/knowledge/security/anti-patterns-java.md
 
 ## Error Handling
 
@@ -433,8 +433,8 @@ For in-depth guidance on architecture patterns, consult:
 - `.claude/knowledge/architecture.md` — full architecture reference
 - `.claude/knowledge/protocols/index.md` — protocol conventions
 - `.claude/knowledge/security/index.md` — security standards
-- `knowledge/observability/index.md` — observability patterns
-- `knowledge/resilience/index.md` — resilience patterns
+- `.claude/knowledge/observability/index.md` — observability patterns
+- `.claude/knowledge/resilience/index.md` — resilience patterns
 - `.claude/knowledge/infrastructure.md` — infrastructure patterns
 
 ## Planning Status Propagation (Rule 22 / EPIC-0046)

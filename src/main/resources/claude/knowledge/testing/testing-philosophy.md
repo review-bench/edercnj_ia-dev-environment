@@ -106,8 +106,8 @@ Prefer **fakes** for collaborators with simple semantics; prefer **stubs** for r
 
 | Threshold | Source |
 |-----------|--------|
-| Project minimum (line) | 80% (Rule 05) |
-| Project minimum (branch) | 70% (Rule 05) |
+| Project minimum (line) | ≥ 95% (Rule 05 — absolute gate, RULE-005-01) |
+| Project minimum (branch) | ≥ 90% (Rule 05 — absolute gate, RULE-005-01) |
 | Mutation kill rate (when enabled) | 60% (`x-execute-mutation-tests`) |
 
 Coverage is necessary, not sufficient. 100% line coverage with no assertions catches nothing. Use mutation testing to confirm tests actually fail when the code breaks (`x-execute-mutation-tests`).
