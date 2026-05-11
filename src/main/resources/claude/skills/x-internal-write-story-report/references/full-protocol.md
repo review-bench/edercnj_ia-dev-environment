@@ -233,3 +233,124 @@ RENAME a `summary` field, follow this playbook:
 This mirrors the deprecation contract used by
 `x-internal-write-report` and avoids lockstep upgrades across the
 `x-internal-*` family.
+
+---
+
+## 11. Workflow Step Detail (migrated from slim SKILL.md)
+
+### Step 1 — Argument parsing and path resolution
+
+Parse the three flags via a tight `while (($#)); case "$1" in …` loop to stay within the SkillSizeLinter 500-line budget without delegating to `x-internal-normalize-args` (peer skill; same rationale as `x-internal-resume-story` §1).
+
+```bash
+epic_dir="ai/epics/epic-${epic_id}"
+state_file="${epic_dir}/execution-state.json"
+template_name="_TEMPLATE-STORY-COMPLETION-REPORT.md"
+template_path="${CLAUDE_PROJECT_DIR}/.claude/templates/${template_name}"
+```
+
+Validate `--output` is not empty and does not contain `..` above the project root (Rule 06 path traversal guard). Reject unknown flags with exit `64`.
+
+### Step 2 — Read execution-state.json (single best-effort read)
+
+```bash
+if [[ ! -r "${state_file}" ]]; then
+  echo "State missing: ${state_file}" >&2
+  exit 1
+fi
+```
+
+Parse the story node:
+
+```bash
+story_json=$(jq --arg sid "${story_id}" '.stories[$sid] // null' "${state_file}")
+if [[ "${story_json}" == "null" ]]; then
+  echo "Story ${story_id} not present in state file" >&2
+  exit 1
+fi
+```
+
+A story absent from the state file degrades to exit 1 (same as missing state) — consumers distinguish via the stderr message, not the exit code.
+
+### Step 3 — Compute summary fields
+
+Tasks classification uses the same DONE synonym set as `x-internal-resume-story`:
+
+```text
+DONE synonyms: DONE, MERGED, COMPLETE, Concluída, Concluida, Done, Merged
+```
+
+```bash
+tasks_count=$(echo "${story_json}" | jq '.tasks // {} | length')
+tasks_done=$(echo "${story_json}" | jq '
+  [ .tasks // {} | to_entries[] |
+    select(.value.status as $s |
+      ["DONE","MERGED","COMPLETE","Concluída","Concluida","Done","Merged"] |
+      index($s)) ] | length')
+commits_count=$(echo "${story_json}" | jq '
+  [ .tasks // {} | to_entries[] | .value.commitSha |
+    select(. != null and . != "") ] | unique | length')
+pr_number=$(echo "${story_json}" | jq '.pr.number // null')
+pr_state=$(echo "${story_json}" | jq '
+  if .pr.state then (.pr.state | ascii_upcase) else null end')
+coverage_line=$(echo "${story_json}" | jq '.verification.coverage.line // null')
+coverage_branch=$(echo "${story_json}" | jq '.verification.coverage.branch // null')
+```
+
+### Step 4 — Build the render payload
+
+Assemble the payload as a single `jq -n` expression so the `x-internal-write-report` invocation receives canonical JSON:
+
+```bash
+data_json=$(jq -nc \
+  --arg storyId "${story_id}" \
+  --arg epicId "${epic_id}" \
+  --argjson tasksCount "${tasks_count}" \
+  --argjson tasksDone "${tasks_done}" \
+  --argjson commitsCount "${commits_count}" \
+  --argjson prNumber "${pr_number}" \
+  --argjson prState "$(jq -nc --arg s "${pr_state}" 'if $s=="null" or $s=="" then null else $s end')" \
+  --argjson coverageLine "${coverage_line}" \
+  --argjson coverageBranch "${coverage_branch}" \
+  --argjson tasks "$(echo "${story_json}" | jq '[.tasks // {} | to_entries[] | {id: .key, status: .value.status, commitSha: (.value.commitSha // null)}]')" \
+  --argjson findings "$(echo "${story_json}" | jq '[.reviews.findings // [] | .[] | {severity: .severity, title: .title, file: (.file // null)}]')" \
+  '{storyId:$storyId, epicId:$epicId,
+    tasksCount:$tasksCount, tasksDone:$tasksDone,
+    commitsCount:$commitsCount,
+    prNumber:$prNumber, prState:$prState,
+    coverageLine:$coverageLine, coverageBranch:$coverageBranch,
+    tasks:$tasks, findings:$findings}')
+```
+
+### Step 5 — Template existence gate
+
+```bash
+if [[ ! -r "${template_path}" ]]; then
+  echo "Template missing: ${template_name}" >&2
+  exit 2
+fi
+```
+
+The pre-check is intentionally local (not delegated to `x-internal-write-report`) so the orchestrator gets a distinct `TEMPLATE_MISSING` exit code (2) rather than the renderer's `TEMPLATE_NOT_FOUND` exit code (1 of that skill). This keeps the two skills' exit-code spaces non-overlapping.
+
+### Step 6 — Delegate to x-internal-write-report
+
+```text
+Skill(skill: "x-internal-write-report",
+      args: "--template _TEMPLATE-STORY-COMPLETION-REPORT.md \
+             --output ${output_path} \
+             --data ${data_json}")
+```
+
+The renderer handles all placeholder substitution and `{{#each}}` loops. Its stdout is a single JSON line matching the `x-internal-write-report` response contract (`{outputPath, bytesWritten, placeholdersReplaced, entriesAppended}`); this skill reads `outputPath` and discards the rest.
+
+### Step 7 — Emit response envelope
+
+```bash
+jq -nc \
+  --arg reportPath "${report_path}" \
+  --argjson summary "${summary_json}" \
+  '{reportPath:$reportPath, summary:$summary}'
+```
+
+Exit 0.

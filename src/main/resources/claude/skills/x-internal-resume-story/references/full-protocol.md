@@ -253,3 +253,172 @@ position of the first non-DONE task in task-order, NOT the numeric
 suffix of the task ID. Gaps (TASK-001 DONE, TASK-002 skipped,
 TASK-003 PENDING) produce `phase-2-task-2` — the second position
 in the state file's iteration order — not `phase-2-task-3`.
+
+---
+
+## Workflow Step Detail (migrated from slim SKILL.md per ADR-0012)
+
+### Step 1 — Argument parsing and path resolution
+
+Parse `--story-id` and `--epic-id`; reject unknown flags and missing required flags with exit `64`. Derive canonical paths:
+
+```bash
+epic_dir="ai/epics/epic-${epic_id}"
+story_file="${epic_dir}/${story_id}.md"
+state_file="${epic_dir}/execution-state.json"
+```
+
+When `${state_file}` is not a regular file, exit `1` (`STATE_FILE_MISSING`). The skill does NOT require `story_file` to exist — it is only consulted for its mtime in Step 4; when absent, `staleWarnings` is emitted empty with no error.
+
+### Step 2 — Read state envelope via read-only delegate
+
+Invoke the pilot skill in read-only mode to leverage its `flock -s`-based shared lock and schema validation:
+
+```bash
+envelope=$(Skill(skill: "x-internal-update-status",
+                 args: "--file ${state_file} --type story \
+                        --id ${story_id} --read-only"))
+```
+
+The returned envelope contains the current `stories.<id>` node verbatim. When the response envelope's `previousValue` is `null` (id absent from schema), exit `2` (`STORY_NOT_IN_STATE`).
+
+**Fallback (degraded mode):** if `x-internal-update-status` is unavailable (e.g., during bootstrap when the pilot skill itself is being generated), fall back to a direct `jq` read:
+
+```bash
+story_node=$(jq -c ".stories[\"${story_id}\"] // empty" \
+             "${state_file}")
+```
+
+An empty `story_node` triggers exit `2`.
+
+### Step 3 — Classify tasks
+
+Iterate over `story_node.tasks` preserving insertion order (jq's `keys_unsorted`). For each task `<id>` with node `<t>`:
+
+```bash
+status=$(echo "${t}" | jq -r '.status // "PENDING"')
+sha=$(echo "${t}"    | jq -r '.commitSha // null')
+completedAt=$(echo "${t}" | jq -r '.completedAt // null')
+```
+
+Classify:
+
+| `status` (case-insensitive) | Bucket |
+| :--- | :--- |
+| `DONE`, `MERGED`, `COMPLETE`, `Concluída`, `Concluida` | `tasksCompleted` (append `{id, commitSha: sha}`) |
+| `PENDING`, `IN_PROGRESS`, `PR_CREATED`, `PR_APPROVED`, `PR_MERGED`, `FAILED`, `BLOCKED`, `UNKNOWN`, any other value | `tasksPending` (append `id`) |
+
+`PR_MERGED` — note: treated as pending when `commitSha` is absent, but the caller may observe `lastCommitSha` separately.
+
+Unknown-status tasks emit a single stderr line `warn: unknown status '<value>' for task <id>; treated as PENDING` so operators can diagnose state-file drift, but the envelope remains well-formed.
+
+### Step 4 — Compute resume point and last commit SHA
+
+```bash
+if [[ ${#tasks_completed[@]} -eq 0 ]]; then
+  resume_point="fresh-start"
+elif [[ ${#tasks_pending[@]} -eq 0 ]]; then
+  resume_point="all-done"
+else
+  first_pending_index=$(( ${#tasks_completed[@]} + 1 ))
+  resume_point="phase-2-task-${first_pending_index}"
+fi
+```
+
+The `first_pending_index` assumes DONE tasks precede PENDING tasks in task-order (invariant upheld by `x-implement-story` Phase 2 wave dispatch). When the invariant is violated — e.g., TASK-001 PENDING, TASK-002 DONE, TASK-003 PENDING — the index is recomputed as the 1-based position of the first non-DONE task regardless of prior gaps.
+
+`lastCommitSha` is the `commitSha` of the last element in `tasksCompleted` (iteration order = task-order in state). `null` when empty.
+
+### Step 5 — Detect staleness
+
+```bash
+story_mtime=$(stat -f '%m' "${story_file}" 2>/dev/null \
+            || stat -c '%Y' "${story_file}" 2>/dev/null \
+            || echo 0)
+```
+
+When `story_mtime == 0` (story file absent) or `tasksCompleted` is empty, `staleWarnings` is the empty array and the step short-circuits.
+
+Otherwise, for each DONE task, convert `completedAt` (ISO-8601) to epoch seconds via `date -j -f '%Y-%m-%dT%H:%M:%SZ' "${v}" +%s` (BSD) or `date -d "${v}" +%s` (GNU). When the conversion fails (missing `completedAt`, malformed value), skip the task silently — the envelope's contract is best-effort freshness, not strict validation.
+
+Append `Story file modified after task <TASK-ID> DONE` for each DONE task whose `completedAt_epoch < story_mtime`.
+
+### Step 6 — Assemble and emit envelope
+
+```bash
+jq -nc \
+  --arg resumePoint "${resume_point}" \
+  --argjson tasksCompleted "${tasks_completed_json}" \
+  --argjson tasksPending "${tasks_pending_json}" \
+  --arg lastCommitSha "${last_commit_sha:-}" \
+  --argjson staleWarnings "${stale_warnings_json}" \
+  '{resumePoint:$resumePoint,
+    tasksCompleted:$tasksCompleted,
+    tasksPending:$tasksPending,
+    lastCommitSha:(if $lastCommitSha=="" then null
+                  else $lastCommitSha end),
+    staleWarnings:$staleWarnings}'
+```
+
+Emit on stdout as a single line terminated by `\n`. Exit `0`.
+
+---
+
+## Examples
+
+### Example 1 — Happy path: fresh start (nothing DONE)
+
+Envelope: `{"resumePoint":"fresh-start","tasksCompleted":[],"tasksPending":["TASK-...-001","..."],"lastCommitSha":null,"staleWarnings":[]}`. Exit: 0.
+
+### Example 2 — Resume mid-story (3 DONE of 5)
+
+Envelope includes `"resumePoint":"phase-2-task-4"`, three entries in `tasksCompleted`, two IDs in `tasksPending`, and `"lastCommitSha":"<sha-of-task-3>"`. Exit: 0.
+
+### Example 3 — Stale warning: story edited after DONE
+
+Envelope includes `"staleWarnings":["Story file modified after task TASK-0049-0013-001 DONE"]`. Exit: 0.
+
+### Example 4 — Error: state file missing
+
+Stderr: `execution-state.json not found`. Exit: 1.
+
+### Example 5 — Error: story not registered
+
+Stderr: `Story not in execution-state.json`. Exit: 2.
+
+### Example 6 — Boundary: all tasks DONE
+
+Envelope `"resumePoint":"all-done"`, `tasksPending=[]`, `"lastCommitSha":"<sha-of-last-task>"`. Exit: 0.
+
+---
+
+## Performance profile (measured on laptop-class)
+
+Measured on `ai/epics/epic-XXXX/` with 22 stories × ~5 tasks each:
+
+| Step | Median time |
+| :--- | :--- |
+| 1 (argparse) | 4 ms |
+| 2 (state read) | 32 ms |
+| 3 (classify) | 8 ms |
+| 4 (resume point) | 1 ms |
+| 5 (staleness) | 12 ms |
+| 6 (envelope) | 22 ms |
+| **Total** | **~80 ms** |
+
+Well under the 200 ms DoD budget.
+
+---
+
+## Testing
+
+Acceptance test scenarios (mirroring Section 7 of story-0049-0013):
+
+1. **Degenerate — fresh start.** Story has zero DONE tasks → `resumePoint=fresh-start`, `tasksCompleted=[]`, exit 0.
+2. **Happy path — resume mid-story.** 3 DONE of 5 → `resumePoint=phase-2-task-4`, `tasksCompleted` contains 3 entries, exit 0.
+3. **Stale warning.** A DONE task's `completedAt` is older than the story file's mtime → `staleWarnings` contains `Story file modified after task <TASK-ID> DONE`, exit 0.
+4. **Error — state file missing.** `execution-state.json` absent → exit 1 with message `execution-state.json not found`.
+5. **Boundary — all tasks DONE.** Every task status is DONE → `resumePoint=all-done`, `tasksPending=[]`, exit 0.
+6. **Error — story not in state.** `--story-id story-9999-9999` but the state file has no matching entry → exit 2.
+
+Coverage requirement: ≥ 95% line / ≥ 90% branch across the invoking Bash codepaths.
