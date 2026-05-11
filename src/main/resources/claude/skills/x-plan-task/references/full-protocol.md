@@ -116,7 +116,7 @@ If validation fails, abort with descriptive error message.
 | Path | Pattern | Example |
 |------|---------|---------|
 | Story file | `<EPIC_DIR>/story-XXXX-YYYY.md` | `ai/epics/epic-XXXX/story-XXXX-YYYY.md` |
-| Plan output | `<EPIC_DIR>/plans/task-plan-XXXX-YYYY-NNN.md` | `ai/epics/epic-XXXX/plans/task-plan-XXXX-YYYY-NNN.md` |
+| Plan output | `<EPIC_DIR>/plans/plan-task-TASK-XXXX-YYYY-NNN.md` | `ai/epics/epic-XXXX/plans/plan-task-TASK-XXXX-YYYY-NNN.md` |
 | Output dir | `<EPIC_DIR>/plans/` | `ai/epics/epic-XXXX/plans/` |
 
 ### 0.4 Idempotency Check (Staleness)
@@ -522,7 +522,7 @@ Ao terminar esta task, o executor DEVE:
 
 ### 5.3 Report
 
-After writing, log: `"Task plan generated: task-plan-XXXX-YYYY-NNN.md (N TDD cycles, M affected files)"`.
+After writing, log: `"Task plan generated: plan-task-TASK-XXXX-YYYY-NNN.md (N TDD cycles, M affected files)"`.
 
 ```text
 <!-- TELEMETRY: phase.end -->
