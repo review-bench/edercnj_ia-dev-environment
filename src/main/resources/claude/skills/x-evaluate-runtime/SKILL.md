@@ -95,7 +95,7 @@ Overall: `overallScore = max(0, 100 - sum(severityWeight × findingCount))`.
 | Login endpoint not provided for `--scope=account-lockout` | Warn and skip account-lockout dimension |
 | Aggressive in production | Downgrade to passive, emit warning |
 | Partial dimension failure | Complete other dimensions, mark failed as SKIPPED |
-| SSL certificate error | Warn and continue with `--insecure` flag |
+| SSL certificate error (untrusted CA, hostname mismatch, expired) | Emit WARNING with the certificate error details; record it as a finding under the `tls`/`hardening` dimension; continue evaluating the remaining HTTP-level checks. TLS verification is NOT silently disabled. |
 
 ## Integration Notes
 

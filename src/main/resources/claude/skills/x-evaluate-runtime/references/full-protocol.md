@@ -285,7 +285,7 @@ Write to `results/security/runtime-protection-{timestamp}.sarif.json`:
 
 ### 6.2 — Markdown Report
 
-Write to `results/security/runtime-protection-{timestamp}-report.md`:
+Write to `results/security/runtime-protection-{timestamp}.md`:
 
 ```markdown
 # Runtime Protection Report — {{PROJECT_NAME}}

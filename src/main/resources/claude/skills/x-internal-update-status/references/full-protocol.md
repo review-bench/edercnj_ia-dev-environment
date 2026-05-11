@@ -56,7 +56,7 @@ The `flock` descriptor is closed on process exit; no explicit unlock is required
 
 ### Step 8 — `--read-only` short-circuit
 
-When `--read-only=true`, Steps 2, 6, and 7 are skipped. The skill opens the file with a shared (`flock -s`) lock, reads the value, emits the response with `noOp=true` and `newValue==previousValue`, and exits 0.
+When `--read-only=true`, Step 2 acquires a **shared** lock (`flock -s`) instead of the default exclusive lock (`flock -x`), and the write Steps 6 and 7 are skipped. The skill opens the file with the shared lock, reads the value, emits the response with `noOp=true` and `newValue==previousValue`, and exits 0. The shared lock allows multiple concurrent readers while still serializing against any in-flight writer.
 
 ## Worked Examples
 

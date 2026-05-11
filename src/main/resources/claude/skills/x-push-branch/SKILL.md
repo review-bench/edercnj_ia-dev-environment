@@ -25,6 +25,26 @@ Standardizes the Git workflow for {{PROJECT_NAME}}. Every feature starts with a 
 - `/x-push-branch branch-name` — create branch, commit, and push
 - `/x-push-branch "commit message"` — commit with message and push
 
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| Positional | String | No | current branch | Either a branch name (matching `feat/`, `fix/`, `refactor/`, `hotfix/`, `release/v*` patterns — see Branch Naming in [`references/full-protocol.md`](references/full-protocol.md) §Step 1) **or** a Conventional Commits subject (`<type>(<scope>): <subject>`). If the value contains a colon (`:`), it is treated as a commit message; otherwise, as a branch name. |
+
+When invoked with no positional argument, the skill commits staged changes on the current branch using the existing commit-message conventions and pushes to origin.
+
+## Output Contract
+
+| Outcome | What changes | How signalled |
+|---------|-------------|---------------|
+| Branch created | New local branch + checkout | Console log line `Branch created: <name>` |
+| Commit added | New atomic commit on current branch | `git log -1` shows new SHA; subject in Conventional Commits format |
+| Push successful | Remote branch updated; tracking set with `-u` | `git push` exits 0 |
+| PR created (when applicable) | Pull request opened on GitHub via `gh pr create` | PR URL emitted to stdout |
+| Failure | No partial state pushed; local working tree may carry uncommitted changes if commit failed | Non-zero exit; error message describes which step failed (branch create / stage / commit / push / PR) |
+
+The skill is idempotent on push: a second invocation on an already-pushed branch with no new commits is a no-op that succeeds without error.
+
 ## Workflow Overview
 
 ```text

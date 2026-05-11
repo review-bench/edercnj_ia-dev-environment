@@ -102,7 +102,7 @@ Step 4: PATH_VALIDATE  -> jq path resolution; exit 3 if absent
 Step 5: IDEMPOTENCY    -> noOp=true short-circuit when previousValue == newValue
 Step 6: ATOMIC_WRITE   -> jq update to tmp; mv tmp file; exit 4 on mv fail
 Step 7: EMIT_RESPONSE  -> sha256 + printf single-line JSON; flock released via FD closure
-Step 8: READ_ONLY      -> when --read-only=true, skip Steps 2/6/7; use shared flock -s
+Step 8: READ_ONLY      -> when --read-only=true, replace Step 2 exclusive lock with shared (flock -s); skip write Steps 6/7
 ```
 
 Each step's full bash, schema-path resolution rules per `--type`, and `flock` semantics live in [`references/full-protocol.md`](references/full-protocol.md):
