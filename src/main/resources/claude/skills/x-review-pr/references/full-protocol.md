@@ -115,7 +115,9 @@ Before executing the Tech Lead review, check if a report already exists and is s
 4. If report exists AND the branch has no new commits since last report:
 
    ```bash
-   stat -c %Y ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
+   # Portable mtime: BSD (macOS) first, then GNU coreutils
+   stat -f %m ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null \
+     || stat -c %Y ai/epics/epic-XXXX/reviews/review-tech-lead-story-XXXX-YYYY.md 2>/dev/null
    git log -1 --format=%ct HEAD
    ```
 
@@ -149,10 +151,10 @@ git diff [BASE_BRANCH] --name-only
 
 Read knowledge packs to calibrate the review:
 
-- `knowledge/coding-standards/coding-conventions.md` — {{LANGUAGE}} naming, injection, mapper conventions
-- `knowledge/architecture/architecture-principles.md` — layer boundaries, dependency direction
-- `rules/05-quality-gates.md` — coverage thresholds, merge checklist
-- `knowledge/testing/testing-philosophy.md` — TDD workflow, Double-Loop TDD, TPP ordering
+- `.claude/knowledge/coding-standards.md` — {{LANGUAGE}} naming, injection, mapper conventions
+- `.claude/knowledge/architecture.md` — layer boundaries, dependency direction
+- `.claude/rules/05-quality-gates.md` — coverage thresholds, merge checklist
+- `.claude/knowledge/testing.md` — TDD workflow, Double-Loop TDD, TPP ordering
 
 Check for existing artifacts (extract epic ID XXXX and story sequence YYYY from story ID): specialist review reports, implementation plan, test plan, common mistakes document.
 
@@ -349,7 +351,7 @@ WHILE gateAttempts < 3:
     question: "Auto-remediation exhausted after 2 retry cycles. The Tech Lead review returned NO-GO. How would you like to proceed?"
     options:
       - { header: "Proceed", label: "Continue (Recommended)", description: "Re-dispatch auto-remediation (+2 loops). If the review converges to GO, the gate closes and the skill exits normally." }
-      - { header: "Fix PR", label: "Run x-fix-pr and retry", description: "Invokes x-fix-pr on the current PR; reapresents this menu on return." }
+      - { header: "Fix PR", label: "Run x-fix-pr and retry", description: "Invokes x-fix-pr on the current PR; re-presents this menu on return." }
       - { header: "Abort", label: "Cancel the operation", description: "Terminates the skill with REVIEW_REMEDIATION_EXHAUSTED. No further remediation is attempted." }
 
   On PROCEED (slot 1):
@@ -362,7 +364,7 @@ WHILE gateAttempts < 3:
       IF gateAttempts >= 3:
         Emit REVIEW_FIX_LOOP_EXCEEDED and terminate (see guard-rail below)
       ELSE:
-        Continue loop (reapresent menu)
+        Continue loop (re-present menu)
 
   On FIX-PR (slot 2):
     gateAttempts++
@@ -379,7 +381,7 @@ WHILE gateAttempts < 3:
     IF gateAttempts >= 3:
       Emit REVIEW_FIX_LOOP_EXCEEDED and terminate
     ELSE:
-      Continue loop (reapresent menu)
+      Continue loop (re-present menu)
 
   On ABORT (slot 3):
     Emit: "Review NO-GO final: operator aborted after ${gateAttempts} remediation attempt(s) on PR ${PR}"
@@ -389,9 +391,9 @@ WHILE gateAttempts < 3:
 **Guard-rail — `REVIEW_FIX_LOOP_EXCEEDED` (3 consecutive PROCEED or FIX-PR without convergence):**
 
 ```text
-REVIEW_FIX_LOOP_EXCEEDED: Loop de fix excedeu 3 tentativas no review do PR ${PR};
-gate encerrado com ABORT automático.
-Retomar via --resume-review ${PR} ou intervenção manual.
+REVIEW_FIX_LOOP_EXCEEDED: Fix loop exceeded 3 attempts on PR ${PR} review;
+gate terminated with automatic ABORT.
+Resume via --resume-review ${PR} or manual intervention.
 ```
 
 No 4th option is offered. The gate terminates immediately. The menu was presented exactly 3 times (RULE-002 invariant: total option count remains 3 at all previous presentations).

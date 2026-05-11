@@ -16,7 +16,13 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-> 🔒 **INTERNAL SKILL** — Invoked only by other skills (orchestrators) via the Skill tool. Not user-invocable. Callers: `x-implement-epic`, `x-orchestrate-epic`, `x-implement-story`.
+> 🔒 **INTERNAL SKILL**
+> Esta skill é invocada apenas por outras skills (orquestradores).
+> NÃO é destinada a invocação direta pelo usuário.
+> Caller principal: x-implement-epic, x-orchestrate-epic, x-implement-story.
+> Segunda skill da convenção `x-internal-*` (após x-internal-update-status,
+> a story PILOTO 0049-0005): frontmatter `visibility: internal`, subdir
+> `internal/ops/`, marker 🔒 e filtragem do menu `/help` via generator.
 
 # Skill: x-internal-write-report (slim — ADR-0012)
 

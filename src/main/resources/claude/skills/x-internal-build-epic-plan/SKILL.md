@@ -16,7 +16,18 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-> 🔒 **INTERNAL SKILL** — Invoked only by other skills (orchestrators) via the Skill tool. Not user-invocable. Caller: `x-implement-epic` (Phase 0 / 0.5 carve-out).
+> 🔒 **INTERNAL SKILL**
+> Esta skill é invocada apenas por outras skills (orquestradores).
+> NÃO é destinada a invocação direta pelo usuário.
+> Caller principal: `x-implement-epic` (Phase 0 / 0.5 carve-out).
+> Sexta skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, e x-internal-build-story-plan 0049-0012). Terceira skill
+> na subdir `internal/plan/`. A subdir `plan/` agrupa as skills que
+> orquestram lógica de planejamento (read-only computation + render);
+> difere de `internal/ops/`, cujas sibling skills mutam estado
+> (execution-state.json, reports).
 
 # Skill: x-internal-build-epic-plan (slim — ADR-0012)
 

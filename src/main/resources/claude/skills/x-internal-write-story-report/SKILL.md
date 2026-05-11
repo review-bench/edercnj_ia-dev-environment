@@ -16,7 +16,22 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-> 🔒 **INTERNAL SKILL** — Invoked only by other skills (orchestrators) via the Skill tool. Not user-invocable. Caller: `x-implement-story` Phase 3 final-report carve-out.
+> 🔒 **INTERNAL SKILL**
+> Esta skill é invocada apenas por outras skills (orquestradores).
+> NÃO é destinada a invocação direta pelo usuário.
+> Caller principal: x-implement-story (Phase 3 carve-out — final report).
+> Oitava skill da convenção `x-internal-*` (após x-internal-update-status
+> pilot 0049-0005, x-internal-write-report 0049-0006,
+> x-internal-normalize-args 0049-0007, x-internal-load-story-context
+> 0049-0011, x-internal-build-story-plan 0049-0012,
+> x-internal-verify-story 0049-0014, e x-internal-resume-story
+> 0049-0013). Quinta skill em `internal/plan/`: o subdir `plan/` agrupa
+> orquestração de planejamento e verificação da story; esta skill fecha
+> a quíntupla `load → build → verify → resume → report` com o report
+> final consolidado. Difere de `internal/ops/`, cujas sibling skills
+> mutam estado compartilhado (`execution-state`, append-markers); esta
+> skill é **single-writer** para o seu próprio `--output` e delega o
+> render a `x-internal-write-report`.
 
 # Skill: x-internal-write-story-report (slim — ADR-0012)
 
