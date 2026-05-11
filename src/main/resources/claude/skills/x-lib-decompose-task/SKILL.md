@@ -47,7 +47,7 @@ Idempotent on staleness: when `mtime(tasks) >= mtime(story)`, returns the existi
 
 ```text
 0.   IDEMPOTENCY    -> mtime(story) vs mtime(tasks); skip generation if fresh
-0.5. ARCH_CONTEXT   -> Read .claude/knowledge/architecture.md + layer-templates.md
+0.5. ARCH_CONTEXT   -> Read .claude/knowledge/architecture.md + .claude/knowledge/layer-templates.md
 1.   READ_STORY     -> Read Architect plan + story + _TEMPLATE-TASK-BREAKDOWN.md (RULE-007)
 1.5. MODE_DETECT    -> Test plan with TPP markers? → 2A (TDD); else → 2B (Layer)
 2A.  TDD_TASKS      -> One task per UT/IT/AT scenario; RED/GREEN/REFACTOR + tier + budget + parallel + depends-on

@@ -56,8 +56,7 @@ Produces a report at the path specified by `--report-path` (default: stdout). Ex
 | Dimension | Trigger | What it validates |
 |-----------|---------|-------------------|
 | `readme` | New public class / SKILL / config key | README.md touched in diff |
-| `api-specs` (openapi) | New `@GetMapping`/`@PostMapping`/etc | Endpoint declared in `openapi.yaml` |
-| `api-specs` (asyncapi) | New `publish`/`emit`/`@KafkaListener` | Event in `asyncapi.yaml` |
+| `api-specs` | New `@GetMapping`/`@PostMapping`/etc (REST) OR `publish`/`emit`/`@KafkaListener` (events) | Endpoint declared in `openapi.yaml` AND/OR event in `asyncapi.yaml`, depending on which sub-dimension is active per `interfaces[].spec` / `interfaces[].broker` in the project YAML. Reports as a single dimension. |
 | `grpc-proto` | New `@GrpcService` or `rpc X` | Matching `.proto` file in diff |
 | `adr` | Story references ADR-XXXX or arch plan exists | ADR file present in `docs/adr/` |
 | `skill-docs` | `SKILL.md` in diff | Required frontmatter + `## Triggers` section |
@@ -81,7 +80,7 @@ Per-dimension detection logic with `git diff` snippets, auto-detect rules per st
 - **Step 3** (§Step 3): 7-row change-classification table mapping file patterns to dimensions; docs-only PR degenerate case (overall PASS).
 - **Step 4** (§Step 4 sub-dimensions): full bash for `readme`/`api-specs (openapi+asyncapi)`/`grpc-proto`/`adr`/`skill-docs`/`system-architecture`; PASS/FAIL/SKIP semantics per dimension; optional `x-update-system-architecture --validate-only` delegation.
 - **Step 5** (§Step 5): `git log -1 --format="%ci"` against changed code; FAIL→WARNING downgrade within window; FAIL restored on expiry.
-- **Step 6** (§Step 6): `_TEMPLATE-DOC-VALIDATE-REPORT.md` consumption; full report template with Overall verdict, per-dimension status, Failures + Warnings sections; security rule (no absolute paths in report).
+- **Step 6** (§Step 6): `.claude/templates/_TEMPLATE-DOC-VALIDATE-REPORT.md` consumption; full report template with Overall verdict, per-dimension status, Failures + Warnings sections; security rule (no absolute paths in report).
 
 ## Error Handling
 
