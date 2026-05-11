@@ -57,8 +57,9 @@ Exit code: 0 on success; non-zero when audit tool fails OR `--policy` validation
 3. PARSE      -> Extract package + version + CVE + severity + fix recommendation
 4. CATEGORIZE -> Assign CRITICAL / HIGH / MEDIUM / LOW per CVSS + license type
 5. REPORT     -> Markdown to results/audits/dependency-audit-YYYY-MM-DD.md
-[6. SBOM]     -> CycloneDX JSON when --scope=sbom (or --scope=all in extended mode)
-[7. POLICY]   -> Skill x-validate-dependency-policy when --policy is set
+[6. POLICY]   -> Skill x-validate-dependency-policy when --policy is set
+
+`--scope=all` covers ONLY the 3 standard dimensions (vulnerabilities + outdated + licenses) — it does NOT include SBOM, license-report, or tree. Each of those is opt-in via its own dedicated `--scope` value, with its own artifact path (see Output Contract above).
 ```
 
 Per-stack command tables (npm/yarn/pnpm/maven/gradle/cargo/pip/poetry/go), parse contracts, SBOM/license-report/tree sub-workflows, risk scoring, and full report templates live in [`references/full-protocol.md`](references/full-protocol.md):

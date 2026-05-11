@@ -184,7 +184,7 @@ Flag any class where estimated coverage < 95% line / 90% branch.
 7. Dependency markers are complete (no orphan UTs)
 8. Estimated coverage meets thresholds (≥ 95% line, ≥ 90% branch)
 9. Test naming follows convention: `[method]_[scenario]_[expected]`
-10. No unnecessary UTs for CRUD-only stories (max Level 3 unless justified)
+10. No unnecessary UTs for CRUD-only stories (max TPP Level 2 per §2.4 unless business rules introduce conditional/iteration logic)
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-tests Phase-4-Report ok`

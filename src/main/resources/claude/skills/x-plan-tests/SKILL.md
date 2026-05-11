@@ -2,7 +2,7 @@
 name: x-plan-tests
 description: "Generates a Double-Loop TDD test plan with TPP-ordered acceptance and unit scenarios."
 user-invocable: true
-allowed-tools: Read, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent
 argument-hint: "[STORY-ID]"
 requires-capabilities: []
 ---
