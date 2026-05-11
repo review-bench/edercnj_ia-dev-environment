@@ -16,54 +16,39 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-> 🔒 **INTERNAL SKILL**
-> Esta skill é invocada apenas por outras skills (orquestradores).
-> NÃO é destinada a invocação direta pelo usuário.
-> Caller principal: x-implement-epic, x-implement-story, x-fix-epic-pr.
-> Esta é a story PILOTO (story-0049-0005) da convenção `x-internal-*`:
-> frontmatter `visibility: internal`, subdir `internal/ops/`, marker 🔒, e
-> filtragem do menu `/help` via generator.
+> 🔒 **INTERNAL SKILL** — Invoked only by orchestrators (callers: `x-implement-epic`, `x-implement-story`, `x-fix-epic-pr`). Not for direct user invocation. This is the PILOT story (story-0049-0005) of the `x-internal-*` convention.
 
-# Skill: x-internal-update-status
+# Skill: x-internal-update-status (slim — ADR-0012)
 
 ## Purpose
 
-Perform atomic read-modify-write mutations of
-`ai/epics/epic-XXXX/execution-state.json` (the telemetry checkpoint file
-consumed by every orchestrator skill). The operation:
+Perform atomic read-modify-write mutations of `ai/epics/epic-XXXX/execution-state.json` (the telemetry checkpoint file consumed by every orchestrator). The operation:
 
 1. Acquires a `flock`-based advisory lock with 30s timeout.
 2. Reads the full JSON document.
 3. Validates the resolved path exists in the schema.
-4. Compares `previousValue` vs `newValue` — emits `noOp=true` when equal
-   (idempotency per RULE-002).
+4. Compares `previousValue` vs `newValue` — emits `noOp=true` when equal (idempotency per RULE-002).
 5. Writes via tmp-file + rename (atomic on POSIX).
 6. Releases the lock.
 
-This replaces ad-hoc `Edit`-tool invocations from inside orchestrators,
-which historically lost updates under `--parallel` execution (documented
-in EPIC-0042 post-mortems).
+Replaces ad-hoc `Edit`-tool invocations from inside orchestrators, which historically lost updates under `--parallel` execution (EPIC-0042 post-mortems).
 
 ## Convention Anchors (x-internal-* PILOT)
 
-| Aspect | Value | Rationale |
-| :--- | :--- | :--- |
-| Path | `internal/ops/x-internal-update-status/` | `internal/` prefix scopes visibility; `ops/` aligns with sibling runtime-ops skills |
-| Frontmatter `visibility` | `internal` | Generator filters these from `/help` menu |
-| Frontmatter `user-invocable` | `false` | Declarative complement to `visibility: internal` |
-| Body marker | `> 🔒 **INTERNAL SKILL**` block as first non-frontmatter content | Visible to humans browsing the repo; no parsing required |
-| Allowed tools | `Bash` only | Minimal surface; all logic is a single shell pipeline |
-| Naming | `x-internal-{subject}-{action}` | Mirrors Rule 04 skill taxonomy; `status-update` = subject+action |
+| Aspect | Value |
+| :--- | :--- |
+| Path | `internal/ops/x-internal-update-status/` |
+| Frontmatter `visibility` | `internal` |
+| Frontmatter `user-invocable` | `false` |
+| Body marker | `> 🔒 **INTERNAL SKILL**` as first non-frontmatter content |
+| Allowed tools | `Bash` only (single shell pipeline) |
+| Naming | `x-internal-{subject}-{action}` (subject = `status`, action = `update`) |
 
-Audit rule: Rule 22 (Lifecycle Integrity) validates every skill under
-`internal/**` satisfies all 6 anchors above. Violations fail the
-`LifecycleIntegrityAuditTest`.
+Audit: Rule 22 (Lifecycle Integrity) validates these 6 anchors. Violations fail `LifecycleIntegrityAuditTest`.
 
 ## Triggers
 
-Bare-slash form is intentionally omitted — this skill is never invoked
-by a human typing `/x-internal-update-status` in chat. All invocations
-follow Rule 13 INLINE-SKILL pattern from a calling orchestrator:
+Bare-slash form intentionally omitted — never invoked by a human. All invocations follow Rule 13 INLINE-SKILL pattern:
 
 ```markdown
 Skill(skill: "x-internal-update-status",
@@ -86,198 +71,63 @@ Skill(skill: "x-internal-update-status",
 
 ## Response Contract
 
-When successful, the skill writes a single-line JSON object to stdout:
+Single-line JSON object on stdout:
 
-| Field | Type | Always Present | Description |
-| :--- | :--- | :--- | :--- |
-| `previousValue` | `String\|Null` | yes | Value before write; null when field was absent |
-| `newValue` | `String` | yes | Value after write (equal to previous on no-op) |
-| `fileSha` | `String(64)` | yes | sha256 of the file after the write |
-| `noOp` | `Boolean` | yes | `true` when `previousValue == newValue` |
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `previousValue` | `String\|Null` | Value before write; null when field was absent |
+| `newValue` | `String` | Value after write (equal to previous on no-op) |
+| `fileSha` | `String(64)` | sha256 of the file after the write |
+| `noOp` | `Boolean` | `true` when `previousValue == newValue` |
 
 ## Exit Codes
 
-| Code | Name | Condition | Message Format |
-| :--- | :--- | :--- | :--- |
-| 0 | SUCCESS | Write or no-op completed | — |
-| 1 | FILE_NOT_FOUND | File missing and `--initialize=false` | `State file not found: <path>` |
-| 2 | LOCK_TIMEOUT | `flock` timed out after 30s | `Lock timeout on <path>.lock` |
-| 3 | INVALID_PATH | `--type/--id/--field` tuple does not resolve | `Path '<resolved-path>' not found in schema` |
-| 4 | WRITE_FAILED | Atomic `mv` of tmp file failed | `Atomic write failed: <stderr>` |
-
-## Workflow
-
-### Step 1 — Argument parsing and validation
-
-Parse flags; reject unknown flags; enforce mutual exclusivity of
-`--read-only` with any write-implying flag combination. When
-`--type=epic`, the resolved path is `<field>` at document root; when
-`--type=story`, the path is `stories.<id>.<field>`; when `--type=task`,
-the path is `stories.<parentStoryId>.tasks.<id>.<field>`. Parent story
-ID is inferred from the task ID prefix (`TASK-0049-0005-001` ⇒
-`story-0049-0005`).
-
-### Step 2 — Lock acquisition
-
-```bash
-lock_file="${file}.lock"
-exec {fd}>"${lock_file}"
-if ! flock -w 30 "${fd}"; then
-  echo "Lock timeout on ${lock_file}" >&2
-  exit 2
-fi
-```
-
-### Step 3 — File existence and initialization
-
-- When the file is absent and `--initialize=false`: exit 1.
-- When absent and `--initialize=true`: write an empty skeleton
-  `{"version":1,"stories":{}}` via the same atomic tmp+rename contract
-  before proceeding.
-
-### Step 4 — Read and validate path
-
-Parse JSON via `jq`; resolve the path per Step 1. When the path does
-not exist, exit 3 with the resolved path in the message.
-
-### Step 5 — Idempotency check
-
-Compute `previousValue` at the resolved path. When
-`previousValue == newValue`, emit the response JSON with `noOp=true`
-and exit 0 without touching the file. The lock is still released via
-`flock` descriptor closure.
-
-### Step 6 — Atomic write
-
-```bash
-tmp="${file}.tmp.$$"
-jq --arg v "${newValue}" "<path-expression>" "${file}" > "${tmp}"
-if ! mv "${tmp}" "${file}"; then
-  rm -f "${tmp}"
-  echo "Atomic write failed: mv returned non-zero" >&2
-  exit 4
-fi
-```
-
-### Step 7 — Emit response and release lock
-
-```bash
-file_sha=$(shasum -a 256 "${file}" | cut -d' ' -f1)
-printf '{"previousValue":%s,"newValue":"%s","fileSha":"%s","noOp":false}\n' \
-  "${prev_json}" "${newValue}" "${file_sha}"
-```
-
-The `flock` descriptor is closed on process exit; no explicit unlock
-is required.
-
-### Step 8 — `--read-only` short-circuit
-
-When `--read-only=true`, Steps 2, 6, and 7 are skipped. The skill
-opens the file with a shared (`flock -s`) lock, reads the value,
-emits the response with `noOp=true` and `newValue==previousValue`,
-and exits 0.
-
-## Examples
-
-### Example 1 — Happy path: mark a story as MERGED
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type story --id story-0049-0005 \
-             --field status --value MERGED")
-```
-
-Output:
-```json
-{"previousValue":"IN_PROGRESS","newValue":"MERGED","fileSha":"a1b2...","noOp":false}
-```
-Exit: 0.
-
-### Example 2 — No-op: value already matches
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type story --id story-0049-0005 \
-             --field status --value MERGED")
-```
-
-Output:
-```json
-{"previousValue":"MERGED","newValue":"MERGED","fileSha":"a1b2...","noOp":true}
-```
-Exit: 0.
-
-### Example 3 — Initialize a fresh state file
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type epic --id 0049 \
-             --initialize")
-```
-
-Output:
-```json
-{"previousValue":null,"newValue":"2","fileSha":"c3d4...","noOp":false}
-```
-Exit: 0.
-
-### Example 4 — Task-level update
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type task --id TASK-0049-0005-003 \
-             --field prNumber --value 612")
-```
-
-Output:
-```json
-{"previousValue":null,"newValue":"612","fileSha":"e5f6...","noOp":false}
-```
-Exit: 0.
-
-### Example 5 — Read-only query
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type story --id story-0049-0005 \
-             --field status --value UNUSED \
-             --read-only")
-```
-
-Output:
-```json
-{"previousValue":"MERGED","newValue":"MERGED","fileSha":"a1b2...","noOp":true}
-```
-Exit: 0. Note: `--value` is required by the argument schema but is
-ignored under `--read-only`.
-
-### Example 6 — Invalid path (schema rejection)
-
-```bash
-Skill(skill: "x-internal-update-status",
-      args: "--file ai/epics/epic-XXXX/execution-state.json \
-             --type story --id unknown-story \
-             --field status --value DONE")
-```
-
-Stderr:
-```
-Path 'stories.unknown-story.status' not found in schema
-```
-Exit: 3.
-
-## Outputs
-
-| Artifact | Path | Description |
+| Code | Name | Condition |
 | :--- | :--- | :--- |
-| Updated state file | `<--file>` | JSON document mutated in place via atomic rename |
-| Response envelope | stdout | Single-line JSON (`previousValue` / `newValue` / `fileSha` / `noOp`) |
-| Lock file | `<--file>.lock` | Created empty on first invocation; retained for reuse |
+| 0 | SUCCESS | Write or no-op completed |
+| 1 | FILE_NOT_FOUND | File missing and `--initialize=false` |
+| 2 | LOCK_TIMEOUT | `flock` timed out after 30s |
+| 3 | INVALID_PATH | `--type/--id/--field` tuple does not resolve in schema |
+| 4 | WRITE_FAILED | Atomic `mv` of tmp file failed |
+| 64 | EX_USAGE | Missing required flag |
+| 127 | NO_JQ | `jq` absent on PATH |
+
+## Workflow Overview
+
+```text
+Step 1: PARSE_ARGS     -> validate flags; resolve schema path by --type/--id/--field
+Step 2: LOCK_ACQUIRE   -> flock -w 30 on <file>.lock; exit 2 on timeout
+Step 3: FILE_INIT      -> exit 1 if absent and !--initialize; else write skeleton
+Step 4: PATH_VALIDATE  -> jq path resolution; exit 3 if absent
+Step 5: IDEMPOTENCY    -> noOp=true short-circuit when previousValue == newValue
+Step 6: ATOMIC_WRITE   -> jq update to tmp; mv tmp file; exit 4 on mv fail
+Step 7: EMIT_RESPONSE  -> sha256 + printf single-line JSON; flock released via FD closure
+Step 8: READ_ONLY      -> when --read-only=true, replace Step 2 exclusive lock with shared (flock -s); skip write Steps 6/7
+```
+
+Each step's full bash, schema-path resolution rules per `--type`, and `flock` semantics live in [`references/full-protocol.md`](references/full-protocol.md):
+
+- **Step 1** (§Step 1): path resolution table per `--type` (`epic` → `<field>`; `story` → `stories.<id>.<field>`; `task` → `stories.<parentStoryId>.tasks.<id>.<field>`); parent-story inference from task-ID prefix.
+- **Steps 2–7** (§Step 2..7): full `flock`/`jq`/`mv` bash blocks; idempotency short-circuit; atomic-rename contract on POSIX.
+- **Step 8** (§Step 8): read-only short-circuit with shared lock.
+- **Worked examples 1–6** (§Worked Examples): happy path (PENDING→MERGED), no-op, `--initialize`, task-level update, read-only query, INVALID_PATH error.
+
+## Concurrency Contract
+
+- All readers and writers acquire the same `<file>.lock` FD. Exclusive (`flock -x`) for writes; shared (`flock -s`) for `--read-only`.
+- Two concurrent invocations on **different fields** of the same file serialize through the lock; both updates are preserved.
+- Two concurrent invocations on **the same field** serialize; the later caller observes the earlier caller's value as `previousValue` — correct "last writer wins" semantic.
+- Lock is released automatically on process exit (FD closure). No `trap`-based cleanup required.
+
+## Trailer Injection Contract (story-0059-0004)
+
+Every write that stages and commits `execution-state.json` MUST inject the canonical trailer so `.githooks/commit-msg` allows the commit:
+
+```
+Co-Authored-By: x-internal-update-status@<40-char-git-sha>
+```
+
+Full commit invocation pattern, trailer-validation regex, and recovery-escape semantics in [`references/full-protocol.md`](references/full-protocol.md) §Trailer Injection Contract.
 
 ## Error Handling
 
@@ -286,116 +136,17 @@ Exit: 3.
 | Missing required flag | Print `usage:` banner to stderr; exit 64 (sysexits EX_USAGE) |
 | `jq` absent on PATH | Exit 127 with `jq is required`; abort before lock |
 | Concurrent invocation exceeds 30s wait | Exit 2 (`LOCK_TIMEOUT`) — caller retries with backoff |
-| `mv` fails mid-write | Delete tmp file; exit 4 (`WRITE_FAILED`); state file is left untouched |
+| `mv` fails mid-write | Delete tmp file; exit 4 (`WRITE_FAILED`); state file untouched |
 | `--initialize` collides with existing non-JSON file | Exit 4 — do not overwrite |
 | Schema version mismatch | Log warning to stderr; proceed (non-blocking per RULE-006) |
 
-## Concurrency Contract
-
-- All readers and writers must acquire the same `<file>.lock` file
-  descriptor. Exclusive (`flock -x`) for writes; shared (`flock -s`)
-  for `--read-only`.
-- Two concurrent invocations targeting **different fields** of the
-  same file serialize through the lock; both updates are preserved.
-- Two concurrent invocations targeting **the same field** serialize;
-  the later caller observes the earlier caller's value as
-  `previousValue` — this is the correct "last writer wins" semantic.
-- Lock is released automatically on process exit (file descriptor
-  closure). No `trap`-based cleanup required.
-
-## Trailer Injection Contract (story-0059-0004)
-
-Every write operation that stages and commits `execution-state.json`
-**MUST** inject the canonical trailer into the commit message so that
-the `.githooks/commit-msg` hook (story-0059-0004 surface F guard) allows
-the commit to proceed.
-
-### Canonical Trailer Format
-
-```
-Co-Authored-By: x-internal-update-status@<40-char-git-sha>
-```
-
-- The `<sha>` is the HEAD commit of the repository at the moment the
-  skill executes (`$(git rev-parse HEAD)`).
-- Uses the standard Git trailer key `Co-Authored-By:` (parseable via
-  `git interpret-trailers`).
-
-### Commit Invocation Pattern
-
-When this skill issues a `git commit` that includes `execution-state.json`
-in the staged files, it MUST pass the trailer:
-
-```bash
-SKILL_SHA=$(git rev-parse HEAD)
-git commit -m "<subject>" \
-  --trailer "Co-Authored-By: x-internal-update-status@${SKILL_SHA}"
-```
-
-This trailer is validated by `.githooks/commit-msg` which checks:
-
-```bash
-git interpret-trailers --parse < "$COMMIT_MSG_FILE" \
-  | grep -qE '^Co-Authored-By:\s+x-internal-update-status@[0-9a-f]{40}$'
-```
-
-### Recovery escape
-
-In documented recovery operations where the operator manually edits
-`execution-state.json` (e.g., state corruption), the trailer MUST
-still be present. The operator adds the trailer with an approved SHA.
-The hook validates format only, not SHA authenticity (RULE-059).
-
-## Testing
-
-The PILOT story (story-0049-0005) ships the following acceptance test
-scenarios, which are the reference contract every future `x-internal-*`
-skill MUST replicate in its own directory:
-
-1. **Write happy path** — status transition PENDING → MERGED;
-   assert `noOp=false` and fileSha changes.
-2. **No-op detection** — same value twice; assert `noOp=true`, file
-   mtime unchanged.
-3. **Read-only** — assert no write occurs; shared lock only.
-4. **Lock contention** — spawn 2 concurrent processes mutating
-   distinct fields; both updates present in final file; JSON valid.
-5. **FILE_NOT_FOUND** — absent file without `--initialize`; exit 1.
-6. **INVALID_PATH** — unknown story ID; exit 3 with path in message.
-
-Goldens under
-`src/test/resources/golden/internal/ops/x-internal-update-status/`
-lock the SKILL.md rendering. Coverage requirement: ≥ 95% line /
-≥ 90% branch across the invoking Bash codepaths.
-
-## Generator Filter Contract
-
-The `ia-dev-env` generator MUST exclude skills with
-`visibility: internal` from:
-
-1. The `.claude/README.md` skill-inventory table.
-2. The `/help` menu listing surfaced by Claude Code.
-3. User-facing autocomplete in the chat input.
-
-Internal skills are still copied into `.claude/skills/` (flat layout)
-so `Skill(skill: "x-internal-...")` invocations from other skills
-resolve correctly. The invariant: **user cannot see them; orchestrators
-can invoke them.**
-
 ## Telemetry
 
-Internal skills DO NOT emit `phase.start` / `phase.end` markers —
-telemetry is produced by the invoking orchestrator (the `phase` wrapping
-the orchestrator's own step is the correct aggregation boundary).
-Passive hooks still capture `tool.call` for the underlying `Bash`
-invocation.
-
-Reference: Rule 13 (Skill Invocation Protocol), Rule 22 (Lifecycle
-Integrity Audit), ADR-0010 (Interactive Gates Convention — exempts
-internal skills from the 3-option menu contract).
+Internal skills do NOT emit `phase.start` / `phase.end` markers — telemetry is produced by the invoking orchestrator. Passive hooks still capture `tool.call` for the underlying `Bash` invocation.
 
 ## Knowledge Pack References
 
-Read src/main/resources/targets/claude/knowledge/lifecycle/refinement-gate.md
+Read `.claude/knowledge/lifecycle/refinement-gate.md` for the lifecycle context that drives most status mutations.
 
 ## Integration Notes
 
@@ -404,8 +155,11 @@ Read src/main/resources/targets/claude/knowledge/lifecycle/refinement-gate.md
 | `x-implement-epic` | caller | Phase 2 (per-story status transitions) + Phase 4 (epic finalization) |
 | `x-implement-story` | caller | Phase 2 (per-task status transitions) + Phase 3 (story finalization) |
 | `x-fix-epic-pr` | caller | Records per-PR correction state when fanning out across an epic |
-| `x-reconcile-status` | peer | Reads the same file to diagnose drift against markdown; never mutates concurrently with this skill (Rule 22) |
+| `x-reconcile-status` | peer | Reads the same file to diagnose drift against markdown; never mutates concurrently (Rule 22) |
 | `x-evaluate-parallelism` | consumer | Reads the resulting state file to build the collision matrix |
 
-Downstream stories that depend on this PILOT: story-0049-0013,
-story-0049-0018, story-0049-0019.
+Downstream stories: story-0049-0013, story-0049-0018, story-0049-0019.
+
+## Full Protocol
+
+Minimum viable contract above. Detailed step-by-step bash (8 steps with `flock`/`jq`/`mv` blocks), 6 worked examples, concurrency semantics, trailer injection contract, acceptance test scenarios, and generator filter contract live in [`references/full-protocol.md`](references/full-protocol.md) per ADR-0012 (skill body slim-by-default).
