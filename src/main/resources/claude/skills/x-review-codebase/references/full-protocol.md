@@ -1,0 +1,553 @@
+# x-review-codebase — Full Protocol
+
+> Verbose detail moved out of `SKILL.md` per ADR-0012 (skill body slim-by-default).
+> SKILL.md remains the minimum viable behavioral contract; this document carries the
+> complete phase-by-phase protocol, sub-step prompts, telemetry hooks, schemas, full
+> Batch A/B/C invocation patterns, and editorial rules. Loaded on-demand via `Read`
+> only when the slim contract is insufficient for the task at hand.
+>
+> For the composition (fragment-slot / EPIC-0064) architecture, see
+> [`composition-architecture.md`](composition-architecture.md) — they are sibling
+> reference documents.
+
+---
+
+## Phase 0 — Idempotency Pre-Check (Orchestrator — Inline)
+
+<!-- phase-no-gate: read-only idempotency pre-check; no artifact produced -->
+
+Open a phase tracker (close with `TaskUpdate(id: phase0TaskId, status: "completed")` after the step):
+
+```text
+TaskCreate(subject: "{STORY_ID} › Review › Phase 0 - Idempotency", activeForm: "Checking review idempotency")
+```
+
+Before executing a review, check if reports already exist and are still valid.
+
+1. Extract story ID from argument or branch name (e.g., `story-XXXX-YYYY`)
+2. Derive epic directory: `ai/epics/epic-XXXX/reviews/`
+3. Check if report files exist:
+
+   ```bash
+   ls ai/epics/epic-XXXX/reviews/review-*-story-XXXX-YYYY.md 2>/dev/null
+   ```
+
+4. If reports exist AND the branch has no new commits since last report:
+
+   ```bash
+   # Compare latest report mtime with latest commit date
+   stat -c %Y ai/epics/epic-XXXX/reviews/review-security-story-XXXX-YYYY.md 2>/dev/null
+   git log -1 --format=%ct HEAD
+   ```
+
+   - If `mtime(report) >= commit_date`: log `Reusing existing review reports from {date}` and skip to Phase 3d (dashboard regeneration)
+   - If code changed after reports: proceed with full review
+
+5. If no reports exist, proceed normally.
+
+Persist `interactiveMode` to `execution-state.json` (EPIC-0068 — consumed by Stop hook `enforce-continuous-flow.sh`):
+
+```text
+Skill(skill: "x-internal-update-status", args: "--file ai/epics/epic-XXXX/execution-state.json --type story --id <STORY-ID> --field interactiveMode --value <interactive|non-interactive>")
+```
+
+Value: `"interactive"` when `--interactive` passed; otherwise `"non-interactive"` (Rule 20 default).
+
+```text
+TaskUpdate(id: phase0TaskId, status: "completed")
+```
+
+---
+
+## Phase 1 — Detect Context (Orchestrator — Inline)
+
+<!-- phase-no-gate: read-only context detection; no artifact produced -->
+
+Open a phase tracker (close with `TaskUpdate(id: phase1TaskId, status: "completed")` after the step):
+
+```text
+TaskCreate(subject: "{STORY_ID} › Review › Phase 1 - Detect", activeForm: "Detecting review context")
+```
+
+1. Extract story ID from argument or branch name
+2. Get diff against main:
+
+   ```bash
+   git branch --show-current
+   git diff main --stat
+   git diff main --name-only
+   ```
+
+3. If no changes, abort: `No changes found relative to main.`
+4. Determine applicable specialists using the Specialist Reference Table in the slim SKILL.md.
+
+**Always active:** QA, Performance
+
+**Conditional:** Activated only when their feature gate condition is met.
+
+If `--scope` provided, filter to listed specialists only.
+
+---
+
+## Phase 2 — Parallel Reviews (Skills via Skill Tool)
+
+**CONTEXT ISOLATION: You receive only metadata. Read all files yourself. Do NOT expect source code, diffs, or knowledge pack content in this prompt. Each review skill reads its own knowledge pack and runs `git diff` independently.**
+
+**CRITICAL: ALL review skills MUST be invoked in a SINGLE message for true parallelism.**
+
+For each applicable specialist determined in Phase 1, invoke the corresponding review skill using the Skill tool. Pass the story ID as argument.
+
+### Invocation Pattern
+
+Each specialist is invoked via `Skill(...)` (Rule 13 — INLINE-SKILL pattern, parallel execution) AND is tracked individually via a per-specialist TaskCreate/TaskUpdate pair (Story 0033-0003 Concern #3 — Level 3 tracking in x-review-codebase). ALL Skill calls and ALL TaskCreate calls in Batch A MUST be in the SAME assistant message for true parallelism — the Claude runtime dispatches tool calls in parallel only when they are siblings in one assistant turn.
+
+**Activation conditions — evaluate BEFORE emitting the batch. Only emit the (TaskCreate, Skill) pair for specialists whose condition is true for the current project profile. Never emit a placeholder pair for inactive specialists.**
+
+- `x-review-qa` — always active.
+- `x-review-performance` — always active.
+- `x-review-database` — only if `database != none`.
+- `x-review-observability` — only if `observability != none`.
+- `x-review-devops` — only if `container != none`.
+- `x-review-data-modeling` — only if `database != none` AND `architecture` is one of `[hexagonal, ddd, cqrs]`.
+- `x-review-security` — only if security frameworks are configured.
+- `x-review-api` — only if a REST interface is present.
+- `x-review-events` — only if event interfaces are present.
+
+Progress is surfaced by the `TaskCreate`/`TaskUpdate` pairs emitted in Batches A/B below — the earlier duplicate `TodoWrite(...)` block was removed in EPIC-0055 (story-0055-0006) because it competed with the canonical task hierarchy defined by Rule 25. Only emit the (TaskCreate, Skill) pair for specialists whose activation condition is true (Phase 1).
+
+**PRE gate (Rule 25 Invariant 4).** Before Batch A, verify Phase 1 detected a valid diff and the story context is consistent:
+
+```text
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --skill x-review-codebase --phase Phase-2-SpecialistReviews")
+```
+
+On gate exit 12, abort with a clear error — a failed PRE gate indicates a stale `execution-state.json` or predecessor phase that must be resolved.
+
+**Batch A — First assistant message (all TaskCreate + all Skill calls as sibling tool calls):**
+
+Each `subject` follows the Rule 25 §3 canonical regex with the `›` (U+203A) separator — `{STORY_ID} › Review › {Specialist}`:
+
+```text
+TaskCreate(subject: "{STORY_ID} › Review › QA",            activeForm: "Running QA review")
+TaskCreate(subject: "{STORY_ID} › Review › Performance",   activeForm: "Running performance review")
+TaskCreate(subject: "{STORY_ID} › Review › Database",      activeForm: "Running database review")
+TaskCreate(subject: "{STORY_ID} › Review › Observability", activeForm: "Running observability review")
+TaskCreate(subject: "{STORY_ID} › Review › DevOps",        activeForm: "Running DevOps review")
+TaskCreate(subject: "{STORY_ID} › Review › Data Modeling", activeForm: "Running data-modeling review")
+TaskCreate(subject: "{STORY_ID} › Review › Security",      activeForm: "Running security review")
+TaskCreate(subject: "{STORY_ID} › Review › API",           activeForm: "Running API review")
+TaskCreate(subject: "{STORY_ID} › Review › Events",        activeForm: "Running events review")
+```
+
+**MANDATORY TOOL CALL — NON-NEGOTIABLE (Rule 24):** Each `Skill(skill: "x-review-*")` below is a tool call, not prose. Silent omission of any active specialist is a `PROTOCOL_VIOLATION` and the resulting `review-story-{STORY-ID}.md` will fail Camada 3 audit (`EIE_EVIDENCE_MISSING`):
+
+```text
+Skill(skill: "x-review-qa",            model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-performance",   model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-database",      model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-observability", model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-devops",        model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-data-modeling", model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-security",      model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-api",           model: "sonnet", args: "{STORY_ID}")
+Skill(skill: "x-review-events",        model: "sonnet", args: "{STORY_ID}")
+```
+
+Record the returned TaskCreate integer IDs in an in-memory map `reviewTasks` indexed by specialist short name (e.g., `reviewTasks["qa"] = <id>`, `reviewTasks["perf"] = <id>`, …). The mapping is used in Batch B below.
+
+**Wait for all Skill calls to return.** The runtime handles this automatically — the next assistant message is only produced after every tool call in Batch A completes.
+
+**Batch B — Second assistant message (all TaskUpdate calls as sibling tool calls):**
+
+```text
+TaskUpdate(id: reviewTasks["qa"],            status: "completed")
+TaskUpdate(id: reviewTasks["perf"],          status: "completed")
+TaskUpdate(id: reviewTasks["db"],            status: "completed")
+TaskUpdate(id: reviewTasks["obs"],           status: "completed")
+TaskUpdate(id: reviewTasks["devops"],        status: "completed")
+TaskUpdate(id: reviewTasks["data-modeling"], status: "completed")
+TaskUpdate(id: reviewTasks["security"],      status: "completed")
+TaskUpdate(id: reviewTasks["api"],           status: "completed")
+TaskUpdate(id: reviewTasks["events"],        status: "completed")
+```
+
+Only emit `TaskUpdate` for specialists that were active in Batch A. If a specialist review returned STATUS = Rejected (score 0 on critical items), the TaskUpdate still uses `status: "completed"` for UI visibility — the authoritative Pass/Fail verdict lives in the consolidated dashboard (Step 4), not in the Claude Code task list (CR-04 of EPIC-0033).
+
+**Batch C — Wave POST gate (Rule 25 REGRA-003).** After Batch B, invoke the phase-gate skill in `--mode wave` to verify every task in `--expected-tasks` completed AND every file in `--expected-artifacts` exists:
+
+```text
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode wave --skill x-review-codebase --phase Phase-2-SpecialistReviews --expected-tasks {comma-separated-reviewTasks-ids} --expected-artifacts {comma-separated-report-paths}")
+```
+
+`--expected-tasks` = the `reviewTasks` IDs recorded in Batch A for the active specialists (same filter as Batch A/B — Rule 25 Invariant 3). `--expected-artifacts` = `ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` for each active specialist; reports are written in Phase 3c. On gate exit 12, surface the failure and return — Phase 3 is skipped until the broken specialist is resolved.
+
+### Standard Review Output Format
+
+Each skill produces output in the standard review format:
+
+```text
+ENGINEER: {SPECIALIST}
+STORY: {STORY_ID}
+SCORE: XX/YY
+STATUS: Approved | Rejected | Partial
+---
+PASSED:
+- [ID] Description (2/2)
+FAILED:
+- [ID] Description (0/2) -- file:line -- Fix: suggestion [SEVERITY]
+PARTIAL:
+- [ID] Description (1/2) -- file:line -- Improvement: suggestion [SEVERITY]
+```
+
+> **STATUS = Approved** only if ALL items score 2/2.
+> **STATUS = Rejected** if ANY item scores 0.
+> **STATUS = Partial** if ANY item scores 1 but none scores 0.
+
+---
+
+## Phase 3 — Consolidation (Orchestrator — Inline)
+
+<!-- phase-no-gate: consolidation aggregates Phase 2 artifacts (already validated by the Phase 2 wave gate); no additional gate needed -->
+
+Open a phase tracker (close with `TaskUpdate(id: phase3TaskId, status: "completed")` after Step 3g):
+
+```text
+TaskCreate(subject: "{STORY_ID} › Review › Phase 3 - Consolidate", activeForm: "Consolidating review findings")
+```
+
+### 3a. Collect & Score
+
+Parse each skill's output. Build consolidated table:
+
+```text
++---------------+-------+--------------------+
+|    Review     | Score |      Status        |
++---------------+-------+--------------------+
+| Security      | XX/30 | Approved           |
+| QA            | XX/36 | Rejected           |
+| ...           | ...   | ...                |
++---------------+-------+--------------------+
+Total: XXX/YYY (XX%)
+OVERALL: APPROVED | REJECTED
+```
+
+### 3b. Issue Summary
+
+Group all findings by severity: `CRITICAL: N | HIGH: N | MEDIUM: N | LOW: N`
+
+```text
+ANY item with score < 2 -> MUST be fixed before merge. No exceptions.
+Approval requires ALL specialists with STATUS: Approved (every item at 2/2).
+OVERALL: APPROVED only when every specialist has STATUS: Approved.
+```
+
+### 3c. Save Individual Reports
+
+Save each specialist's report to `ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md` (extract epic ID XXXX and story sequence YYYY from the story ID). Ensure directory exists: `mkdir -p ai/epics/epic-XXXX/reviews`.
+
+**Persistence (EPIC-0042):** Use the Write tool explicitly to save each specialist report:
+
+```text
+Write(file_path: "ai/epics/epic-XXXX/reviews/review-{specialist}-story-XXXX-YYYY.md", content: "{report_content}")
+```
+
+Do NOT rely on generating report content in the conversation alone — every report MUST be written to disk via the Write tool.
+
+### 3d. Generate Consolidated Dashboard
+
+After saving all individual reports, generate a consolidated dashboard.
+
+1. **Check dashboard template:**
+
+   ```bash
+   test -f .claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md && echo "DASHBOARD_TEMPLATE_AVAILABLE" || echo "DASHBOARD_TEMPLATE_MISSING"
+   ```
+
+2. **If template available:**
+   - Read template at `.claude/templates/_TEMPLATE-CONSOLIDATED-REVIEW-DASHBOARD.md`
+   - Create `ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md`
+   - Populate with:
+     - **Engineer Scores Table:** One row per specialist with Score, Max, and Status
+     - **Overall Score:** Sum of all specialist scores / sum of all max scores, with percentage
+     - **Overall Status:** `Approved` only if ALL specialists are Approved; `Rejected` if ANY has score 0 items; `Partial` otherwise
+     - **Critical Issues Summary:** All findings with severity Critical or High from all reports
+     - **Severity Distribution:** Aggregate counts across all specialists
+     - **Review History:** Record as Round N with date, scores, and status
+   - Tech Lead Score section: leave as placeholder `--/{review_max_score} | Status: Pending` (updated by `x-review-pr`)
+   - Dashboard is **cumulative** (RULE-006): if dashboard already exists, append a new round to Review History instead of overwriting
+
+   **Persistence (EPIC-0042):** Use the Write tool explicitly to save the dashboard:
+
+   ```text
+   Write(file_path: "ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md", content: "{dashboard_content}")
+   ```
+
+   Do NOT rely on generating dashboard content in the conversation alone — the dashboard MUST be written to disk via the Write tool.
+
+3. **If template missing:**
+   - Log warning: `Dashboard template not found, skipping dashboard generation`
+   - Continue to next phase without generating dashboard
+
+### 3e. Generate Remediation Tracking
+
+After generating the dashboard, create a remediation tracking file.
+
+1. **Check remediation template:**
+
+   ```bash
+   test -f .claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md && echo "REMEDIATION_TEMPLATE_AVAILABLE" || echo "REMEDIATION_TEMPLATE_MISSING"
+   ```
+
+2. **If template available:**
+   - Read template at `.claude/templates/_TEMPLATE-REVIEW-REMEDIATION.md`
+   - Create `ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md`
+   - **Extract findings:** Parse all individual reports for items with status FAILED or PARTIAL
+   - **Populate Findings Tracker:** One row per finding with:
+     - `Finding ID`: Sequential `FIND-NNN`
+     - `Engineer`: Specialist who reported the finding
+     - `Severity`: Critical / High / Medium / Low
+     - `Description`: Finding description from the report
+     - `Status`: All initialized as `Open`
+     - `Fix Commit SHA`: Empty (populated after fixes)
+   - **Populate Remediation Summary:** Count of findings by status (all Open initially)
+   - **Header:** Include total count: `{N} findings pending remediation`
+
+   **Persistence (EPIC-0042):** Use the Write tool explicitly to save the remediation file:
+
+   ```text
+   Write(file_path: "ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md", content: "{remediation_content}")
+   ```
+
+   Do NOT rely on generating remediation content in the conversation alone — the remediation file MUST be written to disk via the Write tool.
+
+3. **If template missing:**
+   - Log warning: `Remediation template not found, skipping remediation tracking generation`
+   - Continue to next phase
+
+### 3f. Threat Model Update
+
+After saving review artifacts, extract security findings from the Security specialist's report and update the project threat model incrementally.
+
+1. **Check for security findings:** Parse the Security specialist's report for items with severity Critical, High, or Medium. If no security findings exist, skip this step.
+2. **Read or create threat model:** If `results/security/threat-model.md` exists, read it. Otherwise, create it from the template `.claude/templates/_TEMPLATE-THREAT-MODEL.md`.
+3. **Map findings to STRIDE categories:** Classify each security finding into one of the 6 STRIDE categories (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) based on the nature of the threat.
+4. **Apply severity-based auto-add rules:**
+
+   | Finding Severity | Auto-Add? | Initial Status |
+   |-----------------|-----------|----------------|
+   | Critical | Yes | `Open` |
+   | High | Yes | `Open` |
+   | Medium | Yes | `Under Review` |
+   | Low | No | N/A (noted in review only) |
+
+5. **Incremental update behavior:** Append new threats to the appropriate STRIDE category table. Preserve all existing entries — never remove or overwrite. If a finding matches an existing threat by description, update the existing entry instead of duplicating.
+6. **Recompute Risk Summary:** Update the severity counts table in the Risk Summary section to reflect current Open and Under Review threats.
+7. **Append Change History:** Add a new row with the current date, story reference, and summary of threats added or updated.
+
+### 3g. Consolidated Summary Box (EPIC-0042)
+
+After ALL specialists complete and all artifacts (reports, dashboard, remediation) are saved, emit a formatted summary to the terminal:
+
+```text
+============================================================
+ SPECIALIST REVIEW — [STORY_ID]
+============================================================
+ Overall Score:  XX/YYY (ZZ%)
+
+ | Specialist     | Score   | Status   |
+ |----------------|---------|----------|
+ | QA             | XX/36   | APPROVED/REJECTED |
+ | Performance    | XX/26   | APPROVED/REJECTED |
+ | Security       | XX/30   | APPROVED/REJECTED |
+ | Database       | XX/40   | APPROVED/REJECTED |
+ | Observability  | XX/18   | APPROVED/REJECTED |
+ | DevOps         | XX/20   | APPROVED/REJECTED |
+ | Data Modeling  | XX/20   | APPROVED/REJECTED |
+ | API            | XX/16   | APPROVED/REJECTED |
+
+ Critical Issues: N
+ Open Findings:   N
+------------------------------------------------------------
+ Dashboard:   ai/epics/epic-XXXX/reviews/dashboard-story-XXXX-YYYY.md
+ Remediation: ai/epics/epic-XXXX/reviews/remediation-story-XXXX-YYYY.md
+============================================================
+```
+
+Only include rows for specialists that were active in Phase 2. Replace placeholders with actual scores and statuses from the consolidation data.
+
+---
+
+## Phase 4 — Story Generation for Findings (Orchestrator — Inline)
+
+<!-- phase-no-gate: conditional correction-story generation; runs only when findings exist and is intrinsically guarded by Phase 3 consolidation result -->
+
+Open a phase tracker only when this phase runs — see Step 4a (close with `TaskUpdate(id: phase4TaskId, status: "completed")` after Step 4c):
+
+```text
+TaskCreate(subject: "{STORY_ID} › Review › Phase 4 - Correction story", activeForm: "Generating correction story")
+```
+
+This phase runs ONLY when CRITICAL, HIGH, or MEDIUM findings exist.
+
+### 4a. Check Findings
+
+After consolidation, evaluate if there are findings with severity CRITICAL, HIGH, or MEDIUM. If all findings are LOW or there are no findings, skip this phase entirely.
+
+### 4b. Auto-Generate Correction Story (EPIC-0042)
+
+**Default behavior (auto-execution):** When CRITICAL or HIGH findings exist, automatically generate a correction story WITHOUT asking the user. Log: `"Auto-generating correction story for {N} CRITICAL/HIGH findings (EPIC-0042)"`
+
+**MEDIUM-only branch:** If Phase 4 entered because MEDIUM findings exist but there is NO CRITICAL and NO HIGH finding, fall back to the `AskUserQuestion` confirmation path defined under `--no-auto-fix-story` below — even when `--no-auto-fix-story` is NOT present. Rationale: MEDIUM severity does not warrant unattended auto-remediation; the operator decides whether to materialize a correction story or accept the findings as-is.
+
+**Exception — CRITICAL security findings:** When ANY finding with severity CRITICAL originates from the Security specialist (`x-review-security`), pause for mandatory human confirmation before proceeding. Use `AskUserQuestion`:
+
+```text
+question: "CRITICAL security finding detected. Review the finding and confirm correction story generation."
+header: "Security — Mandatory Human Review"
+options:
+  - label: "Generate correction story"
+    description: "Proceed with auto-generating correction story including the CRITICAL security finding"
+  - label: "Abort"
+    description: "Do not generate correction story. Manual remediation required."
+multiSelect: false
+```
+
+If "Abort", end the review process normally. Log: `"Correction story generation aborted by user (CRITICAL security finding)"`
+
+**Opt-out flag `--no-auto-fix-story` (EPIC-0042) and MEDIUM-only fallback:** When `--no-auto-fix-story` is present OR when only MEDIUM findings exist (no CRITICAL, no HIGH), suppress automatic correction story generation. Instead, use `AskUserQuestion` to confirm. The prompt follows the skill's Global Output Policy (English ONLY):
+
+```text
+question: "Generate a correction story for the findings reported by this review?"
+header: "Story"
+options:
+  - label: "Yes"
+    description: "Generate a story with the CRITICAL/HIGH/MEDIUM findings as acceptance criteria"
+  - label: "No"
+    description: "Keep the review report only; do not generate a correction story"
+multiSelect: false
+```
+
+If "No", end the review process normally.
+
+### 4c. Generate Correction Story
+
+When auto-generation proceeds (default) or user selects "Sim" (with `--no-auto-fix-story`), generate a correction story following these steps:
+
+1. **Read the story template:**
+
+   ```text
+   .claude/templates/_TEMPLATE-STORY.md
+   ```
+
+2. **Build the story content** using findings as input:
+   - **Story ID**: `STORY-{STORY_ID}-FIX-{NNN}` (where NNN is sequential)
+   - **Title**: `Correcao de findings do review -- {STORY_ID}`
+   - **Descricao**: Summary of what was found, grouped by specialist and severity
+   - **Regras Transversais**: Reference rules violated by the findings
+   - **Criterios de Aceite (Gherkin)**: Transform each CRITICAL and MEDIUM finding into a Gherkin scenario:
+
+     ```text
+     Cenario: {finding description}
+       DADO que o codigo atual {describe current violation}
+       QUANDO a correcao for aplicada
+       ENTAO {expected fix result}
+       E o score do review para {specialist} deve melhorar
+     ```
+
+   - **Sub-tarefas**: One `[Dev]` task per CRITICAL finding, grouped `[Dev]` tasks for MEDIUM findings by specialist, one `[Test]` task to re-run `/x-review-codebase` after fixes
+   - **DoD Local**: All CRITICAL findings resolved, all MEDIUM findings resolved or justified, `/x-review-codebase` re-run with no new CRITICAL findings
+
+3. **Save the story** to `ai/epics/epic-XXXX/reviews/correction-story-XXXX-YYYY.md`
+4. **Report** to the user: story file path, number of findings converted, and suggested next step (`/x-implement-task` or manual fix).
+
+---
+
+## Phase 5 — Emit Frontmatter (MANDATORY — Rule 24 §Camada-1)
+
+```text
+<!-- TELEMETRY: phase.start -->
+Bash command: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-review-codebase Phase-5-Frontmatter
+```
+
+> **MANDATORY TOOL CALL (Rule 24 §Camada-1):** This phase MUST NOT be inlined, simulated, or omitted. The LLM MUST prepend the populated YAML frontmatter to the review artifact. Absent frontmatter is detected by `audit-review-frontmatter.sh` (Layer 3 CI) and the Stop hook (Layer 2 runtime). There is no fallback when frontmatter emission fails.
+
+```text
+TaskCreate(
+  subject: "<STORY_ID> › Phase 5 › Emit specialist review frontmatter",
+  activeForm: "Emitting specialist review frontmatter",
+  metadata: {
+    "phase": "Phase 5",
+    "parentSkill": "x-review-codebase",
+    "storyId": "<STORY_ID>",
+    "epicId": "<EPIC_ID>",
+    "expectedArtifacts": ["<path to review-story-XXXX-YYYY.md>"]
+  }
+)
+```
+
+Invoke pre-gate (Rule 25 §Invariants 4):
+
+```text
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode pre --phase 'Phase 5' --skill x-review-codebase")
+```
+
+After all specialist subagents have returned findings and the prose body of `review-story-<STORY_ID>.md` has been assembled, prepend the YAML frontmatter block conforming to `governance/schemas/review-frontmatter-1.0.json`:
+
+```yaml
+<!-- template-version: 1.0 -->
+---
+schema-version: "1.0"
+generated-by: x-review-codebase@<git rev-parse HEAD>
+story-id: <STORY_ID>
+epic-id: <EPIC_ID>
+date: <date -u +%Y-%m-%dT%H:%M:%SZ>
+decision: <GO|NO-GO|GO-WITH-RESERVATIONS>
+score: <sum of specialist scores>
+score-max: 50
+severity-counts:
+  critical: <count>
+  high: <count>
+  medium: <count>
+  low: <count>
+  info: <count>
+blocking-findings:
+<YAML list of critical/high findings, empty list [] if none>
+reviewers:
+<YAML list of invoked specialist roles>
+---
+# Specialist Review — <STORY_ID>
+...existing prose body...
+```
+
+**Decision consolidation rule:** NO-GO > GO-WITH-RESERVATIONS > GO. If any specialist returned NO-GO → `decision: "NO-GO"`. If any returned GO-WITH-RESERVATIONS (and no NO-GO) → `decision: "GO-WITH-RESERVATIONS"`. Otherwise → `decision: "GO"`.
+
+After writing the artifact, validate:
+
+```bash
+$CLAUDE_PROJECT_DIR/.claude/scripts/audit-review-frontmatter.sh --story <STORY_ID>
+```
+
+If the script returns exit ≠ 0, abort with `REVIEW_FRONTMATTER_INVALID`. No fallback.
+
+Invoke post-gate (Rule 25 §Invariants 4):
+
+```text
+Skill(skill: "x-internal-verify-phase-gates", model: "haiku", args: "--mode post --phase 'Phase 5' --skill x-review-codebase --expected-artifacts <path to review-story-XXXX-YYYY.md>")
+```
+
+```text
+TaskUpdate(taskId: <id from TaskCreate above>, status: "completed")
+```
+
+```text
+<!-- TELEMETRY: phase.end -->
+Bash command: $CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-review-codebase Phase-5-Frontmatter ok
+```
+
+> **Note on the previously-duplicated Phase 5 block.** The pre-Wave 2.4 `SKILL.md` contained two consecutive `## Phase 5 — Emit Frontmatter` sections — one using `x-review-codebase` / `x-internal-verify-phase-gates` (canonical, kept above) and one using the legacy names `x-review` / `x-internal-phase-gate` from before EPIC-0076 (verb-first rename). The legacy block referenced skills that no longer exist and was therefore dead text; it was not migrated to this file. If the second block is ever needed for legacy compatibility, recreate it under a clearly-labeled legacy section.
+
+---
+
+## Source-of-truth note
+
+Source: `src/main/resources/claude/skills/x-review-codebase/references/full-protocol.md`. Generated output at `.claude/skills/x-review-codebase/references/full-protocol.md` is byte-equivalent.
