@@ -9,6 +9,14 @@ description: "Decompose a bug into 2-4 implementation stories by severity+scope 
 
 # Skill: x-internal-decompose-bug (slim — ADR-0012)
 
+> ⚠️ **Known integration gap with `x-create-bug` (pre-existing, story-0080 backlog):**
+> This skill expects the bug at `ai/bugs/<bug-id>/bug.md` (6-digit id, file literally named
+> `bug.md`), but the current `x-create-bug` (Wave 3.6 slim) creates files at
+> `docs/bugs/bug-NNNN-<slug>.md` (4-digit id, slug-suffixed). Callers MUST materialize
+> the `ai/bugs/<bug-id>/bug.md` directory + file before invoking this skill, OR a follow-up
+> story must align both skills (option: accept a `--bug-file` path argument here, or move
+> the bug scaffold under `ai/bugs/`). Tracking: story-0080-0002 §Path alignment.
+
 ## Purpose
 
 Decompose a `bug.md` file into 2-4 implementation story files deterministically based on `(severity, scope)`. Implements the decomposition rules table defined in story-0080-0002.

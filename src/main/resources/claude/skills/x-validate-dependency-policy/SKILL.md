@@ -19,9 +19,9 @@ requires-capabilities: [governance.dependency-policy]
 
 Validates all project dependencies against the `dependencies.policy` block declared in the project YAML (parsed into `DependencyPolicyConfig` — EPIC-0074, Rule 32). Applies the D-R10 enforcement matrix (block-on) and the D-R11 scope policy to each finding, emitting:
 
-- **Exit 0** — gate disabled or all findings are WARN/IGNORE only; no BLOCK-level violations
+- **Exit 0** — gate disabled OR zero violations OR all violations are IGNORE (suppressed by scope-policy)
 - **Exit 1** (`DEP_POLICY_BLOCK`) — at least one BLOCK-level violation (denied CVE, license, min-version, or scope escalation)
-- **Exit 2** (`DEP_POLICY_WARN`) — only WARN-level violations; no blocking failures
+- **Exit 2** (`DEP_POLICY_WARN`) — zero BLOCK violations; at least one WARN_ONLY violation (non-blocking)
 
 Produces evidence artifact at `ai/epics/epic-XXXX/reports/dep-policy-validation-report-STORY-ID.md` (required by Rule 27 Surface 13 — conditional on `quality.dependencyPolicy.enabled=true`).
 

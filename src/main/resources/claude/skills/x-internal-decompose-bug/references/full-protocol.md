@@ -4,6 +4,13 @@ Detailed reference for `x-internal-decompose-bug`. The SKILL.md body holds the m
 
 ## Step 1 — Argument parsing and path resolution
 
+> ⚠️ **Known integration gap (pre-existing):** the current `x-create-bug` creates bug files
+> at `docs/bugs/bug-NNNN-<slug>.md` (4-digit id, slug-suffixed) rather than at
+> `ai/bugs/<bug-id>/bug.md` (6-digit id, plain `bug.md`) assumed below. Callers MUST
+> materialize the expected layout before invoking this skill, OR a follow-up story must
+> align both skills (option: accept a `--bug-file` path argument here, or move the bug
+> scaffold under `ai/bugs/`). Tracking: story-0080-0002 §Path alignment.
+
 ```bash
 BUG_ID="${1}"
 

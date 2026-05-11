@@ -131,7 +131,7 @@ if freshness-window-days > 0:
     VIOLATION(type=freshness, severity=block-on.freshness, age_days=dependency.age_days)
 ```
 
-Age resolution: run `mvn versions:display-dependency-updates -DprocessDependencies=true` → parse `[INFO] ... -> X.Y.Z available` lines; compute age as `today - release_date(latest_version)`. If update unavailable, skip freshness check.
+Age resolution: run `mvn versions:display-dependency-updates -DprocessDependencies=true` → parse `[INFO] ... -> X.Y.Z available` lines; compute age as `today - release_date(latest_version)`. If update data is unavailable (network failure, plugin missing, registry rate-limit), emit log line `FRESHNESS_UNAVAILABLE: <reason>` to stderr and skip the freshness dimension for that dependency. Other dimensions continue normally; the report's `Suppressed` section lists each skipped dependency for audit-trail.
 
 ## Step 5 — Classify Violations
 
