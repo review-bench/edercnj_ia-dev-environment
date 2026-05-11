@@ -43,7 +43,7 @@ epicDir=$(ls -d ai/epics/epic-{epicId}/ ai/epics/epic-{epicId}-*/ 2>/dev/null | 
 If no match is found, abort:
 
 ```
-ERROR: Directory ai/epics/epic-{epicId}/ (or suffix variant) not found. Run /x-epic-decompose first.
+ERROR: Directory ai/epics/epic-{epicId}/ (or suffix variant) not found. Run /x-create-feature <SPEC-FILE-PATH> --epic-id {epicId} first.
 ```
 
 Use the resolved `epicDir` path for ALL subsequent reads/writes
@@ -54,7 +54,7 @@ Use the resolved `epicDir` path for ALL subsequent reads/writes
 Check that `IMPLEMENTATION-MAP.md` exists in the epic directory.
 
 ```
-ERROR: IMPLEMENTATION-MAP.md not found in ai/epics/epic-{epicId}/. Run /x-epic-map first.
+ERROR: IMPLEMENTATION-MAP.md not found in ai/epics/epic-{epicId}/. Run /x-create-feature first (it delegates internally to x-internal-map-epic).
 ```
 
 ### 0.5 Validate Story Files
@@ -700,7 +700,16 @@ When `--resume` is set:
 
 ## Flat File Naming Convention (RULE-004)
 
-All output files follow the flat naming convention under `{epicDir}/plans/`:
+All output files follow the flat naming convention under `{epicDir}/plans/`.
+Per-task artifacts have two schemas dispatched by `/x-plan-story` based on
+`planningSchemaVersion` (see `x-plan-story/SKILL.md` §Output Contract):
+
+- **v1 (`planningSchemaVersion: "1.0"` or absent)** — single task-plan file
+  per task: `task-plan-TASK-NNN-story-XXXX-YYYY.md`.
+- **v2 (`planningSchemaVersion: "2.0"`)** — split layout with one task file
+  + one plan-task file + one task implementation map per story:
+  `task-TASK-XXXX-YYYY-NNN.md`, `plan-task-TASK-XXXX-YYYY-NNN.md`,
+  `task-implementation-map-STORY-XXXX-YYYY.md`.
 
 ```
 {epicDir}/
@@ -716,11 +725,21 @@ All output files follow the flat naming convention under `{epicDir}/plans/`:
     planning-report-story-XXXX-0002.md
     dor-story-XXXX-0001.md
     dor-story-XXXX-0002.md
+    # v1 task-plan layout (planningSchemaVersion: "1.0")
     task-plan-TASK-001-story-XXXX-0001.md
     task-plan-TASK-002-story-XXXX-0001.md
+    # v2 split layout (planningSchemaVersion: "2.0")
+    plan-story-XXXX-0001.md
+    task-TASK-XXXX-0001-001.md
+    plan-task-TASK-XXXX-0001-001.md
+    task-implementation-map-STORY-XXXX-0001.md
   reports/
     epic-planning-report-XXXX.md
 ```
+
+The orchestrator commits whichever per-task pattern the subagent emits; v1 and
+v2 are mutually exclusive within a single story but MAY coexist across stories
+during a migration window.
 
 ---
 

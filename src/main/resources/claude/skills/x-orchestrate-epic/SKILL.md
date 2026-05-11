@@ -50,10 +50,15 @@ If `--resume` and `--story` are both provided, abort with `ERROR: --resume and -
 | Epic planning report | `{epicDir}/reports/epic-planning-report-XXXX.md` | Phase 3 |
 | Epic file update (Planning column) | `{epicDir}/EPIC-XXXX.md` | Phase 3 |
 | Task breakdown (per story) | `{epicDir}/plans/tasks-story-XXXX-YYYY.md` | `/x-plan-story` subagent |
-| Task plans (per task per story) | `{epicDir}/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | `/x-plan-story` subagent |
+| Task plans v1 (per task per story) | `{epicDir}/plans/task-plan-TASK-NNN-story-XXXX-YYYY.md` | `/x-plan-story` subagent (`planningSchemaVersion: "1.0"`) |
+| Task files v2 (per task per story) | `{epicDir}/plans/task-TASK-XXXX-YYYY-NNN.md` | `/x-plan-story` subagent (`planningSchemaVersion: "2.0"`) |
+| Task plans v2 (per task per story) | `{epicDir}/plans/plan-task-TASK-XXXX-YYYY-NNN.md` | `/x-plan-story` subagent (`planningSchemaVersion: "2.0"`) |
+| Task implementation map v2 | `{epicDir}/plans/task-implementation-map-STORY-XXXX-YYYY.md` | `/x-plan-story` subagent (`planningSchemaVersion: "2.0"`) |
 | Planning report (per story) | `{epicDir}/plans/planning-report-story-XXXX-YYYY.md` | `/x-plan-story` subagent |
 | DoR checklist (per story) | `{epicDir}/plans/dor-story-XXXX-YYYY.md` | `/x-plan-story` subagent |
 | Story file update (Section 8) | `{epicDir}/story-XXXX-YYYY.md` | `/x-plan-story` subagent |
+
+> Schema dispatch is owned by `/x-plan-story` — see `x-plan-story/SKILL.md` §Output Contract for the v1/v2 file-pattern matrix. This orchestrator commits whichever artifacts the subagent produces.
 
 Resolve `{epicDir}` from `ai/epics/epic-{EPIC-ID}/` or its suffix variant (`epic-XXXX-title-slug/`); see Phase 0.3 in the [full protocol](references/full-protocol.md).
 
@@ -109,9 +114,9 @@ On push failure log a WARNING and continue (commits preserved locally). See [ful
 
 | Error | Action | Recovery |
 |-------|--------|----------|
-| Epic directory not found | Abort with error message | Run `/x-create-feature` or `/x-internal-create-epic` first |
-| `IMPLEMENTATION-MAP.md` not found | Abort with error message | Run `/x-internal-map-epic` first |
-| No story files found | Abort with error message | Run `/x-internal-create-story` first |
+| Epic directory not found | Abort with error message | Run `/x-create-feature` (or `/x-epic-create` if the feature already exists) first |
+| `IMPLEMENTATION-MAP.md` not found | Abort with error message | Run `/x-create-feature` first (delegates to `x-internal-map-epic`) |
+| No story files found | Abort with error message | Run `/x-create-feature` or `/x-story-create` first |
 | `execution-state.json` missing on `--resume` | Abort with error message | Run without `--resume` |
 | `--resume` and `--story` both set | Abort with error message | Use only one flag |
 | Story not in implementation map (`--story`) | Abort with error message | Check story ID |
