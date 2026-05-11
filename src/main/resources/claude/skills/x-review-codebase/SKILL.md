@@ -62,7 +62,7 @@ Phase 0: PRE-CHECK     -> Idempotency (skip if reports exist + code unchanged)
 Phase 1: DETECT        -> Identify branch, diff, applicable specialists
 Phase 2: REVIEW        -> Invoke N review skills in parallel (SINGLE batch message)
 Phase 3: CONSOLIDATE   -> Collect reports, score, dashboard, remediation, STRIDE
-Phase 4: STORY         -> If CRITICAL/HIGH findings: generate correction story
+Phase 4: STORY         -> If CRITICAL/HIGH/MEDIUM findings: generate correction story (auto for CRITICAL/HIGH; AskUserQuestion for MEDIUM-only)
 Phase 5: FRONTMATTER   -> Emit YAML frontmatter (Rule 24 §Camada-1, mandatory)
 ```
 

@@ -329,7 +329,7 @@ After generating the dashboard, create a remediation tracking file.
 After saving review artifacts, extract security findings from the Security specialist's report and update the project threat model incrementally.
 
 1. **Check for security findings:** Parse the Security specialist's report for items with severity Critical, High, or Medium. If no security findings exist, skip this step.
-2. **Read or create threat model:** If `results/security/threat-model.md` exists, read it. Otherwise, create it from the template `resources/templates/_TEMPLATE-THREAT-MODEL.md`.
+2. **Read or create threat model:** If `results/security/threat-model.md` exists, read it. Otherwise, create it from the template `.claude/templates/_TEMPLATE-THREAT-MODEL.md`.
 3. **Map findings to STRIDE categories:** Classify each security finding into one of the 6 STRIDE categories (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) based on the nature of the threat.
 4. **Apply severity-based auto-add rules:**
 
@@ -397,6 +397,8 @@ After consolidation, evaluate if there are findings with severity CRITICAL, HIGH
 
 **Default behavior (auto-execution):** When CRITICAL or HIGH findings exist, automatically generate a correction story WITHOUT asking the user. Log: `"Auto-generating correction story for {N} CRITICAL/HIGH findings (EPIC-0042)"`
 
+**MEDIUM-only branch:** If Phase 4 entered because MEDIUM findings exist but there is NO CRITICAL and NO HIGH finding, fall back to the `AskUserQuestion` confirmation path defined under `--no-auto-fix-story` below — even when `--no-auto-fix-story` is NOT present. Rationale: MEDIUM severity does not warrant unattended auto-remediation; the operator decides whether to materialize a correction story or accept the findings as-is.
+
 **Exception — CRITICAL security findings:** When ANY finding with severity CRITICAL originates from the Security specialist (`x-review-security`), pause for mandatory human confirmation before proceeding. Use `AskUserQuestion`:
 
 ```text
@@ -412,20 +414,20 @@ multiSelect: false
 
 If "Abort", end the review process normally. Log: `"Correction story generation aborted by user (CRITICAL security finding)"`
 
-**Opt-out flag `--no-auto-fix-story` (EPIC-0042):** When `--no-auto-fix-story` is present, suppress automatic correction story generation. Instead, use `AskUserQuestion` to confirm:
+**Opt-out flag `--no-auto-fix-story` (EPIC-0042) and MEDIUM-only fallback:** When `--no-auto-fix-story` is present OR when only MEDIUM findings exist (no CRITICAL, no HIGH), suppress automatic correction story generation. Instead, use `AskUserQuestion` to confirm. The prompt follows the skill's Global Output Policy (English ONLY):
 
 ```text
-question: "Deseja criar uma historia para correcao dos problemas encontrados?"
+question: "Generate a correction story for the findings reported by this review?"
 header: "Story"
 options:
-  - label: "Sim"
-    description: "Gerar uma historia com os findings CRITICAL e MEDIUM como criterios de aceite"
-  - label: "Nao"
-    description: "Apenas manter o relatorio de review sem gerar historia"
+  - label: "Yes"
+    description: "Generate a story with the CRITICAL/HIGH/MEDIUM findings as acceptance criteria"
+  - label: "No"
+    description: "Keep the review report only; do not generate a correction story"
 multiSelect: false
 ```
 
-If "Nao", end the review process normally.
+If "No", end the review process normally.
 
 ### 4c. Generate Correction Story
 
