@@ -71,7 +71,7 @@ Using the analysis from Phase 1, write the spec file inside the worktree.
 
 **Output path (inside worktree):** `docs/specs/SPEC-<slug>-v1.md`
 
-**RA9 v2 minimal structure (5 mandatory sections, ≥100 chars each):**
+**RA9 v2 minimal structure (6 mandatory sections, ≥100 chars each):**
 
 ```markdown
 # SPEC-<slug>-v1 — <Feature Title>
@@ -145,7 +145,7 @@ mkdir -p .claude/worktrees/feature-ideation-<slug>/docs/specs
 # Write SPEC-<slug>-v1.md content to the worktree
 ```
 
-**Validation:** After writing, verify each of the 5 sections (Sistema, Escopo, Regras, Histórias, DoR/DoD) has ≥ 100 characters. If any section is too short, expand with domain-relevant placeholder content.
+**Validation:** After writing, verify each of the 6 sections (Sistema, Escopo, Regras, Histórias, DoR/DoD, Riscos) has ≥ 100 characters. If any section is too short, expand with domain-relevant placeholder content.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-2-Spec ok`
@@ -167,7 +167,7 @@ From inside the worktree, commit the spec file:
 
 Capture `{prUrl, prNumber}`.
 
-**3.3 No CI-watch (RULE-003):** Ideation PRs do not require CI validation — they are planning artifacts, not code changes. Skip `x-watch-pr-ci`.
+**3.3 No CI-watch (EPIC-0065 story-local rule — not project-wide Rule 03):** Ideation PRs do not require CI validation — they are planning artifacts, not code changes. Skip `x-watch-pr-ci`.
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-3-PR ok`
@@ -196,7 +196,7 @@ Print the following structured report to stdout:
 ====================================================
 ```
 
-**Exact mandatory phrase (RULE-005):** "Spec pronta. Para criar a feature inteira, invoque `/x-create-feature <PR-spec-path> --epic-id <NNNN>`."
+**Exact mandatory phrase (EPIC-0065 story-local rule — not project-wide Rule 05):** "Spec pronta. Para criar a feature inteira, invoque `/x-create-feature <PR-spec-path> --epic-id <NNNN>`."
 
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-ideate-feature Phase-4-Report ok`

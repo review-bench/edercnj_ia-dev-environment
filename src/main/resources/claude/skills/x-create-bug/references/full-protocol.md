@@ -187,7 +187,7 @@ Output:
 ### Create in Custom Directory
 
 ```bash
-/x-create-bug "Cache invalidation broken after deploy" --output ./archive --id bug-2026-001
+/x-create-bug "Cache invalidation broken after deploy" --output ./archive --id bug-2026001
 ```
 
 ## Performance Contract

@@ -18,9 +18,9 @@ requires-capabilities: []
 
 ## Purpose
 
-Transform free-form ideation prose (or a text file) into a structured feature specification document (RA9 v2 minimal, 5 sections) and open a pull request for human review. The operator reviews and optionally edits the spec, then manually invokes `x-create-feature` to drive the full epic + story decomposition.
+Transform free-form ideation prose (or a text file) into a structured feature specification document (RA9 v2 minimal, 6 sections) and open a pull request for human review. The operator reviews and optionally edits the spec, then manually invokes `x-create-feature` to drive the full epic + story decomposition.
 
-**RULE-005 (no auto-chain):** This skill does NOT call `x-create-feature` automatically. It terminates after opening the PR with an explicit instruction to the operator.
+**No auto-chain (EPIC-0065 story-local rule):** This skill does NOT call `x-create-feature` automatically. It terminates after opening the PR with an explicit instruction to the operator. (Story-local invariant from EPIC-0065 — not the project-wide Rule 05.)
 
 ## Triggers
 
@@ -59,16 +59,16 @@ Phase 0: SETUP    -> Validate input ≥100 chars; derive kebab slug (first 5 wor
 Phase 1: ANALYZE  -> Agent(opus) extracts {domain, scopeIn, scopeOut, rules, stories, dor, dod, risks}
 Phase 2: SPEC     -> Render RA9 v2 minimal (Sistema/Escopo/Regras/Histórias/DoR-DoD/Riscos) — each section ≥100 chars
 Phase 3: PR       -> Skill x-commit-changes (docs:) + Skill x-create-pr (--no-auto-merge --label docs)
-Phase 4: REPORT   -> Structured stdout + mandatory next-step phrase (RULE-005 — no auto-chain to x-create-feature)
+Phase 4: REPORT   -> Structured stdout + mandatory next-step phrase (no auto-chain to x-create-feature — operator invokes manually)
 ```
 
 Detailed Phase 0–4 procedures, deep-reasoning subagent prompt with 8-key extraction contract, full RA9 v2 minimal template, validation rules, and report format live in [`references/full-protocol.md`](references/full-protocol.md):
 
 - **Phase 0** (§Phase 0): input-source detection (file vs inline); 100-char minimum guard; kebab-slug derivation (first 5 words, ASCII-only, max 40 chars); `Skill(x-manage-worktrees, model: haiku)` create with `feature-ideation-<slug>` identifier.
 - **Phase 1** (§Phase 1): full subagent prompt with 8-element extraction (DOMAIN / SCOPE_IN / SCOPE_OUT / RULES / STORIES / DOR / DOD / RISKS); structured-JSON return contract.
-- **Phase 2** (§Phase 2): RA9 v2 minimal Markdown template (5 mandatory sections: Sistema, Escopo, Regras, Histórias, DoR/DoD, Riscos); per-section ≥100-char validation rule.
-- **Phase 3** (§Phase 3): `Skill(x-commit-changes, model: haiku)` invocation with `docs:` Conventional Commits prefix; `Skill(x-create-pr, model: haiku)` with `--no-auto-merge` and `--label docs`; RULE-003 — skip CI-watch (planning artifacts).
-- **Phase 4** (§Phase 4): full structured-report template; mandatory RULE-005 next-step phrase format.
+- **Phase 2** (§Phase 2): RA9 v2 minimal Markdown template (6 mandatory sections: Sistema, Escopo, Regras, Histórias, DoR/DoD, Riscos); per-section ≥100-char validation rule.
+- **Phase 3** (§Phase 3): `Skill(x-commit-changes, model: haiku)` invocation with `docs:` Conventional Commits prefix; `Skill(x-create-pr, model: haiku)` with `--no-auto-merge` and `--label docs`; skip CI-watch (planning artifacts — EPIC-0065 story-local rule, not project-wide Rule 03).
+- **Phase 4** (§Phase 4): full structured-report template; mandatory next-step phrase format.
 
 ## Error Handling
 

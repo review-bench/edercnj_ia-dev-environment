@@ -40,8 +40,8 @@ Report (stdout) with PASS / FAIL / WARN / SKIP per check:
 |-------|-------------------|
 | Language Runtime | `java`/`node`/`go`/`rustc`/`python3` present and version matches `{{ language_version }}` |
 | Build Tool | `mvn`/`gradle`/`npm`/`cargo`/`pip` present |
-| Docker | `docker --version` + daemon up (when `container != none`) |
-| Database Client | `psql`/`mysql`/`mongosh` present (when `database != none`) |
+| Docker | `docker --version` + daemon up (when `container != "none"`) |
+| Database Client | `psql`/`mysql`/`mongosh` present (when `database_name != "none"`) |
 | IDE Configuration | `.editorconfig` + `.vscode/`/`.idea/` directory presence |
 | Database Connectivity | `SELECT 1` / ping against configured database |
 | Initial Build | `mvn clean compile` / `gradle build` / `npm install && build` / `cargo build` / `pip install -e` |
