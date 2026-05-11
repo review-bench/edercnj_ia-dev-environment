@@ -13,7 +13,7 @@ requires-capabilities: []
 - **Tone**: Technical, Direct, and Concise.
 - **Efficiency**: Remove all conversational fillers and greetings to save tokens.
 
-# Skill: Runtime Protection Eval
+# Skill: Runtime Protection Eval (slim — ADR-0012)
 
 ## Purpose
 
@@ -37,28 +37,7 @@ Evaluate runtime protection controls for {{PROJECT_NAME}} by analyzing active de
 | `--intensity` | Enum | No | `moderate` | `passive`, `moderate`, `aggressive` | `passive` |
 | `--login-endpoint` | Path | No | — | Relative path starting with `/` | `/api/auth/login` |
 
-## Workflow
-
-### Step 1 — Validate Parameters
-
-Validate all inputs before execution:
-
-- `--target` must be a valid HTTP or HTTPS URL
-- `--target` must be reachable (TCP connection within 10s timeout)
-- If target is unreachable, emit error `"Target unreachable: {url}"` and abort
-- `--scope` must match one of the 8 valid values
-- `--login-endpoint` is required when `--scope=account-lockout`
-
-### Step 2 — Configure Intensity
-
-Resolve effective intensity:
-
-1. If `--intensity=aggressive` and environment is production:
-   - Log warning: `"Aggressive intensity not allowed in production"`
-   - Downgrade to `passive`
-2. Record effective intensity in report metadata
-
-**Intensity levels:**
+## Intensity Levels
 
 | Level | Behavior | Allowed Environments |
 |-------|----------|---------------------|
@@ -66,317 +45,45 @@ Resolve effective intensity:
 | **moderate** | Send non-destructive test payloads (default) | All environments |
 | **aggressive** | Test limits with higher volume of requests | Local and dev only |
 
-### Step 3 — Discover Baseline
+`--intensity=aggressive` in production is automatically downgraded to `passive` with a warning.
 
-Probe the target to establish baseline:
+## Workflow Overview
 
-- Send a single GET request to `--target`
-- Record response headers for later comparison
-- Extract security-relevant headers: `X-RateLimit-*`, `Content-Security-Policy`, `Permissions-Policy`, `X-Content-Type-Options`, `Strict-Transport-Security`
-- Record server identification if exposed
-
-### Step 4 — Evaluate Dimensions
-
-Execute checks for each dimension in scope. Each dimension produces a `RuntimeProtectionResult`.
-
-#### 4.1 — Rate Limiting
-
-**ASVS Reference:** V4.3 (Access Control)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| `X-RateLimit-*` headers present | Yes | Yes | Yes |
-| `Retry-After` header on 429 | No | Yes | Yes |
-| Global rate limit triggers 429 | No | Yes | Yes |
-| Per-endpoint rate limit | No | Yes | Yes |
-| Per-user rate limit | No | No | Yes |
-| Burst handling | No | No | Yes |
-
-**Moderate test procedure:**
-1. Send burst of 100 requests to target root endpoint within 10 seconds
-2. Count responses with status 429
-3. Validate `Retry-After` header is present on 429 responses
-4. Check for `X-RateLimit-Remaining` and `X-RateLimit-Limit` headers
-
-**Result fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| endpoint | String | Tested endpoint path |
-| requestsSent | int | Total requests sent |
-| requestsBlocked | int | Responses with 429 status |
-| statusCode | int | Expected blocking status (429) |
-| retryAfterPresent | boolean | Whether Retry-After header was found |
-| rateLimitHeaders | Map | Rate limit headers observed |
-
-#### 4.2 — WAF Rules (OWASP CRS)
-
-**ASVS Reference:** V5.1 (Input Validation)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| Security headers indicating WAF | Yes | Yes | Yes |
-| SQL injection blocking | No | Yes | Yes |
-| XSS payload blocking | No | Yes | Yes |
-| Path traversal blocking | No | Yes | Yes |
-| Custom WAF rules | No | No | Yes |
-
-**Non-destructive test payloads (moderate):**
-
-```
-SQL Injection:  GET /search?q=' OR '1'='1
-XSS:            GET /search?q=<script>alert(1)</script>
-Path Traversal: GET /files/../../../etc/passwd
-Command Inject: GET /ping?host=;cat /etc/passwd
+```text
+1. VALIDATE     -> Verify --target URL, reachability, scope, login-endpoint dependency
+2. INTENSITY    -> Resolve effective intensity (downgrade aggressive→passive in prod)
+3. BASELINE     -> Single GET request to capture security-relevant headers
+4. DIMENSIONS   -> Execute checks per scope (Rate-Limit, WAF, Bot, Lockout, BruteForce, CSP, Permissions)
+5. SCORE        -> Per-dimension (PROTECTED@80+/PARTIAL@40+/UNPROTECTED) + overall + grade A..F
+6. REPORT       -> SARIF 2.1.0 + Markdown to results/security/runtime-protection-{ts}.{sarif.json,md}
 ```
 
-These payloads probe for WAF blocking behavior (expecting 403 or custom block page) without causing harm.
+7 dimension check matrices, SARIF/Markdown templates, and ASVS mapping in [`references/full-protocol.md`](references/full-protocol.md):
 
-**Status:** `PROTECTED` if all payloads return 403/blocking response; `PARTIAL` if some blocked; `UNPROTECTED` if none blocked; `SKIPPED` in passive mode.
+- **Steps 1–3** (§Step 1/2/3): parameter validation; intensity downgrade rule; baseline GET probe with header extraction (`X-RateLimit-*`, CSP, Permissions-Policy, X-Content-Type-Options, HSTS).
+- **Step 4 sub-sections 4.1–4.7** (§Step 4): full passive/moderate/aggressive check matrices for Rate Limiting (V4.3 — 100-req burst test, Retry-After validation), WAF/OWASP CRS (V5.1 — SQLi/XSS/path-traversal/cmd-inject non-destructive payloads), Bot Protection (V13.1 — CAPTCHA markers, challenge pages), Account Lockout (V2.2 — 10-attempt sequence, CRITICAL finding on no-lockout), Brute Force (V2.2/V11.1 — timing-attack mitigation), CSP Enforcement (V14.4 — directive severity table), Permissions Policy (V14.4 — feature restriction matrix).
+- **Step 5** (§Step 5.1–5.2): per-dimension scoring formula and status thresholds; overall scoring with severity weights (CRITICAL=10, HIGH=5, MEDIUM=2, LOW=1); grade mapping (A=90+, F<60).
+- **Step 6** (§Step 6.1–6.2): SARIF 2.1.0 output schema with `properties.dimension`/`asvs-ref`/`severity`/`fix-recommendation`; Markdown report template with Dimension Summary table + Critical Gaps + Detailed Findings + Recommendations.
+- **ASVS Mapping Summary** (§ASVS Mapping Summary): full dimension→ASVS chapter/section/requirements crosswalk.
 
-#### 4.3 — Bot Protection
+## Scoring Quick Reference
 
-**ASVS Reference:** V13.1 (API and Web Service)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| CAPTCHA presence in HTML | Yes | Yes | Yes |
-| Bot detection headers | Yes | Yes | Yes |
-| Automated request blocking | No | Yes | Yes |
-| Challenge page detection | No | Yes | Yes |
-
-**Checks:**
-- Scan HTML responses for CAPTCHA markers (reCAPTCHA, hCaptcha, Turnstile)
-- Check for bot-detection response headers
-- Send requests with missing/invalid User-Agent
-- Detect challenge/interstitial pages
-
-#### 4.4 — Account Lockout
-
-**ASVS Reference:** V2.2 (Authentication)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| Login endpoint responds | Yes | Yes | Yes |
-| Lockout after max attempts | No | Yes | Yes |
-| Lockout duration enforced | No | Yes | Yes |
-| Progressive delay detection | No | No | Yes |
-| Lockout notification | No | No | Yes |
-| Reset mechanism available | No | No | Yes |
-
-**Requires:** `--login-endpoint` parameter.
-
-**Moderate test procedure:**
-1. Send 10 login attempts with invalid credentials to `--login-endpoint`
-2. Check for 423 (Locked) or 429 (Too Many Requests) response
-3. Validate lockout message in response body
-4. Record number of attempts before lockout
-
-**Finding on absence:** If no lockout is detected after 10 failed attempts, generate a `CRITICAL` finding with fix recommendation including max attempts and lockout duration configuration.
-
-#### 4.5 — Brute Force Protection
-
-**ASVS Reference:** V2.2 (Authentication), V11.1 (Business Logic)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| Rate limiting on auth endpoints | Yes | Yes | Yes |
-| Progressive delay observed | No | Yes | Yes |
-| API key enumeration protection | No | Yes | Yes |
-| Timing attack mitigation | No | Yes | Yes |
-
-**Checks:**
-- Verify rate limiting on authentication endpoints (separate from global rate limit)
-- Measure response time variance for valid vs. invalid credentials (timing attack mitigation expects constant time)
-- Send sequential requests with incrementing API key patterns to detect enumeration protection
-
-#### 4.6 — CSP Enforcement
-
-**ASVS Reference:** V14.4 (Configuration)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| `Content-Security-Policy` header present | Yes | Yes | Yes |
-| CSP directives completeness | Yes | Yes | Yes |
-| `report-uri` or `report-to` configured | Yes | Yes | Yes |
-| `unsafe-inline` absent | Yes | Yes | Yes |
-| `unsafe-eval` absent | Yes | Yes | Yes |
-
-**CSP directives to validate:**
-
-| Directive | Expected | Severity if Missing |
-|-----------|----------|-------------------|
-| `default-src` | Present and restrictive | HIGH |
-| `script-src` | No `unsafe-inline` or `unsafe-eval` | CRITICAL |
-| `style-src` | Defined | MEDIUM |
-| `img-src` | Defined | LOW |
-| `connect-src` | Defined | MEDIUM |
-| `frame-ancestors` | `'none'` or specific origins | HIGH |
-| `report-uri` / `report-to` | Present | MEDIUM |
-
-#### 4.7 — Permissions Policy
-
-**ASVS Reference:** V14.4 (Configuration)
-
-| Check | Passive | Moderate | Aggressive |
-|-------|---------|----------|------------|
-| `Permissions-Policy` header present | Yes | Yes | Yes |
-| Feature restrictions defined | Yes | Yes | Yes |
-| Geolocation restricted | Yes | Yes | Yes |
-| Camera/microphone restricted | Yes | Yes | Yes |
-| Payment API restricted | Yes | Yes | Yes |
-
-**Features to validate:**
-
-| Feature | Expected | Severity if Unrestricted |
-|---------|----------|------------------------|
-| `geolocation` | `()` (disabled) or specific origins | MEDIUM |
-| `camera` | `()` (disabled) | HIGH |
-| `microphone` | `()` (disabled) | HIGH |
-| `payment` | `()` (disabled) or specific origins | HIGH |
-| `usb` | `()` (disabled) | MEDIUM |
-| `autoplay` | Restricted | LOW |
-
-### Step 5 — Score Results
-
-#### 5.1 — Per-Dimension Scoring
-
-For each dimension, calculate:
-
-```
-dimensionScore = (passedChecks / totalChecks) * 100
-```
-
-**Status assignment:**
-
-| Score Range | Status |
-|-------------|--------|
-| 80-100 | PROTECTED |
-| 40-79 | PARTIAL |
-| 0-39 | UNPROTECTED |
+| Dimension Score | Status |
+|-----------------|--------|
+| 80–100 | PROTECTED |
+| 40–79 | PARTIAL |
+| 0–39 | UNPROTECTED |
 | N/A | SKIPPED |
 
-#### 5.2 — Overall Scoring
-
-```
-overallScore = max(0, 100 - sum(severityWeight * findingCount))
-```
-
-**Severity weights:** CRITICAL=10, HIGH=5, MEDIUM=2, LOW=1, INFO=0
-
-**Grade assignment:**
-
-| Score | Grade |
-|-------|-------|
+| Overall Score | Grade |
+|---------------|-------|
 | 90-100 | A |
 | 80-89 | B |
 | 70-79 | C |
 | 60-69 | D |
 | 0-59 | F |
 
-### Step 6 — Generate Reports
-
-Generate two output files:
-
-#### 6.1 — SARIF 2.1.0 Output
-
-Write to `results/security/runtime-protection-{timestamp}.sarif.json`:
-
-```json
-{
-  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
-  "version": "2.1.0",
-  "runs": [{
-    "tool": {
-      "driver": {
-        "name": "x-evaluate-runtime",
-        "version": "1.0.0",
-        "informationUri": "https://owasp.org/www-project-application-security-verification-standard/",
-        "rules": [
-          {
-            "id": "RTPROT-001",
-            "shortDescription": { "text": "Rate limit not configured" },
-            "helpUri": "https://cheatsheetseries.owasp.org/cheatsheets/Denial_of_Service_Cheat_Sheet.html",
-            "properties": { "asvs-ref": "V4.3", "dimension": "rate-limit" }
-          }
-        ]
-      }
-    },
-    "results": [
-      {
-        "ruleId": "RTPROT-001",
-        "level": "error",
-        "message": { "text": "No rate limiting detected on endpoint /api/users" },
-        "locations": [{ "physicalLocation": { "artifactLocation": { "uri": "https://app.example.com/api/users" } } }],
-        "properties": {
-          "dimension": "rate-limit",
-          "asvs-ref": "V4.3",
-          "severity": "CRITICAL",
-          "fix-recommendation": "Configure rate limiting (e.g., 100 req/min per IP) with 429 response and Retry-After header"
-        }
-      }
-    ]
-  }]
-}
-```
-
-#### 6.2 — Markdown Report
-
-Write to `results/security/runtime-protection-{timestamp}-report.md`:
-
-```markdown
-# Runtime Protection Report — {{PROJECT_NAME}}
-
-**Date:** YYYY-MM-DD
-**Target:** {target_url}
-**Scope:** {scope}
-**Intensity:** {effective_intensity}
-
-## Overall Score: {score}/100 (Grade {grade})
-
-## Dimension Summary
-
-| Dimension | Status | Score | Checks | Passed | ASVS Ref |
-|-----------|--------|-------|--------|--------|----------|
-| Rate Limiting | PROTECTED | 90 | 6 | 5 | V4.3 |
-| WAF Rules | PARTIAL | 60 | 5 | 3 | V5.1 |
-| Bot Protection | UNPROTECTED | 20 | 4 | 1 | V13.1 |
-| Account Lockout | SKIPPED | — | — | — | V2.2 |
-| Brute Force | PROTECTED | 85 | 4 | 3 | V2.2, V11.1 |
-| CSP Enforcement | PARTIAL | 70 | 5 | 3 | V14.4 |
-| Permissions Policy | PROTECTED | 100 | 5 | 5 | V14.4 |
-
-## Critical Gaps
-
-- {dimension}: {description of gap and remediation}
-
-## Detailed Findings
-
-### [RTPROT-001] {Dimension} — {Finding Title}
-- **Severity:** CRITICAL
-- **ASVS Reference:** V4.3
-- **Description:** {detailed description}
-- **Evidence:** {observed behavior}
-- **Fix Recommendation:** {actionable fix steps}
-
-## Recommendations
-
-1. **Immediate:** Address CRITICAL findings ({count})
-2. **Short-term:** Resolve HIGH findings ({count})
-3. **Long-term:** Review MEDIUM/LOW findings ({count})
-```
-
-## ASVS Mapping Summary
-
-| Dimension | ASVS Chapter | ASVS Section | Key Requirements |
-|-----------|-------------|--------------|-----------------|
-| Rate Limiting | V4 Access Control | V4.3 | Rate limiting, resource protection |
-| WAF Rules | V5 Validation | V5.1 | Input validation, injection prevention |
-| Bot Protection | V13 API Security | V13.1 | API security mechanisms |
-| Account Lockout | V2 Authentication | V2.2 | Credential protection, lockout |
-| Brute Force | V2 Authentication, V11 Business Logic | V2.2, V11.1 | Brute force mitigation |
-| CSP Enforcement | V14 Configuration | V14.4 | HTTP security headers |
-| Permissions Policy | V14 Configuration | V14.4 | Feature policy headers |
+Overall: `overallScore = max(0, 100 - sum(severityWeight × findingCount))`.
 
 ## Error Handling
 
@@ -385,7 +92,7 @@ Write to `results/security/runtime-protection-{timestamp}-report.md`:
 | Target unreachable | Emit `"Target unreachable: {url}"`, abort with no score |
 | Connection timeout | Retry once with doubled timeout, then report error |
 | Target returns 5xx | Report as finding (server error under load) |
-| Login endpoint not provided for account-lockout scope | Warn and skip account-lockout dimension |
+| Login endpoint not provided for `--scope=account-lockout` | Warn and skip account-lockout dimension |
 | Aggressive in production | Downgrade to passive, emit warning |
 | Partial dimension failure | Complete other dimensions, mark failed as SKIPPED |
 | SSL certificate error | Warn and continue with `--insecure` flag |
@@ -394,12 +101,17 @@ Write to `results/security/runtime-protection-{timestamp}-report.md`:
 
 | Skill | Relationship | Context |
 |-------|-------------|---------|
-| x-generate-security-dashboard | called-by | Dashboard aggregates runtime protection results |
-| x-evaluate-hardening | complements | Hardening evaluates static config; runtime evaluates live behavior |
-| x-run-dast | complements | DAST tests vulnerabilities; runtime tests defensive controls |
+| `x-generate-security-dashboard` | called-by | Dashboard aggregates runtime protection results |
+| `x-evaluate-hardening` | complements | Hardening evaluates static config; runtime evaluates live behavior |
+| `x-run-dast` | complements | DAST tests vulnerabilities; runtime tests defensive controls |
 
 ## Knowledge Pack References
 
 | Knowledge Pack | Usage |
 |----------------|-------|
-| security | OWASP ASVS compliance mapping, remediation recommendations |
+| `.claude/knowledge/security/` | OWASP ASVS compliance mapping, remediation recommendations |
+| `.claude/knowledge/security/application-security.md` | Security headers and CSP guidance |
+
+## Full Protocol
+
+Minimum viable contract above. Detailed 7-dimension check matrices (passive/moderate/aggressive per dimension), non-destructive test payloads, scoring formulas, SARIF 2.1.0 schema, and Markdown report template live in [`references/full-protocol.md`](references/full-protocol.md) per ADR-0012 (skill body slim-by-default).
