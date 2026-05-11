@@ -23,7 +23,10 @@ requires-capabilities: []
 
 ## Purpose
 
-Renders a PR body Markdown file from existing on-disk artifacts (review, verify, telemetry, commits) and writes it to `--out`. Consumed by `x-create-pr` (`kind=implementation`) and `x-create-feature` (`kind=backlog`). Fail-open: any missing source produces a human-readable placeholder — never an audit-sentinel string recognized by `audit-pr-evidence.sh`.
+Renders a PR body Markdown file from existing on-disk artifacts (review, verify, telemetry,
+commits) and writes it to `--out`. Consumed by `x-create-pr` (`kind=implementation`) and
+`x-create-feature` (`kind=backlog`). Fail-open: any missing source produces a human-readable
+placeholder — never an audit-sentinel string recognized by `audit-pr-evidence.sh`.
 
 ## Parameters
 
@@ -62,7 +65,7 @@ This skill is internal — never typed by a user. Callers use Rule 13 INLINE-SKI
 
 ```markdown
 Skill(skill: "x-internal-render-pr-body",
-      args: "--kind=implementation --story-id story-XXXX-YYYY --out /abs/path/body.md")
+      args: "--kind=implementation --story-id story-XXXX-YYYY --out ${REPO_ROOT}/ai/epics/epic-XXXX/reports/pr-body-story-XXXX-YYYY.md")
 ```
 
 ## Workflow Overview

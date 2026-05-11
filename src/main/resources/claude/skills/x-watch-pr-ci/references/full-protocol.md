@@ -14,19 +14,19 @@ fi
 # Validate --timeout-seconds (60..7200)
 if [[ "$TIMEOUT_SECONDS" -lt 60 || "$TIMEOUT_SECONDS" -gt 7200 ]]; then
   echo "ERROR: timeout-seconds must be in range 60..7200" >&2
-  exit 1
+  exit 80
 fi
 
 # Validate --poll-interval-seconds (15..300)
 if [[ "$POLL_INTERVAL" -lt 15 || "$POLL_INTERVAL" -gt 300 ]]; then
   echo "ERROR: poll-interval-seconds must be in range 15..300" >&2
-  exit 1
+  exit 80
 fi
 
 # Validate --copilot-review-timeout (60..timeout)
-if [[ "$COPILOT_TIMEOUT" -lt 60 || "$COPILOT_TIMEOUT" -gt "$TIMEOUT_SECONDS" ]]; then
+if [[ "$COPILOT_REVIEW_TIMEOUT" -lt 60 || "$COPILOT_REVIEW_TIMEOUT" -gt "$TIMEOUT_SECONDS" ]]; then
   echo "ERROR: copilot-review-timeout must be in range 60..${TIMEOUT_SECONDS}" >&2
-  exit 1
+  exit 80
 fi
 ```
 

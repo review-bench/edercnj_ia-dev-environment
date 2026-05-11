@@ -53,6 +53,7 @@ Solves the gap identified in `spec-ci-watch.md §2`: when `x-fix-pr` is invoked 
 | 50 | `NO_CI_CONFIGURED` | `statusCheckRollup` is empty — no CI configured. |
 | 60 | `PR_CLOSED` | PR closed without merge. |
 | 70 | `PR_NOT_FOUND` | PR does not exist or caller lacks permission. |
+| 80 | `INVALID_ARGS` | An argument failed bounds/format validation (e.g., `--timeout-seconds` outside `60..7200`, `--poll-interval-seconds` outside `15..300`, `--copilot-review-timeout` outside `60..--timeout-seconds`). |
 
 These codes are a **public contract**. Adding a new code = MINOR bump; changing semantics = MAJOR bump (Rule 08 — SemVer).
 
@@ -100,7 +101,7 @@ Orchestrators MUST use this Pattern 1 INLINE-SKILL form. Bare-slash (`/x-watch-p
 
 Full bash for all 3 steps, `emit_json` helper, state-file schema (RULE-045-03), stdout/stderr separation contract, edge cases (rate-limit exponential backoff, Copilot-not-configured, corrupted state, mid-poll merge/close), and rule compliance live in [`references/full-protocol.md`](references/full-protocol.md):
 
-- **Step 1** (§Step 1): bounds validation per flag with specific exit codes.
+- **Step 1** (§Step 1): bounds validation per flag — `--pr-number ≤ 0` → exit `70` (`PR_NOT_FOUND`); `--timeout-seconds`/`--poll-interval-seconds`/`--copilot-review-timeout` out-of-range → exit `80` (`INVALID_ARGS`). All validation exit codes are in the stable contract above.
 - **Step 2** (§Step 2): state-file resume via `jq -r .startedAt` + `ELAPSED_OFFSET` computation; `mkdir -p` on state directory.
 - **Step 3** (§Step 3): polling loop with `gh pr view` + `gh api .../reviews`; rate-limit detection with exponential backoff (30s/60s/120s, max 3 retries → exit 30); early-exit classification (MERGED→40, CLOSED→60, empty CI→50, failing→20, all-green+Copilot→0, all-green+Copilot-timeout→10).
 - **Helper** (§Helper emit_json): JSON envelope construction via `jq -n` with all 5 fields.
