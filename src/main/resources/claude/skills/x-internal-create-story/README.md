@@ -12,7 +12,7 @@
 
 ## What It Does
 
-Generates self-contained story files that developers can implement without referencing the original spec. Each story includes precise data contracts (typed fields, M/O flags, error codes per RFC 7807), Gherkin acceptance criteria in TPP order (degenerate cases first), Mermaid sequence diagrams, and granular sub-tasks. Stories go through a quality gate (default threshold: 70/100) with automatic refinement before being saved. Optionally creates stories in Jira with dependency links.
+Generates self-contained story files that developers can implement without referencing the original spec or upstream Feature context. Each story includes precise data contracts (typed fields, M/O flags, error codes per RFC 7807), Gherkin acceptance criteria in TPP order (degenerate cases first), Mermaid sequence diagrams, and granular sub-tasks. Feature-derived stories must still include persona/scenario, measurable value, metrics, AC, typed contracts, and decision rationale; generation aborts early when those refinement-critical sections cannot be filled concretely. Stories go through a quality gate (default threshold: 70/100) with automatic refinement before being saved. Optionally creates stories in Jira with dependency links.
 
 ## Usage
 
@@ -22,10 +22,10 @@ Generates self-contained story files that developers can implement without refer
 
 ## Workflow
 
-1. Read the Epic (story index, rules table, DoD) and the system specification
+1. Read the Epic (story index, rules table, DoD) and the system specification or upstream Feature context
 2. Generate each story file following the template, in dependency order
 3. Build sections: dependencies, data contracts, Gherkin scenarios, diagrams, sub-tasks
-4. Run quality gate validation (6 dimensions, weighted scoring)
+4. Validate refinement-critical sections and run quality gate validation (6 dimensions, weighted scoring)
 5. Auto-refine stories below threshold (up to 2 attempts)
 6. Save story files and optionally create them in Jira with dependency links
 

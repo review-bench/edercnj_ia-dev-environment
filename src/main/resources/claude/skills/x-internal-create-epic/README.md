@@ -12,7 +12,7 @@
 
 ## What It Does
 
-Reads a system specification document and generates the Epic -- the top-level artifact defining scope, cross-cutting rules, quality gates, and story index for a development effort. It extracts business rules that span multiple stories, defines global DoR/DoD criteria, and produces a dependency-aware story index organized by layers (foundation, core, extensions, compositions, cross-cutting). Optionally creates the Epic in Jira via MCP.
+Reads a system specification document or upstream Feature context and generates the Epic -- the top-level artifact defining scope, cross-cutting rules, quality gates, and story index for a development effort. It extracts business rules that span multiple stories, defines global DoR/DoD criteria, and produces a dependency-aware story index organized by layers (foundation, core, extensions, compositions, cross-cutting). Feature-derived epics must still include persona, hypothesis, OKRs/KPIs, alternatives, risks, scope, and quality gates; generation aborts early when those refinement-critical sections cannot be filled concretely. Optionally creates the Epic in Jira via MCP.
 
 ## Usage
 
@@ -23,11 +23,11 @@ Reads a system specification document and generates the Epic -- the top-level ar
 
 ## Workflow
 
-1. Read the system specification and the Epic template
+1. Read the system specification or upstream Feature context and the Epic template
 2. Extract cross-cutting business rules (rules affecting 2+ stories)
 3. Identify stories using layer-by-layer decomposition from the decomposition guide
 4. Define global DoR and DoD quality criteria
-5. Generate the Epic file following the template structure
+5. Validate refinement-critical sections before writing and generate the Epic file following the template structure
 6. Optionally create the Epic in Jira (if MCP is available)
 
 ## Outputs
