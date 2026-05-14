@@ -3,48 +3,36 @@ package dev.iadevkit.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.iadevkit.IaDevKitApplication;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 class GenerateCommandVerboseTest {
 
-    private final PrintStream originalOut = System.out;
-    private ByteArrayOutputStream captured;
-
-    @BeforeEach
-    void setUp() {
-        captured = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(captured));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
+    private static CommandLine newCli(StringWriter sw) {
+        CommandLine cli = new CommandLine(new IaDevKitApplication());
+        cli.setOut(new PrintWriter(sw));
+        return cli;
     }
 
     @Test
     void verbose_printsEachCopiedFile(@TempDir Path tmpDir) {
-        new CommandLine(new IaDevKitApplication())
-                .execute("generate", "--output", tmpDir.toString(), "--verbose");
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--verbose");
 
-        String output = captured.toString();
-        assertThat(output).contains("copy");
+        assertThat(sw.toString()).contains("copy");
     }
 
     @Test
     void verbose_dryRun_printsWouldCopy(@TempDir Path tmpDir) {
-        new CommandLine(new IaDevKitApplication())
-                .execute("generate", "--output", tmpDir.toString(), "--dry-run", "--verbose");
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--dry-run", "--verbose");
 
-        String output = captured.toString();
-        assertThat(output).contains("would copy");
+        assertThat(sw.toString()).contains("would copy");
     }
 
     @Test
@@ -53,17 +41,16 @@ class GenerateCommandVerboseTest {
         Files.createDirectories(claudeDir);
         Files.writeString(claudeDir.resolve("settings.json"), "existing");
 
-        new CommandLine(new IaDevKitApplication())
-                .execute("generate", "--output", tmpDir.toString(), "--verbose");
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--verbose");
 
-        String output = captured.toString();
-        assertThat(output).contains("skip");
+        assertThat(sw.toString()).contains("skip");
     }
 
     @Test
     void generate_copiesClaudioMd(@TempDir Path tmpDir) {
-        new CommandLine(new IaDevKitApplication())
-                .execute("generate", "--output", tmpDir.toString());
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString());
 
         assertThat(tmpDir.resolve("CLAUDE.md")).isRegularFile();
     }
@@ -72,9 +59,27 @@ class GenerateCommandVerboseTest {
     void generate_force_overwritesClaudioMd(@TempDir Path tmpDir) throws Exception {
         Files.writeString(tmpDir.resolve("CLAUDE.md"), "old");
 
-        new CommandLine(new IaDevKitApplication())
-                .execute("generate", "--output", tmpDir.toString(), "--force");
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--force");
 
         assertThat(Files.readString(tmpDir.resolve("CLAUDE.md"))).doesNotContain("old");
+    }
+
+    @Test
+    void verbose_skipsExistingClaudioMd(@TempDir Path tmpDir) throws Exception {
+        Files.writeString(tmpDir.resolve("CLAUDE.md"), "existing");
+
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--verbose");
+
+        assertThat(sw.toString()).contains("skip");
+    }
+
+    @Test
+    void verbose_dryRun_printsClaudioMd(@TempDir Path tmpDir) {
+        StringWriter sw = new StringWriter();
+        newCli(sw).execute("generate", "--output", tmpDir.toString(), "--dry-run", "--verbose");
+
+        assertThat(sw.toString()).contains("CLAUDE.md");
     }
 }

@@ -76,7 +76,7 @@ class GenerateCommandTest {
     }
 
     @Test
-    void generate_defaultOutputIsCurrentDirectory(@TempDir Path tmpDir) {
+    void generate_helpExitsZero() {
         int exit = new CommandLine(new IaDevKitApplication()).execute("generate", "--help");
         assertThat(exit).isZero();
     }
