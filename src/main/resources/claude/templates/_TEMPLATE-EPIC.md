@@ -117,7 +117,7 @@ template-version: "3.0"
 
 > **Por que acreditamos que isso vai funcionar — e como vamos medir.**
 > A hipótese deve ter forma `Se <ação>, então <resultado observável>, porque <mecanismo causal>`.
-> OKRs: ≥ 1 Objective com ≥ 1 Key Result mensurável (unidade + valor-alvo + prazo).
+> OKRs: ≥ 1 Objective com ≥ 1 Key Result mensurável (unidade + valor-alvo + prazo + método de medição).
 
 ### Hipótese de Valor
 
@@ -127,9 +127,9 @@ template-version: "3.0"
 
 ### OKRs
 
-| Objetivo | Key Result | Métrica | Valor Atual | Meta | Prazo |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| <Objetivo de negócio ou técnico> | <Resultado mensurável> | <Unidade de medida> | <Baseline> | <Alvo> | <Data/sprint> |
+| Objetivo | Key Result | Métrica | Método de Medição | Valor Atual | Meta | Prazo |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| <Objetivo de negócio ou técnico> | <Resultado mensurável> | <Unidade de medida> | <telemetria, relatório CI, pesquisa com amostra, dashboard, etc.> | <Baseline> | <Alvo> | <Data/sprint> |
 
 ---
 

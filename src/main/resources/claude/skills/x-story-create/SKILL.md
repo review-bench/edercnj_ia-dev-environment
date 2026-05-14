@@ -18,7 +18,7 @@ requires-capabilities: []
 
 ## Purpose
 
-Generate 1-N Story markdown artifacts from an existing Feature artifact, linked to a target epic via `--epic-id`. This focused Product-First wrapper materializes only the Feature → Story step, preserving `sourceFeature`, carrying inherited RNFs into `## 2. RNFs Herdadas`, and intentionally omitting the generic sections `4` and `8` plus the default `2. Persona & Cenário` because that context is already represented upstream.
+Generate 1-N Story markdown artifacts from an existing Feature artifact, linked to a target epic via `--epic-id`. This focused Product-First wrapper materializes only the Feature → Story step, preserving `sourceFeature`, carrying inherited RNFs, and enriching each story with the refinement-critical context required by `x-refine-story`.
 
 > **EPIC-0077 semantic reintroduction:** `x-story-create` was hard-cut in EPIC-0065 when generic story generation moved behind `x-internal-create-story`. It is reintroduced here with a narrower responsibility: **Feature-derived story generation only**. It is not a legacy alias.
 
@@ -48,12 +48,18 @@ If the feature source cannot be resolved, stop with a validation error.
 4. Decompose the feature into 1-N stories using its use cases as story seeds.
 5. Create `ai/epics/epic-<ID>-<slug>/story-<ID>-<NNNN>.md`.
 6. Populate:
-   - `Epic ID`
-   - `Source Feature`
-   - `Source Feature Link`
-   - `## 2. RNFs Herdadas`
-   - `## 1`, `## 3`, `## 5`, `## 6`, `## 7`, `## 9`
-7. **Do not render** `## 2. Persona & Cenário`, `## 4. AC (Gherkin ...)`, or `## 8. Decision Rationale` for these Feature-derived stories.
+    - `Epic ID`
+    - `Source Feature`
+    - `Source Feature Link`
+    - inherited RNFs in the story body without replacing mandatory template sections
+    - `## 1` through `## 9`
+7. Before writing each story, validate the refinement-critical sections:
+   - `## 1` and `## 2` contain a concrete persona and scenario
+   - `## 3` contains measurable value and at least 1 metric with unit and target
+   - `## 4` contains Gherkin ACs covering happy-path, error/boundary, performance/SLA, and security
+   - `## 5` contains typed contracts
+   - `## 8` contains at least 1 alternative/decision rationale
+8. If the source feature and linked epic do not provide enough evidence to fill those sections concretely, stop with a validation error instead of generating a story that will fail refinement.
 
 ## Parameters
 

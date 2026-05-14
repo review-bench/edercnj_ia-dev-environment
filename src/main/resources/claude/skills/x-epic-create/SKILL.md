@@ -18,7 +18,7 @@ requires-capabilities: []
 
 ## Purpose
 
-Generate a single Epic markdown artifact from an existing Feature artifact. This focused skill is the Product-First complement to `x-create-feature`: it materializes only the Feature → Epic step, preserving `Source Feature`, inheriting RNFs from the Product / Capability / Feature chain, and intentionally omitting sections `2`, `4`, and `8` of the generic epic template because that context is already owned upstream in the chain.
+Generate a single Epic markdown artifact from an existing Feature artifact. This focused skill is the Product-First complement to `x-create-feature`: it materializes only the Feature → Epic step, preserving `Source Feature`, inheriting RNFs from the Product / Capability / Feature chain, and enriching the epic with the strategic context required by `x-refine-epic`.
 
 > **EPIC-0077 semantic reintroduction:** `x-epic-create` was hard-cut in EPIC-0065 when the generic public epic generator moved behind `x-internal-create-epic`. It is reintroduced here with a narrower responsibility: **Feature-derived epic generation only**. It is not a legacy alias.
 
@@ -47,11 +47,17 @@ If the feature source cannot be resolved, stop with a validation error.
 3. Validate epic id (`4 digits`, default `0001`).
 4. Create `ai/epics/epic-<ID>-<slug>/epic-<ID>.md`.
 5. Populate:
-   - `Source Feature`
-   - `Source Feature Link`
-   - `## 0.6 Inherited RNFs`
-   - `## 1`, `## 3`, `## 5`, `## 6`, `## 7`, `## 9`
-6. **Do not render** sections `## 2`, `## 4`, `## 8` for Feature-derived epics.
+    - `Source Feature`
+    - `Source Feature Link`
+    - `## 0.6 Inherited RNFs`
+    - `## 1` through `## 9`
+6. Before writing, validate the refinement-critical sections:
+   - `## 2` contains at least 1 affected persona/stakeholder connected to the problem
+   - `## 3` contains value hypothesis + at least 1 OKR/KPI with unit and measurement method
+   - `## 4` contains at least 2 alternatives with rejection rationale
+   - `## 6` contains product and technical risks
+   - `## 8` contains global DoR/DoD
+7. If the source feature and optional upstream artifacts do not provide enough evidence to fill these sections with concrete content, stop with a validation error instead of generating an epic that will fail refinement.
 
 ## Parameters
 

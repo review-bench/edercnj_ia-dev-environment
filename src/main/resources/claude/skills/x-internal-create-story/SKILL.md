@@ -94,8 +94,8 @@ P1 is fail-open (RULE-006 advisory). P2 aborts with `EPIC_BRANCH_ENSURE_FAILED` 
 
 The detailed inline protocol for each step (sub-step prompts of Step 2 covering the rendering rules per template section, quality scoring dimensions, Jira MCP invocations, `<!-- TELEMETRY -->` hooks) lives in [`references/full-protocol.md`](references/full-protocol.md):
 
-- **Step 1 — Read the Epic and Spec** (§Step 1): in Epic mode extract story index + rules table + DoD; in `--from-feature` mode read the Feature artifact + target `--epic-id`, derive stories from use cases, render inherited RNFs into `## 2. RNFs Herdadas`, and intentionally omit template Sections 2 (Persona & Cenário), 4 (AC) and 8 (Decision Rationale).
-- **Step 2 — Generate Each Story** (§Step 2): for each entry in the Epic index, materialize a `story-XXXX-YYYY.md` per `_TEMPLATE-STORY.md` (v2 EPIC-0070) covering Sections 1–9 — Visão, Persona & Cenário, Entrega de Valor, AC (Gherkin), Contratos, Tasks, Dependências, Decision Rationale, Refinement Verdict. In `--from-feature` mode, Sections 2/4/8 are omitted (see Step 1 above).
+- **Step 1 — Read the Epic and Spec** (§Step 1): in Epic mode extract story index + rules table + DoD; in `--from-feature` mode read the Feature artifact + target `--epic-id`, derive stories from use cases, render inherited RNFs as supplemental context, and collect enough evidence to fill Persona & Cenário, AC, metric, contract, and Decision Rationale sections.
+- **Step 2 — Generate Each Story** (§Step 2): for each entry in the Epic index, materialize a `story-XXXX-YYYY.md` per `_TEMPLATE-STORY.md` (v2 EPIC-0070) covering Sections 1–9 — Visão, Persona & Cenário, Entrega de Valor, AC (Gherkin), Contratos, Tasks, Dependências, Decision Rationale, Refinement Verdict. `--from-feature` mode must still render those sections with concrete content.
 - **Step 3 — Optional Jira Integration** (§Step 3): cascaded mode honors `jiraContext` from the orchestrator; standalone mode honors `--jira` / `--no-jira` flags or falls back to `AskUserQuestion`; a second pass creates `Blocks` dependency links.
 - **Step 4 — Quality Gate Validation** (§Step 4): weighted score across 8 dimensions vs `--quality-threshold`; up to 2 automatic refinement attempts before rejecting the story.
 - **Step 5 — Save and Report** (§Step 5): write each story to `ai/epics/epic-XXXX/story-XXXX-YYYY.md`; emit console summary with totals and any Jira results.
@@ -136,6 +136,7 @@ On push failure, log a WARNING and continue — local commit is preserved. See [
 | Spec file missing | Abort with message: "Specification file not found" |
 | Circular dependency detected | Warn and list the cycle; proceed with best-effort ordering |
 | Quality gate failure after 2 retries | Skip story, report: "Manual intervention needed" |
+| Refinement-critical section missing during generation | Abort that story with validation error naming missing dimensions |
 | Jira MCP unavailable | Replace `<CHAVE-JIRA>` with `—`, continue without Jira |
 | Jira issue creation fails | Log warning, set `<CHAVE-JIRA>` to `—`, continue with next story |
 | `x-internal-ensure-epic-branch` fails (Step P2) | Abort with `EPIC_BRANCH_ENSURE_FAILED`; canonical branch is required for versioning |

@@ -52,7 +52,7 @@ Read the source inputs completely.
   - The rules table (RULE-001..N) — stories reference these by ID
   - The DoD (copied into each story for quick reference)
 
-- **Feature mode (`--from-feature`):** read the Feature artifact and target `--epic-id`. In this mode, derive stories from the feature use cases, render inherited RNFs into `## 2. RNFs Herdadas`, and intentionally omit `## 2. Persona & Cenário`, `## 4. AC (...)`, and `## 8. Decision Rationale`.
+- **Feature mode (`--from-feature`):** read the Feature artifact and target `--epic-id`. In this mode, derive stories from the feature use cases, render inherited RNFs as supplemental context, and still populate `## 2. Persona & Cenário`, `## 4. AC (...)`, and `## 8. Decision Rationale` with concrete content suitable for refinement.
 
 From the upstream source, understand the technical context: journeys, data contracts, protocol mappings, state machines, error codes, and metrics.
 
@@ -83,6 +83,8 @@ For each story in the Epic's index, create a file following `_TEMPLATE-STORY.md`
 7. **Dependências**: Blocked By / Blocks cross-references consistent with epic index
 8. **Decision Rationale**: 4-line micro-template (`**Decisão:** / **Motivo:** / **Alternativa descartada:** / **Consequência:**`)
 9. **Refinement Verdict**: `Status: TBD`, all dimensions unchecked
+
+Before saving each story, validate the refinement-critical dimensions from `.claude/knowledge/refinement/dimensions.md`: persona, value, AC, contracts, metrics, alternatives. If any dimension is materially incomplete, abort generation for that story with a validation error naming the missing dimensions.
 
 **Story header (mandatory):**
 

@@ -60,6 +60,7 @@ and must be read fresh from disk every time (never hardcode the structure).
 > - **Section 3 (Hipótese & OKRs):** State the value hypothesis in `Se…então…porque` form + at least 1 OKR/KPI with unit and measurement method.
 > - **Section 4 (Alternativas Consideradas):** At least 2 alternatives with rejection rationale (`Decisão de rejeição:` marker).
 > - **Section 5 (Escopo):** In-scope list AND out-of-scope list; out-of-scope ≥ 3 items.
+> - **Feature-derived epics MUST still render all refinement-critical sections** (`2`, `3`, `4`, `6`, `8`) with concrete content. Product-First lineage is additive, not a reason to omit strategic context.
 
 ## Workflow
 
@@ -104,7 +105,7 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-epic
 Read the entire source artifact provided by the user.
 
 - **Spec mode (default):** the file follows `_TEMPLATE.md` with sections like Overview, Business Rules, Platform Specs, Data Contracts, Journeys, Dependencies, and Interfaces.
-- **Feature mode (`--from-feature`):** the file is an existing Feature markdown artifact. In this mode, preserve `Source Feature`, load inherited RNFs from Feature → Capability → Product, and intentionally omit sections `2`, `4`, and `8` from the generated epic because that context already exists upstream in the Product-First chain.
+- **Feature mode (`--from-feature`):** the file is an existing Feature markdown artifact. In this mode, preserve `Source Feature`, load inherited RNFs from Feature → Capability → Product, and derive the epic's persona, value hypothesis, OKRs/KPIs, alternatives, risks, scope, and quality gates from the Feature plus upstream Product/Capability context. Do not omit refinement-critical sections.
 
 Understand the full source scope before starting extraction.
 
@@ -203,6 +204,8 @@ Write the Epic following the `_TEMPLATE-EPIC.md` structure exactly.
 8. **Section 7 — Índice de Histórias**: Story index from Step 3, with links, dependencies, and measurable value per story
 9. **Section 8 — Quality Gates**: DoR/DoD from Step 4
 10. **Refinement Verdict block**: `Status: TBD`, all dimensions unchecked
+
+Before saving, validate the generated epic against `.claude/knowledge/refinement/dimensions.md` §Epic Dimensions. If Problem, Persona, Value Hypothesis, OKRs/KPIs, Alternatives, Risks, or Scope are materially incomplete, abort with a validation error and name the missing dimensions. Do not write a partially-filled epic that is expected to fail `x-refine-epic`.
 
 **Directory and file naming** (mandatory — see SD-09 in decomposition guide):
 1. Determine the epic number: scan `plans/` for existing `epic-XXXX` folders and use the next available number (default `0001` if none exist). Ask the user if unsure.
