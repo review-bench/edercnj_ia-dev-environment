@@ -31,11 +31,8 @@
         <spotless.version>2.44.5</spotless.version>
         <google-java-format.version>1.25.2</google-java-format.version>
         <checkstyle.version>10.23.1</checkstyle.version>
-        <slf4j.version>2.0.17</slf4j.version>
-        <logback.version>1.5.15</logback.version>
         <junit.version>5.11.4</junit.version>
         <assertj.version>3.27.7</assertj.version>
-        <mockito.version>5.14.2</mockito.version>
         <jacoco.version>0.8.14</jacoco.version>
         <cyclonedx.version>2.9.1</cyclonedx.version>
     </properties>
@@ -46,18 +43,6 @@
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
             <version>${picocli.version}</version>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -73,19 +58,6 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -94,14 +66,14 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>dev/iadev/version.properties</exclude>
+                    <exclude>dev/iadevkit/version.properties</exclude>
                 </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>dev/iadev/version.properties</include>
+                    <include>dev/iadevkit/version.properties</include>
                 </includes>
             </resource>
         </resources>
