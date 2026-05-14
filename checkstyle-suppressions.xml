@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+    "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <!--
+        Indentation and Javadoc checks are suppressed project-wide.
+
+        Indentation: google_checks.xml expects 2-space indent but the project uses
+        Google Java Format via Spotless (4-space indent for continuation lines).
+        The formatter is the authoritative style enforcer; Checkstyle indentation
+        would produce false positives on every file.
+
+        MissingJavadocType / MissingJavadocMethod: internal CLI tool with no
+        public API surface; Javadoc is not required per coding standards.
+    -->
+    <suppress checks="Indentation" files=".*\.java"/>
+    <suppress checks="MissingJavadocType" files=".*\.java"/>
+    <suppress checks="MissingJavadocMethod" files=".*\.java"/>
+</suppressions>

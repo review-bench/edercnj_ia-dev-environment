@@ -11,7 +11,9 @@ public class VersionProvider implements IVersionProvider {
     public String[] getVersion() throws Exception {
         Properties props = new Properties();
         try (InputStream in = getClass().getResourceAsStream("/dev/iadevkit/version.properties")) {
-            if (in != null) props.load(in);
+            if (in != null) {
+                props.load(in);
+            }
         } catch (IOException e) {
             System.err.println("Warning: could not read version.properties: " + e.getMessage());
         }

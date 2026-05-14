@@ -54,7 +54,6 @@ public class GenerateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        long startTimeMs = System.currentTimeMillis();
         Path target = outputDir.toAbsolutePath().normalize();
 
         if (!isWithinAllowedScope(target)) {
@@ -66,6 +65,7 @@ public class GenerateCommand implements Callable<Integer> {
 
         Map<String, Integer> counts = new TreeMap<>();
         PrintWriter out = spec.commandLine().getOut();
+        long startTimeMs = System.currentTimeMillis();
 
         copyResourceTree(RESOURCE_ROOT, target.resolve(".claude"), counts, out);
         copyRootClaudeMd(target, counts, out);
@@ -88,8 +88,9 @@ public class GenerateCommand implements Callable<Integer> {
             String resourceRoot, Path targetDir, Map<String, Integer> counts, PrintWriter out)
             throws IOException, URISyntaxException {
         URL url = getClass().getClassLoader().getResource(resourceRoot);
-        if (url == null)
+        if (url == null) {
             throw new IllegalStateException("Bundled resource not found: " + resourceRoot);
+        }
         URI uri = url.toURI();
         if ("jar".equals(uri.getScheme())) {
             try (FileSystem fs = FileSystems.newFileSystem(uri, Map.of())) {
@@ -105,12 +106,16 @@ public class GenerateCommand implements Callable<Integer> {
             throws IOException {
         try (Stream<Path> walk = Files.walk(source)) {
             for (Path src : (Iterable<Path>) walk::iterator) {
-                if (Files.isDirectory(src)) continue;
+                if (Files.isDirectory(src)) {
+                    continue;
+                }
                 String relative = source.relativize(src).toString();
                 Path dest = targetDir.resolve(relative);
                 String displayPath = targetDir.getFileName() + "/" + relative;
                 if (!force && Files.exists(dest)) {
-                    if (verbose) out.println("  skip   " + displayPath);
+                    if (verbose) {
+                        out.println("  skip   " + displayPath);
+                    }
                     continue;
                 }
                 if (!dryRun) {
@@ -119,7 +124,9 @@ public class GenerateCommand implements Callable<Integer> {
                         Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
-                if (verbose) out.println("  " + (dryRun ? "would copy " : "copy   ") + displayPath);
+                if (verbose) {
+                    out.println("  " + (dryRun ? "would copy " : "copy   ") + displayPath);
+                }
                 counts.merge(categorize(relative), 1, Integer::sum);
             }
         }
@@ -128,10 +135,14 @@ public class GenerateCommand implements Callable<Integer> {
     private void copyRootClaudeMd(Path targetDir, Map<String, Integer> counts, PrintWriter out)
             throws IOException {
         URL url = getClass().getClassLoader().getResource(CLAUDE_MD);
-        if (url == null) return;
+        if (url == null) {
+            return;
+        }
         Path dest = targetDir.resolve(CLAUDE_MD);
         if (!force && Files.exists(dest)) {
-            if (verbose) out.println("  skip   " + CLAUDE_MD);
+            if (verbose) {
+                out.println("  skip   " + CLAUDE_MD);
+            }
             return;
         }
         if (!dryRun) {
@@ -139,7 +150,9 @@ public class GenerateCommand implements Callable<Integer> {
                 Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
             }
         }
-        if (verbose) out.println("  " + (dryRun ? "would copy " : "copy   ") + CLAUDE_MD);
+        if (verbose) {
+            out.println("  " + (dryRun ? "would copy " : "copy   ") + CLAUDE_MD);
+        }
         counts.merge("Root Files", 1, Integer::sum);
     }
 
