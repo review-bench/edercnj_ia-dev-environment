@@ -56,13 +56,6 @@ public class GenerateCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         Path target = outputDir.toAbsolutePath().normalize();
 
-        if (!isWithinAllowedScope(target)) {
-            spec.commandLine()
-                    .getErr()
-                    .println("Error: output directory is not valid: " + outputDir);
-            return 2;
-        }
-
         Map<String, Integer> counts = new TreeMap<>();
         PrintWriter out = spec.commandLine().getOut();
         long startTimeMs = System.currentTimeMillis();
@@ -72,16 +65,6 @@ public class GenerateCommand implements Callable<Integer> {
 
         printSummary(counts, System.currentTimeMillis() - startTimeMs, out);
         return 0;
-    }
-
-    private boolean isWithinAllowedScope(Path target) {
-        try {
-            Path canonical = target.toRealPath(java.nio.file.LinkOption.NOFOLLOW_LINKS);
-            return !canonical.toString().contains("..");
-        } catch (IOException e) {
-            // Path does not exist yet — validate syntactically
-            return !target.toString().contains("..");
-        }
     }
 
     private void copyResourceTree(
@@ -101,6 +84,18 @@ public class GenerateCommand implements Callable<Integer> {
         }
     }
 
+    private static void validateDestContainment(Path dest, Path targetDir) throws IOException {
+        Path normalized = dest.toAbsolutePath().normalize();
+        if (!normalized.startsWith(targetDir.toAbsolutePath().normalize())) {
+            throw new IOException(
+                    "Path traversal detected: resolved destination '"
+                            + normalized
+                            + "' escapes target directory '"
+                            + targetDir
+                            + "'");
+        }
+    }
+
     private void walkAndCopy(
             Path source, Path targetDir, Map<String, Integer> counts, PrintWriter out)
             throws IOException {
@@ -111,6 +106,7 @@ public class GenerateCommand implements Callable<Integer> {
                 }
                 String relative = source.relativize(src).toString();
                 Path dest = targetDir.resolve(relative);
+                validateDestContainment(dest, targetDir);
                 String displayPath = targetDir.getFileName() + "/" + relative;
                 if (!force && Files.exists(dest)) {
                     if (verbose) {
@@ -139,6 +135,7 @@ public class GenerateCommand implements Callable<Integer> {
             return;
         }
         Path dest = targetDir.resolve(CLAUDE_MD);
+        validateDestContainment(dest, targetDir);
         if (!force && Files.exists(dest)) {
             if (verbose) {
                 out.println("  skip   " + CLAUDE_MD);

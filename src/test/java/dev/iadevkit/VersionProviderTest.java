@@ -23,22 +23,11 @@ class VersionProviderTest {
     }
 
     @Test
-    void getVersion_returnsUnknownWhenResourceMissing() throws Exception {
-        // Subclass that returns null stream to simulate missing resource
-        VersionProvider provider =
-                new VersionProvider() {
-                    @Override
-                    public String[] getVersion() throws Exception {
-                        java.util.Properties props = new java.util.Properties();
-                        // No resource loaded — version defaults to "unknown"
-                        return new String[] {
-                            "ia-dev-kit " + props.getProperty("version", "unknown")
-                        };
-                    }
-                };
+    void getVersion_returnsUnknownWhenResourceMissing() {
+        // Exercises the real null-InputStream branch in loadVersion (no override)
+        String[] version = new VersionProvider().loadVersion(null);
 
-        String[] version = provider.getVersion();
-
+        assertThat(version).hasSize(1);
         assertThat(version[0]).isEqualTo("ia-dev-kit unknown");
     }
 
