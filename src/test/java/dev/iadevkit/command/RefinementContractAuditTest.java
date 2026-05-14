@@ -14,23 +14,53 @@ import picocli.CommandLine;
 
 class RefinementContractAuditTest {
 
+    private static final String[] EPIC_REQUIRED_SIGNALS = {
+        "## 2",
+        "persona",
+        "OKR/KPI",
+        "measurement method",
+        "alternatives",
+        "risks",
+        "validation error"
+    };
+
+    private static final String[] STORY_REQUIRED_SIGNALS = {
+        "## 1",
+        "## 2",
+        "persona",
+        "scenario",
+        "Gherkin",
+        "performance/SLA",
+        "typed contracts",
+        "validation error"
+    };
+
+    private static final String[] FORBIDDEN_OMISSION_SIGNALS = {
+        "omit sections `2`, `4`, and `8`",
+        "Sections 2/4/8 are omitted",
+        "Do not render** sections `## 2`, `## 4`, `## 8`",
+        "Do not render** `## 2. Persona & Cenário`, `## 4. AC",
+        "intentionally omit `## 2. Persona & Cenário`",
+        "intentionally omitting the generic sections `4` and `8`"
+    };
+
     @Test
     void sourceSkills_keepEpicCreationAlignedWithRefinementGate() throws IOException {
         String publicSkill = readResource("claude/skills/x-epic-create/SKILL.md");
         String internalSkill = readResource("claude/skills/x-internal-create-epic/SKILL.md");
 
-        assertThat(publicSkill)
-                .contains("`## 1` through `## 9`")
-                .contains("measurement method")
-                .contains("validation error")
-                .doesNotContain("Do not render** sections `## 2`, `## 4`, `## 8`")
-                .doesNotContain("intentionally omitting sections `2`, `4`, and `8`");
-
-        assertThat(internalSkill)
-                .contains("Feature-derived epics MUST still render all refinement-critical sections")
-                .contains("validate the generated epic against")
-                .contains("measurement method")
-                .doesNotContain("intentionally omit sections `2`, `4`, and `8`");
+        assertContainsAll(publicSkill, EPIC_REQUIRED_SIGNALS);
+        assertContainsAll(
+                internalSkill,
+                new String[] {
+                    "Feature-derived epics MUST still render all refinement-critical sections",
+                    "validate the generated epic against",
+                    "measurement method",
+                    "priority order",
+                    "RNFs never replace persona"
+                });
+        assertContainsNone(publicSkill, FORBIDDEN_OMISSION_SIGNALS);
+        assertContainsNone(internalSkill, FORBIDDEN_OMISSION_SIGNALS);
     }
 
     @Test
@@ -40,23 +70,26 @@ class RefinementContractAuditTest {
         String fullProtocol =
                 readResource("claude/skills/x-internal-create-story/references/full-protocol.md");
 
-        assertThat(publicSkill)
-                .contains("`## 1` through `## 9`")
-                .contains("validation error")
-                .contains("performance/SLA")
-                .doesNotContain("Do not render** `## 2. Persona & Cenário`, `## 4. AC")
-                .doesNotContain("intentionally omitting the generic sections `4` and `8`");
-
-        assertThat(internalSkill)
-                .contains("must still render those sections with concrete content")
-                .contains("Refinement-critical section missing during generation")
-                .doesNotContain("Sections 2/4/8 are omitted");
-
-        assertThat(fullProtocol)
-                .contains("still populate `## 2. Persona & Cenário`, `## 4. AC (...)",
-                        "and `## 8. Decision Rationale`")
-                .contains("validate the refinement-critical dimensions")
-                .doesNotContain("intentionally omit `## 2. Persona & Cenário`");
+        assertContainsAll(publicSkill, STORY_REQUIRED_SIGNALS);
+        assertContainsAll(
+                internalSkill,
+                new String[] {
+                    "must still render those sections with concrete content",
+                    "Refinement-critical section missing during generation",
+                    "priority order",
+                    "RNFs never replace persona"
+                });
+        assertContainsAll(
+                fullProtocol,
+                new String[] {
+                    "still populate `## 2. Persona & Cenário`, `## 4. AC (...)`, and `## 8. Decision Rationale`",
+                    "validate the refinement-critical dimensions",
+                    "Evidence derivation order",
+                    "Never use RNFs as a substitute"
+                });
+        assertContainsNone(publicSkill, FORBIDDEN_OMISSION_SIGNALS);
+        assertContainsNone(internalSkill, FORBIDDEN_OMISSION_SIGNALS);
+        assertContainsNone(fullProtocol, FORBIDDEN_OMISSION_SIGNALS);
     }
 
     @Test
@@ -90,14 +123,23 @@ class RefinementContractAuditTest {
                         tmpDir.resolve(".claude/templates/_TEMPLATE-EPIC.md"),
                         StandardCharsets.UTF_8);
 
-        assertThat(generatedEpicSkill)
-                .contains("`## 1` through `## 9`")
-                .contains("validation error");
-        assertThat(generatedStorySkill)
-                .contains("`## 1` through `## 9`")
-                .contains("performance/SLA")
-                .contains("validation error");
+        assertContainsAll(generatedEpicSkill, EPIC_REQUIRED_SIGNALS);
+        assertContainsAll(generatedStorySkill, STORY_REQUIRED_SIGNALS);
+        assertContainsNone(generatedEpicSkill, FORBIDDEN_OMISSION_SIGNALS);
+        assertContainsNone(generatedStorySkill, FORBIDDEN_OMISSION_SIGNALS);
         assertThat(generatedTemplate).contains("Método de Medição");
+    }
+
+    private void assertContainsAll(String content, String[] requiredSignals) {
+        for (String signal : requiredSignals) {
+            assertThat(content).contains(signal);
+        }
+    }
+
+    private void assertContainsNone(String content, String[] forbiddenSignals) {
+        for (String signal : forbiddenSignals) {
+            assertThat(content).doesNotContain(signal);
+        }
     }
 
     private String readResource(String resourcePath) throws IOException {

@@ -59,7 +59,12 @@ If the feature source cannot be resolved, stop with a validation error.
    - `## 4` contains Gherkin ACs covering happy-path, error/boundary, performance/SLA, and security
    - `## 5` contains typed contracts
    - `## 8` contains at least 1 alternative/decision rationale
-8. If the source feature and linked epic do not provide enough evidence to fill those sections concretely, stop with a validation error instead of generating a story that will fail refinement.
+8. Derive evidence for those sections in this order:
+   - primary actor, flow, input/output, and success signal from the Feature use case
+   - cross-cutting constraints and measurable value from the linked Epic
+   - complementary context from `--capability-file` and `--product-file`
+   - inherited RNFs as constraints, never as a replacement for persona, AC, contracts, or rationale
+9. If the source feature and linked epic do not provide enough evidence to fill those sections concretely, stop with a validation error instead of generating a story that will fail refinement.
 
 ## Parameters
 

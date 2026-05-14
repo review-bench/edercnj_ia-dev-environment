@@ -57,7 +57,12 @@ If the feature source cannot be resolved, stop with a validation error.
    - `## 4` contains at least 2 alternatives with rejection rationale
    - `## 6` contains product and technical risks
    - `## 8` contains global DoR/DoD
-7. If the source feature and optional upstream artifacts do not provide enough evidence to fill these sections with concrete content, stop with a validation error instead of generating an epic that will fail refinement.
+7. Derive evidence for those sections in this order:
+   - explicit signals already present in the Feature
+   - actors, use cases, constraints, and success signals inferred from the Feature body
+   - complementary context from `--capability-file` and `--product-file`
+   - inherited RNFs as constraints, never as a replacement for persona/value/alternatives
+8. If the source feature and optional upstream artifacts do not provide enough evidence to fill these sections with concrete content, stop with a validation error instead of generating an epic that will fail refinement.
 
 ## Parameters
 

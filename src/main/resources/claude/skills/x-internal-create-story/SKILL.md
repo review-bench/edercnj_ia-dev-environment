@@ -146,6 +146,8 @@ On push failure, log a WARNING and continue — local commit is preserved. See [
 | `--dry-run` set | Steps P4 and P5 become no-ops with log line `"dry-run, skipping commit"` / `"dry-run, skipping push"` |
 | `--no-commit` set | Steps P2, P4 and P5 become no-ops — parent orchestrator owns branch + commit lifecycle |
 
+For feature-derived stories, derive evidence in this priority order: (1) primary actor, trigger, flow, inputs/outputs, and success signal from the Feature use case, (2) linked Epic value, risks, and quality gates, (3) optional Product/Capability context, (4) inherited RNFs as constraints only. RNFs never replace persona, acceptance criteria, typed contracts, or decision rationale.
+
 ## Integration Notes
 
 | Skill | Relationship | Context |

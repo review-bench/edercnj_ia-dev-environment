@@ -107,6 +107,8 @@ Read the entire source artifact provided by the user.
 - **Spec mode (default):** the file follows `_TEMPLATE.md` with sections like Overview, Business Rules, Platform Specs, Data Contracts, Journeys, Dependencies, and Interfaces.
 - **Feature mode (`--from-feature`):** the file is an existing Feature markdown artifact. In this mode, preserve `Source Feature`, load inherited RNFs from Feature → Capability → Product, and derive the epic's persona, value hypothesis, OKRs/KPIs, alternatives, risks, scope, and quality gates from the Feature plus upstream Product/Capability context. Do not omit refinement-critical sections.
 
+For feature-derived epics, derive evidence in this priority order: (1) explicit problem/persona/value/metrics already documented in the Feature, (2) actors, use cases, constraints, and expected outcomes inferable from the Feature body, (3) complementary Product/Capability context passed through optional files, (4) inherited RNFs as bounding constraints only. RNFs never replace persona, hypothesis, alternatives, or risks.
+
 Understand the full source scope before starting extraction.
 
 <!-- TELEMETRY: phase.end -->
@@ -205,7 +207,7 @@ Write the Epic following the `_TEMPLATE-EPIC.md` structure exactly.
 9. **Section 8 — Quality Gates**: DoR/DoD from Step 4
 10. **Refinement Verdict block**: `Status: TBD`, all dimensions unchecked
 
-Before saving, validate the generated epic against `.claude/knowledge/refinement/dimensions.md` §Epic Dimensions. If Problem, Persona, Value Hypothesis, OKRs/KPIs, Alternatives, Risks, or Scope are materially incomplete, abort with a validation error and name the missing dimensions. Do not write a partially-filled epic that is expected to fail `x-refine-epic`.
+Before saving, validate the generated epic against `.claude/knowledge/refinement/dimensions.md` §Epic Dimensions. If Problem, Persona, Value Hypothesis, OKRs/KPIs, Alternatives, Risks, or Scope are materially incomplete, abort with a validation error and name the missing dimensions. Treat placeholders, generic personas, qualitative-only KPIs, or single-option decisions as incomplete. Do not write a partially-filled epic that is expected to fail `x-refine-epic`.
 
 **Directory and file naming** (mandatory — see SD-09 in decomposition guide):
 1. Determine the epic number: scan `plans/` for existing `epic-XXXX` folders and use the next available number (default `0001` if none exist). Ask the user if unsure.

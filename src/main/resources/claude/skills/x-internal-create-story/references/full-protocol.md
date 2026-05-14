@@ -54,6 +54,15 @@ Read the source inputs completely.
 
 - **Feature mode (`--from-feature`):** read the Feature artifact and target `--epic-id`. In this mode, derive stories from the feature use cases, render inherited RNFs as supplemental context, and still populate `## 2. Persona & Cenário`, `## 4. AC (...)`, and `## 8. Decision Rationale` with concrete content suitable for refinement.
 
+Evidence derivation order in `--from-feature` mode:
+
+1. Primary actor, trigger, main flow, alternative flow, inputs/outputs, and success signal from the Feature use case
+2. Cross-cutting value, risk, and quality constraints from the linked Epic
+3. Complementary context from optional Capability/Product artifacts
+4. Inherited RNFs as constraints only
+
+Never use RNFs as a substitute for persona, metric, Gherkin AC, typed contracts, or decision rationale.
+
 From the upstream source, understand the technical context: journeys, data contracts, protocol mappings, state machines, error codes, and metrics.
 
 ```text
@@ -84,7 +93,7 @@ For each story in the Epic's index, create a file following `_TEMPLATE-STORY.md`
 8. **Decision Rationale**: 4-line micro-template (`**Decisão:** / **Motivo:** / **Alternativa descartada:** / **Consequência:**`)
 9. **Refinement Verdict**: `Status: TBD`, all dimensions unchecked
 
-Before saving each story, validate the refinement-critical dimensions from `.claude/knowledge/refinement/dimensions.md`: persona, value, AC, contracts, metrics, alternatives. If any dimension is materially incomplete, abort generation for that story with a validation error naming the missing dimensions.
+Before saving each story, validate the refinement-critical dimensions from `.claude/knowledge/refinement/dimensions.md`: persona, value, AC, contracts, metrics, alternatives. If any dimension is materially incomplete, abort generation for that story with a validation error naming the missing dimensions. Treat placeholders, generic personas, qualitative-only metrics, untyped payloads, or rationale without rejected alternative as incomplete.
 
 **Story header (mandatory):**
 
