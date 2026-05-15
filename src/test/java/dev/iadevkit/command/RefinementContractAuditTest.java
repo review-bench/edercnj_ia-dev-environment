@@ -96,8 +96,7 @@ class RefinementContractAuditTest {
                 auditRunner.run(
                         List.of(
                                 resourceTarget(
-                                        "epic-template",
-                                        "claude/templates/_TEMPLATE-EPIC.md")),
+                                        "epic-template", "claude/templates/_TEMPLATE-EPIC.md")),
                         refinementContractPolicy());
 
         assertNoViolations(violations);
@@ -226,9 +225,7 @@ class RefinementContractAuditTest {
     }
 
     private void assertNoViolations(List<AuditViolation> violations) {
-        assertThat(violations)
-                .withFailMessage(() -> formatViolations(violations))
-                .isEmpty();
+        assertThat(violations).withFailMessage(() -> formatViolations(violations)).isEmpty();
     }
 
     private String formatViolations(List<AuditViolation> violations) {
@@ -246,8 +243,7 @@ class RefinementContractAuditTest {
     }
 
     private String readResource(String resourcePath) throws IOException {
-        try (InputStream input =
-                getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             assertThat(input).as("resource %s", resourcePath).isNotNull();
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }

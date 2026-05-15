@@ -29,13 +29,19 @@ public class GenerateCommand implements Callable<Integer> {
             defaultValue = ".")
     private Path outputDir;
 
-    @Option(names = {"-f", "--force"}, description = "Overwrite existing files")
+    @Option(
+            names = {"-f", "--force"},
+            description = "Overwrite existing files")
     private boolean force;
 
-    @Option(names = {"--dry-run"}, description = "Simulate without writing any files")
+    @Option(
+            names = {"--dry-run"},
+            description = "Simulate without writing any files")
     private boolean dryRun;
 
-    @Option(names = {"-v", "--verbose"}, description = "List each copied file")
+    @Option(
+            names = {"-v", "--verbose"},
+            description = "List each copied file")
     private boolean verbose;
 
     @Override
@@ -54,7 +60,8 @@ public class GenerateCommand implements Callable<Integer> {
     private void copyResourceTree(String resourceRoot, Path targetDir, Map<String, Integer> counts)
             throws IOException, URISyntaxException {
         URL url = getClass().getClassLoader().getResource(resourceRoot);
-        if (url == null) throw new IllegalStateException("Bundled resource not found: " + resourceRoot);
+        if (url == null)
+            throw new IllegalStateException("Bundled resource not found: " + resourceRoot);
         URI uri = url.toURI();
         if ("jar".equals(uri.getScheme())) {
             try (FileSystem fs = FileSystems.newFileSystem(uri, Map.of())) {
@@ -103,7 +110,8 @@ public class GenerateCommand implements Callable<Integer> {
     }
 
     static String categorize(String relative) {
-        String first = relative.contains("/") ? relative.substring(0, relative.indexOf('/')) : relative;
+        String first =
+                relative.contains("/") ? relative.substring(0, relative.indexOf('/')) : relative;
         return switch (first) {
             case "agents" -> "Agents";
             case "hooks" -> "Hooks";

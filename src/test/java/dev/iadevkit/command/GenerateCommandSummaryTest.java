@@ -61,11 +61,13 @@ class GenerateCommandSummaryTest {
     void categorize_knownDirectories() {
         assertThat(GenerateCommand.categorize("agents/foo.md")).isEqualTo("Agents");
         assertThat(GenerateCommand.categorize("skills/core/x-foo/SKILL.md")).isEqualTo("Skills");
-        assertThat(GenerateCommand.categorize("knowledge/governance/rule.md")).isEqualTo("Knowledge");
+        assertThat(GenerateCommand.categorize("knowledge/governance/rule.md"))
+                .isEqualTo("Knowledge");
         assertThat(GenerateCommand.categorize("hooks/post-compile-check.sh")).isEqualTo("Hooks");
         assertThat(GenerateCommand.categorize("rules/01-essentials.md")).isEqualTo("Rules");
         assertThat(GenerateCommand.categorize("scripts/audit.sh")).isEqualTo("Scripts");
-        assertThat(GenerateCommand.categorize("templates/_TEMPLATE-EPIC.md")).isEqualTo("Templates");
+        assertThat(GenerateCommand.categorize("templates/_TEMPLATE-EPIC.md"))
+                .isEqualTo("Templates");
         assertThat(GenerateCommand.categorize("settings.json")).isEqualTo("Settings");
         assertThat(GenerateCommand.categorize("unknown/file.md")).isEqualTo("Other");
     }

@@ -10,8 +10,7 @@ public class VersionProvider implements IVersionProvider {
     @Override
     public String[] getVersion() throws Exception {
         Properties props = new Properties();
-        try (InputStream in =
-                getClass().getResourceAsStream("/dev/iadevkit/version.properties")) {
+        try (InputStream in = getClass().getResourceAsStream("/dev/iadevkit/version.properties")) {
             if (in != null) props.load(in);
         } catch (IOException ignored) {
         }
