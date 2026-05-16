@@ -114,7 +114,7 @@ normalize_epic_id() {
 # ── Self-check ─────────────────────────────────────────────────────────────────
 run_self_check() {
     local failed=0
-    for tool in mvn jq git; do
+    for tool in jq git; do
         command -v "$tool" >/dev/null 2>&1 || {
             printf 'PREFLIGHT_SELF_CHECK: %s not found on PATH\n' "$tool" >&2
             failed=1
@@ -135,62 +135,10 @@ run_self_check() {
 }
 
 # ── Gate runners ───────────────────────────────────────────────────────────────
-
-# Resolves the base ref for the Java-diff probe. Echoes the ref name on stdout.
-# Exits with E_OPERATIONAL when neither origin/develop nor HEAD@{upstream} is
-# resolvable — must never silently degrade to "no Java diff", which would let
-# Java gates be skipped on a misconfigured remote (shallow clone, missing
-# fetch, branch with no upstream, etc.).
-resolve_java_diff_base_ref() {
-    if git -C "${REPO_ROOT}" rev-parse --verify --quiet origin/develop >/dev/null; then
-        printf '%s\n' 'origin/develop'
-        return 0
-    fi
-    if git -C "${REPO_ROOT}" rev-parse --verify --quiet 'HEAD@{upstream}' >/dev/null; then
-        git -C "${REPO_ROOT}" rev-parse --abbrev-ref 'HEAD@{upstream}'
-        return 0
-    fi
-    printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — unable to resolve git base ref (origin/develop or HEAD@{upstream})\n' >&2
-    exit $E_OPERATIONAL
-}
-
-# Returns 0 if the branch contains any change under java/ vs the resolved base
-# ref; non-zero otherwise. Used to skip Java-only gates on documentation /
-# refinement PRs that touch nothing under the Java module. Matches the entire
-# java/ subtree (not only .java + pom.xml) so changes to src/main/resources/,
-# build configs, and other Java-module assets still trigger format + test
-# gates as expected.
-java_sources_changed() {
-    local base_ref
-    local changed_files
-
-    base_ref="$(resolve_java_diff_base_ref)"
-    if ! changed_files="$(git -C "${REPO_ROOT}" diff --name-only "${base_ref}...HEAD" 2>&1)"; then
-        printf 'PREFLIGHT_FAILED: OPERATIONAL_ERROR — git diff failed for base ref %s\n' "${base_ref}" >&2
-        exit $E_OPERATIONAL
-    fi
-
-    grep -E '^java/' >/dev/null <<<"${changed_files}"
-}
-
-run_gate_format() {
-    printf '[Gate 5] format check\n' >&2
-    # Repo layout: pom.xml lives under java/, not at the repo root. Skip the gate
-    # when java/pom.xml is absent (e.g., docs-only branches in nested checkouts).
-    local java_pom="${REPO_ROOT}/java/pom.xml"
-    if [[ ! -f "${java_pom}" ]]; then
-        printf '[Gate 5] no java/pom.xml — skipping format check\n' >&2
-        return 0
-    fi
-    if ! java_sources_changed; then
-        printf '[Gate 5] no Java source changes vs origin/develop — skipping format check\n' >&2
-        return 0
-    fi
-    mvn -f "${java_pom}" spotless:check -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: FORMAT_VIOLATION — fix: (cd java && mvn spotless:apply)\n' >&2
-        exit $E_FORMAT
-    }
-}
+# NOTE: The Java gates (format/tests/coverage) were removed when this repository
+# became a pure Claude Code resource store (no Java/Maven build). The exit-code
+# constants E_FORMAT/E_TESTS_FAILED/E_COVERAGE are retained for contract
+# stability but are no longer emitted by any gate.
 
 run_gate_review_content() {
     printf '[Gate 3] review content audit\n' >&2
@@ -234,34 +182,6 @@ run_gate_self_check_audit() {
     done
 }
 
-run_gate_tests() {
-    printf '[Gate 1] mvn test\n' >&2
-    local java_pom="${REPO_ROOT}/java/pom.xml"
-    if [[ ! -f "${java_pom}" ]]; then
-        printf '[Gate 1] no java/pom.xml — skipping mvn test\n' >&2
-        return 0
-    fi
-    if ! java_sources_changed; then
-        printf '[Gate 1] no Java source changes vs origin/develop — skipping mvn test\n' >&2
-        return 0
-    fi
-    mvn -f "${java_pom}" test -q 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: TESTS_FAILED — fix: (cd java && mvn test) to see failures\n' >&2
-        exit $E_TESTS_FAILED
-    }
-}
-
-run_gate_coverage() {
-    printf '[Gate 2] coverage check\n' >&2
-    local csv="${REPO_ROOT}/java/target/site/jacoco/jacoco.csv"
-    [[ -f "$csv" ]] || { printf '[Gate 2] jacoco.csv not found — skip\n' >&2; return 0; }
-    "${CLAUDE_SCRIPTS}/audit-coverage-local.sh" \
-        --report-path "$csv" --story-id="story-${STORY_ID}" 2>/dev/null || {
-        printf 'PREFLIGHT_FAILED: COVERAGE_BELOW_THRESHOLD — fix: add tests\n' >&2
-        exit $E_COVERAGE
-    }
-}
-
 run_gate_phase_gates() {
     printf '[Gate 12] phase gate audit\n' >&2
     local script="${REPO_ROOT}/scripts/audit-task-hierarchy.sh"
@@ -276,16 +196,14 @@ stub_gate() { local name="$1" exit_code="$2"
 
 # ── Main dispatch ──────────────────────────────────────────────────────────────
 dispatch_gates() {
-    # Ordering: 5→3→4→9→7→6→10→1→2→8→11→12
-    run_gate_format
+    # Ordering: 3→4→9→7→6→10→8→11→12
+    # (Java gates 5/1/2 — format/tests/coverage — removed with the Java build.)
     run_gate_review_content
     run_gate_telemetry
     stub_gate "9" $E_PLANNING
     stub_gate "7" $E_GRAMMAR
     run_gate_self_check_audit
     stub_gate "10" $E_HOOKS
-    run_gate_tests
-    run_gate_coverage
     stub_gate "8" $E_WAVE_DISPATCH
     stub_gate "11" $E_CHAIN
     run_gate_phase_gates

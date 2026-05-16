@@ -1,5 +1,10 @@
 # Epics History
 
+> **Note:** Many entries below reference the Java/Maven generator and CI
+> pipeline. That build was removed when the repository became a pure Claude
+> Code resource store; this document is preserved unchanged as historical
+> record.
+
 Concluded epics extracted from `CLAUDE.md` on 2026-05-06 (story-0078-0004).
 Each block is preserved verbatim for traceability. Ordered chronologically by epic number.
 

@@ -1,5 +1,10 @@
 # Audit Bypass Catalog
 
+> **⚠️ PARTIALLY SUPERSEDED (Java/CI removal).** Bypass vectors that targeted
+> the Java/Maven build or GitHub Actions workflows no longer apply — those
+> layers were removed when this repository became a pure Claude Code resource
+> store. Kept for historical reference.
+
 > **Generated:** 2026-04-28 (story-0063-0009)
 > **Purpose:** Catalogue of skills with file-based or telemetry-based evidence and the hardening roadmap (EPIC-0063 RULE-002 + RULE-003).
 

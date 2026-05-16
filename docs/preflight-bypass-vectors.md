@@ -1,5 +1,10 @@
 # Preflight Bypass Vectors Catalog
 
+> **⚠️ PARTIALLY SUPERSEDED (Java/CI removal).** Preflight's Java gates
+> (format/tests/coverage via Maven) were removed with the Java build; bypass
+> vectors targeting them no longer apply. Non-Java preflight gates remain.
+> Kept for historical reference.
+
 **Story:** story-0063-0013 (PreToolUse Hook Coverage Expansion — Bypass Vectors v2)
 **Hook:** `.claude/hooks/enforce-preflight-gates-v2.sh`
 **Rule Refs:** Rule 24 §Camada 0, Rule 26 §Camada 0, Rule 27 §Zero-Bypass Lifecycle

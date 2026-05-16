@@ -10,8 +10,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-DEFAULT_SKILLS_ROOT="${PROJECT_ROOT}/src/main/resources/targets/claude/skills"
-DEFAULT_AGENTS_ROOT="${PROJECT_ROOT}/src/main/resources/targets/claude/agents"
+DEFAULT_SKILLS_ROOT="${PROJECT_ROOT}/resources/skills"
+DEFAULT_AGENTS_ROOT="${PROJECT_ROOT}/resources/agents"
 DEFAULT_BASELINE="${PROJECT_ROOT}/audits/agent-skill-wiring-baseline.txt"
 
 SKILLS_ROOT="$DEFAULT_SKILLS_ROOT"

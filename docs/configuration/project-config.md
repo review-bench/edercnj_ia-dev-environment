@@ -1,5 +1,12 @@
 # Project Configuration (`project-config.yaml`)
 
+> **⚠️ SUPERSEDED (Java/CI removal).** The `mvn process-resources` generation
+> pipeline described here was removed when the repository became a pure
+> Claude Code resource store. Content now lives canonically under
+> `resources/` and is installed verbatim via
+> `bin/install-claude-resources.sh` — there is no YAML-driven generation.
+> Kept for historical reference.
+
 This page documents the optional configuration sections that drive
 `mvn process-resources` — the pipeline that generates `.claude/`,
 `.github/`, and related artefacts.
