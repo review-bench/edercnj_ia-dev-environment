@@ -1,6 +1,0 @@
-id: build.maven.standard
-category: build
-kind: atomic
-requires:
-  - runtime.jvm.openjdk
-description: Maven build tool

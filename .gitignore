@@ -34,31 +34,14 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Java
-target/
-dependency-reduced-pom.xml
-*.class
-*.jar
-!lib/*.jar
-
-# Maven
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# Coverage
-target/site/
-*.exec
-
 # Test output
 test-output/
 test-output-ts/
 output/
-# Re-include Java source 'output' directories (hexagonal architecture ports/adapters)
-!src/**/output/
 
-# .claude/ is a generated output of ia-dev-env (source of truth lives in
-# src/main/resources/targets/claude/). It is no longer versioned —
-# regenerate locally instead of committing diffs.
+# .claude/ is a local install of the resource store (source of truth lives in
+# resources/). It is regenerated locally via bin/install-claude-resources.sh
+# --output . and is not versioned.
 /.claude/
 
 # .claire/ is a local Claude Code worktree/state directory (generated at runtime).

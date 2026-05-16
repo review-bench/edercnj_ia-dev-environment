@@ -9,7 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SCHEMA_FILE="${PROJECT_ROOT}/governance/schemas/agent-frontmatter-1.0.json"
-AGENTS_ROOT="${PROJECT_ROOT}/src/main/resources/targets/claude/agents"
+AGENTS_ROOT="${PROJECT_ROOT}/resources/agents"
 STRICT=false
 ALL_AGENTS=false
 SELF_CHECK=false
