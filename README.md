@@ -1,12 +1,16 @@
-# ia-dev-kit
+# ia-dev-environment
 
-A CLI that installs a complete Claude Code development environment into any project with a single command.
+The source-of-truth **store** for a complete Claude Code development environment:
+rules, skills, agents, knowledge packs, templates, and `settings.json`.
+
+Install it into any project with a single command:
 
 ```bash
-ia-dev-kit generate
+bin/install-claude-resources.sh --output /path/to/your/project
 ```
 
-That's it. Your project gains rules, skills, agents, hooks, templates, and a `CLAUDE.md` — everything Claude Code needs to assist you with engineering work from the very first conversation.
+Your project gains rules, skills, agents, templates, and a `CLAUDE.md` — everything
+Claude Code needs to assist with engineering work from the very first conversation.
 
 ---
 
@@ -16,173 +20,124 @@ That's it. Your project gains rules, skills, agents, hooks, templates, and a `CL
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [What gets generated](#what-gets-generated)
-- [Development](#development)
+- [What gets installed](#what-gets-installed)
+- [Repository layout](#repository-layout)
 - [License](#license)
 
 ---
 
 ## What it does
 
-`ia-dev-kit` copies a curated bundle of Claude Code resources from the JAR into your project's
-`.claude/` directory. The result is a fully configured development environment:
+This repository **is** the resource store. The canonical content lives in `resources/`
+and is version-controlled. `bin/install-claude-resources.sh` performs a verbatim
+recursive copy of `resources/` into a target project's `.claude/` directory, plus a
+`CLAUDE.md` stub. The result is a fully configured environment:
 
 - **Rules** — coding standards and architecture boundaries loaded into every Claude Code session
-- **Skills** — slash commands (`/x-implement-story`, `/x-review-pr`, `/x-arch-plan`, and more) covering the full development lifecycle
+- **Skills** — slash commands (`/x-implement-story`, `/x-review-pr`, `/x-plan-architecture`, and more) covering the full development lifecycle
 - **Agents** — specialized AI personas for architecture, security, QA, SRE, and other roles
 - **Knowledge packs** — domain knowledge for governance, security patterns, lifecycle contracts, and CI tooling
 - **Templates** — planning, review, and documentation templates ready to use
-- **Hooks** — a post-compile check that catches Java compilation errors immediately after every edit
-- **Settings** — `settings.json` with permissions and hooks pre-configured
-- **`CLAUDE.md`** — the executive summary Claude Code loads automatically on every conversation
+- **Settings** — `settings.json` with permissions pre-configured
 
-No configuration required. No internet access at generate time. Everything ships inside the JAR.
+There is no build step and no templating: `{{PLACEHOLDER}}` tokens in skill bodies
+are resolved at runtime by Claude itself. No internet access is required.
 
 ---
 
 ## Prerequisites
 
-- Java 21 or later
+- `bash` and standard POSIX tools (`find`, `cp`) — already present on macOS and Linux
 
 ---
 
 ## Installation
 
-### Mac / Linux
+Clone the repository and run the installer against your target project:
 
 ```bash
 git clone https://github.com/edercnj/ia-dev-environment.git
 cd ia-dev-environment
-bash install.sh
+bin/install-claude-resources.sh --output /path/to/your/project
 ```
 
-The installer builds the JAR, places it in `~/.local/share/ia-dev-kit/`, and adds a `ia-dev-kit`
-wrapper to your PATH.
-
-### Windows
-
-```powershell
-git clone https://github.com/edercnj/ia-dev-environment.git
-cd ia-dev-environment
-.\install.ps1
-```
-
-### Uninstall
+To make this repository's own Claude Code session use the resources directly
+(the local `.claude/` is gitignored):
 
 ```bash
-bash install.sh --uninstall   # Mac / Linux
-.\install.ps1 --uninstall     # Windows
-```
-
-### From source (no installer)
-
-```bash
-mvn clean package
-java -jar target/ia-dev-kit-*.jar generate
+bin/install-claude-resources.sh --output . --force
 ```
 
 ---
 
 ## Usage
 
-### Generate into the current directory
-
-```bash
-ia-dev-kit generate
 ```
-
-### Generate into a specific project
-
-```bash
-ia-dev-kit generate --output /path/to/your/project
-```
-
-### Preview without writing anything
-
-```bash
-ia-dev-kit generate --dry-run --verbose
-```
-
-### Overwrite existing files
-
-```bash
-ia-dev-kit generate --force
-```
-
-### Full CLI reference
-
-```
-ia-dev-kit generate [OPTIONS]
+bin/install-claude-resources.sh [OPTIONS]
 
   -o, --output <DIR>    Target project directory (default: current directory)
-  -f, --force           Overwrite existing files
+  -f, --force           Overwrite existing files (default: skip existing)
       --dry-run         Simulate without writing any files
-  -v, --verbose         List each file as it is copied
-
-  -V, --version         Print version and exit
+  -v, --verbose         List each file as it is copied or skipped
   -h, --help            Show help and exit
 ```
 
-After running, `ia-dev-kit` prints a summary of what was installed:
+Examples:
+
+```bash
+# Install into the current directory
+bin/install-claude-resources.sh
+
+# Install into a specific project
+bin/install-claude-resources.sh --output /path/to/your/project
+
+# Preview without writing anything
+bin/install-claude-resources.sh --dry-run --verbose
+
+# Overwrite existing files
+bin/install-claude-resources.sh --force
+```
+
+After running, the installer prints a summary of what was installed:
 
 ```
-Pipeline: Success (65ms)
+Pipeline: Success (3940ms)
 
   Category                Count
   ──────────────────────  ─────
   Agents                     14
-  Hooks                       1
-  Knowledge                 166
+  Knowledge                 176
   Root Files                  1
-  Rules                       5
-  Scripts                    44
+  Rules                       4
+  Scripts                    43
   Settings                    1
-  Skills                    273
-  Templates                  62
+  Skills                    303
+  Templates                  63
   ──────────────────────  ─────
-  Total                     567
+  Total                     605
 ```
 
 ---
 
-## What gets generated
+## What gets installed
 
 ```
 <your-project>/
 ├── CLAUDE.md                    # Executive summary — loaded automatically by Claude Code
 └── .claude/
-    ├── settings.json            # Permissions and hooks
+    ├── settings.json            # Permissions
     ├── agents/                  # 14 AI personas
-    │   ├── architect.md
-    │   ├── tech-lead.md
-    │   ├── security-engineer.md
-    │   └── ...
-    ├── hooks/
-    │   └── post-compile-check.sh
-    ├── knowledge/               # 166 domain knowledge packs
-    │   ├── governance/
-    │   ├── security/
-    │   ├── lifecycle/
-    │   └── ...
-    ├── rules/                   # 5 core rules
-    │   └── 00-essentials.md
-    ├── scripts/                 # 44 audit and utility scripts
-    ├── skills/                  # 273 slash commands
-    │   ├── x-implement-story/
-    │   ├── x-review-pr/
-    │   ├── x-arch-plan/
-    │   └── ...
-    └── templates/               # 62 planning and review templates
-        ├── _TEMPLATE-EPIC.md
-        ├── _TEMPLATE-STORY.md
-        ├── _TEMPLATE-IMPLEMENTATION-PLAN.md
-        └── ...
+    ├── knowledge/               # 176 domain knowledge packs
+    ├── rules/                   # core rules
+    ├── scripts/                 # 43 audit and utility scripts
+    ├── skills/                  # 303 slash commands
+    └── templates/               # 63 planning and review templates
 ```
 
 ### Agents
 
-14 specialized AI personas used by skills during code reviews, architecture planning, security
-audits, and other tasks:
+14 specialized AI personas used by skills during code reviews, architecture planning,
+security audits, and other tasks:
 
 `architect` · `tech-lead` · `security-engineer` · `qa-engineer` · `sre-engineer` ·
 `performance-engineer` · `java-developer` · `devops-engineer` · `database-engineer` ·
@@ -197,68 +152,38 @@ Skills are invoked via `/skill-name` in the Claude Code chat. A selection of the
 |-------|-------------|
 | `/x-implement-story` | Implements a story end-to-end: planning → TDD → review → PR |
 | `/x-review-pr` | Tech lead review with GO/NO-GO decision |
-| `/x-arch-plan` | Architecture plan with component and sequence diagrams |
-| `/x-epic-decompose` | Decomposes a specification into epic, stories, and implementation map |
-| `/x-test-plan` | Generates a Double-Loop TDD test plan |
-| `/x-test-run` | Runs tests and reports coverage gaps |
-| `/x-codebase-audit` | Full codebase quality audit across 6 dimensions |
-| `/x-changelog` | Generates changelog from Conventional Commits |
-| `/x-ops-troubleshoot` | Systematic diagnosis of compilation, test, and runtime failures |
+| `/x-plan-architecture` | Architecture plan with component and sequence diagrams |
+| `/x-epic-create` | Decomposes a specification into epic, stories, and implementation map |
+| `/x-plan-tests` | Generates a Double-Loop TDD test plan |
+| `/x-execute-tests` | Runs tests and reports coverage gaps |
+| `/x-audit-code` | Full codebase quality audit across specialist dimensions |
+| `/x-generate-release-changelog` | Generates changelog from Conventional Commits |
+| `/x-troubleshoot-operations` | Systematic diagnosis of compilation, test, and runtime failures |
 
-The full list of 273 skills is available in `.claude/skills/` after generation.
+The full list of skills is available in `resources/skills/`.
 
 ---
 
-## Development
-
-```bash
-# Build
-mvn clean package
-
-# Run tests with coverage
-mvn verify
-
-# Run a dry-run against a temp directory
-java -jar target/ia-dev-kit-*.jar generate --output /tmp/test-output --dry-run --verbose
-```
-
-### Project structure
+## Repository layout
 
 ```
-ia-dev-kit/
-├── pom.xml
-├── src/
-│   ├── main/
-│   │   ├── java/dev/iadevkit/
-│   │   │   ├── IaDevKitApplication.java    # CLI entry point
-│   │   │   ├── VersionProvider.java
-│   │   │   └── command/
-│   │   │       └── GenerateCommand.java    # generate subcommand
-│   │   └── resources/
-│   │       ├── CLAUDE.md                   # template for generated CLAUDE.md
-│   │       └── claude/                     # bundled .claude/ resources
-│   │           ├── agents/
-│   │           ├── hooks/
-│   │           ├── knowledge/
-│   │           ├── rules/
-│   │           ├── scripts/
-│   │           ├── skills/
-│   │           ├── templates/
-│   │           └── settings.json
-│   └── test/
-│       └── java/dev/iadevkit/
-├── install.sh
-└── install.ps1
+ia-dev-environment/
+├── CLAUDE.md                    # This repo's own project guide (rich)
+├── CLAUDE.template.md           # 6-line stub installed into consumer projects
+├── bin/
+│   └── install-claude-resources.sh
+└── resources/                   # ← SOURCE OF TRUTH (canonical, version-controlled)
+    ├── agents/
+    ├── knowledge/
+    ├── rules/
+    ├── scripts/
+    ├── skills/
+    ├── templates/
+    └── settings.json
 ```
 
-### Coverage
-
-| Metric | Threshold | Current |
-|--------|-----------|---------|
-| Line   | ≥ 85%     | 92%     |
-| Branch | ≥ 80%     | 89%     |
-
-Enforced by JaCoCo in `mvn verify`.
+Edit content under `resources/` and re-run the installer to propagate changes.
+The `.claude/` directory is a local, gitignored install — never edit it directly.
 
 ---
 

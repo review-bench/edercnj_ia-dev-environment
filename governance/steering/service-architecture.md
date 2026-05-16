@@ -1,5 +1,11 @@
 # Service Architecture — my-java-cli
 
+> **⚠️ SUPERSEDED (Java/CI removal).** This document describes the hexagonal
+> Java/Maven architecture that was removed when the repository became a pure
+> Claude Code resource store. There is no longer compiled application code:
+> the canonical content lives under `resources/` and is installed via
+> `bin/install-claude-resources.sh`. Kept for historical reference.
+
 ## 1. Overview
 
 **Service:** my-java-cli

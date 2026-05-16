@@ -1,9 +1,0 @@
-{
-  "epicId": "EPIC-TEST",
-  "interactiveMode": "non-interactive",
-  "taskTracking": {
-    "enabled": true,
-    "openTasks": [14, 15],
-    "phaseGateResults": [{"phase": "Phase 3", "mode": "pre", "passed": true}]
-  }
-}

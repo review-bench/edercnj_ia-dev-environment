@@ -1,5 +1,13 @@
 # Audit Gates Catalog
 
+> **⚠️ PARTIALLY SUPERSEDED (Java/CI removal).** The Java/Maven build and all
+> GitHub Actions workflows were removed when this repository became a pure
+> Claude Code resource store. Gates implemented as Maven/Java tests or CI
+> jobs (e.g. `*AuditTest.java`, `lifecycle-integrity-audit`, the `test` job,
+> preflight format/test/coverage gates) are **no longer active**. Shell-based
+> audits under `resources/scripts/` and `scripts/` remain valid. Entries
+> below are kept for historical reference.
+
 > **Maintained by:** Rule 26 §Catalog-before-Add (RULE-004).
 > **Last updated:** chore/rules-consolidation-essentials (ADR-0034 — Rules Consolidation).
 > **Purpose:** Single source of truth for every governance gate across all 5 layers (Camada 0–4).

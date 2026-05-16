@@ -1,14 +1,16 @@
-# .claude/ -- Usage Guide
+# resources/ -- Usage Guide
 
-This directory contains all Claude Code configuration for the **ia-dev-environment** project.
-It includes coding rules, skills (slash commands), knowledge packs, agents, and hooks.
+This repository is the **source of truth store** for all Claude Code configuration:
+coding rules, skills (slash commands), knowledge packs, agents, and templates.
+The canonical content lives in the `resources/` directory at the repository root.
 
-> **Note:** The `.claude/` directory is a **generated output** produced by `ia-dev-env`.
-> Do not edit it manually -- regenerate instead.
+> **Note:** The `.claude/` directory is a local, gitignored install produced by
+> `bin/install-claude-resources.sh --output .`. Do not edit `.claude/` manually —
+> edit `resources/` and re-run the installer.
 
 > **CRITICAL — Source of Truth:**
-> The source of truth for skills, knowledge packs, agents, rules, and templates is `java/src/main/resources/targets/claude/`.
-> The directories `.claude/` and `src/test/resources/golden/` are generated outputs — NEVER edit them directly.
+> The source of truth for skills, knowledge packs, agents, rules, and templates is the `resources/` directory at the repository root.
+> The `.claude/` directory is a local, gitignored install produced by `bin/install-claude-resources.sh --output .` — NEVER edit it directly; edit `resources/` instead.
 
 > The `CLAUDE.md` file at the project root provides an executive summary loaded automatically in EVERY conversation.
 
@@ -42,8 +44,8 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > outro escape hatch.
 > Ver [Rule 29](.claude/rules/29-refinement-gate.md) e [EPIC-0069](ai/epics/epic-0069-refinement-and-dor-gate/).
 
-> **In progress — EPIC-0046 (Lifecycle Integrity Phase 2 — CI enforcement).**
-> Story-0046-0007 ships `LifecycleIntegrityAuditTest` (Maven CI-blocking). The audit scans every `SKILL.md` under `java/src/main/resources/targets/claude/skills/` for three Rule 22 regressions: `ORPHAN_PHASE` (dotted sub-section documented but not referenced elsewhere), `WRITE_WITHOUT_COMMIT` (write to `ai/epics/epic-*/reports/` with no `x-commit-changes` in the next 20 lines), and `SKIP_IN_HAPPY_PATH` (`--skip-verification` / `--skip-status-sync` used outside `## Recovery` / `## Error Handling`). Baseline at `audits/lifecycle-integrity-baseline.txt` tolerates current TOC-style sub-sections; any NEW violation fails the build with `LIFECYCLE_AUDIT_REGRESSION`. Escape hatch: place `<!-- audit-exempt -->` on the line immediately before (or on) the intentional violation; keep usage rare (reviewed exceptions only). Standalone CLI: `java -cp target/test-classes:target/classes dev.iadev.adapter.inbound.cli.LifecycleAuditCli scan [--skills-root <path>] [--json]` (exit 0 / 11 / 2).
+> **Retired — EPIC-0046 (Lifecycle Integrity Phase 2).**
+> The Maven CI-blocking `LifecycleIntegrityAuditTest` and the `LifecycleAuditCli` Java tooling were removed together with the Java/Maven codebase when this repository became a pure resource store. The Rule 22 regression concepts it guarded (`ORPHAN_PHASE`, `WRITE_WITHOUT_COMMIT`, `SKIP_IN_HAPPY_PATH`) remain valid authoring guidance for `SKILL.md` files under `resources/skills/`; enforcement is now manual review until a shell-based audit replaces it.
 > - Story: [`ai/epics/epic-0046/story-0046-0007.md`](ai/epics/epic-0046/story-0046-0007.md)
 
 > **In progress — EPIC-0043 (Interactive Gates Convention).**
@@ -52,7 +54,7 @@ It includes coding rules, skills (slash commands), knowledge packs, agents, and 
 > - Story index: [`ai/epics/epic-0043/`](ai/epics/epic-0043/)
 
 > **In progress — EPIC-0036 (Skill Taxonomy Refactor).**
-> The source of truth for skills under `java/src/main/resources/targets/claude/skills/` is being reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`), and ~19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. The generated output `.claude/skills/` remains **flat** — user-facing invocation paths are preserved.
+> The source of truth for skills under `resources/skills/` is being reorganized into 10 category subfolders (`plan/`, `dev/`, `test/`, `review/`, `security/`, `code/`, `git/`, `pr/`, `ops/`, `jira/`), and ~19 skills will be renamed to a consistent `x-{subject}-{action}` scheme. The generated output `.claude/skills/` remains **flat** — user-facing invocation paths are preserved.
 > - Decision record: [`docs/adr/ADR-0003-skill-taxonomy-and-naming.md`](docs/adr/ADR-0003-skill-taxonomy-and-naming.md)
 > - Rename staging checklist: [`ai/epics/epic-0036/skill-renames.md`](ai/epics/epic-0036/skill-renames.md)
 > - Current skill names are the renamed forms (e.g., `/x-epic-create`, `/x-implement-task`, `/x-execute-e2e-tests`). Do not use the old pre-rename names.
@@ -106,8 +108,8 @@ They define mandatory standards that Claude MUST follow when generating code.
 ## Skills (Slash Commands)
 
 Skills are invoked via `/name` in chat — lazy-loaded (only when invoked).
-A complete list is generated in `.claude/README.md` by the `ia-dev-env` generator.
-To author a new skill, start from `shared/templates/_TEMPLATE-SKILL.md`.
+Each skill lives under `resources/skills/<name>/SKILL.md`.
+To author a new skill, start from `resources/templates/_TEMPLATE-SKILL.md`.
 See `.claude/rules/13-skill-invocation-protocol.md` for the invocation markers contract.
 
 ---
@@ -160,8 +162,8 @@ Source: `shared/templates/_TEMPLATE-*.md`. Content is copied verbatim by `PlanTe
 - Rules are always active -- no invocation needed.
 - Skills are lazy -- load when you type `/name`.
 - Knowledge Packs do not appear in `/` -- used internally by agents.
-- Hooks run automatically on events like post-compile.
-- To add a skill / rule, create the file under the matching directory.
-- The `.claude/` directory is generated -- run `ia-dev-env generate` to regenerate.
+- Hooks run automatically on events configured in `resources/settings.json`.
+- To add a skill / rule, create the file under the matching directory in `resources/`.
+- `.claude/` is a local install -- run `bin/install-claude-resources.sh --output . --force` to refresh it from `resources/`.
 
-Generated by `ia-dev-env`.
+This repository is the Claude Code resource store. Source of truth: `resources/`.

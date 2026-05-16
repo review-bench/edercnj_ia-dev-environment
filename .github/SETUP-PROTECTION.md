@@ -1,5 +1,13 @@
 # GitHub Branch Protection Setup Guide
 
+> **⚠️ SUPERSEDED (Java/CI removal).** This repository was converted into a pure
+> Claude Code resource store: the Java/Maven build and **all GitHub Actions
+> workflows were removed**. The required status checks listed below (e.g.
+> `lifecycle-integrity-audit`, the `test` job) **no longer exist**. Configure
+> branch protection without required status checks, or add new shell/markdown
+> checks if CI is reintroduced. The content below is kept for historical
+> reference only.
+
 This guide documents the required GitHub branch protection configuration for
 `ia-dev-environment` as defined by EPIC-0059 (Zero-Bypass Lifecycle Enforcement).
 
