@@ -36,6 +36,7 @@ Read before starting:
 - `.claude/templates/_TEMPLATE-STORY.md` (RA9 v2: 9 sections)
 - `.claude/templates/_TEMPLATE-IMPLEMENTATION-MAP.md`
 - `.claude/skills/planning-standards-kp/SKILL.md` — **Mandatory** RA9 9-section model (source of truth), granularity per level (Epic/Story/Task), Packages Hexagonal catalog format, Decision Rationale micro-template
+- `.claude/skills/spec-driven-kp/SKILL.md` — Planning Depth Tier (§1), Gray-Area Discovery (§2), Knowledge Verification Chain (§3), REQ-ID traceability (§4). Assign the epic/story tier and resolve gray areas before decomposition. Subordinate to Rule 27.
 - `.claude/knowledge/refinement/decomposition-guide.md` (shared knowledge pack)
 
 If any template is missing, stop and tell the user.

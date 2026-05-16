@@ -13,6 +13,8 @@ requires-capabilities: []
 
 Single source of truth for the RA9 model. Every plan artifact (Epic, Story, Task) MUST contain the 9 fixed sections in the canonical order below. Skills reference this KP via `@planning-standards-kp` instead of duplicating the contract inline.
 
+> **See also `@spec-driven-kp`.** RA9 defines *which* sections are mandatory (always all 9). `@spec-driven-kp` §1 defines *how deep* each section goes per **Planning Depth Tier** — it never removes a section (subordinate to Rule 27). REQ-ID traceability (§4) is additive to `RULE-NNN`. Gray-Area capture lands in Story `### 8.1`.
+
 ---
 
 ## 1. Contexto & Escopo

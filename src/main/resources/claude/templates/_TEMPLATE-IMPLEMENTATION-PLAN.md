@@ -15,6 +15,24 @@
 
 {{EXECUTIVE_SUMMARY}}
 
+## Knowledge Verification Provenance
+
+> `@spec-driven-kp` §3 — every technical assertion below was sourced via the chain
+> codebase → docs → MCP/Context7 → web → `UNVERIFIED` (never fabricate).
+> TIER-1 may collapse this to a single `verified against: <ref>` line.
+
+| Claim | Chain step | Source ref | Status |
+| :--- | :--- | :--- | :--- |
+| {{TECHNICAL_CLAIM}} | codebase\|docs\|mcp\|web\|none | {{SOURCE_REF}} | verified\|UNVERIFIED |
+
+## Requirement Traceability
+
+> `@spec-driven-kp` §4 — additive to RULE-NNN and the `Task:` commit trailer.
+
+| REQ-ID | Acceptance Criterion | AT / UT | Task | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| {{REQ_ID}} | {{ACCEPTANCE_CRITERION}} | {{AT_UT}} | {{TASK_ID}} | planned\|done |
+
 ## Package Structure
 
 > Aligned with RA9 Section 2 (Packages Hexagonal — planning-standards-kp).
