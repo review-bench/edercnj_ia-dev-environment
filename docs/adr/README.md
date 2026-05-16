@@ -36,6 +36,7 @@
 | ADR-0031 | [Product-First Capability Registration (EPIC-0077)](ADR-0031-product-first-capability-registration.md) | Accepted | 2026-05-04 |
 | ADR-0032 | [Product-First Lifecycle Finalization (EPIC-0077)](ADR-0032-product-first-lifecycle-finalization.md) | Accepted | 2026-05-05 |
 | ADR-0048 | [Java-Only Scope for the ia-dev-env Generator (EPIC-0048)](ADR-0048-java-only-scope.md) | Accepted | 2026-04-22 |
+| ADR-0050 | [Selective Adoption of `tlc-spec-driven` Concepts](ADR-0050-spec-driven-adoption.md) | Accepted | 2026-05-16 |
 
 > **Note (2026-04-29):** ADRs 0018–0021 are renumbered duplicates from a prior numbering collision (originally 0015-zero-bypass, 0016-preflight, 001-hexagonal, 0048-B). The canonical ADRs at 0015, 0016, and 0048 retain their original numbers.
 

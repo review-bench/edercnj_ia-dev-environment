@@ -82,6 +82,13 @@ Phase 5: WRITE PLAN           -> Assemble + write plan-task-*.md per template
 P5.  PUSH             -> x-push-branch --branch epic/<XXXX> (optional)
 ```
 
+> **Spec-Driven Disciplines (`@spec-driven-kp`).** Phase 5 MUST fill the task plan's
+> `## 0. Knowledge Verification Provenance & REQ` block: every technical claim sourced
+> via the Knowledge Verification Chain (§3 — codebase → docs → MCP → web →
+> `UNVERIFIED`, never fabricate) and the covered `REQ-<DOMÍNIO>-NN` (§4) recorded for
+> the commit trailer `Requirement:`. Section depth follows the story Planning Depth
+> Tier (§1); subordinate to Rule 27 — no section removed.
+
 ## Steps P1 + P2 — Worktree + Epic Branch Prelude
 
 Apply the canonical [orchestrator prelude](../_shared/orchestrator-prelude.md) using

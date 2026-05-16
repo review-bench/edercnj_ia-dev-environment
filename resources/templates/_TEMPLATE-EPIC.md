@@ -11,6 +11,11 @@ template-version: "3.0"
 **Status:** <Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada>
 **Source Feature:** <feature-id or N/A>  _(optional — N/A when epic was not originated from a Feature)_
 **Source Feature Link:** <url or —>
+**Planning Depth Tier:** <TIER-1 | TIER-2 | TIER-3> — trigger: <o que forçou o tier>
+
+> **Planning Depth Tier (`@spec-driven-kp` §1).** Escala apenas a profundidade de
+> conteúdo — **não** remove seção, artefato, gate ou telemetria (subordinado a
+> Rule 27). Stories herdam o tier do épico salvo justificativa explícita.
 
 > **Status Transitions (Rule 29 — refinement-gate):**
 > artifacts lifecycle-controlados (Story/Task) usam o enum canônico
@@ -260,6 +265,16 @@ regen:
 | <Nome do documento/spec> | Spec / ADR / Epic / PRD / Pós-mortem | <Link> | <Por que este artefato é relevante para este épico> |
 | <ADR-XXXX — Nome> | ADR | <Link> | <Decisão que afeta este épico> |
 | <EPIC-XXXX — Nome> | Epic predecessor | <Link> | <Como este épico se relaciona> |
+
+### Knowledge Sources (`@spec-driven-kp` §3 — Knowledge Verification Chain)
+
+> Proveniência dos fatos técnicos afirmados neste épico. Cadeia: codebase → docs →
+> MCP/Context7 → web → `UNVERIFIED` (nunca fabricar). TIER-1 pode resumir em uma
+> linha `verified against:`.
+
+| Afirmação técnica | Passo da cadeia | Fonte (path/url) | Status |
+| :--- | :--- | :--- | :--- |
+| <fato afirmado> | codebase\|docs\|mcp\|web\|none | <ref> | verified\|UNVERIFIED |
 
 ### Branching (EPIC-0065 — Feature Creation Chain)
 

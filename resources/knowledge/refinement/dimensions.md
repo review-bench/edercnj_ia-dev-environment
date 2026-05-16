@@ -61,6 +61,15 @@ Each persona-agent loads this KP alongside its own `agents/core/<persona>.md` to
 **Advisory (question, not NO-GO):**
 - AC has ≥8 scenarios — suggest grouping or splitting the story
 
+**Gray-Area input (`@spec-driven-kp` §2 — folds into this `ac` dimension):**
+- Treat **unresolved user-facing ambiguity** (layout, interaction, error-handling,
+  tone, data shape, integration contract) as an `ac`/`value` NO-GO when it is **not**
+  recorded in the story's `### 8.1 Gray Area Decisions` (or marked
+  `UNRESOLVED — assumption:` under `--non-interactive`).
+- This is evaluated under the **existing** `ac` and `value` dimensions. It adds **no**
+  new key to `refinementVerdict.dimensions`; the verdict schema and `verdictHash` are
+  unchanged (Rule 29 contract preserved).
+
 ---
 
 ### 4. Contracts

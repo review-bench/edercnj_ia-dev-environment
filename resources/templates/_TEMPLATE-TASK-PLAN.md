@@ -23,6 +23,21 @@ story-id: {{STORY_ID}}
 
 ---
 
+## 0. Knowledge Verification Provenance & REQ
+
+> `@spec-driven-kp` §3/§4 — fatos técnicos verificados (codebase → docs → MCP → web →
+> `UNVERIFIED`, nunca fabricar) e requisito coberto. TIER-1 pode resumir em uma linha
+> `verified against: <ref>`. O `REQ-ID` deve casar com o do Test Plan e ir no trailer
+> de commit `Requirement: {{REQ_ID}}`.
+
+| Claim | Chain step | Source ref | Status |
+| :--- | :--- | :--- | :--- |
+| {{TECHNICAL_CLAIM}} | codebase\|docs\|mcp\|web\|none | {{SOURCE_REF}} | verified\|UNVERIFIED |
+
+**REQ-ID coberto:** `{{REQ_ID}}`
+
+---
+
 ## 1. Contexto na Story
 
 > OBRIGATÓRIO — back-reference explícita: qual parte da story esta task implementa?

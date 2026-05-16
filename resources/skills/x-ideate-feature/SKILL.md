@@ -62,6 +62,13 @@ Phase 3: PR       -> Skill x-commit-changes (docs:) + Skill x-create-pr (--no-au
 Phase 4: REPORT   -> Structured stdout + mandatory next-step phrase (no auto-chain to x-create-feature — operator invokes manually)
 ```
 
+> **Spec-Driven Disciplines (`@spec-driven-kp`).** Phase 1 MUST run **Gray-Area
+> Discovery** (§2): scan the prose for user-facing ambiguity and, if any, raise the
+> single batched `AskUserQuestion` before emitting the spec (or, in
+> `--non-interactive`, mark `UNRESOLVED — assumption:`). Phase 2 MUST assign a
+> **Planning Depth Tier** (§1) and apply the **Knowledge Verification Chain** (§3):
+> never fabricate technical facts — flag `UNVERIFIED`.
+
 Detailed Phase 0–4 procedures, deep-reasoning subagent prompt with 8-key extraction contract, full RA9 v2 minimal template, validation rules, and report format live in [`references/full-protocol.md`](references/full-protocol.md):
 
 - **Phase 0** (§Phase 0): input-source detection (file vs inline); 100-char minimum guard; kebab-slug derivation (first 5 words, ASCII-only, max 40 chars); `Skill(x-manage-worktrees, model: haiku)` create with `feature-ideation-<slug>` identifier.

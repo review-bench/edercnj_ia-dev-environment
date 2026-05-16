@@ -145,6 +145,8 @@ Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh start x-plan
 
 Read knowledge packs **in order** before generating the architecture plan. For Simplified Plan, read only Architecture KP + KPs relevant to affected sections.
 
+Also read `.claude/skills/spec-driven-kp/SKILL.md`: apply the **Knowledge Verification Chain** (§3) — every architectural assertion (library behaviour, protocol, schema) must be sourced (codebase → docs → MCP/Context7 → web → `UNVERIFIED`, never fabricate) and recorded in the plan's `## Knowledge Verification Provenance` table. Section depth follows the story **Planning Depth Tier** (§1). Subordinate to Rule 27 — the 13 mandatory sections are always emitted; only depth scales.
+
 <!-- TELEMETRY: phase.end -->
 Bash command: `$CLAUDE_PROJECT_DIR/.claude/hooks/telemetry-phase.sh end x-plan-architecture Phase-1-KP-Read ok`
 

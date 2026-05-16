@@ -14,6 +14,16 @@
 
 {{EXECUTIVE_SUMMARY}}
 
+## Knowledge Verification Provenance
+
+> `@spec-driven-kp` §3 — architecture assertions (library behaviour, protocol, schema)
+> sourced via codebase → docs → MCP/Context7 → web → `UNVERIFIED` (never fabricate).
+> TIER-1 may collapse to a single `verified against: <ref>` line.
+
+| Claim | Chain step | Source ref | Status |
+| :--- | :--- | :--- | :--- |
+| {{TECHNICAL_CLAIM}} | codebase\|docs\|mcp\|web\|none | {{SOURCE_REF}} | verified\|UNVERIFIED |
+
 ## Component Diagram
 
 ```mermaid

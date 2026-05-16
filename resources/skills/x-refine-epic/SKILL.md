@@ -77,6 +77,12 @@ Phase D: ARCHITECT CONSOLIDATE -> Opus-tier architect agent merges sections, eva
                                   Dual-write: execution-state.json + epic markdown (skipped on --dry-run).
 ```
 
+> **Gray-Area input (`@spec-driven-kp` §2).** Phase A persona agents MUST treat
+> unresolved user-facing ambiguity as a NO-GO under the **existing** strategic
+> dimensions (value/problem/alternatives). This adds **no** key to
+> `refinementVerdict.dimensions` — the schema and `verdictHash` are unchanged
+> (Rule 29 contract preserved).
+
 ## Phases A–D
 
 The detailed inline protocol for each phase (full persona Agent() prompts with all dimension-specific NO-GO rules, telemetry sub-markers per persona, Phase B dedup heuristic, Phase D consolidator algorithm with section merge targets and the verdict format) lives in [`references/full-protocol.md`](references/full-protocol.md):

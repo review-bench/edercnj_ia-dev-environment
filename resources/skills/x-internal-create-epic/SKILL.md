@@ -53,6 +53,9 @@ Read the following files before starting:
 **Decomposition philosophy (how to identify stories and rules):**
 - `.claude/knowledge/refinement/decomposition-guide.md`
 
+**Spec-driven disciplines:**
+- `.claude/skills/spec-driven-kp/SKILL.md` — set the epic `**Planning Depth Tier:**` (§1) and fill `### Knowledge Sources` provenance (§3, never fabricate). Subordinate to Rule 27 — depth scales, no section/artifact removed.
+
 If any template file is missing, stop and tell the user. The templates define the output structure
 and must be read fresh from disk every time (never hardcode the structure).
 

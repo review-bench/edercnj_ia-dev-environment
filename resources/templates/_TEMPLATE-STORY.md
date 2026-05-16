@@ -8,6 +8,13 @@ template-version: "2.0"
 **ID:** <story-XXXX-YYYY>
 **Chave Jira:** <CHAVE-JIRA>
 **Status:** Pendente
+**Planning Depth Tier:** <TIER-1 | TIER-2 | TIER-3> — trigger: <o que forçou o tier>
+
+> **Planning Depth Tier (`@spec-driven-kp` §1).** Classifica a profundidade de
+> conteúdo das seções — **nunca** remove seção, artefato, gate ou telemetria
+> (subordinado a Rule 27). Default na dúvida: `TIER-2`. Qualquer gatilho TIER-3
+> (domínio novo/ambíguo, integração externa, superfície de segurança/dados,
+> irreversível) ⇒ `TIER-3`.
 
 > **Status Transitions (Rule 29 — refinement-gate):**
 > valores permitidos `Pendente | Refinada | Planejada | Em Andamento | Concluída | Falha | Bloqueada`.
@@ -70,8 +77,14 @@ Como **<persona específica>**, quero <capacidade/ação concreta>, para que <be
 > - `Error/Boundary` — falha externa controlada, valores nos limites do domínio
 > - `Performance/SLA` — tempo de resposta, throughput, tamanho de payload
 > - `Security` — autenticação, autorização, injeção, dados sensíveis
+>
+> **Rastreabilidade (`@spec-driven-kp` §4):** anote cada `Cenario:` com o requisito
+> que ele cobre, na linha de comentário Gherkin imediatamente acima:
+> `# REQ-<DOMÍNIO>-NN`. O mesmo `REQ-ID` deve aparecer no Test Plan (AT/UT) e no
+> trailer de commit `Requirement: REQ-<DOMÍNIO>-NN`.
 
 ```gherkin
+# REQ-<DOMÍNIO>-NN
 Cenario: Degenerate — <input nulo/vazio/zero>
   DADO que <pré-condição de caso nulo ou entrada mínima>
   QUANDO <ação é executada com esse input>
@@ -137,6 +150,14 @@ Cenario: Security — <autenticação, autorização ou sanitização>
 | `timestamp` | `Instant` | Sim | ISO-8601 UTC |
 | `correlationId` | `UUID` | Sim | ID de correlação |
 | `payload` | `Object` | Sim | Payload do evento |
+
+### 5.5 Rastreabilidade de Requisitos (`@spec-driven-kp` §4)
+
+> Aditivo a `RULE-NNN` e ao trailer `Task:`. Liga requisito → AC → teste → task.
+
+| REQ-ID | Critério de Aceite (Cenario) | AT / UT | Task | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| `REQ-<DOMÍNIO>-01` | `<Cenario: Happy — ...>` | `<AT-NN / UT-NN>` | `TASK-...-NNN` | `<planned\|done>` |
 
 ---
 
@@ -215,6 +236,23 @@ regen:
 **Motivo:** <por que esta opção foi escolhida — restrição técnica ou de negócio>
 **Alternativa descartada:** <o que foi rejeitado e por quê>
 **Consequência:** <trade-off ou implicação futura>
+
+### 8.1 Gray Area Decisions (`@spec-driven-kp` §2 — condicional)
+
+> Preencher quando havia ambiguidade *user-facing* (layout, interação, tratamento de
+> erro, tom, formato de dado, contrato de integração) resolvida via `AskUserQuestion`
+> **antes do design**. Em `--non-interactive`, registrar
+> `UNRESOLVED — assumption: <suposição>` e tratar como candidato a blocker de
+> refinamento. Não adiciona chave ao `refinementVerdict.dimensions` (Rule 29 intacto).
+
+- _Sem gray areas — N/A._ <!-- ou repetir o micro-template de 4 linhas por decisão -->
+
+### 8.2 Deferred Ideas (`@spec-driven-kp` §5 — condicional)
+
+> Ideias fora de escopo que surgiram durante o trabalho. Nunca implementadas
+> silenciosamente. Store primário: `execution-state.json.deferredIdeas[]`.
+
+- _Nenhuma._ <!-- ou: `<id>` — `<nota>` — alvo sugerido: `<epic/feature futuro>` -->
 
 ---
 
